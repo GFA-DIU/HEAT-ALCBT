@@ -1,0 +1,13 @@
+<ul class="list-group">
+    {% for item in items %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{ item }}
+        <button class="btn btn-secondary"
+                hx-delete="{% url 'home' %}?item={{ item }}" 
+                hx-target="#item-list" 
+                hx-swap="innerHTML">
+            Delete
+        </button>
+    </li>
+    {% endfor %}
+</ul>
