@@ -1,0 +1,13 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}List view{% endblock title %}
+{% block content %}
+<h1>Item List</h1>
+
+{% include "pages/home/building_list/item_select.html" %}
+
+<div id="item-list">
+    {% include "pages/home/building_list/item.html" %}
+</div>
+{% endblock %}
