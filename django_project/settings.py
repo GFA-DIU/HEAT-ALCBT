@@ -1,5 +1,49 @@
 from pathlib import Path
 
+from django.utils.log import DEFAULT_LOGGING
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        },
+        'django.server': DEFAULT_LOGGING['formatters']['django.server'],  # Use Django's default formatter for server logs
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/root.log',
+            'formatter': 'standard',
+            'encoding': 'utf-8',
+            'mode': 'a',
+        },
+        'django.server': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',  # Typically used for console output in development
+            'formatter': 'django.server',
+        },
+    },
+    'root': {
+        'handlers': ['file'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.server': {  # Specific logger for server logs
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
