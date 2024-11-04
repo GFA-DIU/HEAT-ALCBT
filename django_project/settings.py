@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "debug_toolbar",
+    'cities_light',
     # Local
     "accounts",
     "pages",
@@ -247,3 +248,13 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
+
+
+# Cities light
+# https://django-cities-light.readthedocs.io/en/stable-3.x.x/full.html#module-cities_light.settings
+CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en', 'abbr']
+CITIES_LIGHT_INCLUDE_COUNTRIES = [
+    'IN',  # India
+    'ID',  # Indonesia
+]
+
