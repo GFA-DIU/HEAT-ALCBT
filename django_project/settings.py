@@ -97,6 +97,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
+    
+    # own
+    'django_project.middleware.LoginRequiredMiddleware',
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
