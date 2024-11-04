@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from cities_light.models import Country, City
 
 class CustomUser(AbstractUser):
-    pass
+    email = models.EmailField(unique=True, blank=False, null=False)
 
     def __str__(self):
         return self.email

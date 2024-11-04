@@ -232,6 +232,7 @@ SITE_ID = 1
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = "home"
+ACCOUNT_SIGNUP_REDIRECT_URL = 'update_profile'
 
 # https://django-allauth.readthedocs.io/en/latest/views.html#logout-account-logout
 ACCOUNT_LOGOUT_REDIRECT_URL = "home"
