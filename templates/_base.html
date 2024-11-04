@@ -46,7 +46,7 @@
                 Settings
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#">{{ user.email }}</a></li>
+                <li><a class="dropdown-item" href="{% url 'update_profile' %}">{{ user.email }}</a></li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>
@@ -60,9 +60,20 @@
     </div>
   </nav>
   {% endif %}
+  <!--Any flash messages pop up in any page because this is the base template-->
+  {% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible d-flex align-items-center justify-content-between" role="alert">
+        <span>{{ message }}</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
 
-  <div class="container">
+  <div class="container pb-2">
     {% block content %}
     <p>Default content...</p>
     {% endblock content %}
