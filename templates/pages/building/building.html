@@ -18,35 +18,8 @@
         <button class="btn btn-success m-2 mt-0">Add Component</button>
     </div>
 
-    <ul class="list-group">
-        {% for component in items.components %}
-        <li class="list-group-item d-flex justify-content-between align-items-center position-relative">
-            <!-- Component name and main content -->
-            <div class="col-4">
-                <h5 class="mb-1">{{ component.name }}</h5>
-                <div class="d-flex flex-row">
-                    <span class="text-muted ms-1">Quantity: {{ component.quantity }}</span>
-                    <span class="text-muted ms-1">Type: {{ component.material }}</span>
-                </div>
-            </div>
-    
-            <!-- Emissions (centered) -->
-            <div class="col-4 d-flex justify-content-center align-items-center">
-                <span class="badge border border-success text-success bg-transparent rounded-pill" style="font-size: medium;"> Emissions: {{ component.emissions }}kg</span>
-            </div>
-    
-            <!-- Action Buttons -->
-            <div class="col-4 d-flex justify-content-end align-items-center gap-2">
-                <button class="btn btn-primary">Edit</button>
-                <button class="btn btn-danger"
-                        hx-delete="{% url 'home' %}?item={{ item.name }}" 
-                        hx-target="#item-list" 
-                        hx-swap="innerHTML">
-                    Delete
-                </button>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
+    <div id="item-list">    
+        {% include "pages/building/building_list/building_item.html" %}
+    </div>
 </div>
 {% endblock %}
