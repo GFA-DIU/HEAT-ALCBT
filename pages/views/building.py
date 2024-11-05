@@ -25,24 +25,24 @@ class Building:
 
 
 item = Building(
-    name="Building 1",
-    country="India",
+    name="Test Building 1",
+    country="New Dehli, India",
     components=[
         StructElement(
             id="1",
-            name="Component 1",
+            name="Intermediate Floor construction",
             country="Germany",
-            material="wood",
-            quantity="20",
-            emissions="30",
+            material="Concrete Filler Slab",
+            quantity="100",
+            emissions="7946,51",
         ),
         StructElement(
             id="2",
-            name="Component 2",
+            name="Bottom Floor Construction",
             country="Germany",
-            material="clay",
-            quantity="10",
-            emissions="15",
+            material="Precast Concrete Double Tee Floor Units",
+            quantity="100",
+            emissions="6341,36",
         ),
     ],
 )
