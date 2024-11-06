@@ -2,12 +2,13 @@ import logging
 
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 logger = logging.getLogger(__name__)
 
 items = ["Apple", "Banana", "Cherry", "Date", "Elderberry"]
 
-
+@login_required
 @require_http_methods(["GET", "POST", "DELETE"])
 def item_list(request):
     global items
