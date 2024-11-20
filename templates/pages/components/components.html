@@ -1,0 +1,94 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Component Creation</h1>
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+<div class="scoped-container">
+    <div class="fields-container">
+        <!-- Row 1: Name and Country -->
+        <div class="fields-row">
+            <div class="field">
+                <label for="name">Name:</label>
+                <span contenteditable="true" id="name" class="editable-field" data-key="Name">{{ fields.Name }}</span>
+            </div>
+            <div class="field">
+                <label for="country">Country:</label>
+                <select id="country-dropdown">
+                    {% for country in countries %}
+                    <option value="{{ country }}" {% if country == fields.Country %}selected{% endif %}>
+                        {{ country }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Row 2: Public and Surface -->
+        <div class="fields-row">
+            <div class="field">
+                <label for="public-toggle">Public:</label>
+                <label class="switch">
+                    <input type="checkbox" id="public-toggle" data-current="{{ fields.Public }}" {% if fields.Public == "Yes" %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="field">
+                <label for="surface">Surface:</label>
+                <span contenteditable="true" id="surface" class="editable-field" data-key="Surface">{{ fields.Surface }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include a button to save changes -->
+<button id="save-button">Save Changes</button>
+
+<script>
+    // Function to toggle the Public field between "Yes" and "No"
+    function togglePublic(button) {
+        const currentValue = button.getAttribute("data-current");
+        const newValue = currentValue === "Yes" ? "No" : "Yes";
+        button.textContent = newValue;
+        button.setAttribute("data-current", newValue);
+    }
+
+    // Save button functionality
+    document.getElementById("save-button").addEventListener("click", function () {
+        const fields = {};
+
+        // Collect editable fields
+        document.querySelectorAll(".editable-field").forEach(field => {
+            const key = field.getAttribute("data-key");
+            const value = field.textContent.trim();
+            fields[key] = value;
+        });
+
+        // Get the Public toggle value
+        const publicToggle = document.getElementById("public-toggle");
+        fields["Public"] = publicToggle.getAttribute("data-current");
+
+        // Get the selected country
+        const countryDropdown = document.getElementById("country-dropdown");
+        fields["Country"] = countryDropdown.value;
+
+        // Send data to the server using Fetch API
+        fetch("{% url 'components' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify(fields)
+        })
+        .then(response => response.json())
+        .then(result => {
+            alert("Changes saved!");
+        })
+        .catch(error => {
+            console.error("Error saving changes:", error);
+        });
+    });
+</script>
+{% endblock %}

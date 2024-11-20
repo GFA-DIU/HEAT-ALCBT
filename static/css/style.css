@@ -1,0 +1,38 @@
+/* Scoped styles for the container */
+.scoped-container .fields-container {
+    display: flex;
+    flex-direction: column; /* Arrange rows vertically */
+    gap: 20px; /* Spacing between rows */
+}
+
+/* Each row contains two fields */
+.scoped-container .fields-row {
+    display: flex;
+    justify-content: space-between; /* Spread fields evenly in a row */
+    gap: 20px; /* Spacing between fields in a row */
+}
+
+/* Individual field styling */
+.scoped-container .field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Spacing between label and input */
+    flex: 1; /* Ensure equal width for fields in a row */
+}
+
+.scoped-container label {
+    font-weight: bold;
+}
+
+.scoped-container select, 
+.scoped-container .editable-field {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%; /* Ensure fields span the available space */
+    box-sizing: border-box;
+}
+
+.scoped-container .switch {
+    margin-top: 10px; /* Align toggle button nicely */
+}
