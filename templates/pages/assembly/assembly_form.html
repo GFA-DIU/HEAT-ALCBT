@@ -1,0 +1,225 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Assembly creation</h1>
+
+
+<form id="assembly-form" hx-post="{% url 'assembly' %}" hx-target="#response" hx-swap="innerHTML">
+    {% csrf_token %}
+    
+    <!-- Row for Assembly Name and Country -->
+    <div class="row mb-3">
+        <!-- Assembly Name -->
+        <div class="col-md-6">
+            <label for="{{ form.assembly_name.id_for_label }}" class="form-label">Assembly Name:</label>
+            {{ form.assembly_name }}
+            <div class="invalid-feedback">
+                Please provide an assembly name.
+            </div>
+        </div>
+        
+        <!-- Country -->
+        <div class="col-md-6">
+            <label for="{{ form.country.id_for_label }}" class="form-label">Country:</label>
+            {{ form.country }}
+        </div>
+    </div>
+    
+    <!-- Row for Measurement type and Toggle Button -->
+    <div class="row mb-3 align-items-center">
+        <!-- Measurement type -->
+        <div class="col-md-6">
+            <label for="{{ form.measurement_type.id_for_label }}" class="form-label">Measurement type:</label>
+            {{ form.measurement_type }}
+        </div>
+        
+        <!-- Public Toggle -->
+        <div class="col-md-6">
+            <div class="form-check form-switch"> <!-- Add margin-top to align with the measurement field -->
+                <label class="form-check-label" for="{{ form.public.id_for_label }}">Public</label>
+                {{ form.public }}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Materials Selection Section -->
+    <div class="mt-4">
+        <h3>Selected Materials</h3>
+        
+        <!-- Selected Materials List -->
+        <div class="card mb-3">
+            <div class="card-body" id="selected-materials" style="height: 150px; overflow-y: auto;">
+                <p id="no-materials-message" class="text-muted">No materials selected</p>
+                <!-- Dynamically populated list of selected materials -->
+            </div>
+        </div>
+        
+
+        <h3>Material Library</h3>
+        <!-- Search Box -->
+        <div class="input-group mb-3">
+            <input type="text" id="material-search" class="form-control" placeholder="Search materials...">
+        </div>
+        
+        <!-- Materials List -->
+        <div class="card mb-3" style="height: calc(3 * 4rem); overflow-y: auto;">
+            <div class="card-body">
+                <div id="materials-list">
+                    <p id="no-results-message" class="text-muted text-center m-0" style="display: none;">No results found</p>
+                    {% for material in materials %}
+                    <div class="card mb-2 material-item">
+                        <div class="card-body d-flex justify-content-between align-items-center p-2">
+                            <span>{{ material.name }}</span>
+                            <button class="btn btn-sm btn-primary add-material" data-id="{{ material.id }}" data-name="{{ material.name }}">Add</button>
+                        </div>
+                    </div>    
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+
+<div id="response" class="mt-3"></div>
+
+<!-- HTMX for dynamic interactions -->
+<script src="https://unpkg.com/htmx.org@1.9.3"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const materialSearch = document.getElementById('material-search'); // Input field
+        const materialsList = document.getElementById('materials-list');  // Container of materials
+        const materialItems = materialsList.querySelectorAll('.material-item'); // All material items
+        const noResultsMessage = document.getElementById('no-results-message'); // "No results found" message
+        const selectedMaterials = document.getElementById('selected-materials');
+        const noMaterialsMessage = document.getElementById('no-materials-message'); // "No materials selected" message
+        const form = document.getElementById('assembly-form');
+        const saveChangesButton = document.querySelector('button[type="submit"]');
+        const requiredFields = form.querySelectorAll('[required]'); // Select all required fields
+
+        // Prevent default validation for non-submit interactions
+        form.addEventListener('submit', function (e) {
+            // Suppress validation unless triggered by "Save Changes"
+            if (!saveChangesButton.contains(document.activeElement)) {
+                e.preventDefault();
+            }
+        });
+
+        // Validate fields on Save Changes click
+        saveChangesButton.addEventListener('click', function (e) {
+            let hasErrors = false;
+
+            // Reset previous highlights
+            requiredFields.forEach(field => {
+                field.classList.remove('is-invalid'); // Remove Bootstrap's error styling
+            });
+
+            // Check for empty required fields
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    hasErrors = true;
+                    field.classList.add('is-invalid'); // Add Bootstrap's error styling
+                }
+            });
+
+            // Prevent form submission if there are errors
+            if (hasErrors) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+            }
+        });
+
+
+
+        // Function to toggle the visibility of the "No materials selected" message
+        function toggleNoMaterialsMessage() {
+            if (selectedMaterials.querySelectorAll('.card').length > 0) {
+                noMaterialsMessage.style.display = 'none';
+            } else {
+                noMaterialsMessage.style.display = 'block';
+            }
+        }
+    
+        // Function to toggle the visibility of the "No results found" message
+        function toggleNoResultsMessage(hasResults) {
+            noResultsMessage.style.display = hasResults ? 'none' : 'block';
+        }
+    
+        // Initial checks
+        toggleNoMaterialsMessage();
+    
+        // Search functionality
+        materialSearch.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase(); // Get search input and make it lowercase
+            let hasResults = false; // Track if any items match the search term
+    
+            materialItems.forEach(item => {
+                const materialName = item.querySelector('span').textContent.toLowerCase(); // Get material name
+                if (materialName.includes(searchTerm)) {
+                    item.style.display = 'block'; // Show item if it matches the search
+                    hasResults = true; // At least one match found
+                } else {
+                    item.style.display = 'none'; // Hide item if it doesn't match
+                }
+            });
+    
+            // Toggle "No results found" message based on search results
+            toggleNoResultsMessage(hasResults);
+        });
+    
+        // Add material to selected list
+        materialsList.addEventListener('click', function (e) {
+            if (e.target.classList.contains('add-material')) {
+                e.preventDefault(); // Prevent the button from submitting the form
+                const id = e.target.getAttribute('data-id');
+                const name = e.target.getAttribute('data-name');
+    
+                // Check if material is already selected
+                if (selectedMaterials.querySelector(`[data-id="${id}"]`)) {
+                    alert('Material already selected.');
+                    return;
+                }
+    
+                // Create selected material element
+                const materialDiv = document.createElement('div');
+                materialDiv.classList.add('card', 'mb-2');
+                materialDiv.setAttribute('data-id', id);
+    
+                const materialBody = document.createElement('div');
+                materialBody.classList.add('card-body', 'd-flex', 'justify-content-between', 'align-items-center', 'p-2');
+    
+                materialBody.innerHTML = `
+                    <span>${name}</span>
+                    <div class="d-flex align-items-center ms-auto">
+                        <input type="number" name="material_${id}_quantity" class="form-control form-control-sm mx-2" style="width: 100px;" placeholder="Quantity" required>
+                        <button class="btn btn-sm btn-danger remove-material">Delete</button>
+                    </div>
+                `;
+    
+                materialDiv.appendChild(materialBody);
+                selectedMaterials.appendChild(materialDiv);
+    
+                // Hide the placeholder message
+                toggleNoMaterialsMessage();
+            }
+        });
+    
+        // Remove material from selected list
+        selectedMaterials.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-material')) {
+                e.target.closest('.card').remove();
+                // Show the placeholder message if no materials are selected
+                toggleNoMaterialsMessage();
+            }
+        });
+    });
+        
+</script>
+
+
+
+{% endblock %}

@@ -34,4 +34,4 @@ class CustomUserUpdateForm(forms.ModelForm):
 class UserProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['country', 'city']
+        fields = ['country', 'city']        
