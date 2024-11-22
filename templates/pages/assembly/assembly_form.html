@@ -23,6 +23,9 @@
         <div class="col-md-6">
             <label for="{{ form.country.id_for_label }}" class="form-label">Country:</label>
             {{ form.country }}
+            <div class="invalid-feedback">
+                Please select a country.
+            </div>
         </div>
     </div>
     
@@ -32,6 +35,9 @@
         <div class="col-md-6">
             <label for="{{ form.measurement_type.id_for_label }}" class="form-label">Measurement type:</label>
             {{ form.measurement_type }}
+            <div class="invalid-feedback">
+                Please select a measurement type.
+            </div>
         </div>
         
         <!-- Public Toggle -->
