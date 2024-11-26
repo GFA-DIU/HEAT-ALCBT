@@ -19,12 +19,12 @@ class BaseModel(models.Model):
         _("Draft"), help_text=_("Is it still a draft"), default=False
     )
 
+    def __str__(self):
+        return self.name
+
 
 class MaterialCategory(BaseModel):
     name = models.CharField(_("Name"), max_length=255)
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         verbose_name = "Material category"
@@ -57,9 +57,6 @@ class Material(BaseModel):
         MaterialCategory, on_delete=models.SET_NULL, null=True, blank=True
     )
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = "Material"
         verbose_name_plural = "Materials"
@@ -85,9 +82,6 @@ class StructuralComponent(BaseModel):
         related_name="structural_components",
         through="StructuralComponentMaterial",
     )
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         verbose_name = "Structural component"
@@ -140,9 +134,6 @@ class StructuralComponentMaterial(models.Model):
 class BuildingSubcategory(BaseModel):
     name = models.CharField(_("Name"), max_length=255)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = "Building subcategory"
         verbose_name_plural = "Building subcategories"
@@ -153,9 +144,6 @@ class BuildingCategory(BaseModel):
     subcategories = models.ManyToManyField(
         BuildingSubcategory, blank=True, related_name="categories"
     )
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         verbose_name = "Building category"
@@ -183,9 +171,6 @@ class Building(BaseModel):
     subcategory = models.ForeignKey(
         BuildingSubcategory, on_delete=models.SET_NULL, null=True, blank=True
     )
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         verbose_name = "Structural component"
