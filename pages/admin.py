@@ -1,17 +1,11 @@
 from django.contrib import admin
-from .models import (
-    MaterialCategory,
-    Material,
-    StructuralComponent,
-    BuildingSubcategory,
-    BuildingCategory,
-    Building,
-)
+from .models.epd import MaterialCategory, EPD
+from .models.assembly import Product, Assembly
+from .models.building import Building
 
 # Register your models here.
 admin.site.register(MaterialCategory)
-admin.site.register(Material)
-admin.site.register(StructuralComponent)
-admin.site.register(BuildingSubcategory)
-admin.site.register(BuildingCategory)
+admin.site.register(EPD)
+admin.site.register(Product)
+admin.site.register(Assembly)
 admin.site.register(Building)

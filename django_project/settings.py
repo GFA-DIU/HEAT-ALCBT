@@ -103,6 +103,8 @@ MIDDLEWARE = [
     'django_project.middleware.LoginRequiredMiddleware',
 ]
 
+LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ['admin:login', 'admin:index']
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = "django_project.urls"
 
