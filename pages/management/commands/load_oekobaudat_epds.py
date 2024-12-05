@@ -1,4 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.contrib.auth import get_user_model
+
 from cities_light.models import Country
 
 from pages.scripts.oekobaudat.oekobaudat_loader import (
@@ -38,6 +40,8 @@ def store_epd(epd_data: dict):
         category_id=epd_data.get("classification")
     )
     country = Country.objects.get(name="Germany")
+    User = get_user_model()
+    superuser = User.objects.filter(is_superuser=True).values_list()[0]
 
     # Step 2: Create or update the EPD record
     epd, created = EPD.objects.update_or_create(
@@ -51,6 +55,11 @@ def store_epd(epd_data: dict):
             "source": epd_data["source"],
             "type": EPDType.OFFICAL,
             "country": country,
+            
+            # from base
+            "created_by": superuser,
+            "public": True,
+            "draft": False     
         },
     )
 
