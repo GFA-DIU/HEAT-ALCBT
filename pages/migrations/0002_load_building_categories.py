@@ -34,7 +34,7 @@ CATEGORIES_DICT = {
         "Light Industry",
         "Warehouse",
     ],
-    "Office": ["Grade A" "Grade B" "Grade C"],
+    "Office": ["Grade A", "Grade B", "Grade C"],
     "Healthcare": [
         "Nursing Homes",
         "Private Hospital",
@@ -58,18 +58,20 @@ CATEGORIES_DICT = {
 
 
 def create_default_categories(apps, schema_editor):
-    # We can't import the models directly as it may be a newer
-    # version than this migration expects. We use the historical version.
     BuildingCategory = apps.get_model("pages", "BuildingCategory")
     BuildingSubcategory = apps.get_model("pages", "BuildingSubcategory")
+    CategorySubcategory = apps.get_model("pages", "CategorySubcategory")
+
     for category, subcategories in CATEGORIES_DICT.items():
-        # There is a function get_or_create() that avoids this repeated code but comes with some issues
         category_obj, _ = BuildingCategory.objects.get_or_create(name=category)
         for subcategory in subcategories:
             subcategory_obj, _ = BuildingSubcategory.objects.get_or_create(
                 name=subcategory
             )
-            subcategory_obj.categories.add(category_obj)
+            # Use the through model to avoid duplicate relationships
+            CategorySubcategory.objects.get_or_create(
+                category=category_obj, subcategory=subcategory_obj
+            )
 
 
 class Migration(migrations.Migration):
