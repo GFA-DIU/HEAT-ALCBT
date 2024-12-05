@@ -22,10 +22,22 @@ $ source .venv/bin/activate
 (.venv) $ pip install -r requirements.txt
 (.venv) $ python manage.py migrate
 (.venv) $ python manage.py createsuperuser
+(.venv) $ python manage.py cities_light
 (.venv) $ python manage.py runserver
-(.venv) $ python manage.py cities_light  # populate with city info
 # Load the site at http://127.0.0.1:8000
 ```
+
+To load the EPD data from Ökobaudat:
+```
+(.venv) $ python manage.py load_oekobaudat_epds
+```
+
+### Info
+The basic `BuildingCategory` and `MaterialCategory` data is automatically imported through the migrations.
+
+
+
+### Background Info
 
 The app is based on the [djangox](https://github.com/wsvincent/djangox/assets/766418/a73ea730-a7b4-4e53-bf51-aa68f6816d6a) template, where additional information can be found.
 
