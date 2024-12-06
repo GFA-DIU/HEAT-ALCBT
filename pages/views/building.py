@@ -68,7 +68,7 @@ def building(request):
         item_to_delete = request.GET.get("component")
         item.components = [c for c in item.components if c.id != item_to_delete]
         return render(
-            request, "pages/building/building_list/building_item.html", context
+            request, "pages/building/structural_info/assemblies_list.html", context
         )  # Partial update for DELETE
 
     # Full page load for GET request
