@@ -9,6 +9,9 @@ from .base import BaseModel
 
 class BuildingSubcategory(models.Model):
     name = models.CharField(_("Name"), max_length=255)
+   
+    def __str__(self):
+        return f"{self.name}"
 
     class Meta:
         verbose_name = "Building subcategory"
@@ -34,7 +37,10 @@ class CategorySubcategory(models.Model):
     subcategory = models.ForeignKey(BuildingSubcategory, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ("category", "subcategory") 
+        unique_together = ("category", "subcategory")
+
+    def __str__(self):
+        return f"{self.category.name}: {self.subcategory.name}"
 
 
 class Building(BaseModel):
@@ -63,8 +69,8 @@ class Building(BaseModel):
     )
 
     class Meta:
-        verbose_name = "Structural component"
-        verbose_name_plural = "Structural components"
+        verbose_name = "Building"
+        verbose_name_plural = "Buildings"
 
 
 class BuildingAssembly(models.Model):

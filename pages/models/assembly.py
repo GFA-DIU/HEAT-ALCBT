@@ -75,6 +75,8 @@ class Assembly(BaseModel):
     )
     impacts = models.ManyToManyField(Impact, blank=False, related_name="assemblies", through="AssemblyImpact")
 
+    def __str__(self):
+        return self.name
 
 class Product(models.Model):
     """Products are EPDs with quantity and results."""
