@@ -219,8 +219,8 @@ class EPD(BaseModel, epdLCAx):
     category = models.ForeignKey(
         MaterialCategory, on_delete=models.SET_NULL, null=True, blank=True
     )
-    source= models.CharField(_("Source"), max_length=255)
-    type= models.CharField(_("Type"), max_length=255)
+    source= models.CharField(_("Source"), max_length=255, null=True, blank=True)
+    type= models.CharField(_("Type"), choices=EPDType.choices, max_length=255)
 
     def __str__(self):
         return self.name

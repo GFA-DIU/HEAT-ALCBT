@@ -79,7 +79,7 @@ class Assembly(BaseModel):
         return self.name
 
 class Product(models.Model):
-    """Products are EPDs with quantity and results."""
+    """Join Table for EPDs and Assemblied. Products are EPDs with quantity and results."""
     description = models.CharField(
         _("Description"), max_length=255, null=True, blank=True
     )
