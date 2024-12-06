@@ -204,6 +204,9 @@ class Impact(models.Model):
         self.clean()
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f"{self.impact_category} {self.life_cycle_stage}"
+
 
 class EPD(BaseModel, epdLCAx):
     """EPDs are the material information from offical databases."""
@@ -218,6 +221,9 @@ class EPD(BaseModel, epdLCAx):
     )
     source= models.CharField(_("Source"), max_length=255)
     type= models.CharField(_("Type"), max_length=255)
+
+    def __str__(self):
+        return self.name
     
 
 

@@ -52,6 +52,12 @@ class Building(BaseModel):
         related_name="buildings",
         through="BuildingAssembly",
     )
+    simulated_components = models.ManyToManyField(
+        Assembly,
+        blank=True,
+        related_name="buildingsimulations",
+        through="BuildingAssemblySimulated",
+    )
     category = models.ForeignKey(
         CategorySubcategory, on_delete=models.SET_NULL, null=True, blank=True
     )
@@ -62,6 +68,25 @@ class Building(BaseModel):
 
 
 class BuildingAssembly(models.Model):
+    assembly = models.ForeignKey(
+        Assembly, on_delete=models.CASCADE
+    )
+    building = models.ForeignKey(Building, on_delete=models.CASCADE)
+    quantity = models.DecimalField(
+        _("Quantity"),
+        help_text=_("How many of components"),
+        max_digits=10,
+        decimal_places=3,
+        null=False,
+        blank=False,
+    )
+
+    class Meta:
+        verbose_name = "Building structural component"
+        verbose_name_plural = "Building structural components"
+
+
+class BuildingAssemblySimulated(models.Model):
     assembly = models.ForeignKey(
         Assembly, on_delete=models.CASCADE
     )

@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext as _
+from django.core.exceptions import ValidationError
 
 from cities_light.models import Country, City
 
@@ -50,24 +51,6 @@ class AssemblyCategorySubcategory(models.Model):
     description = models.TextField()
 
 
-class Product(models.Model):
-    """Products are EPDs with quantity and results."""
-    description = models.CharField(
-        _("Description"), max_length=255, null=True, blank=True
-    )
-    epd = models.ForeignKey(EPD, on_delete=models.CASCADE)
-    input_unit = models.CharField(
-        _("Unit for quantity of EPD"),
-        max_length=20,
-        choices=Unit.choices,
-        default=Unit.UNKNOWN,
-    )
-
-    class Meta:
-        verbose_name = "Product"
-        verbose_name_plural = "Products"
-
-
 class Assembly(BaseModel):
     """Structural Element consisting of Products.
     """
@@ -84,19 +67,28 @@ class Assembly(BaseModel):
     classification = models.ForeignKey(
          AssemblyCategorySubcategory, on_delete=models.SET_NULL, null=True, blank=True
     )
-    comment = models.TextField(_("Comment"))
-    description = models.TextField(_("Description"))
+    comment = models.TextField(_("Comment"), null=True, blank=True)
+    description = models.TextField(_("Description"), null=True, blank=True)
     name = models.CharField(max_length=255)
     products = models.ManyToManyField(
-        Product, blank=True, related_name="assemblies", through="AssemblyProduct"
+        EPD, blank=True, related_name="assemblies", through="Product"
     )
     impacts = models.ManyToManyField(Impact, blank=False, related_name="assemblies", through="AssemblyImpact")
 
 
-class AssemblyProduct(models.Model):
-    """Join table for Product and Assembly."""
+class Product(models.Model):
+    """Products are EPDs with quantity and results."""
+    description = models.CharField(
+        _("Description"), max_length=255, null=True, blank=True
+    )
+    epd = models.ForeignKey(EPD, on_delete=models.CASCADE)
+    input_unit = models.CharField(
+        _("Unit for quantity of EPD"),
+        max_length=20,
+        choices=Unit.choices,
+        default=Unit.UNKNOWN,
+    )
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.DecimalField(
         _("Quantity of EPD"),
         max_digits=10,
@@ -105,9 +97,33 @@ class AssemblyProduct(models.Model):
         blank=False,
     )
 
+    def clean(self):
+            """
+            Validates that the `unit` matches the expected unit for the chosen `impact_category`.
+            """
+            super().clean()
+            expected_units = [i.get("unit") for i in self.epd.conversions]
+            expected_units.append(self.epd.declared_unit)
+            if self.input_unit not in expected_units:
+                raise ValidationError(
+                    {
+                        'input_unit': _(
+                            f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
+                            f"Expected unit: '{expected_units}'."
+                        )
+                    }
+                )
+
+    def save(self, *args, **kwargs):
+        """
+        Override save to include clean validation.
+        """
+        self.clean()
+        super().save(*args, **kwargs)
+
     class Meta:
-        verbose_name = "Assembly Product"
-        verbose_name_plural = "Assembly Products"
+        verbose_name = "Product"
+        verbose_name_plural = "Products"
 
 
 class AssemblyImpact(models.Model):
