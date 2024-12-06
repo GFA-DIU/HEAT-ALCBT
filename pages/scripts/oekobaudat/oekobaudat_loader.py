@@ -43,11 +43,15 @@ def get_all_epds() -> dict:
 
 
 def get_full_epd(uid: str) -> dict:
-    """Get the full dataset for a single EPD"""
+    """Get the full dataset for a single EPD
+    
+    Notes:
+     - If no version number is specified, the most recent dataset (with the highest version number) is always
+    returned. (ECO-Platform documentation on soda4LCA)
+    """
 
     base_url = f"{OKOBAU_URL}/processes/{uid}"
     response = requests.get(f"{base_url}?format=json&view=extended")
-
     response.raise_for_status()
     data = response.json()
     data["source"] = base_url
