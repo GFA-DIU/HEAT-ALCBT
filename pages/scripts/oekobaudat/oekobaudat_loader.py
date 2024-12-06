@@ -88,9 +88,10 @@ def parse_epd(epd: dict):
     parsed_epd = {}
     
     # parsing from JSON
-    _, name_en, names = get_names(epd)
+    name_de, name_en, names = get_names(epd)
+    name = name_en if name_en else name_de
     parsed_epd.update({
-        "name": name_en,
+        "name": name,
         "names": names,
         "source": "OEKOBAU.DAT"
     })

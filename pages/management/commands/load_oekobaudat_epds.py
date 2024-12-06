@@ -9,7 +9,14 @@ from pages.scripts.oekobaudat.oekobaudat_loader import (
     parse_epd,
 )
 
-from pages.models.epd import EPD, EPDType, MaterialCategory, EPDImpact, Impact
+from pages.models.epd import (
+    EPD,
+    EPDType,
+    MaterialCategory,
+    EPDImpact,
+    Impact,
+    INDICATOR_UNIT_MAPPING,
+)
 
 
 class Command(BaseCommand):
@@ -22,13 +29,9 @@ class Command(BaseCommand):
         for uuid in uuids:
             data = get_full_epd(uuid)
             epd = parse_epd(data)
-            self.stdout.write(
-                self.style.SUCCESS(("Starting %s", epd))
-            )
+            self.stdout.write(self.style.SUCCESS(("Starting %s", epd)))
             store_epd(epd)
-            self.stdout.write(
-                self.style.SUCCESS(("Successfully uploaded %s", uuid))
-            )
+            self.stdout.write(self.style.SUCCESS(("Successfully uploaded %s", uuid)))
 
 
 def store_epd(epd_data: dict):
@@ -41,7 +44,7 @@ def store_epd(epd_data: dict):
     )
     country = Country.objects.get(name="Germany")
     User = get_user_model()
-    superuser = User.objects.filter(is_superuser=True).values_list()[0]
+    superuser = User.objects.filter(is_superuser=True).first()
 
     # Step 2: Create or update the EPD record
     epd, created = EPD.objects.update_or_create(
@@ -55,11 +58,10 @@ def store_epd(epd_data: dict):
             "source": epd_data["source"],
             "type": EPDType.OFFICAL,
             "country": country,
-            
             # from base
             "created_by": superuser,
             "public": True,
-            "draft": False     
+            "draft": False,
         },
     )
 
@@ -71,14 +73,14 @@ def store_epd(epd_data: dict):
         if key.startswith("gwp") or key.startswith("penrt"):
             if value is not None:
                 # Extract impact category and life cycle stage
-                impact_category_key = key.split("_")[0].upper()  # e.g., 'gwp'
-                life_cycle_stage_key = key.split("_")[1].upper()  # e.g., 'a1a3'
+                impact_category_key = key.split("_")[0]  # e.g., 'gwp'
+                life_cycle_stage_key = key.split("_")[1]  # e.g., 'a1a3'
 
                 # Retrieve or create the Impact instance
                 impact, _ = Impact.objects.get_or_create(
                     impact_category=impact_category_key,
                     life_cycle_stage=life_cycle_stage_key,
-                    unit="mj",  # Default unit, update as needed
+                    unit=INDICATOR_UNIT_MAPPING.get(impact_category_key),  # Default unit, update as needed
                 )
 
                 # Create or update the EPDImpact linking table
