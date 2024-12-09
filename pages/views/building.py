@@ -4,6 +4,8 @@ from dataclasses import dataclass, asdict
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
+from pages.forms.building_general_info import BuildingGeneralInformation
+
 logger = logging.getLogger(__name__)
 
 
@@ -51,7 +53,7 @@ item = Building(
 @require_http_methods(["GET", "POST", "DELETE"])
 def building(request):
     global item
-    context = {"items": item}
+    context = {"items": item, "form": BuildingGeneralInformation}
 
     logger.info("Access list view with request: %s", request.method)
 
@@ -61,7 +63,7 @@ def building(request):
             logger.info("Add item: '%s' to list", new_item)
             item.append(new_item)
         return render(
-            request, "pages/home/building_list/item.html", context
+            request, "pages/building/building_list/item.html", context
         )  # Partial update for POST
 
     elif request.method == "DELETE":

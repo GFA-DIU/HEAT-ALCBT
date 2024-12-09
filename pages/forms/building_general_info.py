@@ -1,0 +1,139 @@
+from django import forms
+from django.db import models
+from django.utils.translation import gettext as _
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Row, Column, Submit
+
+from cities_light.models import Country, City
+
+
+class BuildingSubcategory(models.Model):
+    name = models.CharField(_("Name"), max_length=255)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Building subcategory"
+        verbose_name_plural = "Building subcategories"
+
+
+class Building(models.Model):
+    name = models.CharField(_("Building name/code"), max_length=255)
+    country = models.ForeignKey(
+        Country, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
+    street = models.CharField(_("Street"), max_length=255, null=True, blank=True)
+    number = models.IntegerField(_("Number"), null=True, blank=True)
+    zip = models.IntegerField(_("ZIP"), null=True, blank=True)
+    category = models.ForeignKey(
+        BuildingSubcategory, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+
+class BuildingGeneralInformation(forms.ModelForm):
+    country = forms.ModelChoiceField(
+        queryset=Country.objects.all(),
+        widget=forms.Select(attrs={
+            'hx-get': '/',               # HTMX request to the root URL
+            'hx-trigger': 'change',      # Trigger HTMX on change event
+            'hx-target': '#city-dropdown', # Update the City dropdown
+            'hx-vals': '{"id": this.value}', # Dynamically include the dropdown value
+            'class': 'select form-select',
+        }),
+        label="Country"
+    )
+    city = forms.ModelChoiceField(
+        queryset=City.objects.none(),  # Start with an empty queryset
+        widget=forms.Select(attrs={'id': 'city-dropdown', 'class': 'select form-select',}),
+        label="City",
+        help_text="Select a country first",
+    )
+    # category = forms.ModelChoiceField(queryset=BuildingSubcategory.objects.none(), label="Building Type")
+    class Meta:
+        model = Building
+        fields = ["name", "street", "zip", "number"]
+    
+        # labels = {
+        #     "name": _("Writer"),
+        # }
+        # help_texts = {
+        #     "city": _("Select a country first"),
+        # }
+        error_messages = {
+            "name": {
+                "max_length": _("This writer's name is too long."),
+            },
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Adjust 'city' queryset dynamically based on 'country' in the request data
+        if 'country' in self.data:
+            try:
+                country_id = int(self.data.get('country'))
+                self.fields['city'].queryset = City.objects.filter(country_id=country_id).order_by('name')
+            except (ValueError, TypeError):
+                self.fields['city'].queryset = City.objects.none()
+        elif self.instance.pk:
+            # If editing an existing instance, prepopulate the 'city' queryset
+            self.fields['city'].queryset = City.objects.filter(country=self.instance.country).order_by('name')
+
+        # Crispy Forms Layout
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            # Name and Category in the first row
+            Row(
+                Column('name', css_class='col-md-6'),
+                # Uncomment and add 'category' if it's part of the form
+                # Column('category', css_class='col-md-6'),
+            ),
+            # Country and City in the second row
+            Row(
+                Column('country', css_class='col-md-6'),
+                Column('city', css_class='col-md-6'),
+            ),
+            # Zip code in its own row
+            Row(
+                Column('zip', css_class='col-md-12'),
+            ),
+            # Street and Number in the last row
+            Row(
+                Column('street', css_class='col-md-9'),
+                Column('number', css_class='col-md-3'),
+            ),
+            Submit('submit', 'Submit', css_class='btn btn-primary'),
+        )
+
+
+    def clean_city(self):
+        city = self.cleaned_data.get('city')
+        country = self.cleaned_data.get('country')
+        if city and country and city.country != country:
+            raise forms.ValidationError("The selected city is not valid for the chosen country.")
+        return city
+
+    # def clean_comment(self):
+    #     name = self.cleaned_data.get('comment')
+
+    #     # Trigger an error if the name is "admin"
+    #     if name == "admin":
+    #         raise ValidationError("The name 'admin' is not allowed.")
+        
+    #     return name
+
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     name = cleaned_data.get('name')
+    #     comment = cleaned_data.get('comment')
+
+    #     # Custom validation: check if 'name' and 'comment' are identical
+    #     if name and comment and name == comment:
+    #         raise ValidationError(
+    #             "The name and comment cannot be the same.",
+    #             code='invalid'
+    #         )
+        
+    #     return cleaned_data
