@@ -6,30 +6,7 @@ from crispy_forms.layout import Layout, Row, Column, Submit
 
 from cities_light.models import Country, City
 
-
-class BuildingSubcategory(models.Model):
-    name = models.CharField(_("Name"), max_length=255)
-
-    def __str__(self):
-        return f"{self.name}"
-
-    class Meta:
-        verbose_name = "Building subcategory"
-        verbose_name_plural = "Building subcategories"
-
-
-class Building(models.Model):
-    name = models.CharField(_("Building name/code"), max_length=255)
-    country = models.ForeignKey(
-        Country, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
-    street = models.CharField(_("Street"), max_length=255, null=True, blank=True)
-    number = models.IntegerField(_("Number"), null=True, blank=True)
-    zip = models.IntegerField(_("ZIP"), null=True, blank=True)
-    category = models.ForeignKey(
-        BuildingSubcategory, on_delete=models.SET_NULL, null=True, blank=True
-    )
+from pages.models import Building, CategorySubcategory
 
 
 class BuildingGeneralInformation(forms.ModelForm):
@@ -50,7 +27,7 @@ class BuildingGeneralInformation(forms.ModelForm):
         label="City",
         help_text="Select a country first",
     )
-    # category = forms.ModelChoiceField(queryset=BuildingSubcategory.objects.none(), label="Building Type")
+    category = forms.ModelChoiceField(queryset=CategorySubcategory.objects.all(), label="Building Type")
     class Meta:
         model = Building
         fields = ["name", "street", "zip", "number"]
@@ -87,8 +64,7 @@ class BuildingGeneralInformation(forms.ModelForm):
             # Name and Category in the first row
             Row(
                 Column('name', css_class='col-md-6'),
-                # Uncomment and add 'category' if it's part of the form
-                # Column('category', css_class='col-md-6'),
+                Column('category', css_class='col-md-6'),
             ),
             # Country and City in the second row
             Row(
