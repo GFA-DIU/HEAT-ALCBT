@@ -55,7 +55,11 @@ item = BuildingMock(
 @require_http_methods(["GET", "POST", "DELETE"])
 def building(request, building_id):
     global item
-    context = {"items": item, "form": BuildingGeneralInformation}
+
+    context = {
+        "items": item,
+        "form_general_info": BuildingGeneralInformation
+    }
 
     logger.info("Access list view with request: %s", request.method)
 
@@ -67,7 +71,7 @@ def building(request, building_id):
         except Building.DoesNotExist:
             return HttpResponse("Building not found", status=404)
 
-
+    # General Info
     if request.method == "POST":
         new_item = request.POST.get("item")
         if new_item and len(item) < 5:
@@ -83,6 +87,9 @@ def building(request, building_id):
         return render(
             request, "pages/building/structural_info/assemblies_list.html", context
         )  # Partial update for DELETE
+
+    else:
+        context["form_general_info"] = BuildingGeneralInformation(instance=building)
 
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")

@@ -26,6 +26,7 @@ class BuildingGeneralInformation(forms.ModelForm):
         widget=forms.Select(attrs={'id': 'city-dropdown', 'class': 'select form-select',}),
         label="City",
         help_text="Select a country first",
+        required=False
     )
     category = forms.ModelChoiceField(queryset=CategorySubcategory.objects.all(), label="Building Type")
     class Meta:
@@ -45,8 +46,26 @@ class BuildingGeneralInformation(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance')
         super().__init__(*args, **kwargs)
+
+        if instance and instance.country:
+            self.fields['city'].queryset = City.objects.filter(country=instance.country).order_by('name')
+        else:
+            self.fields['city'].queryset = City.objects.none()
+
+        # Ensure the selected 'country' is prepopulated
+        if instance and instance.country:
+            self.initial['category'] = instance.category
         
+        # Ensure the selected 'country' is prepopulated
+        if instance and instance.country:
+            self.initial['country'] = instance.country
+
+        # Ensure the selected 'city' is prepopulated
+        if instance and instance.city:
+            self.initial['city'] = instance.city
+            
         # Adjust 'city' queryset dynamically based on 'country' in the request data
         if 'country' in self.data:
             try:
