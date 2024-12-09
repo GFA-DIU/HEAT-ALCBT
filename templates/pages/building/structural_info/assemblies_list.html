@@ -19,7 +19,7 @@
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
             <button class="btn btn-secondary">Edit</button>
             <button class="btn btn-danger"
-                    hx-delete="{% url 'building' %}?component={{ component.id }}" 
+                    hx-delete="{% url 'building' building_id=building_id %}?component={{ component.id }}" 
                     hx-target="#item-list" 
                     hx-swap="innerHTML">
                 Delete

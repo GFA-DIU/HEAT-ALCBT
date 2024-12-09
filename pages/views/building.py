@@ -58,28 +58,28 @@ def building(request, building_id):
 
     context = {
         "items": item,
-        "form_general_info": BuildingGeneralInformation
+        "building_id": building_id,
     }
 
     logger.info("Access list view with request: %s", request.method)
 
     building = None
-    if building_id:
-        try:
-            building = Building.objects.get(pk=building_id)
-            print("Found building: %s", building)
-        except Building.DoesNotExist:
-            return HttpResponse("Building not found", status=404)
+    try:
+        building = Building.objects.get(pk=building_id)
+        print("Found building: %s", building)
+    except Building.DoesNotExist:
+        return HttpResponse("Building not found", status=404)
 
     # General Info
-    if request.method == "POST":
-        new_item = request.POST.get("item")
-        if new_item and len(item) < 5:
-            logger.info("Add item: '%s' to list", new_item)
-            item.append(new_item)
-        return render(
-            request, "pages/building/building_list/item.html", context
-        )  # Partial update for POST
+    if request.method == "POST" and request.POST.get('action') == "general_information":
+        form = BuildingGeneralInformation(request.POST, instance=building)  # Bind form to instance
+        if form.is_valid():
+            print("these fields changed", form.changed_data)
+            updated_building = form.save()
+            print("Building updated in DB:", updated_building)
+        else:
+            print("Form is invalid")
+            print("Errors:", form.errors)
 
     elif request.method == "DELETE":
         item_to_delete = request.GET.get("component")
@@ -89,8 +89,9 @@ def building(request, building_id):
         )  # Partial update for DELETE
 
     else:
-        context["form_general_info"] = BuildingGeneralInformation(instance=building)
+        form = BuildingGeneralInformation(instance=building)
 
+    context["form_general_info"] = form
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
     return render(request, "pages/building/building.html", context)

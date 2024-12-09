@@ -31,7 +31,14 @@ class BuildingGeneralInformation(forms.ModelForm):
     category = forms.ModelChoiceField(queryset=CategorySubcategory.objects.all(), label="Building Type")
     class Meta:
         model = Building
-        fields = ["name", "street", "zip", "number"]
+        fields = [
+            "name",
+            "street",
+            "zip",
+            "number",
+            "city",
+            "country",
+            "category"]
     
         # labels = {
         #     "name": _("Writer"),
@@ -103,12 +110,14 @@ class BuildingGeneralInformation(forms.ModelForm):
         )
 
 
-    def clean_city(self):
-        city = self.cleaned_data.get('city')
-        country = self.cleaned_data.get('country')
-        if city and country and city.country != country:
-            raise forms.ValidationError("The selected city is not valid for the chosen country.")
-        return city
+    # def clean_city(self):
+    #     city = self.cleaned_data.get('city')
+    #     country = self.cleaned_data.get('country')
+    #     if city and country and city.country != country:
+    #         raise forms.ValidationError("The selected city is not valid for the chosen country.")
+    #     return city
+
+
 
     # def clean_comment(self):
     #     name = self.cleaned_data.get('comment')
