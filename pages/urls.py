@@ -7,5 +7,5 @@ from .views.building import building
 urlpatterns = [
     path("", get_building, name="home"),
     path("about/", AboutPageView.as_view(), name="about"),
-    path("building/", building, name="building")
+    path("building/<int:building_id>/", building, name="building")
 ]

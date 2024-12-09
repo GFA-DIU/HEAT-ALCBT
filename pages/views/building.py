@@ -1,10 +1,12 @@
 import logging
 
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
 from pages.forms.building_general_info import BuildingGeneralInformation
+from pages.models.building import Building, Assembly
 
 logger = logging.getLogger(__name__)
 
@@ -20,13 +22,13 @@ class StructElement:
 
 
 @dataclass
-class Building:
+class BuildingMock:
     name: str
     country: str
     components: list[StructElement]
 
 
-item = Building(
+item = BuildingMock(
     name="Test Building 1",
     country="New Dehli, India",
     components=[
@@ -51,11 +53,20 @@ item = Building(
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
-def building(request):
+def building(request, building_id):
     global item
     context = {"items": item, "form": BuildingGeneralInformation}
 
     logger.info("Access list view with request: %s", request.method)
+
+    building = None
+    if building_id:
+        try:
+            building = Building.objects.get(pk=building_id)
+            print("Found building: %s", building)
+        except Building.DoesNotExist:
+            return HttpResponse("Building not found", status=404)
+
 
     if request.method == "POST":
         new_item = request.POST.get("item")

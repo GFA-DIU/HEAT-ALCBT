@@ -1,0 +1,6 @@
+{% load crispy_forms_tags %}
+<form action="/" method="post">
+    <!-- Create an identifier for this post request -->
+    <input type="hidden" name="action" value="general_information">
+    {% crispy form %}
+</form>
