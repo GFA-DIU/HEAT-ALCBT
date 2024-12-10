@@ -1,75 +1,20 @@
 import logging
 
-from dataclasses import dataclass
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.db.models import Prefetch
+from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
 from pages.forms.building_general_info import BuildingGeneralInformation
-from pages.models.building import Building, Assembly
+from pages.models.building import Building, BuildingAssembly
+from pages.models.assembly import Assembly, AssemblyImpact
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class StructElement:
-    id: str
-    name: str
-    country: str
-    material: str
-    quantity: str
-    emissions: str
-
-
-@dataclass
-class BuildingMock:
-    name: str
-    country: str
-    components: list[StructElement]
-
-
-item = BuildingMock(
-    name="Test Building 1",
-    country="New Dehli, India",
-    components=[
-        StructElement(
-            id="1",
-            name="Intermediate Floor construction",
-            country="Germany",
-            material="Concrete Filler Slab",
-            quantity="100",
-            emissions="7946,51",
-        ),
-        StructElement(
-            id="2",
-            name="Bottom Floor Construction",
-            country="Germany",
-            material="Precast Concrete Double Tee Floor Units",
-            quantity="100",
-            emissions="6341,36",
-        ),
-    ],
-)
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
 def building(request, building_id):
-    global item
-
-    context = {
-        "items": item,
-        "building_id": building_id,
-    }
-
-    logger.info("Access list view with request: %s", request.method)
-
-    building = None
-    try:
-        building = Building.objects.get(pk=building_id)
-        print("Found building: %s", building)
-    except Building.DoesNotExist:
-        return HttpResponse("Building not found", status=404)
-
     # General Info
     if request.method == "POST" and request.POST.get('action') == "general_information":
         form = BuildingGeneralInformation(request.POST, instance=building)  # Bind form to instance
@@ -82,13 +27,93 @@ def building(request, building_id):
             print("Errors:", form.errors)
 
     elif request.method == "DELETE":
-        item_to_delete = request.GET.get("component")
-        item.components = [c for c in item.components if c.id != item_to_delete]
+        component_id = request.GET.get("component")
+        # component = get_object_or_404(BuildingAssembly, id=item_to_delete)
+        # component.delete()
+        # context["structural_components"] = [c for c in structural_components if str(c["assembly_id"]) != item_to_delete]
+        # print("context: ", context)
+        # Get the component and delete it
+        component = get_object_or_404(BuildingAssembly, id=component_id)
+        component.delete()
+
+        # Fetch the updated list of assemblies for the building
+        updated_list = (
+            BuildingAssembly.objects.filter(building_id=building_id)
+            .select_related('assembly')  # Optimize query by preloading related Assembly
+        )
+        structural_components = []
+        for component in updated_list:
+            impacts = [
+                {
+                    'impact_id': impact.impact.id,
+                    'impact_name': impact.impact.name,
+                    'value': impact.value
+                }
+                for impact in component.assembly.assemblyimpact_set.all()
+            ]
+
+            structural_components.append({
+                'assemblybuilding_id': component.id,
+                'assembly_name': component.assembly.name,
+                'assembly_classification': component.assembly.classification,
+                'quantity': component.quantity,
+                'unit': component.unit,
+                'impacts': impacts
+            })
+        context = {
+        "building_id": building_id,
+        "structural_components": list(structural_components),
+        }
         return render(
             request, "pages/building/structural_info/assemblies_list.html", context
         )  # Partial update for DELETE
 
+    # Full reload
     else:
+        building = get_object_or_404(
+            Building.objects.prefetch_related(
+                Prefetch(
+                    'buildingassembly_set',
+                    queryset=BuildingAssembly.objects.select_related('assembly').prefetch_related(
+                        Prefetch(
+                            'assembly__assemblyimpact_set',
+                            queryset=AssemblyImpact.objects.select_related('impact')
+                        )
+                    ),
+                    to_attr='prefetched_components'
+                )
+            ),
+            pk=building_id
+        )
+
+        # Build structural components and impacts in one step
+        structural_components = []
+        for component in building.prefetched_components:
+            impacts = [
+                {
+                    'impact_id': impact.impact.id,
+                    'impact_name': impact.impact.name,
+                    'value': impact.value
+                }
+                for impact in component.assembly.assemblyimpact_set.all()
+            ]
+
+            structural_components.append({
+                'assemblybuilding_id': component.id,
+                'assembly_name': component.assembly.name,
+                'assembly_classification': component.assembly.classification,
+                'quantity': component.quantity,
+                'unit': component.unit,
+                'impacts': impacts
+            })
+
+
+        context = {
+            "building_id": building.id,
+            "structural_components": list(structural_components),
+        }
+        
+        logger.info("Found building: %s with %d structural components", building.name, len(context["structural_components"])) 
         form = BuildingGeneralInformation(instance=building)
 
     context["form_general_info"] = form

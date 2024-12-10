@@ -35,7 +35,7 @@ class EPDAdmin(admin.ModelAdmin):
 # Custom admin for Assembly
 class AssemblyAdmin(admin.ModelAdmin):
     inlines = [ProductsInline]  # Add the inline for products
-    list_display = ["name", "country", "classification"]
+    list_display = ["name", "country", "classification", "id"]
 
 # Custom admin for Building
 class BuildingAdmin(admin.ModelAdmin):
