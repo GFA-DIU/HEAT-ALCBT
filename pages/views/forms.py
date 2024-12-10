@@ -36,7 +36,6 @@ class AssemblyForm(forms.Form):
         })
     )
     country = forms.ChoiceField(
-        initial="Select your country..",
         required=True,
         widget=forms.Select(attrs={'class': 'form-select'})
     ) 
