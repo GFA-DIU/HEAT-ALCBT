@@ -1,13 +1,16 @@
 {% extends '_base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}List view{% endblock title %}
 {% block content %}
 <h1>Item List</h1>
 
-{% include "pages/home/building_list/item_select.html" %}
+<form action="/" method="post">
+    <!-- Create an identifier for this post request -->
+    <input type="hidden" name="action" value="general_information">
+    {% crispy form %}
+</form>
 
-<div id="item-list">
-    {% include "pages/home/building_list/item.html" %}
-</div>
+
 {% endblock %}
