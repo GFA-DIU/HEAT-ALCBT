@@ -110,6 +110,7 @@ def building(request, building_id):
 
         context = {
             "building_id": building.id,
+            "building": building,
             "structural_components": list(structural_components),
         }
         
