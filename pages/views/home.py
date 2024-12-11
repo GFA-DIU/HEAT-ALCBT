@@ -1,46 +1,38 @@
 import logging
 
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 
-from cities_light.models import Country, City
+from pages.models.building import Building
 
-from pages.forms.building_general_info import BuildingGeneralInformation
 
 logger = logging.getLogger(__name__)
 
-def get_building(request):
 
-    print("Test")
-    print(request.POST)
-    # if this is a POST request we need to process the form data
-    if request.method == "POST" and request.POST.get('action') == "general_information":
-        print("I am here")
-        # create a form instance and populate it with data from the request:
-        form = BuildingGeneralInformation(request.POST)
-        print(form.is_valid())
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            building = form.save()
-        else:
-            print("Form errors:", form.errors)
+@login_required
+@require_http_methods(["GET", "POST", "DELETE"])
+def buildings_list(request):
+    buildings = Building.objects.filter(created_by=request.user)
+    context = {"buildings": buildings}
 
-    if request.GET.get('country'):
-        print("country I request")
-        country_id = request.GET.get('country')
-        print("This is country id: %s", country_id)
-        if country_id:
-            cities = City.objects.filter(country_id=country_id).order_by('name')
-            return render(request, 'pages/home/home_country.html', {'cities': cities})
-    
-    # if a regular get (or any other method) we'll create a blank form
-    else:
-        form = BuildingGeneralInformation()
+    logger.info("Access list view.")
 
-    return render(request, "pages/home/home.html", {"form": form})
+    if request.method == "POST":
+        new_item = request.POST.get("item")
+        if new_item and len(buildings) < 5:
+            logger.info("Add item: '%s' to list", new_item)
+            buildings.append(new_item)
+        return render(
+            request, "pages/home/building_list/item.html", context
+        )  # Partial update for POST
 
+    elif request.method == "DELETE":
+        building_id = request.GET.get("building_id")
+        building_to_delete = get_object_or_404(Building, id=int(building_id))
+        building_to_delete.delete()
+        context = {"buildings": Building.objects.filter(created_by=request.user)}
+        return render(request, "pages/home/buildings_list.html", context)
+    # Full page load for GET request
+    logger.info("Serving full item list page for GET request")
+    return render(request, "pages/home/home.html", context)

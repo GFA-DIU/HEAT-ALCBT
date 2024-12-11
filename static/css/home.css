@@ -1,0 +1,21 @@
+.home-title{
+  margin: 1rem;
+}
+
+.selectable-list-item{
+  color: #343a40;
+  text-decoration: none;
+  border: 1px solid #ddd;
+  border-radius: calc(0.375rem - 1px);
+  font-size: 1.1rem;
+  &:hover{
+    background-color: rgb(175, 175, 175, 0.2);
+  }
+}
+
+.icon-button{
+  margin: 0.05rem;
+  i{
+    font-size: 1.5rem;
+  }
+}
