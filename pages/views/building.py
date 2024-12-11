@@ -1,6 +1,6 @@
 import logging
 
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 @require_http_methods(["GET", "POST", "DELETE"])
 def building(request, building_id):
+    print("request user", request.user)
     # General Info
     if request.method == "POST" and request.POST.get('action') == "general_information":
         form = BuildingGeneralInformation(request.POST, instance=building)  # Bind form to instance
@@ -38,8 +39,11 @@ def building(request, building_id):
 
         # Fetch the updated list of assemblies for the building
         updated_list = (
-            BuildingAssembly.objects.filter(building_id=building_id)
-            .select_related('assembly')  # Optimize query by preloading related Assembly
+            BuildingAssembly.objects.filter(
+                building__created_by=request.user,
+                assembly__created_by=request.user,
+                building_id=building_id
+            ).select_related('assembly')  # Optimize query by preloading related Assembly
         )
         structural_components = []
         for component in updated_list:
@@ -71,10 +75,13 @@ def building(request, building_id):
     # Full reload
     else:
         building = get_object_or_404(
-            Building.objects.prefetch_related(
+            Building.objects.filter(created_by=request.user)  # Ensure the building belongs to the user
+            .prefetch_related(
                 Prefetch(
                     'buildingassembly_set',
-                    queryset=BuildingAssembly.objects.select_related('assembly').prefetch_related(
+                    queryset=BuildingAssembly.objects.filter(
+                        # assembly__created_by=request.user  # Ensure the assembly belongs to the user
+                    ).select_related('assembly').prefetch_related(
                         Prefetch(
                             'assembly__assemblyimpact_set',
                             queryset=AssemblyImpact.objects.select_related('impact')
