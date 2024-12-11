@@ -1,10 +1,59 @@
 {% load crispy_forms_tags %}
-{% if assembly_id %}
+<!-- {% if assembly_id %}
 <form action="{% url 'component_edit' assembly_id=assembly_id%}" method="post">
 {% else %}
 <form action="{% url 'component' %}" method="post">
-{% endif %}
+{% endif %} -->
+<form action="{% url 'component_edit' assembly_id=assembly_id%}" method="post">
+    {% csrf_token %}
+    <div class="row">
+        <!-- Name and Type in the first row -->
+        <div class="col-md-6">
+            {{ form.name |as_crispy_field }}
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="me-2">
+                {{ form.type |as_crispy_field }}
+            </div>
+            <div class="form-check form-switch">
+                {{ form.public |as_crispy_field }}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Country and Classification in the second row -->
+        <div class="col-md-6">
+            {{ form.country |as_crispy_field }}
+        </div>
+        <div class="col-md-6">
+            {{ form.classification |as_crispy_field }}
+        </div>
+    </div>
+    <div class="row">
+        <!-- Comment in its own row -->
+        <div class="col-md-12">
+            {{ form.comment |as_crispy_field }}
+        </div>
+    </div>
+    
     <!-- Create an identifier for this post request -->
-    <input type="hidden" name="action" value="general_information">
-    {% crispy form %}
+    <input type="hidden" name="action" value="form_submission">
+    <h4>EPDs</h4>
+    <div class="card mb-3 card-body" style="min-height: 150px; max-height: 500px; overflow-y: auto;">
+        <div id="selected-epd-list">
+            {% include "pages/building/component_add/selected_epd_list.html" %}
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Submit button -->
+        <div class="col-md-12">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
 </form>
+
+<h4>EPD Library</h4>
+<div id="epd-list">
+    {% include "pages/building/component_add/epd_list.html" %}
+</div>
