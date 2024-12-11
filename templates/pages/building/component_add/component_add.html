@@ -1,0 +1,10 @@
+{% load crispy_forms_tags %}
+{% if assembly_id %}
+<form action="{% url 'component_edit' assembly_id=assembly_id%}" method="post">
+{% else %}
+<form action="{% url 'component' %}" method="post">
+{% endif %}
+    <!-- Create an identifier for this post request -->
+    <input type="hidden" name="action" value="general_information">
+    {% crispy form %}
+</form>
