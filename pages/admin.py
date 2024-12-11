@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models.epd import MaterialCategory, EPD, EPDImpact, Impact
-from .models.assembly import Product, Assembly
+from .models.assembly import Product, Assembly, AssemblyImpact
 from .models.building import Building, BuildingSubcategory
 
 # Register your models here.
@@ -41,6 +41,10 @@ class AssemblyAdmin(admin.ModelAdmin):
 class BuildingAdmin(admin.ModelAdmin):
     inlines = [AssembliesInline, AssembliesSimulationInline]  # Add the inline for products
     list_display = ["name", "country", "category"]
+    
+# Custom admin for Assembly Impact
+class AssemblyImpactAdmin(admin.ModelAdmin):
+    list_display = ['assembly', 'impact', 'value']    
 
 # Register your models with custom admin
 admin.site.register(MaterialCategory)
@@ -51,3 +55,4 @@ admin.site.register(Building, BuildingAdmin)
 admin.site.register(BuildingSubcategory)
 admin.site.register(EPDImpact)
 admin.site.register(Impact)
+admin.site.register(AssemblyImpact, AssemblyImpactAdmin)

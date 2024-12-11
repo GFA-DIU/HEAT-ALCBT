@@ -26,7 +26,7 @@ class Command(BaseCommand):
         # load EPD data
         uuids = get_all_epds()
 
-        for uuid in uuids:
+        for uuid in uuids[0:10]:
             data = get_full_epd(uuid)
             epd = parse_epd(data)
             self.stdout.write(self.style.SUCCESS(("Starting %s", epd)))

@@ -81,6 +81,8 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "debug_toolbar",
     'cities_light',
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    "dpd_static_support",
     # Local
     "accounts",
     "pages",
@@ -101,6 +103,8 @@ MIDDLEWARE = [
     
     # own
     'django_project.middleware.LoginRequiredMiddleware',
+    "django_plotly_dash.middleware.BaseMiddleware",
+    "django_plotly_dash.middleware.ExternalRedirectionMiddleware",
 ]
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ['admin:login', 'admin:index']
@@ -263,3 +267,8 @@ CITIES_LIGHT_INCLUDE_COUNTRIES = [
 ]
 CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLC']
 
+# https://django-plotly-dash.readthedocs.io/en/latest/installation.html
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# https://github.com/GibbsConsulting/django-plotly-dash/issues/502
+STATICFILES_FINDERS = ['django_plotly_dash.finders.DashComponentFinder']

@@ -7,6 +7,7 @@ from django.views.decorators.http import require_http_methods
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.building import Building, BuildingAssembly
 from pages.models.assembly import Assembly, AssemblyImpact
+from pages.dash_apps import building_dashboard
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +93,7 @@ def building(request, building_id):
             impacts = [
                 {
                     'impact_id': impact.impact.id,
-                    'impact_name': impact.impact.name,
+                    'impact_name': impact.impact.__str__,
                     'value': impact.value
                 }
                 for impact in component.assembly.assemblyimpact_set.all()
@@ -107,12 +108,14 @@ def building(request, building_id):
                 'impacts': impacts
             })
 
-
+        print(structural_components)
+        
         context = {
             "building_id": building.id,
             "building": building,
             "structural_components": list(structural_components),
-        }
+            #"dashboard": dashboard,
+        }     
         
         logger.info("Found building: %s with %d structural components", building.name, len(context["structural_components"])) 
         form = BuildingGeneralInformation(instance=building)

@@ -1,5 +1,6 @@
 {% extends '_base.html' %}
 {% load static %}
+{%load plotly_dash%}
 
 {% block title %}Building View{% endblock title %}
 {% block content %}
@@ -7,11 +8,8 @@
 <h1>{{ building.name }}</h1>
 <p class="text-muted">{{ building.country }}</p>
 
-<div
-  class="mt-1 mb-1 p-5 text-center"
-  style="background-color: #f0f0f0; border: 2px dashed #ddd"
->
-  <p class="mb-0 text-muted">Placeholder Dashbaord</p>
+<div class="mt-1 mb-1 p-5 text-center" style="width: 100%; height: 400px; padding: 200px;">
+  {% plotly_app name="BuildingDashboard" %}
 </div>
 
 <div class="accordion pt-3 pb-3" id="accordionExample">
