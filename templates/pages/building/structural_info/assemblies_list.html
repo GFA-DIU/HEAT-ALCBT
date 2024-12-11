@@ -1,12 +1,12 @@
 <ul class="list-group">
-    {% for component in items.components %}
+    {% for component in structural_components %}
     <li class="list-group-item d-flex justify-content-between align-items-center position-relative">
         <!-- Component name and main content -->
         <div class="col-6">
-            <h5 class="mb-1">{{ component.name }}</h5>
+            <h5 class="mb-1">{{ component.assembly_name }}</h5>
             <div class="d-flex flex-column">
-                <span class="text-muted ms-1">{{ component.material }}</span>
-                <span class="text-muted ms-1">Quantity: {{ component.quantity }}m<sup>2</sup></span>
+                <span class="text-muted ms-1">{{ component.assembly_classification }}</span>
+                <span class="text-muted ms-1">Quantity: {{ component.quantity }}{{ component.unit}}</sup></span>
             </div>
         </div>
 
@@ -19,7 +19,7 @@
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
             <button class="btn btn-secondary">Edit</button>
             <button class="btn btn-danger"
-                    hx-delete="{% url 'building' building_id=building_id %}?component={{ component.id }}" 
+                    hx-delete="{% url 'building' building_id=building_id %}?component={{ component.assemblybuilding_id }}" 
                     hx-target="#item-list" 
                     hx-swap="innerHTML">
                 Delete
