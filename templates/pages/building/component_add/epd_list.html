@@ -1,22 +1,39 @@
 <ul class="list-group">
     {% for epd in epd_list %}
-    <li class="list-group-item d-flex justify-content-between align-items-center position-relative">
+    <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
         <div class="col-6">
             <h5 class="mb-1">{{ epd.name }}</h5>
             <div class="d-flex flex-column">
                 <span class="text-muted ms-1">{{ epd.country }}</span>
             </div>
         </div>
-
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-            <button class="btn btn-success"
-                    hx-post="{% url 'component_edit' assembly_id=assembly_id %}"
-                    hx-vals='{"epd_selected": "{{ epd.id }}"}'
-                    hx-target="#selected-epd-list"
-                    hx-swap="innerHTML">
+            <button class="btn btn-success add-epd" data-id="{{ epd.id }}" data-name="{{ epd.name }}" data-country="{{ epd.country }}">
                 Add
             </button>
         </div>
     </li>
     {% endfor %}
 </ul>
+
+<div class="mt-3">
+    <nav aria-label="Pagination">
+        <ul class="pagination">
+            {% if epd_list.has_previous %}
+            <li class="page-item">
+                <a hx-get="?page={{ epd_list.previous_page_number }}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">Previous</a>
+            </li>
+            {% endif %}
+            {% for num in epd_list.paginator.page_range %}
+            <li class="page-item {% if num == epd_list.number %}active{% endif %}">
+                <a hx-get="?page={{ num }}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">{{ num }}</a>
+            </li>
+            {% endfor %}
+            {% if epd_list.has_next %}
+            <li class="page-item">
+                <a hx-get="?page={{ epd_list.next_page_number }}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>

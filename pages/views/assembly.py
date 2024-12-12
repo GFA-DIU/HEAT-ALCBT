@@ -4,6 +4,7 @@ from decimal import Decimal
 from dataclasses import dataclass
 from typing import Optional
 
+from django.core.paginator import Paginator
 from django.db.models import Prefetch
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -71,21 +72,35 @@ class SelectedEPD:
 @require_http_methods(["GET", "POST", "DELETE"])
 def component_edit(request, assembly_id=None):
     """
-    View to either edit an existing component or create a new one.
+    View to either edit an existing component or create a new one with pagination for EPDs.
     """
     # Initialize the session variable if it doesn't exist
     if "selected_epds" not in request.session:
         request.session["selected_epds"] = []
 
-    # Load selected EPDs from session
-    selected_epd_ids = request.session["selected_epds"]
-    selected_epds = EPD.objects.filter(id__in=selected_epd_ids)
+
+    component = get_object_or_404(Assembly, id=assembly_id)
+    products = Product.objects.filter(assembly=component).select_related('epd')
+    selected_epds = [SelectedEPD.parse_product(p) for p in products]
+
+    # # Load selected EPDs from session
+    # selected_epd_ids = request.session["selected_epds"]
+    # selected_epds = EPD.objects.filter(id__in=selected_epd_ids)
 
     context = {
         "assembly_id": assembly_id,
         "selected_epds": selected_epds,
     }
-    
+
+    # Pagination setup for EPD list
+    epd_list = EPD.objects.all().order_by('id')  # Replace with any filtering logic if needed
+    paginator = Paginator(epd_list, 10)  # Show 10 items per page
+    page_number = request.GET.get('page', 1)  # Get the current page number from the query parameters
+    page_obj = paginator.get_page(page_number)
+
+    # Add the paginated list to the context
+    context["epd_list"] = page_obj
+
     if assembly_id:
         component = get_object_or_404(Assembly, id=assembly_id)
         context["assembly_id"] = component.id
@@ -94,34 +109,17 @@ def component_edit(request, assembly_id=None):
         owned_products = [SelectedEPD.parse_product(p) for p in products]
         
 
+
         if request.method == "POST" and request.POST.get("action") == "form_submission":
-            context =  save_assembly(request, context, component)
+            context = save_assembly(request, context, component)
             return render(request, "pages/building/test_component.html", context)
 
-
-        elif request.method == "POST" and request.POST.get("epd_selected"):
-            epd_id = request.POST.get("epd_selected")
-            if epd_id not in selected_epd_ids:
-                selected_epd_ids.append(epd_id)
-                request.session["selected_epds"] = selected_epd_ids
-            context["selected_epds"] = EPD.objects.filter(id__in=selected_epd_ids)
-            return render(request, "pages/building/component_add/selected_epd_list.html", context)
-
-        elif request.method == "DELETE":
-            # epd_id = request.body.decode("utf-8")  # Get epd_id from the request body
-            epd_id = request.GET.get("epd_remove")
-            print("This is delete: ", epd_id)
-            print(selected_epd_ids)
-            if epd_id in selected_epd_ids:
-                selected_epd_ids.remove(epd_id)
-                request.session["selected_epds"] = selected_epd_ids
-            context["selected_epds"] = EPD.objects.filter(id__in=selected_epd_ids)
-            return render(request, "pages/building/component_add/selected_epd_list.html", context)
+        elif request.method == "GET" and request.GET.get("page"):
+            # Handle partial rendering for HTMX
+            return render(request, "pages/building/component_add/epd_list.html", context)
 
         else:
             form = AssemblyForm(instance=component)
-            epd_list = EPD.objects.all()
-            context["epd_list"] = epd_list
     else:
         # Handle creation of a new assembly
         if request.method == "POST":
@@ -133,12 +131,12 @@ def component_edit(request, assembly_id=None):
                 return HttpResponseRedirect(reverse("component"))
         else:
             form = AssemblyForm()
-            epd_list = EPD.objects.all()
-            context["epd_list"] = epd_list
 
+    # Add form to context
     context["form"] = form
-    return render(request, "pages/building/test_component.html", context)
 
+    # Render full template for non-HTMX requests
+    return render(request, "pages/building/test_component.html", context)
 
 
 def save_assembly(request, context, component):
