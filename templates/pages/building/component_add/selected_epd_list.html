@@ -1,6 +1,6 @@
 <ul class="list-group">
     {% for epd in selected_epds %}
-    <li class="list-group-item d-flex justify-content-between align-items-center position-relative">
+    <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
         <div class="col-6">
             <h5 class="mb-1">{{ epd.name }}</h5>
             <div class="d-flex flex-column">
@@ -8,22 +8,24 @@
             </div>
         </div>
         <input type="number" 
-               name="material_{{ epd.id }}_quantity" 
-               class="form-control form-control-sm mx-2" 
-               style="width: 100px;" 
-               placeholder="Quantity" 
-               required>
-        <input type="text" 
-               name="material_{{ epd.id }}_unit" 
-               class="form-control form-control-sm mx-2" 
-               style="width: 100px;" 
-               placeholder="Unit" 
-               required>
+                name="material_{{ epd.id }}_quantity" 
+                class="form-control form-control-sm mx-2" 
+                style="width: 100px;" 
+                placeholder="Quantity"
+                {% if epd.sel_quantity%}value="{{ epd.sel_quantity}}"{% endif %}
+                required>
+        <select name="material_{{ epd.id }}_unit" 
+                class="form-select form-select-sm mx-2" 
+                style="width: 100px;" 
+                required>
+            {% for unit in epd.available_units %}
+            <option value="{{ unit }}" {% if unit == epd.sel_unit %}selected{% endif %}>
+                {{ unit }}
+            </option>
+            {% endfor %}
+        </select>
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-            <button class="btn btn-danger"
-                    hx-delete="{% url 'component_edit' assembly_id=assembly_id %}?epd_remove={{ epd.id }}"
-                    hx-target="#selected-epd-list"
-                    hx-swap="innerHTML">
+            <button class="btn btn-danger remove-epd" data-id="{{ epd.id }}">
                 Remove
             </button>
         </div>

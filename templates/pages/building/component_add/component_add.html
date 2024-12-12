@@ -1,4 +1,5 @@
 {% load crispy_forms_tags %}
+<h2>Component Editor</h2>
 <form action="{% url 'component_edit' assembly_id=assembly_id %}" method="post">
     {% csrf_token %}
     <div class="row">
@@ -35,40 +36,7 @@
     <h4>Selected EPDs</h4>
     <div class="card mb-3 card-body" style="min-height: 150px; max-height: 500px; overflow-y: auto;">
         <div id="selected-epd-list">
-            <ul class="list-group">
-                {% for epd in selected_epds %}
-                <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
-                    <div class="col-6">
-                        <h5 class="mb-1">{{ epd.name }}</h5>
-                        <div class="d-flex flex-column">
-                            <span class="text-muted ms-1">{{ epd.country.name }}</span>
-                        </div>
-                    </div>
-                    <input type="number" 
-                           name="material_{{ epd.id }}_quantity" 
-                           class="form-control form-control-sm mx-2" 
-                           style="width: 100px;" 
-                           placeholder="Quantity"
-                           {% if epd.quantity%}value="{{ epd.quantity}}"{% endif %}
-                           required>
-                    <select name="material_{{ epd.id }}_unit" 
-                           class="form-select form-select-sm mx-2" 
-                           style="width: 100px;" 
-                           required>
-                       {% for unit in epd.available_units %}
-                       <option value="{{ unit }}" {% if unit == epd.sel_unit %}selected{% endif %}>
-                           {{ unit }}
-                       </option>
-                       {% endfor %}
-                   </select>
-                    <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-                        <button class="btn btn-danger remove-epd" data-id="{{ epd.id }}">
-                            Remove
-                        </button>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+            {% include "pages/building/component_add/selected_epd_list.html"%}
         </div>
     </div>
 
@@ -95,6 +63,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const epdId = event.target.dataset.id;
             const epdName = event.target.dataset.name;
             const epdCountry = event.target.dataset.country;
+            let conversions = [];
+            const rawConversions = event.target.dataset.conversions;
+
+            // Preprocess the raw JSON string
+            if (rawConversions) {
+                try {
+                    // Replace single quotes with double quotes
+                    const validJson = rawConversions.replace(/'/g, '"');
+                    conversions = JSON.parse(validJson);
+                } catch (error) {
+                    console.error('Failed to parse conversions:', error.message);
+                }
+            }
+            const declaredUnit = event.target.dataset.declaredUnit; // Declared unit
+
+            // Build available units list
+            const availableUnits = conversions.map(conversion => conversion.unit);
+            if (declaredUnit) {
+                availableUnits.push(declaredUnit);
+            }
+
+            console.log(`Available Units for EPD ${epdId}:`, availableUnits);
+
 
             // Check if already selected
             if (document.querySelector(`#selected-epd-list li[data-id="${epdId}"]`)) {
@@ -119,12 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
                        style="width: 100px;" 
                        placeholder="Quantity" 
                        required>
-                <input type="text" 
-                       name="material_${epdId}_unit" 
-                       class="form-control form-control-sm mx-2" 
-                       style="width: 100px;" 
-                       placeholder="Unit" 
-                       required>
+                <select name="material_${epdId}_unit" 
+                        class="form-select form-select-sm mx-2" 
+                        style="width: 100px;" 
+                        required>
+                    ${availableUnits.map(unit => `<option value="${unit}">${unit}</option>`).join('')}
+                </select>
                 <div class="col-3 d-flex justify-content-end align-items-center gap-2">
                     <button class="btn btn-danger remove-epd" data-id="${epdId}">
                         Remove

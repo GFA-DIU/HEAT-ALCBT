@@ -25,7 +25,7 @@ class SelectedEPD:
     id: str
     available_units: list[str]
     sel_unit: Optional[str]
-    sel_quantity: Optional[str]
+    sel_quantity: float
     name: str
     category: Optional[str]
     country: Optional[str]
@@ -104,10 +104,6 @@ def component_edit(request, assembly_id=None):
     if assembly_id:
         component = get_object_or_404(Assembly, id=assembly_id)
         context["assembly_id"] = component.id
-        products = Product.objects.filter(assembly=component).select_related('epd')
-
-        owned_products = [SelectedEPD.parse_product(p) for p in products]
-        
 
 
         if request.method == "POST" and request.POST.get("action") == "form_submission":
@@ -201,20 +197,19 @@ def save_assembly(request, context, component):
                 })
 
             # Save the Product
-            product = Product(
+            product = Product.objects.update_or_create(
                 epd=epd,
                 assembly=component,
                 quantity=field.get("quantity"),
                 input_unit=field.get("unit"),
             )
-            product.clean()
-            product.save()
+
 
         print("epd_impacts: ", epd_impacts)
         print("impacts_data: ", impacts_data)
         # Create AssemblyImpact records
         for impact, total_value in impacts_data.items():
-            AssemblyImpact.objects.create(
+            AssemblyImpact.objects.update_or_create(
                 assembly=assembly,
                 impact=impact,
                 value=total_value,
