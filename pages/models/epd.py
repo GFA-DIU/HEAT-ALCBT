@@ -154,6 +154,7 @@ class epdLCAx(models.Model):
 
     class Meta:
         unique_together = ('UUID', 'name')
+        abstract = True  # This ensures it won't create its own table.
 
 
 class MaterialCategory(models.Model):
