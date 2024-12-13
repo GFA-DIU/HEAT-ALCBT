@@ -108,7 +108,7 @@ def component_edit(request, assembly_id=None):
 
         if request.method == "POST" and request.POST.get("action") == "form_submission":
             context = save_assembly(request, context, component)
-            return render(request, "pages/building/test_component.html", context)
+            return HttpResponseRedirect(reverse('component_edit', kwargs={'assembly_id': assembly_id}))
 
         elif request.method == "GET" and request.GET.get("page"):
             # Handle partial rendering for HTMX
@@ -144,6 +144,10 @@ def save_assembly(request, context, component):
     if form.is_valid():
         # Save the updated Assembly instance
         assembly = form.save()
+        
+        # Create clean slate
+        Product.objects.filter(assembly=assembly).delete()
+        AssemblyImpact.objects.filter(assembly=assembly).delete()
 
         # Clear the session variable after successful submission
         request.session["selected_epds"] = []
@@ -180,7 +184,7 @@ def save_assembly(request, context, component):
         impacts_data = defaultdict(Decimal)  # For summing impacts by cate1 mgory & stage
         for field in dynamic_fields:
             # Fetch the EPD and its impacts
-            epd = epd_map[epd_id]
+            epd = epd_map[field["epd_id"]]
             conversion_f = 1
             if epd.declared_unit != field.get("unit"):
                 conversion_f = [f["value"] for f in epd.conversions if f["unit"]==field.get("unit")]
