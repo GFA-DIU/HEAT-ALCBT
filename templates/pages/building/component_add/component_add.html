@@ -1,0 +1,148 @@
+{% load crispy_forms_tags %}
+<h2>Component Editor</h2>
+<form action="{% url 'component_edit' assembly_id=assembly_id %}" method="post">
+    {% csrf_token %}
+    <div class="row">
+        <!-- Name and Type in the first row -->
+        <div class="col-md-6">
+            {{ form.name |as_crispy_field }}
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="me-2">
+                {{ form.type |as_crispy_field }}
+            </div>
+            <div class="form-check form-switch">
+                {{ form.public |as_crispy_field }}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Country and Classification in the second row -->
+        <div class="col-md-6">
+            {{ form.country |as_crispy_field }}
+        </div>
+        <div class="col-md-6">
+            {{ form.classification |as_crispy_field }}
+        </div>
+    </div>
+    <div class="row">
+        <!-- Comment in its own row -->
+        <div class="col-md-12">
+            {{ form.comment |as_crispy_field }}
+        </div>
+    </div>
+
+    <input type="hidden" name="action" value="form_submission">
+    <h4>Selected EPDs</h4>
+    <div class="card mb-3 card-body" style="min-height: 150px; max-height: 500px; overflow-y: auto;">
+        <div id="selected-epd-list">
+            {% include "pages/building/component_add/selected_epd_list.html"%}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</form>
+
+<h4>EPD Library</h4>
+<div id="epd-list">
+    {% include "pages/building/component_add/epd_list.html" %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const epdList = document.getElementById('epd-list');
+    const selectedEpdList = document.getElementById('selected-epd-list').querySelector('ul');
+
+    // Add material to selected list
+    epdList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('add-epd')) {
+            const epdId = event.target.dataset.id;
+            const epdName = event.target.dataset.name;
+            const epdCountry = event.target.dataset.country;
+            let conversions = [];
+            const rawConversions = event.target.dataset.conversions;
+
+            // Preprocess the raw JSON string
+            if (rawConversions) {
+                try {
+                    // Replace single quotes with double quotes
+                    const validJson = rawConversions.replace(/'/g, '"');
+                    conversions = JSON.parse(validJson);
+                } catch (error) {
+                    console.error('Failed to parse conversions:', error.message);
+                }
+            }
+            const declaredUnit = event.target.dataset.declaredUnit; // Declared unit
+
+            // Build available units list
+            const availableUnits = conversions.map(conversion => conversion.unit);
+            if (declaredUnit) {
+                availableUnits.push(declaredUnit);
+            }
+
+            console.log(`Available Units for EPD ${epdId}:`, availableUnits);
+
+
+            // Check if already selected
+            if (document.querySelector(`#selected-epd-list li[data-id="${epdId}"]`)) {
+                alert('This material is already selected.');
+                return;
+            }
+
+            // Create new list item for the selected material
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center position-relative';
+            li.setAttribute('data-id', epdId);
+            li.innerHTML = `
+                <div class="col-6">
+                    <h5 class="mb-1">${epdName}</h5>
+                    <div class="d-flex flex-column">
+                        <span class="text-muted ms-1">${epdCountry}</span>
+                    </div>
+                </div>
+                <input type="number" 
+                       name="material_${epdId}_quantity" 
+                       class="form-control form-control-sm mx-2" 
+                       style="width: 100px;" 
+                       placeholder="Quantity" 
+                       required>
+                <select name="material_${epdId}_unit" 
+                        class="form-select form-select-sm mx-2" 
+                        style="width: 100px;" 
+                        required>
+                    ${availableUnits.map(unit => `<option value="${unit}">${unit}</option>`).join('')}
+                </select>
+                <div class="col-3 d-flex justify-content-end align-items-center gap-2">
+                    <button class="btn btn-danger remove-epd" data-id="${epdId}">
+                        Remove
+                    </button>
+                </div>
+            `;
+            selectedEpdList.appendChild(li);
+        }
+    });
+
+    // Remove material from selected list
+    selectedEpdList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('remove-epd')) {
+            const epdId = event.target.dataset.id;
+
+            // Remove the material from the selected list
+            const li = document.querySelector(`#selected-epd-list li[data-id="${epdId}"]`);
+            if (li) {
+                li.remove();
+            }
+
+            // Optionally, you could re-enable the "Add" button in the library
+            const addButton = document.querySelector(`#epd-list button.add-epd[data-id="${epdId}"]`);
+            if (addButton) {
+                addButton.disabled = false;
+            }
+        }
+    });
+});
+</script>
