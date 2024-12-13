@@ -259,6 +259,9 @@ CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en', 'abbr']
 CITIES_LIGHT_INCLUDE_COUNTRIES = [
     'IN',  # India
     'ID',  # Indonesia
+    'TH',  # Thailand
+    'VN',  # Vietnam
+    'KH',  # Cambodia
     'DE',  # Germany
 ]
 CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLC']

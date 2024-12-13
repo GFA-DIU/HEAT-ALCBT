@@ -67,7 +67,7 @@ def get_all_uuids_ecoplatform() -> list[dict]:
     return epd_list
 
 
-def get_full_epd(uri: str, country) -> dict:
+def get_full_epd(uri: str) -> dict:
     """Get the full dataset for a single EPD"""
 
         
@@ -76,11 +76,17 @@ def get_full_epd(uri: str, country) -> dict:
     }
 
     assert "?" in uri  # check that parameter can be given    
+        
     
-    response = requests.get(f"{uri}?format=json&view=extended", headers=headers)
+    response = requests.get(f"{uri}&lang=en&format=json&view=extended", headers=headers)
     response.raise_for_status()
     data = response.json()
     data["source"] = uri
-    data["country"] = country
-
+    #TODO: potentially correct if "representative" is not the correct fallback
+    if not data["modellingAndValidation"]["LCIMethodAndAllocation"].get("other"):
+        data["modellingAndValidation"]["LCIMethodAndAllocation"]["other"] = {"anies": [{
+            "name": "subType",
+            "value": "representative dataset"
+        }]}
+    
     return data

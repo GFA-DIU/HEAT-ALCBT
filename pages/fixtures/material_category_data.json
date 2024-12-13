@@ -4816,5 +4816,16 @@
         "level": 3,
         "parent": 432
     }
+},
+{
+    "model": "pages.materialcategory",
+    "pk": 439,
+    "fields": {
+        "name_de": "Unbekannt",
+        "name_en": "Unknown",
+        "category_id": "0.0.0",
+        "level": 1,
+        "parent": null
+    }
 }
 ]

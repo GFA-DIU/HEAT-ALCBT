@@ -1,15 +1,15 @@
+import traceback
+
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth import get_user_model
 
 from cities_light.models import Country
 
-from pages.scripts.oekobaudat.oekobaudat_loader import (
-    parse_epd,
-)
+from pages.scripts.oekobaudat.oekobaudat_loader import parse_epd, get_classification
 from pages.scripts.ecoplatform.ecoplatform_loader import (
     get_all_uuids_ecoplatform,
     get_full_epd,
-    country_list
+    country_list,
 )
 
 from pages.models.epd import (
@@ -26,28 +26,51 @@ class Command(BaseCommand):
     help = "Load all EPDs from Ökobaudat database."
 
     def handle(self, *args, **options):
-        # load EPD data
+        # Load EPD data
         epd_info = get_all_uuids_ecoplatform()
-        epd_info = [(e["uuid"], e["geo"]) for e in epd_info]
+        epd_info = [(e["uri"], e["geo"]) for e in epd_info]
 
-        for uuid, geo in epd_info:
-            country = Country.objects.get(code2=geo)
-            data = get_full_epd(uuid, country)
-            epd = parse_epd(data)
-            self.stdout.write(self.style.SUCCESS(("Starting %s", epd)))
-            store_epd(epd)
-            self.stdout.write(self.style.SUCCESS(("Successfully uploaded %s", uuid)))
+        for uri, geo in epd_info:
+            try:
+                # Fetch related country
+                country = Country.objects.get(code2=geo)
+                
+                # Retrieve and process EPD data
+                data = get_full_epd(uri)
+                epd = parse_epd(data)
+                self.stdout.write(self.style.SUCCESS(f"Starting processing for {epd}"))
+                
+                # Store processed EPD
+                store_epd(epd, country, data)
+                self.stdout.write(self.style.SUCCESS(f"Successfully uploaded {uri}"))
+            except Country.DoesNotExist:
+                self.stdout.write(self.style.ERROR(f"Country with code2={geo} does not exist."))
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"An error occurred: {str(e)}"))
+                self.stdout.write(self.style.ERROR(traceback.format_exc()))
 
-
-def store_epd(epd_data: dict):
+def store_epd(epd_data: dict, country: Country, data: dict):
     """
     Parse the EPD data and link it to the correct material categories and impacts.
     """
-    # Step 1: Retrieve the MaterialCategory based on levels
-    classification = MaterialCategory.objects.get(
-        category_id=epd_data.get("classification")
-    )
-    country = Country.objects.get(name="Germany")
+    try:
+        classification = MaterialCategory.objects.get(
+            category_id=epd_data.get("classification")
+        )
+    except MaterialCategory.DoesNotExist:
+        try:
+            classification_info = data["processInformation"]["dataSetInformation"].get(
+                "classificationInformation"
+            )
+            if classification_info:
+                classification = MaterialCategory.objects.get(
+                    name_en="Primer for paints and plasters"
+                )
+            else:
+                classification = MaterialCategory.objects.get(name_en="Unknown")
+        except MaterialCategory.DoesNotExist:
+            classification = None  # Or handle this case as needed
+            
     User = get_user_model()
     superuser = User.objects.filter(is_superuser=True).first()
 
@@ -63,6 +86,8 @@ def store_epd(epd_data: dict):
             "source": epd_data["source"],
             "type": EPDType.OFFICAL,
             "country": country,
+            "declared_amount": epd_data["declared_amount"],
+            "version": epd_data["version"],
             # from base
             "created_by": superuser,
             "public": True,
@@ -85,7 +110,9 @@ def store_epd(epd_data: dict):
                 impact, _ = Impact.objects.get_or_create(
                     impact_category=impact_category_key,
                     life_cycle_stage=life_cycle_stage_key,
-                    unit=INDICATOR_UNIT_MAPPING.get(impact_category_key),  # Default unit, update as needed
+                    unit=INDICATOR_UNIT_MAPPING.get(
+                        impact_category_key
+                    ),  # Default unit, update as needed
                 )
 
                 # Create or update the EPDImpact linking table

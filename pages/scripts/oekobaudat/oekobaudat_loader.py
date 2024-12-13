@@ -76,34 +76,39 @@ def get_names(d: dict):
 
 
 def get_classification(d: dict):
-    classification_list = d["processInformation"]["dataSetInformation"]["classificationInformation"]["classification"][0]["class"]
-    container = {}
-    for count, i in enumerate(classification_list):
-        # classification list is ordered
-        assert i.get("level") == count
-        container = {"classification": i.get("classId")}
-
+    try:
+        classification_list = d["processInformation"]["dataSetInformation"]["classificationInformation"]["classification"][0]["class"]
+        container = {}
+        for count, i in enumerate(classification_list):
+            # classification list is ordered
+            assert i.get("level") == count
+            container = {"classification": i.get("classId")}
+    except:
+        container = {}
     return container
 
 
 def parse_epd(epd: dict):
-    parsed_epd = {}
+    try: 
+        parsed_epd = {}
 
-    # parsing from JSON
-    name_de, name_en, names = get_names(epd)
-    name = name_en if name_en else name_de
-    parsed_epd.update({"name": name, "names": names, "source": epd["source"]})
-    parsed_epd.update(get_classification(epd))
-    parsed_epd.update(get_declared_quantity(epd))
+        # parsing from JSON
+        name_de, name_en, names = get_names(epd)
+        name = name_en if name_en else name_de
+        parsed_epd.update({"name": name, "names": names, "source": epd["source"]})
+        parsed_epd.update(get_classification(epd))
+        parsed_epd.update(get_declared_quantity(epd))
 
-    # parsing from LCAx
-    parsed_epd.update(parse_Lcax_format(epd))
+        # parsing from LCAx
+        parsed_epd.update(parse_Lcax_format(epd))
 
-    logger.info(
-        "Successfuly parsed EPD %s",
-    )
+        logger.info(
+            "Successfuly parsed EPD %s",
+        )
 
-    return parsed_epd
+        return parsed_epd
+    except:
+        pass
 
 
 def parse_Lcax_format(epd: dict) -> dict:
