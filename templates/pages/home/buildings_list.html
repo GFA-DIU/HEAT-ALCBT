@@ -1,0 +1,75 @@
+<!-- Bootstrap Modal -->
+<div id="modals-here"
+    class="modal modal-blur fade"
+    style="display: none"
+    aria-hidden="false"
+    tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">Hello worlds</div>
+    </div>
+</div>
+
+<ul class="btn-group list-group">
+  {% for building in buildings %}
+    <div class='row gap-1 p-2 selectable-list-item'>
+      <div class="col-md-2 align-middle" title="{{ building.name }}">
+        {%if building.name%}
+        {{ building.name | truncatechars:20 }}
+        {%else%}
+        Not specified
+        {%endif%}
+      </div>
+      <div class="col-md-2 align-middle" title="{{ building.city }}">
+        {%if building.city%}
+        {{ building.city | truncatechars:20 }}
+        {%else%}
+        Not specified
+        {%endif%}
+      </div>
+      <div class="col-md-2 align-middle"  title="{{ building.street }}">
+        {%if building.street%}
+        {{ building.street | truncatechars:15 }}
+        {%else%}
+        Not specified
+        {%endif%}
+      </div>
+      <div class="col-md-1 align-middle"  title="{{ building.number }}">
+        {%if building.number%}
+        {{ building.number | truncatechars:15 }}
+        {%else%}
+        Not specified
+        {%endif%}
+      </div>
+      <div class="col-md-1 align-middle"  title="{{ building.zip }}">
+        {%if building.zip%}
+        {{ building.zip | truncatechars:15 }}
+        {%else%}
+        Not specified
+        {%endif%}
+      </div>
+      <div class="col-md-2 align-middle"  title="{{ building.category }}">
+        {%if building.category%}
+        {{ building.category | truncatechars:15 }}
+        {%else%}
+        Not specified
+        {%endif%}
+      </div>
+      <div class="row gap-1 col-md-2 align-middle"  title="{{ building.category }}">
+        <!-- Button to trigger modal -->
+        <a href="/building/{{ building.id }}/"  class="icon-button btn btn-primary col">
+          <i class="bi bi-eye"></i>
+        </a>
+        <!-- Button to trigger modal -->
+        <button type="button" 
+          class="icon-button btn btn-danger col"
+          hx-delete="{% url 'home' %}?building_id={{ building.id }}" 
+          hx-confirm="Are you sure you wish to delete this building?"
+          hx-target="#buildings_list"
+          hx-swap="innerHTML">
+          <i class="bi bi-trash"></i>
+          
+        </button>
+      </div>
+    </div>
+  {% endfor %}
+</ul>

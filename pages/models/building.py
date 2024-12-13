@@ -1,10 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext as _
 
-from cities_light.models import Country, City
 
 from .assembly import Assembly
-from .base import BaseModel
+from .base import BaseGeoModel, BaseModel
 from .epd import Unit
 
 
@@ -44,15 +43,8 @@ class CategorySubcategory(models.Model):
         return f"{self.category.name}: {self.subcategory.name}"
 
 
-class Building(BaseModel):
+class Building(BaseModel, BaseGeoModel):
     name = models.CharField(_("Building name/code"), max_length=255)
-    country = models.ForeignKey(
-        Country, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
-    street = models.CharField(_("Street"), max_length=255, null=True, blank=True)
-    number = models.IntegerField(_("Number"), null=True, blank=True)
-    zip = models.IntegerField(_("ZIP"), null=True, blank=True)
     structural_components = models.ManyToManyField(
         Assembly,
         blank=True,

@@ -1,16 +1,29 @@
 {% extends '_base.html' %}
 {% load static %}
+
 {% load crispy_forms_tags %}
 
 {% block title %}List view{% endblock title %}
 {% block content %}
-<h1>Item List</h1>
+<h1>Buildings overview</h1>
 
-<form action="/" method="post">
-    <!-- Create an identifier for this post request -->
-    <input type="hidden" name="action" value="general_information">
-    {% crispy form %}
-</form>
-
-
+<div hx-get="{% url 'map' %}?model=building&ids=[]" 
+     hx-trigger="load"
+     hx-target="#buildings_map"
+     hx-swap="innerHTML"
+     id="buildings_map"
+     >
+  <img alt="Result loading..." class="htmx-indicator" width="150" src="https://htmx.org/img/bars.svg"/>
+</div>
+<div class="row my-2">
+  <div class='fs-3 fw-bold col-10'>Your buildings</div>
+ <!-- Button to trigger modal -->
+  <a href="/building/_new"  class="icon-button btn btn-primary fs-6 col p-0">
+    <i class="bi bi-plus"></i>
+    Add building
+  </a>
+</div>
+<div id="buildings_list">
+{% include "pages/home/buildings_list.html" %} 
+</div>
 {% endblock %}
