@@ -19,3 +19,15 @@
     font-size: 1.5rem;
   }
 }
+
+.htmx-indicator{
+  filter: invert(60%) sepia(89%) saturate(814%) hue-rotate(328deg) brightness(99%) contrast(91%);
+}
+
+#buildings_map{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  min-height: 300px;
+  max-height: 300px;
+}

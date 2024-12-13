@@ -47,8 +47,9 @@ def map_view(request):
     else:
         objects = ModelClass.objects.filter(created_by=request.user)
     # Create the map
+    f = folium.Figure(width=1000, height=500)
     folium_map = folium.Map(
-        location=[24.021379, 58.640202], zoom_start=3, tiles="OpenStreetMap"
+        location=[24.021379, 58.640202], zoom_start=2, tiles="OpenStreetMap", height="60%"
     )
     for object in objects:
         if object.latitude and object.longitude:
@@ -58,7 +59,8 @@ def map_view(request):
                 popup="Mt. Hood Meadows",
                 icon=folium.Icon(icon="cloud"),
             ).add_to(folium_map)
+    folium_map.add_to(f)
     # Render the map HTML
-    map_html = folium_map._repr_html_()  # This renders the full map HTML
+    map_html = f._repr_html_()  # This renders the full map HTML
 
     return render(request, "pages/home/map.html", {"map_html": map_html})
