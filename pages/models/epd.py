@@ -150,6 +150,7 @@ class epdLCAx(models.Model):
     UUID = models.CharField(_("Unique worldwide EPD identifier"), max_length=40)
     name = models.CharField(_("Material name"), max_length=255)
     names = models.JSONField(_("Name translations"))  # list[{"value": str, "lang": str}]
+    version = models.CharField(_("EPD Node Version"), max_length=255, null=True, blank=True)
 
     class Meta:
         unique_together = ('UUID', 'name')
@@ -221,6 +222,13 @@ class EPD(BaseModel, epdLCAx):
     )
     source= models.CharField(_("Source"), max_length=255, null=True, blank=True)
     type= models.CharField(_("Type"), choices=EPDType.choices, max_length=255)
+    declared_amount = models.DecimalField(
+        _("Reference Quantity of EPD"),
+        max_digits=10,
+        decimal_places=3,
+        null=False,
+        blank=False,
+    )
 
     def __str__(self):
         return self.name
