@@ -5,7 +5,8 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_http_methods
 import pandas as pd
 from plotly.offline import plot
-import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.building import Building, BuildingAssembly
@@ -14,84 +15,171 @@ from pages.models.assembly import Assembly, AssemblyImpact
 logger = logging.getLogger(__name__)
 
 def plotly_graph(structural_components):
-    
+    # Prepare DataFrame
     rows = []
     for assembly in structural_components:
         row = {
             'assemblybuilding_id': assembly['assemblybuilding_id'],
             'assembly_name': assembly['assembly_name']
         }
-        # Add each impact as a column
         for impact in assembly['impacts']:
             row[impact['impact_name']] = impact['value']
         rows.append(row)
-
     df = pd.DataFrame(rows)
-    gwp_a1a3_df = df[["assembly_name", "gwp a1a3"]]
+
+    # Generate colors
+    colorscale_orange = generate_discrete_colors(
+        start_color=(242,103,22),
+        end_color=(255,247,237),
+        n=df.shape[0]
+    )
+
+    colorscale_green = generate_discrete_colors(
+        start_color=(36,191,91),
+        end_color=(213,242,220),
+        n=df.shape[0]
+    )
+
+    # Create a 2x2 layout: top row for pies, bottom row for indicators
+    fig = make_subplots(
+        rows=2, cols=2, 
+        specs=[
+            [{'type':'domain'}, {'type':'domain'}],
+            [{'type':'domain'}, {'type':'domain'}]
+        ],
+        subplot_titles=['<b>Embodied Carbon</b><br>[kg CO2eq/m²/a]<br> ', '<b>Embodied Energy</b><br>[MJ/m²/a]<br> ', '', ''],
+        # Give more vertical space to top row
+        row_heights=[0.6, 0.3],
+        vertical_spacing=0.05
+    )
+
+    # Update all annotations (including subplot titles)
+    for annotation in fig['layout']['annotations']:
+        annotation['font'] = dict(size=20)  # Change 20 to your desired font size
+        
+    # Add pies
+    fig.add_trace(
+        go.Pie(
+            labels=df["assembly_name"], 
+            values=df["gwp a1a3"],
+            name="GWP A1A3",
+            hole=.4,
+            marker=dict(colors=colorscale_orange),
+            legendgroup="GWP",
+            showlegend=True
+        ), 
+        row=1, col=1
+    )
+
+    fig.add_trace(
+        go.Pie(
+            labels=df["assembly_name"], 
+            values=df["penrt a1a3"],
+            name="PENRT A1A3",
+            hole=.4,
+            marker=dict(colors=colorscale_green),
+            legendgroup="PENRT",
+            showlegend=True
+        ),
+        row=1, col=2
+    )
+
+    # Update pies formatting
+    fig.update_traces(
+        hoverinfo='label+value', hovertemplate='%{label}<br>Value: %{value:.2f}<extra></extra>', textinfo='value', textfont_size=12, texttemplate="%{percent:.1%}"
+    )
+
+    # Store existing annotations (subplot titles)
+    existing_annotations = list(fig.layout.annotations)
+
+    # Calculate centers for pie hole annotations
+    first_pie_domain = fig.data[0].domain
+    second_pie_domain = fig.data[1].domain
+
+    gwp_annotation = dict(
+        text='GWP', 
+        x=(first_pie_domain.x[0] + first_pie_domain.x[1]) / 2, 
+        y=(first_pie_domain.y[0] + first_pie_domain.y[1]) / 2,
+        font_size=20, 
+        showarrow=False, 
+        xanchor="center",
+        yanchor="middle"
+    )
+
+    penrt_annotation = dict(
+        text='PENRT', 
+        x=(second_pie_domain.x[0] + second_pie_domain.x[1]) / 2, 
+        y=(second_pie_domain.y[0] + second_pie_domain.y[1]) / 2,
+        font_size=20, 
+        showarrow=False, 
+        xanchor="center",
+        yanchor="middle"
+    )
+
+    # Combine original titles + new annotations
+    new_annotations = existing_annotations + [gwp_annotation, penrt_annotation]
+    fig.update_layout(annotations=new_annotations)
+
+    # Calculate initial sums
+    gwp_sum = df["gwp a1a3"].sum()
+    penrt_sum = df["penrt a1a3"].sum()
+
+    # Add Indicators (make them larger)
+    fig.add_trace(go.Indicator(
+        mode="number",
+        value=gwp_sum,
+        title={"text": "<b>Total GWP</b>", "font":{"size":20}},
+        number={"font": {"size":30}}
+    ), row=2, col=1)
+
+    fig.add_trace(go.Indicator(
+        mode="number",
+        value=penrt_sum,
+        title={"text": "<b>Total PENRT</b>", "font":{"size":20}},
+        number={"font": {"size":30}}
+    ), row=2, col=2)
+
+    # Increase figure size and reduce margins
+    fig.update_layout(
+        height=500,
+        width=900,
+        margin=dict(l=50, r=50, t=100, b=50),
+        showlegend=True
+    )
     
-    print(gwp_a1a3_df.shape[0])
-    
-    colorscale = generate_discrete_colorscale(
-        start_color=(242,103,22),  # Orange = #F26716
-        end_color=(255,247,237), # Light-Orange = #FFF7ED
-        n=gwp_a1a3_df.shape[0])
-    print(colorscale)
-    colorscale = ["rgb(242,103,22)", "rgb(255,247,237)"]
-    
-    fig = px.pie(gwp_a1a3_df, names='assembly_name', values='gwp a1a3', 
-                    title='Sample Pie Chart', 
-                    hole=0.5,
-                    color="gwp a1a3")
-                 #["#F26716", "#F28749"])
     pie_plot = plot(fig, output_type="div")
     return pie_plot
 
-def generate_discrete_colorscale(start_color=(242, 103, 22), end_color=(242, 135, 73), n=9):
+def generate_discrete_colors(start_color=(242, 103, 22), end_color=(255,247,237), n=5):
     """
-    Generate a discrete colorscale from start_color to end_color with n discrete steps.
-    Each discrete color is represented twice in the scale so there's no interpolation 
-    between them in Plotly's rendering. The scale starts at 0 and ends at 1.
-
+    Generate a list of n discrete colors evenly spaced between start_color and end_color.
+    
     Parameters
     ----------
-    start_color : tuple of int
-        Starting color as (R, G, B).
-    end_color : tuple of int
-        Ending color as (R, G, B).
+    start_color : tuple
+        A tuple of (R, G, B) for the start color. Each channel should be 0-255.
+    end_color : tuple
+        A tuple of (R, G, B) for the end color. Each channel should be 0-255.
     n : int
-        Number of discrete colors (including start and end).
-
+        Number of discrete colors to generate.
+        
     Returns
     -------
-    list of [float, str]
-        Discrete colorscale in the format:
-        [
-          [0.000, 'rgb(...)'],
-          [0.XXX, 'rgb(...)'],
-          [0.XXX, 'rgb(...)'],
-          ...
-          [1.000, 'rgb(...)']
-        ]
+    list of str
+        A list of n RGB color strings in the format 'rgb(R,G,B)'.
     """
-    # Interpolate colors linearly between start and end
     colors = []
     for i in range(n):
+        # Determine fraction along the gradient
         fraction = i / (n - 1) if n > 1 else 0
-        r = int(round(start_color[0] + fraction * (end_color[0] - start_color[0])))
-        g = int(round(start_color[1] + fraction * (end_color[1] - start_color[1])))
-        b = int(round(start_color[2] + fraction * (end_color[2] - start_color[2])))
-        colors.append((r, g, b))
-    
-    colorscale = []
-    # For each discrete color, create two stops to form a "box"
-    for i, (r, g, b) in enumerate(colors):
-        frac_start = round(i / n, 3)
-        frac_end = round((i + 1) / n, 3)
-        # Add the two entries for this discrete "box"
-        colorscale.append([frac_start, f"rgb({r},{g},{b})"])
-        colorscale.append([frac_end, f"rgb({r},{g},{b})"])
-
-    return colorscale
+        
+        # Interpolate each channel
+        r = int(start_color[0] + fraction * (end_color[0] - start_color[0]))
+        g = int(start_color[1] + fraction * (end_color[1] - start_color[1]))
+        b = int(start_color[2] + fraction * (end_color[2] - start_color[2]))
+        
+        colors.append(f"rgb({r},{g},{b})")
+    return colors
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
