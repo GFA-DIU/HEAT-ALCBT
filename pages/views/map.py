@@ -55,9 +55,9 @@ def map_view(request):
         if object.latitude and object.longitude:
             folium.Marker(
                 location=[object.latitude, object.longitude],
-                tooltip="Click me!",
-                popup="Mt. Hood Meadows",
-                icon=folium.Icon(icon="cloud"),
+                tooltip="Click here to see a preview of the " + model,
+                popup=object.name,
+                icon=folium.Icon(icon="glyphicon glyphicon-home"),
             ).add_to(folium_map)
     folium_map.add_to(f)
     # Render the map HTML

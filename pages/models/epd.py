@@ -144,7 +144,6 @@ class epdLCAx(models.Model):
     """
     TODO: what about english names
     """
-    base_id = models.AutoField(primary_key=True)
     comment = models.CharField(_("Comment"), max_length=255, null=True, blank=True)
     conversions = models.JSONField(_("Conversions for units, follwoing EPDx"))
     declared_unit = models.CharField(_("Declared Unit"), max_length=20, choices=Unit.choices, default=Unit.UNKNOWN)
