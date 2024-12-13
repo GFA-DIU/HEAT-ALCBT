@@ -31,3 +31,5 @@ whitenoise==6.7.0
 django-cities-light==3.10.1
 lcax==2.6.0
 requests==2.28.2
+python-dotenv==1.0.1
+geopy==2.4.1

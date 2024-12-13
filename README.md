@@ -15,6 +15,9 @@
 ----
 
 ## Get started
+
+**Note**: The Ecoplatform Loader expects an API Token `ECO_PLATFORM_TOKEN` in an `.env` file.
+
 ```
 $ python -m venv .venv
 $ source .venv/bin/activate
