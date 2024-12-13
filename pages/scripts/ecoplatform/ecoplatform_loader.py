@@ -67,7 +67,7 @@ def get_all_uuids_ecoplatform() -> list[dict]:
     return epd_list
 
 
-def get_full_epd(uri: str) -> dict:
+def get_full_epd(uri: str, country) -> dict:
     """Get the full dataset for a single EPD"""
 
         
@@ -81,5 +81,6 @@ def get_full_epd(uri: str) -> dict:
     response.raise_for_status()
     data = response.json()
     data["source"] = uri
+    data["country"] = country
 
     return data

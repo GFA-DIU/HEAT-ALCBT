@@ -8,7 +8,8 @@ from pages.scripts.oekobaudat.oekobaudat_loader import (
 )
 from pages.scripts.ecoplatform.ecoplatform_loader import (
     get_all_uuids_ecoplatform,
-    get_full_epd
+    get_full_epd,
+    country_list
 )
 
 from pages.models.epd import (
@@ -26,10 +27,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # load EPD data
-        uuids = get_all_uuids_ecoplatform()
+        epd_info = get_all_uuids_ecoplatform()
+        epd_info = [(e["uuid"], e["geo"]) for e in epd_info]
 
-        for uuid in uuids:
-            data = get_full_epd(uuid)
+        for uuid, geo in epd_info:
+            country = Country.objects.get(code2=geo)
+            data = get_full_epd(uuid, country)
             epd = parse_epd(data)
             self.stdout.write(self.style.SUCCESS(("Starting %s", epd)))
             store_epd(epd)
