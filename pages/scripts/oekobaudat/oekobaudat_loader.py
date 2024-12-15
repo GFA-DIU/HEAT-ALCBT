@@ -1,5 +1,6 @@
 import logging
 import json
+import re
 
 import lcax
 import requests
@@ -113,6 +114,9 @@ def parse_epd(epd: dict):
 
 def parse_Lcax_format(epd: dict) -> dict:
     epd_string = json.dumps(epd)
+    
+    # if value is ND, set to zero
+    epd_string = re.sub('"value": "ND"|"value": "MNA"', '"value": "0"', epd_string)
     epd = lcax.convert_ilcd(epd_string, as_type=lcax.EPD)
     conversions = [json.loads(conv.meta_data) for conv in epd.conversions]
     info = {

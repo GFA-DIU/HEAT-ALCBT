@@ -82,11 +82,5 @@ def get_full_epd(uri: str) -> dict:
     response.raise_for_status()
     data = response.json()
     data["source"] = uri
-    #TODO: potentially correct if "representative" is not the correct fallback
-    if not data["modellingAndValidation"]["LCIMethodAndAllocation"].get("other"):
-        data["modellingAndValidation"]["LCIMethodAndAllocation"]["other"] = {"anies": [{
-            "name": "subType",
-            "value": "representative dataset"
-        }]}
-    
+
     return data

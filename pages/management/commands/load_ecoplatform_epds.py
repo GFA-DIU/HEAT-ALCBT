@@ -30,25 +30,31 @@ class Command(BaseCommand):
         epd_info = get_all_uuids_ecoplatform()
         epd_info = [(e["uri"], e["geo"]) for e in epd_info]
 
+
+        uri_issue_list = []
         for uri, geo in epd_info:
             try:
                 # Fetch related country
                 country = Country.objects.get(code2=geo)
                 
                 # Retrieve and process EPD data
+                self.stdout.write(self.style.SUCCESS(f"1. Load epd with URI {uri}"))
                 data = get_full_epd(uri)
+                self.stdout.write(self.style.SUCCESS(f"2. Parse for {data}"))
                 epd = parse_epd(data)
-                self.stdout.write(self.style.SUCCESS(f"Starting processing for {epd}"))
-                
+                self.stdout.write(self.style.SUCCESS(f"3. Parsed data to epd: {epd}"))
                 # Store processed EPD
                 store_epd(epd, country, data)
-                self.stdout.write(self.style.SUCCESS(f"Successfully uploaded {uri}"))
+                self.stdout.write(self.style.SUCCESS(f"4. Successfully uploaded {uri}"))
             except Country.DoesNotExist:
                 self.stdout.write(self.style.ERROR(f"Country with code2={geo} does not exist."))
             except Exception as e:
+                uri_issue_list.append(epdi)
                 self.stdout.write(self.style.ERROR(f"An error occurred: {str(e)}"))
                 self.stdout.write(self.style.ERROR(traceback.format_exc()))
 
+        self.stdout.write(self.style.ERROR(f"List of problem uris: {uri_issue_list}"))
+        
 def store_epd(epd_data: dict, country: Country, data: dict):
     """
     Parse the EPD data and link it to the correct material categories and impacts.
