@@ -49,7 +49,7 @@ class Command(BaseCommand):
             except Country.DoesNotExist:
                 self.stdout.write(self.style.ERROR(f"Country with code2={geo} does not exist."))
             except Exception as e:
-                uri_issue_list.append(epdi)
+                uri_issue_list.append(uri)
                 self.stdout.write(self.style.ERROR(f"An error occurred: {str(e)}"))
                 self.stdout.write(self.style.ERROR(traceback.format_exc()))
 

@@ -26,7 +26,7 @@ class Command(BaseCommand):
         # load EPD data
         uuids = get_all_epds()
 
-        for uuid in uuids:
+        for uuid in uuids[0:10]:
             data = get_full_epd(uuid)
             epd = parse_epd(data)
             self.stdout.write(self.style.SUCCESS(("Starting %s", epd)))
@@ -58,6 +58,8 @@ def store_epd(epd_data: dict):
             "source": epd_data["source"],
             "type": EPDType.OFFICAL,
             "country": country,
+            "declared_amount": epd_data["declared_amount"],
+            "version": epd_data["version"],
             # from base
             "created_by": superuser,
             "public": True,

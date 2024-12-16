@@ -118,7 +118,7 @@ def parse_Lcax_format(epd: dict) -> dict:
     # if value is ND, set to zero
     epd_string = re.sub('"value": "ND"|"value": "MNA"', '"value": "0"', epd_string)
     epd = lcax.convert_ilcd(epd_string, as_type=lcax.EPD)
-    conversions = [json.loads(conv.meta_data) for conv in epd.conversions]
+    conversions = [conv.meta_data for conv in epd.conversions]
     info = {
         "declared_unit": epd.declared_unit.value,
         "conversions": conversions,

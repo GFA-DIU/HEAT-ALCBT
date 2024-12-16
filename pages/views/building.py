@@ -99,7 +99,7 @@ def building(request, building_id):
             impacts = [
                 {
                     'impact_id': impact.impact.id,
-                    'impact_name': impact.impact.name,
+                    'impact_name': impact.impact.__str__(),
                     'value': impact.value
                 }
                 for impact in component.assembly.assemblyimpact_set.all()

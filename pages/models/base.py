@@ -58,8 +58,9 @@ class BaseGeoModel(models.Model):
                 try:
                     location = geolocator.geocode(", ".join(address_string))
                     self.longitude, self.latitude = location.longitude, location.latitude
-                except _ as error:
+                except Exception as error:
                     logger.error(error)
+                    self.longitude, self.latitude = self.city.longitude, self.city.latitude
             else:
                 self.longitude, self.latitude = self.city.longitude, self.city.latitude
     class Meta:
