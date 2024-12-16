@@ -1,5 +1,6 @@
 import logging
 import json
+import re
 
 import lcax
 import requests
@@ -12,7 +13,9 @@ OKOBAU_URL = "https://oekobaudat.de/OEKOBAU.DAT/resource/datastocks/c391de0f-2cf
 def get_epds(limit) -> dict:
     """Get several EPDs from Ökobau"""
 
-    response = requests.get(f"{OKOBAU_URL}/processes?format=json&view=extended&pageSize={limit}")
+    response = requests.get(
+        f"{OKOBAU_URL}/processes?format=json&view=extended&pageSize={limit}"
+    )
     response.raise_for_status()
     data = response.json()
 
@@ -33,18 +36,18 @@ def get_all_epds() -> dict:
 
     # Load all epds
     data = get_epds(num_epds)
-    
+
     # Get UUID
     uuids = []
     for epd in data.get("data"):
-        uuids.append(epd.get('uuid'))
-    
+        uuids.append(epd.get("uuid"))
+
     return uuids
 
 
 def get_full_epd(uid: str) -> dict:
     """Get the full dataset for a single EPD
-    
+
     Notes:
      - If no version number is specified, the most recent dataset (with the highest version number) is always
     returned. (ECO-Platform documentation on soda4LCA)
@@ -74,46 +77,54 @@ def get_names(d: dict):
 
 
 def get_classification(d: dict):
-    classification_list = d["processInformation"]["dataSetInformation"]["classificationInformation"]["classification"][0]["class"]
-    container = {}
-    for count, i in enumerate(classification_list):
-        # classification list is ordered
-        assert i.get("level") == count
-        container = {"classification": i.get('classId')}
-
+    try:
+        classification_list = d["processInformation"]["dataSetInformation"]["classificationInformation"]["classification"][0]["class"]
+        container = {}
+        for count, i in enumerate(classification_list):
+            # classification list is ordered
+            assert i.get("level") == count
+            container = {"classification": i.get("classId")}
+    except:
+        container = {}
     return container
 
 
 def parse_epd(epd: dict):
-    parsed_epd = {}
-    
-    # parsing from JSON
-    name_de, name_en, names = get_names(epd)
-    name = name_en if name_en else name_de
-    parsed_epd.update({
-        "name": name,
-        "names": names,
-        "source": "OEKOBAU.DAT"
-    })
-    parsed_epd.update(get_classification(epd))
+    try: 
+        parsed_epd = {}
 
-    # parsing from LCAx
-    parsed_epd.update(parse_Lcax_format(epd))
-    
-    logger.info("Successfuly parsed EPD %s", )
+        # parsing from JSON
+        name_de, name_en, names = get_names(epd)
+        name = name_en if name_en else name_de
+        parsed_epd.update({"name": name, "names": names, "source": epd["source"]})
+        parsed_epd.update(get_classification(epd))
+        parsed_epd.update(get_declared_quantity(epd))
 
-    return parsed_epd
+        # parsing from LCAx
+        parsed_epd.update(parse_Lcax_format(epd))
+
+        logger.info(
+            "Successfuly parsed EPD %s",
+        )
+
+        return parsed_epd
+    except:
+        pass
 
 
 def parse_Lcax_format(epd: dict) -> dict:
     epd_string = json.dumps(epd)
+    
+    # if value is ND, set to zero
+    epd_string = re.sub('"value": "ND"|"value": "MNA"', '"value": "0"', epd_string)
     epd = lcax.convert_ilcd(epd_string, as_type=lcax.EPD)
     conversions = [json.loads(conv.meta_data) for conv in epd.conversions]
-    info =  {
+    info = {
         "declared_unit": epd.declared_unit.value,
         "conversions": conversions,
         "uuid": epd.id,
         "comment": epd.comment,
+        "version": epd.version,
     }
     impacts = get_impacts(epd)
     info.update(impacts)
@@ -122,14 +133,18 @@ def parse_Lcax_format(epd: dict) -> dict:
 
 def get_impacts(epd: lcax.EPD):
     indicator_list = {
-        "penrt": ["a1a3","c3","c4","d"],
-        "gwp": ["a1a3", "c3", "c4", "d"]
+        "penrt": ["a1a3", "c3", "c4", "d"],
+        "gwp": ["a1a3", "c3", "c4", "d"],
     }
 
     container = {}
     for k, v in epd.impacts.items():
-        if lifecycle:= indicator_list.get(k):
+        if lifecycle := indicator_list.get(k):
             for i in lifecycle:
                 container.update({f"{k}_{i}": v.get(i)})
-    
+
     return container
+
+
+def get_declared_quantity(epd: dict) -> float:
+    return {"declared_amount": epd["exchanges"]["exchange"][0]["resultingflowAmount"]}
