@@ -31,11 +31,16 @@ port=5432
 ```
 **Note**: Replace `POSTGRES_USER` and `POSTGRES_DB` with your own values.
 
-Finally create a new file named `.pg_password` in the secrets folder with the following content:
+Furthermore, create a new file named `.pg_password` in the secrets folder with the following content:
 ```
 localhost:5432:POSTGRES_USER:POSTGRES_DB:POSTGRES_PASSWD
 ```
 **Note**: Replace `POSTGRES_USER`, `POSTGRES_PASSWD` and `POSTGRES_DB` with your own values.
+
+Finally, start the docker container with the following command (add the -d option to run the container in the background):
+```
+$ docker compose up postgres --build
+```
 
 ### Installation
 ```Bash
