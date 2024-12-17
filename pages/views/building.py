@@ -30,11 +30,11 @@ def plotly_graph(structural_components):
 
     # Generate colors
     colorscale_orange = generate_discrete_colors(
-        start_color=(242, 103, 22), end_color=(255, 247, 237), n=df.shape[0]
+        start_color=(242, 103, 22), end_color=(250, 199, 165), n=df.shape[0]
     )
 
     colorscale_green = generate_discrete_colors(
-        start_color=(36, 191, 91), end_color=(213, 242, 220), n=df.shape[0]
+        start_color=(36, 191, 91), end_color=(154, 225, 177), n=df.shape[0]
     )
 
     # Create a 2x2 layout: top row for pies, bottom row for indicators
@@ -92,10 +92,14 @@ def plotly_graph(structural_components):
     # Update pies formatting
     fig.update_traces(
         hoverinfo="label+value",
-        hovertemplate="%{label}<br>Value: %{value:.2f}<extra></extra>",
-        textinfo="value",
-        textfont_size=12,
-        texttemplate="%{percent:.1%}",
+        hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
+        textinfo='label+percent',  # Show assembly names, values, and percentages
+        textfont=dict(
+            size=14,        # Increase text size
+            family="Arial, sans-serif",  # Use a modern sans-serif font
+            color='white'   # Default high contrast text color
+        ),
+        texttemplate="<b>%{label}</b><br>%{percent:.0%}"
     )
 
     # Store existing annotations (subplot titles)
