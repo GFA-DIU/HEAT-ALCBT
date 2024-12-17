@@ -7,18 +7,19 @@ from django.views.decorators.http import require_http_methods
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.building import Building, BuildingAssembly
 from pages.models.assembly import Assembly, AssemblyImpact
+from pages.scripts.dashboards.building_dashboard import building_dashboard
 
 logger = logging.getLogger(__name__)
-
-
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
 def building(request, building_id):
     print("request user", request.user)
     # General Info
-    if request.method == "POST" and request.POST.get('action') == "general_information":
-        form = BuildingGeneralInformation(request.POST, instance=building)  # Bind form to instance
+    if request.method == "POST" and request.POST.get("action") == "general_information":
+        form = BuildingGeneralInformation(
+            request.POST, instance=building
+        )  # Bind form to instance
         if form.is_valid():
             print("these fields changed", form.changed_data)
             updated_building = form.save()
@@ -38,35 +39,37 @@ def building(request, building_id):
         component.delete()
 
         # Fetch the updated list of assemblies for the building
-        updated_list = (
-            BuildingAssembly.objects.filter(
-                building__created_by=request.user,
-                assembly__created_by=request.user,
-                building_id=building_id
-            ).select_related('assembly')  # Optimize query by preloading related Assembly
-        )
+        updated_list = BuildingAssembly.objects.filter(
+            building__created_by=request.user,
+            assembly__created_by=request.user,
+            building_id=building_id,
+        ).select_related(
+            "assembly"
+        )  # Optimize query by preloading related Assembly
         structural_components = []
         for component in updated_list:
             impacts = [
                 {
-                    'impact_id': impact.impact.id,
-                    'impact_name': impact.impact.name,
-                    'value': impact.value
+                    "impact_id": impact.impact.id,
+                    "impact_name": impact.impact.name,
+                    "value": impact.value,
                 }
                 for impact in component.assembly.assemblyimpact_set.all()
             ]
 
-            structural_components.append({
-                'assemblybuilding_id': component.id,
-                'assembly_name': component.assembly.name,
-                'assembly_classification': component.assembly.classification,
-                'quantity': component.quantity,
-                'unit': component.unit,
-                'impacts': impacts
-            })
+            structural_components.append(
+                {
+                    "assemblybuilding_id": component.id,
+                    "assembly_name": component.assembly.name,
+                    "assembly_classification": component.assembly.classification,
+                    "quantity": component.quantity,
+                    "unit": component.unit,
+                    "impacts": impacts,
+                }
+            )
         context = {
-        "building_id": building_id,
-        "structural_components": list(structural_components),
+            "building_id": building_id,
+            "structural_components": list(structural_components),
         }
         return render(
             request, "pages/building/structural_info/assemblies_list.html", context
@@ -75,22 +78,25 @@ def building(request, building_id):
     # Full reload
     else:
         building = get_object_or_404(
-            Building.objects.filter(created_by=request.user)  # Ensure the building belongs to the user
-            .prefetch_related(
+            Building.objects.filter(
+                created_by=request.user
+            ).prefetch_related(  # Ensure the building belongs to the user
                 Prefetch(
-                    'buildingassembly_set',
+                    "buildingassembly_set",
                     queryset=BuildingAssembly.objects.filter(
                         # assembly__created_by=request.user  # Ensure the assembly belongs to the user
-                    ).select_related('assembly').prefetch_related(
+                    )
+                    .select_related("assembly")
+                    .prefetch_related(
                         Prefetch(
-                            'assembly__assemblyimpact_set',
-                            queryset=AssemblyImpact.objects.select_related('impact')
+                            "assembly__assemblyimpact_set",
+                            queryset=AssemblyImpact.objects.select_related("impact"),
                         )
                     ),
-                    to_attr='prefetched_components'
+                    to_attr="prefetched_components",
                 )
             ),
-            pk=building_id
+            pk=building_id,
         )
 
         # Build structural components and impacts in one step
@@ -98,30 +104,36 @@ def building(request, building_id):
         for component in building.prefetched_components:
             impacts = [
                 {
-                    'impact_id': impact.impact.id,
-                    'impact_name': impact.impact.__str__(),
-                    'value': impact.value
+                    "impact_id": impact.impact.id,
+                    "impact_name": impact.impact.__str__(),
+                    "value": impact.value,
                 }
                 for impact in component.assembly.assemblyimpact_set.all()
             ]
 
-            structural_components.append({
-                'assemblybuilding_id': component.id,
-                'assembly_name': component.assembly.name,
-                'assembly_classification': component.assembly.classification,
-                'quantity': component.quantity,
-                'unit': component.unit,
-                'impacts': impacts
-            })
-
+            structural_components.append(
+                {
+                    "assemblybuilding_id": component.id,
+                    "assembly_name": component.assembly.name,
+                    "assembly_classification": component.assembly.classification,
+                    "quantity": component.quantity,
+                    "unit": component.unit,
+                    "impacts": impacts,
+                }
+            )
 
         context = {
             "building_id": building.id,
             "building": building,
             "structural_components": list(structural_components),
+            "dashboard": building_dashboard(structural_components),
         }
-        
-        logger.info("Found building: %s with %d structural components", building.name, len(context["structural_components"])) 
+
+        logger.info(
+            "Found building: %s with %d structural components",
+            building.name,
+            len(context["structural_components"]),
+        )
         form = BuildingGeneralInformation(instance=building)
 
     context["form_general_info"] = form
