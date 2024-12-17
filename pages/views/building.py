@@ -94,6 +94,7 @@ def plotly_graph(structural_components):
         hoverinfo="label+value",
         hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
         textinfo='label+percent',  # Show assembly names, values, and percentages
+        hoverlabel=dict(font_color="white"),
         textfont=dict(
             size=14,        # Increase text size
             family="Arial, sans-serif",  # Use a modern sans-serif font
