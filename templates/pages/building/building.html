@@ -7,12 +7,9 @@
 <h1>{{ building.name }}</h1>
 <p class="text-muted">{{ building.country }}</p>
 
-<div
-  class="mt-1 mb-1 p-5 text-center"
-  style="background-color: #f0f0f0; border: 2px dashed #ddd"
->
-  <p class="mb-0 text-muted">Placeholder Dashbaord</p>
-</div>
+{% autoescape off %}
+  {{ dashboard }}
+{% endautoescape %}
 
 <div class="accordion pt-3 pb-3" id="accordionExample">
 
@@ -20,7 +17,7 @@
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingOne">
       <button
-        class="accordion-button collapsed"
+        class="accordion-button"
         type="button"
         data-bs-toggle="collapse"
         data-bs-target="#collapseOne"
@@ -32,7 +29,7 @@
     </h2>
     <div
       id="collapseOne"
-      class="accordion-collapse collapse"
+      class="accordion-collapse collapse show"
       aria-labelledby="headingOne"
       data-bs-parent="#accordionExample"
     >
