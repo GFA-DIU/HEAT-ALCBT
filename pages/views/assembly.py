@@ -98,13 +98,14 @@ def component_edit(request, building_id, assembly_id=None):
 
     elif request.method =="GET" and request.GET.get("add_component") == "step_1":
         # TODO: Only makes sense for new component
-        return render(request, "pages/building/component_add/modal_step_1.html")
+        return render(request, "pages/building/component_add/modal_step_1.html", context)
 
     else:
-        component = get_object_or_404(Assembly, id=assembly_id)
-        products = Product.objects.filter(assembly=component).select_related('epd')
-        selected_epds = [SelectedEPD.parse_product(p) for p in products]
-        context["selected_epds"] = selected_epds
+        component = get_object_or_404(Assembly, id=assembly_id) if assembly_id else None
+        if component:
+            products = Product.objects.filter(assembly=component).select_related('epd')
+            selected_epds = [SelectedEPD.parse_product(p) for p in products]
+            context["selected_epds"] = selected_epds
         form = AssemblyForm(instance=component)
         context["form"] = form
 
