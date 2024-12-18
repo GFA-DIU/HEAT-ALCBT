@@ -1,5 +1,4 @@
 {% load crispy_forms_tags %}
-<h2>Component Editor</h2>
 <form action="{% url 'component_edit' assembly_id=assembly_id %}" method="post">
     {% csrf_token %}
     <div class="row">

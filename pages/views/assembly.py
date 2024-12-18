@@ -114,8 +114,9 @@ def component_edit(request, assembly_id=None):
             # Handle partial rendering for HTMX
             return render(request, "pages/building/component_add/epd_list.html", context)
 
-        elif request.method =="GET" and request.GET.get("add_component") == "any_component":
-            return render(request, "pages/building/component_add/modal_default_or_custom.html")
+        elif request.method =="GET" and request.GET.get("add_component") == "step_1":
+            # TODO: Only makes sense for new component
+            return render(request, "pages/building/component_add/modal_step_1.html")
 
         else:
             form = AssemblyForm(instance=component)
@@ -135,7 +136,7 @@ def component_edit(request, assembly_id=None):
     context["form"] = form
 
     # Render full template for non-HTMX requests
-    return render(request, "pages/building/test_component.html", context)
+    return render(request, "pages/building/component_add/modal_step_2.html", context)
 
 
 def save_assembly(request, context, component):

@@ -1,11 +1,11 @@
 <button class="btn btn-primary m-2 mt-3"
-  hx-get="{% url 'component_edit' assembly_id=1 %}?add_component=any_component"
+  hx-get="{% url 'component_edit' assembly_id=1 %}?add_component=step_1"
   hx-target="#modal-body"
   hx-swap="innerHTML"
 >Add Component</button>
 
 <div id="modal" class="modal fade" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
     <div class="modal-content">
       <div id="modal-body"></div>
     </div>
