@@ -90,7 +90,7 @@ def component_edit(request, building_id, assembly_id=None):
         selected_epds = [SelectedEPD.parse_product(p) for p in products]
         context["selected_epds"] = selected_epds
         context = save_assembly(request, context, component)
-        return redirect('building', kwargs={'building_id': building_id})
+        return redirect('building', building_id = building_id)
 
     elif request.method == "GET" and request.GET.get("page"):
         # Handle partial rendering for HTMX
