@@ -34,12 +34,6 @@ def buildings_list(request):
         building_to_delete.delete()
         context = {"buildings": Building.objects.filter(created_by=request.user)}
         return render(request, "pages/home/buildings_list.html", context)
-    
-    elif request.GET.get('country'):
-        country_id = request.GET.get('country')
-        if country_id:
-            cities = City.objects.filter(country_id=country_id).order_by('name')
-            return render(request, 'pages/utils/city_list.html', {'cities': cities})
         
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")

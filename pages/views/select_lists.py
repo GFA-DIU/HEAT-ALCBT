@@ -16,11 +16,11 @@ def select_lists(request):
     if request.GET.get('country'):
         country_id = int(request.GET.get("country"))
         if country_id:
-            cities = City.objects.filter(level=2, parent=country_id).order_by("name")
+            cities = City.objects.filter(country=country_id).order_by("name")
             return render(
                 request,
-                "pages/building/general_info/city_list.html",
-                {"items": cities, "default_text": "Select a category"},
+                "pages/utils/select_list.html",
+                {"items": cities, "default_text": "Select a country"},
             )
     if request.GET.get('category'):
         category_id = int(request.GET.get('category'))
@@ -30,7 +30,7 @@ def select_lists(request):
             ).order_by("name_en")
             return render(
                 request,
-                "pages/building/general_info/city_list.html",
+                "pages/utils/select_list.html",
                 {"items": subcategories, "default_text": "Select a category"},
             )
     if request.GET.get('subcategory'):
@@ -41,9 +41,12 @@ def select_lists(request):
             ).order_by("name_en")
             return render(
                 request,
-                "pages/building/general_info/city_list.html",
+                "pages/utils/select_list.html",
                 {"items": childcategories, "default_text": "Select a subcategory"},
             )
     # Full page load for GET request
-    logger.info("")
-    return redirect("home")
+    return render(
+        request,
+        "pages/utils/select_list.html",
+        {"items": [], "default_text": ""},
+    )

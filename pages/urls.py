@@ -1,6 +1,7 @@
 from django.urls import path
 
 from pages.views.map import map_view
+from pages.views.select_lists import select_lists
 
 from .views.about import AboutPageView
 from .views.home import buildings_list
@@ -10,6 +11,7 @@ from .views.assembly import component_edit, component_new
 urlpatterns = [
     path("", buildings_list, name="home"),
     path("about/", AboutPageView.as_view(), name="about"),
+    path("select_lists/", select_lists, name="select-lists"),
     path("map/", map_view, name="map"),
     path("building/_new/", building, name="new_building"),
     path("building/<int:building_id>/", building, name="building"),

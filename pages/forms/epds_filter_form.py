@@ -27,7 +27,7 @@ class EPDsFilterForm(forms.Form):
         widget=forms.Select(
             attrs={
                 "id": "sub-category",
-                "hx-get": "select_lists/",  # HTMX request to the root URL
+                "hx-get": "/select_lists/",  # HTMX request to the root URL
                 "hx-trigger": "change",  # Trigger HTMX on change event
                 "hx-target": "#child-category",  # Update the City dropdown
                 "hx-vals": '{"id": this.value}',
