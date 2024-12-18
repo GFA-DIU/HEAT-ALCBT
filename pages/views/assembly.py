@@ -101,11 +101,15 @@ def component_edit(request, building_id, assembly_id=None):
         return render(request, "pages/building/component_add/modal_step_1.html")
 
     else:
+        component = get_object_or_404(Assembly, id=assembly_id)
+        products = Product.objects.filter(assembly=component).select_related('epd')
+        selected_epds = [SelectedEPD.parse_product(p) for p in products]
+        context["selected_epds"] = selected_epds
         form = AssemblyForm(instance=component)
         context["form"] = form
 
     # Render full template for non-HTMX requests
-    return render(request, "pages/building/component_add/modal_step_2.html", context)
+    return render(request, "pages/building/component_add/editor_own_page.html", context)
 
 
 def save_assembly(request, context, component):
