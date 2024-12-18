@@ -1,5 +1,5 @@
 {% load crispy_forms_tags %}
-<form action="{% url 'component_edit' assembly_id=assembly_id %}" method="post">
+<form action="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}" method="post">
     {% csrf_token %}
     <div class="row">
         <!-- Name and Type in the first row -->

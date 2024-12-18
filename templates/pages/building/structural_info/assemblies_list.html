@@ -18,7 +18,7 @@
         <!-- Action Buttons -->
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
             <button class="btn btn-secondary"
-                    hx-get="{% url 'component_edit' assembly_id=component.assemblybuilding_id %}"
+                    hx-get="{% url 'component_edit' assembly_id=component.assemblybuilding_id building_id=building_id%}"
                     hx-target="#modal-body"
                     hx-swap="innerHTML"
                 >Edit

@@ -6,8 +6,7 @@ from typing import Optional
 
 from django.core.paginator import Paginator
 from django.db.models import Prefetch
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from django.forms import ValidationError
@@ -70,70 +69,40 @@ class SelectedEPD:
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
-def component_edit(request, assembly_id=None):
+def component_edit(request, building_id, assembly_id=None):
     """
     View to either edit an existing component or create a new one with pagination for EPDs.
     """
-    # Initialize the session variable if it doesn't exist
-    if "selected_epds" not in request.session:
-        request.session["selected_epds"] = []
-
-
-    component = get_object_or_404(Assembly, id=assembly_id)
-    products = Product.objects.filter(assembly=component).select_related('epd')
-    selected_epds = [SelectedEPD.parse_product(p) for p in products]
-
-    # # Load selected EPDs from session
-    # selected_epd_ids = request.session["selected_epds"]
-    # selected_epds = EPD.objects.filter(id__in=selected_epd_ids)
-
     context = {
         "assembly_id": assembly_id,
-        "selected_epds": selected_epds,
+        "building_id": building_id,
     }
 
     # Pagination setup for EPD list
     epd_list = EPD.objects.all().order_by('id')  # Replace with any filtering logic if needed
     paginator = Paginator(epd_list, 10)  # Show 10 items per page
     page_number = request.GET.get('page', 1)  # Get the current page number from the query parameters
-    page_obj = paginator.get_page(page_number)
+    context["epd_list"] = paginator.get_page(page_number)
 
-    # Add the paginated list to the context
-    context["epd_list"] = page_obj
-
-    if assembly_id:
+    if request.method == "POST" and request.POST.get("action") == "form_submission":
         component = get_object_or_404(Assembly, id=assembly_id)
-        context["assembly_id"] = component.id
+        products = Product.objects.filter(assembly=component).select_related('epd')
+        selected_epds = [SelectedEPD.parse_product(p) for p in products]
+        context["selected_epds"] = selected_epds
+        context = save_assembly(request, context, component)
+        return redirect('building', kwargs={'building_id': building_id})
 
+    elif request.method == "GET" and request.GET.get("page"):
+        # Handle partial rendering for HTMX
+        return render(request, "pages/building/component_add/epd_list.html", context)
 
-        if request.method == "POST" and request.POST.get("action") == "form_submission":
-            context = save_assembly(request, context, component)
-            return HttpResponseRedirect(reverse('component_edit', kwargs={'assembly_id': assembly_id}))
+    elif request.method =="GET" and request.GET.get("add_component") == "step_1":
+        # TODO: Only makes sense for new component
+        return render(request, "pages/building/component_add/modal_step_1.html")
 
-        elif request.method == "GET" and request.GET.get("page"):
-            # Handle partial rendering for HTMX
-            return render(request, "pages/building/component_add/epd_list.html", context)
-
-        elif request.method =="GET" and request.GET.get("add_component") == "step_1":
-            # TODO: Only makes sense for new component
-            return render(request, "pages/building/component_add/modal_step_1.html")
-
-        else:
-            form = AssemblyForm(instance=component)
     else:
-        # Handle creation of a new assembly
-        if request.method == "POST":
-            form = AssemblyForm(request.POST)
-            if form.is_valid():
-                form.save()
-                # Clear the session variable after successful submission
-                request.session["selected_epds"] = []
-                return HttpResponseRedirect(reverse("component"))
-        else:
-            form = AssemblyForm()
-
-    # Add form to context
-    context["form"] = form
+        form = AssemblyForm(instance=component)
+        context["form"] = form
 
     # Render full template for non-HTMX requests
     return render(request, "pages/building/component_add/modal_step_2.html", context)
