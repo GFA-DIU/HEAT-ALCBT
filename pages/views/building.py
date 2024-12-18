@@ -1,6 +1,7 @@
 import logging
 
 from django.db.models import Prefetch, Q
+from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
@@ -20,22 +21,21 @@ def building(request, building_id = None):
     # General Info
     if request.method == "POST" and request.POST.get("action") == "general_information":
         building = get_object_or_404(Building, created_by=request.user, pk=building_id) if building_id else None
-        
         form = BuildingGeneralInformation(
             request.POST, instance=building
         )  # Bind form to instance
         if form.is_valid():
             print("these fields changed", form.changed_data)
-            updated_building = form.save()
-            print("Building updated in DB:", updated_building)
-            context["building_id"]= building.id,
-            context["building"]= building,
-            context["structural_components"] = []
+            building = form.save(commit=False)
+            building.created_by = request.user
+            building.save()
+            print("Building updated in DB:", building)
         else:
             print("Form is invalid")
             print("Errors:", form.errors)
-        
-        return redirect('building', building_id=building_id)
+            return HttpResponseServerError()
+
+        return redirect("building", building_id=building.id)
 
     elif request.method == "DELETE":
         component_id = request.GET.get("component")
@@ -139,14 +139,10 @@ def building(request, building_id = None):
             "building_id": building.id,
             "building": building,
             "structural_components": list(structural_components),
-            "dashboard": building_dashboard(structural_components),
         }
+        if len(structural_components):
+            context["dashboard"] = building_dashboard(structural_components)
 
-        logger.info(
-            "Found building: %s with %d structural components",
-            building.name,
-            len(context["structural_components"]),
-        )
         form = BuildingGeneralInformation(instance=building)
 
         logger.info(
@@ -154,7 +150,6 @@ def building(request, building_id = None):
             building.name,
             len(context["structural_components"]),
         )
-        form = BuildingGeneralInformation(instance=building)
     else:
         context = {
             "building_id": None,

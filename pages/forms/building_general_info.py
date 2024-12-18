@@ -13,7 +13,7 @@ class BuildingGeneralInformation(forms.ModelForm):
     country = forms.ModelChoiceField(
         queryset=Country.objects.all(),
         widget=forms.Select(attrs={
-            'hx-get': '/building/_new',               # HTMX request to the root URL
+            'hx-get': '/',               # HTMX request to the root URL
             'hx-trigger': 'change',      # Trigger HTMX on change event
             'hx-target': '#city-dropdown', # Update the City dropdown
             'hx-vals': '{"id": this.value}', # Dynamically include the dropdown value
@@ -57,19 +57,6 @@ class BuildingGeneralInformation(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if instance:
-            self.fields["country"] = forms.ModelChoiceField(
-                queryset=Country.objects.all(),
-                widget=forms.Select(
-                    attrs={
-                        "hx-get": "/building/"
-                        + str(instance.pk),  # HTMX request to the root URL
-                        "hx-trigger": "change",  # Trigger HTMX on change event
-                        "hx-target": "#city-dropdown",  # Update the City dropdown
-                        "class": "select form-select",
-                    }
-                ),
-                label="Country",
-            )
             if instance.country:
                 self.fields['city'].queryset = City.objects.filter(country=instance.country).order_by('name')
                 self.initial['country'] = instance.country
@@ -83,8 +70,20 @@ class BuildingGeneralInformation(forms.ModelForm):
             if instance.city:
                 self.initial['city'] = instance.city
 
-        if 'city' in self.data:
-            self.instance.city = get_object_or_404(City, id=int(self.data['city']))
+        # Adjust 'city' queryset dynamically based on 'country' in the request data
+        if "country" in self.data:
+            try:
+                country_id = int(self.data.get("country"))
+                self.fields["city"].queryset = City.objects.filter(
+                    country_id=country_id
+                ).order_by("name")
+            except (ValueError, TypeError):
+                self.fields["city"].queryset = City.objects.none()
+        elif self.instance.pk:
+            # If editing an existing instance, prepopulate the 'city' queryset
+            self.fields["city"].queryset = City.objects.filter(
+                country=self.instance.country
+            ).order_by("name")
         # Crispy Forms Layout
         self.helper = FormHelper()
         self.helper.layout = Layout(
