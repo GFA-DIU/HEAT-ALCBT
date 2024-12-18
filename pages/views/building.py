@@ -1,7 +1,7 @@
 import logging
 
 from django.db.models import Prefetch, Q
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
 from pages.forms.building_general_info import BuildingGeneralInformation
@@ -17,6 +17,8 @@ def building(request, building_id):
     print("request user", request.user)
     # General Info
     if request.method == "POST" and request.POST.get("action") == "general_information":
+        building = get_object_or_404(Building, created_by=request.user, pk=building_id) if building_id else None
+        
         form = BuildingGeneralInformation(
             request.POST, instance=building
         )  # Bind form to instance
@@ -27,6 +29,8 @@ def building(request, building_id):
         else:
             print("Form is invalid")
             print("Errors:", form.errors)
+        
+        return redirect('building', building_id=building_id)
 
     elif request.method == "DELETE":
         component_id = request.GET.get("component")
