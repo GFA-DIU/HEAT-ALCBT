@@ -13,6 +13,7 @@ urlpatterns = [
     path("map/", map_view, name="map"),
     path("building/_new/", building, name="new_building"),
     path("building/<int:building_id>/", building, name="building"),
-    path("component/", component_edit, name="component"),
-    path("component/<int:assembly_id>/", component_edit, name="component_edit"),  # For editing an existing component
+
+    path("component/<int:building_id>/_new", component_edit, name="component"),
+    path("component/<int:assembly_id>/<int:building_id>/", component_edit, name="component_edit"),  # For editing an existing component
 ]

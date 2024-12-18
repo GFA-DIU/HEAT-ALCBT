@@ -1,6 +1,9 @@
 {% load crispy_forms_tags %}
-<h2>Component Editor</h2>
-<form action="{% url 'component_edit' assembly_id=assembly_id %}" method="post">
+{% if assembly_id %}
+<form action="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}" method="post">
+{% else %}
+<form action="{% url 'component' building_id=building_id %}" method="post">
+{% endif %}
     {% csrf_token %}
     <div class="row">
         <!-- Name and Type in the first row -->
@@ -42,6 +45,7 @@
 
     <div class="row">
         <div class="col-md-12">
+            <a href="{% url 'building' building_id=building_id %}" class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">Save</button>
         </div>
     </div>
@@ -117,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${availableUnits.map(unit => `<option value="${unit}">${unit}</option>`).join('')}
                 </select>
                 <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-                    <button class="btn btn-danger remove-epd" data-id="${epdId}">
+                    <button type="button" class="btn btn-danger remove-epd" data-id="${epdId}">
                         Remove
                     </button>
                 </div>
@@ -129,6 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Remove material from selected list
     selectedEpdList.addEventListener('click', (event) => {
         if (event.target.classList.contains('remove-epd')) {
+            event.preventDefault(); // Prevent form submission
+            event.stopPropagation(); // Stop the event from bubbling up
+
             const epdId = event.target.dataset.id;
 
             // Remove the material from the selected list
@@ -137,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.remove();
             }
 
-            // Optionally, you could re-enable the "Add" button in the library
+            // Optionally, re-enable the "Add" button in the library
             const addButton = document.querySelector(`#epd-list button.add-epd[data-id="${epdId}"]`);
             if (addButton) {
                 addButton.disabled = false;
