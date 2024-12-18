@@ -114,6 +114,9 @@ def component_edit(request, assembly_id=None):
             # Handle partial rendering for HTMX
             return render(request, "pages/building/component_add/epd_list.html", context)
 
+        elif request.method =="GET" and request.GET.get("add_component") == "any_component":
+            return render(request, "pages/building/component_add/modal_default_or_custom.html")
+
         else:
             form = AssemblyForm(instance=component)
     else:
