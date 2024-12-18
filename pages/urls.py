@@ -11,8 +11,8 @@ urlpatterns = [
     path("", buildings_list, name="home"),
     path("about/", AboutPageView.as_view(), name="about"),
     path("map/", map_view, name="map"),
-    path("building/<int:building_id>/", building, name="building"),
     path("building/_new/", building, name="new_building"),
+    path("building/<int:building_id>/", building, name="building"),
     path("component/", component_edit, name="component"),
     path("component/<int:assembly_id>/", component_edit, name="component_edit"),  # For editing an existing component
 ]

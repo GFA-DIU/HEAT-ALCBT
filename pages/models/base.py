@@ -36,32 +36,33 @@ class BaseGeoModel(models.Model):
     longitude = models.FloatField(_("Longitude"), null=True, blank=True)
     latitude = models.FloatField(_("Latitude"), null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if not self.longitude or not self.latitude:
-            self.calculate_lon_lat()
+    def address(self):
+        address_string = [str(self.number)] if  self.number else []
+        if self.street:
+            address_string.append(self.street)
+        if self.zip:
+            address_string.append(str(self.zip))
+        address_string.append(str(self.city or self.country))
+        return ", ".join(address_string)
 
+    def save(self, *args, **kwargs):
+        self.longitude, self.latitude = None, None
+        if self.city: 
+            if self.number and self.street and self.zip:
+                self.calculate_lon_lat()
+            else:
+                self.longitude, self.latitude = self.city.longitude, self.city.latitude
         super().save(*args, **kwargs)
 
     def calculate_lon_lat(self):
-        if self.city:
-            geolocator = Nominatim(
-                user_agent="Beat/1.0 (https://d2innovate.eu/; ramon.zalabardo@gfa-group.de)"
-            )
-            address_string = [str(self.number)] if  self.number else []
-            if self.street:
-                address_string.append(self.street)
-            if self.zip:
-                address_string.append(str(self.zip))
-
-            if len(address_string) != 0:
-                address_string.append(str(self.city))
-                try:
-                    location = geolocator.geocode(", ".join(address_string))
-                    self.longitude, self.latitude = location.longitude, location.latitude
-                except Exception as error:
-                    logger.error(error)
-                    self.longitude, self.latitude = self.city.longitude, self.city.latitude
-            else:
-                self.longitude, self.latitude = self.city.longitude, self.city.latitude
+        geolocator = Nominatim(
+            user_agent="Beat/1.0 (https://d2innovate.eu/; ramon.zalabardo@gfa-group.de)"
+        )
+        try:
+            location = geolocator.geocode(self.address())
+            self.longitude, self.latitude = location.longitude, location.latitude
+        except Exception as error:
+            logger.error(error)
+            self.longitude, self.latitude = self.city.longitude, self.city.latitude
     class Meta:
         abstract = True  # This ensures it won't create its own table.

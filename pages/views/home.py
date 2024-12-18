@@ -39,7 +39,7 @@ def buildings_list(request):
         country_id = request.GET.get('country')
         if country_id:
             cities = City.objects.filter(country_id=country_id).order_by('name')
-            return render(request, 'pages/building/general_info/city_list.html', {'cities': cities})
+            return render(request, 'pages/utils/city_list.html', {'cities': cities})
         
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")

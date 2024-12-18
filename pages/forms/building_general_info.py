@@ -1,5 +1,5 @@
 from django import forms
-from django.db import models
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit
@@ -39,7 +39,7 @@ class BuildingGeneralInformation(forms.ModelForm):
             "city",
             "country",
             "category"]
-    
+
         # labels = {
         #     "name": _("Writer"),
         # }
@@ -56,34 +56,34 @@ class BuildingGeneralInformation(forms.ModelForm):
         instance = kwargs.get('instance')
         super().__init__(*args, **kwargs)
 
-        if instance and instance.country:
-            self.fields['city'].queryset = City.objects.filter(country=instance.country).order_by('name')
-        else:
-            self.fields['city'].queryset = City.objects.none()
-
-        # Ensure the selected 'country' is prepopulated
-        if instance and instance.country:
-            self.initial['category'] = instance.category
-        
-        # Ensure the selected 'country' is prepopulated
-        if instance and instance.country:
-            self.initial['country'] = instance.country
-
-        # Ensure the selected 'city' is prepopulated
-        if instance and instance.city:
-            self.initial['city'] = instance.city
-            
-        # Adjust 'city' queryset dynamically based on 'country' in the request data
-        if 'country' in self.data:
-            try:
-                country_id = int(self.data.get('country'))
-                self.fields['city'].queryset = City.objects.filter(country_id=country_id).order_by('name')
-            except (ValueError, TypeError):
+        if instance:
+            if instance.country:
+                self.fields['city'].queryset = City.objects.filter(country=instance.country).order_by('name')
+                self.initial['country'] = instance.country
+            else: 
                 self.fields['city'].queryset = City.objects.none()
+            # Ensure the selected 'country' is prepopulated
+            if instance.category:
+                self.initial['category'] = instance.category
+
+            # Ensure the selected 'city' is prepopulated
+            if instance.city:
+                self.initial['city'] = instance.city
+
+        # Adjust 'city' queryset dynamically based on 'country' in the request data
+        if "country" in self.data:
+            try:
+                country_id = int(self.data.get("country"))
+                self.fields["city"].queryset = City.objects.filter(
+                    country_id=country_id
+                ).order_by("name")
+            except (ValueError, TypeError):
+                self.fields["city"].queryset = City.objects.none()
         elif self.instance.pk:
             # If editing an existing instance, prepopulate the 'city' queryset
-            self.fields['city'].queryset = City.objects.filter(country=self.instance.country).order_by('name')
-
+            self.fields["city"].queryset = City.objects.filter(
+                country=self.instance.country
+            ).order_by("name")
         # Crispy Forms Layout
         self.helper = FormHelper()
         self.helper.layout = Layout(
@@ -109,7 +109,6 @@ class BuildingGeneralInformation(forms.ModelForm):
             Submit('submit', 'Submit', css_class='btn btn-primary'),
         )
 
-
     # def clean_city(self):
     #     city = self.cleaned_data.get('city')
     #     country = self.cleaned_data.get('country')
@@ -117,15 +116,13 @@ class BuildingGeneralInformation(forms.ModelForm):
     #         raise forms.ValidationError("The selected city is not valid for the chosen country.")
     #     return city
 
-
-
     # def clean_comment(self):
     #     name = self.cleaned_data.get('comment')
 
     #     # Trigger an error if the name is "admin"
     #     if name == "admin":
     #         raise ValidationError("The name 'admin' is not allowed.")
-        
+
     #     return name
 
     # def clean(self):
@@ -139,5 +136,5 @@ class BuildingGeneralInformation(forms.ModelForm):
     #             "The name and comment cannot be the same.",
     #             code='invalid'
     #         )
-        
+
     #     return cleaned_data

@@ -1,36 +1,41 @@
 import logging
 
 from django.db.models import Prefetch, Q
+from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.building import Building, BuildingAssembly
-from pages.models.assembly import Assembly, AssemblyImpact
+from pages.models.assembly import AssemblyImpact
+
+from cities_light.models import City
 from pages.scripts.dashboards.building_dashboard import building_dashboard
 
 logger = logging.getLogger(__name__)
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
-def building(request, building_id):
+def building(request, building_id = None):
     print("request user", request.user)
     # General Info
     if request.method == "POST" and request.POST.get("action") == "general_information":
         building = get_object_or_404(Building, created_by=request.user, pk=building_id) if building_id else None
-        
         form = BuildingGeneralInformation(
             request.POST, instance=building
         )  # Bind form to instance
         if form.is_valid():
             print("these fields changed", form.changed_data)
-            updated_building = form.save()
-            print("Building updated in DB:", updated_building)
+            building = form.save(commit=False)
+            building.created_by = request.user
+            building.save()
+            print("Building updated in DB:", building)
         else:
             print("Form is invalid")
             print("Errors:", form.errors)
-        
-        return redirect('building', building_id=building_id)
+            return HttpResponseServerError()
+
+        return redirect("building", building_id=building.id)
 
     elif request.method == "DELETE":
         component_id = request.GET.get("component")
@@ -78,9 +83,13 @@ def building(request, building_id):
         return render(
             request, "pages/building/structural_info/assemblies_list.html", context
         )  # Partial update for DELETE
-
+    elif request.GET.get("country"):
+        cities = City.objects.filter(
+            country_id=request.GET.get("country")
+        ).order_by("name")
+        return render(request, "pages/utils/city_select.html", {"cities": cities})
     # Full reload
-    else:
+    elif building_id:
         building = get_object_or_404(
             Building.objects.filter(
                 created_by=request.user
@@ -130,16 +139,24 @@ def building(request, building_id):
             "building_id": building.id,
             "building": building,
             "structural_components": list(structural_components),
-            "dashboard": building_dashboard(structural_components),
         }
+        if len(structural_components):
+            context["dashboard"] = building_dashboard(structural_components)
+
+        form = BuildingGeneralInformation(instance=building)
 
         logger.info(
             "Found building: %s with %d structural components",
             building.name,
             len(context["structural_components"]),
         )
-        form = BuildingGeneralInformation(instance=building)
-
+    else:
+        context = {
+            "building_id": None,
+            "building": None,
+            "structural_components": [],
+        }
+        form = BuildingGeneralInformation()
     context["form_general_info"] = form
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
