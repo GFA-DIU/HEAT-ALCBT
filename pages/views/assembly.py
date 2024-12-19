@@ -77,21 +77,22 @@ def component_edit(request, building_id, assembly_id=None):
     context = {
         "assembly_id": assembly_id,
         "building_id": building_id,
+        "epd_list": get_filtered_epd_list(request),
+        "epd_filters_form": EPDsFilterForm(request.POST) 
     }
-
-
-    context["epd_list"] = get_filtered_epd_list(
-        request
-    )
 
     if request.method == "POST" and request.POST.get("action") == "form_submission":
         component = get_object_or_404(Assembly, id=assembly_id)
         save_assembly(request, component)
         return redirect("building", building_id=building_id)
 
-    elif request.method == "GET" and request.GET.get("page"):
+    elif (
+        request.method == "GET"
+        and request.GET.get("page")
+        or request.method == "POST"
+        and request.POST.get("filter") == "true"
+    ):
         # Handle partial rendering for HTMX
-        context["epd_filters_form"] = EPDsFilterForm()
         return render(request, "pages/building/component_add/epd_list.html", context)
 
     elif request.method == "GET" and request.GET.get("add_component") == "step_1":
@@ -106,7 +107,6 @@ def component_edit(request, building_id, assembly_id=None):
             products = Product.objects.filter(assembly=component).select_related("epd")
             selected_epds = [SelectedEPD.parse_product(p) for p in products]
             context["selected_epds"] = selected_epds
-        context["epd_filters_form"] = EPDsFilterForm()
         context["form"] = AssemblyForm(instance=component)
 
     # Render full template for non-HTMX requests
@@ -226,16 +226,13 @@ def component_new(request):
         form = AssemblyForm()  # Blank form for new component creation
 
     context["form"] = form
-    context["epd_filters_form"] = EPDsFilterForm()
     return render(request, "pages/building/test_component.html", context)
 
 
-def get_filtered_epd_list(request
-):
+def get_filtered_epd_list(request):
     # Start with the base queryset
     filtered_epds = EPD.objects.all().order_by("id")
-    page_number= request.GET.get("page", 1),
-    if request.method == "POST" and request.POST.get("action") == "filter":
+    if request.method == "POST" and request.POST.get("filter") == "true":
         category= request.POST.get("category", None)
         subcategory= request.POST.get("subcategory", None)
         childcategory= request.POST.get("childcategory", None)
@@ -263,4 +260,5 @@ def get_filtered_epd_list(request
 
     # Pagination setup for EPD list
     paginator = Paginator(filtered_epds, 10)  # Show 10 items per page
+    page_number= request.GET.get("page", 1),
     return paginator.get_page(page_number)

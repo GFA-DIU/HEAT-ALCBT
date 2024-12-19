@@ -54,7 +54,14 @@ class EPDsFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        if "search_query" in self.data:
+            self.initial["search_query"] = self.data.get("search_query")
+
+        if "childcategory" in self.data:
+            self.initial["childcategory"] = self.data.get("childcategory")
+
         if "subcategory" in self.data:
+            self.initial["subcategory"] = self.data.get("subcategory")
             try:
                 subcategory_id = int(self.data.get("subcategory"))
                 self.fields["childcategory"].queryset = MaterialCategory.objects.filter(
@@ -64,7 +71,8 @@ class EPDsFilterForm(forms.Form):
                 self.fields["childcategory"].queryset = MaterialCategory.objects.none()
 
         # Adjust 'city' queryset dynamically based on 'country' in the request data
-        elif "category" in self.data:
+        if "category" in self.data:
+            self.initial["category"] = self.data.get("category")
             try:
                 category_id = int(self.data.get("category"))
                 self.fields["subcategory"].queryset = MaterialCategory.objects.filter(
@@ -73,10 +81,8 @@ class EPDsFilterForm(forms.Form):
             except (ValueError, TypeError):
                 self.fields["subcategory"].queryset = MaterialCategory.objects.none()
 
-        # Crispy Forms Layout
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            # Name and Category in the first row
             Row(
                 Column("search_query", css_class="col-md-3"),
                 Column("category", css_class="col-md-3"),
