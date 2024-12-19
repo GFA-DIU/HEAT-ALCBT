@@ -90,26 +90,24 @@ def get_classification(d: dict):
 
 
 def parse_epd(epd: dict):
-    try: 
-        parsed_epd = {}
+    parsed_epd = {}
 
-        # parsing from JSON
-        name_de, name_en, names = get_names(epd)
-        name = name_en if name_en else name_de
-        parsed_epd.update({"name": name, "names": names, "source": epd["source"]})
-        parsed_epd.update(get_classification(epd))
-        parsed_epd.update(get_declared_quantity(epd))
+    # parsing from JSON
+    name_de, name_en, names = get_names(epd)
+    name = name_en if name_en else name_de
+    parsed_epd.update({"name": name, "names": names, "source": epd["source"]})
+    parsed_epd.update(get_classification(epd))
+    parsed_epd.update(get_declared_quantity(epd))
 
-        # parsing from LCAx
-        parsed_epd.update(parse_Lcax_format(epd))
+    # parsing from LCAx
+    parsed_epd.update(parse_Lcax_format(epd))
 
-        logger.info(
-            "Successfuly parsed EPD %s",
-        )
+    logger.info(
+        "Successfuly parsed EPD %s",
+    )
 
-        return parsed_epd
-    except:
-        pass
+    return parsed_epd
+
 
 
 def parse_Lcax_format(epd: dict) -> dict:
@@ -147,4 +145,9 @@ def get_impacts(epd: lcax.EPD):
 
 
 def get_declared_quantity(epd: dict) -> float:
-    return {"declared_amount": epd["exchanges"]["exchange"][0]["resultingflowAmount"]}
+    try:
+        return {"declared_amount": epd["exchanges"]["exchange"][0]["resultingflowAmount"]}
+    except:
+        names = get_names(epd)
+        print("Failed to load declared quantity %s", names)
+        return {}

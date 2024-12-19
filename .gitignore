@@ -16,3 +16,8 @@ media
 
 # secrets
 .env
+
+
+*.ipynb
+*.xlsx
+*.csv
