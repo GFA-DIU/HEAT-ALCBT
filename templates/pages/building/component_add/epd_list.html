@@ -1,6 +1,9 @@
  {% load crispy_forms_tags %}
-<form hx-post="{%if assembly_id%}{% url 'component_edit' assembly_id=assembly_id %}{%else%}{% url 'component' building_id=building_id %}{% endif %}" hx-target="#epd-list"
-hx-vals='{"filter": true}'>
+{% if assembly_id %}
+<form hx-post="{% url 'component_edit' building_id=building_id assembly_id=assembly_id %}" hx-target="#epd-list" hx-vals='{"action": "filter"}'>
+{% else %}
+<form hx-post="{% url 'component' building_id=building_id %}" hx-target="#epd-list" hx-vals='{"action": "filter"}'>
+{% endif %}
     <!-- Create an identifier for this post request -->
     {% crispy epd_filters_form %}
 </form> 

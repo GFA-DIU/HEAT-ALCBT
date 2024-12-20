@@ -78,7 +78,7 @@ def component_edit(request, building_id, assembly_id=None):
         "assembly_id": assembly_id,
         "building_id": building_id,
         "epd_list": get_filtered_epd_list(request),
-        "epd_filters_form": EPDsFilterForm(request.POST) 
+        "epd_filters_form": EPDsFilterForm(request.POST),
     }
 
     if request.method == "POST" and request.POST.get("action") == "form_submission":
@@ -90,7 +90,7 @@ def component_edit(request, building_id, assembly_id=None):
         request.method == "GET"
         and request.GET.get("page")
         or request.method == "POST"
-        and request.POST.get("filter") == "true"
+        and request.POST.get("action") == "filter"
     ):
         # Handle partial rendering for HTMX
         return render(request, "pages/building/component_add/epd_list.html", context)
@@ -232,11 +232,11 @@ def component_new(request):
 def get_filtered_epd_list(request):
     # Start with the base queryset
     filtered_epds = EPD.objects.all().order_by("id")
-    if request.method == "POST" and request.POST.get("filter") == "true":
-        category= request.POST.get("category", None)
-        subcategory= request.POST.get("subcategory", None)
-        childcategory= request.POST.get("childcategory", None)
-        search_query= request.POST.get("search_query", None)
+    if request.method == "POST" and request.POST.get("action") == "filter":
+        category= request.POST.get("category")
+        subcategory= request.POST.get("subcategory")
+        childcategory= request.POST.get("childcategory")
+        search_query= request.POST.get("search_query")
         # Add filters conditionally
         if childcategory:
             childcategory_object = get_object_or_404(
@@ -260,5 +260,5 @@ def get_filtered_epd_list(request):
 
     # Pagination setup for EPD list
     paginator = Paginator(filtered_epds, 10)  # Show 10 items per page
-    page_number= request.GET.get("page", 1),
+    page_number= request.GET.get("page", 1)
     return paginator.get_page(page_number)
