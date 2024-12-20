@@ -1,8 +1,12 @@
-<button class="btn btn-primary m-2 mt-3"
+{% if building_id %}
+  <button class="btn btn-primary m-2 mt-3"
   hx-get="{% url 'component' building_id=building_id %}?add_component=step_1"
   hx-target="#modal-body"
   hx-swap="innerHTML"
->Add Component</button>
+  >Add Component</button>
+{% else %}
+  Please save the building before adding any components
+{% endif %}
 
 <div id="modal" class="modal fade" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">

@@ -13,7 +13,7 @@ class BuildingGeneralInformation(forms.ModelForm):
     country = forms.ModelChoiceField(
         queryset=Country.objects.all(),
         widget=forms.Select(attrs={
-            'hx-get': '/',               # HTMX request to the root URL
+            'hx-get': '/select_lists/',               # HTMX request to the root URL
             'hx-trigger': 'change',      # Trigger HTMX on change event
             'hx-target': '#city-dropdown', # Update the City dropdown
             'hx-vals': '{"id": this.value}', # Dynamically include the dropdown value

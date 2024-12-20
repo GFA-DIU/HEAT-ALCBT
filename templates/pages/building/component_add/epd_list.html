@@ -1,3 +1,12 @@
+ {% load crispy_forms_tags %}
+{% if assembly_id %}
+<form hx-post="{% url 'component_edit' building_id=building_id assembly_id=assembly_id %}" hx-target="#epd-list" hx-vals='{"action": "filter"}'>
+{% else %}
+<form hx-post="{% url 'component' building_id=building_id %}" hx-target="#epd-list" hx-vals='{"action": "filter"}'>
+{% endif %}
+    <!-- Create an identifier for this post request -->
+    {% crispy epd_filters_form %}
+</form> 
 <ul class="list-group">
     {% for epd in epd_list %}
     <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
