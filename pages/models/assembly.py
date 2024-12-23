@@ -8,11 +8,27 @@ from .epd import EPD, Unit, Impact
 from .base import BaseModel
 
 
-class AssemblyType(models.TextChoices):
-    """Adopted from LCAx."""
-    GENERIC = "generic", "Use for Quick Assessment"
-    CUSTOM = "custom", "Use for Detailed Assessment"
+class AssemblyMode(models.TextChoices):
+    """Part of default or not.
+    
+    Adapted from LCAx, where it's used for EPDs.
+    ```Python
+    class SubType(Enum):
+        generic = 'generic'
+        specific = 'specific'
+        industry = 'industry'
+        representative = 'representative'    
+    ```
+    """
+    GENERIC = "generic", "Generic" # "Use for Quick Assessment"
+    CUSTOM = "custom", "Custom" # "Use for Detailed Assessment"
 
+
+class AssemblyDimension(models.TextChoices):
+    AREA = "area", "Area-Type" # Area-type calculations
+    LENGTH = "length", "Length-Type" # Length-type calculations   
+    MASS = "mass", "Mass-Type" # Length-type calculations   
+    Volume = "volume", "Volume-Type" # Length-type calculations   
 
 class AssemblySubCategory(models.Model):
     """
@@ -58,11 +74,17 @@ class Assembly(BaseModel):
         Country, on_delete=models.SET_NULL, null=True, blank=True
     )
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
-    type = models.CharField(
+    mode = models.CharField(
+        _("Assembly Mode"),
+        max_length=20,
+        choices=AssemblyMode.choices,
+        default=AssemblyMode.CUSTOM,
+    )
+    dimension = models.CharField(
         _("Assembly type"),
         max_length=20,
-        choices=AssemblyType.choices,
-        default=AssemblyType.CUSTOM,
+        choices=AssemblyDimension.choices,
+        default=AssemblyDimension.AREA,
     )
     classification = models.ForeignKey(
          AssemblyCategorySubcategory, on_delete=models.SET_NULL, null=True, blank=True
