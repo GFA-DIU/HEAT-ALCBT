@@ -17,10 +17,11 @@ class AssemblyForm(forms.ModelForm):
         widget=widgets.CheckboxInput(attrs={'class': 'form-check-input'})
     )
     mode = forms.ChoiceField(
+        required=False,
         choices=AssemblyMode.choices,
-        widget=forms.Select(attrs={'disabled': 'disabled'})
+        widget=forms.Select(attrs={"disabled": "disabled"}),
     )
-    
+
     class Meta:
         model = Assembly
         fields = [
@@ -34,6 +35,7 @@ class AssemblyForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["dimension"].required = False
         if self.instance.pk:
             self.fields['mode'].initial = self.instance.mode
         else:
