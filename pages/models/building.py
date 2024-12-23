@@ -76,8 +76,7 @@ class BuildingAssembly(models.Model):
         help_text=_("How many of components"),
         max_digits=10,
         decimal_places=3,
-        null=False,
-        blank=False,
+        default=0
     )
     unit = models.CharField(_("Unit of Quantity"), max_length=20, choices=Unit.choices, default=Unit.UNKNOWN)
 
