@@ -6,7 +6,7 @@ from pages.views.select_lists import select_lists
 from .views.about import AboutPageView
 from .views.home import buildings_list
 from .views.building import building
-from .views.assembly import component_edit, component_new
+from .views.assembly import component_edit
 
 urlpatterns = [
     path("", buildings_list, name="home"),

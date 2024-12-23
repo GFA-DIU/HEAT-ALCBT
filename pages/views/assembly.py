@@ -6,6 +6,7 @@ from typing import Optional
 
 from django.core.paginator import Paginator
 from django.db.models import Prefetch
+from django.http import HttpResponseServerError, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
@@ -13,6 +14,7 @@ from django.forms import ValidationError
 
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.assembly import Assembly, Product, AssemblyImpact
+from pages.models.building import Building
 from pages.models.epd import EPD, EPDImpact, MaterialCategory
 from pages.forms.assembly_form import AssemblyForm
 
@@ -80,11 +82,25 @@ def component_edit(request, building_id, assembly_id=None):
         "epd_list": get_filtered_epd_list(request),
         "epd_filters_form": EPDsFilterForm(request.POST),
     }
+    building_instance = get_object_or_404(Building, pk=building_id)
 
     if request.method == "POST" and request.POST.get("action") == "form_submission":
-        component = get_object_or_404(Assembly, id=assembly_id)
-        save_assembly(request, component)
-        return redirect("building", building_id=building_id)
+        if assembly_id:
+            try:
+                component = building_instance.structural_components.get(pk=assembly_id)
+            except Assembly.DoesNotExist:
+                return HttpResponseServerError()
+        else:
+            component = Assembly()
+        save_assembly(request, component, building_instance)
+        # The redirect shortcut is not working properly with HTMX
+        # return redirect("building", building_id=building_instance.id)
+        # instead use the following:
+        response = JsonResponse({"message": "Redirecting"})
+        response["HX-Redirect"] = reverse(
+            "building", kwargs={"building_id": building_id}
+        )
+        return response
 
     elif (
         request.method == "GET"
@@ -113,10 +129,9 @@ def component_edit(request, building_id, assembly_id=None):
     return render(request, "pages/building/component_add/editor_own_page.html", context)
 
 
-def save_assembly(request, component):
+def save_assembly(request, component, building_instance):
     print("This is a form submission")
     print(request.POST)
-
     # Bind the form to the existing Assembly instance
     form = AssemblyForm(request.POST, instance=component)
     if form.is_valid():
@@ -211,6 +226,8 @@ def save_assembly(request, component):
                 impact=impact,
                 value=total_value,
             )
+        # It doesn't duplicate if the assembly already is in structural_components
+        building_instance.structural_components.add(assembly)
 
 
 def component_new(request):

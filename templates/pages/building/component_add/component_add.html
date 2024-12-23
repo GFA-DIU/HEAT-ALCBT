@@ -1,8 +1,8 @@
 {% load crispy_forms_tags %}
 {% if assembly_id %}
-<form action="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}" method="post">
+<form hx-post="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}">
 {% else %}
-<form action="{% url 'component' building_id=building_id %}" method="post">
+<form hx-post="{% url 'component' building_id=building_id %}">
 {% endif %}
     {% csrf_token %}
     <div class="row">
