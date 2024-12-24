@@ -21,10 +21,13 @@
     </div>
     <div class="row">
         <!-- Country and Classification in the second row -->
-        <div class="col-md-6">
+        <div class="col-md-4">
             {{ form.country |as_crispy_field }}
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
+            {{ form.dimension |as_crispy_field }}
+        </div>
+        <div class="col-md-4">
             {{ form.classification |as_crispy_field }}
         </div>
     </div>

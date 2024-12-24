@@ -15,7 +15,6 @@ class EPDsFilterForm(forms.Form):
                 "hx-get": "/select_lists/",  # HTMX request to the root URL
                 "hx-trigger": "change",  # Trigger HTMX on change event
                 "hx-target": "#sub-category",  # Update the City dropdown
-                "hx-vals": '{"id": this.value}',  # Dynamically include the dropdown value
                 "class": "select form-select",
             }
         ),
@@ -30,7 +29,6 @@ class EPDsFilterForm(forms.Form):
                 "hx-get": "/select_lists/",  # HTMX request to the root URL
                 "hx-trigger": "change",  # Trigger HTMX on change event
                 "hx-target": "#child-category",  # Update the City dropdown
-                "hx-vals": '{"id": this.value}',
                 "class": "select form-select",
             }
         ),

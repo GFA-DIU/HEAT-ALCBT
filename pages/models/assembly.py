@@ -28,7 +28,7 @@ class AssemblyDimension(models.TextChoices):
     AREA = "area", "Area-Type" # Area-type calculations
     LENGTH = "length", "Length-Type" # Length-type calculations   
     MASS = "mass", "Mass-Type" # Length-type calculations   
-    Volume = "volume", "Volume-Type" # Length-type calculations   
+    VOLUME = "volume", "Volume-Type" # Length-type calculations   
 
 class AssemblySubCategory(models.Model):
     """

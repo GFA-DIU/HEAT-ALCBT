@@ -13,9 +13,9 @@ from django.views.decorators.http import require_http_methods
 from django.forms import ValidationError
 
 from pages.forms.epds_filter_form import EPDsFilterForm
-from pages.models.assembly import Assembly, Product, AssemblyImpact
+from pages.models.assembly import Assembly, AssemblyDimension, Product, AssemblyImpact
 from pages.models.building import Building
-from pages.models.epd import EPD, EPDImpact, MaterialCategory
+from pages.models.epd import EPD, EPDImpact, MaterialCategory, Unit
 from pages.forms.assembly_form import AssemblyForm
 
 
@@ -81,6 +81,7 @@ def component_edit(request, building_id, assembly_id=None):
         "building_id": building_id,
         "epd_list": get_filtered_epd_list(request),
         "epd_filters_form": EPDsFilterForm(request.POST),
+        "dimension": request.POST.get("dimension")
     }
     building_instance = get_object_or_404(Building, pk=building_id)
 
@@ -124,6 +125,7 @@ def component_edit(request, building_id, assembly_id=None):
             selected_epds = [SelectedEPD.parse_product(p) for p in products]
             context["selected_epds"] = selected_epds
         context["form"] = AssemblyForm(instance=component)
+        context["dimension"] = component.dimension if component else "area"
 
     # Render full template for non-HTMX requests
     return render(request, "pages/building/component_add/editor_own_page.html", context)
@@ -230,31 +232,18 @@ def save_assembly(request, component, building_instance):
         building_instance.structural_components.add(assembly)
 
 
-def component_new(request):
-    print("Component new", request)
-    context = {}
-    # If no component ID, assume creation of a new component
-    if request.method == "POST":
-        form = AssemblyForm(request.POST)
-        if form.is_valid():
-            form.save()
-            # return HttpResponseRedirect(reverse("component"))  # Redirect after successful creation
-    else:
-        form = AssemblyForm()  # Blank form for new component creation
-
-    context["form"] = form
-    return render(request, "pages/building/test_component.html", context)
-
-
 def get_filtered_epd_list(request):
     # Start with the base queryset
     filtered_epds = EPD.objects.all().order_by("id")
     if request.method == "POST" and request.POST.get("action") == "filter":
-        category= request.POST.get("category")
-        subcategory= request.POST.get("subcategory")
-        childcategory= request.POST.get("childcategory")
-        search_query= request.POST.get("search_query")
+        dimension = request.POST.get("dimension")
+        category = request.POST.get("category")
+        subcategory = request.POST.get("subcategory")
+        childcategory = request.POST.get("childcategory")
+        search_query = request.POST.get("search_query")
         # Add filters conditionally
+        if dimension:
+            filtered_epds = filter_by_dimension(filtered_epds, dimension)
         if childcategory:
             childcategory_object = get_object_or_404(
                 MaterialCategory, pk=int(childcategory)
@@ -279,3 +268,18 @@ def get_filtered_epd_list(request):
     paginator = Paginator(filtered_epds, 10)  # Show 10 items per page
     page_number= request.GET.get("page", 1)
     return paginator.get_page(page_number)
+
+
+def filter_by_dimension(epds, dimension):
+    match dimension:
+        case AssemblyDimension.AREA:
+            declared_units = [Unit.M3, Unit.M2, Unit.KG, Unit.PCS]
+        case AssemblyDimension.VOLUME:
+            declared_units = [Unit.M3, Unit.KG, Unit.PCS]
+        case AssemblyDimension.MASS:
+            declared_units = [Unit.M3, Unit.KG, Unit.PCS]
+        case AssemblyDimension.LENGTH:
+            declared_units = [Unit.M3, Unit.M, Unit.KG, Unit.PCS]
+        case _:
+            return epds
+    return epds.filter(declared_unit__in=declared_units)
