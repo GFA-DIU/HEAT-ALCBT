@@ -7,7 +7,7 @@ from crispy_forms.layout import Layout, Row, Column, Submit
 
 from cities_light.models import Country, City
 
-from pages.models import Assembly
+from pages.models import Assembly, AssemblyMode
 
 
 class AssemblyForm(forms.ModelForm):
@@ -16,21 +16,30 @@ class AssemblyForm(forms.ModelForm):
         required=False,
         widget=widgets.CheckboxInput(attrs={'class': 'form-check-input'})
     )
-    
+    mode = forms.ChoiceField(
+        required=False,
+        choices=AssemblyMode.choices,
+        widget=forms.Select(attrs={"disabled": "disabled"}),
+    )
+
     class Meta:
         model = Assembly
         fields = [
             "name",
             "country",
-            "type",
+            "dimension",
             "classification",
             "comment",
             "public",
         ]
 
-    # def __init__(self, *args, **kwargs):
-    #     instance = kwargs.get('instance')
-    #     super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["dimension"].required = False
+        if self.instance.pk:
+            self.fields['mode'].initial = self.instance.mode
+        else:
+            self.fields['mode'].initial = AssemblyMode.CUSTOM
 
     #     # Crispy Forms Layout
     #     self.helper = FormHelper()
