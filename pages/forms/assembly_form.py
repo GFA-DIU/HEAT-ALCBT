@@ -21,6 +21,7 @@ class AssemblyForm(forms.ModelForm):
         choices=AssemblyDimension.choices,
         widget=forms.Select(
             attrs={
+                "id": "dimension-select",
                 "hx-post": "",  # HTMX request to the current url path
                 "hx-trigger": "change",  # Trigger HTMX on change event
                 "hx-target": "#epd-list",  # Update the City dropdown

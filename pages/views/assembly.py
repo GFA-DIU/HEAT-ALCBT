@@ -14,7 +14,7 @@ from django.forms import ValidationError
 
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.assembly import Assembly, AssemblyDimension, Product, AssemblyImpact
-from pages.models.building import Building
+from pages.models.building import Building, BuildingAssembly
 from pages.models.epd import EPD, EPDImpact, MaterialCategory, Unit
 from pages.forms.assembly_form import AssemblyForm
 
@@ -76,22 +76,21 @@ def component_edit(request, building_id, assembly_id=None):
     """
     View to either edit an existing component or create a new one with pagination for EPDs.
     """
+    if assembly_id:
+        building_assembly = get_object_or_404(BuildingAssembly.objects.select_related(), assembly_id=assembly_id, building_id=building_id)
+        # If there's non it will already throw an error so no need for checking
+        component = building_assembly.assembly
     context = {
         "assembly_id": assembly_id,
         "building_id": building_id,
-        "epd_list": get_filtered_epd_list(request),
+        "epd_list": get_filtered_epd_list(request, component.dimension if component else None),
         "epd_filters_form": EPDsFilterForm(request.POST),
         "dimension": request.POST.get("dimension")
     }
     building_instance = get_object_or_404(Building, pk=building_id)
 
     if request.method == "POST" and request.POST.get("action") == "form_submission":
-        if assembly_id:
-            try:
-                component = building_instance.structural_components.get(pk=assembly_id)
-            except Assembly.DoesNotExist:
-                return HttpResponseServerError()
-        else:
+        if not component:
             component = Assembly()
         save_assembly(request, component, building_instance)
         # The redirect shortcut is not working properly with HTMX
@@ -119,13 +118,14 @@ def component_edit(request, building_id, assembly_id=None):
         )
 
     else:
-        component = get_object_or_404(Assembly, id=assembly_id) if assembly_id else None
         if component:
             products = Product.objects.filter(assembly=component).select_related("epd")
             selected_epds = [SelectedEPD.parse_product(p) for p in products]
             context["selected_epds"] = selected_epds
         context["form"] = AssemblyForm(instance=component)
-        context["dimension"] = component.dimension if component else "area"
+        context["dimension"] = (
+            component.dimension if component else AssemblyDimension.AREA
+        )
 
     # Render full template for non-HTMX requests
     return render(request, "pages/building/component_add/editor_own_page.html", context)
@@ -232,7 +232,7 @@ def save_assembly(request, component, building_instance):
         building_instance.structural_components.add(assembly)
 
 
-def get_filtered_epd_list(request):
+def get_filtered_epd_list(request, dimension = None):
     # Start with the base queryset
     filtered_epds = EPD.objects.all().order_by("id")
     if request.method == "POST" and request.POST.get("action") == "filter":
@@ -263,7 +263,10 @@ def get_filtered_epd_list(request):
             filtered_epds = filtered_epds.filter(
                 name__icontains=search_query
             )  # Adjust the field for your model
-
+    elif dimension:
+        filtered_epds = filter_by_dimension(
+            filtered_epds, dimension
+        )
     # Pagination setup for EPD list
     paginator = Paginator(filtered_epds, 10)  # Show 10 items per page
     page_number= request.GET.get("page", 1)
