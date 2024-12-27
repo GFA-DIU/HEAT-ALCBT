@@ -1,13 +1,9 @@
 from django import forms
 from django.forms import widgets
-from django.db import models
 from django.utils.translation import gettext as _
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Submit
-
-from cities_light.models import Country, City
 
 from pages.models import Assembly, AssemblyMode
+from pages.models.assembly import AssemblyDimension
 
 
 class AssemblyForm(forms.ModelForm):
@@ -21,25 +17,39 @@ class AssemblyForm(forms.ModelForm):
         choices=AssemblyMode.choices,
         widget=forms.Select(attrs={"disabled": "disabled"}),
     )
+    dimension = forms.ChoiceField(
+        choices=AssemblyDimension.choices,
+        widget=forms.Select(
+            attrs={
+                "id": "dimension-select",
+                "hx-post": "",  # HTMX request to the current url path
+                "hx-trigger": "change",  # Trigger HTMX on change event
+                "hx-target": "#epd-list",  # Update the City dropdown
+                "hx-vals": '{"action": "filter"}',  # Dynamically include the dropdown value
+                "class": "select form-select",
+            }
+        ),
+    )
 
     class Meta:
         model = Assembly
         fields = [
             "name",
             "country",
-            "dimension",
             "classification",
             "comment",
             "public",
+            "dimension",
         ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["dimension"].required = False
         if self.instance.pk:
             self.fields['mode'].initial = self.instance.mode
+            self.fields['dimension'].initial = self.instance.dimension
         else:
             self.fields['mode'].initial = AssemblyMode.CUSTOM
+            self.fields["dimension"].initial = AssemblyDimension.AREA
 
     #     # Crispy Forms Layout
     #     self.helper = FormHelper()

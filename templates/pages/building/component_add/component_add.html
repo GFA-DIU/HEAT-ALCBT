@@ -21,10 +21,13 @@
     </div>
     <div class="row">
         <!-- Country and Classification in the second row -->
-        <div class="col-md-6">
+        <div class="col-md-4">
             {{ form.country |as_crispy_field }}
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
+            {{ form.dimension |as_crispy_field }}
+        </div>
+        <div class="col-md-4">
             {{ form.classification |as_crispy_field }}
         </div>
     </div>
@@ -59,6 +62,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const epdList = document.getElementById('epd-list');
+    const dimensionSelect = document.getElementById('dimension-select');
     const selectedEpdList = document.getElementById('selected-epd-list').querySelector('ul');
 
     // Add material to selected list
@@ -151,5 +155,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    dimensionSelect.addEventListener('change', (event) => {
+        // Remove all materials from the selected list
+        const list = document.querySelector('#selected-epd-list');
+        if (list) {
+            const items = list.querySelectorAll('li'); // Select all <li> elements in the list
+            items.forEach(li => li.remove()); // Iterate through each <li> and remove it
+        }
+    })
 });
 </script>
