@@ -2,8 +2,7 @@ from django import forms
 from django.forms import widgets
 from django.utils.translation import gettext as _
 
-from pages.models import Assembly, AssemblyMode
-from pages.models.assembly import AssemblyDimension
+from pages.models.assembly import Assembly, AssemblyDimension, AssemblyMode, AssemblyCategory, AssemblyTechnique
 
 
 class AssemblyForm(forms.ModelForm):
