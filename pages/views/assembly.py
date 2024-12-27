@@ -76,6 +76,7 @@ def component_edit(request, building_id, assembly_id=None):
     """
     View to either edit an existing component or create a new one with pagination for EPDs.
     """
+    component = None
     if assembly_id:
         building_assembly = get_object_or_404(BuildingAssembly.objects.select_related(), assembly_id=assembly_id, building_id=building_id)
         # If there's non it will already throw an error so no need for checking
