@@ -45,6 +45,17 @@ def select_lists(request):
             {"items": childcategories, "default_text": "Select a subcategory"},
         )
 
+    
+    elif m := request.GET.get('assembly_category'):
+        assembly_category_id = int(m)
+        techniques = AssemblyTechnique.objects.filter(categories__id=assembly_category_id).order_by("name")
+        return render(
+            request,
+            "pages/utils/select_list.html",
+            {"items": techniques, "default_text": "Select a category"},
+        )
+    
+
     # Full page load for GET request
     return render(
         request,

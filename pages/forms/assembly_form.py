@@ -16,6 +16,32 @@ class AssemblyForm(forms.ModelForm):
         choices=AssemblyMode.choices,
         widget=forms.Select(attrs={"disabled": "disabled"}),
     )
+    assembly_category = forms.ModelChoiceField(
+        queryset=AssemblyCategory.objects.all().order_by("tag"),
+        widget=forms.Select(
+            attrs={
+                "hx-get": "/select_lists/",  # HTMX request to the root URL
+                "hx-trigger": "change",  # Trigger HTMX on change event
+                "hx-target": "#assembly-technique",  # Update the City dropdown
+                "class": "select form-select",
+            }
+        ),
+        label="Category",
+        required=False,
+    )
+    assembly_technique = forms.ModelChoiceField(
+        queryset=AssemblyTechnique.objects.none(),  # Start with an empty queryset
+        widget=forms.Select(
+            attrs={
+                "id": "assembly-technique",
+                "class": "select form-select",
+            }
+        ),
+        label="Technique",
+        help_text="Select a category first",
+        required=False,
+    )
+
     dimension = forms.ChoiceField(
         choices=AssemblyDimension.choices,
         widget=forms.Select(
@@ -35,7 +61,7 @@ class AssemblyForm(forms.ModelForm):
         fields = [
             "name",
             "country",
-            "classification",
+            # "classification",
             "comment",
             "public",
             "dimension",
