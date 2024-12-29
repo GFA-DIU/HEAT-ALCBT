@@ -145,21 +145,16 @@ def save_assembly(request, component, building_instance):
         Product.objects.filter(assembly=assembly).delete()
         AssemblyImpact.objects.filter(assembly=assembly).delete()
 
-        # Clear the session variable after successful submission
-        request.session["selected_epds"] = []
-
-        epd_impacts = []
-
         # Collect EPD IDs and dynamic field data
         epd_ids = set()
-        dynamic_fields = []
+        selected_epds = []
         for key, value in request.POST.items():
             print("Key: ", key)
             print("Value: ", value)
             if key.startswith("material_") and "_quantity" in key:
                 epd_id = key.split("_")[1]
                 epd_ids.add(epd_id)
-                dynamic_fields.append(
+                selected_epds.append(
                     {
                         "epd_id": epd_id,
                         "quantity": Decimal(value),
@@ -167,7 +162,7 @@ def save_assembly(request, component, building_instance):
                     }
                 )
 
-        print("Dynamic fields: ", dynamic_fields)
+        print("Selected EPDs: ", selected_epds)
         # Pre-fetch EPDImpact and Impact objects
         epds = EPD.objects.filter(pk__in=epd_ids).prefetch_related(
             Prefetch(
@@ -178,11 +173,12 @@ def save_assembly(request, component, building_instance):
         )
         epd_map = {str(epd.id): epd for epd in epds}
 
+        epd_impacts = []
         # Process each dynamic field
         impacts_data = defaultdict(
             Decimal
         )  # For summing impacts by cate1 mgory & stage
-        for field in dynamic_fields:
+        for field in selected_epds:
             # Fetch the EPD and its impacts
             epd = epd_map[field["epd_id"]]
             conversion_f = 1
