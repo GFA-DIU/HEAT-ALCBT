@@ -237,31 +237,27 @@ def get_filtered_epd_list(request, dimension = None):
     # Start with the base queryset
     filtered_epds = EPD.objects.all().order_by("id")
     if request.method == "POST" and request.POST.get("action") == "filter":
-        dimension = request.POST.get("dimension")
-        category = request.POST.get("category")
-        subcategory = request.POST.get("subcategory")
-        childcategory = request.POST.get("childcategory")
-        search_query = request.POST.get("search_query")
-        country = request.POST.get("country")
         # Add filters conditionally
-        if dimension:
+        if dimension := request.POST.get("dimension"):
             filtered_epds = filter_by_dimension(filtered_epds, dimension)
-        if childcategory:
+
+        if childcategory := request.POST.get("childcategory"):
             childcategory_object = get_object_or_404(
                 MaterialCategory, pk=int(childcategory)
             )
             filtered_epds = filtered_epds.filter(category=childcategory_object)
-        elif subcategory:
+        elif subcategory := request.POST.get("subcategory"):
             subcategory_object = get_object_or_404(MaterialCategory, pk=int(subcategory))
             filtered_epds = filtered_epds.filter(
                 category__category_id__istartswith=subcategory_object.category_id
             )
-        elif category:
+        elif category := request.POST.get("category"):
             category_object = get_object_or_404(MaterialCategory, pk=int(category))
             filtered_epds = filtered_epds.filter(
                 category__category_id__istartswith=category_object.category_id
             )
-        if search_query:
+
+        if search_query := request.POST.get("search_query"):
             search_terms = search_query.split()
             query = Q()
             # Add a case-insensitive filter for each search term
@@ -270,7 +266,7 @@ def get_filtered_epd_list(request, dimension = None):
                 
             filtered_epds = filtered_epds.filter(query)
             
-        if country:
+        if country := request.POST.get("country"):
             filtered_epds = filtered_epds.filter(
                 country=country
             )  # Adjust the field for your model
