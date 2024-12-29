@@ -8,7 +8,7 @@ def building_dashboard(structural_components):
     rows = []
     for assembly in structural_components:
         row = {
-            "assemblybuilding_id": assembly["assemblybuilding_id"],
+            "assembly_id": assembly["assembly_id"],
             "assembly_name": assembly["assembly_name"],
         }
         for impact in assembly["impacts"]:

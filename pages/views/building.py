@@ -68,7 +68,7 @@ def building(request, building_id = None):
 
             structural_components.append(
                 {
-                    "assemblybuilding_id": component.id,
+                    "assembly_id": component.id,
                     "assembly_name": component.assembly.name,
                     "assembly_classification": component.assembly.classification,
                     "quantity": component.quantity,
@@ -126,7 +126,7 @@ def building(request, building_id = None):
 
             structural_components.append(
                 {
-                    "assemblybuilding_id": component.id,
+                    "assembly_id": component.assembly.id,
                     "assembly_name": component.assembly.name,
                     "assembly_classification": component.assembly.classification,
                     "quantity": component.quantity,
