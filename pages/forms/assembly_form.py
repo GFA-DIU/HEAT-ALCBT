@@ -80,6 +80,7 @@ class AssemblyForm(forms.ModelForm):
             self.fields["mode"].initial = self.instance.mode
             self.fields["dimension"].initial = self.instance.dimension
             self.fields["assembly_category"].initial = self.instance.classification.category
+            self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__pk=self.instance.classification.category.pk)
             self.fields["assembly_technique"].initial = self.instance.classification.technique
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
@@ -90,11 +91,14 @@ class AssemblyForm(forms.ModelForm):
             category_id = int(category_id)
             # update queryset
             self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__id=category_id)
-            # parse into Assembly category
+        
+        # parse into Assembly classification
+        if category_id or self.fields["assembly_technique"].initial:
+            category_id = category_id if category_id else self.fields["assembly_technique"].initial.pk
+            technique_id = self.data.get("assembly_technique") if self.data.get("assembly_technique") else None
             self.initial["classification"] = AssemblyCategoryTechnique.objects.filter(
-                    category__id=category_id, technique__id=self.data.get("assembly_technique")
+                    category__id=category_id, technique__id=technique_id
                 ).first()
-            print(self.initial["classification"])
 
     def clean(self):
         cleaned_data = super().clean()
