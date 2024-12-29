@@ -2,14 +2,21 @@ from django import forms
 from django.forms import widgets
 from django.utils.translation import gettext as _
 
-from pages.models.assembly import Assembly, AssemblyDimension, AssemblyMode, AssemblyCategory, AssemblyTechnique
+from pages.models.assembly import (
+    Assembly,
+    AssemblyDimension,
+    AssemblyMode,
+    AssemblyCategory,
+    AssemblyTechnique,
+    AssemblyCategoryTechnique,
+)
 
 
 class AssemblyForm(forms.ModelForm):
-    comment = forms.CharField(widget=widgets.Textarea(attrs={'rows': 3}))
+    comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 3}))
     public = forms.BooleanField(
         required=False,
-        widget=widgets.CheckboxInput(attrs={'class': 'form-check-input'})
+        widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
     )
     mode = forms.ChoiceField(
         required=False,
@@ -61,7 +68,7 @@ class AssemblyForm(forms.ModelForm):
         fields = [
             "name",
             "country",
-            # "classification",
+            "classification",
             "comment",
             "public",
             "dimension",
@@ -70,11 +77,30 @@ class AssemblyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.pk:
-            self.fields['mode'].initial = self.instance.mode
-            self.fields['dimension'].initial = self.instance.dimension
+            self.fields["mode"].initial = self.instance.mode
+            self.fields["dimension"].initial = self.instance.dimension
+            self.fields["assembly_category"].initial = self.instance.classification.category
+            self.fields["assembly_technique"].initial = self.instance.classification.technique
         else:
-            self.fields['mode'].initial = AssemblyMode.CUSTOM
+            self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA
+        
+        # Dynamically update the queryset for assembly_technique to enable form validation
+        if category_id := self.data.get("assembly_category"):
+            category_id = int(category_id)
+            # update queryset
+            self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__id=category_id)
+            # parse into Assembly category
+            self.initial["classification"] = AssemblyCategoryTechnique.objects.filter(
+                    category__id=category_id, technique__id=self.data.get("assembly_technique")
+                ).first()
+            print(self.initial["classification"])
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.get("classification") and self.initial.get("classification"):
+            cleaned_data["classification"] = self.initial["classification"]
+        return cleaned_data
 
     #     # Crispy Forms Layout
     #     self.helper = FormHelper()
