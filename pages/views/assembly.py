@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from django.core.paginator import Paginator
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.http import HttpResponseServerError, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -242,6 +242,7 @@ def get_filtered_epd_list(request, dimension = None):
         subcategory = request.POST.get("subcategory")
         childcategory = request.POST.get("childcategory")
         search_query = request.POST.get("search_query")
+        country = request.POST.get("country")
         # Add filters conditionally
         if dimension:
             filtered_epds = filter_by_dimension(filtered_epds, dimension)
@@ -261,9 +262,14 @@ def get_filtered_epd_list(request, dimension = None):
                 category__category_id__istartswith=category_object.category_id
             )
         if search_query:
-            filtered_epds = filtered_epds.filter(
-                name__icontains=search_query
-            )  # Adjust the field for your model
+            search_terms = search_query.split()
+            query = Q()
+            # Add a case-insensitive filter for each search term
+            for term in search_terms:
+                query &= Q(name__icontains=term)
+                
+            filtered_epds = filtered_epds.filter(query)
+            
         if country:
             filtered_epds = filtered_epds.filter(
                 country=country
