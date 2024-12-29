@@ -2,6 +2,8 @@ from django import forms
 from django.utils.translation import gettext as _
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit
+from cities_light.models import Country
+
 
 from pages.models.epd import MaterialCategory
 
@@ -48,6 +50,11 @@ class EPDsFilterForm(forms.Form):
         help_text="Select a subcategory first",
         required=False,
     )
+    country = forms.ModelChoiceField(
+        queryset=Country.objects.all().order_by("name"),
+        label="Country",
+        required=False,
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -82,10 +89,13 @@ class EPDsFilterForm(forms.Form):
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Row(
-                Column("search_query", css_class="col-md-3"),
-                Column("category", css_class="col-md-3"),
-                Column("subcategory", css_class="col-md-3"),
-                Column("childcategory", css_class="col-md-3"),
+                Column("search_query", css_class="col-md-9"),
+                Column("country", css_class="col-md-3"),
+            ),
+            Row(
+                Column("category", css_class="col-md-4"),
+                Column("subcategory", css_class="col-md-4"),
+                Column("childcategory", css_class="col-md-4"),
             ),
             Submit("submit", "Search", css_class="btn btn-primary"),
         )

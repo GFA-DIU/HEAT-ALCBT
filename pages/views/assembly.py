@@ -264,6 +264,10 @@ def get_filtered_epd_list(request, dimension = None):
             filtered_epds = filtered_epds.filter(
                 name__icontains=search_query
             )  # Adjust the field for your model
+        if country:
+            filtered_epds = filtered_epds.filter(
+                country=country
+            )  # Adjust the field for your model
     elif dimension:
         filtered_epds = filter_by_dimension(
             filtered_epds, dimension
