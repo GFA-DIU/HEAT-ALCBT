@@ -24,24 +24,16 @@ def building(request, building_id = None):
             request.POST, instance=building
         )  # Bind form to instance
         if form.is_valid():
-            print("these fields changed", form.changed_data)
             building = form.save(commit=False)
             building.created_by = request.user
             building.save()
-            print("Building updated in DB:", building)
         else:
-            print("Form is invalid")
-            print("Errors:", form.errors)
             return HttpResponseServerError()
 
         return redirect("building", building_id=building.id)
 
     elif request.method == "DELETE":
         component_id = request.GET.get("component")
-        # component = get_object_or_404(BuildingAssembly, id=item_to_delete)
-        # component.delete()
-        # context["structural_components"] = [c for c in structural_components if str(c["assembly_id"]) != item_to_delete]
-        # print("context: ", context)
         # Get the component and delete it
         component = get_object_or_404(BuildingAssembly, id=component_id)
         component.delete()
@@ -62,11 +54,13 @@ def building(request, building_id = None):
         return render(
             request, "pages/building/structural_info/assemblies_list.html", context
         )  # Partial update for DELETE
+
     elif request.GET.get("country"):
         cities = City.objects.filter(
             country_id=request.GET.get("country")
         ).order_by("name")
         return render(request, "pages/utils/city_select.html", {"cities": cities})
+    
     # Full reload
     elif building_id:
         building = get_object_or_404(
@@ -103,6 +97,7 @@ def building(request, building_id = None):
             building.name,
             len(context["structural_components"]),
         )
+
     else:
         context = {
             "building_id": None,
@@ -110,6 +105,7 @@ def building(request, building_id = None):
             "structural_components": [],
         }
         form = BuildingGeneralInformation()
+
     context["form_general_info"] = form
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
