@@ -7,7 +7,6 @@ from django.views.decorators.http import require_http_methods
 
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.building import Building, BuildingAssembly
-from pages.models.assembly import AssemblyImpact
 
 from cities_light.models import City
 from pages.scripts.dashboards.building_dashboard import building_dashboard
@@ -55,27 +54,7 @@ def building(request, building_id = None):
         ).select_related(
             "assembly"
         )  # Optimize query by preloading related Assembly
-        structural_components = []
-        for component in updated_list:
-            impacts = [
-                {
-                    "impact_id": impact.impact.id,
-                    "impact_name": impact.impact.name,
-                    "value": impact.value,
-                }
-                for impact in component.assembly.assemblyimpact_set.all()
-            ]
-
-            structural_components.append(
-                {
-                    "assemblybuilding_id": component.id,
-                    "assembly_name": component.assembly.name,
-                    "assembly_classification": component.assembly.classification,
-                    "quantity": component.quantity,
-                    "unit": component.unit,
-                    "impacts": impacts,
-                }
-            )
+        structural_components = get_assemblies(updated_list)
         context = {
             "building_id": building_id,
             "structural_components": list(structural_components),
@@ -99,13 +78,7 @@ def building(request, building_id = None):
                     queryset=BuildingAssembly.objects.filter(
                         # assembly__created_by=request.user  # Ensure the assembly belongs to the user
                     )
-                    .select_related("assembly")
-                    .prefetch_related(
-                        Prefetch(
-                            "assembly__assemblyimpact_set",
-                            queryset=AssemblyImpact.objects.select_related("impact"),
-                        )
-                    ),
+                    .select_related("assembly"),
                     to_attr="prefetched_components",
                 )
             ),
@@ -113,35 +86,15 @@ def building(request, building_id = None):
         )
 
         # Build structural components and impacts in one step
-        structural_components = []
-        for component in building.prefetched_components:
-            impacts = [
-                {
-                    "impact_id": impact.impact.id,
-                    "impact_name": impact.impact.__str__(),
-                    "value": impact.value,
-                }
-                for impact in component.assembly.assemblyimpact_set.all()
-            ]
-
-            structural_components.append(
-                {
-                    "assemblybuilding_id": component.id,
-                    "assembly_name": component.assembly.name,
-                    "assembly_classification": component.assembly.classification,
-                    "quantity": component.quantity,
-                    "unit": component.unit,
-                    "impacts": impacts,
-                }
-            )
+        structural_components =get_assemblies(building.prefetched_components)
 
         context = {
             "building_id": building.id,
             "building": building,
             "structural_components": list(structural_components),
         }
-        if len(structural_components):
-            context["dashboard"] = building_dashboard(structural_components)
+        # if len(structural_components):
+            # context["dashboard"] = building_dashboard(structural_components)
 
         form = BuildingGeneralInformation(instance=building)
 
@@ -161,3 +114,27 @@ def building(request, building_id = None):
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
     return render(request, "pages/building/building.html", context)
+
+def get_assemblies(assembly_list):
+    structural_components = []
+    for component in assembly_list:
+            # impacts = [
+            #     {
+            #         "impact_id": impact.impact.id,
+            #         "impact_name": impact.impact.name,
+            #         "value": impact.value,
+            #     }
+            #     for impact in component.assembly.assemblyimpact_set.all()
+            # ]
+        structural_components.append(
+                {
+                    "assemblybuilding_id": component.id,
+                    "assembly_name": component.assembly.name,
+                    "assembly_classification": component.assembly.classification,
+                    "quantity": component.quantity,
+                    "unit": component.unit,
+                    # "impacts": impacts,
+                }
+            )
+        
+    return structural_components
