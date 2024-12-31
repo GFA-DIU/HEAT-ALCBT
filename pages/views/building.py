@@ -124,8 +124,13 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
                 calculate_impacts(b_assembly.assembly.dimension, b_assembly.quantity, p)
             )
         
-        # calculate GWP impact for each assembly to display in list
-        gwpa1a3 = [float(i[3]) for i in assembly_impact_list if i[2].impact_category == "gwpa" and i[2].life_cycle_stage == "a1a3"]
+        # get GWP impact for each assembly to display in list
+        gwpa1a3 = [
+            i["impact_value"]
+            for i in assembly_impact_list
+            if i["impact_type"].impact_category == "gwp"
+            and i["impact_type"].life_cycle_stage == "a1a3"
+        ]
         structural_components.append(
                 {
                     "assemblybuilding_id": b_assembly.pk,
