@@ -10,6 +10,8 @@ from pages.models.building import Building, BuildingAssembly
 
 from cities_light.models import City
 from pages.scripts.dashboards.building_dashboard import building_dashboard
+from pages.scripts.dashboards.impact_calculation import calculate_impacts
+
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +48,7 @@ def building(request, building_id = None):
         ).select_related(
             "assembly"
         )  # Optimize query by preloading related Assembly
-        structural_components = get_assemblies(updated_list)
+        structural_components, _ = get_assemblies(updated_list)
         context = {
             "building_id": building_id,
             "structural_components": list(structural_components),
@@ -80,12 +82,12 @@ def building(request, building_id = None):
         )
 
         # Build structural components and impacts in one step
-        structural_components =get_assemblies(building.prefetched_components)
+        structural_components, impact_list =get_assemblies(building.prefetched_components)
 
         context = {
             "building_id": building.id,
             "building": building,
-            "structural_components": list(structural_components),
+            "structural_components": structural_components,
         }
         # if len(structural_components):
             # context["dashboard"] = building_dashboard(structural_components)
@@ -111,26 +113,29 @@ def building(request, building_id = None):
     logger.info("Serving full item list page for GET request")
     return render(request, "pages/building/building.html", context)
 
-def get_assemblies(assembly_list):
+
+def get_assemblies(assembly_list: list[BuildingAssembly]):
+    impact_list = []
     structural_components = []
-    for component in assembly_list:
-            # impacts = [
-            #     {
-            #         "impact_id": impact.impact.id,
-            #         "impact_name": impact.impact.name,
-            #         "value": impact.value,
-            #     }
-            #     for impact in component.assembly.assemblyimpact_set.all()
-            # ]
-        structural_components.append(
-                {
-                    "assemblybuilding_id": component.id,
-                    "assembly_name": component.assembly.name,
-                    "assembly_classification": component.assembly.classification,
-                    "quantity": component.quantity,
-                    "unit": component.unit,
-                    # "impacts": impacts,
-                }
+    for b_assembly in assembly_list:
+        assembly_impact_list = []
+        for p in b_assembly.assembly.product_set.all():
+            assembly_impact_list.extend(
+                calculate_impacts(b_assembly.assembly.dimension, b_assembly.quantity, p)
             )
         
-    return structural_components
+        # calculate GWP impact for each assembly to display in list
+        gwpa1a3 = [float(i[3]) for i in assembly_impact_list if i[2].impact_category == "gwpa" and i[2].life_cycle_stage == "a1a3"]
+        structural_components.append(
+                {
+                    "assemblybuilding_id": b_assembly.pk,
+                    "assembly_name": b_assembly.assembly.name,
+                    "assembly_classification": b_assembly.assembly.classification,
+                    "quantity": b_assembly.quantity,
+                    "unit": b_assembly.unit,
+                    "impacts": sum(gwpa1a3),
+                }
+            )
+        impact_list.extend(assembly_impact_list)
+        
+    return structural_components, impact_list

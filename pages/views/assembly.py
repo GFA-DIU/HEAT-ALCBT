@@ -143,7 +143,7 @@ def save_assembly(request, assembly: Assembly, building_instance: Building):
 
         # Create clean slate
         Product.objects.filter(assembly=assembly).delete()
-        AssemblyImpact.objects.filter(assembly=assembly).delete()
+        # AssemblyImpact.objects.filter(assembly=assembly).delete()
 
         # Identify selected EPDs
         selected_epds = {}
