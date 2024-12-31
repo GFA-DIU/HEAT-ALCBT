@@ -3,18 +3,21 @@ from plotly.offline import plot
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-def building_dashboard(structural_components):
+
+def building_dashboard(impact_list):
     # Prepare DataFrame
-    rows = []
-    for assembly in structural_components:
-        row = {
-            "assemblybuilding_id": assembly["assemblybuilding_id"],
-            "assembly_name": assembly["assembly_name"],
-        }
-        for impact in assembly["impacts"]:
-            row[impact["impact_name"]] = impact["value"]
-        rows.append(row)
-    df = pd.DataFrame(rows)
+    df = pd.DataFrame.from_records(impact_list)
+    # filter to impacts of interest
+    df["impact_type"] = df["impact_type"].apply(lambda x: x.__str__())
+    df["assembly_category"] = df["assembly_category"].apply(lambda x: x.__str__())
+    df["material_category"] = df["material_category"].apply(lambda x: x.__str__())
+    df = df[df["impact_type"].isin(["gwp a1a3", "penrt a1a3"])]
+    # bring into wide format for plotting
+    df = df.pivot(
+        index=["assembly_id", "epd_id", "assembly_category", "material_category"],
+        columns="impact_type",
+        values="impact_value",
+    ).reset_index()
 
     # Generate colors
     colorscale_orange = generate_discrete_colors(
@@ -51,7 +54,7 @@ def building_dashboard(structural_components):
     # Add pies
     fig.add_trace(
         go.Pie(
-            labels=df["assembly_name"],
+            labels=df["assembly_category"],
             values=df["gwp a1a3"],
             name="GWP A1A3",
             hole=0.4,
@@ -65,7 +68,7 @@ def building_dashboard(structural_components):
 
     fig.add_trace(
         go.Pie(
-            labels=df["assembly_name"],
+            labels=df["assembly_category"],
             values=df["penrt a1a3"],
             name="PENRT A1A3",
             hole=0.4,
@@ -83,11 +86,11 @@ def building_dashboard(structural_components):
         hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
         hoverlabel=dict(font_color="white", namelength=-1),
         textfont=dict(
-            size=14,        # Default font size
+            size=14,  # Default font size
             family="Arial, sans-serif",  # Use a modern sans-serif font
-            color='white'   # Default high contrast text color
+            color="white",  # Default high contrast text color
         ),
-        texttemplate="<b>%{label}</b><br>%{percent:.0%}"
+        texttemplate="<b>%{label}</b><br>%{percent:.0%}",
     )
 
     # Store existing annotations (subplot titles)

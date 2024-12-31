@@ -15,6 +15,7 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, p: P
                 {
                     "assembly_id": p.assembly.pk,
                     "epd_id": p.epd.pk,
+                    "assembly_category": p.assembly.classification.category,
                     "material_category": p.epd.category,
                     "impact_type": epdimpact.impact,
                     "impact_value": factor * epdimpact.value,

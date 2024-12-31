@@ -43,7 +43,7 @@ class AssemblySubCategory(models.Model):
         verbose_name_plural = "Assembly Subcategories"
 
     def __str__(self):
-        return f"{self.group.name} / {self.name}"
+        return f"{self.name} / {self.name}"
 
 
 class AssemblyCategory(models.Model):

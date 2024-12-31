@@ -89,8 +89,8 @@ def building(request, building_id = None):
             "building": building,
             "structural_components": structural_components,
         }
-        # if len(structural_components):
-            # context["dashboard"] = building_dashboard(structural_components)
+        if len(structural_components):
+            context["dashboard"] = building_dashboard(impact_list)
 
         form = BuildingGeneralInformation(instance=building)
 
