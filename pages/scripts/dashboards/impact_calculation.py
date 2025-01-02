@@ -35,7 +35,7 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, p: P
                     "assembly_category": p.assembly.classification.category,
                     "material_category": p.epd.category,
                     "impact_type": epdimpact.impact,
-                    "impact_value": factor * p.epd.declared_amount * epdimpact.value,
+                    "impact_value": float(factor) * float(p.epd.declared_amount) * float(epdimpact.value),
                 }
             )
         return container
@@ -56,7 +56,7 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, p: P
         case (AssemblyDimension.AREA, Unit.M3 | Unit.KG):
             # impact = impact_per_unit * conversion_kg_per_m3 * total_m2 * thickness / epd_base_amount
             conversion_f = fetch_conversion("kg/m^3")
-            impacts = calculate_impact(assembly_quantity * p.quantity * conversion_f)
+            impacts = calculate_impact(float(assembly_quantity) * float(p.quantity) * float(conversion_f))
 
         case (AssemblyDimension.VOLUME, Unit.M3):
             # impact = impact_per_unit * total_m3 / epd_base_amount
