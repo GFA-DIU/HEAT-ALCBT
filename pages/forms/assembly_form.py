@@ -19,7 +19,7 @@ class AssemblyForm(forms.ModelForm):
         widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
     )
     mode = forms.ChoiceField(
-        required=False,
+        required=True,
         choices=AssemblyMode.choices,
         widget=forms.Select(attrs={"disabled": "disabled"}),
     )
@@ -34,7 +34,7 @@ class AssemblyForm(forms.ModelForm):
             }
         ),
         label="Category",
-        required=False,
+        required=True,
     )
     assembly_technique = forms.ModelChoiceField(
         queryset=AssemblyTechnique.objects.none(),  # Start with an empty queryset
@@ -48,7 +48,6 @@ class AssemblyForm(forms.ModelForm):
         help_text="Select a category first",
         required=False,
     )
-
     dimension = forms.ChoiceField(
         choices=AssemblyDimension.choices,
         widget=forms.Select(
@@ -61,6 +60,12 @@ class AssemblyForm(forms.ModelForm):
                 "class": "select form-select",
             }
         ),
+        label="Input Dimension"
+    )
+    quantity = forms.FloatField(
+        min_value=0,
+        label="Quantity",
+        required=True
     )
 
     class Meta:

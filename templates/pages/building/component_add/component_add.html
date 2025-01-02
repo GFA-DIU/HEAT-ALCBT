@@ -11,8 +11,11 @@
             {{ form.name |as_crispy_field }}
         </div>
         <div class="col-md-6 d-flex align-items-center">
-            <div class="me-2">
+            <div class="me-2 flex-grow-1">
                 {{ form.mode |as_crispy_field }}
+            </div>
+            <div class="ms-2 flex-grow-1">
+                {{ form.country |as_crispy_field }}
             </div>
             <div class="form-check form-switch">
                 {{ form.public |as_crispy_field }}
@@ -22,15 +25,15 @@
     <div class="row">
         <!-- Country and Classification in the second row -->
         <div class="col-md-3">
-            {{ form.country |as_crispy_field }}
-        </div>
-        <div class="col-md-3">
             {{ form.dimension |as_crispy_field }}
+        </div>
+        <div class="col-md-2">
+            {{ form.quantity |as_crispy_field }}
         </div>
         <div class="col-md-3">
             {{ form.assembly_category |as_crispy_field }}
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             {{ form.assembly_technique |as_crispy_field }}
         </div>
     </div>

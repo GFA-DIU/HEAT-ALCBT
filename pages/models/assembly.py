@@ -25,10 +25,10 @@ class AssemblyMode(models.TextChoices):
 
 
 class AssemblyDimension(models.TextChoices):
-    AREA = "area", "Area-Type" # Area-type calculations
-    LENGTH = "length", "Length-Type" # Length-type calculations   
-    MASS = "mass", "Mass-Type" # Length-type calculations   
-    VOLUME = "volume", "Volume-Type" # Length-type calculations   
+    AREA = "area", "Area (m^2)" # Area-type calculations
+    LENGTH = "length", "Length (m)" # Length-type calculations   
+    MASS = "mass", "Mass (kg)" # Length-type calculations   
+    VOLUME = "volume", "Volume (m^3)" # Length-type calculations   
 
 
 class AssemblyTechnique(models.Model):
