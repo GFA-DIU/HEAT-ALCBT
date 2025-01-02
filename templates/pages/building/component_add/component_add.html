@@ -74,29 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const epdId = event.target.dataset.id;
             const epdName = event.target.dataset.name;
             const epdCountry = event.target.dataset.country;
-            let conversions = [];
-            const rawConversions = event.target.dataset.conversions;
-
-            // Preprocess the raw JSON string
-            if (rawConversions) {
-                try {
-                    // Replace single quotes with double quotes
-                    const validJson = rawConversions.replace(/'/g, '"');
-                    conversions = JSON.parse(validJson);
-                } catch (error) {
-                    console.error('Failed to parse conversions:', error.message);
-                }
-            }
-            const declaredUnit = event.target.dataset.declaredUnit; // Declared unit
-
-            // Build available units list
-            const availableUnits = conversions.map(conversion => conversion.unit);
-            if (declaredUnit) {
-                availableUnits.push(declaredUnit);
-            }
-
-            console.log(`Available Units for EPD ${epdId}:`, availableUnits);
-
+            const epdUnit = event.target.dataset.selectionunit;
+            const epdText = event.target.dataset.selectiontext;
 
             // Check if already selected
             if (document.querySelector(`#selected-epd-list li[data-id="${epdId}"]`)) {
@@ -115,17 +94,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="text-muted ms-1">${epdCountry}</span>
                     </div>
                 </div>
+                <p>${epdText}<p>
                 <input type="number" 
                        name="material_${epdId}_quantity" 
                        class="form-control form-control-sm mx-2" 
                        style="width: 100px;" 
-                       placeholder="Quantity" 
+                       placeholder="Enter value" 
                        required>
                 <select name="material_${epdId}_unit" 
                         class="form-select form-select-sm mx-2" 
                         style="width: 100px;" 
-                        required>
-                    ${availableUnits.map(unit => `<option value="${unit}">${unit}</option>`).join('')}
+                        disabled>
+                    <option value="${epdUnit}">${epdUnit}</option>
                 </select>
                 <div class="col-3 d-flex justify-content-end align-items-center gap-2">
                     <button type="button" class="btn btn-danger remove-epd" data-id="${epdId}">

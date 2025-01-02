@@ -74,7 +74,7 @@ class SelectedEPD:
 
 @dataclass
 class FilteredEPD:
-    pk: str
+    id: str
     name: str
     country: str
     conversions: str
@@ -289,7 +289,7 @@ def parse_epds(epd_list: list[EPD], dimension: AssemblyDimension) -> list[Filter
             FilteredEPD(
                     selection_text=sel_text,
                     selection_unit=sel_unit,
-                    pk=epd.pk,
+                    id=epd.pk,
                     name=epd.name,
                     country=epd.country,
                     conversions=[],
