@@ -7,10 +7,11 @@ from django.views.decorators.http import require_http_methods
 
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.building import Building, BuildingAssembly
-from pages.models.assembly import AssemblyImpact
 
 from cities_light.models import City
 from pages.scripts.dashboards.building_dashboard import building_dashboard
+from pages.scripts.dashboards.impact_calculation import calculate_impacts
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,24 +26,16 @@ def building(request, building_id = None):
             request.POST, instance=building
         )  # Bind form to instance
         if form.is_valid():
-            print("these fields changed", form.changed_data)
             building = form.save(commit=False)
             building.created_by = request.user
             building.save()
-            print("Building updated in DB:", building)
         else:
-            print("Form is invalid")
-            print("Errors:", form.errors)
             return HttpResponseServerError()
 
         return redirect("building", building_id=building.id)
 
     elif request.method == "DELETE":
         component_id = request.GET.get("component")
-        # component = get_object_or_404(BuildingAssembly, id=item_to_delete)
-        # component.delete()
-        # context["structural_components"] = [c for c in structural_components if str(c["assembly_id"]) != item_to_delete]
-        # print("context: ", context)
         # Get the component and delete it
         component = get_object_or_404(BuildingAssembly, id=component_id)
         component.delete()
@@ -55,27 +48,7 @@ def building(request, building_id = None):
         ).select_related(
             "assembly"
         )  # Optimize query by preloading related Assembly
-        structural_components = []
-        for component in updated_list:
-            impacts = [
-                {
-                    "impact_id": impact.impact.id,
-                    "impact_name": impact.impact.name,
-                    "value": impact.value,
-                }
-                for impact in component.assembly.assemblyimpact_set.all()
-            ]
-
-            structural_components.append(
-                {
-                    "assembly_id": component.id,
-                    "assembly_name": component.assembly.name,
-                    "assembly_classification": component.assembly.classification,
-                    "quantity": component.quantity,
-                    "unit": component.unit,
-                    "impacts": impacts,
-                }
-            )
+        structural_components, _ = get_assemblies(updated_list)
         context = {
             "building_id": building_id,
             "structural_components": list(structural_components),
@@ -83,11 +56,13 @@ def building(request, building_id = None):
         return render(
             request, "pages/building/structural_info/assemblies_list.html", context
         )  # Partial update for DELETE
+
     elif request.GET.get("country"):
         cities = City.objects.filter(
             country_id=request.GET.get("country")
         ).order_by("name")
         return render(request, "pages/utils/city_select.html", {"cities": cities})
+    
     # Full reload
     elif building_id:
         building = get_object_or_404(
@@ -99,13 +74,7 @@ def building(request, building_id = None):
                     queryset=BuildingAssembly.objects.filter(
                         # assembly__created_by=request.user  # Ensure the assembly belongs to the user
                     )
-                    .select_related("assembly")
-                    .prefetch_related(
-                        Prefetch(
-                            "assembly__assemblyimpact_set",
-                            queryset=AssemblyImpact.objects.select_related("impact"),
-                        )
-                    ),
+                    .select_related("assembly"),
                     to_attr="prefetched_components",
                 )
             ),
@@ -113,35 +82,15 @@ def building(request, building_id = None):
         )
 
         # Build structural components and impacts in one step
-        structural_components = []
-        for component in building.prefetched_components:
-            impacts = [
-                {
-                    "impact_id": impact.impact.id,
-                    "impact_name": impact.impact.__str__(),
-                    "value": impact.value,
-                }
-                for impact in component.assembly.assemblyimpact_set.all()
-            ]
-
-            structural_components.append(
-                {
-                    "assembly_id": component.assembly.id,
-                    "assembly_name": component.assembly.name,
-                    "assembly_classification": component.assembly.classification,
-                    "quantity": component.quantity,
-                    "unit": component.unit,
-                    "impacts": impacts,
-                }
-            )
+        structural_components, impact_list =get_assemblies(building.prefetched_components)
 
         context = {
             "building_id": building.id,
             "building": building,
-            "structural_components": list(structural_components),
+            "structural_components": structural_components,
         }
         if len(structural_components):
-            context["dashboard"] = building_dashboard(structural_components)
+            context["dashboard"] = building_dashboard(impact_list)
 
         form = BuildingGeneralInformation(instance=building)
 
@@ -150,6 +99,7 @@ def building(request, building_id = None):
             building.name,
             len(context["structural_components"]),
         )
+
     else:
         context = {
             "building_id": None,
@@ -157,7 +107,40 @@ def building(request, building_id = None):
             "structural_components": [],
         }
         form = BuildingGeneralInformation()
+
     context["form_general_info"] = form
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
     return render(request, "pages/building/building.html", context)
+
+
+def get_assemblies(assembly_list: list[BuildingAssembly]):
+    impact_list = []
+    structural_components = []
+    for b_assembly in assembly_list:
+        assembly_impact_list = []
+        for p in b_assembly.assembly.product_set.all():
+            assembly_impact_list.extend(
+                calculate_impacts(b_assembly.assembly.dimension, b_assembly.quantity, p)
+            )
+        
+        # get GWP impact for each assembly to display in list
+        gwpa1a3 = [
+            i["impact_value"]
+            for i in assembly_impact_list
+            if i["impact_type"].impact_category == "gwp"
+            and i["impact_type"].life_cycle_stage == "a1a3"
+        ]
+        structural_components.append(
+                {
+                    "assemblybuilding_id": b_assembly.pk,
+                    "assembly_name": b_assembly.assembly.name,
+                    "assembly_classification": b_assembly.assembly.classification,
+                    "quantity": b_assembly.quantity,
+                    "unit": b_assembly.unit,
+                    "impacts": sum(gwpa1a3),
+                }
+            )
+        impact_list.extend(assembly_impact_list)
+        
+    return structural_components, impact_list

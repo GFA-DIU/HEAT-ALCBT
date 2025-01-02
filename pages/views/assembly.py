@@ -13,7 +13,7 @@ from django.views.decorators.http import require_http_methods
 from django.forms import ValidationError
 
 from pages.forms.epds_filter_form import EPDsFilterForm
-from pages.models.assembly import Assembly, AssemblyDimension, Product, AssemblyImpact
+from pages.models.assembly import Assembly, AssemblyDimension, Product
 from pages.models.building import Building, BuildingAssembly
 from pages.models.epd import EPD, EPDImpact, MaterialCategory, Unit
 from pages.forms.assembly_form import AssemblyForm
@@ -132,44 +132,31 @@ def component_edit(request, building_id, assembly_id=None):
     return render(request, "pages/building/component_add/editor_own_page.html", context)
 
 
-def save_assembly(request, component, building_instance):
+def save_assembly(request, assembly: Assembly, building_instance: Building):
     print("This is a form submission")
     print(request.POST)
     # Bind the form to the existing Assembly instance
-    form = AssemblyForm(request.POST, instance=component)
+    form = AssemblyForm(request.POST, instance=assembly)
     if form.is_valid():
         # Save the updated Assembly instance
         assembly = form.save()
 
         # Create clean slate
         Product.objects.filter(assembly=assembly).delete()
-        AssemblyImpact.objects.filter(assembly=assembly).delete()
+        # AssemblyImpact.objects.filter(assembly=assembly).delete()
 
-        # Clear the session variable after successful submission
-        request.session["selected_epds"] = []
-
-        epd_impacts = []
-
-        # Collect EPD IDs and dynamic field data
-        epd_ids = set()
-        dynamic_fields = []
+        # Identify selected EPDs
+        selected_epds = {}
         for key, value in request.POST.items():
-            print("Key: ", key)
-            print("Value: ", value)
             if key.startswith("material_") and "_quantity" in key:
                 epd_id = key.split("_")[1]
-                epd_ids.add(epd_id)
-                dynamic_fields.append(
-                    {
-                        "epd_id": epd_id,
-                        "quantity": Decimal(value),
-                        "unit": request.POST[f"material_{epd_id}_unit"],
-                    }
-                )
+                selected_epds[epd_id] = {
+                    "quantity": Decimal(value),
+                    "unit": request.POST[f"material_{epd_id}_unit"],
+                }
 
-        print("Dynamic fields: ", dynamic_fields)
         # Pre-fetch EPDImpact and Impact objects
-        epds = EPD.objects.filter(pk__in=epd_ids).prefetch_related(
+        epds = EPD.objects.filter(pk__in=selected_epds.keys()).prefetch_related(
             Prefetch(
                 "epdimpact_set",
                 queryset=EPDImpact.objects.select_related("impact"),
@@ -177,58 +164,19 @@ def save_assembly(request, component, building_instance):
             )
         )
         epd_map = {str(epd.id): epd for epd in epds}
-
-        # Process each dynamic field
-        impacts_data = defaultdict(
-            Decimal
-        )  # For summing impacts by cate1 mgory & stage
-        for field in dynamic_fields:
-            # Fetch the EPD and its impacts
-            epd = epd_map[field["epd_id"]]
-            conversion_f = 1
-            if epd.declared_unit != field.get("unit"):
-                conversion_f = [
-                    f["value"]
-                    for f in epd.conversions
-                    if f["unit"] == field.get("unit")
-                ]
-                conversion_f = float(conversion_f[0])
-            print("conversion f: ", conversion_f)
-
-            for impact in epd.prefetched_impacts:
-                # Group impacts by category and stage
-                impacts_data[impact.impact] += (
-                    Decimal(impact.value)
-                    * field.get("quantity")
-                    * Decimal(conversion_f)
+        # Save to products
+        # TODO: Does this undermine the pre-fetching of the EPD data?
+        products = []
+        for k, v in selected_epds.items():
+            products.append(
+                Product.objects.create(
+                    epd=epd_map[k],
+                    assembly=assembly,
+                    quantity=v.get("quantity"),
+                    input_unit=v.get("unit"),
                 )
-
-                epd_impacts.append(
-                    {
-                        "impact": impact.impact,
-                        "value": Decimal(impact.value)
-                        * field.get("quantity")
-                        * Decimal(conversion_f),
-                    }
-                )
-
-            # Save the Product
-            product = Product.objects.update_or_create(
-                epd=epd,
-                assembly=component,
-                quantity=field.get("quantity"),
-                input_unit=field.get("unit"),
             )
-
-        print("epd_impacts: ", epd_impacts)
-        print("impacts_data: ", impacts_data)
-        # Create AssemblyImpact records
-        for impact, total_value in impacts_data.items():
-            AssemblyImpact.objects.update_or_create(
-                assembly=assembly,
-                impact=impact,
-                value=total_value,
-            )
+        
         # It doesn't duplicate if the assembly already is in structural_components
         building_instance.structural_components.add(assembly)
 

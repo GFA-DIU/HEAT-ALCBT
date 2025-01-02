@@ -96,7 +96,6 @@ class Assembly(BaseModel):
     products = models.ManyToManyField(
         EPD, blank=True, related_name="assemblies", through="Product"
     )
-    impacts = models.ManyToManyField(Impact, blank=False, related_name="assemblies", through="AssemblyImpact")
 
     def __str__(self):
         return self.name
@@ -149,10 +148,3 @@ class Product(models.Model):
     class Meta:
         verbose_name = "Product"
         verbose_name_plural = "Products"
-
-
-class AssemblyImpact(models.Model):
-    """Join Table for Assemblies and Impact"""
-    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
-    impact = models.ForeignKey(Impact, on_delete=models.CASCADE)
-    value = models.FloatField()    

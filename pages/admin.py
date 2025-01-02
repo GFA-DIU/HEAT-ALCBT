@@ -16,14 +16,9 @@ class ProductsInline(admin.TabularInline):  # or admin.StackedInline
     extra = 1  # Number of empty rows to display
   
 
-class AssemblyImpact(admin.TabularInline):
-    model = Assembly.impacts.through  # Use the through model for the many-to-many field
-    extra = 1  # Number of empty rows to display 
-
-
 class AssembliesClassificationInline(admin.TabularInline):
     model = AssemblyCategory.techniques.through
-    
+
 
 # Inline for Many-to-Many (assemblies in Building)
 class AssembliesInline(admin.TabularInline):  # or admin.StackedInline
@@ -43,7 +38,7 @@ class EPDAdmin(admin.ModelAdmin):
 
 # Custom admin for Assembly
 class AssemblyAdmin(admin.ModelAdmin):
-    inlines = [ProductsInline, AssemblyImpact]  # Add the inline for products
+    inlines = [ProductsInline]  # Add the inline for products
     list_display = ["name", "country", "classification", "id"]
 
 
