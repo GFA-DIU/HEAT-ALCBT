@@ -247,18 +247,37 @@ def get_filtered_epd_list(request, dimension = None):
     return paginator.get_page(page_number), dimension
 
 
-def filter_by_dimension(epds, dimension):
+def filter_by_dimension(epds:BaseManager[EPD], dimension: AssemblyDimension):
+    """Logic for filering EPDs from DB by Assembly Dimension.
+    
+    This is the logic:
+    | **    Declared unit   ** | **    Area Assembly   ** | **    Volume Assembly   ** | **    Mass Assembly   ** | **    Length Assembly   ** |
+    |--------------------------|--------------------------|----------------------------|--------------------------|----------------------------|
+    |     m3                   |     Yes                  |     Yes                    |     Yes                  |     Yes                    |
+    |     m2                   |     Yes                  |     No                     |     No                   |     No                     |
+    |     m                    |     No                   |     No                     |     No                   |     Yes                    |
+    |     kg                   |     w. Volume density    |     w. Volume density      |     Yes                  |     w. Volume density      |
+    |     pieces               |     Set a quantity       |     Set a quantity         |     Set a quantity       |     Set a quantity         |
+    
+    """ 
+    # Requires postgres backend
+    # TODO: uncomment once we have Postgres backend
+    additional_filters = None
     match dimension:
         case AssemblyDimension.AREA:
             declared_units = [Unit.M3, Unit.M2, Unit.KG, Unit.PCS]
+            # additional_filters = (Q(declared_unit=Unit.KG) & Q(conversions__contains=[{"unit": "kg/m^3"}]) | ~Q(declared_unit=Unit.KG))
         case AssemblyDimension.VOLUME:
             declared_units = [Unit.M3, Unit.KG, Unit.PCS]
+            # additional_filters = (Q(declared_unit=Unit.KG) & Q(conversions__contains=[{"unit": "kg/m^3"}]) | ~Q(declared_unit=Unit.KG))
         case AssemblyDimension.MASS:
             declared_units = [Unit.M3, Unit.KG, Unit.PCS]
         case AssemblyDimension.LENGTH:
             declared_units = [Unit.M3, Unit.M, Unit.KG, Unit.PCS]
+            # additional_filters = (Q(declared_unit=Unit.KG) & Q(conversions__contains=[{"unit": "kg/m^3"}]) | ~Q(declared_unit=Unit.KG))
         case _:
             return epds
+    
     return epds.filter(declared_unit__in=declared_units)
 
 
