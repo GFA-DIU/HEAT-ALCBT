@@ -21,14 +21,17 @@
     </div>
     <div class="row">
         <!-- Country and Classification in the second row -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             {{ form.country |as_crispy_field }}
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             {{ form.dimension |as_crispy_field }}
         </div>
-        <div class="col-md-4">
-            {{ form.classification |as_crispy_field }}
+        <div class="col-md-3">
+            {{ form.assembly_category |as_crispy_field }}
+        </div>
+        <div class="col-md-3">
+            {{ form.assembly_technique |as_crispy_field }}
         </div>
     </div>
     <div class="row">

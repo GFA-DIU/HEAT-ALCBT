@@ -30,20 +30,20 @@ class AssemblyDimension(models.TextChoices):
     MASS = "mass", "Mass-Type" # Length-type calculations   
     VOLUME = "volume", "Volume-Type" # Length-type calculations   
 
-class AssemblySubCategory(models.Model):
+
+class AssemblyTechnique(models.Model):
     """
     Represents an individual assembly category within a group.
     """
     name = models.CharField(max_length=255)
-    numeric_identifier = models.PositiveIntegerField()  # To preserve order (e.g., 1, 2, 3, etc.)
 
     class Meta:
-        ordering = ["numeric_identifier"]  # Default ordering by order field
+        # ordering = ["numeric_identifier"]  # Default ordering by order field
         verbose_name = "Assembly Subcategorie"
         verbose_name_plural = "Assembly Subcategories"
 
     def __str__(self):
-        return f"{self.group.name} / {self.name}"
+        return self.name
 
 
 class AssemblyCategory(models.Model):
@@ -51,20 +51,21 @@ class AssemblyCategory(models.Model):
     Represents a group of assemblies, e.g., 'Bottom Floor Construction'.
     """
     name = models.CharField(max_length=255, unique=True)
-    subcategories = models.ManyToManyField(AssemblySubCategory,through="AssemblyCategorySubcategory", related_name="categories" )
+    tag = models.CharField(max_length=50)
+    techniques = models.ManyToManyField(AssemblyTechnique,through="AssemblyCategoryTechnique", related_name="categories" )
 
     class Meta:
         verbose_name = "Assembly Group"
         verbose_name_plural = "Assembly Groups"
 
     def __str__(self):
-        return self.name
+        return f"{self.tag} - {self.name}"
 
 
-class AssemblyCategorySubcategory(models.Model):
+class AssemblyCategoryTechnique(models.Model):
     category = models.ForeignKey(AssemblyCategory, on_delete=models.CASCADE)
-    subcategory = models.ForeignKey(AssemblySubCategory, on_delete=models.CASCADE)
-    description = models.TextField()
+    technique = models.ForeignKey(AssemblyTechnique, on_delete=models.CASCADE, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
 
 
 class Assembly(BaseModel):
@@ -87,7 +88,7 @@ class Assembly(BaseModel):
         default=AssemblyDimension.AREA,
     )
     classification = models.ForeignKey(
-         AssemblyCategorySubcategory, on_delete=models.SET_NULL, null=True, blank=True
+         AssemblyCategoryTechnique, on_delete=models.SET_NULL, null=True, blank=True
     )
     comment = models.TextField(_("Comment"), null=True, blank=True)
     description = models.TextField(_("Description"), null=True, blank=True)

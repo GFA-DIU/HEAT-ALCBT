@@ -18,7 +18,7 @@
 
 **Note**: The Ecoplatform Loader expects an API Token `ECO_PLATFORM_TOKEN` in an `.env` file.
 
-```
+```Bash
 $ python -m venv .venv
 $ source .venv/bin/activate
 
@@ -31,8 +31,13 @@ $ source .venv/bin/activate
 ```
 
 To load the EPD data from Ökobaudat:
-```
+```Bash
 (.venv) $ python manage.py load_oekobaudat_epds
+```
+
+If `cities_light` is not being loaded, try:
+```Bash
+(.venv) $ python manage.py cities_light --force-import-all
 ```
 
 ### Info
