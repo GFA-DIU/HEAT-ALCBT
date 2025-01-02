@@ -19,9 +19,10 @@ class AssemblyForm(forms.ModelForm):
         widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
     )
     mode = forms.ChoiceField(
-        required=True,
+        required=False,
         choices=AssemblyMode.choices,
         widget=forms.Select(attrs={"disabled": "disabled"}),
+        label="Mode*",
     )
     assembly_category = forms.ModelChoiceField(
         queryset=AssemblyCategory.objects.all().order_by("tag"),
