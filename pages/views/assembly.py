@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from typing import Optional
 
 from django.core.paginator import Paginator
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch,  Q
+from django.db.models.manager import BaseManager
 from django.http import HttpResponseServerError, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -71,6 +72,17 @@ class SelectedEPD:
         )
 
 
+@dataclass
+class FilteredEPD:
+    pk: str
+    name: str
+    country: str
+    conversions: str
+    declared_unit: str
+    selection_text: str
+    selection_unit: str
+    
+
 @require_http_methods(["GET", "POST", "DELETE"])
 def component_edit(request, building_id, assembly_id=None):
     """
@@ -84,7 +96,7 @@ def component_edit(request, building_id, assembly_id=None):
     context = {
         "assembly_id": assembly_id,
         "building_id": building_id,
-        "epd_list": get_filtered_epd_list(request, component.dimension if component else None),
+        "epd_list": get_epd_list(request, component),
         "epd_filters_form": EPDsFilterForm(request.POST),
         "dimension": request.POST.get("dimension")
     }
@@ -181,6 +193,13 @@ def save_assembly(request, assembly: Assembly, building_instance: Building):
         building_instance.structural_components.add(assembly)
 
 
+def get_epd_list(request, component):
+    # TODO: can dimension every be None? For new component perhaps?
+    filtered_list, dimension = get_filtered_epd_list(request, component.dimension if component else None)
+    dimension = dimension if dimension else AssemblyDimension.AREA
+    return parse_epds(filtered_list, dimension)
+
+
 def get_filtered_epd_list(request, dimension = None):
     # Start with the base queryset
     filtered_epds = EPD.objects.all().order_by("id")
@@ -225,7 +244,7 @@ def get_filtered_epd_list(request, dimension = None):
     # Pagination setup for EPD list
     paginator = Paginator(filtered_epds, 10)  # Show 10 items per page
     page_number= request.GET.get("page", 1)
-    return paginator.get_page(page_number)
+    return paginator.get_page(page_number), dimension
 
 
 def filter_by_dimension(epds, dimension):
@@ -241,3 +260,51 @@ def filter_by_dimension(epds, dimension):
         case _:
             return epds
     return epds.filter(declared_unit__in=declared_units)
+
+
+def parse_epds(epd_list: list[EPD], dimension: AssemblyDimension) -> list[FilteredEPD]:
+    container = []
+    for epd in epd_list:
+        sel_text, sel_unit = get_epd_dimension_info(dimension, epd.declared_unit)
+        container.append(
+            FilteredEPD(
+                    selection_text=sel_text,
+                    selection_unit=sel_unit,
+                    pk=epd.pk,
+                    name=epd.name,
+                    country=epd.country,
+                    conversions=[],
+                    declared_unit=epd.declared_unit
+                )
+        )
+    
+    return container
+
+
+def get_epd_dimension_info(dimension: AssemblyDimension, unit: Unit):
+    """Rule for input texts and units depending on Dimension."""
+    match (dimension, unit):
+        case (_, Unit.PCS):
+            # 'Pieces' EPD is treated the same across all assembly dimensions
+            selection_text = "Quantity"
+            selection_unit = Unit.PCS
+        case (AssemblyDimension.AREA, _):
+            selection_text = "Layer Thickness"
+            selection_unit = Unit.CM
+        case (AssemblyDimension.VOLUME, _):
+            selection_text = "Share of volume"
+            selection_unit = Unit.PERCENT
+        case (AssemblyDimension.MASS, _):
+            selection_text = "Share of mass"
+            selection_unit = Unit.KG
+        case (AssemblyDimension.LENGTH, _):
+            selection_text = "Share of cross-section"
+            selection_unit = Unit.CM2
+        case _:
+            raise ValueError(
+                f"Unsupported combination: dimension '{dimension}', declared_unit '{unit}'"
+            )
+    
+    return selection_text, selection_unit    
+            
+                
