@@ -73,12 +73,11 @@ class BuildingAssembly(models.Model):
     building = models.ForeignKey(Building, on_delete=models.CASCADE)
     quantity = models.DecimalField(
         _("Quantity"),
-        help_text=_("How many of components"),
+        help_text=_("How much of this component"),
         max_digits=10,
         decimal_places=3,
         default=0
     )
-    unit = models.CharField(_("Unit of Quantity"), max_length=20, choices=Unit.choices, default=Unit.UNKNOWN)
 
     class Meta:
         verbose_name = "Building structural component"

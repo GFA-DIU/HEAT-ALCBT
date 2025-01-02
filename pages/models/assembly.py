@@ -126,14 +126,38 @@ class Product(models.Model):
             Validates that the `unit` matches the expected unit for the chosen `impact_category`.
             """
             super().clean()
-            expected_units = [i.get("unit") for i in self.epd.conversions]
-            expected_units.append(self.epd.declared_unit)
-            if self.input_unit not in expected_units:
+            
+            def get_dim_info(dimension, declared_unit):
+                match (dimension, declared_unit):
+                    case (_, Unit.PCS):
+                        # 'Pieces' EPD is treated the same across all assembly dimensions
+                        selection_text = "Quantity"
+                        selection_unit = Unit.PCS
+                    case (AssemblyDimension.AREA, _):
+                        selection_text = "Layer Thickness"
+                        selection_unit = Unit.CM
+                    case (AssemblyDimension.VOLUME, _):
+                        selection_text = "Share of volume"
+                        selection_unit = Unit.PERCENT
+                    case (AssemblyDimension.MASS, _):
+                        selection_text = "Share of mass"
+                        selection_unit = Unit.KG
+                    case (AssemblyDimension.LENGTH, _):
+                        selection_text = "Share of cross-section"
+                        selection_unit = Unit.CM2
+                    case _:
+                        raise ValueError(
+                            f"Unsupported combination: dimension '{dimension}', declared_unit '{declared_unit}'"
+                        )
+                return selection_unit
+            
+            expected_unit = get_dim_info(self.assembly.dimension, self.epd.declared_unit)
+            if self.input_unit != expected_unit:
                 raise ValidationError(
                     {
                         'input_unit': _(
                             f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
-                            f"Expected unit: '{expected_units}'."
+                            f"Expected unit: '{expected_unit}'."
                         )
                     }
                 )
