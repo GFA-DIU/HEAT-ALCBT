@@ -14,15 +14,21 @@
                 placeholder="Quantity"
                 {% if epd.sel_quantity%}value="{{ epd.sel_quantity}}"{% endif %}
                 required>
+        <select name="material_{{ epd.id }}_unit_disabled" 
+                class="form-select form-select-sm mx-2" 
+                style="width: 100px;" 
+                disabled>
+            <option value="{{ epd.sel_unit }}">
+                {{ epd.sel_unit }}
+            </option>
+        </select>
         <select name="material_{{ epd.id }}_unit" 
                 class="form-select form-select-sm mx-2" 
                 style="width: 100px;" 
-                required>
-            {% for unit in epd.available_units %}
-            <option value="{{ unit }}" {% if unit == epd.sel_unit %}selected{% endif %}>
-                {{ unit }}
+                hidden>
+            <option value="{{ epd.sel_unit }}">
+                {{ epd.sel_unit }}
             </option>
-            {% endfor %}
         </select>
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
             <button class="btn btn-danger remove-epd" data-id="{{ epd.id }}">

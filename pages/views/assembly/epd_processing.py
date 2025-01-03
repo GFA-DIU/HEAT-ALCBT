@@ -9,7 +9,6 @@ from pages.views.assembly.epd_filtering import get_epd_dimension_info, get_filte
 @dataclass
 class SelectedEPD:
     id: str
-    available_units: list[str]
     sel_unit: Optional[str]
     sel_quantity: float
     name: str
@@ -22,13 +21,9 @@ class SelectedEPD:
         """
         Parses a Product instance into a SelectedEPD dataclass.
         """
-        available_units = [i["unit"] for i in product.epd.conversions]
-        available_units.append(product.epd.declared_unit)
-
         return cls(
             id=str(product.epd.id),
             sel_unit=product.input_unit,
-            available_units=available_units,
             sel_quantity=float(product.quantity),
             name=product.epd.name,
             category=product.epd.category.name_en if product.epd.category else None,
@@ -41,9 +36,6 @@ class SelectedEPD:
         """
         Parses an EPD instance into a SelectedEPD dataclass.
         """
-        available_units = [i["unit"] for i in epd.conversions]
-        available_units.append(epd.declared_unit)
-
         return cls(
             id=str(epd.id),
             sel_unit="",
