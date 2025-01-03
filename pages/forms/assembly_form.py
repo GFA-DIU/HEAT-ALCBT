@@ -14,7 +14,7 @@ from pages.models.building import BuildingAssembly
 
 
 class AssemblyForm(forms.ModelForm):
-    comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 3}))
+    comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 3}), required=False)
     public = forms.BooleanField(
         required=False,
         widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
