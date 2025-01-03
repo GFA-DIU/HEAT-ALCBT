@@ -104,10 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
                        style="width: 100px;" 
                        placeholder="Enter value" 
                        required>
-                <select name="material_${epdId}_unit" 
+                <select name="material_${epdId}_unit_disabled" 
                         class="form-select form-select-sm mx-2" 
                         style="width: 100px;" 
                         disabled>
+                    <option value="${epdUnit}">${epdUnit}</option>
+                </select>
+                <select name="material_${epdId}_unit" 
+                        class="form-select form-select-sm mx-2" 
+                        style="width: 100px;" 
+                        hidden>
                     <option value="${epdUnit}">${epdUnit}</option>
                 </select>
                 <div class="col-3 d-flex justify-content-end align-items-center gap-2">

@@ -137,7 +137,6 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
                     "assembly_name": b_assembly.assembly.name,
                     "assembly_classification": b_assembly.assembly.classification,
                     "quantity": b_assembly.quantity,
-                    "unit": b_assembly.unit,
                     "impacts": sum(gwpa1a3),
                 }
             )
