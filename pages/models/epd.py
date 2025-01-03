@@ -228,7 +228,7 @@ class EPD(BaseModel, epdLCAx):
     declared_amount = models.DecimalField(
         _("Reference Quantity of EPD"),
         max_digits=10,
-        decimal_places=3,
+        decimal_places=2,
         null=False,
         blank=False,
     )

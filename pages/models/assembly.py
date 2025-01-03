@@ -125,7 +125,7 @@ class Product(models.Model):
     quantity = models.DecimalField(
         _("Quantity of EPD"),
         max_digits=10,
-        decimal_places=3,
+        decimal_places=2,
         null=False,
         blank=False,
     )

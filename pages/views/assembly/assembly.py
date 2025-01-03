@@ -72,7 +72,7 @@ def component_edit(request, building_id, assembly_id=None):
             products = Product.objects.filter(assembly=component).select_related("epd")
             selected_epds = [SelectedEPD.parse_product(p) for p in products]
             context["selected_epds"] = selected_epds
-        context["form"] = AssemblyForm(instance=component)
+        context["form"] = AssemblyForm(instance=component, building_id=building_id)
         context["dimension"] = (
             component.dimension if component else AssemblyDimension.AREA
         )

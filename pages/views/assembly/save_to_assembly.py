@@ -10,14 +10,13 @@ def save_assembly(request, assembly: Assembly, building_instance: Building):
     print("This is a form submission")
     print(request.POST)
     # Bind the form to the existing Assembly instance
-    form = AssemblyForm(request.POST, instance=assembly)
+    form = AssemblyForm(request.POST, instance=assembly, building_id=building_instance.pk)
     if form.is_valid():
         # Save the updated Assembly instance
         assembly = form.save()
 
         # Create clean slate
         Product.objects.filter(assembly=assembly).delete()
-        # AssemblyImpact.objects.filter(assembly=assembly).delete()
 
         # Identify selected EPDs
         selected_epds = {}

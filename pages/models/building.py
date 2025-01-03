@@ -75,7 +75,7 @@ class BuildingAssembly(models.Model):
         _("Quantity"),
         help_text=_("How much of this component"),
         max_digits=10,
-        decimal_places=3,
+        decimal_places=2,
         default=0
     )
 
@@ -93,7 +93,7 @@ class BuildingAssemblySimulated(models.Model):
         _("Quantity"),
         help_text=_("How many of components"),
         max_digits=10,
-        decimal_places=3,
+        decimal_places=2,
         null=False,
         blank=False,
     )

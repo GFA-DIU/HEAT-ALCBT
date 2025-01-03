@@ -10,6 +10,7 @@ from pages.models.assembly import (
     AssemblyTechnique,
     AssemblyCategoryTechnique,
 )
+from pages.models.building import BuildingAssembly
 
 
 class AssemblyForm(forms.ModelForm):
@@ -63,10 +64,12 @@ class AssemblyForm(forms.ModelForm):
         ),
         label="Input Dimension"
     )
-    quantity = forms.FloatField(
+    quantity = forms.DecimalField(
         min_value=0,
         label="Quantity",
-        required=True
+        required=True,
+        decimal_places=2,
+        max_digits=10
     )
 
     class Meta:
@@ -81,6 +84,7 @@ class AssemblyForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        building_id = kwargs.pop("building_id", None)
         super().__init__(*args, **kwargs)
         if self.instance.pk:
             self.fields["mode"].initial = self.instance.mode
@@ -88,6 +92,7 @@ class AssemblyForm(forms.ModelForm):
             self.fields["assembly_category"].initial = self.instance.classification.category
             self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__pk=self.instance.classification.category.pk)
             self.fields["assembly_technique"].initial = self.instance.classification.technique
+            self.fields["quantity"].initial = BuildingAssembly.objects.get(assembly=self.instance, building__pk=building_id).quantity
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA
