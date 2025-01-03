@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
 from pages.forms.building_general_info import BuildingGeneralInformation
+from pages.models.assembly import DIMENSION_UNIT_MAPPING
 from pages.models.building import Building, BuildingAssembly
 
 from cities_light.models import City
@@ -135,9 +136,10 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
                 {
                     "assemblybuilding_id": b_assembly.pk,
                     "assembly_name": b_assembly.assembly.name,
-                    "assembly_classification": b_assembly.assembly.classification,
+                    "assembly_classification": b_assembly.assembly.classification.category,
                     "quantity": b_assembly.quantity,
                     "impacts": sum(gwpa1a3),
+                    "unit": DIMENSION_UNIT_MAPPING.get(b_assembly.assembly.dimension),
                 }
             )
         impact_list.extend(assembly_impact_list)

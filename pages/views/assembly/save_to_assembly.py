@@ -56,6 +56,6 @@ def save_assembly(request, assembly: Assembly, building_instance: Building):
             building=building_instance,
             assembly=assembly,
             defaults={
-                "quantity": request.POST.get("assembly_quantity", 0),  # Get quantity from POST data
+                "quantity": request.POST.get("quantity", 0),  # Get quantity from POST data
             }
         )

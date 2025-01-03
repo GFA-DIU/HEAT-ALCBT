@@ -24,6 +24,14 @@ class AssemblyMode(models.TextChoices):
     CUSTOM = "custom", "Custom" # "Use for Detailed Assessment"
 
 
+DIMENSION_UNIT_MAPPING = {
+    "area": "m^2",
+    "length": "m",
+    "mass": "kg",
+    "volume": "m^3",
+}
+
+
 class AssemblyDimension(models.TextChoices):
     AREA = "area", "Area (m^2)" # Area-type calculations
     LENGTH = "length", "Length (m)" # Length-type calculations   
