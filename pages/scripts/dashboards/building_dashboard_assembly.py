@@ -172,7 +172,7 @@ def building_dashboard_assembly(impact_list):
         height=500, width=900, margin=dict(l=50, r=50, t=100, b=50), showlegend=True
     )
 
-    pie_plot = plot(fig, output_type="div")
+    pie_plot = plot(fig, output_type="div", config= {'displaylogo': False, 'displayModeBar': False})
     return pie_plot
 
 
