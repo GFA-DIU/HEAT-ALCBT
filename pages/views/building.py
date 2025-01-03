@@ -9,7 +9,8 @@ from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.building import Building, BuildingAssembly
 
 from cities_light.models import City
-from pages.scripts.dashboards.building_dashboard import building_dashboard
+from pages.scripts.dashboards.building_dashboard_assembly import building_dashboard_assembly
+from pages.scripts.dashboards.building_dashboard_material import building_dashboard_material
 from pages.scripts.dashboards.impact_calculation import calculate_impacts
 
 
@@ -90,7 +91,9 @@ def building(request, building_id = None):
             "structural_components": structural_components,
         }
         if len(structural_components):
-            context["dashboard"] = building_dashboard(impact_list)
+            print(impact_list)
+            context["building_dashboard_assembly"] = building_dashboard_assembly(impact_list)
+            context["building_dashboard_material"] = building_dashboard_material(impact_list)
 
         form = BuildingGeneralInformation(instance=building)
 

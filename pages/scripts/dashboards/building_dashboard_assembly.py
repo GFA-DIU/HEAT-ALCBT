@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
-def building_dashboard(impact_list):
+def building_dashboard_assembly(impact_list):
     # Prepare DataFrame
     df = pd.DataFrame.from_records(impact_list)
     # filter to impacts of interest
@@ -20,10 +20,19 @@ def building_dashboard(impact_list):
     ).reset_index()
 
 
-    # Decision to set negative values to 0
-    df.loc[df["gwp a1a3"] <= 0, "gwp a1a3"] = 0
-    df.loc[df["penrt a1a3"] <= 0, "penrt a1a3"] = 0
-
+    # Decision to only display positive values for embodied carbon and embodied energy, yet indicator below still shows sum.
+    # Thus creating a new column
+    df["gwp a1a3 pos"] = df["gwp a1a3"]
+    df.loc[df["gwp a1a3 pos"] <= 0, "gwp a1a3 pos"] = 0
+    df["penrt a1a3 pos"] = df["penrt a1a3"]
+    df.loc[df["penrt a1a3 pos"] <= 0, "penrt a1a3 pos"] = 0
+    
+    # Create short Assembly category names to enable to show the labels
+    df["assembly_short"] = df["assembly_category"].str.split("- ").str[1]
+    df.loc[df["assembly_short"] == "Intermediate Floor Construction", "assembly_short"] = "Interm. Floor"
+    df.loc[df["assembly_short"] == "Bottom Floor Construction", "assembly_short"] = "Bottom Floor"
+    df.loc[df["assembly_short"] == "Roof Construction", "assembly_short"] = "Roof Const."
+    
     # Generate colors
     colorscale_orange = generate_discrete_colors(
         start_color=(242, 103, 22), end_color=(250, 199, 165), n=df.shape[0]
@@ -59,8 +68,8 @@ def building_dashboard(impact_list):
     # Add pies
     fig.add_trace(
         go.Pie(
-            labels=df["assembly_category"],
-            values=df["gwp a1a3"],
+            labels=df["assembly_short"],
+            values=df["gwp a1a3 pos"], # using ony positive values
             name="GWP A1A3",
             hole=0.4,
             marker=dict(colors=colorscale_orange),
@@ -73,8 +82,8 @@ def building_dashboard(impact_list):
 
     fig.add_trace(
         go.Pie(
-            labels=df["assembly_category"],
-            values=df["penrt a1a3"],
+            labels=df["assembly_short"],
+            values=df["penrt a1a3 pos"],
             name="PENRT A1A3",
             hole=0.4,
             marker=dict(colors=colorscale_green),
@@ -89,13 +98,15 @@ def building_dashboard(impact_list):
     fig.update_traces(
         hoverinfo="label+value",
         hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
-        hoverlabel=dict(font_color="white", namelength=-1),
+        hoverlabel=dict(font_color="white", namelength=-1), 
+        textposition = "auto", 
         textfont=dict(
             size=14,  # Default font size
             family="Arial, sans-serif",  # Use a modern sans-serif font
             color="white",  # Default high contrast text color
         ),
         texttemplate="<b>%{label}</b><br>%{percent:.0%}",
+        #connector=dict(line=dict(color="black", width=1, dash="solid")),
     )
 
     # Store existing annotations (subplot titles)
