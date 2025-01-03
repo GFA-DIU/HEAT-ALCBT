@@ -10,10 +10,11 @@ from pages.models.assembly import (
     AssemblyTechnique,
     AssemblyCategoryTechnique,
 )
+from pages.models.building import BuildingAssembly
 
 
 class AssemblyForm(forms.ModelForm):
-    comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 3}))
+    comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 3}), required=False)
     public = forms.BooleanField(
         required=False,
         widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
@@ -22,6 +23,7 @@ class AssemblyForm(forms.ModelForm):
         required=False,
         choices=AssemblyMode.choices,
         widget=forms.Select(attrs={"disabled": "disabled"}),
+        label="Mode*",
     )
     assembly_category = forms.ModelChoiceField(
         queryset=AssemblyCategory.objects.all().order_by("tag"),
@@ -34,7 +36,7 @@ class AssemblyForm(forms.ModelForm):
             }
         ),
         label="Category",
-        required=False,
+        required=True,
     )
     assembly_technique = forms.ModelChoiceField(
         queryset=AssemblyTechnique.objects.none(),  # Start with an empty queryset
@@ -48,7 +50,6 @@ class AssemblyForm(forms.ModelForm):
         help_text="Select a category first",
         required=False,
     )
-
     dimension = forms.ChoiceField(
         choices=AssemblyDimension.choices,
         widget=forms.Select(
@@ -61,6 +62,14 @@ class AssemblyForm(forms.ModelForm):
                 "class": "select form-select",
             }
         ),
+        label="Input Dimension"
+    )
+    quantity = forms.DecimalField(
+        min_value=0,
+        label="Quantity",
+        required=True,
+        decimal_places=2,
+        max_digits=10
     )
 
     class Meta:
@@ -75,6 +84,7 @@ class AssemblyForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        building_id = kwargs.pop("building_id", None)
         super().__init__(*args, **kwargs)
         if self.instance.pk:
             self.fields["mode"].initial = self.instance.mode
@@ -82,6 +92,7 @@ class AssemblyForm(forms.ModelForm):
             self.fields["assembly_category"].initial = self.instance.classification.category
             self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__pk=self.instance.classification.category.pk)
             self.fields["assembly_technique"].initial = self.instance.classification.technique
+            self.fields["quantity"].initial = BuildingAssembly.objects.get(assembly=self.instance, building__pk=building_id).quantity
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA

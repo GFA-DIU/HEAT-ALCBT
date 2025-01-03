@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 
 from cities_light.models import Country, City
 
-from .epd import EPD, Unit, Impact
+from .epd import EPD, Unit
 from .base import BaseModel
 
 
@@ -24,11 +24,19 @@ class AssemblyMode(models.TextChoices):
     CUSTOM = "custom", "Custom" # "Use for Detailed Assessment"
 
 
+DIMENSION_UNIT_MAPPING = {
+    "area": "m^2",
+    "length": "m",
+    "mass": "kg",
+    "volume": "m^3",
+}
+
+
 class AssemblyDimension(models.TextChoices):
-    AREA = "area", "Area-Type" # Area-type calculations
-    LENGTH = "length", "Length-Type" # Length-type calculations   
-    MASS = "mass", "Mass-Type" # Length-type calculations   
-    VOLUME = "volume", "Volume-Type" # Length-type calculations   
+    AREA = "area", "Area (m^2)" # Area-type calculations
+    LENGTH = "length", "Length (m)" # Length-type calculations   
+    MASS = "mass", "Mass (kg)" # Length-type calculations   
+    VOLUME = "volume", "Volume (m^3)" # Length-type calculations   
 
 
 class AssemblyTechnique(models.Model):
@@ -100,6 +108,7 @@ class Assembly(BaseModel):
     def __str__(self):
         return self.name
 
+
 class Product(models.Model):
     """Join Table for EPDs and Assemblied. Products are EPDs with quantity and results."""
     description = models.CharField(
@@ -116,27 +125,29 @@ class Product(models.Model):
     quantity = models.DecimalField(
         _("Quantity of EPD"),
         max_digits=10,
-        decimal_places=3,
+        decimal_places=2,
         null=False,
         blank=False,
     )
 
     def clean(self):
-            """
-            Validates that the `unit` matches the expected unit for the chosen `impact_category`.
-            """
-            super().clean()
-            expected_units = [i.get("unit") for i in self.epd.conversions]
-            expected_units.append(self.epd.declared_unit)
-            if self.input_unit not in expected_units:
-                raise ValidationError(
-                    {
-                        'input_unit': _(
-                            f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
-                            f"Expected unit: '{expected_units}'."
-                        )
-                    }
-                )
+        """
+        Validates that the `unit` matches the expected unit for the chosen `impact_category`.
+        """
+        super().clean()
+        
+        from pages.views.assembly.epd_filtering import get_epd_dimension_info
+        
+        _t, expected_unit = get_epd_dimension_info(self.assembly.dimension, self.epd.declared_unit)
+        if self.input_unit != expected_unit:
+            raise ValidationError(
+                {
+                    'input_unit': _(
+                        f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
+                        f"Expected unit: '{expected_unit}'."
+                    )
+                }
+            )
 
     def save(self, *args, **kwargs):
         """

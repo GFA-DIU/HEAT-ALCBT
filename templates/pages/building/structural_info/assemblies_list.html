@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <ul class="list-group">
     {% for component in structural_components %}
     <li class="list-group-item d-flex justify-content-between align-items-center position-relative">
@@ -6,7 +7,7 @@
             <h5 class="mb-1">{{ component.assembly_name }}</h5>
             <div class="d-flex flex-column">
                 <span class="text-muted ms-1">{{ component.assembly_classification }}</span>
-                <span class="text-muted ms-1">Quantity: {{ component.quantity }}{{ component.unit}}</sup></span>
+                <span class="text-muted ms-1">Quantity: {{ component.quantity|floatformat:"-2" }}{{ component.unit|superscript_units|safe }}</span>
             </div>
         </div>
 
@@ -17,7 +18,7 @@
 
         <!-- Action Buttons -->
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-            <a href="{% url 'component_edit' assembly_id=component.assembly_id building_id=building_id %}" class="btn btn-secondary">Edit</a>
+            <a href="{% url 'component_edit' assembly_id=component.assemblybuilding_id building_id=building_id %}" class="btn btn-secondary">Edit</a>
             <button class="btn btn-danger"
                     hx-delete="{% url 'building' building_id=building_id %}?component={{ component.assembly_id }}" 
                     hx-target="#item-list" 

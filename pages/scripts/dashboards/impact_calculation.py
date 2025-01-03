@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pages.models.assembly import AssemblyDimension, Product
 from pages.models.epd import Unit
 
@@ -35,7 +37,9 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, p: P
                     "assembly_category": p.assembly.classification.category,
                     "material_category": p.epd.category,
                     "impact_type": epdimpact.impact,
-                    "impact_value": factor * p.epd.declared_amount * epdimpact.value,
+                    "impact_value": Decimal(factor)
+                    * Decimal(p.epd.declared_amount)
+                    * Decimal(epdimpact.value),
                 }
             )
         return container
@@ -56,31 +60,39 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, p: P
         case (AssemblyDimension.AREA, Unit.M3 | Unit.KG):
             # impact = impact_per_unit * conversion_kg_per_m3 * total_m2 * thickness / epd_base_amount
             conversion_f = fetch_conversion("kg/m^3")
-            impacts = calculate_impact(assembly_quantity * p.quantity * conversion_f)
+            impacts = calculate_impact(
+                Decimal(assembly_quantity) * Decimal(p.quantity) * Decimal(conversion_f)
+            )
 
         case (AssemblyDimension.VOLUME, Unit.M3):
             # impact = impact_per_unit * total_m3 / epd_base_amount
-            impacts = calculate_impact(assembly_quantity * p.quantity)
+            impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(p.quantity))
         case (AssemblyDimension.VOLUME, Unit.KG):
             # impact = impact_per_unit * conversion_kg_per_m3 * total_m3 * percentage / epd_base_amount
             conversion_f = fetch_conversion("kg/m^3")
-            impacts = calculate_impact(assembly_quantity * p.quantity * conversion_f)
+            impacts = calculate_impact(
+                Decimal(assembly_quantity) * Decimal(p.quantity) * Decimal(conversion_f)
+            )
 
         case (AssemblyDimension.MASS, Unit.KG):
             # impact = impact_per_unit * total_kg / epd_base_amount
-            impacts = calculate_impact(assembly_quantity * p.quantity)
+            impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(p.quantity))
         case (AssemblyDimension.MASS, Unit.M3):
             # impact = impact_per_unit * conversion_kg_per_m3 * total_kg * percentage / epd_base_amount
             conversion_f = fetch_conversion("kg/m^3")
-            impacts = calculate_impact(assembly_quantity * p.quantity * conversion_f)
+            impacts = calculate_impact(
+                Decimal(assembly_quantity) * Decimal(p.quantity) * Decimal(conversion_f)
+            )
 
         case (AssemblyDimension.LENGTH, Unit.M):
             # impact = impact_per_unit * total_length / epd_base_amount
-            impacts = calculate_impact(assembly_quantity * p.quantity)
+            impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(p.quantity))
         case (AssemblyDimension.LENGTH, Unit.M3 | Unit.KG):
             # impact = impact_per_unit * conversion_kg_per_m3 * total_length * surface_cross-section / epd_base_amount
             conversion_f = fetch_conversion("kg/m^3")
-            impacts = calculate_impact(assembly_quantity * p.quantity * conversion_f)
+            impacts = calculate_impact(
+                Decimal(assembly_quantity) * Decimal(p.quantity) * Decimal(conversion_f)
+            )
 
         case _:
             raise ValueError(
