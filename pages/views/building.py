@@ -58,11 +58,6 @@ def building(request, building_id = None):
             request, "pages/building/structural_info/assemblies_list.html", context
         )  # Partial update for DELETE
 
-    elif request.GET.get("country"):
-        cities = City.objects.filter(
-            country_id=request.GET.get("country")
-        ).order_by("name")
-        return render(request, "pages/utils/city_select.html", {"cities": cities})
     
     # Full reload
     elif building_id:
