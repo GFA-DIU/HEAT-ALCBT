@@ -97,7 +97,6 @@ class BuildingAssemblySimulated(models.Model):
         null=False,
         blank=False,
     )
-    unit = models.CharField(_("Unit of Quantity"), max_length=20, choices=Unit.choices, default=Unit.UNKNOWN)
 
     class Meta:
         verbose_name = "Building structural component simulation"

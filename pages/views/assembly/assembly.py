@@ -59,12 +59,12 @@ def component_edit(request, building_id, assembly_id=None):
         and request.POST.get("action") == "filter"
     ):
         # Handle partial rendering for HTMX
-        return render(request, "pages/building/component_add/epd_list.html", context)
+        return render(request, "pages/assembly/epd_list.html", context)
 
     elif request.method == "GET" and request.GET.get("add_component") == "step_1":
         # TODO: Only makes sense for new component
         return render(
-            request, "pages/building/component_add/modal_step_1.html", context
+            request, "pages/assembly/modal_step_1.html", context
         )
 
     else:
@@ -78,4 +78,4 @@ def component_edit(request, building_id, assembly_id=None):
         )
 
     # Render full template for non-HTMX requests
-    return render(request, "pages/building/component_add/editor_own_page.html", context)
+    return render(request, "pages/assembly/editor_own_page.html", context)
