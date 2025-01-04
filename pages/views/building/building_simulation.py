@@ -28,6 +28,7 @@ def building_simulation(request, building_id = None):
         form.helper.layout[4].flat_attrs = "disabled"
 
     context["form_general_info"] = form
+    context["simulation"] = True
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
     return render(request, "pages/building/building_simulation.html", context)

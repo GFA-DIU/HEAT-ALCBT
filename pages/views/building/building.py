@@ -41,6 +41,7 @@ def building(request, building_id=None):
         form = BuildingGeneralInformation()
 
     context["form_general_info"] = form
+    context["simulation"] = False
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
     return render(request, "pages/building/building.html", context)

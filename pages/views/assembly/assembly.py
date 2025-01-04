@@ -7,7 +7,7 @@ from django.views.decorators.http import require_http_methods
 
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.assembly import Assembly, AssemblyDimension, Product
-from pages.models.building import Building, BuildingAssembly
+from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 from pages.forms.assembly_form import AssemblyForm
 
 from pages.views.assembly.epd_processing import SelectedEPD, get_epd_list
@@ -17,16 +17,16 @@ logger = logging.getLogger(__name__)
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
-def component_edit(request, building_id, assembly_id=None):
+def component_edit(request, building_id, assembly_id=None, simulation = False):
     """
     View to either edit an existing component or create a new one with pagination for EPDs.
     """
     assembly, building, context = set_up_view(request, building_id, assembly_id)
 
     if request.method == "POST" and request.POST.get("action") == "form_submission":
-        return handle_assembly_submission(request, assembly, building)
+        return handle_assembly_submission(request, assembly, building, context["simulation"])
 
-    # Update
+    # Update EPD List
     elif (
         request.method == "GET"
         and request.GET.get("page")
@@ -38,8 +38,9 @@ def component_edit(request, building_id, assembly_id=None):
         return render(request, "pages/assembly/epd_list.html", context)
 
 
+    # Open Modal in Building View
     elif request.method == "GET" and request.GET.get("add_component") == "step_1":
-        # TODO: Only makes sense for new component
+        # TODO: Only makes sense for new component, maybe make part of Building view?
         return render(
             request, "pages/assembly/modal_step_1.html", context
         )
@@ -53,9 +54,15 @@ def component_edit(request, building_id, assembly_id=None):
 
 def set_up_view(request, building_id, assembly_id):
     """Fetch objects and create baseline context."""
+    simulation = request.GET.get('simulation', 'false').lower() == 'true'
+    if simulation:
+        BuildingAssemblyModel = BuildingAssemblySimulated
+    else:
+        BuildingAssemblyModel = BuildingAssembly
+    
     if assembly_id:
         building_assembly = get_object_or_404(
-            BuildingAssembly.objects.select_related(),
+            BuildingAssemblyModel.objects.select_related(),
             assembly_id=assembly_id,
             building_id=building_id,
         )
@@ -71,21 +78,27 @@ def set_up_view(request, building_id, assembly_id):
         "epd_list": get_epd_list(request, assembly),
         "epd_filters_form": EPDsFilterForm(request.POST),
         "dimension": request.POST.get("dimension"),  # TODO: do I need this here already?
+        "simulation": simulation,
     }
     return assembly, building, context
 
 
-def handle_assembly_submission(request, assembly, building):
+def handle_assembly_submission(request, assembly, building, simulation):
     if not assembly:
         assembly = Assembly()
-    save_assembly(request, assembly, building)
-        # The redirect shortcut is not working properly with HTMX
-        # return redirect("building", building_id=building_instance.id)
-        # instead use the following:
+    save_assembly(request, assembly, building, simulation)
+    # The redirect shortcut is not working properly with HTMX
+    # return redirect("building", building_id=building_instance.id)
+    # instead use the following:
     response = JsonResponse({"message": "Redirecting"})
-    response["HX-Redirect"] = reverse(
-            "building", kwargs={"building_id": building.pk}
-        )
+    if simulation:
+        response["HX-Redirect"] = reverse(
+                "building_simulation", kwargs={"building_id": building.pk}
+            )
+    else:
+        response["HX-Redirect"] = reverse(
+                "building", kwargs={"building_id": building.pk}
+            )
     
     return response
 
