@@ -4,9 +4,21 @@
 {% block title %}Building View{% endblock title %}
 {% block content %}
 
-<h1>Simulation: {{ building.name }}</h1>
-<p class="text-muted">{{ building.country }}</p>
+<div class="row">
+  <!-- Title and Subtitle -->
+  <div class="col">
+    <h1> <span style="color:#adb5bd">Simulation:</span> {{ building.name }}</h1>
+    <p class="text-muted">{{ building.country }}</p>
+  </div>
+  <!-- Buttons -->
+  <div class="col-auto">
+    <div class="d-flex pt-2">
+      <button type="button" class="btn btn-secondary me-2">Go back</button>
+      <button type="button" class="btn btn-danger">Reset</button>
+    </div>
+  </div>
+</div>
 
-{% include "pages/building/building_core.html" %}
+{% include "pages/building/building_core.html" %} 
 
 {% endblock %}
