@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 @require_http_methods(["GET", "POST", "DELETE"])
 def building(request, building_id = None):
-    logger.info("Request method: %s, user: %s", request.method, request.user)
+    logger.info("Building - Request method: %s, user: %s", request.method, request.user)
 
     # General Info
     if request.method == "POST" and request.POST.get("action") == "general_information":

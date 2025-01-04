@@ -28,6 +28,8 @@ class BuildingGeneralInformation(forms.ModelForm):
         required=False
     )
     category = forms.ModelChoiceField(queryset=CategorySubcategory.objects.all(), label="Building Type")
+
+
     class Meta:
         model = Building
         fields = [
