@@ -154,7 +154,7 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
         ]
         structural_components.append(
             {
-                "assemblybuilding_id": b_assembly.pk,
+                "assembly_id": b_assembly.assembly.pk,
                 "assembly_name": b_assembly.assembly.name,
                 "assembly_classification": b_assembly.assembly.classification.category,
                 "quantity": b_assembly.quantity,
