@@ -109,10 +109,11 @@ def handle_general_information_submit(request, building_id):
 
 
 def handle_assembly_delete(request, building_id):
+    #TODO flexibilise to include simulation
     component_id = request.GET.get("component")
     # Get the component and delete it
     component = get_object_or_404(
-        BuildingAssembly, id=component_id, building__id=building_id
+        BuildingAssembly, assembly__id=component_id, building__id=building_id
     )
     component.delete()
 

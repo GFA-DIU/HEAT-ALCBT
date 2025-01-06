@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
-def component_edit(request, building_id, assembly_id=None, simulation = False):
+def component_edit(request, building_id, assembly_id=None):
     """
     View to either edit an existing component or create a new one with pagination for EPDs.
     """
