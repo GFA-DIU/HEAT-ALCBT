@@ -21,9 +21,9 @@
             <a href="{% url 'component_edit' assembly_id=component.assembly_id building_id=building_id %}{% if simulation %}?simulation=true{% endif %}" class="btn btn-secondary">Edit</a>
             <button class="btn btn-danger"
                     {% if simulation %}
-                    hx-delete="{% url 'building' building_id=building_id %}?component={{ component.assembly_id }}" 
-                    {% else %}
                     hx-delete="{% url 'building_simulation' building_id=building_id %}?component={{ component.assembly_id }}" 
+                    {% else %}
+                    hx-delete="{% url 'building' building_id=building_id %}?component={{ component.assembly_id }}" 
                     {% endif %}
                     hx-target="#item-list" 
                     hx-swap="innerHTML">

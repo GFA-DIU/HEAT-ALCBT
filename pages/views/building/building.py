@@ -25,7 +25,7 @@ def building(request, building_id=None):
         return handle_general_information_submit(request, building_id)
 
     elif request.method == "DELETE":
-        return handle_assembly_delete(request, building_id)
+        return handle_assembly_delete(request, building_id, simulation=False)
 
     # Full reload
     elif building_id:
@@ -108,17 +108,21 @@ def handle_general_information_submit(request, building_id):
         return HttpResponseServerError()
 
 
-def handle_assembly_delete(request, building_id):
-    #TODO flexibilise to include simulation
+def handle_assembly_delete(request, building_id, simulation):
+    if simulation:
+        BuildingAssemblyModel = BuildingAssemblySimulated
+    else:
+        BuildingAssemblyModel = BuildingAssembly
+
     component_id = request.GET.get("component")
     # Get the component and delete it
     component = get_object_or_404(
-        BuildingAssembly, assembly__id=component_id, building__id=building_id
+        BuildingAssemblyModel, assembly__id=component_id, building__id=building_id
     )
     component.delete()
 
     # Fetch the updated list of assemblies for the building
-    updated_list = BuildingAssembly.objects.filter(
+    updated_list = BuildingAssemblyModel.objects.filter(
         building__created_by=request.user,
         assembly__created_by=request.user,
         building_id=building_id,

@@ -3,6 +3,7 @@ import logging
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 
+from pages.models.assembly import AssemblyMode, Assembly
 from pages.models.building import BuildingAssembly, BuildingAssemblySimulated
 from pages.views.building.building import handle_building_load
 from pages.views.building.building import handle_assembly_delete
@@ -16,7 +17,7 @@ def building_simulation(request, building_id):
     logger.info("Building Simulation - Request method: %s, user: %s", request.method, request.user)
 
     if request.method == "DELETE":
-        return handle_assembly_delete(request, building_id)
+        return handle_assembly_delete(request, building_id, simulation=True)
     
     elif request.method == "POST" and request.POST.get("action") == "reset":
         return handle_simulation_reset(building_id)
@@ -35,7 +36,7 @@ def building_simulation(request, building_id):
         form.helper.layout[4].flat_attrs = "disabled"
 
         context["form_general_info"] = form
-        
+
     context["simulation"] = True
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
@@ -43,17 +44,35 @@ def building_simulation(request, building_id):
 
 
 def handle_simulation_reset(building_id):
-    # TODO: this needs create new assemblies for assemblies mode=Custom
-    # create clean slate
-    BuildingAssemblySimulated.objects.filter(building__id=building_id).delete()
+    ##### create clean slate
+    # Fetch the simulated assemblies for the given building
+    simulated_assemblies = BuildingAssemblySimulated.objects.filter(building__id=building_id)
+
+    # Find and delete associated assemblies with AssemblyMode.CUSTOM
+    custom_assemblies = Assembly.objects.filter(
+        id__in=simulated_assemblies.values_list('assembly_id', flat=True),
+        mode=AssemblyMode.CUSTOM
+    )
+    custom_assemblies.delete()
+
+    # Clear existing simulated assemblies
+    simulated_assemblies.delete()
     
+    ###### Create from Building Assembly
     normal_assemblies = BuildingAssembly.objects.filter(building__id=building_id)
     
     if not normal_assemblies:
-        # simulation is not possible if there is normal set-up
+        # simulation is not possible if there is no normal set-up
         return redirect("building", building_id=building_id)
     
     for a in normal_assemblies:
+        # For custom assemblies, clone the original
+        if a.assembly.mode == AssemblyMode.CUSTOM:
+            # https://docs.djangoproject.com/en/5.1/topics/db/queries/#copying-model-instances
+            a.assembly.pk = None
+            a.assembly._state.adding = True
+            a.assembly.save()
+
         BuildingAssemblySimulated.objects.create(
             assembly=a.assembly,
             building=a.building,
