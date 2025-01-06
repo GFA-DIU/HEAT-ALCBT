@@ -108,7 +108,7 @@ def handle_assembly_load(building_id, assembly, context):
         products = Product.objects.filter(assembly=assembly).select_related("epd")
         selected_epds = [SelectedEPD.parse_product(p) for p in products]
         context["selected_epds"] = selected_epds
-    context["form"] = AssemblyForm(instance=assembly, building_id=building_id)
+    context["form"] = AssemblyForm(instance=assembly, building_id=building_id, simulation=context.get("simulation"))
     context["dimension"] = (
             assembly.dimension if assembly else AssemblyDimension.AREA
         )

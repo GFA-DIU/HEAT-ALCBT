@@ -45,7 +45,6 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, p: P
         return container
 
     # TODO fix assembly quantity
-    assembly_quantity = 20
     declared_unit = p.epd.declared_unit
 
     # TODO: DO I need to take into account declared amount?
