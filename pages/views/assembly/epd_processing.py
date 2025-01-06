@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from pages.models.assembly import AssemblyDimension
+from pages.models.assembly import AssemblyDimension, Product
 from pages.models.epd import EPD
 from pages.views.assembly.epd_filtering import get_epd_dimension_info, get_filtered_epd_list
 
@@ -10,6 +10,7 @@ from pages.views.assembly.epd_filtering import get_epd_dimension_info, get_filte
 class SelectedEPD:
     id: str
     sel_unit: Optional[str]
+    sel_text: Optional[str]
     sel_quantity: float
     name: str
     category: Optional[str]
@@ -17,13 +18,16 @@ class SelectedEPD:
     source: Optional[str]
 
     @classmethod
-    def parse_product(cls, product):
+    def parse_product(cls, product:Product):
         """
         Parses a Product instance into a SelectedEPD dataclass.
         """
+        sel_text, _ = get_epd_dimension_info(product.assembly.dimension, product.epd.declared_unit)
+        
         return cls(
             id=str(product.epd.id),
             sel_unit=product.input_unit,
+            sel_text= sel_text,
             sel_quantity=float(product.quantity),
             name=product.epd.name,
             category=product.epd.category.name_en if product.epd.category else None,

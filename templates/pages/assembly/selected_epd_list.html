@@ -7,21 +7,32 @@
                 <span class="text-muted ms-1">{{ epd.country.name }}</span>
             </div>
         </div>
+        <div class="form-label"> {{epd.sel_text}} </div>
+        {% if epd.sel_unit == 'unknown' %}
         <input type="number" 
-                name="material_{{ epd.id }}_quantity" 
-                class="form-control form-control-sm mx-2" 
+                name="material_{{ epd.id }}_quantity"
+                class="form-control form-control-sm mx-2"
+                style="width: 100px;" 
+                placeholder="Quantity"
+                {% if epd.sel_quantity%}value="{{ epd.sel_quantity}}"{% endif %}
+                required>       
+        {% else %}
+        <input type="number" 
+                name="material_{{ epd.id }}_quantity"
+                class="form-control form-control-sm mx-2"
                 style="width: 100px;" 
                 placeholder="Quantity"
                 {% if epd.sel_quantity%}value="{{ epd.sel_quantity}}"{% endif %}
                 required>
-        <select name="material_{{ epd.id }}_unit_disabled" 
-                class="form-select form-select-sm mx-2" 
+        <select name="material_{{ epd.id }}_unit_disabled"
+                class="form-select form-select-sm mx-2"
                 style="width: 100px;" 
                 disabled>
             <option value="{{ epd.sel_unit }}">
                 {{ epd.sel_unit }}
             </option>
         </select>
+        {% endif %}
         <select name="material_{{ epd.id }}_unit" 
                 class="form-select form-select-sm mx-2" 
                 style="width: 100px;" 

@@ -96,38 +96,67 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             li.className = 'list-group-item d-flex justify-content-between align-items-center position-relative';
             li.setAttribute('data-id', epdId);
-            li.innerHTML = `
-                <div class="col-6">
-                    <h5 class="mb-1">${epdName}</h5>
-                    <div class="d-flex flex-column">
-                        <span class="text-muted ms-1">${epdCountry}</span>
+            if (epdUnit==='unknown') {
+                li.innerHTML = `
+                    <div class="col-6">
+                        <h5 class="mb-1">${epdName}</h5>
+                        <div class="d-flex flex-column">
+                            <span class="text-muted ms-1">${epdCountry}</span>
+                        </div>
                     </div>
-                </div>
-                <p>${epdText}<p>
-                <input type="number" 
-                       name="material_${epdId}_quantity" 
-                       class="form-control form-control-sm mx-2" 
-                       style="width: 100px;" 
-                       placeholder="Enter value" 
-                       required>
-                <select name="material_${epdId}_unit_disabled" 
-                        class="form-select form-select-sm mx-2" 
-                        style="width: 100px;" 
-                        disabled>
-                    <option value="${epdUnit}">${epdUnit}</option>
-                </select>
-                <select name="material_${epdId}_unit" 
-                        class="form-select form-select-sm mx-2" 
-                        style="width: 100px;" 
-                        hidden>
-                    <option value="${epdUnit}">${epdUnit}</option>
-                </select>
-                <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-                    <button type="button" class="btn btn-danger remove-epd" data-id="${epdId}">
-                        Remove
-                    </button>
-                </div>
-            `;
+                    <div class=form-label>${epdText}</div>
+                    <input type="number" 
+                           name="material_${epdId}_quantity" 
+                           class="form-control form-control-sm mx-2" 
+                           style="width: 100px;" 
+                           value=1
+                           required>
+                    <select name="material_${epdId}_unit" 
+                            class="form-select form-select-sm mx-2" 
+                            style="width: 100px;" 
+                            hidden>
+                        <option value="${epdUnit}">${epdUnit}</option>
+                    </select>
+                    <div class="col-3 d-flex justify-content-end align-items-center gap-2">
+                        <button type="button" class="btn btn-danger remove-epd" data-id="${epdId}">
+                            Remove
+                        </button>
+                    </div>
+                `;
+            } else {
+                li.innerHTML = `
+                    <div class="col-6">
+                        <h5 class="mb-1">${epdName}</h5>
+                        <div class="d-flex flex-column">
+                            <span class="text-muted ms-1">${epdCountry}</span>
+                        </div>
+                    </div>
+                    <div class=form-label>${epdText}</div>
+                    <input type="number" 
+                           name="material_${epdId}_quantity" 
+                           class="form-control form-control-sm mx-2" 
+                           style="width: 100px;" 
+                           placeholder="Enter value" 
+                           required>
+                    <select name="material_${epdId}_unit_disabled" 
+                            class="form-select form-select-sm mx-2" 
+                            style="width: 100px;" 
+                            disabled>
+                        <option value="${epdUnit}">${epdUnit}</option>
+                    </select>
+                    <select name="material_${epdId}_unit" 
+                            class="form-select form-select-sm mx-2" 
+                            style="width: 100px;" 
+                            hidden>
+                        <option value="${epdUnit}">${epdUnit}</option>
+                    </select>
+                    <div class="col-3 d-flex justify-content-end align-items-center gap-2">
+                        <button type="button" class="btn btn-danger remove-epd" data-id="${epdId}">
+                            Remove
+                        </button>
+                    </div>
+                `;
+            }
             selectedEpdList.appendChild(li);
         }
     });
