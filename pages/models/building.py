@@ -83,7 +83,8 @@ class Building(BaseModel, BaseGeoModel):
         help_text=_("Gross floor area [m^2]"),
         max_digits=10,
         decimal_places=2,
-        default=0
+        null=False,
+        blank=False
     )
     cond_floor_area = models.DecimalField(
         _("Conditional Floor Area"),
