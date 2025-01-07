@@ -10,7 +10,7 @@ from pages.models.assembly import DIMENSION_UNIT_MAPPING
 from pages.models.building import Building, BuildingAssembly
 
 from cities_light.models import City
-from pages.scripts.dashboards.building_dashboard import building_dashboard
+from pages.scripts.dashboards.building_dashboard import building_dashboard_assembly, building_dashboard_material
 from pages.scripts.dashboards.impact_calculation import calculate_impacts
 
 
@@ -83,7 +83,7 @@ def building(request, building_id = None):
         )
 
         # Build structural components and impacts in one step
-        structural_components, impact_list =get_assemblies(building.prefetched_components)
+        structural_components, impact_list = get_assemblies(building.prefetched_components)
 
         context = {
             "building_id": building.id,
@@ -91,7 +91,9 @@ def building(request, building_id = None):
             "structural_components": structural_components,
         }
         if len(structural_components):
-            context["dashboard"] = building_dashboard(impact_list)
+            print(impact_list)
+            context["building_dashboard_assembly"] = building_dashboard_assembly(impact_list)
+            context["building_dashboard_material"] = building_dashboard_material(impact_list)
 
         form = BuildingGeneralInformation(instance=building)
 
