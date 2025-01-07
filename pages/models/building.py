@@ -7,6 +7,14 @@ from .base import BaseGeoModel, BaseModel
 from .epd import Unit
 
 
+class ClimateZone(models.TextChoices):
+    HOT_DRY = "hot-dry", "hot-dry"
+    WARM_HUMID = "warm-humid", "warm-humid"
+    COMPOSITE = "composite", "composite"
+    TEMPERATE = "temperate", "temperate"
+    COLD = "cold", "cold"
+
+
 class BuildingSubcategory(models.Model):
     name = models.CharField(_("Name"), max_length=255)
    
@@ -60,6 +68,42 @@ class Building(BaseModel, BaseGeoModel):
     category = models.ForeignKey(
         CategorySubcategory, on_delete=models.SET_NULL, null=True, blank=True
     )
+    construction_year = models.DateField(
+        _("Year of Construction"),
+        null=True,
+        blank=True,
+    )
+    climate_zone = models.CharField(
+        _("Climate"),
+        choices=ClimateZone.choices,
+        max_length=50
+    )
+    total_floor_area = models.DecimalField(
+        _("Total Floor Area"),
+        help_text=_("Gross floor area [m^2]"),
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+    cond_floor_area = models.DecimalField(
+        _("Conditional Floor Area"),
+        help_text=_("Gross floor area [m^2]"),
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+    floors_above_ground = models.IntegerField(
+        _("Floors above ground"),
+        help_text=_("Number of floors above ground"),
+        max_length=3,
+        default=0
+    )
+    floors_below_ground = models.IntegerField(
+        _("Floors below ground"),
+        help_text=_("Number of floors below ground"),
+        max_length=3,
+        default=0
+    )
 
     class Meta:
         verbose_name = "Building"
@@ -77,6 +121,12 @@ class BuildingAssembly(models.Model):
         max_digits=10,
         decimal_places=2,
         default=0
+    )
+    reporting_life_cycle = models.IntegerField(
+        _("Reporting life-cycle"),
+        help_text=_("Reporting life-cycle for assembly"),
+        max_length=3,
+        default=50,   
     )
 
     class Meta:
@@ -98,6 +148,12 @@ class BuildingAssemblySimulated(models.Model):
         blank=False,
     )
     unit = models.CharField(_("Unit of Quantity"), max_length=20, choices=Unit.choices, default=Unit.UNKNOWN)
+    reporting_life_cycle = models.IntegerField(
+        _("Reporting life-cycle"),
+        help_text=_("Reporting life-cycle for assembly"),
+        max_length=3,
+        default=50,   
+    )
 
     class Meta:
         verbose_name = "Building structural component simulation"
