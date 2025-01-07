@@ -9,8 +9,7 @@ from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.building import Building, BuildingAssembly
 
 from cities_light.models import City
-from pages.scripts.dashboards.building_dashboard_assembly import building_dashboard_assembly
-from pages.scripts.dashboards.building_dashboard_material import building_dashboard_material
+from pages.scripts.dashboards.building_dashboard import building_dashboard_assembly, building_dashboard_material
 from pages.scripts.dashboards.impact_calculation import calculate_impacts
 
 
@@ -83,7 +82,7 @@ def building(request, building_id = None):
         )
 
         # Build structural components and impacts in one step
-        structural_components, impact_list =get_assemblies(building.prefetched_components)
+        structural_components, impact_list = get_assemblies(building.prefetched_components)
 
         context = {
             "building_id": building.id,

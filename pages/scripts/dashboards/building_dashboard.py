@@ -4,7 +4,30 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
+def building_dashboard_material(impact_list):
+    df = prep_building_dashboard_df(impact_list)
+    return _building_dashboard_base(df, "material_category")
+
+
 def building_dashboard_assembly(impact_list):
+    df = prep_building_dashboard_df(impact_list)
+
+    # Create short Assembly category names to enable to show the labels
+    df["assembly_short"] = df["assembly_category"].str.split("- ").str[1]
+    df.loc[
+        df["assembly_short"] == "Intermediate Floor Construction", "assembly_short"
+    ] = "Interm. Floor"
+    df.loc[df["assembly_short"] == "Bottom Floor Construction", "assembly_short"] = (
+        "Bottom Floor"
+    )
+    df.loc[df["assembly_short"] == "Roof Construction", "assembly_short"] = (
+        "Roof Const."
+    )
+
+    return _building_dashboard_base(df, "assembly_short")
+
+
+def prep_building_dashboard_df(impact_list):
     # Prepare DataFrame
     df = pd.DataFrame.from_records(impact_list)
     # filter to impacts of interest
@@ -19,26 +42,24 @@ def building_dashboard_assembly(impact_list):
         values="impact_value",
     ).reset_index()
 
-
     # Decision to only display positive values for embodied carbon and embodied energy, yet indicator below still shows sum.
     # Thus creating a new column
     df["gwp a1a3 pos"] = df["gwp a1a3"]
     df.loc[df["gwp a1a3 pos"] <= 0, "gwp a1a3 pos"] = 0
     df["penrt a1a3 pos"] = df["penrt a1a3"]
     df.loc[df["penrt a1a3 pos"] <= 0, "penrt a1a3 pos"] = 0
-    
-    # Create short Assembly category names to enable to show the labels
-    df["assembly_short"] = df["assembly_category"].str.split("- ").str[1]
-    df.loc[df["assembly_short"] == "Intermediate Floor Construction", "assembly_short"] = "Interm. Floor"
-    df.loc[df["assembly_short"] == "Bottom Floor Construction", "assembly_short"] = "Bottom Floor"
-    df.loc[df["assembly_short"] == "Roof Construction", "assembly_short"] = "Roof Const."
-    
+
+    return df
+
+
+def _building_dashboard_base(df, key_column: str):
+
     # Generate colors
-    colorscale_orange = generate_discrete_colors(
+    colorscale_orange = _generate_discrete_colors(
         start_color=(242, 103, 22), end_color=(250, 199, 165), n=df.shape[0]
     )
 
-    colorscale_green = generate_discrete_colors(
+    colorscale_green = _generate_discrete_colors(
         start_color=(36, 191, 91), end_color=(154, 225, 177), n=df.shape[0]
     )
 
@@ -68,8 +89,8 @@ def building_dashboard_assembly(impact_list):
     # Add pies
     fig.add_trace(
         go.Pie(
-            labels=df["assembly_short"],
-            values=df["gwp a1a3 pos"], # using ony positive values
+            labels=df[key_column],
+            values=df["gwp a1a3 pos"],  # using ony positive values
             name="GWP A1A3",
             hole=0.4,
             marker=dict(colors=colorscale_orange),
@@ -82,7 +103,7 @@ def building_dashboard_assembly(impact_list):
 
     fig.add_trace(
         go.Pie(
-            labels=df["assembly_short"],
+            labels=df[key_column],
             values=df["penrt a1a3 pos"],
             name="PENRT A1A3",
             hole=0.4,
@@ -98,15 +119,15 @@ def building_dashboard_assembly(impact_list):
     fig.update_traces(
         hoverinfo="label+value",
         hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
-        hoverlabel=dict(font_color="white", namelength=-1), 
-        textposition = "auto", 
+        hoverlabel=dict(font_color="white", namelength=-1),
+        textposition="auto",
         textfont=dict(
             size=14,  # Default font size
             family="Arial, sans-serif",  # Use a modern sans-serif font
             color="white",  # Default high contrast text color
         ),
         texttemplate="<b>%{label}</b><br>%{percent:.0%}",
-        #connector=dict(line=dict(color="black", width=1, dash="solid")),
+        # connector=dict(line=dict(color="black", width=1, dash="solid")),
     )
 
     # Store existing annotations (subplot titles)
@@ -172,11 +193,15 @@ def building_dashboard_assembly(impact_list):
         height=500, width=900, margin=dict(l=50, r=50, t=100, b=50), showlegend=True
     )
 
-    pie_plot = plot(fig, output_type="div", config= {'displaylogo': False, 'displayModeBar': False})
+    pie_plot = plot(
+        fig, output_type="div", config={"displaylogo": False, "displayModeBar": False}
+    )
     return pie_plot
 
 
-def generate_discrete_colors(start_color=(242, 103, 22), end_color=(255, 247, 237), n=5):
+def _generate_discrete_colors(
+    start_color=(242, 103, 22), end_color=(255, 247, 237), n=5
+):
     """
     Generate a list of n discrete colors evenly spaced between start_color and end_color.
 
