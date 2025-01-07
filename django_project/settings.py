@@ -257,12 +257,12 @@ ACCOUNT_UNIQUE_EMAIL = True
 # https://django-cities-light.readthedocs.io/en/stable-3.x.x/full.html#module-cities_light.settings
 CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en', 'abbr']
 CITIES_LIGHT_INCLUDE_COUNTRIES = [
-    'IN',  # India
-    'ID',  # Indonesia
-    'TH',  # Thailand
-    'VN',  # Vietnam
-    'KH',  # Cambodia
+    # 'IN',  # India
+    # 'ID',  # Indonesia
+    # 'TH',  # Thailand
+    # 'VN',  # Vietnam
+    # 'KH',  # Cambodia
     'DE',  # Germany
 ]
-CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLC']
+CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPLA']  #['PPL', 'PPLA', 'PPLC']
 

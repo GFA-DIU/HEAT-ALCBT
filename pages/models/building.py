@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext as _
-
+from django.core.validators import MaxValueValidator
 
 from .assembly import Assembly
 from .base import BaseGeoModel, BaseModel
@@ -68,7 +68,7 @@ class Building(BaseModel, BaseGeoModel):
     category = models.ForeignKey(
         CategorySubcategory, on_delete=models.SET_NULL, null=True, blank=True
     )
-    construction_year = models.DateField(
+    construction_year = models.IntegerField(
         _("Year of Construction"),
         null=True,
         blank=True,
@@ -91,19 +91,25 @@ class Building(BaseModel, BaseGeoModel):
         help_text=_("Gross floor area [m^2]"),
         max_digits=10,
         decimal_places=2,
-        default=0
+        default=0,
+        null=True,
+        blank=True,
     )
     floors_above_ground = models.IntegerField(
         _("Floors above ground"),
-        help_text=_("Number of floors above ground"),
-        max_length=3,
-        default=0
+        help_text=_("Number of floors above"),
+        validators=[MaxValueValidator(1000)],
+        default=0,
+        null=True,
+        blank=True,
     )
     floors_below_ground = models.IntegerField(
         _("Floors below ground"),
-        help_text=_("Number of floors below ground"),
-        max_length=3,
-        default=0
+        help_text=_("Number of floors below"),
+        validators=[MaxValueValidator(100)],
+        default=0,
+        null=True,
+        blank=True,
     )
 
     class Meta:
@@ -126,7 +132,7 @@ class BuildingAssembly(models.Model):
     reporting_life_cycle = models.IntegerField(
         _("Reporting life-cycle"),
         help_text=_("Reporting life-cycle for assembly"),
-        max_length=3,
+        validators=[MaxValueValidator(10000)],
         default=50,   
     )
 
@@ -152,7 +158,7 @@ class BuildingAssemblySimulated(models.Model):
     reporting_life_cycle = models.IntegerField(
         _("Reporting life-cycle"),
         help_text=_("Reporting life-cycle for assembly"),
-        max_length=3,
+        validators=[MaxValueValidator(10000)],
         default=50,   
     )
 
