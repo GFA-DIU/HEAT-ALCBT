@@ -9,7 +9,7 @@ from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.assembly import DIMENSION_UNIT_MAPPING
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 
-from pages.scripts.dashboards.building_dashboard import building_dashboard
+from pages.scripts.dashboards.building_dashboard import building_dashboard_assembly, building_dashboard_material
 from pages.scripts.dashboards.impact_calculation import calculate_impacts
 
 
@@ -77,7 +77,8 @@ def handle_building_load(request, building_id, simulation):
         "structural_components": structural_components,
     }
     if len(structural_components):
-        context["dashboard"] = building_dashboard(impact_list)
+        context["building_dashboard_assembly"] = building_dashboard_assembly(impact_list)
+        context["building_dashboard_material"] = building_dashboard_material(impact_list)
 
     form = BuildingGeneralInformation(instance=building)
 
