@@ -1,7 +1,4 @@
-{% autoescape off %}
-  {{ dashboard }}
-{% endautoescape %}
-
+{% if building_id %}
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item" role="presentation">
     <button class="nav-link active" id="assembly-tab" data-bs-toggle="tab" data-bs-target="#assembly" type="button" role="tab" aria-controls="assembly" aria-selected="true">Assembly</button>
@@ -22,6 +19,7 @@
     {% endautoescape %}
   </div>
 </div>
+{% endif %}
 
 <div class="accordion pt-3 pb-3" id="accordionExample">
 
