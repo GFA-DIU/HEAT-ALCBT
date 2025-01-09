@@ -15,6 +15,7 @@ from pages.models.building import BuildingAssembly
 
 class AssemblyForm(forms.ModelForm):
     comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 3}), required=False)
+
     public = forms.BooleanField(
         required=False,
         widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
@@ -71,7 +72,13 @@ class AssemblyForm(forms.ModelForm):
         decimal_places=2,
         max_digits=10
     )
-
+    reporting_life_cycle = forms.IntegerField(
+        label="Reporting Life Cycle",
+        min_value=0,
+        help_text="Report in years",
+        disabled = True,
+    )
+    
     class Meta:
         model = Assembly
         fields = [
@@ -81,6 +88,7 @@ class AssemblyForm(forms.ModelForm):
             "comment",
             "public",
             "dimension",
+            "reporting_life_cycle",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -93,6 +101,7 @@ class AssemblyForm(forms.ModelForm):
             self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__pk=self.instance.classification.category.pk)
             self.fields["assembly_technique"].initial = self.instance.classification.technique
             self.fields["quantity"].initial = BuildingAssembly.objects.get(assembly=self.instance, building__pk=building_id).quantity
+            self.fields["reporting_life_cycle"].initial = BuildingAssembly.objects.get(assembly=self.instance, building__pk=building_id).reporting_life_cycle
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA

@@ -27,20 +27,23 @@
         <div class="col-md-3">
             {{ form.dimension |as_crispy_field }}
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             {{ form.quantity |as_crispy_field }}
         </div>
         <div class="col-md-3">
             {{ form.assembly_category |as_crispy_field }}
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             {{ form.assembly_technique |as_crispy_field }}
         </div>
     </div>
     <div class="row">
         <!-- Comment in its own row -->
-        <div class="col-md-12">
+        <div class="col-md-6">
             {{ form.comment |as_crispy_field }}
+        </div>
+        <div class="col-md-6">
+            {{ form.reporting_life_cycle |as_crispy_field }}
         </div>
     </div>
 

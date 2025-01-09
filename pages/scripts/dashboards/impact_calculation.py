@@ -4,7 +4,7 @@ from pages.models.assembly import AssemblyDimension, Product
 from pages.models.epd import Unit
 
 
-def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, p: Product):
+def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, reporting_life_cycle: int, p: Product):
     """Calculate EPDs using the dimension approach.
 
     # Each AssembyDimension implies a set of allowed `declared_unit`s of EPDs. This is summarized
@@ -39,7 +39,9 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, p: P
                     "impact_type": epdimpact.impact,
                     "impact_value": Decimal(factor)
                     * Decimal(p.epd.declared_amount)
-                    * Decimal(epdimpact.value),
+                    * Decimal(epdimpact.value)
+                    / Decimal(reporting_life_cycle), # Divide by reporting_life_cycle
+                    #"reporting_life_cycle": p.assembly,
                 }
             )
         return container
