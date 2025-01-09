@@ -79,11 +79,9 @@
     <p>Default content...</p>
     {% endblock content %}
   </div>
-  <footer class="footer">
-    <div class="container">
-      <span class="text-muted">Footer...</span>
-    </div>
-  </footer>
+  {% if user.is_authenticated %}
+  {% include 'footer.html' %}
+  {% endif %}
 
   {% block javascript %}
   <!-- Bootstrap JavaScript -->
