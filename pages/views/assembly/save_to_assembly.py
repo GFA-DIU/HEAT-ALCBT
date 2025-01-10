@@ -20,6 +20,8 @@ def save_assembly(request, assembly: Assembly, building_instance: Building, simu
 
         # DB OPERATIONS
         assembly = form.save() # Save the updated Assembly instance
+        assembly.created_by = request.user
+        assembly.save()
 
         Product.objects.filter(assembly=assembly).delete()  # create a clean slate
         
@@ -36,8 +38,8 @@ def save_assembly(request, assembly: Assembly, building_instance: Building, simu
             building=building_instance,
             assembly=assembly,
             defaults={
-                "quantity": request.POST.get("quantity", None),  # Get quantity from POST data
-                "reporting_life_cycle": request.POST.get("reporting_life_cycle", None),  # Get reporting_life_cycle from POST data
+                "quantity": request.POST.get("quantity"),  # Get quantity from POST data
+                "reporting_life_cycle": request.POST.get("reporting_life_cycle"),  # Get reporting_life_cycle from POST data
             }
         )
 
