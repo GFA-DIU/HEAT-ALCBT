@@ -27,7 +27,7 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, repo
         return next(c["value"] for c in p.epd.conversions if c["unit"] == unit)
 
     def calculate_impact(factor=1):
-        """Calculate impacts using a given factor and normalized by EPD base amount."""
+        """Calculate impacts using a given factor and normalized by EPD base amount and reporting life_cycle."""
         container = []
         for epdimpact in p.epd.epdimpact_set.all():
             container.append(
@@ -38,10 +38,9 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, repo
                     "material_category": p.epd.category,
                     "impact_type": epdimpact.impact,
                     "impact_value": Decimal(factor)
-                    * Decimal(p.epd.declared_amount)
                     * Decimal(epdimpact.value)
-                    / Decimal(reporting_life_cycle), # Divide by reporting_life_cycle
-                    #"reporting_life_cycle": p.assembly,
+                    / Decimal(p.epd.declared_amount) # Normalise by base amount
+                    / Decimal(reporting_life_cycle), # Normalise by reporting_life_cycle
                 }
             )
         return container
