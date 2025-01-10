@@ -36,7 +36,8 @@ def save_assembly(request, assembly: Assembly, building_instance: Building, simu
             building=building_instance,
             assembly=assembly,
             defaults={
-                "quantity": request.POST.get("quantity", 0),  # Get quantity from POST data
+                "quantity": request.POST.get("quantity", None),  # Get quantity from POST data
+                "reporting_life_cycle": request.POST.get("reporting_life_cycle", None),  # Get reporting_life_cycle from POST data
             }
         )
 

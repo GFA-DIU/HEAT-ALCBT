@@ -20,7 +20,7 @@ def select_lists(request):
         return render(
             request,
             "pages/utils/select_list.html",
-            {"items": cities, "default_text": "Select a country"},
+            {"items": cities, "default_text": "Select a city"},
         )
     
     elif m := request.GET.get('category'):

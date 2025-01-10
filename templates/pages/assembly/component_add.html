@@ -33,8 +33,11 @@
         <div class="col-md-3">
             {{ form.assembly_category |as_crispy_field }}
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
             {{ form.assembly_technique |as_crispy_field }}
+        </div>
+        <div class="col-md-2">
+            {{ form.reporting_life_cycle |as_crispy_field }}
         </div>
     </div>
     <div class="row">
@@ -47,9 +50,11 @@
     <input type="hidden" name="action" value="form_submission">
     <h4>Selected EPDs</h4>
     <div class="card mb-3 card-body" style="min-height: 150px; max-height: 500px; overflow-y: auto;">
-        <div id="selected-epd-list">
-            {% include "pages/assembly/selected_epd_list.html"%}
-        </div>
+        <ul id="selected_epds" class="list-group">
+            {% for epd in selected_epds %}
+            {% include "pages/assembly/selected_epd_list.html" with epd=epd %}
+            {% endfor %}
+        </ul>
     </div>
 
     <div class="row">
@@ -75,111 +80,27 @@
 document.addEventListener('DOMContentLoaded', () => {
     const epdList = document.getElementById('epd-list');
     const dimensionSelect = document.getElementById('dimension-select');
-    const selectedEpdList = document.getElementById('selected-epd-list').querySelector('ul');
-
-    // Add material to selected list
-    epdList.addEventListener('click', (event) => {
-        if (event.target.classList.contains('add-epd')) {
-            const epdId = event.target.dataset.id;
-            const epdName = event.target.dataset.name;
-            const epdCountry = event.target.dataset.country;
-            const epdUnit = event.target.dataset.selectionunit;
-            const epdText = event.target.dataset.selectiontext;
-
-            // Check if already selected
-            if (document.querySelector(`#selected-epd-list li[data-id="${epdId}"]`)) {
-                alert('This material is already selected.');
-                return;
-            }
-
-            // Create new list item for the selected material
-            const li = document.createElement('li');
-            li.className = 'list-group-item d-flex justify-content-between align-items-center position-relative';
-            li.setAttribute('data-id', epdId);
-            if (epdUnit==='unknown') {
-                li.innerHTML = `
-                    <div class="col-6">
-                        <h5 class="mb-1">${epdName}</h5>
-                        <div class="d-flex flex-column">
-                            <span class="text-muted ms-1">${epdCountry}</span>
-                        </div>
-                    </div>
-                    <div class=form-label>${epdText}</div>
-                    <input type="number" 
-                           name="material_${epdId}_quantity" 
-                           class="form-control form-control-sm mx-2" 
-                           style="width: 100px;" 
-                           value=1
-                           required>
-                    <select name="material_${epdId}_unit" 
-                            class="form-select form-select-sm mx-2" 
-                            style="width: 100px;" 
-                            hidden>
-                        <option value="${epdUnit}">${epdUnit}</option>
-                    </select>
-                    <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-                        <button type="button" class="btn btn-danger remove-epd" data-id="${epdId}">
-                            Remove
-                        </button>
-                    </div>
-                `;
-            } else {
-                li.innerHTML = `
-                    <div class="col-6">
-                        <h5 class="mb-1">${epdName}</h5>
-                        <div class="d-flex flex-column">
-                            <span class="text-muted ms-1">${epdCountry}</span>
-                        </div>
-                    </div>
-                    <div class=form-label>${epdText}</div>
-                    <input type="number" 
-                           name="material_${epdId}_quantity" 
-                           class="form-control form-control-sm mx-2" 
-                           style="width: 100px;" 
-                           placeholder="Enter value" 
-                           required>
-                    <select name="material_${epdId}_unit_disabled" 
-                            class="form-select form-select-sm mx-2" 
-                            style="width: 100px;" 
-                            disabled>
-                        <option value="${epdUnit}">${epdUnit}</option>
-                    </select>
-                    <select name="material_${epdId}_unit" 
-                            class="form-select form-select-sm mx-2" 
-                            style="width: 100px;" 
-                            hidden>
-                        <option value="${epdUnit}">${epdUnit}</option>
-                    </select>
-                    <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-                        <button type="button" class="btn btn-danger remove-epd" data-id="${epdId}">
-                            Remove
-                        </button>
-                    </div>
-                `;
-            }
-            selectedEpdList.appendChild(li);
-        }
-    });
+    const selectedEpdList = document.getElementById('selected_epds');
 
     // Remove material from selected list
     selectedEpdList.addEventListener('click', (event) => {
         if (event.target.classList.contains('remove-epd')) {
             event.preventDefault(); // Prevent form submission
             event.stopPropagation(); // Stop the event from bubbling up
-
+            
             const epdId = event.target.dataset.id;
-
-            // Remove the material from the selected list
-            const li = document.querySelector(`#selected-epd-list li[data-id="${epdId}"]`);
-            if (li) {
-                li.remove();
-            }
-
+            
             // Optionally, re-enable the "Add" button in the library
             const addButton = document.querySelector(`#epd-list button.add-epd[data-id="${epdId}"]`);
             if (addButton) {
                 addButton.disabled = false;
             }
+        }
+    });
+    // Add material to selected list
+    epdList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('add-epd')) {
+            event.target.disabled = true
         }
     });
 

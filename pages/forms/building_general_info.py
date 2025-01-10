@@ -1,3 +1,5 @@
+import datetime
+
 from django import forms
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
@@ -7,6 +9,16 @@ from crispy_forms.layout import Layout, Row, Column, Submit
 from cities_light.models import Country, City
 
 from pages.models import Building, CategorySubcategory
+
+
+class YearInput(forms.DateInput):
+    input_type = 'number'
+
+    def __init__(self, attrs=None):
+        years = range(1900, datetime.date.today().year + 1)
+        attrs = attrs or {}
+        attrs.update({'min': min(years), 'max': max(years)})
+        super().__init__(attrs)
 
 
 class BuildingGeneralInformation(forms.ModelForm):
@@ -28,6 +40,8 @@ class BuildingGeneralInformation(forms.ModelForm):
         required=False
     )
     category = forms.ModelChoiceField(queryset=CategorySubcategory.objects.all(), label="Building Type")
+    construction_year = forms.IntegerField(widget=YearInput(), required=False)
+    #forms.DateField(input_formats="%y-%m-%d", widget=forms.widgets.DateInput(attrs={'type': 'date'}))
 
 
     class Meta:
@@ -39,7 +53,16 @@ class BuildingGeneralInformation(forms.ModelForm):
             "number",
             "city",
             "country",
-            "category"]
+            "category",
+            "construction_year",
+            "climate_zone",
+            "total_floor_area",
+            "cond_floor_area",
+            "floors_above_ground",
+            "floors_below_ground",
+            "latitude",
+            "longitude",
+            ]
 
         # labels = {
         #     "name": _("Writer"),
@@ -93,20 +116,29 @@ class BuildingGeneralInformation(forms.ModelForm):
                 Column('name', css_class='col-md-6'),
                 Column('category', css_class='col-md-6'),
             ),
-            # Country and City in the second row
+            # Country, ZIP and City in the second row
             Row(
-                Column('country', css_class='col-md-6'),
-                Column('city', css_class='col-md-6'),
+                Column('country', css_class='col-md-3'),
+                Column('city', css_class='col-md-3'),
+                Column('construction_year', css_class='col-md-3'),
+                Column('climate_zone', css_class='col-md-3'),
             ),
-            # Zip code in its own row
+            # Street and Number
             Row(
-                Column('zip', css_class='col-md-12'),
+                
+                Column('zip', css_class='col-md-2'),
+                Column('latitude', css_class='col-md-2'),
+                Column('longitude', css_class='col-md-2'),
+                Column('total_floor_area', css_class='col-md-3'),
+                Column('cond_floor_area', css_class='col-md-3'),
             ),
-            # Street and Number in the last row
+            # Street and Number in the last row with Postal code behind
             Row(
-                Column('street', css_class='col-md-9'),
-                Column('number', css_class='col-md-3'),
-            ),
+                Column('street', css_class='col-md-4'),
+                Column('number', css_class='col-md-2'),
+                Column('floors_above_ground', css_class='col-md-3'),
+                Column('floors_below_ground', css_class='col-md-3'),
+            ),            
             Submit('submit', 'Submit', css_class='btn btn-primary'),
         )
 

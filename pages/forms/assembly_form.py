@@ -15,6 +15,7 @@ from pages.models.building import BuildingAssembly, BuildingAssemblySimulated
 
 class AssemblyForm(forms.ModelForm):
     comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 3}), required=False)
+
     public = forms.BooleanField(
         required=False,
         widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
@@ -47,7 +48,7 @@ class AssemblyForm(forms.ModelForm):
             }
         ),
         label="Technique",
-        help_text="Select a category first",
+        help_text="Select a category",
         required=False,
     )
     dimension = forms.ChoiceField(
@@ -62,7 +63,7 @@ class AssemblyForm(forms.ModelForm):
                 "class": "select form-select",
             }
         ),
-        label="Input Dimension"
+        label="Input Dimension",
     )
     quantity = forms.DecimalField(
         min_value=0,
@@ -71,7 +72,15 @@ class AssemblyForm(forms.ModelForm):
         decimal_places=2,
         max_digits=10
     )
-
+    reporting_life_cycle = forms.IntegerField(
+        label="Ref. period",
+        min_value=1,
+        max_value=10000,
+        help_text="Report in years",
+        required = True,
+        initial = 50
+    )
+    
     class Meta:
         model = Assembly
         fields = [
@@ -99,16 +108,17 @@ class AssemblyForm(forms.ModelForm):
             self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__pk=self.instance.classification.category.pk)
             self.fields["assembly_technique"].initial = self.instance.classification.technique
             self.fields["quantity"].initial = BuildingAssemblyModel.objects.get(assembly=self.instance, building__pk=building_id).quantity
+            self.fields["reporting_life_cycle"].initial = BuildingAssemblyModel.objects.get(assembly=self.instance, building__pk=building_id).reporting_life_cycle
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA
-        
+
         # Dynamically update the queryset for assembly_technique to enable form validation
         if category_id := self.data.get("assembly_category"):
             category_id = int(category_id)
             # update queryset
             self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__id=category_id)
-        
+
         # parse into Assembly classification
         if category_id or self.fields["assembly_technique"].initial:
             category_id = category_id if category_id else self.fields["assembly_technique"].initial.pk

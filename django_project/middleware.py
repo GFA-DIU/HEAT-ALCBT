@@ -12,6 +12,7 @@ class LoginRequiredMiddleware:
                 reverse('account_login'),
                 reverse('account_signup'),
                 reverse('admin:login'),
+                reverse('privacy_policy'),
                 # Add other public paths if necessary
             ]
             if request.path not in allowed_paths:
