@@ -38,6 +38,9 @@
           <button class="btn btn-success" type="submit">Sign up</button>
         </form>
         <div class="text-center mt-3">
+          <p class="mb-1 form-text">
+            By signing up, you agree to BEAT's <a href="{% url 'terms_of_use' %}">Terms of Use</a> and <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+          </p>
           <p class="mb-1">
             Already have an account?
             <a href="{% url 'account_login' %}">Log in</a>
