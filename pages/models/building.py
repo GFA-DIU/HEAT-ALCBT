@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext as _
-from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .assembly import Assembly
 from .base import BaseGeoModel, BaseModel
@@ -124,13 +124,14 @@ class BuildingAssembly(models.Model):
         help_text=_("How much of this component"),
         max_digits=10,
         decimal_places=2,
-        default=0
+        default=0,
+        null=False,
+        blank=False,
     )
     reporting_life_cycle = models.IntegerField(
         _("Reporting life-cycle"),
         help_text=_("Reporting life-cycle for assembly"),
-        validators=[MaxValueValidator(10000)],
-        default=50,   
+        validators=[MinValueValidator(1), MaxValueValidator(10000)],  
     )
 
     class Meta:
@@ -155,7 +156,7 @@ class BuildingAssemblySimulated(models.Model):
     reporting_life_cycle = models.IntegerField(
         _("Reporting life-cycle"),
         help_text=_("Reporting life-cycle for assembly"),
-        validators=[MaxValueValidator(10000)],
+        validators=[MinValueValidator(1), MaxValueValidator(10000)],
         default=50,   
     )
 
