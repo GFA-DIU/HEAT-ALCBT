@@ -58,6 +58,8 @@ class BuildingGeneralInformation(forms.ModelForm):
             "cond_floor_area",
             "floors_above_ground",
             "floors_below_ground",
+            "latitude",
+            "longitude",
             ]
 
         # labels = {
@@ -114,14 +116,17 @@ class BuildingGeneralInformation(forms.ModelForm):
             ),
             # Country, ZIP and City in the second row
             Row(
-                Column('country', css_class='col-md-6'),
+                Column('country', css_class='col-md-3'),
+                Column('city', css_class='col-md-3'),
                 Column('construction_year', css_class='col-md-3'),
                 Column('climate_zone', css_class='col-md-3'),
             ),
             # Street and Number
             Row(
-                Column('city', css_class='col-md-3'),
-                Column('zip', css_class='col-md-3'),
+                
+                Column('zip', css_class='col-md-2'),
+                Column('latitude', css_class='col-md-2'),
+                Column('longitude', css_class='col-md-2'),
                 Column('total_floor_area', css_class='col-md-3'),
                 Column('cond_floor_area', css_class='col-md-3'),
             ),
