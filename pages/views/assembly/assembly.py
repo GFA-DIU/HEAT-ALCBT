@@ -43,7 +43,7 @@ def component_edit(request, building_id, assembly_id=None):
     # Open Modal in Building View
     elif request.method == "GET" and request.GET.get("add_component") == "step_1":
         # TODO: Only makes sense for new component, maybe make part of Building view?
-        return render(request, "pages/building/assembly/modal_step_1.html", context)
+        return render(request, "pages/assembly/modal_step_1.html", context)
 
     elif request.method == "POST" and request.POST.get("action") == "select_epd":
         # TODO: Only makes sense for new component
