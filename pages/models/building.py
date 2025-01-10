@@ -91,7 +91,6 @@ class Building(BaseModel, BaseGeoModel):
         help_text=_("Gross floor area [m^2]"),
         max_digits=10,
         decimal_places=2,
-        default=0,
         null=True,
         blank=True,
     )
@@ -99,7 +98,6 @@ class Building(BaseModel, BaseGeoModel):
         _("Floors above ground"),
         help_text=_("Number of floors above"),
         validators=[MaxValueValidator(1000)],
-        default=0,
         null=True,
         blank=True,
     )
@@ -107,7 +105,6 @@ class Building(BaseModel, BaseGeoModel):
         _("Floors below ground"),
         help_text=_("Number of floors below"),
         validators=[MaxValueValidator(100)],
-        default=0,
         null=True,
         blank=True,
     )
