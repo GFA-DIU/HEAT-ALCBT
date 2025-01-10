@@ -63,7 +63,7 @@ class AssemblyForm(forms.ModelForm):
                 "class": "select form-select",
             }
         ),
-        label="Input Dimension"
+        label="Input Dimension",
     )
     quantity = forms.DecimalField(
         min_value=0,
@@ -106,13 +106,13 @@ class AssemblyForm(forms.ModelForm):
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA
-        
+
         # Dynamically update the queryset for assembly_technique to enable form validation
         if category_id := self.data.get("assembly_category"):
             category_id = int(category_id)
             # update queryset
             self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__id=category_id)
-        
+
         # parse into Assembly classification
         if category_id or self.fields["assembly_technique"].initial:
             category_id = category_id if category_id else self.fields["assembly_technique"].initial.pk

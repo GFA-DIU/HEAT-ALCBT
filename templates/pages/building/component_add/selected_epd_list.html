@@ -1,40 +1,42 @@
-<ul class="list-group">
-    {% for epd in selected_epds %}
-    <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
-        <div class="col-6">
-            <h5 class="mb-1">{{ epd.name }}</h5>
-            <div class="d-flex flex-column">
-                <span class="text-muted ms-1">{{ epd.country.name }}</span>
-            </div>
+<li class="list-group-item d-flex justify-content-between align-items-center position-relative" id="epd-{{epd.id}}" data-id="{{ epd.id }}">
+    <div class="col-6">
+        <h5 class="mb-1">{{ epd.name }}</h5>
+        <div class="d-flex flex-column">
+            <span class="text-muted ms-1">{{ epd.country.name }}</span>
         </div>
-        <input type="number" 
-                name="material_{{ epd.id }}_quantity" 
-                class="form-control form-control-sm mx-2" 
-                style="width: 100px;" 
-                placeholder="Quantity"
-                {% if epd.sel_quantity%}value="{{ epd.sel_quantity}}"{% endif %}
-                required>
-        <select name="material_{{ epd.id }}_unit_disabled" 
-                class="form-select form-select-sm mx-2" 
-                style="width: 100px;" 
-                disabled>
-            <option value="{{ epd.sel_unit }}">
-                {{ epd.sel_unit }}
-            </option>
-        </select>
-        <select name="material_{{ epd.id }}_unit" 
-                class="form-select form-select-sm mx-2" 
-                style="width: 100px;" 
-                hidden>
-            <option value="{{ epd.sel_unit }}">
-                {{ epd.sel_unit }}
-            </option>
-        </select>
-        <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-            <button class="btn btn-danger remove-epd" data-id="{{ epd.id }}">
-                Remove
-            </button>
-        </div>
-    </li>
-    {% endfor %}
-</ul>
+    </div>
+    <input type="number" 
+            name="material_{{ epd.id }}_quantity" 
+            class="form-control form-control-sm mx-2" 
+            style="width: 100px;" 
+            placeholder="Quantity"
+            {% if epd.sel_quantity%}value="{{ epd.sel_quantity}}"{% endif %}
+            required>
+    <p>{{ epd.selection_text }}<p>
+    <select name="material_{{ epd.id }}_unit_disabled" 
+            class="form-select form-select-sm mx-2" 
+            style="width: 100px;" 
+            disabled>
+        <option value="{{ epd.sel_unit }}">
+            {{ epd.sel_unit }}
+        </option>
+    </select>
+    <select name="material_{{ epd.id }}_unit" 
+            class="form-select form-select-sm mx-2" 
+            style="width: 100px;" 
+            hidden>
+        <option value="{{ epd.sel_unit }}">
+            {{ epd.sel_unit }}
+        </option>
+    </select>
+    <div class="col-3 d-flex justify-content-end align-items-center gap-2">
+        <button class="btn btn-danger remove-epd"  
+                data-id="{{ epd.id }}"
+                hx-post=""
+                hx-vals='{"action": "remove_epd"}'
+                hx-target="#epd-{{epd.id}}"
+                hx-swap="outerHTML">
+            Remove
+        </button>
+    </div>
+</li>
