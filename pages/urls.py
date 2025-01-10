@@ -13,6 +13,7 @@ urlpatterns = [
     path("", buildings_list, name="home"),
     path("about/", AboutPageView.as_view(), name="about"),
     path("privacy_policy/", TemplateView.as_view(template_name="compliance/privacy_policy.html"), name="privacy_policy"),
+    path("terms_of_use/", TemplateView.as_view(template_name="compliance/terms_of_use.html"), name="terms_of_use"),
     path("select_lists/", select_lists, name="select-lists"),
     path("map/", map_view, name="map"),
     path("building/_new/", building, name="new_building"),
