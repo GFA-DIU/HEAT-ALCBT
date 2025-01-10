@@ -77,6 +77,7 @@ class AssemblyForm(forms.ModelForm):
         min_value=0,
         help_text="Report in years",
         disabled = True,
+        required = False,
     )
     
     class Meta:
@@ -88,7 +89,6 @@ class AssemblyForm(forms.ModelForm):
             "comment",
             "public",
             "dimension",
-            "reporting_life_cycle",
         ]
 
     def __init__(self, *args, **kwargs):
