@@ -7,6 +7,7 @@
     <!-- Create an identifier for this post request -->
     {% crispy epd_filters_form %}
 </form> 
+
 <ul class="list-group">
     {% for epd in epd_list %}
     <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
@@ -17,8 +18,21 @@
             </div>
         </div>
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-            <button class="btn btn-success add-epd" data-id="{{ epd.id }}" data-name="{{ epd.name }}" data-country="{{ epd.country }}" data-declared-unit="{{epd.declared_unit}}" data-selectionunit="{{epd.selection_unit}}" data-selectiontext="{{epd.selection_text}}">
-                Add
+            {% if epd.id|stringformat:"i" in selected_epds_ids %}
+            <button class="btn btn-success add-epd"
+                    data-id="{{ epd.id }}"
+                    disabled
+            >
+            {% else %}
+            <button class="btn btn-success add-epd"
+                    data-id="{{ epd.id }}"
+                    hx-post=""
+                    hx-vals='{"action": "select_epd", "id": "{{ epd.id }}", "dimension": "{{dimension}}" }'
+                    hx-target="#selected_epds"
+                    hx-swap="beforeend"
+            >
+            {% endif %}
+            Add
             </button>
         </div>
     </li>
