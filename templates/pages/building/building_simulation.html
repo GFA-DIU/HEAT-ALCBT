@@ -1,0 +1,30 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Building View{% endblock title %}
+{% block content %}
+
+<div class="row">
+  <!-- Title and Subtitle -->
+  <div class="col">
+    <h1><span style="color: #adb5bd">Simulation:</span> {{ building.name }}</h1>
+    <p class="text-muted">{{ building.country }}</p>
+  </div>
+  <!-- Buttons -->
+  <div class="col-auto">
+    <div class="d-flex pt-2">
+      <a
+        href="{% url 'building' building_id=building_id %}"
+        class="btn btn-secondary me-2"
+        >Go back</a
+      >
+      <form method="post" action="{% url 'building_simulation' building_id=building_id %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reset">
+        <button type="submit" class="btn btn-danger">Reset</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% include "pages/building/building_core.html" %} {% endblock %}

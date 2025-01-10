@@ -6,7 +6,8 @@ from pages.views.select_lists import select_lists
 
 from .views.about import AboutPageView
 from .views.home import buildings_list
-from .views.building import building
+from .views.building.building import building
+from .views.building.building_simulation import building_simulation
 from .views.assembly.assembly import component_edit
 
 urlpatterns = [
@@ -18,6 +19,7 @@ urlpatterns = [
     path("map/", map_view, name="map"),
     path("building/_new/", building, name="new_building"),
     path("building/<int:building_id>/", building, name="building"),
+    path("building/<int:building_id>/simulation", building_simulation, name="building_simulation"),
 
     path("component/<int:building_id>/_new", component_edit, name="component"),
     path("component/<int:assembly_id>/<int:building_id>/", component_edit, name="component_edit"),  # For editing an existing component

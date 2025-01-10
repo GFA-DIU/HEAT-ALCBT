@@ -1,8 +1,8 @@
  {% load crispy_forms_tags %}
 {% if assembly_id %}
-<form hx-post="{% url 'component_edit' building_id=building_id assembly_id=assembly_id %}" hx-target="#epd-list" hx-vals='{"action": "filter", "dimension": "{{dimension}}" }'>
+<form hx-post="{% url 'component_edit' building_id=building_id assembly_id=assembly_id %}{% if simulation %}?simulation=true{% endif %}" hx-target="#epd-list" hx-vals='{"action": "filter", "dimension": "{{dimension}}" }'>
 {% else %}
-<form hx-post="{% url 'component' building_id=building_id %}" hx-target="#epd-list" hx-vals='{"action": "filter", "dimension": "{{dimension}}" }'>
+<form hx-post="{% url 'component' building_id=building_id %}{% if simulation %}?simulation=true{% endif %}" hx-target="#epd-list" hx-vals='{"action": "filter", "dimension": "{{dimension}}" }'>
 {% endif %}
     <!-- Create an identifier for this post request -->
     {% crispy epd_filters_form %}
@@ -44,17 +44,17 @@
         <ul class="pagination">
             {% if epd_list.has_previous %}
             <li class="page-item">
-                <a hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.previous_page_number }}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">Previous</a>
+                <a hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.previous_page_number }}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">Previous</a>
             </li>
             {% endif %}
             {% for num in epd_list.paginator.page_range %}
             <li class="page-item {% if num == epd_list.number %}active{% endif %}">
-                <a hx-get="{% url 'component' building_id=building_id %}?page={{ num }}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">{{ num }}</a>
+                <a hx-get="{% url 'component' building_id=building_id %}?page={{ num }}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">{{ num }}</a>
             </li>
             {% endfor %}
             {% if epd_list.has_next %}
             <li class="page-item">
-                <a hx-get="?page={{ epd_list.next_page_number }}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">Next</a>
+                <a hx-get="?page={{ epd_list.next_page_number }}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">Next</a>
             </li>
             {% endif %}
         </ul>

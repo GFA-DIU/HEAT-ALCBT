@@ -1,8 +1,8 @@
 {% load crispy_forms_tags %}
 {% if assembly_id %}
-<form hx-post="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}">
+<form hx-post="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}{% if simulation %}?simulation=true{% endif %}">
 {% else %}
-<form hx-post="{% url 'component' building_id=building_id %}">
+<form hx-post="{% url 'component' building_id=building_id %}{% if simulation %}?simulation=true{% endif %}">
 {% endif %}
     {% csrf_token %}
     <div class="row">
@@ -52,14 +52,20 @@
     <div class="card mb-3 card-body" style="min-height: 150px; max-height: 500px; overflow-y: auto;">
         <ul id="selected_epds" class="list-group">
             {% for epd in selected_epds %}
-            {% include "pages/building/component_add/selected_epd_list.html" with epd=epd %}
+            {% include "pages/assembly/selected_epd_list.html" with epd=epd %}
             {% endfor %}
         </ul>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <a href="{% url 'building' building_id=building_id %}" class="btn btn-secondary">Cancel</a>
+            <a 
+            {% if simulation %}
+            href="{% url 'building' building_id=building_id %}" 
+            {% else %}
+            href="{% url 'building_simulation' building_id=building_id %}" 
+            {% endif %}
+            class="btn btn-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">Save</button>
         </div>
     </div>
@@ -67,5 +73,5 @@
 
 <h4>EPD Library</h4>
 <div id="epd-list">
-    {% include "pages/building/component_add/epd_list.html"  %}
+    {% include "pages/assembly/epd_list.html" %}
 </div>

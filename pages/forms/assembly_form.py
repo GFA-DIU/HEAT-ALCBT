@@ -10,7 +10,7 @@ from pages.models.assembly import (
     AssemblyTechnique,
     AssemblyCategoryTechnique,
 )
-from pages.models.building import BuildingAssembly
+from pages.models.building import BuildingAssembly, BuildingAssemblySimulated
 
 
 class AssemblyForm(forms.ModelForm):
@@ -94,6 +94,12 @@ class AssemblyForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         building_id = kwargs.pop("building_id", None)
+        simulation = kwargs.pop("simulation", None)
+        if simulation:
+            BuildingAssemblyModel = BuildingAssemblySimulated
+        else:
+            BuildingAssemblyModel = BuildingAssembly
+
         super().__init__(*args, **kwargs)
         if self.instance.pk:
             self.fields["mode"].initial = self.instance.mode
@@ -101,8 +107,8 @@ class AssemblyForm(forms.ModelForm):
             self.fields["assembly_category"].initial = self.instance.classification.category
             self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__pk=self.instance.classification.category.pk)
             self.fields["assembly_technique"].initial = self.instance.classification.technique
-            self.fields["quantity"].initial = BuildingAssembly.objects.get(assembly=self.instance, building__pk=building_id).quantity
-            self.fields["reporting_life_cycle"].initial = BuildingAssembly.objects.get(assembly=self.instance, building__pk=building_id).reporting_life_cycle
+            self.fields["quantity"].initial = BuildingAssemblyModel.objects.get(assembly=self.instance, building__pk=building_id).quantity
+            self.fields["reporting_life_cycle"].initial = BuildingAssemblyModel.objects.get(assembly=self.instance, building__pk=building_id).reporting_life_cycle
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA
