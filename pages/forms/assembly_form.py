@@ -48,7 +48,7 @@ class AssemblyForm(forms.ModelForm):
             }
         ),
         label="Technique",
-        help_text="Select a category first",
+        help_text="Select a category",
         required=False,
     )
     dimension = forms.ChoiceField(
