@@ -72,8 +72,8 @@ def _building_dashboard_base(df, key_column: str):
             [{"type": "domain"}, {"type": "domain"}],
         ],
         subplot_titles=[
-            "<b>Embodied Carbon</b><br>[kg CO2eq/m²]<br> ",
-            "<b>Embodied Energy</b><br>[MJ/m²]<br> ",
+            "<b>Embodied Carbon</b><br>[kg CO2eq/m²/a]<br> ",
+            "<b>Embodied Energy</b><br>[MJ/m²/a]<br> ",
             "",
             "",
         ],

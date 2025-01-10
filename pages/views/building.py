@@ -124,7 +124,7 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
         assembly_impact_list = []
         for p in b_assembly.assembly.product_set.all():
             assembly_impact_list.extend(
-                calculate_impacts(b_assembly.assembly.dimension, b_assembly.quantity, p)
+                calculate_impacts(b_assembly.assembly.dimension, b_assembly.quantity, b_assembly.reporting_life_cycle, p)
             )
         
         # get GWP impact for each assembly to display in list

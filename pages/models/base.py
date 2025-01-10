@@ -46,12 +46,17 @@ class BaseGeoModel(models.Model):
         return ", ".join(address_string)
 
     def save(self, *args, **kwargs):
-        self.longitude, self.latitude = None, None
-        if self.city: 
-            if self.number and self.street and self.zip:
-                self.calculate_lon_lat()
-            else:
-                self.longitude, self.latitude = self.city.longitude, self.city.latitude
+        if self.longitude and self.latitude:
+            pass
+        
+        elif self.number and self.street and self.zip:
+            self.calculate_lon_lat()
+        
+        elif self.city:
+            self.longitude, self.latitude = self.city.longitude, self.city.latitude
+        
+        else:
+            self.longitude, self.latitude = None, None
         super().save(*args, **kwargs)
 
     def calculate_lon_lat(self):
@@ -63,6 +68,7 @@ class BaseGeoModel(models.Model):
             self.longitude, self.latitude = location.longitude, location.latitude
         except Exception as error:
             logger.error(error)
-            self.longitude, self.latitude = self.city.longitude, self.city.latitude
+            if self.city:
+                self.longitude, self.latitude = self.city.longitude, self.city.latitude
     class Meta:
         abstract = True  # This ensures it won't create its own table.
