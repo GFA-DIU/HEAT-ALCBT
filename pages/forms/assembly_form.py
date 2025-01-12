@@ -101,7 +101,7 @@ class AssemblyForm(forms.ModelForm):
             BuildingAssemblyModel = BuildingAssembly
 
         super().__init__(*args, **kwargs)
-        if self.instance.pk:
+        if kwargs.get("instance"):
             self.fields["mode"].initial = self.instance.mode
             self.fields["dimension"].initial = self.instance.dimension
             self.fields["assembly_category"].initial = self.instance.classification.category
