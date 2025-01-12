@@ -51,7 +51,7 @@ def component_edit(request, building_id, assembly_id=None):
         dimension = request.POST.get("dimension")
         dimension = dimension if dimension else AssemblyDimension.AREA
 
-        epd = get_object_or_404(EPD, pk=int(epd_id))
+        epd = get_object_or_404(EPD, pk=epd_id)
         epd.sel_quantity = 1
         epd.selection_text, epd.sel_unit = get_epd_dimension_info(dimension, epd.declared_unit)
         return render(request, "pages/assembly/selected_epd_list.html", {"epd": epd})
@@ -99,8 +99,6 @@ def set_up_view(request, building_id, assembly_id):
 
 
 def handle_assembly_submission(request, assembly, building, simulation):
-    if not assembly:
-        assembly = Assembly()
     save_assembly(request, assembly, building, simulation)
     # The redirect shortcut is not working properly with HTMX
     # return redirect("building", building_id=building_instance.id)
