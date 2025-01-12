@@ -45,10 +45,8 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, repo
             )
         return container
 
-    # TODO fix assembly quantity
     declared_unit = p.epd.declared_unit
 
-    # TODO: DO I need to take into account declared amount?
     match (dimension, declared_unit):
         case (_, Unit.PCS):
             # impact = impact_per_unit * number of pieces / epd_base_amount
