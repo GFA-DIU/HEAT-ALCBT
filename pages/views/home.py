@@ -17,7 +17,7 @@ def buildings_list(request):
     buildings = Building.objects.filter(created_by=request.user)
     context = {"buildings": buildings}
 
-    logger.info("Access list view.")
+    logger.info("User: %s access list view.", request.user)
 
     if request.method == "POST":
         new_item = request.POST.get("item")
@@ -32,6 +32,7 @@ def buildings_list(request):
         building_id = request.GET.get("building_id")
         building_to_delete = get_object_or_404(Building, id=int(building_id))
         building_to_delete.delete()
+        logger.info("Delete item '%s' from list", building_to_delete)
         context = {"buildings": Building.objects.filter(created_by=request.user)}
         return render(request, "pages/home/buildings_list.html", context)
         
