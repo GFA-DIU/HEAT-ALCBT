@@ -16,9 +16,9 @@ urlpatterns = [
     path("select_lists/", select_lists, name="select-lists"),
     path("map/", map_view, name="map"),
     path("building/_new/", building, name="new_building"),
-    path("building/<int:building_id>/", building, name="building"),
-    path("building/<int:building_id>/simulation", building_simulation, name="building_simulation"),
+    path("building/<uuid:building_id>/", building, name="building"),
+    path("building/<uuid:building_id>/simulation", building_simulation, name="building_simulation"),
 
-    path("component/<int:building_id>/_new", component_edit, name="component"),
-    path("component/<int:assembly_id>/<int:building_id>/", component_edit, name="component_edit"),  # For editing an existing component
+    path("component/<uuid:building_id>/_new", component_edit, name="component"),
+    path("component/<uuid:assembly_id>/<uuid:building_id>/", component_edit, name="component_edit"),  # For editing an existing component
 ]

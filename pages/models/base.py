@@ -1,4 +1,6 @@
 import logging
+import uuid
+
 from django.db import models
 from django.utils.translation import gettext as _
 from cities_light.models import Country, City
@@ -8,6 +10,7 @@ from accounts.models import CustomUser
 logger = logging.getLogger(__name__)
 
 class BaseModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_by = models.ForeignKey(
         CustomUser, on_delete=models.SET_NULL, null=True, blank=True
     )
