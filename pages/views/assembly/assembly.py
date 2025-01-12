@@ -24,6 +24,14 @@ def component_edit(request, building_id, assembly_id=None):
     View to either edit an existing component or create a new one with pagination for EPDs.
     """
     assembly, building, context = set_up_view(request, building_id, assembly_id)
+    logger.info(
+        "Building - Request method: %s, user: %s, building %s, assembly: %s, simulation: %s",
+        request.method,
+        request.user,
+        building,
+        assembly,
+        context["simulation"]
+    )
 
     if request.method == "POST" and request.POST.get("action") == "form_submission":
         return handle_assembly_submission(request, assembly, building, context["simulation"])
