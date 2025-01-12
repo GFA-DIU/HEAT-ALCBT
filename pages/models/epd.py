@@ -145,7 +145,7 @@ class EPDType(models.TextChoices):
 
 class epdLCAx(models.Model):
     """
-    TODO: what about english names
+    Fields parsed through LCAx.
     """
     comment = models.CharField(_("Comment"), max_length=255, null=True, blank=True)
     conversions = models.JSONField(_("Conversions for units, follwoing EPDx"))
