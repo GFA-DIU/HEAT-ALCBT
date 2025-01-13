@@ -1,6 +1,7 @@
 import logging
 
 from cities_light.models import City
+from django.db import transaction
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
@@ -38,29 +39,36 @@ def buildings_list(request):
     return render(request, "pages/home/home.html", context)
 
 
+@transaction.atomic
 def handle_delete_building(request):
     building_id = request.GET.get("building_id")
     
-    # Delete assemblies
-    # TODO: Change once assemblies are managed separately
-    assemblies_list = (
-        BuildingAssembly.objects.filter(building__id=building_id).values_list('assembly_id', flat=True).union(
-            BuildingAssemblySimulated.objects.filter(building__id=building_id).values_list('assembly_id', flat=True)
+    try:
+        # Delete assemblies
+        # TODO: Change once assemblies are managed separately
+        assemblies_list = (
+            BuildingAssembly.objects.filter(building__id=building_id).values_list('assembly_id', flat=True).union(
+                BuildingAssemblySimulated.objects.filter(building__id=building_id).values_list('assembly_id', flat=True)
+            )
         )
-    )
 
-    # Find and delete associated assemblies with AssemblyMode.CUSTOM
-    assemblies_to_delete = Assembly.objects.filter(
-            id__in=assemblies_list,
-            mode=AssemblyMode.CUSTOM
-        )
-    logger.info("Delete %s out of %s assemblies from building %s", len(assemblies_list), len(assemblies_to_delete), building_id)
-    assemblies_to_delete.delete()
+        # Find and delete associated assemblies with AssemblyMode.CUSTOM
+        assemblies_to_delete = Assembly.objects.filter(
+                id__in=assemblies_list,
+                mode=AssemblyMode.CUSTOM
+            )
+        logger.info("Delete %s out of %s assemblies from building %s", len(assemblies_list), len(assemblies_to_delete), building_id)
+        assemblies_to_delete.delete()
+        
+        
+        building_to_delete = get_object_or_404(Building, id=building_id)
+        building_to_delete.delete()
+        logger.info("Successfully deleted building '%s' from list", building_to_delete)
     
-    
-    building_to_delete = get_object_or_404(Building, id=building_id)
-    building_to_delete.delete()
+    except:
+        logger.exception("Error occured when trying to delete building: %s", building_id)
+        
+        
 
-    logger.info("Delete building '%s' from list", building_to_delete)
     context = {"buildings": Building.objects.filter(created_by=request.user)}
     return context
