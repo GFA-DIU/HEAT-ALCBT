@@ -30,7 +30,7 @@ def buildings_list(request):
 
     elif request.method == "DELETE":
         building_id = request.GET.get("building_id")
-        building_to_delete = get_object_or_404(Building, id=int(building_id))
+        building_to_delete = get_object_or_404(Building, id=building_id)
         building_to_delete.delete()
         logger.info("Delete item '%s' from list", building_to_delete)
         context = {"buildings": Building.objects.filter(created_by=request.user)}
