@@ -51,15 +51,17 @@ def building(request, building_id=None):
 def handle_building_load(request, building_id, simulation):
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
+        relation_name = "buildingassemblysimulated_set"
     else:
         BuildingAssemblyModel = BuildingAssembly
+        relation_name = "buildingassembly_set"
     
     building = get_object_or_404(
         Building.objects.filter(
             created_by=request.user
         ).prefetch_related(  # Ensure the building belongs to the user
             Prefetch(
-                "buildingassembly_set",
+                relation_name,
                 queryset=BuildingAssemblyModel.objects.filter(
                     # assembly__created_by=request.user  # Ensure the assembly belongs to the user
                 ).select_related("assembly"),
