@@ -18,20 +18,13 @@
             </div>
         </div>
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-            {% if epd.id|stringformat:"i" in selected_epds_ids %}
-            <button class="btn btn-success add-epd"
-                    data-id="{{ epd.id }}"
-                    disabled
-            >
-            {% else %}
             <button class="btn btn-success add-epd"
                     data-id="{{ epd.id }}"
                     hx-post=""
                     hx-vals='{"action": "select_epd", "id": "{{ epd.id }}", "dimension": "{{dimension}}" }'
                     hx-target="#selected_epds"
                     hx-swap="beforeend"
-            >
-            {% endif %}
+                    {% if epd.id|stringformat:"s" in selected_epds_ids %}disabled{% endif %}>
             Add
             </button>
         </div>

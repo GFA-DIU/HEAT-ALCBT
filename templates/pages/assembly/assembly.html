@@ -52,7 +52,7 @@
     <div class="card mb-3 card-body" style="min-height: 150px; max-height: 500px; overflow-y: auto;">
         <ul id="selected_epds" class="list-group">
             {% for epd in selected_epds %}
-            {% include "pages/assembly/selected_epd_list.html" with epd=epd %}
+            {% include "pages/assembly/selected_epd.html" with epd=epd %}
             {% endfor %}
         </ul>
     </div>
@@ -75,3 +75,41 @@
 <div id="epd-list">
     {% include "pages/assembly/epd_list.html" %}
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const epdList = document.getElementById('epd-list');
+    const dimensionSelect = document.getElementById('dimension-select');
+    const selectedEpdList = document.getElementById('selected_epds');
+
+    // Remove material from selected list
+    selectedEpdList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('remove-epd')) {
+            event.preventDefault(); // Prevent form submission
+            event.stopPropagation(); // Stop the event from bubbling up
+            
+            const epdId = event.target.dataset.id;
+            
+            // Optionally, re-enable the "Add" button in the library
+            const addButton = document.querySelector(`#epd-list button.add-epd[data-id="${epdId}"]`);
+            if (addButton) {
+                addButton.disabled = false;
+            }
+        }
+    });
+    // Add material to selected list
+    epdList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('add-epd')) {
+            event.target.disabled = true
+        }
+    });
+
+    dimensionSelect.addEventListener('change', (event) => {
+        // Remove all materials from the selected list
+        const list = document.querySelector('#selected_epds');
+        if (list) {
+            const items = list.querySelectorAll('li'); // Select all <li> elements in the list
+            items.forEach(li => li.remove()); // Iterate through each <li> and remove it
+        }
+    })
+});
+</script>
