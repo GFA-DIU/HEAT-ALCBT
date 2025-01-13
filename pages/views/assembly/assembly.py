@@ -44,7 +44,7 @@ def component_edit(request, building_id, assembly_id=None):
         and request.POST.get("action") == "filter"
     ):
         # Handle partial rendering for HTMX
-        # TODO: consider moving page logic and filtering out of "set-up"
+        # Does not need own logic since filtering is also part of full-load
         return render(request, "pages/assembly/epd_list.html", context)
 
 
@@ -54,7 +54,6 @@ def component_edit(request, building_id, assembly_id=None):
         return render(request, "pages/assembly/modal_step_1.html", context)
 
     elif request.method == "POST" and request.POST.get("action") == "select_epd":
-        # TODO: Only makes sense for new component
         epd_id = request.POST.get("id")
         dimension = request.POST.get("dimension")
         dimension = dimension if dimension else AssemblyDimension.AREA
@@ -65,7 +64,6 @@ def component_edit(request, building_id, assembly_id=None):
         return render(request, "pages/assembly/selected_epd_list.html", {"epd": epd})
 
     elif request.method == "POST" and request.POST.get("action") == "remove_epd":
-        # TODO: Only makes sense for new component
         return HttpResponse()
 
     else:
@@ -95,12 +93,13 @@ def set_up_view(request, building_id, assembly_id):
         building = get_object_or_404(Building, pk=building_id)
         assembly = None
 
+    epd_list, dimension = get_epd_list(request, assembly)
     context = {
         "assembly_id": assembly_id,
         "building_id": building_id,
-        "epd_list": get_epd_list(request, assembly),
+        "epd_list": epd_list,
         "epd_filters_form": EPDsFilterForm(request.POST),
-        "dimension": request.POST.get("dimension"),  # TODO: do I need this here already?
+        "dimension": dimension,  # Is also required for full reload
         "simulation": simulation,
     }
     return assembly, building, context
