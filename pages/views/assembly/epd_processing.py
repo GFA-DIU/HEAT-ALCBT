@@ -31,7 +31,7 @@ class SelectedEPD:
             selection_quantity=float(product.quantity),
             name=product.epd.name,
             category=product.epd.category.name_en if product.epd.category else None,
-            country=product.epd.country.name if product.epd.country else None,
+            country=product.epd.country.name if product.epd.country else "",
             source=product.epd.source,
         )
 
@@ -46,7 +46,7 @@ class SelectedEPD:
             selection_quantity="",
             name=epd.name,
             category=epd.category.name_en if epd.category else None,
-            country=epd.country.name if epd.country else None,
+            country=epd.country.name if epd.country else "",
             source=epd.source,
         )
 
@@ -56,6 +56,7 @@ class FilteredEPD:
     id: str
     name: str
     country: str
+    category: Optional[str]
     conversions: str
     declared_unit: str
     selection_text: str
@@ -74,14 +75,15 @@ def parse_epds(epd_list: list[EPD], dimension: AssemblyDimension) -> list[Filter
         sel_text, sel_unit = get_epd_dimension_info(dimension, epd.declared_unit)
         container.append(
             FilteredEPD(
-                    selection_text=sel_text,
-                    selection_unit=sel_unit,
-                    id=epd.pk,
-                    name=epd.name,
-                    country=epd.country,
-                    conversions=[],
-                    declared_unit=epd.declared_unit
-                )
+                selection_text=sel_text,
+                selection_unit=sel_unit,
+                id=epd.pk,
+                name=epd.name,
+                country=epd.country.name if epd.country else "",
+                category=epd.category.name_en if epd.category else None,
+                conversions=[],
+                declared_unit=epd.declared_unit,
+            )
         )
-    
+
     return container
