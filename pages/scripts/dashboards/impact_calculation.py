@@ -4,7 +4,12 @@ from pages.models.assembly import AssemblyDimension, Product
 from pages.models.epd import Unit
 
 
-def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, reporting_life_cycle: int, p: Product):
+def calculate_impacts(
+    dimension: AssemblyDimension,
+    assembly_quantity: int,
+    reporting_life_cycle: int,
+    p: Product,
+):
     """Calculate EPDs using the dimension approach.
 
     # Each AssembyDimension implies a set of allowed `declared_unit`s of EPDs. This is summarized
@@ -39,13 +44,16 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, repo
                     "impact_type": epdimpact.impact,
                     "impact_value": Decimal(factor)
                     * Decimal(epdimpact.value)
-                    / Decimal(p.epd.declared_amount) # Normalise by base amount
-                    / Decimal(reporting_life_cycle), # Normalise by reporting_life_cycle
+                    / Decimal(p.epd.declared_amount)  # Normalise by base amount
+                    / Decimal(
+                        reporting_life_cycle
+                    ),  # Normalise by reporting_life_cycle
                 }
             )
         return container
 
     declared_unit = p.epd.declared_unit
+    cm_to_m = 100
 
     match (dimension, declared_unit):
         case (_, Unit.PCS):
@@ -55,11 +63,16 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, repo
         case (AssemblyDimension.AREA, Unit.M2):
             # impact = impact_per_unit * total_m2 * num_layers / epd_base_amount
             impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(p.quantity))
+        case (AssemblyDimension.AREA, Unit.M3):
+            # impact = impact_per_unit * total_m2 * thickness_to_meter / epd_base_amount
+            impacts = calculate_impact(
+                Decimal(assembly_quantity) * Decimal(p.quantity) / Decimal(cm_to_m)
+            )
         case (AssemblyDimension.AREA, Unit.M3 | Unit.KG):
-            # impact = impact_per_unit * conversion_kg_per_m3 * total_m2 * thickness / epd_base_amount
+            # impact = impact_per_unit * conversion_kg_per_m3 * total_m2 * thickness_to_meter / epd_base_amount
             conversion_f = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
-                Decimal(assembly_quantity) * Decimal(p.quantity) * Decimal(conversion_f)
+                Decimal(assembly_quantity) * Decimal(p.quantity) * Decimal(conversion_f) / Decimal(cm_to_m)
             )
 
         case (AssemblyDimension.VOLUME, Unit.M3):
@@ -86,10 +99,15 @@ def calculate_impacts(dimension: AssemblyDimension, assembly_quantity: int, repo
             # impact = impact_per_unit * total_length * num_elements / epd_base_amount
             impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(p.quantity))
         case (AssemblyDimension.LENGTH, Unit.M3 | Unit.KG):
-            # impact = impact_per_unit * conversion_kg_per_m3 * total_length * surface_cross-section / epd_base_amount
+            # impact = impact_per_unit * total_length * surface_cross-section_to_m2 / epd_base_amount
+            impacts = calculate_impact(
+                Decimal(assembly_quantity) * Decimal(p.quantity) / Decimal(cm_to_m**2)
+            )
+        case (AssemblyDimension.LENGTH, Unit.KG):
+            # impact = impact_per_unit * conversion_kg_per_m3 * total_length * surface_cross-section_to_m2 / epd_base_amount
             conversion_f = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
-                Decimal(assembly_quantity) * Decimal(p.quantity) * Decimal(conversion_f)
+                Decimal(assembly_quantity) * Decimal(p.quantity) * Decimal(conversion_f) / Decimal(cm_to_m**2)
             )
 
         case _:
