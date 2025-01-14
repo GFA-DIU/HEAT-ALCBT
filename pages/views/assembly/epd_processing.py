@@ -57,10 +57,12 @@ class FilteredEPD:
     name: str
     country: str
     category: Optional[str]
+    impact: float
     conversions: str
     declared_unit: str
     selection_text: str
     selection_unit: str
+    source: Optional[str]
 
 
 def get_epd_list(request, component):
@@ -75,14 +77,16 @@ def parse_epds(epd_list: list[EPD], dimension: AssemblyDimension) -> list[Filter
         sel_text, sel_unit = get_epd_dimension_info(dimension, epd.declared_unit)
         container.append(
             FilteredEPD(
-                selection_text=sel_text,
-                selection_unit=sel_unit,
                 id=epd.pk,
                 name=epd.name,
                 country=epd.country.name if epd.country else "",
                 category=epd.category.name_en if epd.category else None,
+                impact=epd.get_impact_sum(),
                 conversions=[],
                 declared_unit=epd.declared_unit,
+                selection_text=sel_text,
+                selection_unit=sel_unit,
+                source=epd.source,
             )
         )
 
