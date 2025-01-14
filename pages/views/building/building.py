@@ -9,9 +9,8 @@ from django.views.decorators.http import require_http_methods
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.assembly import DIMENSION_UNIT_MAPPING
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
+from pages.views.building.impact_calculation import calculate_impacts
 
-from pages.scripts.dashboards.building_dashboard import building_dashboard_assembly, building_dashboard_material
-from pages.scripts.dashboards.impact_calculation import calculate_impacts
 
 
 logger = logging.getLogger(__name__)
@@ -72,17 +71,14 @@ def handle_building_load(request, building_id, simulation):
     )
 
     # Build structural components and impacts in one step
-    structural_components, impact_list = get_assemblies(building.prefetched_components)
+    structural_components, _ = get_assemblies(building.prefetched_components)
 
     context = {
         "building_id": building.id,
         "building": building,
         "structural_components": structural_components,
     }
-    if len(structural_components):
-        context["building_dashboard_assembly"] = building_dashboard_assembly(impact_list)
-        context["building_dashboard_material"] = building_dashboard_material(impact_list)
-
+    
     form = BuildingGeneralInformation(instance=building)
 
     logger.info(
