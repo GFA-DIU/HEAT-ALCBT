@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from django.utils.log import DEFAULT_LOGGING
+import os
 
 LOGGING = {
     'version': 1,
@@ -80,7 +81,8 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "debug_toolbar",
-    'cities_light',
+    "cities_light",
+    "encrypted_model_fields",
     # Local
     "accounts",
     "pages",
@@ -165,6 +167,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# Encryption
+# https://pypi.org/project/django-encrypted-model-fields/
+FIELD_ENCRYPTION_KEY = "vZzyAIaVEKo5nVtm3RfrLxP7GoJUZBiK9I_2HORozcY="
 
 # Internationalization
 # https://docs.djangoproject.com/en/dev/topics/i18n/
@@ -265,4 +271,3 @@ CITIES_LIGHT_INCLUDE_COUNTRIES = [
     'DE',  # Germany
 ]
 CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLC']
-
