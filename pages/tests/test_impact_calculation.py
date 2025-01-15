@@ -94,7 +94,7 @@ def create_product():
 # Parametrized test with fixtures
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "epd_name, declared_unit, conversions, epdimpact_value, product_quantity, product_unit, assembly_quantity, expected_impact",
+    "epd_name, declared_unit, conversions, epdimpact_value, product_quantity, product_unit, expected_impact",
     [
         ( # From Excel: 2024-12-18 - LCA modelling - phase II - with macro.xlsm
             "Cement screed",                        # epd_name
@@ -102,8 +102,7 @@ def create_product():
             [{"unit": "kg/m^3", "value": "2200"}],  # conversions
             Decimal("0.183550838458225"),           # epdimpact value
             Decimal("3.5"),                         # product_value
-            Unit.CM,                                # product unit
-            Decimal("1"),                           # assembly_quantity
+            Unit.CM,                                # product unit                          # assembly_quantity
             Decimal("14.1334145612833"),            # expected impact
         ),
         ( # From Excel `2024-12-18 - LCA modelling - phase II - with macro.xlsm`
@@ -113,7 +112,6 @@ def create_product():
             Decimal("4.12"),
             Decimal("1"),
             Unit.UNKNOWN,
-            Decimal("1"),
             Decimal("4.12"),
         ),
         ( # Ensure M2 conversions doesn't matter for result
@@ -123,7 +121,6 @@ def create_product():
             Decimal("4.12"),
             Decimal("1"),
             Unit.UNKNOWN,
-            Decimal("1"),
             Decimal("4.12"),
         ),
         ( # From Excel `2024-12-18 - LCA modelling - phase II - with macro.xlsm`
@@ -133,7 +130,6 @@ def create_product():
             Decimal("94.0282964318439"),
             Decimal("5"),
             Unit.CM,
-            Decimal("1"),
             Decimal("4.70141482159219"),
         ),
         ( # Ensure M3 conversion doesn't matter for result
@@ -143,7 +139,6 @@ def create_product():
             Decimal("94.0282964318439"),
             Decimal("5"),
             Unit.CM,
-            Decimal("1"),
             Decimal("4.70141482159219"),
         ),
     ],
@@ -155,7 +150,6 @@ def test_calculate_impacts_area(
     epdimpact_value,
     product_quantity,
     product_unit,
-    assembly_quantity,
     expected_impact,
     ### Functions
     create_impact,
@@ -165,6 +159,9 @@ def test_calculate_impacts_area(
     create_product,
 ):
     """Test if calculate impact matches Excel.
+    
+    Note:
+     - Excel comparison implies `reporting_life_cycle=1` and `assembly_quantity=1`
 
     ARRANGE: Create simple Ökobaudat EPD and set to product from Excel.
     ACT: Calculate impact of product
@@ -181,7 +178,7 @@ def test_calculate_impacts_area(
     # Act: Perform the calculation
     impacts = calculate_impacts(
         dimension=assembly.dimension,
-        assembly_quantity=assembly_quantity,
+        assembly_quantity=1,
         reporting_life_cycle=1,
         p=product,
     )
