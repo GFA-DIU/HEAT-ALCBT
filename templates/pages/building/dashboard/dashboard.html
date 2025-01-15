@@ -1,0 +1,5 @@
+{% comment %} Own template to be able to lazy load the dashboard {% endcomment %}
+
+{% autoescape off %}
+    {{ dashboard_html|safe }}
+{% endautoescape %}

@@ -9,14 +9,38 @@
 </ul>
 <div class="tab-content" id="myTabContent">
   <div class="tab-pane fade show active" id="assembly" role="tabpanel" aria-labelledby="assembly-tab">    
-    {% autoescape off %}
-      {{ building_dashboard_assembly }}
-    {% endautoescape %}
+    <div hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=assembly&simulation={{simulation}}" 
+      hx-trigger="load"
+      hx-target="#assembly_dashboard"
+      hx-swap="innerHTML"
+      id="assembly_dashboard"
+      >
+      <div class="text-center">
+        <img
+          alt="Result loading..."
+          class="htmx-indicator"
+          width="150"
+          src="https://htmx.org/img/bars.svg"
+        />
+      </div>
+    </div>
   </div>
   <div class="tab-pane fade" id="material" role="tabpanel" aria-labelledby="material-tab">
-    {% autoescape off %}
-    {{ building_dashboard_material }}
-    {% endautoescape %}
+    <div hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=material&simulation={{simulation}}" 
+      hx-trigger="shown.bs.tab from:#material-tab"
+      hx-target="#material_dashboard"
+      hx-swap="innerHTML"
+      id="material_dashboard"
+      >
+      <div class="text-center">
+        <img
+          alt="Result loading..."
+          class="htmx-indicator"
+          width="150"
+          src="https://htmx.org/img/bars.svg"
+        />
+      </div>
+    </div>
   </div>
 </div>
 {% endif %}
