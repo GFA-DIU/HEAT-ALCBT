@@ -21,7 +21,7 @@ from pages.models.epd import (
     MaterialCategory,
     Unit,
 )
-from pages.scripts.dashboards.impact_calculation import calculate_impacts
+from pages.views.building.impact_calculation import calculate_impacts
 
 
 # Fixtures for reusable components
