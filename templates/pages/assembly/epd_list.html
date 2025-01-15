@@ -1,4 +1,4 @@
- {% load crispy_forms_tags %}
+{% load crispy_forms_tags %}
 {% if assembly_id %}
 <form hx-post="{% url 'component_edit' building_id=building_id assembly_id=assembly_id %}{% if simulation %}?simulation=true{% endif %}" hx-target="#epd-list" hx-vals='{"action": "filter", "dimension": "{{dimension}}" }'>
 {% else %}
@@ -8,30 +8,34 @@
     {% crispy epd_filters_form %}
 </form> 
 
-<ul class="list-group">
+<ul class="list-group mt-3">
     {% for epd in epd_list %}
     <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
-        <div class="col-6">
+        <div class="col-10">
             <h5 class="mb-1">{{ epd.name }}</h5>
-            <div class="d-flex flex-column">
-                <span class="text-muted ms-1">{{ epd.country }}</span>
+            <div class="row">
+                <span class="text-muted col-3">{{ epd.country }}</span>
+                <div class="col gap-3">
+                    <span class="badge border bg-transparent rounded-pill" style="    border-color: #6f42c1 !important; color: #6f42c1; ">{{epd.category}}</span>
+                    <span class="badge border border-dark text-dark bg-transparent rounded-pill">Unit: {{epd.declared_unit}}</span>
+                    <span class="badge border border-success text-success bg-transparent rounded-pill">{{epd.impact}} kgCO2e</span>
+                </div>
             </div>
         </div>
-        <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-            {% if epd.id|stringformat:"i" in selected_epds_ids %}
-            <button class="btn btn-success add-epd"
-                    data-id="{{ epd.id }}"
-                    disabled
-            >
-            {% else %}
+        <div class="ms-auto d-flex flex-column gap-2">
+            <a href="{{epd.source}}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="align-self-end">  
+                <i class="bi bi-arrow-up-right-square"></i>
+            </a>
             <button class="btn btn-success add-epd"
                     data-id="{{ epd.id }}"
                     hx-post=""
                     hx-vals='{"action": "select_epd", "id": "{{ epd.id }}", "dimension": "{{dimension}}" }'
                     hx-target="#selected_epds"
                     hx-swap="beforeend"
-            >
-            {% endif %}
+                    {% if epd.id|stringformat:"s" in selected_epds_ids %}disabled{% endif %}>
             Add
             </button>
         </div>

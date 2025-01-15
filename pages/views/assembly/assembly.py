@@ -47,7 +47,6 @@ def component_edit(request, building_id, assembly_id=None):
         # Does not need own logic since filtering is also part of full-load
         return render(request, "pages/assembly/epd_list.html", context)
 
-
     # Open Modal in Building View
     elif request.method == "GET" and request.GET.get("add_component") == "step_1":
         # TODO: Only makes sense for new component, maybe make part of Building view?
@@ -59,9 +58,9 @@ def component_edit(request, building_id, assembly_id=None):
         dimension = dimension if dimension else AssemblyDimension.AREA
 
         epd = get_object_or_404(EPD, pk=epd_id)
-        epd.sel_quantity = 1
-        epd.selection_text, epd.sel_unit = get_epd_dimension_info(dimension, epd.declared_unit)
-        return render(request, "pages/assembly/selected_epd_list.html", {"epd": epd})
+        epd.selection_quantity = 1
+        epd.selection_text, epd.selection_unit = get_epd_dimension_info(dimension, epd.declared_unit)
+        return render(request, "pages/assembly/selected_epd.html", {"epd": epd})
 
     elif request.method == "POST" and request.POST.get("action") == "remove_epd":
         return HttpResponse()
