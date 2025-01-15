@@ -48,7 +48,7 @@ class CategorySubcategory(models.Model):
         unique_together = ("category", "subcategory")
 
     def __str__(self):
-        return f"{self.category.name}: {self.subcategory.name}"
+        return f"{self.category.name} - {self.subcategory.name}"
 
 
 class Building(BaseModel, BaseGeoModel):

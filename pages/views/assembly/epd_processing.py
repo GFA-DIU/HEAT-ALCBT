@@ -63,10 +63,9 @@ class FilteredEPD:
 
 
 def get_epd_list(request, component):
-    # TODO: can dimension every be None? For new component perhaps?
-    filtered_list, dimension = get_filtered_epd_list(request, component.dimension if component else None)
-    dimension = dimension if dimension else AssemblyDimension.AREA
-    return parse_epds(filtered_list, dimension)
+    # Dimension can never be None, since we need dimension info to parse epds
+    filtered_list, dimension = get_filtered_epd_list(request, component.dimension if component else AssemblyDimension.AREA)
+    return parse_epds(filtered_list, dimension), dimension
 
 
 def parse_epds(epd_list: list[EPD], dimension: AssemblyDimension) -> list[FilteredEPD]:

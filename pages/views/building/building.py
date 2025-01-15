@@ -107,11 +107,20 @@ def handle_general_information_submit(request, building_id):
             building = form.save(commit=False)
             building.created_by = request.user
             building.save()
+            logger.info("User %s successfully saved building %s", request.user, building)
             return redirect("building", building_id=building.id)
         else:
+            logger.info(
+                "User %s could not save building %s. Form had following errors",
+                request.user, building, form.errors
+            )
             return HttpResponseServerError()
     except Exception:
         logger.exception("Submit of general information for building %s failed", building.pk)
+        logger.info(
+            "User %s could not savee building %s. From had following errors",
+            request.user, building, form.errors
+        )
         return HttpResponseServerError()
 
 @transaction.atomic
@@ -144,7 +153,12 @@ def handle_assembly_delete(request, building_id, simulation):
         "building_id": building_id,
         "structural_components": list(structural_components),
     }
-
+    logger.info(
+        "User %s successfully deleted assembly %s - simulation %s",
+        request.user,
+        component_id,
+        simulation
+    )
     return render(
         request, "pages/building/structural_info/assemblies_list.html", context
     )  # Partial update for DELETE
