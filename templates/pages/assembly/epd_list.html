@@ -11,13 +11,13 @@
 <ul class="list-group mt-3">
     {% for epd in epd_list %}
     <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
-        <div class="col-8">
+        <div class="col-10">
             <h5 class="mb-1">{{ epd.name }}</h5>
             <div class="row">
-                <span class="text-muted col-5">{{ epd.country }}</span>
+                <span class="text-muted col-3">{{ epd.country }}</span>
                 <div class="col gap-3">
                     <span class="badge border bg-transparent rounded-pill" style="    border-color: #6f42c1 !important; color: #6f42c1; ">{{epd.category}}</span>
-                    <span class="badge border border-secondary text-secondary bg-transparent rounded-pill">Unit: {{epd.declared_unit}}</span>
+                    <span class="badge border border-dark text-dark bg-transparent rounded-pill">Unit: {{epd.declared_unit}}</span>
                     <span class="badge border border-success text-success bg-transparent rounded-pill">{{epd.impact}} kgCO2e</span>
                 </div>
             </div>
