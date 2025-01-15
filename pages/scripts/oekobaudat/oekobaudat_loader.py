@@ -150,4 +150,4 @@ def get_declared_quantity(epd: dict) -> float:
     except:
         names = get_names(epd)
         print("Failed to load declared quantity %s", names)
-        return {}
+        return {"declared_amount": 1}
