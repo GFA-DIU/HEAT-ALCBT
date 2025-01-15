@@ -35,12 +35,6 @@ To load the EPD data from Ökobaudat:
 (.venv) $ python manage.py load_oekobaudat_epds
 ```
 
-To create a proper encryption for the user data execute the following command:
-```Bash
-(.venv) $ python manage.py generate_encryption_key
-```
-Then create a variable `FIELD_ENCRYPTION_KEY` with the generated key in the `.env` file
-
 If `cities_light` is not being loaded, try:
 ```Bash
 (.venv) $ python manage.py cities_light --force-import-all

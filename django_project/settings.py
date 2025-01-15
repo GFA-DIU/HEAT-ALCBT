@@ -82,7 +82,6 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "debug_toolbar",
     "cities_light",
-    "encrypted_model_fields",
     # Local
     "accounts",
     "pages",
@@ -167,10 +166,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Encryption
-# https://pypi.org/project/django-encrypted-model-fields/
-FIELD_ENCRYPTION_KEY = "vZzyAIaVEKo5nVtm3RfrLxP7GoJUZBiK9I_2HORozcY="
 
 # Internationalization
 # https://docs.djangoproject.com/en/dev/topics/i18n/
