@@ -9,6 +9,12 @@
     {{ user_form|crispy }}
     <strong>Profile Information</strong>
     {{ profile_form|crispy }}
+    <input type="hidden" name="_method" value="UPDATE">
     <button type="submit" class="btn btn-primary">Update</button>
+  </form>
+  <form method="post" action="{% url 'update_profile' %}" style="display: inline;">
+    {% csrf_token %}
+    <input type="hidden" name="_method" value="DELETE">
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete your profile?');">Delete</button>
   </form>
 {% endblock %}
