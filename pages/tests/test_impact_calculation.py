@@ -148,7 +148,7 @@ def create_product():
         ),
     ],
 )
-def test_calculate_impacts(
+def test_calculate_impacts_area(
     epd_name,
     declared_unit,
     conversions,
