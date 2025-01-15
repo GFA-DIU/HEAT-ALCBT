@@ -2,6 +2,7 @@ import logging
 
 from django.db import transaction
 from django.db.models import Prefetch
+from django.http import HttpResponseServerError
 
 from pages.forms.assembly_form import AssemblyForm
 from pages.models.assembly import Assembly, Product
@@ -49,6 +50,9 @@ def save_assembly(request, assembly: Assembly, building_instance: Building, simu
                     "reporting_life_cycle": request.POST.get("reporting_life_cycle"),  # Get reporting_life_cycle from POST data
                 }
             )
+        else:
+            logger.error("Submit failed for user %s because form is invalid, with these errors: %s", request.user, form.errors)
+            raise HttpResponseServerError()
     except Exception:
         logger.exception("Saving assemby %s for building %s failed", assembly.pk, building_instance.pk)
 
