@@ -1,5 +1,6 @@
 import logging
 
+from django.db import transaction
 from django.db.models import Prefetch
 from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
@@ -91,6 +92,7 @@ def handle_building_load(request, building_id, simulation):
     return context, form
 
 
+@transaction.atomic
 def handle_general_information_submit(request, building_id):
     building = (
         get_object_or_404(Building, created_by=request.user, pk=building_id)
@@ -100,20 +102,28 @@ def handle_general_information_submit(request, building_id):
     form = BuildingGeneralInformation(
         request.POST, instance=building
     )  # Bind form to instance
-    if form.is_valid():
-        building = form.save(commit=False)
-        building.created_by = request.user
-        building.save()
-        logger.info("User %s successfully saved building %s", request.user, building)
-        return redirect("building", building_id=building.id)
-    else:
+    try:
+        if form.is_valid():
+            building = form.save(commit=False)
+            building.created_by = request.user
+            building.save()
+            logger.info("User %s successfully saved building %s", request.user, building)
+            return redirect("building", building_id=building.id)
+        else:
+            logger.info(
+                "User %s could not save building %s. Form had following errors",
+                request.user, building, form.errors
+            )
+            return HttpResponseServerError()
+    except Exception:
+        logger.exception("Submit of general information for building %s failed", building.pk)
         logger.info(
             "User %s could not savee building %s. From had following errors",
             request.user, building, form.errors
         )
         return HttpResponseServerError()
 
-
+@transaction.atomic
 def handle_assembly_delete(request, building_id, simulation):
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
@@ -121,12 +131,15 @@ def handle_assembly_delete(request, building_id, simulation):
         BuildingAssemblyModel = BuildingAssembly
 
     component_id = request.GET.get("component")
-    # Get the component and delete it
-    component = get_object_or_404(
-        BuildingAssemblyModel, assembly__id=component_id, building__id=building_id
-    )
-    component.delete()
-
+    try:
+        # Get the component and delete it
+        component = get_object_or_404(
+            BuildingAssemblyModel, assembly__id=component_id, building__id=building_id
+        )
+        component.delete()
+    except Exception:
+        logger.exception("Deletion of assembly %s for building %s failed.", component_id, building_id)
+        
     # Fetch the updated list of assemblies for the building
     updated_list = BuildingAssemblyModel.objects.filter(
         building__created_by=request.user,

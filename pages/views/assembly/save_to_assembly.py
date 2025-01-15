@@ -1,11 +1,17 @@
+import logging
+
+from django.db import transaction
 from django.db.models import Prefetch
+from django.http import HttpResponseServerError
 
 from pages.forms.assembly_form import AssemblyForm
 from pages.models.assembly import Assembly, Product
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 from pages.models.epd import EPD, EPDImpact
 
+logger = logging.getLogger(__name__)
 
+@transaction.atomic
 def save_assembly(request, assembly: Assembly, building_instance: Building, simulation=None) -> None:
     # Save to BuildingAssembly or -Simulated, depending on Mode
     if simulation:
@@ -15,33 +21,40 @@ def save_assembly(request, assembly: Assembly, building_instance: Building, simu
     
     # Bind the form to the existing Assembly instance
     form = AssemblyForm(request.POST, instance=assembly, building_id=building_instance.pk, simulation=simulation)
-    if form.is_valid():
-        selected_epds, epd_map = parse_selected_epds(request)
+    
+    try:
+        if form.is_valid():
+            selected_epds, epd_map = parse_selected_epds(request)
 
-        # DB OPERATIONS
-        assembly = form.save() # Save the updated Assembly instance
-        assembly.created_by = request.user
-        assembly.save()
+            # DB OPERATIONS
+            assembly = form.save() # Save the updated Assembly instance
+            assembly.created_by = request.user
+            assembly.save()
 
-        Product.objects.filter(assembly=assembly).delete()  # create a clean slate
-        
-        # Save to products
-        for k, v in selected_epds.items():
-            Product.objects.create(
-                epd=epd_map[k],
+            Product.objects.filter(assembly=assembly).delete()  # create a clean slate
+            
+            # Save to products
+            for k, v in selected_epds.items():
+                Product.objects.create(
+                    epd=epd_map[k],
+                    assembly=assembly,
+                    quantity=v.get("quantity"),
+                    input_unit=v.get("unit"),
+                )
+            
+            BuildingAssemblyModel.objects.update_or_create(
+                building=building_instance,
                 assembly=assembly,
-                quantity=v.get("quantity"),
-                input_unit=v.get("unit"),
+                defaults={
+                    "quantity": request.POST.get("quantity"),  # Get quantity from POST data
+                    "reporting_life_cycle": request.POST.get("reporting_life_cycle"),  # Get reporting_life_cycle from POST data
+                }
             )
-        
-        BuildingAssemblyModel.objects.update_or_create(
-            building=building_instance,
-            assembly=assembly,
-            defaults={
-                "quantity": request.POST.get("quantity"),  # Get quantity from POST data
-                "reporting_life_cycle": request.POST.get("reporting_life_cycle"),  # Get reporting_life_cycle from POST data
-            }
-        )
+        else:
+            logger.error("Submit failed for user %s because form is invalid, with these errors: %s", request.user, form.errors)
+            raise HttpResponseServerError()
+    except Exception:
+        logger.exception("Saving assemby %s for building %s failed", assembly.pk, building_instance.pk)
 
 
 def parse_selected_epds(request) -> tuple[dict, dict[str, EPD]]:
