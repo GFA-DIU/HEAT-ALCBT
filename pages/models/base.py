@@ -1,3 +1,4 @@
+import os
 import logging
 import uuid
 
@@ -7,6 +8,7 @@ from cities_light.models import Country, City
 from geopy.geocoders import Nominatim
 from accounts.models import CustomUser
 
+NOMINATIM_AGENT_STRING = os.environ.get("NOMINATIM_AGENT_STRING")
 logger = logging.getLogger(__name__)
 
 class BaseModel(models.Model):
@@ -63,10 +65,10 @@ class BaseGeoModel(models.Model):
         super().save(*args, **kwargs)
 
     def calculate_lon_lat(self):
-        geolocator = Nominatim(
-            user_agent="Beat/1.0 (https://d2innovate.eu/; ramon.zalabardo@gfa-group.de)"
-        )
         try:
+            geolocator = Nominatim(
+                user_agent=NOMINATIM_AGENT_STRING
+            )
             location = geolocator.geocode(self.address())
             self.longitude, self.latitude = location.longitude, location.latitude
         except Exception as error:
