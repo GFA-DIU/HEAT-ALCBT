@@ -19,7 +19,7 @@
           <div class="card p-3 flex-grow-1 d-flex flex-column">
             <h6 class="card-title">Create Custom</h6>
             <p class="text-secondary small flex-grow-1">Create a new custom component from the materials list.</br>This is best for a detailed LCA assessment.</p>
-            <a href="{% url 'component' building_id=building_id %}{% if simulation %}?simulation=true{% endif %}" class="btn btn-primary mt-2">Select</a>
+            <a href="{% url 'component' building_id=building_id %}?simulation={{simulation}}" class="btn btn-primary mt-2">Select</a>
           </div>
         </div>
       </div>
