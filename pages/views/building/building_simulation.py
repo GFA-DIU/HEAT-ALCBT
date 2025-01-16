@@ -48,11 +48,11 @@ def building_simulation(request, building_id):
 def handle_simulation_reset(building_id):
     ##### create clean slate
     # Fetch the simulated assemblies for the given building
-    simulated_assemblies = BuildingAssemblySimulated.objects.filter(building__id=building_id)
+    simulated_buildingassemblies = BuildingAssemblySimulated.objects.filter(building__id=building_id)
 
     # Find and delete associated assemblies with AssemblyMode.CUSTOM
     sim_custom_assemblies = Assembly.objects.filter(
-        id__in=simulated_assemblies.values_list('assembly_id', flat=True),
+        id__in=simulated_buildingassemblies.values_list('assembly_id', flat=True),
         mode=AssemblyMode.CUSTOM
     )
     
@@ -60,7 +60,7 @@ def handle_simulation_reset(building_id):
         sim_custom_assemblies.delete()
 
         # Clear existing simulated assemblies
-        simulated_assemblies.delete()
+        simulated_buildingassemblies.delete()
         
         ###### Create from Building Assembly
         normal_assemblies = BuildingAssembly.objects.filter(building__id=building_id)
@@ -73,7 +73,7 @@ def handle_simulation_reset(building_id):
             # For custom assemblies, clone the original
             if a.assembly.mode == AssemblyMode.CUSTOM:                
                 # https://docs.djangoproject.com/en/5.1/topics/db/queries/#copying-model-instances
-                original_assembly_id = a.pk
+                original_assembly_id = a.assembly.pk
                 a.assembly.pk = None
                 a.assembly._state.adding = True
                 a.assembly.save()
