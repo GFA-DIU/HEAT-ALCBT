@@ -105,6 +105,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "debug_toolbar",
     "cities_light",
+    "encrypted_json_fields",
     # Local
     "accounts",
     "pages",
@@ -129,6 +130,8 @@ MIDDLEWARE = [
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ['admin:login', 'admin:index']
 
+# https://github.com/morlandi/django-encrypted-json-fields
+EJF_ENCRYPTION_KEYS = [os.environ.get("FIELD_ENCRYPTION_KEY", "")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
 ROOT_URLCONF = "django_project.urls"
 
