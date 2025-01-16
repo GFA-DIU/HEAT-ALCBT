@@ -37,5 +37,7 @@ geopy==2.4.1
 pandas==2.2.3
 plotly==5.24.1
 dj-database-url==2.3.0
-psycopg[c]; sys_platform == "linux"
-psycopg[binary]; sys_platform != "linux"
+psycopg==3.2.3
+psycopg-binary==3.2.3
+# psycopg[c]; sys_platform == "linux"
+# psycopg[binary]; sys_platform != "linux"
