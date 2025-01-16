@@ -36,5 +36,7 @@ django-encrypted-model-fields=0.6.5
 cryptography==39.0.1
 folium==0.19.0
 dj-database-url==2.3.0
-psycopg[c]; sys_platform == "linux"
-psycopg[binary]; sys_platform != "linux"
+psycopg==3.2.3
+psycopg-binary==3.2.3
+# psycopg[c]; sys_platform == "linux"
+# psycopg[binary]; sys_platform != "linux"
