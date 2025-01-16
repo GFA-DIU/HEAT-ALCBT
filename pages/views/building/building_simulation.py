@@ -51,46 +51,50 @@ def handle_simulation_reset(building_id):
     simulated_assemblies = BuildingAssemblySimulated.objects.filter(building__id=building_id)
 
     # Find and delete associated assemblies with AssemblyMode.CUSTOM
-    custom_assemblies = Assembly.objects.filter(
+    sim_custom_assemblies = Assembly.objects.filter(
         id__in=simulated_assemblies.values_list('assembly_id', flat=True),
         mode=AssemblyMode.CUSTOM
     )
-    custom_assemblies.delete()
-
-    # Clear existing simulated assemblies
-    simulated_assemblies.delete()
     
-    ###### Create from Building Assembly
-    normal_assemblies = BuildingAssembly.objects.filter(building__id=building_id)
-    
-    if not normal_assemblies:
-        # simulation is not possible if there is no normal set-up
-        return redirect("building", building_id=building_id)
-    
-    for a in normal_assemblies:
-        # For custom assemblies, clone the original
-        if a.assembly.mode == AssemblyMode.CUSTOM:                
-            # https://docs.djangoproject.com/en/5.1/topics/db/queries/#copying-model-instances
-            original_assembly_id = a.pk
-            a.assembly.pk = None
-            a.assembly._state.adding = True
-            a.assembly.save()
+    try:
+        sim_custom_assemblies.delete()
 
-            # Clone associated Products
-            for product in Product.objects.filter(assembly__id=original_assembly_id):
-                Product.objects.create(
-                    description=product.description,
-                    epd=product.epd,
-                    input_unit=product.input_unit,
-                    assembly=a.assembly,  # Use the new cloned assembly
-                    quantity=product.quantity
-                )
+        # Clear existing simulated assemblies
+        simulated_assemblies.delete()
+        
+        ###### Create from Building Assembly
+        normal_assemblies = BuildingAssembly.objects.filter(building__id=building_id)
+        
+        if not normal_assemblies:
+            # simulation is not possible if there is no normal set-up
+            return redirect("building", building_id=building_id)
+        
+        for a in normal_assemblies:
+            # For custom assemblies, clone the original
+            if a.assembly.mode == AssemblyMode.CUSTOM:                
+                # https://docs.djangoproject.com/en/5.1/topics/db/queries/#copying-model-instances
+                original_assembly_id = a.pk
+                a.assembly.pk = None
+                a.assembly._state.adding = True
+                a.assembly.save()
 
-        BuildingAssemblySimulated.objects.create(
-            assembly=a.assembly,
-            building=a.building,
-            quantity=a.quantity
-        )
+                # Clone associated Products
+                for product in Product.objects.filter(assembly__id=original_assembly_id):
+                    Product.objects.create(
+                        description=product.description,
+                        epd=product.epd,
+                        input_unit=product.input_unit,
+                        assembly=a.assembly,  # Use the new cloned assembly
+                        quantity=product.quantity
+                    )
+
+            BuildingAssemblySimulated.objects.create(
+                assembly=a.assembly,
+                building=a.building,
+                quantity=a.quantity
+            )
+    except Exception:
+        logger.exception("Resetting the simulation failed for building %s failed", building_id)
     
     # Do a full page reload
     return redirect("building_simulation", building_id=building_id)

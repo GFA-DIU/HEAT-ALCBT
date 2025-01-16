@@ -15,9 +15,16 @@
 ----
 
 ## Get started
+In local development we use a dockerized postgres instance.
+**Note:** The Django config automatically checks if this is the production environment or not.
 
-**Note**: The Ecoplatform Loader expects an API Token `ECO_PLATFORM_TOKEN` in an `.env` file.
+### Installation
+Start the postgres DB
+```Bash
+$ docker compose up db
+```
 
+Start the Django application
 ```Bash
 $ python -m venv .venv
 $ source .venv/bin/activate
@@ -30,15 +37,30 @@ $ source .venv/bin/activate
 # Load the site at http://127.0.0.1:8000
 ```
 
-To load the EPD data from Ökobaudat:
-```Bash
-(.venv) $ python manage.py load_oekobaudat_epds
-```
-
 If `cities_light` is not being loaded, try:
 ```Bash
 (.venv) $ python manage.py cities_light --force-import-all
 ```
+
+#### Load EPD Data
+To load the EPD data from Ökobaudat:
+```Bash
+(.venv) $ python manage.py load_oekobaudat_epds
+```
+**Note**: The Ecoplatform Loader expects an API Token `ECO_PLATFORM_TOKEN` in an `.env` file.
+
+
+To load the EPD data from Ecoplatform:
+```Bash
+(.venv) $ python manage.py load_ecoplatform_epds
+```
+
+### PostGres
+To inspect the data tables in postgres instead of Django admin
+```Bash
+$ pgcli -h localhost -p 8080 -U postgres -d postgres
+```
+
 
 ### Info
 The basic `BuildingCategory` and `MaterialCategory` data is automatically imported through the migrations.

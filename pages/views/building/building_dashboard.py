@@ -1,16 +1,39 @@
 import pandas as pd
+import logging
+
 from plotly.offline import plot
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from django.db.models import Prefetch
+from django.http import HttpResponse, HttpResponseServerError
 
-def building_dashboard_material(impact_list):
-    df = prep_building_dashboard_df(impact_list)
+from django.shortcuts import get_object_or_404
+
+from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
+from pages.views.building.building import get_assemblies
+
+logger = logging.getLogger(__name__)
+
+def get_building_dashboard(user, building_id, dashboard_type: str, simulation: str):
+    if dashboard_type == "assembly":
+        return building_dashboard_assembly(user, building_id, simulation)
+    elif dashboard_type == "material":
+        return building_dashboard_material(user, building_id, simulation)
+    else:
+        logger.info("Dashboard type not defined", 
+            user, building_id, dashboard_type
+        )
+        return HttpResponseServerError()    
+
+
+def building_dashboard_material(user, building_id, simulation):
+    df = prep_building_dashboard_df(user, building_id, simulation)
     return _building_dashboard_base(df, "material_category")
 
 
-def building_dashboard_assembly(impact_list):
-    df = prep_building_dashboard_df(impact_list)
+def building_dashboard_assembly(user, building_id, simulation):
+    df = prep_building_dashboard_df(user, building_id, simulation)
 
     # Create short Assembly category names to enable to show the labels
     df["assembly_short"] = df["assembly_category"].str.split("- ").str[1]
@@ -27,7 +50,33 @@ def building_dashboard_assembly(impact_list):
     return _building_dashboard_base(df, "assembly_short")
 
 
-def prep_building_dashboard_df(impact_list):
+def prep_building_dashboard_df(user, building_id, simulation):
+    if simulation == "true":
+        BuildingAssemblyModel = BuildingAssemblySimulated
+    else:
+        BuildingAssemblyModel = BuildingAssembly
+    
+    building = get_object_or_404(
+        Building.objects.filter(
+            created_by=user
+        ).prefetch_related(  # Ensure the building belongs to the user
+            Prefetch(
+                "buildingassembly_set",
+                queryset=BuildingAssemblyModel.objects.filter(
+                    # assembly__created_by=request.user  # Ensure the assembly belongs to the user
+                ).select_related("assembly"),
+                to_attr="prefetched_components",
+            )
+        ),
+        pk=building_id,
+    )
+
+    # Build structural components and impacts in one step
+    structural_components, impact_list = get_assemblies(building.prefetched_components)
+    
+    if not structural_components:
+        return HttpResponse()
+        
     # Prepare DataFrame
     df = pd.DataFrame.from_records(impact_list)
     # filter to impacts of interest
@@ -53,7 +102,6 @@ def prep_building_dashboard_df(impact_list):
 
 
 def _building_dashboard_base(df, key_column: str):
-
     # Generate colors
     colorscale_orange = _generate_discrete_colors(
         start_color=(242, 103, 22), end_color=(250, 199, 165), n=df.shape[0]
@@ -62,7 +110,7 @@ def _building_dashboard_base(df, key_column: str):
     colorscale_green = _generate_discrete_colors(
         start_color=(36, 191, 91), end_color=(154, 225, 177), n=df.shape[0]
     )
-
+    
     # Create a 2x2 layout: top row for pies, bottom row for indicators
     fig = make_subplots(
         rows=2,
@@ -195,7 +243,7 @@ def _building_dashboard_base(df, key_column: str):
 
     pie_plot = plot(
         fig, output_type="div", config={"displaylogo": False, "displayModeBar": False}
-    )
+    )    
     return pie_plot
 
 

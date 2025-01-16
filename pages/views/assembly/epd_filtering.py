@@ -116,7 +116,4 @@ def get_filtered_epd_list(request, dimension = None):
         filtered_epds = filter_by_dimension(
             filtered_epds, dimension
         )
-    # Pagination setup for EPD list
-    paginator = Paginator(filtered_epds, 10)  # Show 10 items per page
-    page_number= request.GET.get("page", 1)
-    return paginator.get_page(page_number), dimension
+    return filtered_epds, dimension

@@ -1,4 +1,4 @@
- {% load crispy_forms_tags %}
+{% load crispy_forms_tags %}
 {% if assembly_id %}
 <form hx-post="{% url 'component_edit' building_id=building_id assembly_id=assembly_id %}{% if simulation %}?simulation=true{% endif %}" hx-target="#epd-list" hx-vals='{"action": "filter", "dimension": "{{dimension}}" }'>
 {% else %}
@@ -8,30 +8,34 @@
     {% crispy epd_filters_form %}
 </form> 
 
-<ul class="list-group">
+<ul class="list-group mt-3">
     {% for epd in epd_list %}
     <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
-        <div class="col-6">
+        <div class="col-10">
             <h5 class="mb-1">{{ epd.name }}</h5>
-            <div class="d-flex flex-column">
-                <span class="text-muted ms-1">{{ epd.country }}</span>
+            <div class="row">
+                <span class="text-muted col-3">{{ epd.country }}</span>
+                <div class="col gap-3">
+                    <span class="badge border bg-transparent rounded-pill" style="    border-color: #6f42c1 !important; color: #6f42c1; ">{{epd.category}}</span>
+                    <span class="badge border border-dark text-dark bg-transparent rounded-pill">Unit: {{epd.declared_unit}}</span>
+                    <span class="badge border border-success text-success bg-transparent rounded-pill">{{epd.impact}} kgCO2e</span>
+                </div>
             </div>
         </div>
-        <div class="col-3 d-flex justify-content-end align-items-center gap-2">
-            {% if epd.id|stringformat:"i" in selected_epds_ids %}
-            <button class="btn btn-success add-epd"
-                    data-id="{{ epd.id }}"
-                    disabled
-            >
-            {% else %}
+        <div class="ms-auto d-flex flex-column gap-2">
+            <a href="{{epd.source}}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="align-self-end">  
+                <i class="bi bi-arrow-up-right-square"></i>
+            </a>
             <button class="btn btn-success add-epd"
                     data-id="{{ epd.id }}"
                     hx-post=""
                     hx-vals='{"action": "select_epd", "id": "{{ epd.id }}", "dimension": "{{dimension}}" }'
                     hx-target="#selected_epds"
                     hx-swap="beforeend"
-            >
-            {% endif %}
+                    {% if epd.id|stringformat:"s" in selected_epds_ids %}disabled{% endif %}>
             Add
             </button>
         </div>
@@ -39,24 +43,73 @@
     {% endfor %}
 </ul>
 
+
 <div class="mt-3">
     <nav aria-label="Pagination">
-        <ul class="pagination">
+        <ul class="pagination justify-content-center">
+            <!-- Jump to First Button -->
             {% if epd_list.has_previous %}
             <li class="page-item">
-                <a hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.previous_page_number }}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">Previous</a>
+                <a class="page-link" hx-get="{% url 'component' building_id=building_id %}?page=1{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="First">
+                    <span aria-hidden="true">Start</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">Start</span>
             </li>
             {% endif %}
-            {% for num in epd_list.paginator.page_range %}
-            <li class="page-item {% if num == epd_list.number %}active{% endif %}">
-                <a hx-get="{% url 'component' building_id=building_id %}?page={{ num }}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">{{ num }}</a>
+
+            <!-- Previous Button -->
+            {% if epd_list.has_previous %}
+            <li class="page-item">
+                <a class="page-link" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.previous_page_number }}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
             </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+            </li>
+            {% endif %}
+
+            <!-- Page Numbers -->
+            {% for num in epd_list.paginator.page_range %}
+                {% if num >= epd_list.number|add:-2 and num <= epd_list.number|add:2 %}
+                <li class="page-item {% if num == epd_list.number %}active{% endif %}">
+                    <a class="page-link" hx-get="{% url 'component' building_id=building_id %}?page={{ num }}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML">{{ num }}</a>
+                </li>
+                {% endif %}
             {% endfor %}
+
+            <!-- Next Button -->
             {% if epd_list.has_next %}
             <li class="page-item">
-                <a hx-get="?page={{ epd_list.next_page_number }}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" class="page-link">Next</a>
+                <a class="page-link" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.next_page_number }}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+            </li>
+            {% endif %}
+
+            <!-- Jump to Last Button -->
+            {% if epd_list.has_next %}
+            <li class="page-item">
+                <a class="page-link" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.paginator.num_pages }}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Last">
+                    <span aria-hidden="true">End</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">End</span>
             </li>
             {% endif %}
         </ul>
     </nav>
 </div>
+
+
+

@@ -1,5 +1,6 @@
 import logging
 
+from django.db import transaction
 from django.db.models import Prefetch
 from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,9 +9,8 @@ from django.views.decorators.http import require_http_methods
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.assembly import DIMENSION_UNIT_MAPPING
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
+from pages.views.building.impact_calculation import calculate_impacts
 
-from pages.scripts.dashboards.building_dashboard import building_dashboard_assembly, building_dashboard_material
-from pages.scripts.dashboards.impact_calculation import calculate_impacts
 
 
 logger = logging.getLogger(__name__)
@@ -50,15 +50,17 @@ def building(request, building_id=None):
 def handle_building_load(request, building_id, simulation):
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
+        relation_name = "buildingassemblysimulated_set"
     else:
         BuildingAssemblyModel = BuildingAssembly
+        relation_name = "buildingassembly_set"
     
     building = get_object_or_404(
         Building.objects.filter(
             created_by=request.user
         ).prefetch_related(  # Ensure the building belongs to the user
             Prefetch(
-                "buildingassembly_set",
+                relation_name,
                 queryset=BuildingAssemblyModel.objects.filter(
                     # assembly__created_by=request.user  # Ensure the assembly belongs to the user
                 ).select_related("assembly"),
@@ -69,17 +71,14 @@ def handle_building_load(request, building_id, simulation):
     )
 
     # Build structural components and impacts in one step
-    structural_components, impact_list = get_assemblies(building.prefetched_components)
+    structural_components, _ = get_assemblies(building.prefetched_components)
 
     context = {
         "building_id": building.id,
         "building": building,
         "structural_components": structural_components,
     }
-    if len(structural_components):
-        context["building_dashboard_assembly"] = building_dashboard_assembly(impact_list)
-        context["building_dashboard_material"] = building_dashboard_material(impact_list)
-
+    
     form = BuildingGeneralInformation(instance=building)
 
     logger.info(
@@ -91,6 +90,7 @@ def handle_building_load(request, building_id, simulation):
     return context, form
 
 
+@transaction.atomic
 def handle_general_information_submit(request, building_id):
     building = (
         get_object_or_404(Building, created_by=request.user, pk=building_id)
@@ -100,20 +100,28 @@ def handle_general_information_submit(request, building_id):
     form = BuildingGeneralInformation(
         request.POST, instance=building
     )  # Bind form to instance
-    if form.is_valid():
-        building = form.save(commit=False)
-        building.created_by = request.user
-        building.save()
-        logger.info("User %s successfully saved building %s", request.user, building)
-        return redirect("building", building_id=building.id)
-    else:
+    try:
+        if form.is_valid():
+            building = form.save(commit=False)
+            building.created_by = request.user
+            building.save()
+            logger.info("User %s successfully saved building %s", request.user, building)
+            return redirect("building", building_id=building.id)
+        else:
+            logger.info(
+                "User %s could not save building %s. Form had following errors",
+                request.user, building, form.errors
+            )
+            return HttpResponseServerError()
+    except Exception:
+        logger.exception("Submit of general information for building %s failed", building.pk)
         logger.info(
             "User %s could not savee building %s. From had following errors",
             request.user, building, form.errors
         )
         return HttpResponseServerError()
 
-
+@transaction.atomic
 def handle_assembly_delete(request, building_id, simulation):
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
@@ -121,12 +129,15 @@ def handle_assembly_delete(request, building_id, simulation):
         BuildingAssemblyModel = BuildingAssembly
 
     component_id = request.GET.get("component")
-    # Get the component and delete it
-    component = get_object_or_404(
-        BuildingAssemblyModel, assembly__id=component_id, building__id=building_id
-    )
-    component.delete()
-
+    try:
+        # Get the component and delete it
+        component = get_object_or_404(
+            BuildingAssemblyModel, assembly__id=component_id, building__id=building_id
+        )
+        component.delete()
+    except Exception:
+        logger.exception("Deletion of assembly %s for building %s failed.", component_id, building_id)
+        
     # Fetch the updated list of assemblies for the building
     updated_list = BuildingAssemblyModel.objects.filter(
         building__created_by=request.user,

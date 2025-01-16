@@ -42,7 +42,6 @@ INDICATOR_UNIT_MAPPING = {
 }
 
 
-
 class Unit(models.TextChoices):
     """Adapted from LCAx."""
     CM = 'cm', 'Centimeter'
@@ -72,7 +71,7 @@ class Unit(models.TextChoices):
     KGN = 'kgne', 'kg N eq.'
     M3WE = 'm3we', 'm³ world equiv.'
     KGSB = 'kgsbe', 'kg Sb eq.'
-    
+
 
 class ImpactCategoryKey(models.TextChoices):
     """Taken from LCAx."""
@@ -235,8 +234,10 @@ class EPD(BaseModel, epdLCAx):
 
     def __str__(self):
         return self.name
-    
 
+    def get_impact_sum(self):
+       impacts = EPDImpact.objects.filter(epd=self, impact__impact_category="gwp", impact__life_cycle_stage="a1a3")
+       return round(sum(impact.value for impact in impacts), 3)
 
 class EPDImpact(models.Model):
     """Join Table for EPDs and Impact"""

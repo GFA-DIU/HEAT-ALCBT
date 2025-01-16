@@ -1,0 +1,61 @@
+{% load custom_filters %}
+<li class="d-flex align-items-center list-group-item" 
+    id="epd-{{epd.id}}" 
+    data-id="{{ epd.id }}">
+    <div class="col-5" >
+        <h5 class="mb-1" title="{{epd.name}}">{{ epd.name|slice:":30"|strip }}{%if epd.name|length > 30 %}... {% endif %}</h5>
+        <div class="d-flex flex-column">
+            <span class="text-muted ms-1">{{epd.country}}</span>
+        </div>
+    </div>
+    <div class="col-5 container" >
+        <div class="row align-items-center">
+            <span class="col-4 text-muted">{{ epd.selection_text }}</span>
+            {% if epd.selection_unit == "unknown" %} 
+            <input type="number" 
+                   name="material_{{ epd.id }}_quantity" 
+                   class="form-control form-control-sm col"
+                   placeholder="Quantity"
+                   style="margin-left: 0.75rem"
+                   min="1"
+                   {% if epd.selection_quantity%}value="{{ epd.selection_quantity}}"{% endif %}
+                   required>
+            <input name="material_{{ epd.id }}_unit" 
+                       value="{{ epd.selection_unit }}"
+                       hidden>
+            {% else %}
+            <div class="input-group input-group-sm ms-auto col row">
+                <input type="number" 
+                       name="material_{{ epd.id }}_quantity" 
+                       class="form-control col"
+                       placeholder="Quantity"
+                       min="1"
+                       step="{{ epd.selection_unit|get_step }}"
+                       {% if epd.selection_quantity%}value="{{ epd.selection_quantity}}"{% endif %}
+                       required>
+                <input name="material_{{ epd.id }}_unit" 
+                       class="input-group-text col" 
+                       value='{{ epd.selection_unit|slice:":10"|strip }}'
+                       title="{{ epd.selection_unit }}"
+                       readonly>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="d-flex flex-column ms-auto gap-2">
+        <a href="{{epd.source}}" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="align-self-end">  
+            <i class="bi bi-arrow-up-right-square"></i>
+        </a>
+        <button class="btn btn-danger remove-epd"  
+                data-id="{{ epd.id }}"
+                hx-post=""
+                hx-vals='{"action": "remove_epd"}'
+                hx-target="#epd-{{epd.id}}"
+                hx-swap="outerHTML">
+            Remove
+        </button>
+    </div>
+</li>
