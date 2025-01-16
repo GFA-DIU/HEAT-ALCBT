@@ -29,7 +29,7 @@ Start the Django application
 $ python -m venv .venv
 $ source .venv/bin/activate
 
-(.venv) $ pip install -r requirements.txt
+(.venv) $ pip install -r requirements.dev.txt
 (.venv) $ python manage.py migrate
 (.venv) $ python manage.py createsuperuser
 (.venv) $ python manage.py cities_light
@@ -58,8 +58,15 @@ To load the EPD data from Ecoplatform:
 ### PostGres
 To inspect the data tables in postgres instead of Django admin
 ```Bash
-$ pgcli -h localhost -p 8080 -U postgres -d postgres
+$ pgcli -h localhost -p 5432 -U postgres -d postgres
 ```
+
+### Unit Tests
+To execute Unit tests, run
+```Bash
+(.venv) $ pytest
+```
+
 
 
 ### Info
