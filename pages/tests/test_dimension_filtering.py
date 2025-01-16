@@ -22,6 +22,11 @@ from pages.views.assembly.epd_filtering import filter_by_dimension
         (Unit.M2, [], AssemblyDimension.LENGTH, True),
         (Unit.M2, [], AssemblyDimension.MASS, True),
         (Unit.M2, [], AssemblyDimension.VOLUME, True),
+        # M EPDs
+        (Unit.M, [], AssemblyDimension.AREA, True),
+        (Unit.M, [], AssemblyDimension.LENGTH, False),
+        (Unit.M, [], AssemblyDimension.MASS, True),
+        (Unit.M, [], AssemblyDimension.VOLUME, True),
         # KG EPDs - without conversion
         (Unit.KG, [], AssemblyDimension.AREA, True),
         (Unit.KG, [], AssemblyDimension.LENGTH, True),
