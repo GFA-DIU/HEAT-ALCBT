@@ -15,8 +15,8 @@ media
 .venv*
 
 # secrets
+secrets
 .env
-
 
 *.ipynb
 *.xlsx
