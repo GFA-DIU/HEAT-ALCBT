@@ -16,7 +16,7 @@ media
 
 # secrets
 secrets
-.env
+.env*
 
 *.ipynb
 *.xlsx

@@ -4,7 +4,9 @@ from pathlib import Path
 
 import dj_database_url
 from django.utils.log import DEFAULT_LOGGING
-import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 LOGGING = {
     'version': 1,

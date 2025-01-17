@@ -1,5 +1,6 @@
 import logging
 
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -7,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 
 from .forms import CustomUserUpdateForm, UserProfileUpdateForm
+from pages.models.building import Building
+from pages.views.home import _delete_building
 
 logger = logging.getLogger(__name__)
 
@@ -25,10 +28,7 @@ def update_profile(request):
             messages.success(request, "Your profile is updated successfully")
             return redirect(to="update_profile")
     if request.method == "DELETE":
-        User = get_user_model()
-        User.objects.filter(id=request.user.id).delete()
-        response = HttpResponse()
-        response['HX-Redirect'] = '/'  # Set the HX-Redirect header with the desired URL
+        response = handle_delete_user(request)
         return response
     else:
         user_form = CustomUserUpdateForm(instance=request.user)
@@ -37,3 +37,26 @@ def update_profile(request):
     context = {"user_form": user_form, "profile_form": profile_form}
 
     return render(request, "account/update_profile.html", context)
+
+
+@transaction.atomic
+def handle_delete_user(request):
+    User = get_user_model()
+    buildings = Building.objects.filter(
+        created_by__id=request.user.id
+    ).values_list('id', flat=True)
+    
+    try:
+        for building_id in buildings:
+            _delete_building(building_id)
+        
+        # filter to avoid second DB call
+        User.objects.filter(id=request.user.id).delete()
+        messages.success(request, "Your profile was deleted successfully")
+        response = HttpResponse()
+        response['HX-Redirect'] = '/'  # Set the HX-Redirect header with the desired URL
+        return response
+    except:
+        logger.exception("Deleting user %s failed", request.user)
+        messages.warning(request, "Warning: Deleting Profile failed.")
+        return redirect(to="update_profile")
