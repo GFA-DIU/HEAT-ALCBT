@@ -7,10 +7,11 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from cities_light.models import Country, City
+from encrypted_json_fields.fields import EncryptedEmailField
 
 class CustomUser(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(unique=True, blank=False, null=False)
+    email = EncryptedEmailField(unique=True, blank=False, null=False)
 
     def __str__(self):
         return self.email
