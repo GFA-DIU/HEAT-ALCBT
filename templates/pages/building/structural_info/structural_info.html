@@ -1,6 +1,6 @@
 {% if building_id %}
   <button class="btn btn-primary m-2 mt-3"
-  hx-get="{% url 'component' building_id=building_id %}?add_component=step_1{% if simulation %}&simulation=true{% endif %}"
+  hx-get="{% url 'component' building_id=building_id %}?add_component=step_1&simulation={{simulation}}"
   hx-target="#modal-body"
   hx-swap="innerHTML"
   >Add Component</button>
