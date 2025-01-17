@@ -2,15 +2,16 @@ import os
 import logging
 import json
 
-from dotenv import load_dotenv
+import environ
 import requests
 import lcax
 
 logger = logging.getLogger(__name__)
 
-load_dotenv()
+env = environ.Env()
+environ.Env.read_env()  # Reads variables from a .env file
 
-ECO_PLATFORM_TOKEN = os.getenv("ECO_PLATFORM_TOKEN")
+ECO_PLATFORM_TOKEN = env("ECO_PLATFORM_TOKEN")
 ECO_PLATFORM_URL =  "https://data.eco-platform.org/resource/processes?search=true&distributed=true&virtual=true&metaDataOnly=false&validUntil=2025&format=json&iew=extended"
 
 # ALCBT countries, ISO 3166-1 alpha-2
