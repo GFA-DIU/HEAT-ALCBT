@@ -60,9 +60,9 @@
     <div class="d-flex flex-row justify-content-between align-items-center">
         <div>
             <a {% if simulation %}
-               href="{% url 'building' building_id=building_id %}" 
-               {% else %}
                href="{% url 'building_simulation' building_id=building_id %}" 
+               {% else %}
+               href="{% url 'building' building_id=building_id %}" 
                {% endif %}
                class="btn btn-secondary">Cancel</a>
             <button 
