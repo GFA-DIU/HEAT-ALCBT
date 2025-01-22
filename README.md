@@ -4,11 +4,15 @@
 ----
 
 ## Table of Contents
-* **[Installation](#installation)**
-  * [Pip](#pip)
-  * [Docker](#docker)
-* [Next Steps](#next-steps)
-* [Contributing](#contributing)
+* **[Get Started](#get-started)**
+  * [Docker Database](#docker-database)
+  * [Installation](#installation)
+  * [Load EPD Data](#load-epd-data)
+  * [PostGres](#postgres)
+
+* [Contribute](#contribute)
+  * [Unit Tests](#unit-tests)
+  * [Deploy to Heroku](#deploy-to-heroku)
 * [Support](#support)
 * [License](#license)
 
@@ -16,15 +20,19 @@
 
 ## Get started
 In local development we use a dockerized postgres instance.
+
 **Note:** The Django config automatically checks if this is the production environment or not.
 
-### Installation
+
+### Docker Database
 Start the postgres DB
 ```Bash
 $ docker compose up db
 ```
 
-Start the Django application
+### Installation
+
+Next, start the Django application
 ```Bash
 $ python -m venv .venv
 $ source .venv/bin/activate
@@ -37,6 +45,8 @@ $ source .venv/bin/activate
 (.venv) $ python manage.py runserver
 # Load the site at http://127.0.0.1:8000
 ```
+
+The basic `BuildingCategory` and `MaterialCategory` data is automatically imported through the migrations.
 
 If `cities_light` is not being loaded, try:
 ```Bash
@@ -62,31 +72,27 @@ To inspect the data tables in postgres instead of Django admin
 $ pgcli -h localhost -p 5432 -U postgres -d postgres
 ```
 
+
+## Contribute
+
+Follow the installation steps [above](#installation).
+
+### Deploy to Heroku
+To deploy to the production server you need to be added to the repository with the relevant roles. Once you obtain an authentication token, you can contribute like this through the Heroku CLI.
+
+```Bash
+$ heroku login -i
+$ git push heroku main
+```
+
+
 ### Unit Tests
 To execute Unit tests, run
 ```Bash
 (.venv) $ pytest
 ```
 
+## Support
+For support, please reach out to the maintainers or [kontakt@heat-international.de](mailto:kontakt@heat-international.de).
 
-
-### Info
-The basic `BuildingCategory` and `MaterialCategory` data is automatically imported through the migrations.
-
-
-
-### Background Info
-
-The app is based on the [djangox](https://github.com/wsvincent/djangox/assets/766418/a73ea730-a7b4-4e53-bf51-aa68f6816d6a) template, where additional information can be found.
-
-## Additional resources
-
-### HTMX in Django
- - this triggered the decision [Modern JavaScript for Django Developers: Part 5](https://www.saaspegasus.com/guides/modern-javascript-for-django-developers/htmx-alpine/#talking-to-your-django-backend-without-a-full-page-reload-with-htmx)
- - opinionated [django-htmx-fun](https://github.com/guettli/django-htmx-fun/tree/main)
- - opinionated [django-htmx-patterns](https://github.com/spookylukey/django-htmx-patterns/tree/master)
- - resource list by  [htmx.org](https://htmx.org/server-examples/)
-
-
-### Django
- - [learndjango.com](https://learndjango.com/search/results/?q=view)
+## License
