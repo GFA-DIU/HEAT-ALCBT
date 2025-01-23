@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import CustomUser, UserProfile
+from .models import CustomUser, UserProfile, CustomCity
 
-from cities_light.models import Country, City
+from cities_light.models import Country
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -45,7 +45,7 @@ class UserProfileUpdateForm(forms.ModelForm):
         label="Country"
     )
     city = forms.ModelChoiceField(
-        queryset=City.objects.none(),  # Start with an empty queryset
+        queryset=CustomCity.objects.none(),  # Start with an empty queryset
         widget=forms.Select(attrs={'id': 'city-dropdown', 'class': 'select form-select',}),
         label="City",
         help_text="Select a country first",
@@ -63,10 +63,10 @@ class UserProfileUpdateForm(forms.ModelForm):
 
         if instance:
             if instance.country:
-                self.fields['city'].queryset = City.objects.filter(country=instance.country).order_by('name')
+                self.fields['city'].queryset = CustomCity.objects.filter(country=instance.country).order_by('name')
                 self.initial['country'] = instance.country
             else: 
-                self.fields['city'].queryset = City.objects.none()
+                self.fields['city'].queryset = CustomCity.objects.none()
 
             # Ensure the selected 'city' is prepopulated
             if instance.city:
@@ -76,13 +76,13 @@ class UserProfileUpdateForm(forms.ModelForm):
         if "country" in self.data:
             try:
                 country_id = int(self.data.get("country"))
-                self.fields["city"].queryset = City.objects.filter(
+                self.fields["city"].queryset = CustomCity.objects.filter(
                     country_id=country_id
                 ).order_by("name")
             except (ValueError, TypeError):
-                self.fields["city"].queryset = City.objects.none()
+                self.fields["city"].queryset = CustomCity.objects.none()
         elif self.instance.pk:
             # If editing an existing instance, prepopulate the 'city' queryset
-            self.fields["city"].queryset = City.objects.filter(
+            self.fields["city"].queryset = CustomCity.objects.filter(
                 country=self.instance.country
             ).order_by("name")

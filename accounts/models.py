@@ -38,6 +38,12 @@ class UserProfile(models.Model):
         verbose_name = "User Profile"
         verbose_name_plural = "User Profiles"
 
+class CustomCity(City):
+    class Meta:
+        proxy = True 
+
+    def __str__(self):
+        return self.name # Show only city name
 
 @receiver(post_save, sender=CustomUser)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
