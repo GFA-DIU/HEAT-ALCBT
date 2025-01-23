@@ -2,10 +2,11 @@ from django.db import models
 from django.utils.translation import gettext as _
 from django.core.exceptions import ValidationError
 
-from cities_light.models import Country, City
+from cities_light.models import Country
 
 from .epd import EPD, Unit
 from .base import BaseModel
+from .city import CustomCity
 
 
 class AssemblyMode(models.TextChoices):
@@ -82,7 +83,7 @@ class Assembly(BaseModel):
     country = models.ForeignKey(
         Country, on_delete=models.SET_NULL, null=True, blank=True
     )
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
+    city = models.ForeignKey(CustomCity, on_delete=models.SET_NULL, null=True, blank=True)
     mode = models.CharField(
         _("Assembly Mode"),
         max_length=20,
