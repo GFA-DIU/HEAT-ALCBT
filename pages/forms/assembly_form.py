@@ -73,7 +73,7 @@ class AssemblyForm(forms.ModelForm):
         max_digits=10
     )
     reporting_life_cycle = forms.IntegerField(
-        label="Ref. period",
+        label="Life Span",
         min_value=1,
         max_value=10000,
         help_text="Report in years",
