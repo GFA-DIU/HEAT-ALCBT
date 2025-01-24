@@ -130,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add material to selected list
     epdList.addEventListener('click', (event) => {
         if (event.target.classList.contains('add-epd')) {
-            event.target.disabled = true;
             saveButton.disabled = false;
             selectEpdText.hidden = true;
         }
