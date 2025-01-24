@@ -6,8 +6,10 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from cities_light.models import Country, City
+from cities_light.models import Country
 from encrypted_json_fields.fields import EncryptedEmailField
+
+from pages.models.city import CustomCity
 
 class CustomUser(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -15,13 +17,6 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
-
-class CustomCity(City):
-    class Meta:
-        proxy = True 
-
-    def __str__(self):
-        return self.name # Show only city name
 
 class UserProfile(models.Model):
     user = models.OneToOneField(

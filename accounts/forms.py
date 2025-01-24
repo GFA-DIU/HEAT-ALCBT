@@ -1,8 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import CustomUser, UserProfile, CustomCity
+from .models import CustomUser, UserProfile
 
 from cities_light.models import Country
+
+from pages.models.city import CustomCity
 
 
 class CustomUserCreationForm(UserCreationForm):
