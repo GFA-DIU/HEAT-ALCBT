@@ -6,8 +6,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 from cities_light.models import Country
 from geopy.geocoders import Nominatim
-from accounts.models import CustomUser
-from pages.models.city import CustomCity
+from accounts.models import CustomUser, CustomCity
 
 NOMINATIM_AGENT_STRING = os.environ.get("NOMINATIM_AGENT_STRING")
 logger = logging.getLogger(__name__)

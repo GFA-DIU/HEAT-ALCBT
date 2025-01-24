@@ -9,7 +9,7 @@ from crispy_forms.layout import Layout, Row, Column, Submit
 from cities_light.models import Country
 
 from pages.models import Building, CategorySubcategory
-from pages.models.city import CustomCity
+from accounts.models import CustomCity
 
 
 class YearInput(forms.DateInput):

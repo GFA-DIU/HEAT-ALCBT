@@ -4,7 +4,7 @@ from .models import CustomUser, UserProfile
 
 from cities_light.models import Country
 
-from pages.models.city import CustomCity
+from accounts.models import CustomCity
 
 
 class CustomUserCreationForm(UserCreationForm):
