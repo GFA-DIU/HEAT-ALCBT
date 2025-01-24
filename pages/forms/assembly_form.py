@@ -60,7 +60,7 @@ class AssemblyForm(forms.ModelForm):
                 "hx-trigger": "change",  # Trigger HTMX on change event
                 "hx-target": "#epd-list",  # Update the City dropdown
                 "hx-vals": '{"action": "filter"}',  # Dynamically include the dropdown value
-                "class": "select form-select",
+                "class": "form-select flex-grow-0 w-auto",
             }
         ),
         label="Input Dimension",
@@ -70,7 +70,13 @@ class AssemblyForm(forms.ModelForm):
         label="Quantity",
         required=True,
         decimal_places=2,
-        max_digits=10
+        max_digits=10,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "type": "number"
+            }   
+        )
     )
     reporting_life_cycle = forms.IntegerField(
         label="Life Span",

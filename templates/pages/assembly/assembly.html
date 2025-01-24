@@ -25,10 +25,13 @@
     <div class="row">
         <!-- Country and Classification in the second row -->
         <div class="col-md-3">
-            {{ form.dimension |as_crispy_field }}
-        </div>
-        <div class="col-md-2">
-            {{ form.quantity |as_crispy_field }}
+            <label for="{{ form.quantity.id_for_label }}" class="form-label">
+                {{ form.quantity.label }}*
+            </label>
+            <div class="input-group">
+               {{ form.quantity }}
+               {{ form.dimension }}
+            </div>
         </div>
         <div class="col-md-3">
             {{ form.assembly_category |as_crispy_field }}
