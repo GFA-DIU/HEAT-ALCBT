@@ -4,9 +4,9 @@ import uuid
 
 from django.db import models
 from django.utils.translation import gettext as _
-from cities_light.models import Country, City
+from cities_light.models import Country
 from geopy.geocoders import Nominatim
-from accounts.models import CustomUser
+from accounts.models import CustomUser, CustomCity
 
 NOMINATIM_AGENT_STRING = os.environ.get("NOMINATIM_AGENT_STRING")
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class BaseGeoModel(models.Model):
     country = models.ForeignKey(
         Country, on_delete=models.SET_NULL, null=True, blank=True
     )
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
+    city = models.ForeignKey(CustomCity, on_delete=models.SET_NULL, null=True, blank=True)
     street = models.CharField(_("Street"), max_length=255, null=True, blank=True)
     number = models.IntegerField(_("Number"), null=True, blank=True)
     zip = models.IntegerField(_("ZIP"), null=True, blank=True)

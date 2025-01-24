@@ -2,7 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
-from cities_light.models import Country, City
+from cities_light.models import Country
+from accounts.models import CustomCity
 
 from .base import BaseModel
 
@@ -218,7 +219,7 @@ class EPD(BaseModel, epdLCAx):
         Country, on_delete=models.SET_NULL, null=True, blank=True
     )
     impacts = models.ManyToManyField(Impact, blank=False, related_name="related_epds", through="EPDImpact")
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
+    city = models.ForeignKey(CustomCity, on_delete=models.SET_NULL, null=True, blank=True)
     category = models.ForeignKey(
         MaterialCategory, on_delete=models.SET_NULL, null=True, blank=True
     )

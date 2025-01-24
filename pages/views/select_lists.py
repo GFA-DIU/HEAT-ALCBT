@@ -4,9 +4,9 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 
-from cities_light.models import City
 from pages.models.epd import MaterialCategory
 from pages.models.assembly import AssemblyTechnique
+from accounts.models import CustomCity
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def select_lists(request):
     if m := request.GET.get('country'):
         country_id = int(m)
-        cities = City.objects.filter(country=country_id).order_by("name")
+        cities = CustomCity.objects.filter(country=country_id).order_by("name")
         return render(
             request,
             "pages/utils/select_list.html",

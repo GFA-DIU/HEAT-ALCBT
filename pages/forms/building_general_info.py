@@ -6,9 +6,10 @@ from django.utils.translation import gettext as _
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit
 
-from cities_light.models import Country, City
+from cities_light.models import Country
 
 from pages.models import Building, CategorySubcategory
+from accounts.models import CustomCity
 
 
 class YearInput(forms.DateInput):
@@ -33,7 +34,7 @@ class BuildingGeneralInformation(forms.ModelForm):
         label="Country"
     )
     city = forms.ModelChoiceField(
-        queryset=City.objects.none(),  # Start with an empty queryset
+        queryset=CustomCity.objects.none(),  # Start with an empty queryset
         widget=forms.Select(attrs={'id': 'city-dropdown', 'class': 'select form-select',}),
         label="City",
         help_text="Select a country first",
@@ -82,10 +83,10 @@ class BuildingGeneralInformation(forms.ModelForm):
 
         if instance:
             if instance.country:
-                self.fields['city'].queryset = City.objects.filter(country=instance.country).order_by('name')
+                self.fields['city'].queryset = CustomCity.objects.filter(country=instance.country).order_by('name')
                 self.initial['country'] = instance.country
             else: 
-                self.fields['city'].queryset = City.objects.none()
+                self.fields['city'].queryset = CustomCity.objects.none()
             # Ensure the selected 'country' is prepopulated
             if instance.category:
                 self.initial['category'] = instance.category
@@ -98,14 +99,14 @@ class BuildingGeneralInformation(forms.ModelForm):
         if "country" in self.data:
             try:
                 country_id = int(self.data.get("country"))
-                self.fields["city"].queryset = City.objects.filter(
+                self.fields["city"].queryset = CustomCity.objects.filter(
                     country_id=country_id
                 ).order_by("name")
             except (ValueError, TypeError):
-                self.fields["city"].queryset = City.objects.none()
+                self.fields["city"].queryset = CustomCity.objects.none()
         elif self.instance.pk:
             # If editing an existing instance, prepopulate the 'city' queryset
-            self.fields["city"].queryset = City.objects.filter(
+            self.fields["city"].queryset = CustomCity.objects.filter(
                 country=self.instance.country
             ).order_by("name")
         # Crispy Forms Layout
