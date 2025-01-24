@@ -3,10 +3,10 @@ from django.utils.translation import gettext as _
 from django.core.exceptions import ValidationError
 
 from cities_light.models import Country
+from accounts.models import CustomCity
 
 from .epd import EPD, Unit
 from .base import BaseModel
-from .city import CustomCity
 
 
 class AssemblyMode(models.TextChoices):

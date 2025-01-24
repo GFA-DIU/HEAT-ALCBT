@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 from pages.models.epd import MaterialCategory
 from pages.models.assembly import AssemblyTechnique
-from pages.models.city import CustomCity
+from accounts.models import CustomCity
 
 logger = logging.getLogger(__name__)
 

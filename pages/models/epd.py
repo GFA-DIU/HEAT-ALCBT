@@ -3,9 +3,9 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from cities_light.models import Country
+from accounts.models import CustomCity
 
 from .base import BaseModel
-from .city import CustomCity
 
 
 INDICATOR_UNIT_MAPPING = {
