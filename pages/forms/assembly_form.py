@@ -14,7 +14,7 @@ from pages.models.building import BuildingAssembly, BuildingAssemblySimulated
 
 
 class AssemblyForm(forms.ModelForm):
-    comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 3}), required=False)
+    comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 2}), required=False)
 
     public = forms.BooleanField(
         required=False,
@@ -84,7 +84,13 @@ class AssemblyForm(forms.ModelForm):
         max_value=10000,
         help_text="Report in years",
         required = True,
-        initial = 50
+        initial = 50,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "type": "number"
+            }   
+        )
     )
     
     class Meta:
