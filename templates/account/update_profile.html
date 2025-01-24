@@ -2,7 +2,14 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-  <h2>Update Profile</h2>
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>Update Profile</h2>
+    <button class="btn btn-danger"
+              hx-confirm="Are you sure you want to delete your profile?"
+              hx-delete="{% url 'update_profile' %}">
+                  Delete
+    </button>
+  </div>
   <form method="post" action="{% url 'update_profile' %}">
     <strong>Account Information</strong>
     {% csrf_token %}
@@ -10,12 +17,8 @@
     <strong>Profile Information</strong>
     {{ profile_form|crispy }}
     <div class="d-flex justify-content-between">
+      <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
       <button type="submit" class="btn btn-primary">Update</button>
-      <button class="btn btn-danger"
-              hx-confirm="Are you sure you want to delete your profile?"
-              hx-delete="{% url 'update_profile' %}">
-                  Delete
-      </button>
     </div>
   </form>
 {% endblock %}
