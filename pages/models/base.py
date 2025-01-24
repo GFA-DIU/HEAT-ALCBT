@@ -6,10 +6,11 @@ from django.db import models
 from django.utils.translation import gettext as _
 from cities_light.models import Country
 from geopy.geocoders import Nominatim
-from accounts.models import CustomUser, CustomCity
+from accounts.models import CustomUser, CustomCity, CustomRegion
 
 NOMINATIM_AGENT_STRING = os.environ.get("NOMINATIM_AGENT_STRING")
 logger = logging.getLogger(__name__)
+
 
 class BaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -24,6 +25,7 @@ class BaseModel(models.Model):
     draft = models.BooleanField(
         _("Draft"), help_text=_("Is it still a draft"), default=False
     )
+
     class Meta:
         abstract = True  # This ensures it won't create its own table.
 
@@ -32,6 +34,7 @@ class BaseGeoModel(models.Model):
     country = models.ForeignKey(
         Country, on_delete=models.SET_NULL, null=True, blank=True
     )
+    region = models.ForeignKey(CustomRegion, on_delete=models.SET_NULL, null=True, blank=True)
     city = models.ForeignKey(CustomCity, on_delete=models.SET_NULL, null=True, blank=True)
     street = models.CharField(_("Street"), max_length=255, null=True, blank=True)
     number = models.IntegerField(_("Number"), null=True, blank=True)
@@ -42,7 +45,7 @@ class BaseGeoModel(models.Model):
     latitude = models.FloatField(_("Latitude"), null=True, blank=True)
 
     def address(self):
-        address_string = [str(self.number)] if  self.number else []
+        address_string = [str(self.number)] if self.number else []
         if self.street:
             address_string.append(self.street)
         if self.zip:
@@ -53,27 +56,26 @@ class BaseGeoModel(models.Model):
     def save(self, *args, **kwargs):
         if self.longitude and self.latitude:
             pass
-        
+
         elif self.number and self.street and self.zip:
             self.calculate_lon_lat()
-        
+
         elif self.city:
             self.longitude, self.latitude = self.city.longitude, self.city.latitude
-        
+
         else:
             self.longitude, self.latitude = None, None
         super().save(*args, **kwargs)
 
     def calculate_lon_lat(self):
         try:
-            geolocator = Nominatim(
-                user_agent=NOMINATIM_AGENT_STRING
-            )
+            geolocator = Nominatim(user_agent=NOMINATIM_AGENT_STRING)
             location = geolocator.geocode(self.address())
             self.longitude, self.latitude = location.longitude, location.latitude
         except Exception as error:
             logger.error(error)
             if self.city:
                 self.longitude, self.latitude = self.city.longitude, self.city.latitude
+
     class Meta:
         abstract = True  # This ensures it won't create its own table.

@@ -17,7 +17,7 @@ class ClimateZone(models.TextChoices):
 
 class BuildingSubcategory(models.Model):
     name = models.CharField(_("Name"), max_length=255)
-   
+
     def __str__(self):
         return f"{self.name}"
 
@@ -38,7 +38,7 @@ class BuildingCategory(models.Model):
     class Meta:
         verbose_name = "Building category"
         verbose_name_plural = "Building categories"
-        
+
 
 class CategorySubcategory(models.Model):
     category = models.ForeignKey(BuildingCategory, on_delete=models.CASCADE)
@@ -74,9 +74,7 @@ class Building(BaseModel, BaseGeoModel):
         blank=True,
     )
     climate_zone = models.CharField(
-        _("Climate"),
-        choices=ClimateZone.choices,
-        max_length=50
+        _("Climate"), choices=ClimateZone.choices, max_length=50
     )
     total_floor_area = models.DecimalField(
         _("Total Floor Area"),
@@ -84,10 +82,10 @@ class Building(BaseModel, BaseGeoModel):
         max_digits=10,
         decimal_places=2,
         null=False,
-        blank=False
+        blank=False,
     )
     cond_floor_area = models.DecimalField(
-        _("Conditional Floor Area"),
+        _("Conditioned Floor Area"),
         help_text=_("Gross floor area [m^2]"),
         max_digits=10,
         decimal_places=2,
@@ -108,6 +106,13 @@ class Building(BaseModel, BaseGeoModel):
         null=True,
         blank=True,
     )
+    reference_period = models.IntegerField(
+        _("Ref. period"),
+        help_text=_("Number of years of building usage"),
+        null=False,
+        blank=False,
+        default=50,
+    )
 
     class Meta:
         verbose_name = "Building"
@@ -115,9 +120,7 @@ class Building(BaseModel, BaseGeoModel):
 
 
 class BuildingAssembly(models.Model):
-    assembly = models.ForeignKey(
-        Assembly, on_delete=models.CASCADE
-    )
+    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
     building = models.ForeignKey(Building, on_delete=models.CASCADE)
     quantity = models.DecimalField(
         _("Quantity"),
@@ -131,7 +134,7 @@ class BuildingAssembly(models.Model):
     reporting_life_cycle = models.IntegerField(
         _("Reporting life-cycle"),
         help_text=_("Reporting life-cycle for assembly"),
-        validators=[MinValueValidator(1), MaxValueValidator(10000)],  
+        validators=[MinValueValidator(1), MaxValueValidator(10000)],
     )
 
     class Meta:
@@ -140,9 +143,7 @@ class BuildingAssembly(models.Model):
 
 
 class BuildingAssemblySimulated(models.Model):
-    assembly = models.ForeignKey(
-        Assembly, on_delete=models.CASCADE
-    )
+    assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
     building = models.ForeignKey(Building, on_delete=models.CASCADE)
     quantity = models.DecimalField(
         _("Quantity"),
@@ -152,12 +153,14 @@ class BuildingAssemblySimulated(models.Model):
         null=False,
         blank=False,
     )
-    unit = models.CharField(_("Unit of Quantity"), max_length=20, choices=Unit.choices, default=Unit.UNKNOWN)
+    unit = models.CharField(
+        _("Unit of Quantity"), max_length=20, choices=Unit.choices, default=Unit.UNKNOWN
+    )
     reporting_life_cycle = models.IntegerField(
         _("Reporting life-cycle"),
         help_text=_("Reporting life-cycle for assembly"),
         validators=[MinValueValidator(1), MaxValueValidator(10000)],
-        default=50,   
+        default=50,
     )
 
     class Meta:

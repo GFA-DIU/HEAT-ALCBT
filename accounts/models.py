@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from cities_light.models import Country, City
+from cities_light.models import Country, Region, City
 from encrypted_json_fields.fields import EncryptedEmailField
 
 
@@ -17,26 +17,42 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
+
 class CustomCity(City):
     class Meta:
-        proxy = True 
+        proxy = True
 
     def __str__(self):
-        return self.name # Show only city name
+        return self.name  # Show only city name
+
+
+class CustomRegion(Region):
+    class Meta:
+        proxy = True
+
+    def __str__(self):
+        return self.name  # Show only city name
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
     )
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True, blank=True)
-    city = models.ForeignKey(CustomCity, on_delete=models.SET_NULL, null=True, blank=True)
+    country = models.ForeignKey(
+        Country, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    city = models.ForeignKey(
+        CustomCity, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     def clean(self):
         # Custom validation logic
         if self.city and self.country:
             if self.city.country != self.country:
-                raise ValidationError("The selected city does not match the selected country.")
+                raise ValidationError(
+                    "The selected city does not match the selected country."
+                )
 
     def __str__(self):
         return self.user.username
@@ -44,6 +60,7 @@ class UserProfile(models.Model):
     class Meta:
         verbose_name = "User Profile"
         verbose_name_plural = "User Profiles"
+
 
 @receiver(post_save, sender=CustomUser)
 def create_or_update_user_profile(sender, instance, created, **kwargs):

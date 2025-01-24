@@ -300,7 +300,15 @@ CITIES_LIGHT_INCLUDE_COUNTRIES = [
     "KH",  # Cambodia
     "DE",  # Germany
 ]
-CITIES_LIGHT_INCLUDE_CITY_TYPES = ["PPL", "PPLA", "PPLC"]
+CITIES_LIGHT_INCLUDE_CITY_TYPES = [
+    "PPL",
+    "PPLA",
+    "PPLA2",
+    "PPLA3",
+    "PPLA4",
+    "PPLA5",
+    "PPLC",
+]
 
 
 LOGGING = {
