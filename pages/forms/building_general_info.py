@@ -36,7 +36,7 @@ class BuildingGeneralInformation(forms.ModelForm):
         label="Country",
     )
     region = forms.ModelChoiceField(
-        queryset=Region.objects.all(),
+        queryset=CustomRegion.objects.all(),
         widget=forms.Select(
             attrs={
                 "id": "region-dropdown",
