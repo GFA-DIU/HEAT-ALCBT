@@ -120,7 +120,7 @@ def get_epd_list(request, component) -> tuple[Page, AssemblyDimension]:
 
     # Pagination setup for EPD list
     lazy_queryset = LazyProcessor(filtered_list, dimension)
-    paginator = Paginator(lazy_queryset, 10)  # Show 10 items per page
+    paginator = Paginator(lazy_queryset, 5)  # Show 10 items per page
     page_number = request.GET.get("page", 1)
 
     return paginator.get_page(page_number), dimension
