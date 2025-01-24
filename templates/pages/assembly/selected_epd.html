@@ -3,7 +3,7 @@
     id="epd-{{epd.id}}" 
     data-id="{{ epd.id }}">
     <div class="col-5" >
-        <h5 class="mb-1" title="{{epd.name}}">{{ epd.name|slice:":30"|strip }}{%if epd.name|length > 30 %}... {% endif %}</h5>
+        <h6 class="mb-1" title="{{epd.name}}">{{ epd.name|truncatechars:75}}</h6>
         <div class="d-flex flex-column">
             <span class="text-muted ms-1">{{epd.country}}</span>
         </div>

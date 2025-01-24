@@ -12,7 +12,7 @@
     {% for epd in epd_list %}
     <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
         <div class="col-10">
-            <h5 class="mb-1">{{ epd.name }}</h5>
+            <h6 class="mb-1" title="{{epd.name}}">{{ epd.name |truncatechars:75}}</h6>
             <div class="row">
                 <span class="text-muted col-3">{{ epd.country }}</span>
                 <div class="col gap-3">
