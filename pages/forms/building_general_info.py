@@ -27,6 +27,7 @@ class BuildingGeneralInformation(forms.ModelForm):
         queryset=Country.objects.all(),
         widget=forms.Select(
             attrs={
+                "id": "country-dropdown",
                 "hx-get": "/select_lists/",  # HTMX request to the root URL
                 "hx-trigger": "change",  # Trigger HTMX on change event
                 "hx-target": "#region-dropdown",  # Update the City dropdown
@@ -47,6 +48,7 @@ class BuildingGeneralInformation(forms.ModelForm):
             }
         ),
         label="Region",
+        required=False,
     )
     city = forms.ModelChoiceField(
         queryset=CustomCity.objects.none(),  # Start with an empty queryset
