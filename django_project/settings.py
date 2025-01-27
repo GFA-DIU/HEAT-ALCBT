@@ -260,7 +260,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 # Security
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
 # https://forum.djangoproject.com/t/improving-herokus-suggestions-for-django/26135/2
-# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-ssl-redirect
 SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
