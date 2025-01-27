@@ -39,8 +39,12 @@ def building_simulation(request, building_id):
         # disable the form fields and button
         for field in form.fields:
             form.fields[field].disabled = True
-
-        form.helper.layout[4].flat_attrs = "disabled"
+        for field in detailedForm.fields:
+            detailedForm.fields[field].disabled = True
+        if hasattr(form.helper.layout[3], "flat_attrs"):
+            form.helper.layout[3].flat_attrs = "disabled"
+        if hasattr(detailedForm.helper.layout[3], "flat_attrs"):
+            detailedForm.helper.layout[3].flat_attrs = "disabled"
 
         context["form_general_info"] = form
         context["form_detailed_info"] = detailedForm

@@ -187,5 +187,6 @@ class BuildingGeneralInformation(forms.ModelForm):
                     Column("construction_year", css_class="col-md-3"),
                 ),
             ),
+            # Update building_simulation.py line 44 if this changes
             Submit("submit", "Submit", css_class="btn btn-primary"),
         )

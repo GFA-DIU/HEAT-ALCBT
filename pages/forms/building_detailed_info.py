@@ -47,5 +47,6 @@ class BuildingDetailedInformation(forms.ModelForm):
                     Column("floors_below_ground", css_class="col-md-3"),
                 ),
             ),
+            # Update building_simulation.py line 46 if this changes 
             Submit("submit", "Submit", css_class="btn btn-primary"),
         )
