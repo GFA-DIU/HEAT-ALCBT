@@ -4,7 +4,7 @@ from django import forms
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Submit
+from crispy_forms.layout import HTML, Layout, Fieldset, Row, Column, Submit
 
 from cities_light.models import Country
 
@@ -81,10 +81,8 @@ class BuildingGeneralInformation(forms.ModelForm):
             "category",
             "construction_year",
             "climate_zone",
+            "reference_period",
             "total_floor_area",
-            "cond_floor_area",
-            "floors_above_ground",
-            "floors_below_ground",
         ]
 
         # labels = {
@@ -157,32 +155,37 @@ class BuildingGeneralInformation(forms.ModelForm):
         # Crispy Forms Layout
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            # Name and Category in the first row
-            Row(
-                Column("name", css_class="col-md-6"),
-                Column("country", css_class="col-md-3"),
-                Column("region", css_class="col-md-3"),
+            # Location Information Section
+            Fieldset(
+                "Location",
+                # Name and Category in the first row
+                Row(
+                    Column("name", css_class="col-md-6"),
+                    Column("country", css_class="col-md-3"),
+                    Column("region", css_class="col-md-3"),
+                ),
+                # Country, ZIP and City in the second row
+                Row(
+                    Column("city", css_class="col-md-3"),
+                    Column("zip", css_class="col-md-2"),
+                    Column("street", css_class="col-md-5"),
+                    Column("number", css_class="col-md-2"),
+                ),
             ),
-            # Country, ZIP and City in the second row
-            Row(
-                Column("city", css_class="col-md-3"),
-                Column("zip", css_class="col-md-2"),
-                Column("street", css_class="col-md-5"),
-                Column("number", css_class="col-md-2"),
-            ),
-            # Street and Number
-            Row(
-                Column("category", css_class="col-md-5"),
-                Column("construction_year", css_class="col-md-3"),
-                Column("climate_zone", css_class="col-md-3"),
-                Column("reference_period", css_class="col-md-3"),
-            ),
-            # Street and Number in the last row with Postal code behind
-            Row(
-                Column("total_floor_area", css_class="col-md-3"),
-                Column("cond_floor_area", css_class="col-md-3"),
-                Column("floors_above_ground", css_class="col-md-3"),
-                Column("floors_below_ground", css_class="col-md-3"),
+            HTML("<hr>"),  # Add a horizontal rule
+            Fieldset(
+                "Category",
+                # Street and Number
+                Row(
+                    Column("category", css_class="col-md-4"),
+                    Column("climate_zone", css_class="col-md-4"),
+                    Column("reference_period", css_class="col-md-4"),
+                ),
+                # Street and Number in the last row with Postal code behind
+                Row(
+                    Column("total_floor_area", css_class="col-md-3"),
+                    Column("construction_year", css_class="col-md-3"),
+                ),
             ),
             Submit("submit", "Submit", css_class="btn btn-primary"),
         )

@@ -6,11 +6,11 @@ from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
+from pages.forms.building_detailed_info import BuildingDetailedInformation
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.assembly import DIMENSION_UNIT_MAPPING
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 from pages.views.building.impact_calculation import calculate_impacts
-
 
 
 logger = logging.getLogger(__name__)
@@ -21,15 +21,20 @@ def building(request, building_id=None):
     logger.info("Building - Request method: %s, user: %s", request.method, request.user)
 
     # General Info
-    if request.method == "POST" and request.POST.get("action") == "general_information":
-        return handle_general_information_submit(request, building_id)
+    if request.method == "POST":
+        if request.POST.get("action") == "general_information":
+            return handle_information_submit(request, building_id, True)
+        if request.POST.get("action") == "detailed_information":
+            return handle_information_submit(request, building_id, False)
 
     elif request.method == "DELETE":
         return handle_assembly_delete(request, building_id, simulation=False)
 
     # Full reload
     elif building_id:
-        context, form = handle_building_load(request, building_id, simulation=False)
+        context, form, detailedForm = handle_building_load(
+            request, building_id, simulation=False
+        )
 
     else:
         # Blank for new building
@@ -39,8 +44,10 @@ def building(request, building_id=None):
             "structural_components": [],
         }
         form = BuildingGeneralInformation()
+        detailedForm = BuildingDetailedInformation()
 
     context["form_general_info"] = form
+    context["form_detailed_info"] = detailedForm
     context["simulation"] = False
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
@@ -54,7 +61,7 @@ def handle_building_load(request, building_id, simulation):
     else:
         BuildingAssemblyModel = BuildingAssembly
         relation_name = "buildingassembly_set"
-    
+
     building = get_object_or_404(
         Building.objects.filter(
             created_by=request.user
@@ -78,8 +85,9 @@ def handle_building_load(request, building_id, simulation):
         "building": building,
         "structural_components": structural_components,
     }
-    
+
     form = BuildingGeneralInformation(instance=building)
+    detailedForm = BuildingDetailedInformation(instance=building)
 
     logger.info(
         "Found building: %s with %d structural components",
@@ -87,39 +95,53 @@ def handle_building_load(request, building_id, simulation):
         len(context["structural_components"]),
     )
 
-    return context, form
+    return context, form, detailedForm
 
 
 @transaction.atomic
-def handle_general_information_submit(request, building_id):
+def handle_information_submit(request, building_id, general):
     building = (
         get_object_or_404(Building, created_by=request.user, pk=building_id)
         if building_id
         else None
     )
-    form = BuildingGeneralInformation(
-        request.POST, instance=building
-    )  # Bind form to instance
+    if general:
+        form = BuildingGeneralInformation(
+            request.POST, instance=building
+        )  # Bind form to instance
+    else:
+        form = BuildingDetailedInformation(
+            request.POST, instance=building
+        )  # Bind form to instance
     try:
         if form.is_valid():
             building = form.save(commit=False)
             building.created_by = request.user
             building.save()
-            logger.info("User %s successfully saved building %s", request.user, building)
+            logger.info(
+                "User %s successfully saved building %s", request.user, building
+            )
             return redirect("building", building_id=building.id)
         else:
             logger.info(
                 "User %s could not save building %s. Form had following errors",
-                request.user, building, form.errors
+                request.user,
+                building,
+                form.errors,
             )
             return HttpResponseServerError()
     except Exception:
-        logger.exception("Submit of general information for building %s failed", building.pk)
+        logger.exception(
+            "Submit of general information for building %s failed", building.pk
+        )
         logger.info(
             "User %s could not savee building %s. From had following errors",
-            request.user, building, form.errors
+            request.user,
+            building,
+            form.errors,
         )
         return HttpResponseServerError()
+
 
 @transaction.atomic
 def handle_assembly_delete(request, building_id, simulation):
@@ -136,8 +158,10 @@ def handle_assembly_delete(request, building_id, simulation):
         )
         component.delete()
     except Exception:
-        logger.exception("Deletion of assembly %s for building %s failed.", component_id, building_id)
-        
+        logger.exception(
+            "Deletion of assembly %s for building %s failed.", component_id, building_id
+        )
+
     # Fetch the updated list of assemblies for the building
     updated_list = BuildingAssemblyModel.objects.filter(
         building__created_by=request.user,
@@ -155,7 +179,7 @@ def handle_assembly_delete(request, building_id, simulation):
         "User %s successfully deleted assembly %s - simulation %s",
         request.user,
         component_id,
-        simulation
+        simulation,
     )
     return render(
         request, "pages/building/structural_info/assemblies_list.html", context
@@ -169,7 +193,12 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
         assembly_impact_list = []
         for p in b_assembly.assembly.product_set.all():
             assembly_impact_list.extend(
-                calculate_impacts(b_assembly.assembly.dimension, b_assembly.quantity, b_assembly.reporting_life_cycle, p)
+                calculate_impacts(
+                    b_assembly.assembly.dimension,
+                    b_assembly.quantity,
+                    b_assembly.reporting_life_cycle,
+                    p,
+                )
             )
 
         # get GWP impact for each assembly to display in list
