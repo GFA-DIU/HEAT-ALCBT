@@ -49,8 +49,12 @@ def map_view(request):
     # Create the map
     f = folium.Figure(width=1000, height=500)
     folium_map = folium.Map(
-        location=[24.021379, 58.640202], zoom_start=2, tiles="OpenStreetMap", height="60%"
+        location=[24.021379, 58.640202], zoom_start=2, tiles="OpenStreetMap", height="60%",
+        attr=(
+            '<a href="https://www.openstreetmap.org" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
+        )   
     )
+
     for object in objects:
         if object.latitude and object.longitude:
             folium.Marker(
