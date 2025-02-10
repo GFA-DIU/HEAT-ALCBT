@@ -47,7 +47,7 @@ class AssemblyForm(forms.ModelForm):
                 "class": "select form-select",
             }
         ),
-        label="Technique",
+        label="Construction Technique",
         help_text="Select a category",
         required=False,
     )
