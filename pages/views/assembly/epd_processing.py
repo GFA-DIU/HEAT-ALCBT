@@ -52,7 +52,8 @@ class FilteredEPD:
     name: str
     country: str
     category: Optional[str]
-    impact: float
+    impact_gwp: float
+    impact_penrt: float
     conversions: str
     declared_unit: str
     selection_text: str
@@ -105,7 +106,8 @@ class LazyProcessor:
                 name=epd.name,
                 country=epd.country.name if epd.country else "",
                 category=epd.category.name_en if epd.category else None,
-                impact=epd.get_impact_sum(),
+                impact_gwp=epd.get_gwp_impact_sum(),
+                impact_penrt = epd.get_penrt_impact_sum(),
                 conversions=[],
                 declared_unit=epd.declared_unit,
                 selection_text=sel_text,

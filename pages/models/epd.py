@@ -236,8 +236,12 @@ class EPD(BaseModel, epdLCAx):
     def __str__(self):
         return self.name
 
-    def get_impact_sum(self):
+    def get_gwp_impact_sum(self):
        impacts = EPDImpact.objects.filter(epd=self, impact__impact_category="gwp", impact__life_cycle_stage="a1a3")
+       return round(sum(impact.value for impact in impacts), 3)
+
+    def get_penrt_impact_sum(self):
+       impacts = EPDImpact.objects.filter(epd=self, impact__impact_category="penrt", impact__life_cycle_stage="a1a3")
        return round(sum(impact.value for impact in impacts), 3)
 
 class EPDImpact(models.Model):
