@@ -5,37 +5,49 @@
     <div class="col-5" >
         <h6 class="mb-1" title="{{epd.name}}">{{ epd.name|truncatechars:75}}</h6>
         <div class="d-flex flex-column">
-            <span class="text-muted ms-1">{{epd.country}}</span>
+            <div class="d-flex align-items-center">
+                <span class="text-muted ms-1 me-3">{{ epd.country }}</span>
+                <textarea 
+                type="text"
+                name="material_{{ epd.id }}_description"
+                class="form-control form-control-sm"
+                rows="2"
+                placeholder="Description"
+                maxlength="255">{% if epd.description%}{{epd.description}}{% endif %}</textarea>
+            </div>
         </div>
     </div>
     <div class="col-5 container" >
-        <div class="row align-items-center">
-            <span class="col-4 text-muted">{{ epd.selection_text }}</span>
+        <div class="ms-5">
+            <label for="material_{{ epd.id }}_quantity" class="text-muted">{{ epd.selection_text }}</label>
             {% if epd.selection_unit == "unknown" %} 
-            <input type="number" 
+            <input type="number"
+                   id="material_{{ epd.id }}_quantity"  
                    name="material_{{ epd.id }}_quantity" 
-                   class="form-control form-control-sm col"
-                   placeholder="Quantity"
-                   style="margin-left: 0.75rem"
+                   class="form-control form-control-sm w-auto"
                    min="1"
                    {% if epd.selection_quantity%}value="{{ epd.selection_quantity}}"{% endif %}
                    required>
-            <input name="material_{{ epd.id }}_unit" 
+            <input name="material_{{ epd.id }}_unit"
                        value="{{ epd.selection_unit }}"
                        hidden>
             {% else %}
-            <div class="input-group input-group-sm ms-auto col row">
+            <div class="input-group input-group-sm">
                 <input type="number" 
+                       id="material_{{ epd.id }}_quantity"  
                        name="material_{{ epd.id }}_quantity" 
-                       class="form-control col"
+                       class="form-control w-auto"
                        placeholder="Quantity"
                        min="1"
                        {% if epd.selection_unit == "percent" %}max="100"{% endif %}
                        step="{{ epd.selection_unit|get_step }}"
-                       {% if epd.selection_quantity%}value="{{ epd.selection_quantity}}"{% endif %}
+                       {% if epd.selection_quantity%}value="{{ epd.selection_quantity }}"{% endif %}
+                       style="max-width: 80px;"
                        required>
-                <input name="material_{{ epd.id }}_unit" 
-                       class="input-group-text col" 
+
+                       <input name="material_{{ epd.id }}_unit" 
+                       class="input-group-text w-auto"
+                       style="max-width: 80px;"
                        value='{{ epd.selection_unit|slice:":10"|strip }}'
                        title="{{ epd.selection_unit }}"
                        readonly>

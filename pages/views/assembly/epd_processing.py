@@ -19,6 +19,7 @@ class SelectedEPD:
     selection_text: Optional[str]
     selection_quantity: float
     name: str
+    description: str
     category: Optional[str]
     country: Optional[str]
     source: Optional[str]
@@ -38,6 +39,7 @@ class SelectedEPD:
             selection_text=sel_text,
             selection_quantity=float(product.quantity),
             name=product.epd.name,
+            description=product.description if product.description else "None",
             category=product.epd.category.name_en if product.epd.category else None,
             country=product.epd.country.name if product.epd.country else "",
             source=product.epd.source,
