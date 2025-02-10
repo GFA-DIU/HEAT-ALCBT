@@ -10,7 +10,7 @@ from pages.models.assembly import (
     AssemblyTechnique,
     AssemblyCategoryTechnique,
 )
-from pages.models.building import BuildingAssembly, BuildingAssemblySimulated
+from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 
 
 class AssemblyForm(forms.ModelForm):
@@ -124,6 +124,7 @@ class AssemblyForm(forms.ModelForm):
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA
+            self.fields["country"].initial = Building.objects.get(id=building_id).country
 
         # Dynamically update the queryset for assembly_technique to enable form validation
         if category_id := self.data.get("assembly_category"):
