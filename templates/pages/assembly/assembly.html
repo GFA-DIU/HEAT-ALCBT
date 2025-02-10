@@ -63,17 +63,27 @@
 
 
     <input type="hidden" name="action" value="form_submission">
-    <h4>Selected EPDs</h4>
+
+    <h4>Materials</h4>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#epdSearchModal">
         Add from EPD Library
     </button>
-    <div class="card mb-3 card-body" style="min-height: 150px; max-height: 500px; overflow-y: auto;">
-        <ul id="selected_epds" class="list-group">
+    <div class="card mb-3 card-body border-0 d-flex justify-content-center align-items-center"
+        style="min-height: 150px; max-height: 500px; overflow-y: auto; position: relative;">
+        <span id="select_epd_text" 
+                class="text-warning position-absolute card card-body"
+                style="font-weight: bold;"
+                {% if selected_epds %} hidden {% endif %}>
+            Please select at least one EPD
+        </span>
+
+        <ul id="selected_epds" class="list-group w-100">
             {% for epd in selected_epds %}
-            {% include "pages/assembly/selected_epd.html" with epd=epd %}
+                {% include "pages/assembly/selected_epd.html" with epd=epd %}
             {% endfor %}
         </ul>
     </div>
+
 
     <div class="d-flex flex-row justify-content-between align-items-center">
         <div>
@@ -91,11 +101,6 @@
                 Save
             </button>
         </div>
-        <small id="select_epd_text" 
-            class="text-warning" 
-            {%if selected_epds%}hidden{%endif%}>
-            Please select at least one EPD
-        </small>
     </div>
 </form>
 

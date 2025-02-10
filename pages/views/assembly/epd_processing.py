@@ -39,7 +39,7 @@ class SelectedEPD:
             selection_text=sel_text,
             selection_quantity=float(product.quantity),
             name=product.epd.name,
-            description=product.description if product.description else "None",
+            description=product.description,
             category=product.epd.category.name_en if product.epd.category else None,
             country=product.epd.country.name if product.epd.country else "",
             source=product.epd.source,
