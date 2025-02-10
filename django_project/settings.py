@@ -15,7 +15,7 @@ env = environ.Env()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Take environment variables from .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
@@ -49,7 +49,7 @@ if not IS_HEROKU_APP:
 if IS_HEROKU_APP:
     ALLOWED_HOSTS = ["*"]
 else:
-    ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0", "[::]"]
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", "0.0.0.0", "[::]"]
 
 
 # Application definition
@@ -88,12 +88,11 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
-    
     # own
-    'django_project.middleware.LoginRequiredMiddleware',
+    "django_project.middleware.LoginRequiredMiddleware",
 ]
 
-LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ['admin:login', 'admin:index']
+LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ["admin:login", "admin:index"]
 
 # https://github.com/morlandi/django-encrypted-json-fields
 EJF_ENCRYPTION_KEYS = [os.environ.get("FIELD_ENCRYPTION_KEY", "")]
@@ -182,7 +181,7 @@ USE_I18N = True
 USE_TZ = True
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
-LOCALE_PATHS = [BASE_DIR / 'locale']
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -212,11 +211,11 @@ WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/stable/ref/settings/#default-auto-field
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # django-crispy-forms
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
-CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
@@ -239,7 +238,7 @@ SITE_ID = 1
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = "home"
-ACCOUNT_SIGNUP_REDIRECT_URL = 'update_profile'
+ACCOUNT_SIGNUP_REDIRECT_URL = "update_profile"
 
 # https://django-allauth.readthedocs.io/en/latest/views.html#logout-account-logout
 ACCOUNT_LOGOUT_REDIRECT_URL = "home"
@@ -290,59 +289,68 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
 )
 
 
-
 # Cities light
 # https://django-cities-light.readthedocs.io/en/stable-3.x.x/full.html#module-cities_light.settings
-CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en', 'abbr']
+CITIES_LIGHT_TRANSLATION_LANGUAGES = ["en", "abbr"]
 CITIES_LIGHT_INCLUDE_COUNTRIES = [
-    'IN',  # India
-    'ID',  # Indonesia
-    'TH',  # Thailand
-    'VN',  # Vietnam
-    'KH',  # Cambodia
-    'DE',  # Germany
+    "IN",  # India
+    "ID",  # Indonesia
+    "TH",  # Thailand
+    "VN",  # Vietnam
+    "KH",  # Cambodia
+    "DE",  # Germany
 ]
-CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLC']
+CITIES_LIGHT_INCLUDE_CITY_TYPES = [
+    "PPL",
+    "PPLA",
+    "PPLA2",
+    "PPLA3",
+    "PPLA4",
+    "PPLA5",
+    "PPLC",
+]
 
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         },
-        'django.server': DEFAULT_LOGGING['formatters']['django.server'],  # Use Django's default formatter for server logs
+        "django.server": DEFAULT_LOGGING["formatters"][
+            "django.server"
+        ],  # Use Django's default formatter for server logs
     },
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': 'logs/root.log',
-            'formatter': 'standard',
-            'encoding': 'utf-8',
-            'mode': 'a',
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "logs/root.log",
+            "formatter": "standard",
+            "encoding": "utf-8",
+            "mode": "a",
         },
-        'django.server': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',  # Typically used for console output in development
-            'formatter': 'django.server',
+        "django.server": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",  # Typically used for console output in development
+            "formatter": "django.server",
         },
     },
-    'root': {
-        'handlers': ['file'],
-        'level': 'INFO',
+    "root": {
+        "handlers": ["file"],
+        "level": "INFO",
     },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'INFO',
-            'propagate': False,
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'django.server': {  # Specific logger for server logs
-            'handlers': ['django.server'],
-            'level': 'INFO',
-            'propagate': False,
+        "django.server": {  # Specific logger for server logs
+            "handlers": ["django.server"],
+            "level": "INFO",
+            "propagate": False,
         },
     },
 }
