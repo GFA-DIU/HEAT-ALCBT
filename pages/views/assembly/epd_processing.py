@@ -19,6 +19,7 @@ class SelectedEPD:
     selection_text: Optional[str]
     selection_quantity: float
     name: str
+    description: str
     category: Optional[str]
     country: Optional[str]
     source: Optional[str]
@@ -38,6 +39,7 @@ class SelectedEPD:
             selection_text=sel_text,
             selection_quantity=float(product.quantity),
             name=product.epd.name,
+            description=product.description,
             category=product.epd.category.name_en if product.epd.category else None,
             country=product.epd.country.name if product.epd.country else "",
             source=product.epd.source,
@@ -50,7 +52,8 @@ class FilteredEPD:
     name: str
     country: str
     category: Optional[str]
-    impact: float
+    impact_gwp: float
+    impact_penrt: float
     conversions: str
     declared_unit: str
     selection_text: str
@@ -103,7 +106,8 @@ class LazyProcessor:
                 name=epd.name,
                 country=epd.country.name if epd.country else "",
                 category=epd.category.name_en if epd.category else None,
-                impact=epd.get_impact_sum(),
+                impact_gwp=epd.get_gwp_impact_sum(),
+                impact_penrt = epd.get_penrt_impact_sum(),
                 conversions=[],
                 declared_unit=epd.declared_unit,
                 selection_text=sel_text,
@@ -120,7 +124,7 @@ def get_epd_list(request, component) -> tuple[Page, AssemblyDimension]:
 
     # Pagination setup for EPD list
     lazy_queryset = LazyProcessor(filtered_list, dimension)
-    paginator = Paginator(lazy_queryset, 10)  # Show 10 items per page
+    paginator = Paginator(lazy_queryset, 5)  # Show 10 items per page
     page_number = request.GET.get("page", 1)
 
     return paginator.get_page(page_number), dimension

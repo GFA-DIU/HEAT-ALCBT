@@ -40,6 +40,7 @@ def save_assembly(request, assembly: Assembly, building_instance: Building, simu
                     assembly=assembly,
                     quantity=v.get("quantity"),
                     input_unit=v.get("unit"),
+                    description=v.get("description"),
                 )
             
             BuildingAssemblyModel.objects.update_or_create(
@@ -67,6 +68,7 @@ def parse_selected_epds(request) -> tuple[dict, dict[str, EPD]]:
             selected_epds[epd_id] = {
                     "quantity": float(value),
                     "unit": request.POST[f"material_{epd_id}_unit"],
+                    "description": request.POST[f"material_{epd_id}_description"],
                 }
 
     # Pre-fetch EPDImpact and Impact objects

@@ -20,4 +20,4 @@ def strip(value):
 def get_step(selection_unit):
     if selection_unit in [Unit.PCS, Unit.M2, Unit.M]:
         return "1"
-    return "0.001"
+    return "0.01"

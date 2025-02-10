@@ -10,11 +10,11 @@ from pages.models.assembly import (
     AssemblyTechnique,
     AssemblyCategoryTechnique,
 )
-from pages.models.building import BuildingAssembly, BuildingAssemblySimulated
+from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 
 
 class AssemblyForm(forms.ModelForm):
-    comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 3}), required=False)
+    comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 2}), required=False)
 
     public = forms.BooleanField(
         required=False,
@@ -47,7 +47,7 @@ class AssemblyForm(forms.ModelForm):
                 "class": "select form-select",
             }
         ),
-        label="Technique",
+        label="Construction Technique",
         help_text="Select a category",
         required=False,
     )
@@ -60,7 +60,7 @@ class AssemblyForm(forms.ModelForm):
                 "hx-trigger": "change",  # Trigger HTMX on change event
                 "hx-target": "#epd-list",  # Update the City dropdown
                 "hx-vals": '{"action": "filter"}',  # Dynamically include the dropdown value
-                "class": "select form-select",
+                "class": "form-select flex-grow-0 w-auto",
             }
         ),
         label="Input Dimension",
@@ -70,15 +70,27 @@ class AssemblyForm(forms.ModelForm):
         label="Quantity",
         required=True,
         decimal_places=2,
-        max_digits=10
+        max_digits=10,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "type": "number"
+            }   
+        )
     )
     reporting_life_cycle = forms.IntegerField(
-        label="Ref. period",
+        label="Life Span",
         min_value=1,
         max_value=10000,
         help_text="Report in years",
         required = True,
-        initial = 50
+        initial = 50,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "type": "number"
+            }   
+        )
     )
     
     class Meta:
@@ -112,6 +124,7 @@ class AssemblyForm(forms.ModelForm):
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA
+            self.fields["country"].initial = Building.objects.get(id=building_id).country
 
         # Dynamically update the queryset for assembly_technique to enable form validation
         if category_id := self.data.get("assembly_category"):

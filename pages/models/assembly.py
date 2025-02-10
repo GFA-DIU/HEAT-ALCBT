@@ -34,10 +34,10 @@ DIMENSION_UNIT_MAPPING = {
 
 
 class AssemblyDimension(models.TextChoices):
-    AREA = "area", "Area (m^2)" # Area-type calculations
-    LENGTH = "length", "Length (m)" # Length-type calculations   
-    MASS = "mass", "Mass (kg)" # Length-type calculations   
-    VOLUME = "volume", "Volume (m^3)" # Length-type calculations   
+    AREA = "area", "m²" # Area-type calculations
+    LENGTH = "length", "m" # Length-type calculations   
+    MASS = "mass", "kg" # Length-type calculations   
+    VOLUME = "volume", "m³" # Length-type calculations   
 
 
 class AssemblyTechnique(models.Model):

@@ -15,12 +15,11 @@
         <div class="col-3 d-flex justify-content-center align-items-center">
             <span class="badge border border-success text-success bg-transparent rounded-pill" style="font-size: medium;"> Carbon: {{ component.impacts|floatformat:"-2" }}kg CO2eq/m</span>
         </div>
-
         <!-- Action Buttons -->
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
             <a href="{% url 'component_edit' assembly_id=component.assembly_id building_id=building_id %}?simulation={{simulation}}" class="btn btn-secondary">Edit</a>
             <button class="btn btn-danger"
-                    {% if simulation %}
+                    {% if simulation == "true" %}
                     hx-delete="{% url 'building_simulation' building_id=building_id %}?component={{ component.assembly_id }}" 
                     {% else %}
                     hx-delete="{% url 'building' building_id=building_id %}?component={{ component.assembly_id }}" 
