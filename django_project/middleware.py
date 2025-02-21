@@ -11,6 +11,7 @@ class LoginRequiredMiddleware:
             allowed_paths = [
                 reverse('account_login'),
                 reverse('account_signup'),
+                reverse('account_reset_password'),
                 reverse('admin:login'),
                 reverse('privacy_policy'),
                 reverse('terms_of_use'),
