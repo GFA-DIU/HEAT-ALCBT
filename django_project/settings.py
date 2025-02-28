@@ -288,6 +288,16 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
     "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True
 )
 
+# Brevo API (https://github.com/getbrevo/brevo-python)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "in-v3.mailjet.com"
+EMAIL_PORT = 587  # Use 587 instead of 465
+EMAIL_USE_TLS = True  # Use TLS instead of SSL
+EMAIL_USE_SSL = False  # Ensure SSL is disabled
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+
 
 # Cities light
 # https://django-cities-light.readthedocs.io/en/stable-3.x.x/full.html#module-cities_light.settings
