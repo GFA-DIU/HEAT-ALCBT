@@ -1,0 +1,144 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Building View{% endblock title %}
+{% block content %}
+
+<h3 class="text-center p-3">BOQ Editor</h3>
+<div class="container">
+    {% if assembly_id %}
+<form hx-post="{% url 'boq_edit' assembly_id=assembly_id building_id=building_id %}{% if simulation %}?simulation=true{% endif %}">
+{% else %}
+<form hx-post="{% url 'boq' building_id=building_id %}{% if simulation %}?simulation=true{% endif %}">
+{% endif %}
+    {% csrf_token %}
+    <div class="row">
+      <!-- Name and Type in the first row -->
+      <div class="col-md-6">
+          {{ form.name |as_crispy_field }}
+      </div>
+      <div class="col-md-6">
+        <label for="{{ form.reporting_life_cycle.id_for_label }}" class="form-label">
+            {{ form.reporting_life_cycle.label }}*
+        </label>
+        <div class="input-group mb-3">
+            {{ form.reporting_life_cycle }}
+            <span class="input-group-text" id="reporting_life_cycle_addon">years</span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-6">
+        {{ form.assembly_category |as_crispy_field }}
+      </div>
+      <div class="col-6">
+        {{ form.assembly_technique |as_crispy_field }}
+      </div>
+    </div>
+    
+    <div class="row">
+      {{ form.comment |as_crispy_field }}
+    </div>
+
+
+    <input type="hidden" name="action" value="form_submission">
+
+    <h4>Materials</h4>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#epdSearchModal">
+        Add from EPD Library
+    </button>
+    <div class="card mb-3 card-body border-0 d-flex justify-content-center align-items-center"
+        style="min-height: 150px; max-height: 500px; overflow-y: auto; position: relative;">
+        <span id="select_epd_text" 
+                class="text-warning position-absolute card card-body"
+                style="font-weight: bold;"
+                {% if selected_epds %} hidden {% endif %}>
+            Please select at least one EPD
+        </span>
+
+        <ul id="selected_epds" class="list-group w-100">
+            {% for epd in selected_epds %}
+                {% include "pages/assembly/selected_epd.html" with epd=epd %}
+            {% endfor %}
+        </ul>
+    </div>
+
+
+    <div class="d-flex flex-row justify-content-between align-items-center">
+        <div>
+            <a {% if simulation %}
+               href="{% url 'building_simulation' building_id=building_id %}" 
+               {% else %}
+               href="{% url 'building' building_id=building_id %}" 
+               {% endif %}
+               class="btn btn-secondary">Cancel</a>
+            <button 
+                id="save_button" 
+                type="submit" 
+                class="btn btn-primary" 
+                {%if not selected_epds%}disabled{%endif%}>
+                Save
+            </button>
+        </div>
+    </div>
+</form>
+
+<div id="epdSearchModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title w-100 text-center">EPD Library</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="container">
+                <div id="epd-list">
+                    {% include "pages/assembly/epd_list.html" %}
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const epdList = document.getElementById('epd-list');
+    const selectedEpdList = document.getElementById('selected_epds');
+    const saveButton = document.getElementById('save_button');
+    const selectEpdText = document.getElementById('select_epd_text');
+
+    // Remove material from selected list
+    selectedEpdList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('remove-epd')) {
+            event.preventDefault(); // Prevent form submission
+            event.stopPropagation(); // Stop the event from bubbling up
+            
+            // Compare with 1 because this code is executed before hx-post response
+            if (selectedEpdList && selectedEpdList.children.length === 1) {
+                saveButton.disabled = true;
+                selectEpdText.hidden = false;
+            }
+
+            const epdId = event.target.dataset.id;
+            // Optionally, re-enable the "Add" button in the library
+            const addButton = document.querySelector(`#epd-list button.add-epd[data-id="${epdId}"]`);
+            if (addButton) {
+                addButton.disabled = false;
+            }
+        }
+    });
+    // Add material to selected list
+    epdList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('add-epd')) {
+            saveButton.disabled = false;
+            selectEpdText.hidden = true;
+        }
+    });
+
+});
+</script>
+
+{% endblock %}

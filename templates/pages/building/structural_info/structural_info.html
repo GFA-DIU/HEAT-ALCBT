@@ -1,15 +1,23 @@
 {% if building_id %}
-  <button class="btn btn-primary m-2 mt-3"
+<button
+  class="btn btn-primary m-2 mt-3"
   hx-get="{% url 'component' building_id=building_id %}?add_component=step_1&simulation={{simulation}}"
   hx-target="#modal-body"
   hx-swap="innerHTML"
-  >Add Component</button>
-{% else %}
-  Please save the building before adding any components
-{% endif %}
+>
+  Add Component
+</button>
+<a
+  class="btn btn-primary m-2 mt-3"
+  href="{% url 'boq' building_id=building_id %}?simulation={{simulation}}"
+  >Add BOQ</a
+>
+{% else %} Please save the building before adding any components {% endif %}
 
 <div id="modal" class="modal fade" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+  <div
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+  >
     <div class="modal-content">
       <div id="modal-body"></div>
     </div>
@@ -20,22 +28,21 @@
   {% include "pages/building/structural_info/assemblies_list.html" %}
 </div>
 
-
 <script src="https://unpkg.com/htmx.org@1.6.1"></script>
 <!-- Custom JavaScript -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Ensure Bootstrap modal is initialized
-    const modalElement = document.getElementById('modal');
-    console.log('Modal Element:', modalElement);
+    const modalElement = document.getElementById("modal");
+    console.log("Modal Element:", modalElement);
     const modal = new bootstrap.Modal(modalElement);
 
     // Listen for HTMX swaps
-    htmx.on('htmx:afterSwap', (e) => {
-      console.log('HTMX Swap Event:', e);
-      console.log('Target ID:', e.detail.target.id);
-      if (e.detail.target.id === 'modal-body') {
-        console.log('Showing modal...');
+    htmx.on("htmx:afterSwap", (e) => {
+      console.log("HTMX Swap Event:", e);
+      console.log("Target ID:", e.detail.target.id);
+      if (e.detail.target.id === "modal-body") {
+        console.log("Showing modal...");
         modal.show();
       }
     });

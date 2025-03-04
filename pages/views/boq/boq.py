@@ -5,10 +5,10 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
+from pages.forms.boq_assembly_form import BOQAssemblyForm
 from pages.forms.epds_filter_form import EPDsFilterForm
-from pages.models.assembly import Assembly, AssemblyDimension, Product
+from pages.models.assembly import AssemblyDimension, Product
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
-from pages.forms.assembly_form import AssemblyForm
 
 from pages.models.epd import EPD
 from pages.views.assembly.epd_filtering import get_epd_dimension_info
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 @require_http_methods(["GET", "POST", "DELETE"])
-def component_edit(request, building_id, assembly_id=None):
+def boq_edit(request, building_id, assembly_id=None):
     """
     View to either edit an existing component or create a new one with pagination for EPDs.
     """
@@ -30,11 +30,13 @@ def component_edit(request, building_id, assembly_id=None):
         request.user,
         building,
         assembly,
-        context["simulation"]
+        context["simulation"],
     )
 
     if request.method == "POST" and request.POST.get("action") == "form_submission":
-        return handle_assembly_submission(request, assembly, building, context["simulation"])
+        return handle_assembly_submission(
+            request, assembly, building, context["simulation"]
+        )
 
     # Update EPD List
     elif (
@@ -59,17 +61,17 @@ def component_edit(request, building_id, assembly_id=None):
 
         epd = get_object_or_404(EPD, pk=epd_id)
         epd.selection_quantity = 1
-        epd.selection_text, epd.selection_unit = get_epd_dimension_info(dimension, epd.declared_unit)
+        epd.selection_text, epd.selection_unit = get_epd_dimension_info(
+            dimension, epd.declared_unit
+        )
         return render(request, "pages/assembly/selected_epd.html", {"epd": epd})
 
     elif request.method == "POST" and request.POST.get("action") == "remove_epd":
         return HttpResponse()
 
-    else:
-        context = handle_assembly_load(building_id, assembly, context)
-
+    context = handle_assembly_load(building_id, assembly, context)
     # Render full template for non-HTMX requests
-    return render(request, "pages/assembly/editor_own_page.html", context)
+    return render(request, "pages/assembly/boq.html", context)
 
 
 def set_up_view(request, building_id, assembly_id):
@@ -105,7 +107,9 @@ def set_up_view(request, building_id, assembly_id):
 
 
 def handle_assembly_submission(request, assembly, building, simulation):
-    save_assembly(request, assembly, building, simulation)
+    save_assembly(
+        request, assembly, building, simulation, assembly_form=BOQAssemblyForm
+    )
     # The redirect shortcut is not working properly with HTMX
     # return redirect("building", building_id=building_instance.id)
     # instead use the following:
@@ -130,7 +134,7 @@ def handle_assembly_load(building_id, assembly, context):
         context["selected_epds_ids"] = [
             selected_epd.id for selected_epd in selected_epds
         ]
-    context["form"] = AssemblyForm(
+    context["form"] = BOQAssemblyForm(
         instance=assembly, building_id=building_id, simulation=context.get("simulation")
     )
     context["dimension"] = assembly.dimension if assembly else AssemblyDimension.AREA
