@@ -1,0 +1,242 @@
+[
+  {
+    "model": "pages.assemblycategory",
+    "pk": 15,
+    "fields": { "name": "Finishes", "tag": "extension" }
+  },
+  {
+    "model": "pages.assemblycategory",
+    "pk": 16,
+    "fields": { "name": "Miscellaneous", "tag": "extension" }
+  },
+  {
+    "model": "pages.assemblycategory",
+    "pk": 17,
+    "fields": { "name": "Staircases and Ramps", "tag": "extension" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 67,
+    "fields": { "name": "Artificial grass" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 68,
+    "fields": { "name": "PCC for Footings" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 69,
+    "fields": { "name": "Ready-Mix Concrete Foundations" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 70,
+    "fields": { "name": "Ready-Mix Concrete Columns" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 71,
+    "fields": { "name": "Cement Based Plaster" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 72,
+    "fields": { "name": "White wash" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 73,
+    "fields": { "name": "Primer" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 74,
+    "fields": { "name": "Paint" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 75,
+    "fields": { "name": "Putty" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 76,
+    "fields": { "name": "Waterproofing" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 77,
+    "fields": { "name": "Lintel, Sunshade and Sill Beam" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 78,
+    "fields": { "name": "Construction chemical" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 79,
+    "fields": { "name": "Cement Mortar for Tiles" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 80,
+    "fields": { "name": "Aluminium Doors" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 81,
+    "fields": { "name": "Aluminium  Windows" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 82,
+    "fields": { "name": "Fire Doors" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 83,
+    "fields": { "name": "Anti termite treatment" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 84,
+    "fields": { "name": "Timber Doors and windows" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 85,
+    "fields": { "name": "In-Situ Reinforced Concrete Staircases and Ramps" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 86,
+    "fields": { "name": "MS Railings" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 87,
+    "fields": { "name": "SS Railings" }
+  },
+  {
+    "model": "pages.assemblytechnique",
+    "pk": 88,
+    "fields": { "name": "Timber Railings" }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 119,
+    "fields": { "category": 5, "technique": 68, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 120,
+    "fields": { "category": 5, "technique": 69, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 121,
+    "fields": { "category": 6, "technique": 70, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 122,
+    "fields": { "category": 15, "technique": 71, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 123,
+    "fields": { "category": 15, "technique": 72, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 124,
+    "fields": { "category": 15, "technique": 73, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 125,
+    "fields": { "category": 15, "technique": 74, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 126,
+    "fields": { "category": 15, "technique": 75, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 127,
+    "fields": { "category": 15, "technique": 76, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 128,
+    "fields": { "category": 16, "technique": 77, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 129,
+    "fields": { "category": 16, "technique": 78, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 130,
+    "fields": { "category": 16, "technique": 79, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 131,
+    "fields": { "category": 16, "technique": 80, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 132,
+    "fields": { "category": 16, "technique": 81, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 133,
+    "fields": { "category": 16, "technique": 82, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 134,
+    "fields": { "category": 16, "technique": 83, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 135,
+    "fields": { "category": 16, "technique": 84, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 136,
+    "fields": { "category": 17, "technique": 85, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 137,
+    "fields": { "category": 17, "technique": 86, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 138,
+    "fields": { "category": 17, "technique": 87, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 139,
+    "fields": { "category": 17, "technique": 88, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 140,
+    "fields": { "category": 3, "technique": 67, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 141,
+    "fields": { "category": 5, "technique": 70, "description": null }
+  }
+]
