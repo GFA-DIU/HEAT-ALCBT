@@ -228,5 +228,15 @@
     "model": "pages.assemblycategorytechnique",
     "pk": 139,
     "fields": { "category": 17, "technique": 88, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 140,
+    "fields": { "category": 3, "technique": 67, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 141,
+    "fields": { "category": 5, "technique": 70, "description": null }
   }
 ]
