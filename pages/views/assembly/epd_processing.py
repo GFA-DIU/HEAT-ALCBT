@@ -102,17 +102,17 @@ class LazyProcessor:
         """Encapsulates the logic for preprocessing EPDs."""
         sel_text, sel_unit = get_epd_dimension_info(self.dimension, epd.declared_unit)
         return FilteredEPD(
-                id=epd.pk,
-                name=epd.name,
-                country=epd.country.name if epd.country else "",
-                category=epd.category.name_en if epd.category else None,
-                impact_gwp=epd.get_gwp_impact_sum(),
-                impact_penrt = epd.get_penrt_impact_sum(),
-                conversions=[],
-                declared_unit=epd.declared_unit,
-                selection_text=sel_text,
-                selection_unit=sel_unit,
-                source=epd.source,
+            id=epd.pk,
+            name=epd.name,
+            country=epd.country.name if epd.country else "",
+            category=epd.category.name_en if epd.category else None,
+            impact_gwp=epd.get_gwp_impact_sum(),
+            impact_penrt=epd.get_penrt_impact_sum(),
+            conversions=[],
+            declared_unit=epd.declared_unit,
+            selection_text=sel_text,
+            selection_unit=sel_unit,
+            source=epd.source,
         )
 
 
@@ -121,10 +121,8 @@ def get_epd_list(request, component) -> tuple[Page, AssemblyDimension]:
     filtered_list, dimension = get_filtered_epd_list(
         request, component.dimension if component else AssemblyDimension.AREA
     )
-
     # Pagination setup for EPD list
     lazy_queryset = LazyProcessor(filtered_list, dimension)
     paginator = Paginator(lazy_queryset, 5)  # Show 10 items per page
     page_number = request.GET.get("page", 1)
-
     return paginator.get_page(page_number), dimension
