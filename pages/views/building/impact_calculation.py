@@ -39,7 +39,11 @@ def calculate_impacts(
                 {
                     "assembly_id": p.assembly.pk,
                     "epd_id": p.epd.pk,
-                    "assembly_category": p.assembly.classification.category,
+                    "assembly_category": (
+                        p.assembly.classification.category
+                        if p.assembly.classification
+                        else ""
+                    ),
                     "material_category": p.epd.category,
                     "impact_type": epdimpact.impact,
                     "impact_value": Decimal(factor)
@@ -72,7 +76,10 @@ def calculate_impacts(
             # impact = impact_per_unit * conversion_kg_per_m3 * total_m2 * thickness_to_meter / epd_base_amount
             conversion_f = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
-                Decimal(assembly_quantity) * Decimal(p.quantity) * Decimal(conversion_f) / Decimal(cm_to_m)
+                Decimal(assembly_quantity)
+                * Decimal(p.quantity)
+                * Decimal(conversion_f)
+                / Decimal(cm_to_m)
             )
 
         case (AssemblyDimension.VOLUME, Unit.M3):
@@ -107,7 +114,10 @@ def calculate_impacts(
             # impact = impact_per_unit * conversion_kg_per_m3 * total_length * surface_cross-section_to_m2 / epd_base_amount
             conversion_f = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
-                Decimal(assembly_quantity) * Decimal(p.quantity) * Decimal(conversion_f) / Decimal(cm_to_m**2)
+                Decimal(assembly_quantity)
+                * Decimal(p.quantity)
+                * Decimal(conversion_f)
+                / Decimal(cm_to_m**2)
             )
 
         case _:

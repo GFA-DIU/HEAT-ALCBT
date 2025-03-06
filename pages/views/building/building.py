@@ -212,7 +212,11 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
             {
                 "assembly_id": b_assembly.assembly.pk,
                 "assembly_name": b_assembly.assembly.name,
-                "assembly_classification": b_assembly.assembly.classification.category,
+                "assembly_classification": (
+                    b_assembly.assembly.classification.category
+                    if b_assembly.assembly.classification
+                    else ""
+                ),
                 "quantity": b_assembly.quantity,
                 "impacts": sum(gwpa1a3),
                 "unit": DIMENSION_UNIT_MAPPING.get(b_assembly.assembly.dimension),
