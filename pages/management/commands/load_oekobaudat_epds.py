@@ -56,7 +56,7 @@ def store_epd(epd_data: dict):
             "conversions": epd_data["conversions"],
             "category": classification,
             "source": epd_data["source"],
-            "type": EPDType.OFFICAL,
+            "type": EPDType.OFFICIAL,
             "country": country,
             "declared_amount": epd_data["declared_amount"],
             "version": epd_data["version"],
@@ -82,7 +82,9 @@ def store_epd(epd_data: dict):
                 impact, _ = Impact.objects.get_or_create(
                     impact_category=impact_category_key,
                     life_cycle_stage=life_cycle_stage_key,
-                    unit=INDICATOR_UNIT_MAPPING.get(impact_category_key),  # Default unit, update as needed
+                    unit=INDICATOR_UNIT_MAPPING.get(
+                        impact_category_key
+                    ),  # Default unit, update as needed
                 )
 
                 # Create or update the EPDImpact linking table

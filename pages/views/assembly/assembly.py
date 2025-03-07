@@ -12,6 +12,8 @@ from pages.forms.assembly_form import AssemblyForm
 
 from pages.models.epd import EPD
 from pages.views.assembly.epd_filtering import get_epd_dimension_info
+
+
 from pages.views.assembly.epd_processing import SelectedEPD, get_epd_list
 from pages.views.assembly.save_to_assembly import save_assembly
 
@@ -30,11 +32,13 @@ def component_edit(request, building_id, assembly_id=None):
         request.user,
         building,
         assembly,
-        context["simulation"]
+        context["simulation"],
     )
 
     if request.method == "POST" and request.POST.get("action") == "form_submission":
-        return handle_assembly_submission(request, assembly, building, context["simulation"])
+        return handle_assembly_submission(
+            request, assembly, building, context["simulation"]
+        )
 
     # Update EPD List
     elif (
@@ -59,7 +63,9 @@ def component_edit(request, building_id, assembly_id=None):
 
         epd = get_object_or_404(EPD, pk=epd_id)
         epd.selection_quantity = 1
-        epd.selection_text, epd.selection_unit = get_epd_dimension_info(dimension, epd.declared_unit)
+        epd.selection_text, epd.selection_unit = get_epd_dimension_info(
+            dimension, epd.declared_unit
+        )
         return render(request, "pages/assembly/selected_epd.html", {"epd": epd})
 
     elif request.method == "POST" and request.POST.get("action") == "remove_epd":
@@ -93,11 +99,14 @@ def set_up_view(request, building_id, assembly_id):
         assembly = None
 
     epd_list, dimension = get_epd_list(request, assembly)
+
+    req = request.POST if request.method == "POST" else request.GET
     context = {
         "assembly_id": assembly_id,
         "building_id": building_id,
+        "filters": req,
         "epd_list": epd_list,
-        "epd_filters_form": EPDsFilterForm(request.POST),
+        "epd_filters_form": EPDsFilterForm(req),
         "dimension": dimension,  # Is also required for full reload
         "simulation": simulation,
     }

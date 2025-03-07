@@ -90,7 +90,7 @@ def store_epd(epd_data: dict, country: Country, data: dict):
             "conversions": epd_data["conversions"],
             "category": classification,
             "source": epd_data["source"],
-            "type": EPDType.OFFICAL,
+            "type": EPDType.OFFICIAL,
             "country": country,
             "declared_amount": epd_data["declared_amount"],
             "version": epd_data["version"],
