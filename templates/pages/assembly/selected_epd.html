@@ -38,7 +38,7 @@
                        name="material_{{ epd.id }}_quantity" 
                        class="form-control w-auto"
                        placeholder="Quantity"
-                       min="1"
+                       min="0"
                        {% if epd.selection_unit == "percent" %}max="100"{% endif %}
                        step="{{ epd.selection_unit|get_step }}"
                        {% if epd.selection_quantity%}value="{{ epd.selection_quantity }}"{% endif %}
