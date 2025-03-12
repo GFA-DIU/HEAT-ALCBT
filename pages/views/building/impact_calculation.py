@@ -4,6 +4,7 @@ from pages.models.assembly import AssemblyDimension, Product
 from pages.models.epd import Unit
 
 
+# TODO: Add Try/Catch when trying to fetch a non-existing conversion and handle and display error
 def calculate_impacts(
     dimension: AssemblyDimension,
     assembly_quantity: int,
@@ -74,8 +75,8 @@ def calculate_impacts(
                 Decimal(assembly_quantity) * Decimal(quantity) / Decimal(cm_to_m)
             )
         case (AssemblyDimension.AREA, Unit.M3 | Unit.KG):
-            # impact = impact_per_unit * conversion_kg_per_m3 * total_m2 * thickness_to_meter / epd_base_amount
-            conversion_f = fetch_conversion("kg/m^3")
+            # impact = impact_per_unit * conversion_kg_per_m2 * total_m2 * thickness_to_meter / epd_base_amount
+            conversion_f = fetch_conversion("kg/m^2")
             impacts = calculate_impact(
                 Decimal(assembly_quantity)
                 * Decimal(quantity)
@@ -112,8 +113,8 @@ def calculate_impacts(
                 Decimal(assembly_quantity) * Decimal(quantity) / Decimal(cm_to_m**2)
             )
         case (AssemblyDimension.LENGTH, Unit.KG):
-            # impact = impact_per_unit * conversion_kg_per_m3 * total_length * surface_cross-section_to_m2 / epd_base_amount
-            conversion_f = fetch_conversion("kg/m^3")
+            # impact = impact_per_unit * conversion_kg_per_m * total_length * surface_cross-section_to_m2 / epd_base_amount
+            conversion_f = fetch_conversion("kg/m")
             impacts = calculate_impact(
                 Decimal(assembly_quantity)
                 * Decimal(quantity)
