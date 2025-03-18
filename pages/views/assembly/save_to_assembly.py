@@ -5,6 +5,7 @@ from django.db.models import Prefetch
 from django.http import HttpResponseServerError
 
 from pages.forms.assembly_form import AssemblyForm
+from pages.forms.boq_assembly_form import BOQAssemblyForm
 from pages.models.assembly import Assembly, Product
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 from pages.models.epd import EPD, EPDImpact
@@ -18,14 +19,14 @@ def save_assembly(
     assembly: Assembly,
     building_instance: Building,
     simulation=None,
-    assembly_form=AssemblyForm,
+    is_boq=False,
 ) -> None:
     # Save to BuildingAssembly or -Simulated, depending on Mode
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
     else:
         BuildingAssemblyModel = BuildingAssembly
-
+    assembly_form = BOQAssemblyForm if is_boq else AssemblyForm
     # Bind the form to the existing Assembly instance
     form = assembly_form(
         request.POST,
@@ -40,6 +41,7 @@ def save_assembly(
 
             # DB OPERATIONS
             assembly = form.save()  # Save the updated Assembly instance
+            assembly.is_boq = is_boq
             assembly.created_by = request.user
             assembly.save()
 
@@ -60,7 +62,7 @@ def save_assembly(
                 assembly=assembly,
                 defaults={
                     "quantity": request.POST.get(
-                        "quantity"
+                        "quantity", 1
                     ),  # Get quantity from POST data
                     "reporting_life_cycle": request.POST.get(
                         "reporting_life_cycle"

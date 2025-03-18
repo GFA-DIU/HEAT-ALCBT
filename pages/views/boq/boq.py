@@ -107,9 +107,7 @@ def set_up_view(request, building_id, assembly_id):
 
 
 def handle_assembly_submission(request, assembly, building, simulation):
-    save_assembly(
-        request, assembly, building, simulation, assembly_form=BOQAssemblyForm
-    )
+    save_assembly(request, assembly, building, simulation, is_boq=True)
     # The redirect shortcut is not working properly with HTMX
     # return redirect("building", building_id=building_instance.id)
     # instead use the following:

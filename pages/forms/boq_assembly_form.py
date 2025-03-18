@@ -57,6 +57,7 @@ class BOQAssemblyForm(forms.ModelForm):
         fields = [
             "name",
             "comment",
+            "classification",
         ]
 
     def __init__(self, *args, **kwargs):

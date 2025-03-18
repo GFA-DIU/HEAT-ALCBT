@@ -11,18 +11,19 @@ from .base import BaseModel
 
 class AssemblyMode(models.TextChoices):
     """Part of default or not.
-    
+
     Adapted from LCAx, where it's used for EPDs.
     ```Python
     class SubType(Enum):
         generic = 'generic'
         specific = 'specific'
         industry = 'industry'
-        representative = 'representative'    
+        representative = 'representative'
     ```
     """
-    GENERIC = "generic", "Generic" # "Use for Quick Assessment"
-    CUSTOM = "custom", "Custom" # "Use for Detailed Assessment"
+
+    GENERIC = "generic", "Generic"  # "Use for Quick Assessment"
+    CUSTOM = "custom", "Custom"  # "Use for Detailed Assessment"
 
 
 DIMENSION_UNIT_MAPPING = {
@@ -34,16 +35,17 @@ DIMENSION_UNIT_MAPPING = {
 
 
 class AssemblyDimension(models.TextChoices):
-    AREA = "area", "m²" # Area-type calculations
-    LENGTH = "length", "m" # Length-type calculations   
-    MASS = "mass", "kg" # Length-type calculations   
-    VOLUME = "volume", "m³" # Length-type calculations   
+    AREA = "area", "m²"  # Area-type calculations
+    LENGTH = "length", "m"  # Length-type calculations
+    MASS = "mass", "kg"  # Length-type calculations
+    VOLUME = "volume", "m³"  # Length-type calculations
 
 
 class AssemblyTechnique(models.Model):
     """
     Represents an individual assembly category within a group.
     """
+
     name = models.CharField(max_length=255)
 
     class Meta:
@@ -59,9 +61,14 @@ class AssemblyCategory(models.Model):
     """
     Represents a group of assemblies, e.g., 'Bottom Floor Construction'.
     """
+
     name = models.CharField(max_length=255, unique=True)
     tag = models.CharField(max_length=50)
-    techniques = models.ManyToManyField(AssemblyTechnique,through="AssemblyCategoryTechnique", related_name="categories" )
+    techniques = models.ManyToManyField(
+        AssemblyTechnique,
+        through="AssemblyCategoryTechnique",
+        related_name="categories",
+    )
 
     class Meta:
         verbose_name = "Assembly Group"
@@ -73,17 +80,21 @@ class AssemblyCategory(models.Model):
 
 class AssemblyCategoryTechnique(models.Model):
     category = models.ForeignKey(AssemblyCategory, on_delete=models.CASCADE)
-    technique = models.ForeignKey(AssemblyTechnique, on_delete=models.CASCADE, null=True, blank=True)
+    technique = models.ForeignKey(
+        AssemblyTechnique, on_delete=models.CASCADE, null=True, blank=True
+    )
     description = models.TextField(null=True, blank=True)
 
 
 class Assembly(BaseModel):
-    """Structural Element consisting of Products.
-    """
+    """Structural Element consisting of Products."""
+
     country = models.ForeignKey(
         Country, on_delete=models.SET_NULL, null=True, blank=True
     )
-    city = models.ForeignKey(CustomCity, on_delete=models.SET_NULL, null=True, blank=True)
+    city = models.ForeignKey(
+        CustomCity, on_delete=models.SET_NULL, null=True, blank=True
+    )
     mode = models.CharField(
         _("Assembly Mode"),
         max_length=20,
@@ -97,7 +108,7 @@ class Assembly(BaseModel):
         default=AssemblyDimension.AREA,
     )
     classification = models.ForeignKey(
-         AssemblyCategoryTechnique, on_delete=models.SET_NULL, null=True, blank=True
+        AssemblyCategoryTechnique, on_delete=models.SET_NULL, null=True, blank=True
     )
     comment = models.TextField(_("Comment"), null=True, blank=True)
     description = models.TextField(_("Description"), null=True, blank=True)
@@ -105,6 +116,7 @@ class Assembly(BaseModel):
     products = models.ManyToManyField(
         EPD, blank=True, related_name="assemblies", through="Product"
     )
+    is_boq = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -112,6 +124,7 @@ class Assembly(BaseModel):
 
 class Product(models.Model):
     """Join Table for EPDs and Assemblied. Products are EPDs with quantity and results."""
+
     description = models.CharField(
         _("Description"), max_length=255, null=True, blank=True
     )
@@ -136,14 +149,16 @@ class Product(models.Model):
         Validates that the `unit` matches the expected unit for the chosen `impact_category`.
         """
         super().clean()
-        
+
         from pages.views.assembly.epd_filtering import get_epd_dimension_info
-        
-        _t, expected_unit = get_epd_dimension_info(self.assembly.dimension, self.epd.declared_unit)
+
+        _t, expected_unit = get_epd_dimension_info(
+            self.assembly.dimension, self.epd.declared_unit
+        )
         if self.input_unit != expected_unit:
             raise ValidationError(
                 {
-                    'input_unit': _(
+                    "input_unit": _(
                         f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
                         f"Expected unit: '{expected_unit}'."
                     )
