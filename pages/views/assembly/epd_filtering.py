@@ -61,7 +61,7 @@ def filter_by_dimension(epds: BaseManager[EPD], dimension: AssemblyDimension):
             declared_units = [Unit.M3, Unit.M2, Unit.KG, Unit.PCS]
             # Limit to KG EPDs that have gross density
             additional_filters = Q(declared_unit=Unit.KG) & Q(
-                conversions__contains=[{"unit": "kg/m^3"}]
+                conversions__contains=[{"unit": "kg/m^2"}]
             ) | ~Q(declared_unit=Unit.KG)
         case AssemblyDimension.VOLUME:
             declared_units = [Unit.M3, Unit.KG, Unit.PCS]
@@ -75,7 +75,7 @@ def filter_by_dimension(epds: BaseManager[EPD], dimension: AssemblyDimension):
             declared_units = [Unit.M3, Unit.M, Unit.KG, Unit.PCS]
             # Limit to KG EPDs that have gross density
             additional_filters = Q(declared_unit=Unit.KG) & Q(
-                conversions__contains=[{"unit": "kg/m^3"}]
+                conversions__contains=[{"unit": "kg/m"}]
             ) | ~Q(declared_unit=Unit.KG)
         case _:
             return epds

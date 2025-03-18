@@ -15,16 +15,15 @@ from pages.views.building.building import get_assemblies
 
 logger = logging.getLogger(__name__)
 
+
 def get_building_dashboard(user, building_id, dashboard_type: str, simulation: str):
     if dashboard_type == "assembly":
         return building_dashboard_assembly(user, building_id, simulation)
     elif dashboard_type == "material":
         return building_dashboard_material(user, building_id, simulation)
     else:
-        logger.info("Dashboard type not defined", 
-            user, building_id, dashboard_type
-        )
-        return HttpResponseServerError()    
+        logger.info("Dashboard type not defined", user, building_id, dashboard_type)
+        return HttpResponseServerError()
 
 
 def building_dashboard_material(user, building_id, simulation):
@@ -55,7 +54,7 @@ def prep_building_dashboard_df(user, building_id, simulation):
         BuildingAssemblyModel = BuildingAssemblySimulated
     else:
         BuildingAssemblyModel = BuildingAssembly
-    
+
     building = get_object_or_404(
         Building.objects.filter(
             created_by=user
@@ -73,10 +72,10 @@ def prep_building_dashboard_df(user, building_id, simulation):
 
     # Build structural components and impacts in one step
     structural_components, impact_list = get_assemblies(building.prefetched_components)
-    
+
     if not structural_components:
         return HttpResponse()
-        
+
     # Prepare DataFrame
     df = pd.DataFrame.from_records(impact_list)
     # filter to impacts of interest
@@ -110,7 +109,7 @@ def _building_dashboard_base(df, key_column: str):
     colorscale_green = _generate_discrete_colors(
         start_color=(36, 191, 91), end_color=(154, 225, 177), n=df.shape[0]
     )
-    
+
     # Create a 2x2 layout: top row for pies, bottom row for indicators
     fig = make_subplots(
         rows=2,
@@ -120,8 +119,8 @@ def _building_dashboard_base(df, key_column: str):
             [{"type": "domain"}, {"type": "domain"}],
         ],
         subplot_titles=[
-            "<b>Embodied Carbon</b><br>[kg CO2eq/m²/a]<br> ",
-            "<b>Embodied Energy</b><br>[MJ/m²/a]<br> ",
+            "<b>Embodied Carbon</b><br>[kg CO₂eq/m·yr]<br> ",
+            "<b>Embodied Energy</b><br>[MJ/m²·yr]<br> ",
             "",
             "",
         ],
@@ -243,7 +242,7 @@ def _building_dashboard_base(df, key_column: str):
 
     pie_plot = plot(
         fig, output_type="div", config={"displaylogo": False, "displayModeBar": False}
-    )    
+    )
     return pie_plot
 
 
