@@ -28,9 +28,12 @@ def calculate_impacts(
 
     """
 
-    def fetch_conversion(unit):
+    def fetch_conversion(unit: str) -> str | None:
         """Fetch conversion factor based on the unit."""
-        return next(c["value"] for c in p.epd.conversions if c["unit"] == unit)
+        try:
+            return next(c["value"] for c in p.epd.conversions if c["unit"] == unit)
+        except:
+            return None
 
     def calculate_impact(factor=1):
         """Calculate impacts using a given factor and normalized by EPD base amount and reporting life_cycle."""
@@ -74,9 +77,9 @@ def calculate_impacts(
             impacts = calculate_impact(
                 Decimal(assembly_quantity) * Decimal(quantity) / Decimal(cm_to_m)
             )
-        case (AssemblyDimension.AREA, Unit.M3 | Unit.KG):
+        case (AssemblyDimension.AREA, Unit.KG):
             # impact = impact_per_unit * conversion_kg_per_m2 * total_m2 * thickness_to_meter / epd_base_amount
-            conversion_f = fetch_conversion("kg/m^2")
+            conversion_f = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
                 Decimal(assembly_quantity)
                 * Decimal(quantity)
@@ -107,7 +110,7 @@ def calculate_impacts(
         case (AssemblyDimension.LENGTH, Unit.M):
             # impact = impact_per_unit * total_length * num_elements / epd_base_amount
             impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(quantity))
-        case (AssemblyDimension.LENGTH, Unit.M3 | Unit.KG):
+        case (AssemblyDimension.LENGTH, Unit.M3):
             # impact = impact_per_unit * total_length * surface_cross-section_to_m2 / epd_base_amount
             impacts = calculate_impact(
                 Decimal(assembly_quantity) * Decimal(quantity) / Decimal(cm_to_m**2)
