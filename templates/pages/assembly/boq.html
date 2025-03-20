@@ -28,14 +28,6 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-6">
-        {{ form.assembly_category |as_crispy_field }}
-      </div>
-      <div class="col-6">
-        {{ form.assembly_technique |as_crispy_field }}
-      </div>
-    </div>
     
     <div class="row">
       {{ form.comment |as_crispy_field }}
@@ -59,7 +51,7 @@
 
         <ul id="selected_epds" class="list-group w-100">
             {% for epd in selected_epds %}
-                {% include "pages/assembly/selected_epd.html" with epd=epd %}
+                {% include "pages/assembly/selected_epd.html" with epd=epd categories=categories %}
             {% endfor %}
         </ul>
     </div>

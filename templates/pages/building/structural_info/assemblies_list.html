@@ -6,8 +6,11 @@
         <div class="col-6">
             <h5 class="mb-1">{{ component.assembly_name }}</h5>
             <div class="d-flex flex-column">
+                {%if not component.is_boq%}
                 <span class="text-muted ms-1">{{ component.assembly_classification }}</span>
-                <span class="text-muted ms-1">Quantity: {{ component.quantity|floatformat:"-2" }}{{ component.unit|superscript_units|safe }}</span>
+                <span class="text-muted ms-1">Quantity: {{ component.quantity|floatformat:"-2" }}{{ component.unit|superscript_units|safe }}</span>{%else%}
+                <span class="text-muted ms-1">Bill of quantities (BOQ)</span>
+                {%endif%}
             </div>
         </div>
 

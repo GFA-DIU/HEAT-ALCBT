@@ -7,7 +7,7 @@ from django.views.decorators.http import require_http_methods
 
 from pages.forms.boq_assembly_form import BOQAssemblyForm
 from pages.forms.epds_filter_form import EPDsFilterForm
-from pages.models.assembly import AssemblyDimension, Product
+from pages.models.assembly import AssemblyCategory, AssemblyDimension, Product
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 
 from pages.models.epd import EPD
@@ -61,10 +61,16 @@ def boq_edit(request, building_id, assembly_id=None):
 
         epd = get_object_or_404(EPD, pk=epd_id)
         epd.selection_quantity = 1
-        epd.selection_text, epd.selection_unit = get_epd_dimension_info(
-            dimension, epd.declared_unit
+        epd.selection_text = "Quantity"
+        epd.selection_unit = epd.declared_unit
+
+        categories = AssemblyCategory.objects.all()
+
+        return render(
+            request,
+            "pages/assembly/selected_epd.html",
+            {"epd": epd, "categories": categories, "is_boq": True},
         )
-        return render(request, "pages/assembly/selected_epd.html", {"epd": epd})
 
     elif request.method == "POST" and request.POST.get("action") == "remove_epd":
         return HttpResponse()
@@ -127,11 +133,13 @@ def handle_assembly_submission(request, assembly, building, simulation):
 def handle_assembly_load(building_id, assembly, context):
     if assembly:
         products = Product.objects.filter(assembly=assembly).select_related("epd")
-        selected_epds = [SelectedEPD.parse_product(p) for p in products]
+        selected_epds = [SelectedEPD.parse_product(p, True) for p in products]
         context["selected_epds"] = selected_epds
         context["selected_epds_ids"] = [
             selected_epd.id for selected_epd in selected_epds
         ]
+    context["is_boq"] = True
+    context["categories"] = AssemblyCategory.objects.all()
     context["form"] = BOQAssemblyForm(
         instance=assembly, building_id=building_id, simulation=context.get("simulation")
     )

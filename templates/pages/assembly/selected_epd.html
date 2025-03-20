@@ -17,8 +17,21 @@
             </div>
         </div>
     </div>
-    <div class="col-5 container" >
-        <div class="ms-5">
+    {% if is_boq %}
+    <div class="col container" >
+        <label for="material_{{ epd.id }}_category" class="text-muted">Category</label>
+        <select id="material_{{ epd.id }}_category"
+                name="material_{{ epd.id }}_category"
+                class="select form-select form-select-sm">
+            {% for category in categories %}
+            <option value="{{category.id}}"
+                    {% if category.id == epd.classification.category.id %} selected {% endif %}>
+             {{category.tag}} - {{category.name}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+    <div class="col-3 container" >
             <label for="material_{{ epd.id }}_quantity" class="text-muted">{{ epd.selection_text }}</label>
             {% if epd.selection_unit == "unknown" %} 
             <input type="number"
@@ -53,7 +66,6 @@
                        readonly>
             </div>
             {% endif %}
-        </div>
     </div>
     <div class="d-flex flex-column ms-auto gap-2">
         <a href="{{epd.source}}" 

@@ -3,10 +3,11 @@ import logging
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import HttpResponseServerError
+from django.shortcuts import get_object_or_404
 
 from pages.forms.assembly_form import AssemblyForm
 from pages.forms.boq_assembly_form import BOQAssemblyForm
-from pages.models.assembly import Assembly, Product
+from pages.models.assembly import Assembly, AssemblyCategoryTechnique, Product
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 from pages.models.epd import EPD, EPDImpact
 
@@ -49,12 +50,17 @@ def save_assembly(
 
             # Save to products
             for k, v in selected_epds.items():
+                classification = AssemblyCategoryTechnique.objects.get(
+                    category_id=v.get("category"),
+                    technique_id=v.get("technique") or None,
+                )
                 Product.objects.create(
                     epd=epd_map[k],
                     assembly=assembly,
                     quantity=v.get("quantity"),
                     input_unit=v.get("unit"),
                     description=v.get("description"),
+                    classification=classification,
                 )
 
             BuildingAssemblyModel.objects.update_or_create(
@@ -82,12 +88,14 @@ def save_assembly(
             assembly.pk,
             building_instance.pk,
         )
+        raise HttpResponseServerError()
 
 
 def parse_selected_epds(request) -> tuple[dict, dict[str, EPD]]:
     """Get user input and db info for selected EPDs."""
     # Identify selected EPDs
     selected_epds = {}
+    # If struct. component classification comes from assembly. If BOQ classification comes from epd
     for key, value in request.POST.items():
         if key.startswith("material_") and "_quantity" in key:
             epd_id = key.split("_")[1]
@@ -95,6 +103,9 @@ def parse_selected_epds(request) -> tuple[dict, dict[str, EPD]]:
                 "quantity": float(value),
                 "unit": request.POST[f"material_{epd_id}_unit"],
                 "description": request.POST[f"material_{epd_id}_description"],
+                "category": request.POST.get(f"material_{epd_id}_category")
+                or request.POST.get("assembly_category"),
+                "technique": request.POST.get("assembly_technique", None),
             }
 
     # Pre-fetch EPDImpact and Impact objects

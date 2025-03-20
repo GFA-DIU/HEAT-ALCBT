@@ -23,15 +23,19 @@ class SelectedEPD:
     category: Optional[str]
     country: Optional[str]
     source: Optional[str]
+    classification: Optional[str]
 
     @classmethod
-    def parse_product(cls, product: Product):
+    def parse_product(cls, product: Product, is_boq_product=False):
         """
         Parses a Product instance into a SelectedEPD dataclass.
         """
-        sel_text, _ = get_epd_dimension_info(
-            product.assembly.dimension, product.epd.declared_unit
-        )
+        if is_boq_product:
+            sel_text = "Quantity"
+        else:
+            sel_text, _ = get_epd_dimension_info(
+                product.assembly.dimension, product.epd.declared_unit
+            )
 
         return cls(
             id=str(product.epd.id),
@@ -43,6 +47,7 @@ class SelectedEPD:
             category=product.epd.category.name_en if product.epd.category else None,
             country=product.epd.country.name if product.epd.country else "",
             source=product.epd.source,
+            classification=product.classification,
         )
 
 

@@ -107,9 +107,7 @@ class Assembly(BaseModel):
         choices=AssemblyDimension.choices,
         default=AssemblyDimension.AREA,
     )
-    classification = models.ForeignKey(
-        AssemblyCategoryTechnique, on_delete=models.SET_NULL, null=True, blank=True
-    )
+
     comment = models.TextField(_("Comment"), null=True, blank=True)
     description = models.TextField(_("Description"), null=True, blank=True)
     name = models.CharField(max_length=255)
@@ -120,6 +118,12 @@ class Assembly(BaseModel):
 
     def __str__(self):
         return self.name
+
+    @property
+    def classification(self):
+        """Return the classification of the assembly from the epds."""
+        product = self.product_set.first()  # Access Product instances
+        return product.classification if product else None
 
 
 class Product(models.Model):
@@ -134,6 +138,9 @@ class Product(models.Model):
         max_length=20,
         choices=Unit.choices,
         default=Unit.UNKNOWN,
+    )
+    classification = models.ForeignKey(
+        AssemblyCategoryTechnique, on_delete=models.SET_NULL, null=True, blank=True
     )
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
     quantity = models.DecimalField(
@@ -152,18 +159,19 @@ class Product(models.Model):
 
         from pages.views.assembly.epd_filtering import get_epd_dimension_info
 
-        _t, expected_unit = get_epd_dimension_info(
-            self.assembly.dimension, self.epd.declared_unit
-        )
-        if self.input_unit != expected_unit:
-            raise ValidationError(
-                {
-                    "input_unit": _(
-                        f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
-                        f"Expected unit: '{expected_unit}'."
-                    )
-                }
+        if not self.assembly.is_boq:
+            _, expected_unit = get_epd_dimension_info(
+                self.assembly.dimension, self.epd.declared_unit
             )
+            if self.input_unit != expected_unit:
+                raise ValidationError(
+                    {
+                        "input_unit": _(
+                            f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
+                            f"Expected unit: '{expected_unit}'."
+                        )
+                    }
+                )
 
     def save(self, *args, **kwargs):
         """
