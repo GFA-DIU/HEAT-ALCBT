@@ -63,7 +63,7 @@ def create_epd_impact(create_impact):
 
 @pytest.fixture
 def create_assembly():
-    def _create_assembly():
+    def _create_assembly(dimension):
         assemblycategorytechnique = AssemblyCategoryTechnique.objects.create(
             category=AssemblyCategory.objects.first(),
             technique=AssemblyTechnique.objects.first(),
@@ -71,7 +71,7 @@ def create_assembly():
         )
         return Assembly.objects.create(
             mode=AssemblyMode.CUSTOM,
-            dimension=AssemblyDimension.AREA,
+            dimension=dimension,
             classification=assemblycategorytechnique,
         )
 
@@ -143,7 +143,7 @@ def create_product():
         ),
     ],
 )
-def test_calculate_impacts_area(
+def test_calculate_impacts_area_assembly_benchmark(
     epd_name,
     declared_unit,
     conversions,
@@ -158,12 +158,12 @@ def test_calculate_impacts_area(
     create_assembly,
     create_product,
 ):
-    """Test if calculate impact matches Excel.
+    """Test if calculate impact matches Excel calculation of area assembly.
     
     Note:
      - Excel comparison implies `reporting_life_cycle=1` and `assembly_quantity=1`
 
-    ARRANGE: Create simple Ökobaudat EPD and set to product from Excel.
+    ARRANGE: Create simple Ökobaudat EPD and set to product from Excel with an area assembly.
     ACT: Calculate impact of product
     ASSERT: Matches expected values from Excel
     """
@@ -172,7 +172,7 @@ def test_calculate_impacts_area(
     impact = create_impact
     epd = create_epd(epd_name, declared_unit, conversions)
     create_epd_impact(epd, epdimpact_value)
-    assembly = create_assembly()
+    assembly = create_assembly(dimension=AssemblyDimension.AREA)
     product = create_product(assembly, epd, product_quantity, product_unit)
 
     # Act: Perform the calculation
@@ -191,3 +191,4 @@ def test_calculate_impacts_area(
         assert impact["impact_value"] == pytest.approx(
             expected_impact, rel=Decimal("1e-15")
         )
+
