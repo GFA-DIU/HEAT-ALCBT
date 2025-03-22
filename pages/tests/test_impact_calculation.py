@@ -64,15 +64,9 @@ def create_epd_impact(create_impact):
 @pytest.fixture
 def create_assembly():
     def _create_assembly(dimension):
-        assemblycategorytechnique = AssemblyCategoryTechnique.objects.create(
-            category=AssemblyCategory.objects.first(),
-            technique=AssemblyTechnique.objects.first(),
-            description="Created for test",
-        )
         return Assembly.objects.create(
             mode=AssemblyMode.CUSTOM,
-            dimension=dimension,
-            classification=assemblycategorytechnique,
+            dimension=AssemblyDimension.AREA,
         )
 
     return _create_assembly
@@ -81,11 +75,17 @@ def create_assembly():
 @pytest.fixture
 def create_product():
     def _create_product(assembly, epd, quantity, unit):
+        assemblycategorytechnique = AssemblyCategoryTechnique.objects.create(
+            category=AssemblyCategory.objects.first(),
+            technique=AssemblyTechnique.objects.first(),
+            description="Created for test",
+        )
         return Product.objects.create(
             assembly=assembly,
             epd=epd,
             quantity=quantity,
             input_unit=unit,
+            classification=assemblycategorytechnique
         )
 
     return _create_product
