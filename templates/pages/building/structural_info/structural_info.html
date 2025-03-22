@@ -1,4 +1,9 @@
 {% if building_id %}
+<a
+  class="btn btn-primary m-2 mt-3"
+  href="{% url 'boq' building_id=building_id %}?simulation={{simulation}}"
+  >Add from BoQ</a
+>
 <button
   class="btn btn-primary m-2 mt-3"
   hx-get="{% url 'component' building_id=building_id %}?add_component=step_1&simulation={{simulation}}"
@@ -7,11 +12,6 @@
 >
   Add Component
 </button>
-<a
-  class="btn btn-primary m-2 mt-3"
-  href="{% url 'boq' building_id=building_id %}?simulation={{simulation}}"
-  >Add BOQ</a
->
 {% else %} Please save the building before adding any components {% endif %}
 
 <div id="modal" class="modal fade" tabindex="-1">

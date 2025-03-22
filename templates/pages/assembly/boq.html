@@ -5,7 +5,7 @@
 {% block title %}Building View{% endblock title %}
 {% block content %}
 
-<h3 class="text-center p-3">BOQ Editor</h3>
+<h3 class="text-center p-3">BoQ Editor</h3>
 <div class="container">
     {% if assembly_id %}
 <form hx-post="{% url 'boq_edit' assembly_id=assembly_id building_id=building_id %}{% if simulation %}?simulation=true{% endif %}">
