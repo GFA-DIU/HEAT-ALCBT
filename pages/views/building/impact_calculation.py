@@ -44,8 +44,8 @@ def calculate_impacts(
                     "assembly_id": p.assembly.pk,
                     "epd_id": p.epd.pk,
                     "assembly_category": (
-                        p.assembly.classification.category
-                        if p.assembly.classification
+                        p.classification.category
+                        if p.classification
                         else ""
                     ),
                     "material_category": p.epd.category,
