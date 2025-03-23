@@ -306,7 +306,7 @@ def test_calculate_impacts_dimension_logic(
 # Parametrized test with fixtures
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "epd_name, declared_unit, conversions, epdimpact_value, product_quantity, product_unit, dimension, expected_impact",
+    "epd_name, declared_unit, conversions, epdimpact_value, product_quantity, product_unit, dimension",
     [
         ( # Ensure KG conversion for Volume Dimension
             #TODO changed dimension to KG
@@ -317,7 +317,6 @@ def test_calculate_impacts_dimension_logic(
             Decimal("4"),
             Unit.CM,
             AssemblyDimension.MASS,
-            Decimal("0.6"),
         ),
         ( # Ensure KG fallback to m works
             "Test KG with M",
@@ -327,7 +326,6 @@ def test_calculate_impacts_dimension_logic(
             Decimal("4"),
             Unit.UNKNOWN,
             AssemblyDimension.LENGTH,
-            Decimal("0.6"),
         ),
         ( # Ensure KG fallback to m^2 works
             "Test KG with M^2",
@@ -337,7 +335,15 @@ def test_calculate_impacts_dimension_logic(
             Decimal("4"),
             Unit.UNKNOWN,
             AssemblyDimension.AREA,
-            Decimal("0.6"),
+        ),
+        ( # Boq Entry
+            "BoQ entry: Test M",
+            Unit.M,
+            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m", "value": "300"}],
+            Decimal("3"),
+            Decimal("4"),
+            Unit.M,
+            AssemblyDimension.AREA,
         ),
     ],
 )
@@ -349,9 +355,7 @@ def test_calculate_impacts_errors(
     product_quantity,
     product_unit,
     dimension,
-    expected_impact,
     ### Functions
-    create_impact,
     create_epd,
     create_epd_impact,
     create_assembly,
@@ -360,23 +364,14 @@ def test_calculate_impacts_errors(
     """Test if calculate impact satisfies dimension logic.
 
     ARRANGE: Create simple EPD and set dimension of assembly.
-    ACT: Calculate impact of product.
-    ASSERT: Matches expected value.
+    ACT: Create product.
+    ASSERT: Raises validation error.
     """
 
     # Arrange: Set up test data
-    impact = create_impact
     epd = create_epd(epd_name, declared_unit, conversions)
     create_epd_impact(epd, epdimpact_value)
     assembly = create_assembly(dimension=dimension)
     
     with pytest.raises(ValidationError):
-        product = create_product(assembly, epd, product_quantity, product_unit)
-
-        # # Act: Perform the calculation
-        # impacts = calculate_impacts(
-        #     dimension=assembly.dimension,
-        #     assembly_quantity=1,
-        #     reporting_life_cycle=1,
-        #     p=product,
-        # )
+        create_product(assembly, epd, product_quantity, product_unit)
