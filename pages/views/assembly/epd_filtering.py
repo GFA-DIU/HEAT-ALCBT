@@ -8,6 +8,13 @@ from pages.models.assembly import AssemblyDimension
 from pages.models.epd import EPD, MaterialCategory, Unit
 
 
+def get_epd_info(dimension: AssemblyDimension, declared_unit: Unit):
+    if dimension:
+        return get_epd_dimension_info(dimension, declared_unit)
+    else:
+        return get_epd_boq_info(declared_unit)
+
+
 def get_epd_dimension_info(dimension: AssemblyDimension, declared_unit: Unit):
     """Rule for input texts and units depending on Dimension."""
     match (dimension, declared_unit):
@@ -36,6 +43,34 @@ def get_epd_dimension_info(dimension: AssemblyDimension, declared_unit: Unit):
         case _:
             raise ValueError(
                 f"Unsupported combination: dimension '{dimension}', declared_unit '{declared_unit}'"
+            )
+
+    return selection_text, selection_unit
+
+
+def get_epd_boq_info(declared_unit: Unit):
+    """Rule for input texts for BoQ."""
+    # TODO: extend with "conversion" to allow for multiple options
+    match (declared_unit):
+        case (Unit.PCS):
+            # 'Pieces' EPD is treated the same across all assembly dimensions
+            selection_text = "Quantity"
+            selection_unit = Unit.PCS
+        case (Unit.M):
+            selection_text = "Length"
+            selection_unit = Unit.M
+        case (Unit.M2):
+            selection_text = "Surface area"
+            selection_unit = Unit.M2
+        case (Unit.M3):
+            selection_text = "Volume"
+            selection_unit = Unit.M3
+        case (Unit.KG):
+            selection_text = "Weigth"
+            selection_unit = Unit.KG
+        case _:
+            raise ValueError(
+                f"Unsupported unit: declared_unit '{declared_unit}'"
             )
 
     return selection_text, selection_unit
@@ -85,7 +120,7 @@ def filter_by_dimension(epds: BaseManager[EPD], dimension: AssemblyDimension):
 
 def get_filtered_epd_list(request, dimension=None):
     # Start with the base queryset
-    filtered_epds = EPD.objects.all().order_by("id")
+    filtered_epds = EPD.objects.exclude(declared_unit=Unit.UNKNOWN).order_by("id")
     if (
         request.method == "POST"
         and request.POST.get("action") == "filter"
