@@ -34,13 +34,16 @@ from pages.views.assembly.epd_filtering import filter_by_dimension
         (Unit.KG, [], AssemblyDimension.VOLUME, True),
         # KG EPDs - with conversion
         (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.AREA, False),
+        (Unit.KG, [{"unit": "kg/m^2"}], AssemblyDimension.AREA, True),
         (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.LENGTH, False),
+        (Unit.KG, [{"unit": "kg/m"}], AssemblyDimension.LENGTH, True),
         (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.MASS, False),
         (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.VOLUME, False),
         # M3 EPDs
         (Unit.M3, [], AssemblyDimension.AREA, False),
         (Unit.M3, [], AssemblyDimension.LENGTH, False),
-        (Unit.M3, [], AssemblyDimension.MASS, False),
+        (Unit.M3, [], AssemblyDimension.MASS, True),
+        (Unit.M3, [{"unit": "kg/m^3"}], AssemblyDimension.MASS, False),
         (Unit.M3, [], AssemblyDimension.VOLUME, False),
     ],
 )
