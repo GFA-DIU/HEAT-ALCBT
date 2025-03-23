@@ -17,7 +17,7 @@ def calculate_impacts(
     in the table below.
     | **    Declared unit   ** | **    Area Assembly   ** | **    Volume Assembly   ** | **    Mass Assembly   ** | **    Length Assembly   ** |
     |--------------------------|--------------------------|----------------------------|--------------------------|----------------------------|
-    |     m3                   |     Yes                  |     Yes                    |     Yes                  |     Yes                    |
+    |     m3                   |     Yes                  |     Yes                    |     w. Volume density    |     Yes                    |
     |     m2                   |     Yes                  |     No                     |     No                   |     No                     |
     |     m                    |     No                   |     No                     |     No                   |     Yes                    |
     |     kg                   |     w. Volume density    |     w. Volume density      |     Yes                  |     w. Volume density      |
@@ -31,7 +31,7 @@ def calculate_impacts(
     def fetch_conversion(unit: str) -> str | None:
         """Fetch conversion factor based on the unit."""
         try:
-            return next(c["value"] for c in p.epd.conversions if c["unit"] == unit)
+            return next((c["value"] for c in p.epd.conversions if c["unit"] == unit), None)
         except:
             return None
 
@@ -101,10 +101,10 @@ def calculate_impacts(
             # impact = impact_per_unit * total_kg / epd_base_amount
             impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(quantity))
         case (AssemblyDimension.MASS, Unit.M3):
-            # impact = impact_per_unit * conversion_kg_per_m3 * total_kg * percentage / epd_base_amount
+            # impact = impact_per_unit / conversion_kg_per_m3 * total_kg * percentage / epd_base_amount
             conversion_f = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
-                Decimal(assembly_quantity) * Decimal(quantity) * Decimal(conversion_f)
+                Decimal(assembly_quantity) * Decimal(quantity) / Decimal(conversion_f)
             )
 
         case (AssemblyDimension.LENGTH, Unit.M):
@@ -117,7 +117,7 @@ def calculate_impacts(
             )
         case (AssemblyDimension.LENGTH, Unit.KG):
             # impact = impact_per_unit * conversion_kg_per_m * total_length * surface_cross-section_to_m2 / epd_base_amount
-            conversion_f = fetch_conversion("kg/m")
+            conversion_f = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
                 Decimal(assembly_quantity)
                 * Decimal(quantity)

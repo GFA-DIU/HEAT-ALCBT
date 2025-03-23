@@ -166,7 +166,7 @@ class Product(models.Model):
             if self.input_unit != expected_unit:
                 raise ValidationError(
                     {
-                        "input_unit": _(
+                        "input_unit": (
                             f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
                             f"Expected unit: '{expected_unit}'."
                         )
