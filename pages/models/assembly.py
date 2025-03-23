@@ -159,19 +159,19 @@ class Product(models.Model):
 
         from pages.views.assembly.epd_filtering import get_epd_info
 
-        if not self.assembly.is_boq:
-            _, expected_unit = get_epd_info(
-                self.assembly.dimension, self.epd.declared_unit
+        dimension = None if self.assembly.is_boq else self.assembly.dimension
+        _, expected_unit = get_epd_info(
+            dimension, self.epd.declared_unit
+        )
+        if self.input_unit != expected_unit:
+            raise ValidationError(
+                {
+                    "input_unit": (
+                        f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
+                        f"Expected unit: '{expected_unit}'."
+                    )
+                }
             )
-            if self.input_unit != expected_unit:
-                raise ValidationError(
-                    {
-                        "input_unit": (
-                            f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
-                            f"Expected unit: '{expected_unit}'."
-                        )
-                    }
-                )
 
     def save(self, *args, **kwargs):
         """

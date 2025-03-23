@@ -79,7 +79,7 @@ def create_boq_assembly():
         ),
     ],
 )
-def test_calculate_impacts_dimension_logic(
+def test_calculate_impacts_boq(
     epd_name,
     declared_unit,
     conversions,
@@ -152,7 +152,7 @@ def test_calculate_impacts_dimension_logic(
         ),
     ],
 )
-def test_calculate_impacts_errors(
+def test_calculate_impacts_boq_errors(
     epd_name,
     declared_unit,
     conversions,
@@ -166,8 +166,11 @@ def test_calculate_impacts_errors(
     create_product,
 ):
     """Test if calculate impact satisfies dimension logic.
+    
+    Note
+     - currently BoQs do not use conversions.
 
-    ARRANGE: Create simple EPD and set dimension of assembly.
+    ARRANGE: Create simple EPD and set input unit for matching conversion.
     ACT: Create product.
     ASSERT: Raises validation error.
     """
