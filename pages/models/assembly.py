@@ -161,7 +161,7 @@ class Product(models.Model):
 
         if not self.assembly.is_boq:
             _, expected_unit = get_epd_dimension_info(
-                self.assembly.dimension, self.epd.declared_unit
+                self.assembly.dimension, self.epd.declared_unit, self.epd.conversions
             )
             if self.input_unit != expected_unit:
                 raise ValidationError(

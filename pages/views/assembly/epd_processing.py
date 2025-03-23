@@ -105,7 +105,7 @@ class LazyProcessor:
 
     def epd_parsing(self, epd: EPD):
         """Encapsulates the logic for preprocessing EPDs."""
-        sel_text, sel_unit = get_epd_dimension_info(self.dimension, epd.declared_unit)
+        sel_text, sel_unit = get_epd_dimension_info(self.dimension, epd.declared_unit, epd.conversions)
         return FilteredEPD(
             id=epd.pk,
             name=epd.name,

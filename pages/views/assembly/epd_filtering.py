@@ -8,34 +8,52 @@ from pages.models.assembly import AssemblyDimension
 from pages.models.epd import EPD, MaterialCategory, Unit
 
 
-def get_epd_dimension_info(dimension: AssemblyDimension, declared_unit: Unit):
+def get_epd_dimension_info(dimension: AssemblyDimension, declared_unit: Unit, conversions: list[dict]):
     """Rule for input texts and units depending on Dimension."""
-    match (dimension, declared_unit):
-        case (_, Unit.PCS):
+    primary_conf = None
+    if declared_unit == Unit.KG:
+        confs = [c["unit"] for c in conversions]
+        
+        conversion_map = {
+            AssemblyDimension.LENGTH: ["kg/m", "kg/m^3"],
+            AssemblyDimension.AREA: ["kg/m^2", "kg/m^3"],
+            AssemblyDimension.VOLUME: ["kg/m^3"],
+        }
+        primary_conf = next((c for c in confs if c in conversion_map[dimension]), None)
+
+ 
+    match (dimension, declared_unit, primary_conf):
+        case (_, Unit.PCS, _):
             # 'Pieces' EPD is treated the same across all assembly dimensions
             selection_text = "Quantity"
             selection_unit = Unit.PCS
-        case (AssemblyDimension.AREA, Unit.M2):
+        case (AssemblyDimension.AREA, Unit.M2, _):
             selection_text = "Number of layers"
             selection_unit = Unit.UNKNOWN
-        case (AssemblyDimension.AREA, _):
+        case (AssemblyDimension.AREA, Unit.KG, "kg/m^2"):
+            selection_text = "Number of layers"
+            selection_unit = Unit.UNKNOWN
+        case (AssemblyDimension.AREA, _, _):
             selection_text = "Layer Thickness"
             selection_unit = Unit.CM
-        case (AssemblyDimension.VOLUME, _):
+        case (AssemblyDimension.VOLUME, _, _):
             selection_text = "Share of volume"
             selection_unit = Unit.PERCENT
-        case (AssemblyDimension.MASS, _):
+        case (AssemblyDimension.MASS, _, _):
             selection_text = "Share of mass"
             selection_unit = Unit.PERCENT
-        case (AssemblyDimension.LENGTH, Unit.M):
-            selection_text = "Number of full-lengt elements"
+        case (AssemblyDimension.LENGTH, Unit.M, _):
+            selection_text = "Number of full-length elements"
             selection_unit = Unit.UNKNOWN
-        case (AssemblyDimension.LENGTH, _):
+        case (AssemblyDimension.LENGTH, Unit.KG, "kg/m"):
+            selection_text = "Number of full-length elements"
+            selection_unit = Unit.UNKNOWN
+        case (AssemblyDimension.LENGTH, _, _):
             selection_text = "Share of cross-section"
             selection_unit = Unit.CM2
         case _:
             raise ValueError(
-                f"Unsupported combination: dimension '{dimension}', declared_unit '{declared_unit}'"
+                f"Unsupported combination: dimension '{dimension}', declared_unit '{declared_unit}', conf '{primary_conf}'"
             )
 
     return selection_text, selection_unit

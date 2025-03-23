@@ -64,7 +64,7 @@ def component_edit(request, building_id, assembly_id=None):
         epd = get_object_or_404(EPD, pk=epd_id)
         epd.selection_quantity = 1
         epd.selection_text, epd.selection_unit = get_epd_dimension_info(
-            dimension, epd.declared_unit
+            dimension, epd.declared_unit, epd.conversions
         )
         return render(request, "pages/assembly/selected_epd.html", {"epd": epd})
 
