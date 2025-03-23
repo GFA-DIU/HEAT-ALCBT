@@ -11,7 +11,7 @@ from pages.models.assembly import AssemblyCategory, AssemblyDimension, Product
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 
 from pages.models.epd import EPD
-from pages.views.assembly.epd_filtering import get_epd_dimension_info
+from pages.views.assembly.epd_filtering import get_epd_info
 from pages.views.assembly.epd_processing import SelectedEPD, get_epd_list
 from pages.views.assembly.save_to_assembly import save_assembly
 
@@ -56,8 +56,6 @@ def boq_edit(request, building_id, assembly_id=None):
 
     elif request.method == "POST" and request.POST.get("action") == "select_epd":
         epd_id = request.POST.get("id")
-        dimension = request.POST.get("dimension")
-        dimension = dimension if dimension else AssemblyDimension.AREA
 
         epd = get_object_or_404(EPD, pk=epd_id)
         epd.selection_quantity = 1
@@ -96,11 +94,12 @@ def set_up_view(request, building_id, assembly_id):
         )
         building = building_assembly.building
         assembly = building_assembly.assembly
+        assert assembly.is_boq
     else:
         building = get_object_or_404(Building, pk=building_id)
         assembly = None
 
-    epd_list, dimension = get_epd_list(request, assembly)
+    epd_list, dimension = get_epd_list(request, None)
     context = {
         "assembly_id": assembly_id,
         "building_id": building_id,
