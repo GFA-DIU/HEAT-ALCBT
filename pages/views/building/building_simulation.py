@@ -4,7 +4,7 @@ from django.db import transaction
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 
-from pages.models.assembly import AssemblyMode, Assembly, Product
+from pages.models.assembly import AssemblyMode, Assembly, StructuralProduct
 from pages.models.building import BuildingAssembly, BuildingAssemblySimulated
 from pages.views.building.building import handle_building_load
 from pages.views.building.building import handle_assembly_delete
@@ -92,10 +92,10 @@ def handle_simulation_reset(building_id):
                 a.assembly.save()
 
                 # Clone associated Products
-                for product in Product.objects.filter(
+                for product in StructuralProduct.objects.filter(
                     assembly__id=original_assembly_id
                 ):
-                    Product.objects.create(
+                    StructuralProduct.objects.create(
                         description=product.description,
                         epd=product.epd,
                         input_unit=product.input_unit,

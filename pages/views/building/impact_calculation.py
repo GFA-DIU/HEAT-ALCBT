@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from pages.models.assembly import AssemblyDimension, Product
+from pages.models.assembly import AssemblyDimension, StructuralProduct
 from pages.models.epd import Unit
 
 
@@ -9,7 +9,7 @@ def calculate_impacts(
     dimension: AssemblyDimension,
     assembly_quantity: int,
     reporting_life_cycle: int,
-    p: Product,
+    p: StructuralProduct,
 ):
     """Calculate EPDs using the dimension approach.
 

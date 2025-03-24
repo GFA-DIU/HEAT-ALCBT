@@ -78,7 +78,8 @@ class Unit(models.TextChoices):
     KW = "kw", "Kilowatt"
     M3_H = "m^3/h", "Cubic Meters per Hour"
     CFM = "cfm", "Cubic Feet per Minute"
-
+    CELSIUS = "celsius", "°Celsius"
+    FAHRENHEIT = "fahrenheit", "°Fahrenheit"
 
 class ImpactCategoryKey(models.TextChoices):
     """Taken from LCAx."""

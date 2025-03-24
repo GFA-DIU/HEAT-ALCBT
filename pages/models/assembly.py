@@ -7,6 +7,7 @@ from accounts.models import CustomCity
 
 from .epd import EPD, Unit
 from .base import BaseModel
+from .product import BaseProduct
 
 
 class AssemblyMode(models.TextChoices):
@@ -103,33 +104,17 @@ class Assembly(BaseModel):
     description = models.TextField(_("Description"), null=True, blank=True)
     name = models.CharField(max_length=255)
     products = models.ManyToManyField(
-        EPD, blank=True, related_name="assemblies", through="Product"
+        EPD, blank=True, related_name="assemblies", through="StructuralProduct"
     )
 
     def __str__(self):
         return self.name
 
 
-class Product(models.Model):
-    """Join Table for EPDs and Assemblied. Products are EPDs with quantity and results."""
-    description = models.CharField(
-        _("Description"), max_length=255, null=True, blank=True
-    )
-    epd = models.ForeignKey(EPD, on_delete=models.CASCADE)
-    input_unit = models.CharField(
-        _("Unit for quantity of EPD"),
-        max_length=20,
-        choices=Unit.choices,
-        default=Unit.UNKNOWN,
-    )
+class StructuralProduct(BaseProduct):
+    """Join Table for EPDs and Assemblies. Products are EPDs with quantity and results."""
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
-    quantity = models.DecimalField(
-        _("Quantity of EPD"),
-        max_digits=10,
-        decimal_places=2,
-        null=False,
-        blank=False,
-    )
+
 
     def clean(self):
         """
@@ -158,5 +143,5 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = "Product"
-        verbose_name_plural = "Products"
+        verbose_name = "StructuralProduct"
+        verbose_name_plural = "StructuralProducts"

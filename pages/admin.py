@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models.epd import MaterialCategory, EPD, EPDImpact, Impact
-from .models.assembly import Product, Assembly, AssemblyCategory, AssemblyTechnique
+from .models.assembly import StructuralProduct, Assembly, AssemblyCategory, AssemblyTechnique
 from .models.building import Building, BuildingSubcategory
 
 # Register your models here.
@@ -55,7 +55,7 @@ class BuildingAdmin(admin.ModelAdmin):
 # Register your models with custom admin
 admin.site.register(MaterialCategory)
 admin.site.register(EPD, EPDAdmin)
-admin.site.register(Product)
+admin.site.register(StructuralProduct)
 admin.site.register(Assembly, AssemblyAdmin)
 admin.site.register(AssemblyCategory, AssemblyCategoryAdmin)
 admin.site.register(AssemblyTechnique)

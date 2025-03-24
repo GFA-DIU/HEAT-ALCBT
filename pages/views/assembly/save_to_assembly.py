@@ -5,7 +5,7 @@ from django.db.models import Prefetch
 from django.http import HttpResponseServerError
 
 from pages.forms.assembly_form import AssemblyForm
-from pages.models.assembly import Assembly, Product
+from pages.models.assembly import Assembly, StructuralProduct
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 from pages.models.epd import EPD, EPDImpact
 
@@ -31,11 +31,11 @@ def save_assembly(request, assembly: Assembly, building_instance: Building, simu
             assembly.created_by = request.user
             assembly.save()
 
-            Product.objects.filter(assembly=assembly).delete()  # create a clean slate
+            StructuralProduct.objects.filter(assembly=assembly).delete()  # create a clean slate
             
             # Save to products
             for k, v in selected_epds.items():
-                Product.objects.create(
+                StructuralProduct.objects.create(
                     epd=epd_map[k],
                     assembly=assembly,
                     quantity=v.get("quantity"),

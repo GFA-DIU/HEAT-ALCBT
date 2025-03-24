@@ -9,7 +9,7 @@ from pages.models.assembly import (
     AssemblyDimension,
     AssemblyMode,
     AssemblyTechnique,
-    Product,
+    StructuralProduct,
 )
 from pages.models.epd import (
     EPD,
@@ -81,7 +81,7 @@ def create_assembly():
 @pytest.fixture
 def create_product():
     def _create_product(assembly, epd, quantity, unit):
-        return Product.objects.create(
+        return StructuralProduct.objects.create(
             assembly=assembly,
             epd=epd,
             quantity=quantity,
