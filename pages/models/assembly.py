@@ -157,10 +157,10 @@ class Product(models.Model):
         """
         super().clean()
 
-        from pages.views.assembly.epd_filtering import get_epd_dimension_info
+        from pages.views.assembly.epd_filtering import get_epd_info
 
         if not self.assembly.is_boq:
-            _, expected_unit = get_epd_dimension_info(
+            _, expected_unit = get_epd_info(
                 self.assembly.dimension, self.epd.declared_unit
             )
             if self.input_unit != expected_unit:
