@@ -44,8 +44,12 @@ class UserProfile(models.Model):
     )
     city = models.ForeignKey(
         CustomCity, on_delete=models.SET_NULL, null=True, blank=True
+    )    
+    consent_flag = models.BooleanField(
+        default=True,
+        verbose_name="Share with BEAT tool maintainers",
     )
-
+    
     def clean(self):
         # Custom validation logic
         if self.city and self.country:
