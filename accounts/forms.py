@@ -32,7 +32,7 @@ class CustomUserUpdateForm(forms.ModelForm):
         model = CustomUser
         fields = [
             'email',
-            'username'
+            'username',
         ] 
 
 class UserProfileUpdateForm(forms.ModelForm):
@@ -56,7 +56,7 @@ class UserProfileUpdateForm(forms.ModelForm):
     
     class Meta:
         model = UserProfile
-        fields = ['country', 'city']
+        fields = ['country', 'city', "consent_flag"]
         
         
     def __init__(self, *args, **kwargs):
