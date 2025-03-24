@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from pages.models.assembly import AssemblyDimension, StructuralProduct
+from pages.models.building import OperationalProduct
 from pages.models.epd import Unit
 
 
@@ -127,4 +128,70 @@ def calculate_impacts(
                 f"Unsupported combination: dimension '{dimension}', declared_unit '{declared_unit}'"
             )
 
+    return impacts
+
+
+def calculate_impact_operational(p: OperationalProduct) -> dict:
+    def fetch_conversion(unit):
+        """Fetch conversion factor based on the unit."""
+        try:
+            return next((c["value"] for c in p.epd.conversions if c["unit"] == unit), None)
+        except:
+            return None
+    
+    def calculate_impact(factor, gwp_impact, penrt_impact):
+        print(gwp_impact)
+        rslt = (Decimal(factor)
+            # * Decimal(gwp_impact)
+            # / Decimal(p.epd.declared_amount)  # Normalise by base amount
+            # / Decimal(p.building.total_floor_area)
+        )
+        print(rslt)
+        return {
+            "gwp_b6": Decimal(factor)
+            * Decimal(gwp_impact)
+            / Decimal(p.epd.declared_amount)  # Normalise by base amount
+            / Decimal(p.building.total_floor_area),  # Normalise by floor area,
+            
+            "penrt_b6": Decimal(factor)
+            * Decimal(penrt_impact)
+            / Decimal(p.epd.declared_amount)  # Normalise by base amount
+            / Decimal(p.building.total_floor_area)  # Normalise by floor area,
+        }
+
+    impact_set = p.epd.epdimpact_set.filter(impact__life_cycle_stage="b6")
+    gwp_b6 = next((i.value for i in impact_set if i.impact.impact_category=="gwp"), None)
+    penrt_b6 = next((i.value for i in impact_set if i.impact.impact_category=="penrt"), None)
+    
+    match (p.input_unit):
+        
+        case (Unit.KWH):
+            impacts = calculate_impact(Decimal(p.quantity), gwp_b6, penrt_b6)
+        case (Unit.M3):
+            kwh_per_kg = fetch_conversion("kg")
+            kg_per_m3 = fetch_conversion("kg/m^3")
+            print(p.quantity)
+            print(kwh_per_kg)
+            print(kg_per_m3)
+            impacts = calculate_impact(
+                Decimal(p.quantity) * Decimal(kwh_per_kg) * Decimal(kg_per_m3),
+                gwp_b6,
+                penrt_b6
+            )
+        case (Unit.LITER):
+            kwh_per_kg = fetch_conversion("kg")
+            kg_per_m3 = fetch_conversion("kg/m^3")
+            impacts = calculate_impact(
+                Decimal(p.quantity) * Decimal(kwh_per_kg) * Decimal(kg_per_m3) / 1000,
+                gwp_b6,
+                penrt_b6
+            )
+        case (Unit.KG):
+            kwh_per_kg = fetch_conversion("kg")
+            impacts = calculate_impact(
+                Decimal(p.quantity) * Decimal(kwh_per_kg),
+                gwp_b6,
+                penrt_b6
+            )
+    
     return impacts

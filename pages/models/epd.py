@@ -80,6 +80,7 @@ class Unit(models.TextChoices):
     CFM = "cfm", "Cubic Feet per Minute"
     CELSIUS = "celsius", "°Celsius"
     FAHRENHEIT = "fahrenheit", "°Fahrenheit"
+    LITER = "liter", "Liter"
 
 class ImpactCategoryKey(models.TextChoices):
     """Taken from LCAx."""
