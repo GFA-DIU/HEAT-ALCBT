@@ -12,6 +12,8 @@ from pages.forms.assembly_form import AssemblyForm
 
 from pages.models.epd import EPD
 from pages.views.assembly.epd_filtering import get_epd_dimension_info
+
+
 from pages.views.assembly.epd_processing import SelectedEPD, get_epd_list
 from pages.views.assembly.save_to_assembly import save_assembly
 
@@ -30,11 +32,13 @@ def component_edit(request, building_id, assembly_id=None):
         request.user,
         building,
         assembly,
-        context["simulation"]
+        context["simulation"],
     )
 
     if request.method == "POST" and request.POST.get("action") == "form_submission":
-        return handle_assembly_submission(request, assembly, building, context["simulation"])
+        return handle_assembly_submission(
+            request, assembly, building, context["simulation"]
+        )
 
     # Update EPD List
     elif (
@@ -59,7 +63,9 @@ def component_edit(request, building_id, assembly_id=None):
 
         epd = get_object_or_404(EPD, pk=epd_id)
         epd.selection_quantity = 1
-        epd.selection_text, epd.selection_unit = get_epd_dimension_info(dimension, epd.declared_unit)
+        epd.selection_text, epd.selection_unit = get_epd_dimension_info(
+            dimension, epd.declared_unit
+        )
         return render(request, "pages/assembly/selected_epd.html", {"epd": epd})
 
     elif request.method == "POST" and request.POST.get("action") == "remove_epd":
@@ -74,12 +80,12 @@ def component_edit(request, building_id, assembly_id=None):
 
 def set_up_view(request, building_id, assembly_id):
     """Fetch objects and create baseline context."""
-    simulation = request.GET.get('simulation', 'false').lower() == 'true'
+    simulation = request.GET.get("simulation", "false").lower() == "true"
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
     else:
         BuildingAssemblyModel = BuildingAssembly
-    
+
     if assembly_id:
         building_assembly = get_object_or_404(
             BuildingAssemblyModel.objects.select_related(),
@@ -93,11 +99,14 @@ def set_up_view(request, building_id, assembly_id):
         assembly = None
 
     epd_list, dimension = get_epd_list(request, assembly)
+
+    req = request.POST if request.method == "POST" else request.GET
     context = {
         "assembly_id": assembly_id,
         "building_id": building_id,
+        "filters": req,
         "epd_list": epd_list,
-        "epd_filters_form": EPDsFilterForm(request.POST),
+        "epd_filters_form": EPDsFilterForm(req),
         "dimension": dimension,  # Is also required for full reload
         "simulation": simulation,
     }
@@ -112,13 +121,13 @@ def handle_assembly_submission(request, assembly, building, simulation):
     response = JsonResponse({"message": "Redirecting"})
     if simulation:
         response["HX-Redirect"] = reverse(
-                "building_simulation", kwargs={"building_id": building.pk}
-            )
+            "building_simulation", kwargs={"building_id": building.pk}
+        )
     else:
         response["HX-Redirect"] = reverse(
-                "building", kwargs={"building_id": building.pk}
-            )
-    
+            "building", kwargs={"building_id": building.pk}
+        )
+
     return response
 
 
@@ -127,10 +136,12 @@ def handle_assembly_load(building_id, assembly, context):
         products = Product.objects.filter(assembly=assembly).select_related("epd")
         selected_epds = [SelectedEPD.parse_product(p) for p in products]
         context["selected_epds"] = selected_epds
-        context["selected_epds_ids"] = [selected_epd.id for selected_epd in selected_epds]
-    context["form"] = AssemblyForm(instance=assembly, building_id=building_id, simulation=context.get("simulation"))
-    context["dimension"] = (
-            assembly.dimension if assembly else AssemblyDimension.AREA
-        )
+        context["selected_epds_ids"] = [
+            selected_epd.id for selected_epd in selected_epds
+        ]
+    context["form"] = AssemblyForm(
+        instance=assembly, building_id=building_id, simulation=context.get("simulation")
+    )
+    context["dimension"] = assembly.dimension if assembly else AssemblyDimension.AREA
 
     return context

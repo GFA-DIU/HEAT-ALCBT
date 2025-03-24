@@ -1,0 +1,5126 @@
+[
+  {
+    "model": "pages.materialcategory",
+    "pk": 440,
+    "fields": {
+      "name_de": "Bodenbeschichtungen",
+      "name_en": "Floor finishes",
+      "category_id": "5.2.01",
+      "level": 3,
+      "parent_id": 213
+    }
+  },
+  {
+    "model": "pages.impact",
+    "pk": 1,
+    "fields": {
+      "impact_category": "penrt",
+      "life_cycle_stage": "a1a3",
+      "unit": "mj"
+    }
+  },
+  {
+    "model": "pages.impact",
+    "pk": 2,
+    "fields": {
+      "impact_category": "penrt",
+      "life_cycle_stage": "c4",
+      "unit": "mj"
+    }
+  },
+  {
+    "model": "pages.impact",
+    "pk": 3,
+    "fields": {
+      "impact_category": "penrt",
+      "life_cycle_stage": "d",
+      "unit": "mj"
+    }
+  },
+  {
+    "model": "pages.impact",
+    "pk": 4,
+    "fields": {
+      "impact_category": "gwp",
+      "life_cycle_stage": "a1a3",
+      "unit": "kgco2e"
+    }
+  },
+  {
+    "model": "pages.impact",
+    "pk": 5,
+    "fields": {
+      "impact_category": "gwp",
+      "life_cycle_stage": "c4",
+      "unit": "kgco2e"
+    }
+  },
+  {
+    "model": "pages.impact",
+    "pk": 6,
+    "fields": {
+      "impact_category": "gwp",
+      "life_cycle_stage": "d",
+      "unit": "kgco2e"
+    }
+  },
+  {
+    "model": "pages.impact",
+    "pk": 7,
+    "fields": {
+      "impact_category": "penrt",
+      "life_cycle_stage": "c3",
+      "unit": "mj"
+    }
+  },
+  {
+    "model": "pages.impact",
+    "pk": 8,
+    "fields": {
+      "impact_category": "gwp",
+      "life_cycle_stage": "c3",
+      "unit": "kgco2e"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "0021ba3f-bfb6-435e-a17d-30cd846d1800",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.961Z",
+      "updated_at": "2025-03-06T10:40:59.961Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "50.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Cellulose insulation ",
+      "names": [
+        { "lang": "en", "value": "Cellulose insulation " },
+        { "lang": "de", "value": "Cellulose insulation " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 89,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "01f92a84-d5bc-4b2b-ac9b-b0a1f4b085c1",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.628Z",
+      "updated_at": "2025-03-06T10:41:00.628Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "EAF Steel ",
+      "names": [
+        { "lang": "en", "value": "EAF Steel " },
+        { "lang": "de", "value": "EAF Steel " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 171,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "05994d82-5293-4709-a2b8-e7caaf6e3465",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.437Z",
+      "updated_at": "2025-03-06T10:40:59.437Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Gypsum ",
+      "names": [
+        { "lang": "en", "value": "Gypsum " },
+        { "lang": "de", "value": "Gypsum " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 5,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "094d2df8-37ef-485a-bd6c-9d1b1e6d006f",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.557Z",
+      "updated_at": "2025-03-06T10:40:59.557Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "1000.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Mud plaster ",
+      "names": [
+        { "lang": "en", "value": "Mud plaster " },
+        { "lang": "de", "value": "Mud plaster " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 43,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "0d8a700e-5bb5-4bf6-9dd0-2ae90f1a3ae2",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.651Z",
+      "updated_at": "2025-03-06T10:40:59.651Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2000.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Portland slag cement stabilized soil blocks ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Portland slag cement stabilized soil blocks "
+        },
+        {
+          "lang": "de",
+          "value": "Portland slag cement stabilized soil blocks "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 15,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "0eb3f6d1-96b1-40d0-a91f-8869c65783a4",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.805Z",
+      "updated_at": "2025-03-06T10:40:59.805Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "46.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Microconcrete roof tile ",
+      "names": [
+        { "lang": "en", "value": "Microconcrete roof tile " },
+        { "lang": "de", "value": "Microconcrete roof tile " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 29,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "1231dd37-08c9-4e94-9818-dceb28f62e02",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.735Z",
+      "updated_at": "2025-03-06T10:41:00.735Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "7850.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Steel section ",
+      "names": [
+        { "lang": "en", "value": "Steel section " },
+        { "lang": "de", "value": "Steel section " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 171,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "174003b9-9317-4c3d-845e-0342d0c833f4",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.958Z",
+      "updated_at": "2025-03-06T10:41:00.958Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2500.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Float glass ",
+      "names": [
+        { "lang": "en", "value": "Float glass " },
+        { "lang": "de", "value": "Float glass " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 301,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "1d62b62e-494e-4b90-8153-bc7dcc9746ec",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.779Z",
+      "updated_at": "2025-03-06T10:40:59.779Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "18.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Glazed ceramic floor tiles ",
+      "names": [
+        { "lang": "en", "value": "Glazed ceramic floor tiles " },
+        { "lang": "de", "value": "Glazed ceramic floor tiles " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 25,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "22b50516-16f2-44d2-b5dc-f6a3ddb2acb3",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.662Z",
+      "updated_at": "2025-03-06T10:40:59.662Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2200.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Precast concrete panels/flooring ",
+      "names": [
+        { "lang": "en", "value": "Precast concrete panels/flooring " },
+        { "lang": "de", "value": "Precast concrete panels/flooring " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 23,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "238dad16-7d4f-4113-b6e9-bd545140495d",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.069Z",
+      "updated_at": "2025-03-06T10:41:01.069Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "252.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Cement-based terrazzo (in-situ) ",
+      "names": [
+        { "lang": "en", "value": "Cement-based terrazzo (in-situ) " },
+        { "lang": "de", "value": "Cement-based terrazzo (in-situ) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "2671d197-74a4-40a3-9f21-097bb30345c1",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.411Z",
+      "updated_at": "2025-03-06T10:40:59.411Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "86.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Ferrocement roof panel ",
+      "names": [
+        { "lang": "en", "value": "Ferrocement roof panel " },
+        { "lang": "de", "value": "Ferrocement roof panel " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 40,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "276bf074-f190-4d91-8541-731ee104a4df",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.301Z",
+      "updated_at": "2025-03-06T10:41:01.301Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Underlay/fixing for laminate flooring ",
+      "names": [
+        { "lang": "en", "value": "Underlay/fixing for laminate flooring " },
+        { "lang": "de", "value": "Underlay/fixing for laminate flooring " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "2bbbca76-5e6a-4d0d-8d74-88d134152b91",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.574Z",
+      "updated_at": "2025-03-06T10:41:00.574Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "8940.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Copper sheet ",
+      "names": [
+        { "lang": "en", "value": "Copper sheet " },
+        { "lang": "de", "value": "Copper sheet " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 186,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "2daada6b-3135-4c28-8b34-0bc33ee1145b",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.894Z",
+      "updated_at": "2025-03-06T10:40:59.894Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2200.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Cement/lime render for external wall finishes ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Cement/lime render for external wall finishes "
+        },
+        {
+          "lang": "de",
+          "value": "Cement/lime render for external wall finishes "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 42,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "319fd07d-03b7-4293-8537-b0603d7666bc",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.387Z",
+      "updated_at": "2025-03-06T10:40:59.387Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "54.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Clay roof tile ",
+      "names": [
+        { "lang": "en", "value": "Clay roof tile " },
+        { "lang": "de", "value": "Clay roof tile " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 28,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "349550b5-5fd8-498d-bbe6-448e0f50b781",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.091Z",
+      "updated_at": "2025-03-06T10:40:59.091Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "15.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Asphalt shingles ",
+      "names": [
+        { "lang": "en", "value": "Asphalt shingles " },
+        { "lang": "de", "value": "Asphalt shingles " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 25,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "37537197-0af2-4d23-a87e-7581fa9c5e39",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.500Z",
+      "updated_at": "2025-03-06T10:40:59.500Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "1097.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Lightweight concrete block ",
+      "names": [
+        { "lang": "en", "value": "Lightweight concrete block " },
+        { "lang": "de", "value": "Lightweight concrete block " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 22,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "38bda26c-37fc-46a3-8fb2-facbdcc536e6",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.205Z",
+      "updated_at": "2025-03-06T10:40:59.205Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Brick - High draught/zigzag kiln ",
+      "names": [
+        { "lang": "en", "value": "Brick - High draught/zigzag kiln " },
+        { "lang": "de", "value": "Brick - High draught/zigzag kiln " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 20,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "3aff9d5a-b1fa-4a8d-9fff-a4a7258f0f48",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.752Z",
+      "updated_at": "2025-03-06T10:40:59.753Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Tile adhesive for ceramic/concrete tiles ",
+      "names": [
+        { "lang": "en", "value": "Tile adhesive for ceramic/concrete tiles " },
+        { "lang": "de", "value": "Tile adhesive for ceramic/concrete tiles " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 25,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "3bc8e632-535a-49df-87a7-a9ed073e437b",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.927Z",
+      "updated_at": "2025-03-06T10:41:00.927Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "3.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Rubber flooring ",
+      "names": [
+        { "lang": "en", "value": "Rubber flooring " },
+        { "lang": "de", "value": "Rubber flooring " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 244,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "414c9402-7c16-433f-adc1-4ab41c1908c2",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.399Z",
+      "updated_at": "2025-03-06T10:40:59.399Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2200.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Dense concrete block ",
+      "names": [
+        { "lang": "en", "value": "Dense concrete block " },
+        { "lang": "de", "value": "Dense concrete block " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 23,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "440ac9ac-2004-4de0-8934-3293d0dccaa8",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.374Z",
+      "updated_at": "2025-03-06T10:41:00.374Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "14.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Wood block flooring ",
+      "names": [
+        { "lang": "en", "value": "Wood block flooring " },
+        { "lang": "de", "value": "Wood block flooring " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 154,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "4640b9dd-fe42-44dd-b3e4-7e68f739d5e2",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.136Z",
+      "updated_at": "2025-03-06T10:41:01.136Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Flooring adhesive for vinyl/carpet/linoleum ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Flooring adhesive for vinyl/carpet/linoleum "
+        },
+        {
+          "lang": "de",
+          "value": "Flooring adhesive for vinyl/carpet/linoleum "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "468569ce-45bf-4055-8701-fc9648a8eb33",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.223Z",
+      "updated_at": "2025-03-06T10:41:01.223Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "710.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Particle board/chipboard ",
+      "names": [
+        { "lang": "en", "value": "Particle board/chipboard " },
+        { "lang": "de", "value": "Particle board/chipboard " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "4922d6cc-f671-4d01-a3a4-b38c1c80d16a",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.022Z",
+      "updated_at": "2025-03-06T10:41:00.022Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "80.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Cork insulation ",
+      "names": [
+        { "lang": "en", "value": "Cork insulation " },
+        { "lang": "de", "value": "Cork insulation " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 83,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "494a8b5b-0d11-4157-ab87-745572f2bf59",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.571Z",
+      "updated_at": "2025-03-06T10:40:59.571Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "PFA ",
+      "names": [
+        { "lang": "en", "value": "PFA " },
+        { "lang": "de", "value": "PFA " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 15,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "49552ffa-0968-4a67-ab95-e19eb50d9fae",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.583Z",
+      "updated_at": "2025-03-06T10:40:59.583Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "PFA (pulverized fuel ash)/fly ash cement (also known as pozzolana) ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "PFA (pulverized fuel ash)/fly ash cement (also known as pozzolana) "
+        },
+        {
+          "lang": "de",
+          "value": "PFA (pulverized fuel ash)/fly ash cement (also known as pozzolana) "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 15,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "4a0b26b2-686d-4eb7-9394-02e6102f7f49",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.419Z",
+      "updated_at": "2025-03-06T10:41:00.419Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "6.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Wood laminate/multi-layer parquet flooring ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Wood laminate/multi-layer parquet flooring "
+        },
+        { "lang": "de", "value": "Wood laminate/multi-layer parquet flooring " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 156,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "4a96dfe3-5fc2-4798-ad88-f1cc6ad8af1f",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.274Z",
+      "updated_at": "2025-03-06T10:40:59.274Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "1760.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Brick (common/facing) ",
+      "names": [
+        { "lang": "en", "value": "Brick (common/facing) " },
+        { "lang": "de", "value": "Brick (common/facing) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 20,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "4df5d361-3998-4735-8058-2b8004c304fa",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.766Z",
+      "updated_at": "2025-03-06T10:40:59.766Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "24.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Vitrified ceramic floor tiles ",
+      "names": [
+        { "lang": "en", "value": "Vitrified ceramic floor tiles " },
+        { "lang": "de", "value": "Vitrified ceramic floor tiles " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 25,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "4e7b075f-aa4a-4b7b-8eb3-304719e97c1a",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.363Z",
+      "updated_at": "2025-03-06T10:40:59.363Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2200.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Cement mortar ",
+      "names": [
+        { "lang": "en", "value": "Cement mortar " },
+        { "lang": "de", "value": "Cement mortar " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 44,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "4ecb01fd-00a7-49bc-a517-d033dee5152b",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.817Z",
+      "updated_at": "2025-03-06T10:40:59.817Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Phosphogypsum ",
+      "names": [
+        { "lang": "en", "value": "Phosphogypsum " },
+        { "lang": "de", "value": "Phosphogypsum " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 25,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "4f2bfcfb-c008-4b39-bfb3-757cba458de8",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.548Z",
+      "updated_at": "2025-03-06T10:41:00.548Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Aluminum sheet ",
+      "names": [
+        { "lang": "en", "value": "Aluminum sheet " },
+        { "lang": "de", "value": "Aluminum sheet " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 181,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "516fb90c-c639-416a-8df5-5847a8370953",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.669Z",
+      "updated_at": "2025-03-06T10:41:00.669Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "7850.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Electrogalvanized steel sheet (“corrugated zinc”) ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Electrogalvanized steel sheet (“corrugated zinc”) "
+        },
+        {
+          "lang": "de",
+          "value": "Electrogalvanized steel sheet (“corrugated zinc”) "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 172,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "5459f922-e237-41d6-9e98-403a2719e285",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.102Z",
+      "updated_at": "2025-03-06T10:41:01.102Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "1700.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Fiber cement board ",
+      "names": [
+        { "lang": "en", "value": "Fiber cement board " },
+        { "lang": "de", "value": "Fiber cement board " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "57c174de-f9b7-4e69-baee-7560e65a7e56",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.069Z",
+      "updated_at": "2025-03-06T10:40:59.069Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "500.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Aircrete (autoclaved aerated concrete) ",
+      "names": [
+        { "lang": "en", "value": "Aircrete (autoclaved aerated concrete) " },
+        { "lang": "de", "value": "Aircrete (autoclaved aerated concrete) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 21,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "58458d4b-df66-4064-9bee-d4ca8916ea2c",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.688Z",
+      "updated_at": "2025-03-06T10:40:59.688Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2200.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Ready mix concrete with fly-ash (30% pozzolana) ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Ready mix concrete with fly-ash (30% pozzolana) "
+        },
+        {
+          "lang": "de",
+          "value": "Ready mix concrete with fly-ash (30% pozzolana) "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 40,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "5a62d840-5253-441a-93d2-d6b3259a60df",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.281Z",
+      "updated_at": "2025-03-06T10:41:00.281Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "655.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Air-dried sawn timber ",
+      "names": [
+        { "lang": "en", "value": "Air-dried sawn timber " },
+        { "lang": "de", "value": "Air-dried sawn timber " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 136,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "5cc31456-e4e1-461b-9a62-75e5c9b86377",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.971Z",
+      "updated_at": "2025-03-06T10:41:00.971Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "linear density",
+          "unit": "kg/m",
+          "value": "2.7",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Steel window frame ",
+      "names": [
+        { "lang": "en", "value": "Steel window frame " },
+        { "lang": "de", "value": "Steel window frame " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 340,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "605a7b4b-113a-49e2-9335-7c7f33fdf6b7",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.044Z",
+      "updated_at": "2025-03-06T10:41:01.044Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Calcined gypsum (gypsum hemihydrate, plaster of Paris) ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Calcined gypsum (gypsum hemihydrate, plaster of Paris) "
+        },
+        {
+          "lang": "de",
+          "value": "Calcined gypsum (gypsum hemihydrate, plaster of Paris) "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "60a117b7-d27c-4cc3-ab44-7570293ff6a4",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.990Z",
+      "updated_at": "2025-03-06T10:40:59.990Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "2.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Cork flooring tile ",
+      "names": [
+        { "lang": "en", "value": "Cork flooring tile " },
+        { "lang": "de", "value": "Cork flooring tile " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 83,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "65fd9381-7f1a-4f99-a3ac-0ba2dd06ea4f",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.211Z",
+      "updated_at": "2025-03-06T10:41:00.211Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2200.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Ready mix concrete with Portland slag cement (25% GGBS) ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Ready mix concrete with Portland slag cement (25% GGBS) "
+        },
+        {
+          "lang": "de",
+          "value": "Ready mix concrete with Portland slag cement (25% GGBS) "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 41,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "66278e0d-0ea5-49e8-9069-f644b93e2ef7",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.739Z",
+      "updated_at": "2025-03-06T10:40:59.739Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "65.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Stone floor tile ",
+      "names": [
+        { "lang": "en", "value": "Stone floor tile " },
+        { "lang": "de", "value": "Stone floor tile " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 26,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "67155ec9-56bc-419a-b467-94f83367bfb4",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.761Z",
+      "updated_at": "2025-03-06T10:41:00.761Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "BOF Steel ",
+      "names": [
+        { "lang": "en", "value": "BOF Steel " },
+        { "lang": "de", "value": "BOF Steel " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 171,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "6c316fe6-0448-4ece-8044-98371a420bef",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.440Z",
+      "updated_at": "2025-03-06T10:41:00.440Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "655.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Kiln-dried timber ",
+      "names": [
+        { "lang": "en", "value": "Kiln-dried timber " },
+        { "lang": "de", "value": "Kiln-dried timber " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 136,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "6eca0913-81e3-46d2-b047-048c5bb63f34",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.831Z",
+      "updated_at": "2025-03-06T10:40:59.831Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "35.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Phosphogypsum panel ",
+      "names": [
+        { "lang": "en", "value": "Phosphogypsum panel " },
+        { "lang": "de", "value": "Phosphogypsum panel " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 25,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "7088d748-fb42-4e68-b013-084fe43ca66c",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.312Z",
+      "updated_at": "2025-03-06T10:40:59.312Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Cement (ordinary Portland cement, OPC) ",
+      "names": [
+        { "lang": "en", "value": "Cement (ordinary Portland cement, OPC) " },
+        { "lang": "de", "value": "Cement (ordinary Portland cement, OPC) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 3,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "71b465a4-e445-4cd4-a935-39de74c8a2ec",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.523Z",
+      "updated_at": "2025-03-06T10:40:59.523Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Lime (hydrated lime needed for aircrete, FaLG blocks) ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Lime (hydrated lime needed for aircrete, FaLG blocks) "
+        },
+        {
+          "lang": "de",
+          "value": "Lime (hydrated lime needed for aircrete, FaLG blocks) "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 41,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "77553389-d9a9-4568-978f-929e26fc38dd",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.248Z",
+      "updated_at": "2025-03-06T10:41:00.248Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "140.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Straw bale ",
+      "names": [
+        { "lang": "en", "value": "Straw bale " },
+        { "lang": "de", "value": "Straw bale " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 122,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "7988b563-38b6-4d98-a72f-d9686b6d2323",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.539Z",
+      "updated_at": "2025-03-06T10:40:59.539Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2200.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Lime mortar ",
+      "names": [
+        { "lang": "en", "value": "Lime mortar " },
+        { "lang": "de", "value": "Lime mortar " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 41,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "7d73e431-5868-410a-83b8-48153347d30f",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.623Z",
+      "updated_at": "2025-03-06T10:40:59.623Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "120.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Polished stone cladding ",
+      "names": [
+        { "lang": "en", "value": "Polished stone cladding " },
+        { "lang": "de", "value": "Polished stone cladding " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 24,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "8572ad21-639b-47be-9d16-1aced22066bb",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.161Z",
+      "updated_at": "2025-03-06T10:41:01.161Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2550.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Glass reinforced concrete ",
+      "names": [
+        { "lang": "en", "value": "Glass reinforced concrete " },
+        { "lang": "de", "value": "Glass reinforced concrete " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "890f0841-df77-4cb4-a026-80d2cb4e4ec2",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.231Z",
+      "updated_at": "2025-03-06T10:41:00.231Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "25.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Stone wool ",
+      "names": [
+        { "lang": "en", "value": "Stone wool " },
+        { "lang": "de", "value": "Stone wool " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 60,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "8bffad61-de3f-4aae-8e47-64d61cfe9b7a",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.423Z",
+      "updated_at": "2025-03-06T10:40:59.423Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "86.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Ferrocement wall panel ",
+      "names": [
+        { "lang": "en", "value": "Ferrocement wall panel " },
+        { "lang": "de", "value": "Ferrocement wall panel " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 40,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "8c9dc87c-b190-4b66-9003-89aecc70a0ff",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.792Z",
+      "updated_at": "2025-03-06T10:40:59.792Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "700.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Honeycomb brick ",
+      "names": [
+        { "lang": "en", "value": "Honeycomb brick " },
+        { "lang": "de", "value": "Honeycomb brick " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 20,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "8d9d7b47-21ce-4752-b27a-b569bd1063c4",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.171Z",
+      "updated_at": "2025-03-06T10:40:59.171Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Brick - Clamp kiln ",
+      "names": [
+        { "lang": "en", "value": "Brick - Clamp kiln " },
+        { "lang": "de", "value": "Brick - Clamp kiln " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 20,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "8ebdda81-3024-42b1-a9d0-ed151ee4bc05",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.867Z",
+      "updated_at": "2025-03-06T10:41:00.867Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "2.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Jute flooring ",
+      "names": [
+        { "lang": "en", "value": "Jute flooring " },
+        { "lang": "de", "value": "Jute flooring " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 440,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "905577e3-337d-4e86-8c3b-a995b0f3d8a5",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.059Z",
+      "updated_at": "2025-03-06T10:41:00.059Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "20.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Expanded polystyrene insulation (EPS) ",
+      "names": [
+        { "lang": "en", "value": "Expanded polystyrene insulation (EPS) " },
+        { "lang": "de", "value": "Expanded polystyrene insulation (EPS) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 62,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "95be7a6e-7732-4d88-8c2e-f8e7ee1b057a",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.707Z",
+      "updated_at": "2025-03-06T10:41:00.707Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "7850.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Steel reinforcement (steel rebar) ",
+      "names": [
+        { "lang": "en", "value": "Steel reinforcement (steel rebar) " },
+        { "lang": "de", "value": "Steel reinforcement (steel rebar) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 169,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "a2160df1-66e8-4e53-a506-196fac5d45c5",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.478Z",
+      "updated_at": "2025-03-06T10:40:59.478Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "4.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Gypsum plaster ",
+      "names": [
+        { "lang": "en", "value": "Gypsum plaster " },
+        { "lang": "de", "value": "Gypsum plaster " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 43,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "a31c2b82-d832-4899-bb5a-6fa3543dc4f4",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.875Z",
+      "updated_at": "2025-03-06T10:40:59.875Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2200.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Cement floor screed (concrete screed) ",
+      "names": [
+        { "lang": "en", "value": "Cement floor screed (concrete screed) " },
+        { "lang": "de", "value": "Cement floor screed (concrete screed) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 42,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "a600b5bf-c1ff-4698-aecc-604eda2dfbbd",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.343Z",
+      "updated_at": "2025-03-06T10:40:59.343Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2200.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Cement based plaster ",
+      "names": [
+        { "lang": "en", "value": "Cement based plaster " },
+        { "lang": "de", "value": "Cement based plaster " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 43,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "a70d6968-fc0d-449b-b67a-d6bd0c57218b",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.310Z",
+      "updated_at": "2025-03-06T10:41:00.310Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "5.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Bamboo flooring ",
+      "names": [
+        { "lang": "en", "value": "Bamboo flooring " },
+        { "lang": "de", "value": "Bamboo flooring " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 154,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "aadd87da-f014-4d8f-85a9-269f4c00bba9",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.946Z",
+      "updated_at": "2025-03-06T10:41:00.946Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "3.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Vinyl (PVC) flooring ",
+      "names": [
+        { "lang": "en", "value": "Vinyl (PVC) flooring " },
+        { "lang": "de", "value": "Vinyl (PVC) flooring " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 243,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "ab47235a-acf8-4bfd-886c-523305c5f375",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.097Z",
+      "updated_at": "2025-03-06T10:41:00.097Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "16.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Glass wool ",
+      "names": [
+        { "lang": "en", "value": "Glass wool " },
+        { "lang": "de", "value": "Glass wool " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 59,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "b1dcc2b0-2ac4-4f3f-b1a6-bfde10ea5c0e",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.600Z",
+      "updated_at": "2025-03-06T10:41:00.600Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "DRI Steel ",
+      "names": [
+        { "lang": "en", "value": "DRI Steel " },
+        { "lang": "de", "value": "DRI Steel " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 171,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "b3c9999f-e10a-4a60-9607-7341b2fa2862",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.926Z",
+      "updated_at": "2025-03-06T10:40:59.926Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "1760.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "FaLG (fly ash/lime/gypsum) block ",
+      "names": [
+        { "lang": "en", "value": "FaLG (fly ash/lime/gypsum) block " },
+        { "lang": "de", "value": "FaLG (fly ash/lime/gypsum) block " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 16,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "b8dfea8e-d375-41b9-b7c6-c2294bd2c714",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.845Z",
+      "updated_at": "2025-03-06T10:40:59.846Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "700.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Plasterboard ",
+      "names": [
+        { "lang": "en", "value": "Plasterboard " },
+        { "lang": "de", "value": "Plasterboard " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 31,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "b92311f7-d392-43af-a78e-fa2a77c82f30",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.467Z",
+      "updated_at": "2025-03-06T10:41:00.467Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Aluminum extruded profile ",
+      "names": [
+        { "lang": "en", "value": "Aluminum extruded profile " },
+        { "lang": "de", "value": "Aluminum extruded profile " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 182,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "bb33a02f-1873-43be-b6ba-b2bd09e4e665",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.017Z",
+      "updated_at": "2025-03-06T10:41:01.017Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "linear density",
+          "unit": "kg/m",
+          "value": "2.8",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "u-PVC window frame ",
+      "names": [
+        { "lang": "en", "value": "u-PVC window frame " },
+        { "lang": "de", "value": "u-PVC window frame " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "bbc018e0-634e-4416-9bb4-309eb58eec5e",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.531Z",
+      "updated_at": "2025-03-06T10:41:00.531Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2800.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Aluminum profiled cladding ",
+      "names": [
+        { "lang": "en", "value": "Aluminum profiled cladding " },
+        { "lang": "de", "value": "Aluminum profiled cladding " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 181,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "bc59bdfa-5952-41fe-b1e0-617da4c5e3e4",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.900Z",
+      "updated_at": "2025-03-06T10:41:00.900Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "3.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Linoleum flooring tile ",
+      "names": [
+        { "lang": "en", "value": "Linoleum flooring tile " },
+        { "lang": "de", "value": "Linoleum flooring tile " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 440,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "c4c9ff8f-74c2-415f-abb7-523d942dd4f9",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.488Z",
+      "updated_at": "2025-03-06T10:41:00.488Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "linear density",
+          "unit": "kg/m",
+          "value": "2.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Aluminum extruded profile (window frame) ",
+      "names": [
+        { "lang": "en", "value": "Aluminum extruded profile (window frame) " },
+        { "lang": "de", "value": "Aluminum extruded profile (window frame) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 182,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "c5477a36-c132-49e9-8fe7-c2945e111dc0",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.860Z",
+      "updated_at": "2025-03-06T10:40:59.860Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "BF slag ",
+      "names": [
+        { "lang": "en", "value": "BF slag " },
+        { "lang": "de", "value": "BF slag " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 16,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "c7c16c16-1f53-4b75-ab01-2297712c3226",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.713Z",
+      "updated_at": "2025-03-06T10:40:59.713Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Sand ",
+      "names": [
+        { "lang": "en", "value": "Sand " },
+        { "lang": "de", "value": "Sand " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 8,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "cadeccc9-016b-4868-a991-15b4a51e40d3",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.134Z",
+      "updated_at": "2025-03-06T10:41:00.134Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "32.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Polyurethane rigid insulation foam (HCFC blown) ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Polyurethane rigid insulation foam (HCFC blown) "
+        },
+        {
+          "lang": "de",
+          "value": "Polyurethane rigid insulation foam (HCFC blown) "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 71,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "cb763663-0c01-4d76-ad6f-2b92a7b94792",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.191Z",
+      "updated_at": "2025-03-06T10:41:01.191Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2000.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "OPC stabilized soil block ",
+      "names": [
+        { "lang": "en", "value": "OPC stabilized soil block " },
+        { "lang": "de", "value": "OPC stabilized soil block " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "ce66a453-6e2e-4cf8-8475-91997c697954",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.561Z",
+      "updated_at": "2025-03-06T10:41:00.561Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "6.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Aluminum thin composite cladding ",
+      "names": [
+        { "lang": "en", "value": "Aluminum thin composite cladding " },
+        { "lang": "de", "value": "Aluminum thin composite cladding " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 181,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "d0a2f94f-c788-41a3-bf1e-33dba4fcae60",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.638Z",
+      "updated_at": "2025-03-06T10:40:59.638Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Portland slag cement ",
+      "names": [
+        { "lang": "en", "value": "Portland slag cement " },
+        { "lang": "de", "value": "Portland slag cement " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 15,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "d428ba53-de30-44c9-ab55-fef848422c5e",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.044Z",
+      "updated_at": "2025-03-06T10:40:59.044Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Aggregate (mixed gravel/crushed stone) ",
+      "names": [
+        { "lang": "en", "value": "Aggregate (mixed gravel/crushed stone) " },
+        { "lang": "de", "value": "Aggregate (mixed gravel/crushed stone) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 8,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "d55d5958-f062-4c8a-922b-50a047b958b9",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.264Z",
+      "updated_at": "2025-03-06T10:41:00.264Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "12.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Woodwool board insulation ",
+      "names": [
+        { "lang": "en", "value": "Woodwool board insulation " },
+        { "lang": "de", "value": "Woodwool board insulation " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 85,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "d5d14616-db96-4a7d-acd0-6cce8733e092",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.843Z",
+      "updated_at": "2025-03-06T10:41:00.843Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Carpet tile (nylon) ",
+      "names": [
+        { "lang": "en", "value": "Carpet tile (nylon) " },
+        { "lang": "de", "value": "Carpet tile (nylon) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 440,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "d6f197d8-fdeb-40cd-9bef-4b1a6c001a65",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.795Z",
+      "updated_at": "2025-03-06T10:41:00.795Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "7850.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Galvanized steel stud ",
+      "names": [
+        { "lang": "en", "value": "Galvanized steel stud " },
+        { "lang": "de", "value": "Galvanized steel stud " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 171,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "d787dab1-d9cb-49bb-99d0-8fd3404f50e0",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.515Z",
+      "updated_at": "2025-03-06T10:41:00.515Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Aluminum ingot ",
+      "names": [
+        { "lang": "en", "value": "Aluminum ingot " },
+        { "lang": "de", "value": "Aluminum ingot " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 182,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "d813cdfe-1d02-449c-9d88-93e54885e4e1",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.700Z",
+      "updated_at": "2025-03-06T10:40:59.700Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2200.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Ready mix concrete with ordinary Portland cement (OPC) ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Ready mix concrete with ordinary Portland cement (OPC) "
+        },
+        {
+          "lang": "de",
+          "value": "Ready mix concrete with ordinary Portland cement (OPC) "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 40,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "d8b65c65-d1cd-4336-af76-a1423ba7e0a3",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.375Z",
+      "updated_at": "2025-03-06T10:40:59.375Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "50.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Cement-based terrazzo tile ",
+      "names": [
+        { "lang": "en", "value": "Cement-based terrazzo tile " },
+        { "lang": "de", "value": "Cement-based terrazzo tile " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 25,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "de065c0a-80aa-4f28-aa18-44fa76b4bff9",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.986Z",
+      "updated_at": "2025-03-06T10:41:00.986Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "linear density",
+          "unit": "kg/m",
+          "value": "3.2",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Timber window frame ",
+      "names": [
+        { "lang": "en", "value": "Timber window frame " },
+        { "lang": "de", "value": "Timber window frame " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 290,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "e03dc215-90ff-4851-94c9-a6c2b1bda90d",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.814Z",
+      "updated_at": "2025-03-06T10:41:00.814Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "2.2",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Carpet (nylon) ",
+      "names": [
+        { "lang": "en", "value": "Carpet (nylon) " },
+        { "lang": "de", "value": "Carpet (nylon) " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 440,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "e6448c73-b52a-4fa3-beb9-099b927de019",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.345Z",
+      "updated_at": "2025-03-06T10:41:00.345Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "600.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Plywood ",
+      "names": [
+        { "lang": "en", "value": "Plywood " },
+        { "lang": "de", "value": "Plywood " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 143,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "ecb4debd-102a-4575-aaf4-3b5d8ba2d371",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.128Z",
+      "updated_at": "2025-03-06T10:40:59.128Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Brick - Bulls trench kiln ",
+      "names": [
+        { "lang": "en", "value": "Brick - Bulls trench kiln " },
+        { "lang": "de", "value": "Brick - Bulls trench kiln " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 20,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "ee538a3c-65c9-4f15-a468-233369ad1b22",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.175Z",
+      "updated_at": "2025-03-06T10:41:01.175Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "1400.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Medium density concrete block ",
+      "names": [
+        { "lang": "en", "value": "Medium density concrete block " },
+        { "lang": "de", "value": "Medium density concrete block " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "f23fde72-14d6-4f36-9487-778c306537e6",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.675Z",
+      "updated_at": "2025-03-06T10:40:59.675Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "1900.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Rammed earth ",
+      "names": [
+        { "lang": "en", "value": "Rammed earth " },
+        { "lang": "de", "value": "Rammed earth " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 35,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "f56f7754-690a-421a-babd-d255b6033420",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.607Z",
+      "updated_at": "2025-03-06T10:40:59.607Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "2000.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "PFA stabilized soil block ",
+      "names": [
+        { "lang": "en", "value": "PFA stabilized soil block " },
+        { "lang": "de", "value": "PFA stabilized soil block " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 15,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "f591a567-8b3f-4f52-ae7a-61733f473b31",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.727Z",
+      "updated_at": "2025-03-06T10:40:59.727Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Shotcrete ",
+      "names": [
+        { "lang": "en", "value": "Shotcrete " },
+        { "lang": "de", "value": "Shotcrete " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 40,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "f8620622-c44e-478b-be59-25b4c1b677d5",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.454Z",
+      "updated_at": "2025-03-06T10:40:59.454Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "35.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Gypsum panel ",
+      "names": [
+        { "lang": "en", "value": "Gypsum panel " },
+        { "lang": "de", "value": "Gypsum panel " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 31,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "f974bb0b-4979-435f-950c-c6d9d6d33325",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:01.260Z",
+      "updated_at": "2025-03-06T10:41:01.260Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "area density",
+          "unit": "kg/m^2",
+          "value": "3.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Polymeric render for external walls ",
+      "names": [
+        { "lang": "en", "value": "Polymeric render for external walls " },
+        { "lang": "de", "value": "Polymeric render for external walls " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 341,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "fda99229-68b7-49ee-b7d4-7fe128af97a8",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:41:00.177Z",
+      "updated_at": "2025-03-06T10:41:00.177Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [
+        {
+          "name": "volume density",
+          "unit": "kg/m^3",
+          "value": "32.0",
+          "unit_description": "-"
+        }
+      ],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Polyurethane rigid insulation foam (pentane blown) ",
+      "names": [
+        {
+          "lang": "en",
+          "value": "Polyurethane rigid insulation foam (pentane blown) "
+        },
+        {
+          "lang": "de",
+          "value": "Polyurethane rigid insulation foam (pentane blown) "
+        }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 71,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epd",
+    "pk": "ffcc22bd-1a43-45da-9412-bb35db008d46",
+    "fields": {
+      "created_by": null,
+      "created_at": "2025-03-06T10:40:59.240Z",
+      "updated_at": "2025-03-06T10:40:59.240Z",
+      "public": true,
+      "draft": false,
+      "comment": null,
+      "conversions": [],
+      "declared_unit": "kg",
+      "UUID": "",
+      "name": "Brick - Hoffman kiln ",
+      "names": [
+        { "lang": "en", "value": "Brick - Hoffman kiln " },
+        { "lang": "de", "value": "Brick - Hoffman kiln " }
+      ],
+      "version": null,
+      "country": 3,
+      "city": null,
+      "category": 20,
+      "source": "https://edgebuildings.com/wp-content/uploads/2022/04/IFC-India-Construction-Materials-Database-Methodology-Report.pdf",
+      "type": "official",
+      "declared_amount": "1.00"
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1149,
+    "fields": {
+      "epd": "d428ba53-de30-44c9-ab55-fef848422c5e",
+      "impact": 1,
+      "value": 0.11
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1150,
+    "fields": {
+      "epd": "d428ba53-de30-44c9-ab55-fef848422c5e",
+      "impact": 4,
+      "value": 0.01
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1151,
+    "fields": {
+      "epd": "57c174de-f9b7-4e69-baee-7560e65a7e56",
+      "impact": 1,
+      "value": 3.7
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1152,
+    "fields": {
+      "epd": "57c174de-f9b7-4e69-baee-7560e65a7e56",
+      "impact": 4,
+      "value": 0.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1153,
+    "fields": {
+      "epd": "349550b5-5fd8-498d-bbe6-448e0f50b781",
+      "impact": 1,
+      "value": 11.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1154,
+    "fields": {
+      "epd": "349550b5-5fd8-498d-bbe6-448e0f50b781",
+      "impact": 4,
+      "value": 0.24
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1155,
+    "fields": {
+      "epd": "ecb4debd-102a-4575-aaf4-3b5d8ba2d371",
+      "impact": 1,
+      "value": 3.6
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1156,
+    "fields": {
+      "epd": "ecb4debd-102a-4575-aaf4-3b5d8ba2d371",
+      "impact": 4,
+      "value": 0.32
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1157,
+    "fields": {
+      "epd": "8d9d7b47-21ce-4752-b27a-b569bd1063c4",
+      "impact": 1,
+      "value": 6.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1158,
+    "fields": {
+      "epd": "8d9d7b47-21ce-4752-b27a-b569bd1063c4",
+      "impact": 4,
+      "value": 0.57
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1159,
+    "fields": {
+      "epd": "38bda26c-37fc-46a3-8fb2-facbdcc536e6",
+      "impact": 1,
+      "value": 6.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1160,
+    "fields": {
+      "epd": "38bda26c-37fc-46a3-8fb2-facbdcc536e6",
+      "impact": 4,
+      "value": 0.59
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1161,
+    "fields": {
+      "epd": "ffcc22bd-1a43-45da-9412-bb35db008d46",
+      "impact": 1,
+      "value": 3.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1162,
+    "fields": {
+      "epd": "ffcc22bd-1a43-45da-9412-bb35db008d46",
+      "impact": 4,
+      "value": 0.31
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1163,
+    "fields": {
+      "epd": "4a96dfe3-5fc2-4798-ad88-f1cc6ad8af1f",
+      "impact": 1,
+      "value": 4.4
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1164,
+    "fields": {
+      "epd": "4a96dfe3-5fc2-4798-ad88-f1cc6ad8af1f",
+      "impact": 4,
+      "value": 0.39
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1165,
+    "fields": {
+      "epd": "7088d748-fb42-4e68-b013-084fe43ca66c",
+      "impact": 1,
+      "value": 6.4
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1166,
+    "fields": {
+      "epd": "7088d748-fb42-4e68-b013-084fe43ca66c",
+      "impact": 4,
+      "value": 0.91
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1167,
+    "fields": {
+      "epd": "a600b5bf-c1ff-4698-aecc-604eda2dfbbd",
+      "impact": 1,
+      "value": 4.8
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1168,
+    "fields": {
+      "epd": "a600b5bf-c1ff-4698-aecc-604eda2dfbbd",
+      "impact": 4,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1169,
+    "fields": {
+      "epd": "4e7b075f-aa4a-4b7b-8eb3-304719e97c1a",
+      "impact": 1,
+      "value": 1.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1170,
+    "fields": {
+      "epd": "4e7b075f-aa4a-4b7b-8eb3-304719e97c1a",
+      "impact": 4,
+      "value": 0.14
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1171,
+    "fields": {
+      "epd": "d8b65c65-d1cd-4336-af76-a1423ba7e0a3",
+      "impact": 1,
+      "value": 4.6
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1172,
+    "fields": {
+      "epd": "d8b65c65-d1cd-4336-af76-a1423ba7e0a3",
+      "impact": 4,
+      "value": 0.51
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1173,
+    "fields": {
+      "epd": "319fd07d-03b7-4293-8537-b0603d7666bc",
+      "impact": 1,
+      "value": 7.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1174,
+    "fields": {
+      "epd": "319fd07d-03b7-4293-8537-b0603d7666bc",
+      "impact": 4,
+      "value": 0.69
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1175,
+    "fields": {
+      "epd": "414c9402-7c16-433f-adc1-4ab41c1908c2",
+      "impact": 1,
+      "value": 1.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1176,
+    "fields": {
+      "epd": "414c9402-7c16-433f-adc1-4ab41c1908c2",
+      "impact": 4,
+      "value": 0.16
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1177,
+    "fields": {
+      "epd": "2671d197-74a4-40a3-9f21-097bb30345c1",
+      "impact": 1,
+      "value": 2.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1178,
+    "fields": {
+      "epd": "2671d197-74a4-40a3-9f21-097bb30345c1",
+      "impact": 4,
+      "value": 0.29
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1179,
+    "fields": {
+      "epd": "8bffad61-de3f-4aae-8e47-64d61cfe9b7a",
+      "impact": 1,
+      "value": 2.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1180,
+    "fields": {
+      "epd": "8bffad61-de3f-4aae-8e47-64d61cfe9b7a",
+      "impact": 4,
+      "value": 0.29
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1181,
+    "fields": {
+      "epd": "05994d82-5293-4709-a2b8-e7caaf6e3465",
+      "impact": 1,
+      "value": 0.044
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1182,
+    "fields": {
+      "epd": "05994d82-5293-4709-a2b8-e7caaf6e3465",
+      "impact": 4,
+      "value": 0.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1183,
+    "fields": {
+      "epd": "f8620622-c44e-478b-be59-25b4c1b677d5",
+      "impact": 1,
+      "value": 3.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1184,
+    "fields": {
+      "epd": "f8620622-c44e-478b-be59-25b4c1b677d5",
+      "impact": 4,
+      "value": 0.26
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1185,
+    "fields": {
+      "epd": "a2160df1-66e8-4e53-a506-196fac5d45c5",
+      "impact": 1,
+      "value": 1.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1186,
+    "fields": {
+      "epd": "a2160df1-66e8-4e53-a506-196fac5d45c5",
+      "impact": 4,
+      "value": 0.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1187,
+    "fields": {
+      "epd": "37537197-0af2-4d23-a87e-7581fa9c5e39",
+      "impact": 1,
+      "value": 3.6
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1188,
+    "fields": {
+      "epd": "37537197-0af2-4d23-a87e-7581fa9c5e39",
+      "impact": 4,
+      "value": 0.37
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1189,
+    "fields": {
+      "epd": "71b465a4-e445-4cd4-a935-39de74c8a2ec",
+      "impact": 1,
+      "value": 4.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1190,
+    "fields": {
+      "epd": "71b465a4-e445-4cd4-a935-39de74c8a2ec",
+      "impact": 4,
+      "value": 1.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1191,
+    "fields": {
+      "epd": "7988b563-38b6-4d98-a72f-d9686b6d2323",
+      "impact": 1,
+      "value": 1.6
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1192,
+    "fields": {
+      "epd": "7988b563-38b6-4d98-a72f-d9686b6d2323",
+      "impact": 4,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1193,
+    "fields": {
+      "epd": "094d2df8-37ef-485a-bd6c-9d1b1e6d006f",
+      "impact": 1,
+      "value": 0.46
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1194,
+    "fields": {
+      "epd": "094d2df8-37ef-485a-bd6c-9d1b1e6d006f",
+      "impact": 4,
+      "value": -0.03
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1195,
+    "fields": {
+      "epd": "494a8b5b-0d11-4157-ab87-745572f2bf59",
+      "impact": 1,
+      "value": 0.64
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1196,
+    "fields": {
+      "epd": "494a8b5b-0d11-4157-ab87-745572f2bf59",
+      "impact": 4,
+      "value": 0.06
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1197,
+    "fields": {
+      "epd": "49552ffa-0968-4a67-ab95-e19eb50d9fae",
+      "impact": 1,
+      "value": 4.6
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1198,
+    "fields": {
+      "epd": "49552ffa-0968-4a67-ab95-e19eb50d9fae",
+      "impact": 4,
+      "value": 0.64
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1199,
+    "fields": {
+      "epd": "f56f7754-690a-421a-babd-d255b6033420",
+      "impact": 1,
+      "value": 0.11
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1200,
+    "fields": {
+      "epd": "f56f7754-690a-421a-babd-d255b6033420",
+      "impact": 4,
+      "value": 0.01
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1201,
+    "fields": {
+      "epd": "7d73e431-5868-410a-83b8-48153347d30f",
+      "impact": 1,
+      "value": 3.7
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1202,
+    "fields": {
+      "epd": "7d73e431-5868-410a-83b8-48153347d30f",
+      "impact": 4,
+      "value": 0.31
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1203,
+    "fields": {
+      "epd": "d0a2f94f-c788-41a3-bf1e-33dba4fcae60",
+      "impact": 1,
+      "value": 4.9
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1204,
+    "fields": {
+      "epd": "d0a2f94f-c788-41a3-bf1e-33dba4fcae60",
+      "impact": 4,
+      "value": 0.69
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1205,
+    "fields": {
+      "epd": "0d8a700e-5bb5-4bf6-9dd0-2ae90f1a3ae2",
+      "impact": 1,
+      "value": 0.55
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1206,
+    "fields": {
+      "epd": "0d8a700e-5bb5-4bf6-9dd0-2ae90f1a3ae2",
+      "impact": 4,
+      "value": 0.073
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1207,
+    "fields": {
+      "epd": "22b50516-16f2-44d2-b5dc-f6a3ddb2acb3",
+      "impact": 1,
+      "value": 2.6
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1208,
+    "fields": {
+      "epd": "22b50516-16f2-44d2-b5dc-f6a3ddb2acb3",
+      "impact": 4,
+      "value": 0.27
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1209,
+    "fields": {
+      "epd": "f23fde72-14d6-4f36-9487-778c306537e6",
+      "impact": 1,
+      "value": 2.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1210,
+    "fields": {
+      "epd": "f23fde72-14d6-4f36-9487-778c306537e6",
+      "impact": 4,
+      "value": -0.01
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1211,
+    "fields": {
+      "epd": "58458d4b-df66-4064-9bee-d4ca8916ea2c",
+      "impact": 1,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1212,
+    "fields": {
+      "epd": "58458d4b-df66-4064-9bee-d4ca8916ea2c",
+      "impact": 4,
+      "value": 0.084
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1213,
+    "fields": {
+      "epd": "d813cdfe-1d02-449c-9d88-93e54885e4e1",
+      "impact": 1,
+      "value": 0.87
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1214,
+    "fields": {
+      "epd": "d813cdfe-1d02-449c-9d88-93e54885e4e1",
+      "impact": 4,
+      "value": 0.11
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1215,
+    "fields": {
+      "epd": "c7c16c16-1f53-4b75-ab01-2297712c3226",
+      "impact": 1,
+      "value": 0.11
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1216,
+    "fields": {
+      "epd": "c7c16c16-1f53-4b75-ab01-2297712c3226",
+      "impact": 4,
+      "value": 0.01
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1217,
+    "fields": {
+      "epd": "f591a567-8b3f-4f52-ae7a-61733f473b31",
+      "impact": 1,
+      "value": 2.7
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1218,
+    "fields": {
+      "epd": "f591a567-8b3f-4f52-ae7a-61733f473b31",
+      "impact": 4,
+      "value": 0.24
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1219,
+    "fields": {
+      "epd": "66278e0d-0ea5-49e8-9069-f644b93e2ef7",
+      "impact": 1,
+      "value": 0.44
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1220,
+    "fields": {
+      "epd": "66278e0d-0ea5-49e8-9069-f644b93e2ef7",
+      "impact": 4,
+      "value": 0.056
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1221,
+    "fields": {
+      "epd": "3aff9d5a-b1fa-4a8d-9fff-a4a7258f0f48",
+      "impact": 1,
+      "value": 5.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1222,
+    "fields": {
+      "epd": "3aff9d5a-b1fa-4a8d-9fff-a4a7258f0f48",
+      "impact": 4,
+      "value": 0.47
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1223,
+    "fields": {
+      "epd": "4df5d361-3998-4735-8058-2b8004c304fa",
+      "impact": 1,
+      "value": 8.2
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1224,
+    "fields": {
+      "epd": "4df5d361-3998-4735-8058-2b8004c304fa",
+      "impact": 4,
+      "value": 0.68
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1225,
+    "fields": {
+      "epd": "1d62b62e-494e-4b90-8153-bc7dcc9746ec",
+      "impact": 1,
+      "value": 7.8
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1226,
+    "fields": {
+      "epd": "1d62b62e-494e-4b90-8153-bc7dcc9746ec",
+      "impact": 4,
+      "value": 0.67
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1227,
+    "fields": {
+      "epd": "8c9dc87c-b190-4b66-9003-89aecc70a0ff",
+      "impact": 1,
+      "value": 3.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1228,
+    "fields": {
+      "epd": "8c9dc87c-b190-4b66-9003-89aecc70a0ff",
+      "impact": 4,
+      "value": 0.31
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1229,
+    "fields": {
+      "epd": "0eb3f6d1-96b1-40d0-a91f-8869c65783a4",
+      "impact": 1,
+      "value": 13.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1230,
+    "fields": {
+      "epd": "0eb3f6d1-96b1-40d0-a91f-8869c65783a4",
+      "impact": 4,
+      "value": 1.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1231,
+    "fields": {
+      "epd": "4ecb01fd-00a7-49bc-a517-d033dee5152b",
+      "impact": 1,
+      "value": 1.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1232,
+    "fields": {
+      "epd": "4ecb01fd-00a7-49bc-a517-d033dee5152b",
+      "impact": 4,
+      "value": 0.056
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1233,
+    "fields": {
+      "epd": "6eca0913-81e3-46d2-b047-048c5bb63f34",
+      "impact": 1,
+      "value": 3.7
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1234,
+    "fields": {
+      "epd": "6eca0913-81e3-46d2-b047-048c5bb63f34",
+      "impact": 4,
+      "value": 0.25
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1235,
+    "fields": {
+      "epd": "b8dfea8e-d375-41b9-b7c6-c2294bd2c714",
+      "impact": 1,
+      "value": 6.8
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1236,
+    "fields": {
+      "epd": "b8dfea8e-d375-41b9-b7c6-c2294bd2c714",
+      "impact": 4,
+      "value": 0.43
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1237,
+    "fields": {
+      "epd": "c5477a36-c132-49e9-8fe7-c2945e111dc0",
+      "impact": 1,
+      "value": 0.64
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1238,
+    "fields": {
+      "epd": "c5477a36-c132-49e9-8fe7-c2945e111dc0",
+      "impact": 4,
+      "value": 0.07
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1239,
+    "fields": {
+      "epd": "a31c2b82-d832-4899-bb5a-6fa3543dc4f4",
+      "impact": 1,
+      "value": 1.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1240,
+    "fields": {
+      "epd": "a31c2b82-d832-4899-bb5a-6fa3543dc4f4",
+      "impact": 4,
+      "value": 0.18
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1241,
+    "fields": {
+      "epd": "2daada6b-3135-4c28-8b34-0bc33ee1145b",
+      "impact": 1,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1242,
+    "fields": {
+      "epd": "2daada6b-3135-4c28-8b34-0bc33ee1145b",
+      "impact": 4,
+      "value": 0.27
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1243,
+    "fields": {
+      "epd": "b3c9999f-e10a-4a60-9607-7341b2fa2862",
+      "impact": 1,
+      "value": 0.83
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1244,
+    "fields": {
+      "epd": "b3c9999f-e10a-4a60-9607-7341b2fa2862",
+      "impact": 4,
+      "value": 0.2
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1245,
+    "fields": {
+      "epd": "0021ba3f-bfb6-435e-a17d-30cd846d1800",
+      "impact": 1,
+      "value": 3.6
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1246,
+    "fields": {
+      "epd": "0021ba3f-bfb6-435e-a17d-30cd846d1800",
+      "impact": 4,
+      "value": -1.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1247,
+    "fields": {
+      "epd": "60a117b7-d27c-4cc3-ab44-7570293ff6a4",
+      "impact": 1,
+      "value": 62.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1248,
+    "fields": {
+      "epd": "60a117b7-d27c-4cc3-ab44-7570293ff6a4",
+      "impact": 4,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1249,
+    "fields": {
+      "epd": "4922d6cc-f671-4d01-a3a4-b38c1c80d16a",
+      "impact": 1,
+      "value": 8.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1250,
+    "fields": {
+      "epd": "4922d6cc-f671-4d01-a3a4-b38c1c80d16a",
+      "impact": 4,
+      "value": -1.4
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1251,
+    "fields": {
+      "epd": "905577e3-337d-4e86-8c3b-a995b0f3d8a5",
+      "impact": 1,
+      "value": 85.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1252,
+    "fields": {
+      "epd": "905577e3-337d-4e86-8c3b-a995b0f3d8a5",
+      "impact": 4,
+      "value": 2.9
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1253,
+    "fields": {
+      "epd": "ab47235a-acf8-4bfd-886c-523305c5f375",
+      "impact": 1,
+      "value": 37.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1254,
+    "fields": {
+      "epd": "ab47235a-acf8-4bfd-886c-523305c5f375",
+      "impact": 4,
+      "value": 2.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1255,
+    "fields": {
+      "epd": "cadeccc9-016b-4868-a991-15b4a51e40d3",
+      "impact": 1,
+      "value": 120.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1256,
+    "fields": {
+      "epd": "cadeccc9-016b-4868-a991-15b4a51e40d3",
+      "impact": 4,
+      "value": 12.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1257,
+    "fields": {
+      "epd": "fda99229-68b7-49ee-b7d4-7fe128af97a8",
+      "impact": 1,
+      "value": 120.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1258,
+    "fields": {
+      "epd": "fda99229-68b7-49ee-b7d4-7fe128af97a8",
+      "impact": 4,
+      "value": 8.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1259,
+    "fields": {
+      "epd": "65fd9381-7f1a-4f99-a3ac-0ba2dd06ea4f",
+      "impact": 1,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1260,
+    "fields": {
+      "epd": "65fd9381-7f1a-4f99-a3ac-0ba2dd06ea4f",
+      "impact": 4,
+      "value": 0.089
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1261,
+    "fields": {
+      "epd": "890f0841-df77-4cb4-a026-80d2cb4e4ec2",
+      "impact": 1,
+      "value": 15.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1262,
+    "fields": {
+      "epd": "890f0841-df77-4cb4-a026-80d2cb4e4ec2",
+      "impact": 4,
+      "value": 1.4
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1263,
+    "fields": {
+      "epd": "77553389-d9a9-4568-978f-929e26fc38dd",
+      "impact": 1,
+      "value": 0.63
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1264,
+    "fields": {
+      "epd": "77553389-d9a9-4568-978f-929e26fc38dd",
+      "impact": 4,
+      "value": -1.4
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1265,
+    "fields": {
+      "epd": "d55d5958-f062-4c8a-922b-50a047b958b9",
+      "impact": 1,
+      "value": 12.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1266,
+    "fields": {
+      "epd": "d55d5958-f062-4c8a-922b-50a047b958b9",
+      "impact": 4,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1267,
+    "fields": {
+      "epd": "5a62d840-5253-441a-93d2-d6b3259a60df",
+      "impact": 1,
+      "value": 4.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1268,
+    "fields": {
+      "epd": "5a62d840-5253-441a-93d2-d6b3259a60df",
+      "impact": 4,
+      "value": -1.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1269,
+    "fields": {
+      "epd": "a70d6968-fc0d-449b-b67a-d6bd0c57218b",
+      "impact": 1,
+      "value": 110.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1270,
+    "fields": {
+      "epd": "a70d6968-fc0d-449b-b67a-d6bd0c57218b",
+      "impact": 4,
+      "value": 2.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1271,
+    "fields": {
+      "epd": "e6448c73-b52a-4fa3-beb9-099b927de019",
+      "impact": 1,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1272,
+    "fields": {
+      "epd": "e6448c73-b52a-4fa3-beb9-099b927de019",
+      "impact": 4,
+      "value": -0.31
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1273,
+    "fields": {
+      "epd": "440ac9ac-2004-4de0-8934-3293d0dccaa8",
+      "impact": 1,
+      "value": 64.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1274,
+    "fields": {
+      "epd": "440ac9ac-2004-4de0-8934-3293d0dccaa8",
+      "impact": 4,
+      "value": 1.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1275,
+    "fields": {
+      "epd": "4a0b26b2-686d-4eb7-9394-02e6102f7f49",
+      "impact": 1,
+      "value": 77.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1276,
+    "fields": {
+      "epd": "4a0b26b2-686d-4eb7-9394-02e6102f7f49",
+      "impact": 4,
+      "value": 2.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1277,
+    "fields": {
+      "epd": "6c316fe6-0448-4ece-8044-98371a420bef",
+      "impact": 1,
+      "value": 15.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1278,
+    "fields": {
+      "epd": "6c316fe6-0448-4ece-8044-98371a420bef",
+      "impact": 4,
+      "value": -0.43
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1279,
+    "fields": {
+      "epd": "b92311f7-d392-43af-a78e-fa2a77c82f30",
+      "impact": 1,
+      "value": 330.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1280,
+    "fields": {
+      "epd": "b92311f7-d392-43af-a78e-fa2a77c82f30",
+      "impact": 4,
+      "value": 33.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1281,
+    "fields": {
+      "epd": "c4c9ff8f-74c2-415f-abb7-523d942dd4f9",
+      "impact": 1,
+      "value": 280.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1282,
+    "fields": {
+      "epd": "c4c9ff8f-74c2-415f-abb7-523d942dd4f9",
+      "impact": 4,
+      "value": 26.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1283,
+    "fields": {
+      "epd": "d787dab1-d9cb-49bb-99d0-8fd3404f50e0",
+      "impact": 1,
+      "value": 310.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1284,
+    "fields": {
+      "epd": "d787dab1-d9cb-49bb-99d0-8fd3404f50e0",
+      "impact": 4,
+      "value": 31.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1285,
+    "fields": {
+      "epd": "bbc018e0-634e-4416-9bb4-309eb58eec5e",
+      "impact": 1,
+      "value": 360.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1286,
+    "fields": {
+      "epd": "bbc018e0-634e-4416-9bb4-309eb58eec5e",
+      "impact": 4,
+      "value": 35.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1287,
+    "fields": {
+      "epd": "4f2bfcfb-c008-4b39-bfb3-757cba458de8",
+      "impact": 1,
+      "value": 330.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1288,
+    "fields": {
+      "epd": "4f2bfcfb-c008-4b39-bfb3-757cba458de8",
+      "impact": 4,
+      "value": 32.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1289,
+    "fields": {
+      "epd": "ce66a453-6e2e-4cf8-8475-91997c697954",
+      "impact": 1,
+      "value": 220.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1290,
+    "fields": {
+      "epd": "ce66a453-6e2e-4cf8-8475-91997c697954",
+      "impact": 4,
+      "value": 18.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1291,
+    "fields": {
+      "epd": "2bbbca76-5e6a-4d0d-8d74-88d134152b91",
+      "impact": 1,
+      "value": 90.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1292,
+    "fields": {
+      "epd": "2bbbca76-5e6a-4d0d-8d74-88d134152b91",
+      "impact": 4,
+      "value": 7.4
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1293,
+    "fields": {
+      "epd": "b1dcc2b0-2ac4-4f3f-b1a6-bfde10ea5c0e",
+      "impact": 1,
+      "value": 38.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1294,
+    "fields": {
+      "epd": "b1dcc2b0-2ac4-4f3f-b1a6-bfde10ea5c0e",
+      "impact": 4,
+      "value": 2.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1295,
+    "fields": {
+      "epd": "01f92a84-d5bc-4b2b-ac9b-b0a1f4b085c1",
+      "impact": 1,
+      "value": 9.9
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1296,
+    "fields": {
+      "epd": "01f92a84-d5bc-4b2b-ac9b-b0a1f4b085c1",
+      "impact": 4,
+      "value": 0.83
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1297,
+    "fields": {
+      "epd": "516fb90c-c639-416a-8df5-5847a8370953",
+      "impact": 1,
+      "value": 35.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1298,
+    "fields": {
+      "epd": "516fb90c-c639-416a-8df5-5847a8370953",
+      "impact": 4,
+      "value": 3.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1299,
+    "fields": {
+      "epd": "95be7a6e-7732-4d88-8c2e-f8e7ee1b057a",
+      "impact": 1,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1300,
+    "fields": {
+      "epd": "95be7a6e-7732-4d88-8c2e-f8e7ee1b057a",
+      "impact": 4,
+      "value": 2.6
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1301,
+    "fields": {
+      "epd": "1231dd37-08c9-4e94-9818-dceb28f62e02",
+      "impact": 1,
+      "value": 30.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1302,
+    "fields": {
+      "epd": "1231dd37-08c9-4e94-9818-dceb28f62e02",
+      "impact": 4,
+      "value": 2.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1303,
+    "fields": {
+      "epd": "67155ec9-56bc-419a-b467-94f83367bfb4",
+      "impact": 1,
+      "value": 24.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1304,
+    "fields": {
+      "epd": "67155ec9-56bc-419a-b467-94f83367bfb4",
+      "impact": 4,
+      "value": 2.8
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1305,
+    "fields": {
+      "epd": "d6f197d8-fdeb-40cd-9bef-4b1a6c001a65",
+      "impact": 1,
+      "value": 37.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1306,
+    "fields": {
+      "epd": "d6f197d8-fdeb-40cd-9bef-4b1a6c001a65",
+      "impact": 4,
+      "value": 3.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1307,
+    "fields": {
+      "epd": "e03dc215-90ff-4851-94c9-a6c2b1bda90d",
+      "impact": 1,
+      "value": 130.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1308,
+    "fields": {
+      "epd": "e03dc215-90ff-4851-94c9-a6c2b1bda90d",
+      "impact": 4,
+      "value": 7.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1309,
+    "fields": {
+      "epd": "d5d14616-db96-4a7d-acd0-6cce8733e092",
+      "impact": 1,
+      "value": 47.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1310,
+    "fields": {
+      "epd": "d5d14616-db96-4a7d-acd0-6cce8733e092",
+      "impact": 4,
+      "value": 2.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1311,
+    "fields": {
+      "epd": "8ebdda81-3024-42b1-a9d0-ed151ee4bc05",
+      "impact": 1,
+      "value": 29.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1312,
+    "fields": {
+      "epd": "8ebdda81-3024-42b1-a9d0-ed151ee4bc05",
+      "impact": 4,
+      "value": 0.91
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1313,
+    "fields": {
+      "epd": "bc59bdfa-5952-41fe-b1e0-617da4c5e3e4",
+      "impact": 1,
+      "value": 49.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1314,
+    "fields": {
+      "epd": "bc59bdfa-5952-41fe-b1e0-617da4c5e3e4",
+      "impact": 4,
+      "value": 1.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1315,
+    "fields": {
+      "epd": "3bc8e632-535a-49df-87a7-a9ed073e437b",
+      "impact": 1,
+      "value": 67.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1316,
+    "fields": {
+      "epd": "3bc8e632-535a-49df-87a7-a9ed073e437b",
+      "impact": 4,
+      "value": 3.6
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1317,
+    "fields": {
+      "epd": "aadd87da-f014-4d8f-85a9-269f4c00bba9",
+      "impact": 1,
+      "value": 55.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1318,
+    "fields": {
+      "epd": "aadd87da-f014-4d8f-85a9-269f4c00bba9",
+      "impact": 4,
+      "value": 2.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1319,
+    "fields": {
+      "epd": "174003b9-9317-4c3d-845e-0342d0c833f4",
+      "impact": 1,
+      "value": 17.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1320,
+    "fields": {
+      "epd": "174003b9-9317-4c3d-845e-0342d0c833f4",
+      "impact": 4,
+      "value": 1.2
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1321,
+    "fields": {
+      "epd": "5cc31456-e4e1-461b-9a62-75e5c9b86377",
+      "impact": 1,
+      "value": 51.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1322,
+    "fields": {
+      "epd": "5cc31456-e4e1-461b-9a62-75e5c9b86377",
+      "impact": 4,
+      "value": 3.5
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1323,
+    "fields": {
+      "epd": "de065c0a-80aa-4f28-aa18-44fa76b4bff9",
+      "impact": 1,
+      "value": 63.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1324,
+    "fields": {
+      "epd": "de065c0a-80aa-4f28-aa18-44fa76b4bff9",
+      "impact": 4,
+      "value": 2.4
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1325,
+    "fields": {
+      "epd": "bb33a02f-1873-43be-b6ba-b2bd09e4e665",
+      "impact": 1,
+      "value": 61.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1326,
+    "fields": {
+      "epd": "bb33a02f-1873-43be-b6ba-b2bd09e4e665",
+      "impact": 4,
+      "value": 3.9
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1327,
+    "fields": {
+      "epd": "605a7b4b-113a-49e2-9335-7c7f33fdf6b7",
+      "impact": 1,
+      "value": 1.7
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1328,
+    "fields": {
+      "epd": "605a7b4b-113a-49e2-9335-7c7f33fdf6b7",
+      "impact": 4,
+      "value": 0.13
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1329,
+    "fields": {
+      "epd": "238dad16-7d4f-4113-b6e9-bd545140495d",
+      "impact": 1,
+      "value": 1.8
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1330,
+    "fields": {
+      "epd": "238dad16-7d4f-4113-b6e9-bd545140495d",
+      "impact": 4,
+      "value": 0.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1331,
+    "fields": {
+      "epd": "5459f922-e237-41d6-9e98-403a2719e285",
+      "impact": 1,
+      "value": 4.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1332,
+    "fields": {
+      "epd": "5459f922-e237-41d6-9e98-403a2719e285",
+      "impact": 4,
+      "value": 0.41
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1333,
+    "fields": {
+      "epd": "4640b9dd-fe42-44dd-b3e4-7e68f739d5e2",
+      "impact": 1,
+      "value": 38.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1334,
+    "fields": {
+      "epd": "4640b9dd-fe42-44dd-b3e4-7e68f739d5e2",
+      "impact": 4,
+      "value": 1.9
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1335,
+    "fields": {
+      "epd": "8572ad21-639b-47be-9d16-1aced22066bb",
+      "impact": 1,
+      "value": 1.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1336,
+    "fields": {
+      "epd": "8572ad21-639b-47be-9d16-1aced22066bb",
+      "impact": 4,
+      "value": 0.16
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1337,
+    "fields": {
+      "epd": "ee538a3c-65c9-4f15-a468-233369ad1b22",
+      "impact": 1,
+      "value": 2.7
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1338,
+    "fields": {
+      "epd": "ee538a3c-65c9-4f15-a468-233369ad1b22",
+      "impact": 4,
+      "value": 0.29
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1339,
+    "fields": {
+      "epd": "cb763663-0c01-4d76-ad6f-2b92a7b94792",
+      "impact": 1,
+      "value": 0.7
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1340,
+    "fields": {
+      "epd": "cb763663-0c01-4d76-ad6f-2b92a7b94792",
+      "impact": 4,
+      "value": 0.1
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1341,
+    "fields": {
+      "epd": "468569ce-45bf-4055-8701-fc9648a8eb33",
+      "impact": 1,
+      "value": 12.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1342,
+    "fields": {
+      "epd": "468569ce-45bf-4055-8701-fc9648a8eb33",
+      "impact": 4,
+      "value": -1.3
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1343,
+    "fields": {
+      "epd": "f974bb0b-4979-435f-950c-c6d9d6d33325",
+      "impact": 1,
+      "value": 12.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1344,
+    "fields": {
+      "epd": "f974bb0b-4979-435f-950c-c6d9d6d33325",
+      "impact": 4,
+      "value": 0.85
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1345,
+    "fields": {
+      "epd": "276bf074-f190-4d91-8541-731ee104a4df",
+      "impact": 1,
+      "value": 98.0
+    }
+  },
+  {
+    "model": "pages.epdimpact",
+    "pk": 1346,
+    "fields": {
+      "epd": "276bf074-f190-4d91-8541-731ee104a4df",
+      "impact": 4,
+      "value": 3.1
+    }
+  }
+]
