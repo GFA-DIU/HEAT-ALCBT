@@ -51,17 +51,17 @@
                        name="material_{{ epd.id }}_quantity" 
                        class="form-control w-auto"
                        placeholder="Quantity"
-                       min="0.01"
-                       {% if epd.selection_unit == "percent" %}max="100"{% endif %}
-                       step="{{ epd.selection_unit|get_step }}"
-                       {% if epd.selection_quantity%}value="{{ epd.selection_quantity }}"{% endif %}
+                       min="{{ epd.selection_unit | get_step }}"
+                       {% if epd.selection_unit == "percent" %} max="100" {% endif %}
+                       step="{{ epd.selection_unit | get_step }}"
+                       {% if epd.selection_quantity %} value="{{ epd.selection_quantity }}" {% endif %}
                        style="max-width: 80px;"
                        required>
 
                        <input name="material_{{ epd.id }}_unit" 
                        class="input-group-text w-auto"
                        style="max-width: 80px;"
-                       value='{{ epd.selection_unit|slice:":10"|strip }}'
+                       value='{{ epd.selection_unit|slice:":10" | strip }}'
                        title="{{ epd.selection_unit }}"
                        readonly>
             </div>
