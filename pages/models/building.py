@@ -4,7 +4,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .assembly import Assembly
 from .base import BaseGeoModel, BaseModel
-from .epd import Unit
+from .product import BaseProduct
+from .epd import EPD, Unit
 
 
 class ClimateZone(models.TextChoices):
@@ -21,7 +22,7 @@ class HeatingType(models.TextChoices):
     SPLIT_AC = "split-ac", "Split AC with Heating Mode"
     PACKAGED_AC = "packaged-ac", "Packaged Air Conditioners with Electric Heating Coils"
     BOILER = "boiler", "Boiler"
-    
+
 
 class CoolingType(models.TextChoices):
     WINDOW_AC = "window-ac", "Window Air Conditioners"
@@ -81,122 +82,169 @@ class CategorySubcategory(models.Model):
 
 
 class BuildingOperationalInfo(models.Model):
-    operational_components = models.OneToOneField(
-        Assembly,
+    ### Operational Emissions
+    operational_components = models.ManyToManyField(
+        EPD,
         blank=True,
-        on_delete=models.CASCADE,
         related_name="buildings",
+        through="OperationalProduct",
     )
-    simulated_operational_components = models.OneToOneField(
-        Assembly,
+    simulated_operational_components = models.ManyToManyField(
+        EPD,
         blank=True,
         related_name="buildingsimulations",
+        through="SimulatedOperationalProduct",
     )
+    ### Building Operation
     num_residents = models.IntegerField(
         _("Approx. number of residents"),
         null=True,
         blank=True,
-        min=0,
+        validators=[MinValueValidator(0)],
     )
     hours_per_week = models.IntegerField(
         _("Operation hours per week"),
         null=True,
         blank=True,
-        min = 0,
-        max=24
+        validators=[MinValueValidator(0), MaxValueValidator(24)],
     )
     workdays_per_week = models.IntegerField(
         _("Operation days per week"),
         null=True,
         blank=True,
-        min=0,
-        max=7
+        validators=[MinValueValidator(0), MaxValueValidator(7)],
     )
     weeks_per_year = models.IntegerField(
         _("Operation weeks per year"),
         null=True,
         blank=True,
-        min=0,
-        max=52
+        validators=[MinValueValidator(0), MaxValueValidator(52)],
     )
     heating_temp = models.DecimalField(
         _("Typical Heating Temperature"),
         max_digits=10,
         decimal_places=2,
-        min=-20,
-        max=100,
+        validators=[MinValueValidator(0), MaxValueValidator(120)],
+        null=True,
+        blank=True,
+    )
+    heating_temp_unit = models.CharField(
+        _("Heating Temperature Unit"),
+        max_length=20,
+        choices=[c for c in Unit.choices if c[0] in (Unit.CELSIUS, Unit.FAHRENHEIT)],
         null=True,
         blank=True,
     )
     cooling_temp = models.DecimalField(
-        _("Typical Cooling Temperature"),
+        _("Typical Cooling Temperature (Celsius)"),
         max_digits=10,
         decimal_places=2,
-        min=-20,
-        max=100,
+        validators=[MinValueValidator(0), MaxValueValidator(120)],
+        null=True,
+        blank=True,
+    )
+    cooling_temp_unit = models.CharField(
+        _("Cooling Temperature Unit"),
+        max_length=20,
+        choices=[c for c in Unit.choices if c[0] in (Unit.CELSIUS, Unit.FAHRENHEIT)],
         null=True,
         blank=True,
     )
     ### Building Services
     heating_type = models.CharField(
-        _("Heating Type"), max_length=50, choices=HeatingType.choices, null=True, blank=True
+        _("Heating Type"),
+        max_length=50,
+        choices=HeatingType.choices,
+        null=True,
+        blank=True,
     )
-    heating_capacity =  models.DecimalField(
+    heating_capacity = models.DecimalField(
         _("Heating Capacity"),
         max_digits=15,
         decimal_places=2,
-        min=0,
+        validators=[MinValueValidator(0)],
         null=True,
         blank=True,
     )
     heating_unit = models.CharField(
-        _("Heating Unit"), max_length=20, choices=[Unit.KW], null=True, blank=True
+        _("Heating Unit"),
+        max_length=20,
+        choices=[c for c in Unit.choices if c[0] in (Unit.KW)],
+        null=True,
+        blank=True,
     )
     cooling_type = models.CharField(
-        _("Coolingting Type"), max_length=50, choices=CoolingType.choices, null=True, blank=True
+        _("Coolingting Type"),
+        max_length=50,
+        choices=CoolingType.choices,
+        null=True,
+        blank=True,
     )
-    cooling_capacity =  models.DecimalField(
+    cooling_capacity = models.DecimalField(
         _("Heating Capacity"),
         max_digits=15,
         decimal_places=2,
-        min=0,
+        validators=[MinValueValidator(0)],
         null=True,
         blank=True,
     )
     cooling_unit = models.CharField(
-        _("Cooling Unit"), max_length=20, choices=[Unit.KW, Unit.TR], null=True, blank=True
+        _("Cooling Unit"),
+        max_length=20,
+        choices=[c for c in Unit.choices if c[0] in (Unit.KW, Unit.TR)],
+        null=True,
+        blank=True,
     )
     ventilation_type = models.CharField(
-        _("Ventilation Type"), max_length=50, choices=VentilationType.choices, null=True, blank=True
+        _("Ventilation Type"),
+        max_length=50,
+        choices=VentilationType.choices,
+        null=True,
+        blank=True,
     )
-    ventilation_capacity =  models.DecimalField(
+    ventilation_capacity = models.DecimalField(
         _("Ventilation Capacity"),
         max_digits=15,
         decimal_places=2,
-        min=0,
+        validators=[MinValueValidator(0)],
         null=True,
         blank=True,
     )
     ventilation_unit = models.CharField(
-        _("Ventilation Unit"), max_length=20, choices=[Unit.M3_H, Unit.CFM], null=True, blank=True
+        _("Ventilation Unit"),
+        max_length=20,
+        choices=[c for c in Unit.choices if c[0] in (Unit.M3_H, Unit.CFM)],
+        null=True,
+        blank=True,
     )
     lighting_type = models.CharField(
-        _("Lighting Type"), max_length=50, choices=LightingType.choices, null=True, blank=True
+        _("Lighting Type"),
+        max_length=50,
+        choices=LightingType.choices,
+        null=True,
+        blank=True,
     )
-    lighting_capacity =  models.DecimalField(
+    lighting_capacity = models.DecimalField(
         _("Lighting Capacity"),
         max_digits=15,
         decimal_places=2,
-        min=0,
+        validators=[MinValueValidator(0)],
         null=True,
         blank=True,
     )
     lighting_unit = models.CharField(
-        _("Lighting Unit"), max_length=20, choices=[Unit.KW], null=True, blank=True
+        _("Lighting Unit"),
+        max_length=20,
+        choices=[c for c in Unit.choices if c[0] in (Unit.KW)],
+        null=True,
+        blank=True,
     )
-    
-    
-class Building(BaseModel, BaseGeoModel):
+
+    class Meta:
+        abstract = True  # This ensures it won't create its own table.
+
+
+class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
     name = models.CharField(_("Building name/code"), max_length=255)
     structural_components = models.ManyToManyField(
         Assembly,
@@ -311,3 +359,15 @@ class BuildingAssemblySimulated(models.Model):
     class Meta:
         verbose_name = "Building structural component simulation"
         verbose_name_plural = "Building structural components simulation"
+
+
+class OperationalProduct(BaseProduct):
+    """Join Table for EPDs and Building. Products are EPDs with quantity and results."""
+
+    building = models.ForeignKey(Building, on_delete=models.CASCADE)
+
+
+class SimulatedOperationalProduct(BaseProduct):
+    """Join Table for EPDs and Simulated Building. Products are EPDs with quantity and results."""
+
+    building = models.ForeignKey(Building, on_delete=models.CASCADE)
