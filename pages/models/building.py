@@ -81,17 +81,16 @@ class CategorySubcategory(models.Model):
 
 
 class BuildingOperationalInfo(models.Model):
-    operational_components = models.ManyToManyField(
+    operational_components = models.OneToOneField(
         Assembly,
         blank=True,
+        on_delete=models.CASCADE,
         related_name="buildings",
-        through="BuildingAssembly",
     )
-    simulated_operational_components = models.ManyToManyField(
+    simulated_operational_components = models.OneToOneField(
         Assembly,
         blank=True,
         related_name="buildingsimulations",
-        through="BuildingAssemblySimulated",
     )
     num_residents = models.IntegerField(
         _("Approx. number of residents"),
