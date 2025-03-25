@@ -17,8 +17,21 @@
             </div>
         </div>
     </div>
-    <div class="col-5 container" >
-        <div class="ms-5">
+    {% if is_boq %}
+    <div class="col container" >
+        <label for="material_{{ epd.id }}_category" class="text-muted">Category</label>
+        <select id="material_{{ epd.id }}_category"
+                name="material_{{ epd.id }}_category"
+                class="select form-select form-select-sm">
+            {% for category in categories %}
+            <option value="{{category.id}}"
+                    {% if category.id == epd.classification.category.id %} selected {% endif %}>
+             {{category.tag}} - {{category.name}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+    <div class="col-3 container" >
             <label for="material_{{ epd.id }}_quantity" class="text-muted">{{ epd.selection_text }}</label>
             {% if epd.selection_unit == "unknown" %} 
             <input type="number"
@@ -38,22 +51,21 @@
                        name="material_{{ epd.id }}_quantity" 
                        class="form-control w-auto"
                        placeholder="Quantity"
-                       min="0.01"
-                       {% if epd.selection_unit == "percent" %}max="100"{% endif %}
-                       step="{{ epd.selection_unit|get_step }}"
-                       {% if epd.selection_quantity%}value="{{ epd.selection_quantity }}"{% endif %}
+                       min="{{ epd.selection_unit | get_step }}"
+                       {% if epd.selection_unit == "percent" %} max="100" {% endif %}
+                       step="{{ epd.selection_unit | get_step }}"
+                       {% if epd.selection_quantity %} value="{{ epd.selection_quantity }}" {% endif %}
                        style="max-width: 80px;"
                        required>
 
                        <input name="material_{{ epd.id }}_unit" 
                        class="input-group-text w-auto"
                        style="max-width: 80px;"
-                       value='{{ epd.selection_unit|slice:":10"|strip }}'
+                       value='{{ epd.selection_unit|slice:":10" | strip }}'
                        title="{{ epd.selection_unit }}"
                        readonly>
             </div>
             {% endif %}
-        </div>
     </div>
     <div class="d-flex flex-column ms-auto gap-2">
         <a href="{{epd.source}}" 

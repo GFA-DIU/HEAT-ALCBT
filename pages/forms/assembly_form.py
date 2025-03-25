@@ -14,7 +14,9 @@ from pages.models.building import Building, BuildingAssembly, BuildingAssemblySi
 
 
 class AssemblyForm(forms.ModelForm):
-    comment = forms.CharField(widget=widgets.Textarea(attrs={"rows": 2}), required=False)
+    comment = forms.CharField(
+        widget=widgets.Textarea(attrs={"rows": 2}), required=False
+    )
 
     public = forms.BooleanField(
         required=False,
@@ -71,34 +73,23 @@ class AssemblyForm(forms.ModelForm):
         required=True,
         decimal_places=2,
         max_digits=10,
-        widget=forms.NumberInput(
-            attrs={
-                "class": "form-control",
-                "type": "number"
-            }   
-        )
+        widget=forms.NumberInput(attrs={"class": "form-control", "type": "number"}),
     )
     reporting_life_cycle = forms.IntegerField(
         label="Life Span",
         min_value=1,
         max_value=10000,
         help_text="Report in years",
-        required = True,
-        initial = 50,
-        widget=forms.NumberInput(
-            attrs={
-                "class": "form-control",
-                "type": "number"
-            }   
-        )
+        required=True,
+        initial=50,
+        widget=forms.NumberInput(attrs={"class": "form-control", "type": "number"}),
     )
-    
+
     class Meta:
         model = Assembly
         fields = [
             "name",
             "country",
-            "classification",
             "comment",
             "public",
             "dimension",
@@ -114,54 +105,61 @@ class AssemblyForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
         if kwargs.get("instance"):
+            assembly_classification = self.instance.classification
             self.fields["mode"].initial = self.instance.mode
             self.fields["dimension"].initial = self.instance.dimension
-            self.fields["assembly_category"].initial = self.instance.classification.category
-            self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__pk=self.instance.classification.category.pk)
-            self.fields["assembly_technique"].initial = self.instance.classification.technique
-            self.fields["quantity"].initial = BuildingAssemblyModel.objects.get(assembly=self.instance, building__pk=building_id).quantity
-            self.fields["reporting_life_cycle"].initial = BuildingAssemblyModel.objects.get(assembly=self.instance, building__pk=building_id).reporting_life_cycle
+            self.fields["assembly_category"].initial = assembly_classification.category
+            self.fields["assembly_technique"].queryset = (
+                AssemblyTechnique.objects.filter(
+                    categories__pk=assembly_classification.category.pk
+                )
+            )
+            self.fields["assembly_technique"].initial = (
+                assembly_classification.technique
+            )
+            self.fields["quantity"].initial = BuildingAssemblyModel.objects.get(
+                assembly=self.instance, building__pk=building_id
+            ).quantity
+            self.fields["reporting_life_cycle"].initial = (
+                BuildingAssemblyModel.objects.get(
+                    assembly=self.instance, building__pk=building_id
+                ).reporting_life_cycle
+            )
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA
-            self.fields["country"].initial = Building.objects.get(id=building_id).country
+            self.fields["country"].initial = Building.objects.get(
+                id=building_id
+            ).country
 
         # Dynamically update the queryset for assembly_technique to enable form validation
         if category_id := self.data.get("assembly_category"):
             category_id = int(category_id)
             # update queryset
-            self.fields["assembly_technique"].queryset = AssemblyTechnique.objects.filter(categories__id=category_id)
+            self.fields["assembly_technique"].queryset = (
+                AssemblyTechnique.objects.filter(categories__id=category_id)
+            )
 
         # parse into Assembly classification
         if category_id or self.fields["assembly_technique"].initial:
-            category_id = category_id if category_id else self.fields["assembly_technique"].initial.pk
-            technique_id = self.data.get("assembly_technique") if self.data.get("assembly_technique") else None
+            category_id = (
+                category_id
+                if category_id
+                else self.fields["assembly_technique"].initial.pk
+            )
+            technique_id = (
+                self.data.get("assembly_technique")
+                if self.data.get("assembly_technique")
+                else None
+            )
             self.initial["classification"] = AssemblyCategoryTechnique.objects.filter(
-                    category__id=category_id, technique__id=technique_id
-                ).first()
+                category__id=category_id, technique__id=technique_id
+            ).first()
 
     def clean(self):
         cleaned_data = super().clean()
-        if not cleaned_data.get("classification") and self.initial.get("classification"):
+        if not cleaned_data.get("classification") and self.initial.get(
+            "classification"
+        ):
             cleaned_data["classification"] = self.initial["classification"]
         return cleaned_data
-
-    #     # Crispy Forms Layout
-    #     self.helper = FormHelper()
-    #     self.helper.layout = Layout(
-    #         # Name and Category in the first row
-    #         Row(
-    #             Column('name', css_class='col-md-6'),
-    #             Column('type', css_class='col-md-6'),
-    #         ),
-    #         # Country and City in the second row
-    #         Row(
-    #             Column('country', css_class='col-md-6'),
-    #             Column('classification', css_class='col-md-6'),
-    #         ),
-    #         # Zip code in its own row
-    #         Row(
-    #             Column('comment', css_class='col-md-12'),
-    #         ),
-    #         Submit('submit', 'Save', css_class='btn btn-primary'),
-    #     )

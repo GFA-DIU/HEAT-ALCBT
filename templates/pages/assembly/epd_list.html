@@ -35,8 +35,7 @@
                     hx-post=""
                     hx-vals='{"action": "select_epd", "id": "{{ epd.id }}", "dimension": "{{dimension}}" }'
                     hx-target="#selected_epds"
-                    hx-swap="beforeend"
-                    {% if epd.id|stringformat:"s" in selected_epds_ids %}disabled{% endif %}>
+                    hx-swap="beforeend">
             Add
             </button>
         </div>

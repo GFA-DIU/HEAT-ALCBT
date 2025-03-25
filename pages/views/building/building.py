@@ -220,6 +220,7 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
                 "quantity": b_assembly.quantity,
                 "impacts": sum(gwpa1a3),
                 "unit": DIMENSION_UNIT_MAPPING.get(b_assembly.assembly.dimension),
+                "is_boq": b_assembly.assembly.is_boq
             }
         )
         impact_list.extend(assembly_impact_list)
