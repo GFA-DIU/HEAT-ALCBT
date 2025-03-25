@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Literal
 
 from pages.models.assembly import AssemblyDimension, StructuralProduct
 from pages.models.building import OperationalProduct
@@ -131,7 +132,7 @@ def calculate_impacts(
     return impacts
 
 
-def calculate_impact_operational(p: OperationalProduct) -> dict:
+def calculate_impact_operational(p: OperationalProduct) -> dict[Literal["gwp_b6", "penrt_b6"], Decimal]:
     def fetch_conversion(unit):
         """Fetch conversion factor based on the unit."""
         try:
