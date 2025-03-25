@@ -3,11 +3,10 @@ import logging
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import HttpResponseServerError
-from django.shortcuts import get_object_or_404
 
 from pages.forms.assembly_form import AssemblyForm
 from pages.forms.boq_assembly_form import BOQAssemblyForm
-from pages.models.assembly import Assembly, AssemblyCategoryTechnique, Product
+from pages.models.assembly import Assembly, AssemblyCategoryTechnique, StructuralProduct
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 from pages.models.epd import EPD, EPDImpact
 
@@ -46,7 +45,9 @@ def save_assembly(
             assembly.created_by = request.user
             assembly.save()
 
-            Product.objects.filter(assembly=assembly).delete()  # create a clean slate
+            StructuralProduct.objects.filter(
+                assembly=assembly
+            ).delete()  # create a clean slate
 
             # Save to products
             for k, v in selected_epds.items():
@@ -54,7 +55,7 @@ def save_assembly(
                     category_id=v.get("category"),
                     technique_id=v.get("technique") or None,
                 )
-                Product.objects.create(
+                StructuralProduct.objects.create(
                     epd=epd_map[k],
                     assembly=assembly,
                     quantity=v.get("quantity"),

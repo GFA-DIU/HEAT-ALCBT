@@ -10,7 +10,7 @@ from pages.models.assembly import (
     AssemblyDimension,
     AssemblyMode,
     AssemblyTechnique,
-    Product,
+    StructuralProduct,
 )
 from pages.models.epd import (
     EPD,
@@ -81,12 +81,14 @@ def create_product():
             technique=AssemblyTechnique.objects.first(),
             description="Created for test",
         )
-        return Product.objects.create(
+        return StructuralProduct.objects.create(
+            # Struct. Product
             assembly=assembly,
+            classification=assemblycategorytechnique,
+            # Base product
             epd=epd,
             quantity=quantity,
             input_unit=unit,
-            classification=assemblycategorytechnique
         )
 
     return _create_product

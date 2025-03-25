@@ -7,7 +7,7 @@ from django.views.decorators.http import require_http_methods
 
 from pages.forms.boq_assembly_form import BOQAssemblyForm
 from pages.forms.epds_filter_form import EPDsFilterForm
-from pages.models.assembly import AssemblyCategory, AssemblyDimension, Product
+from pages.models.assembly import AssemblyCategory, AssemblyDimension, StructuralProduct
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 
 from pages.models.epd import EPD
@@ -131,7 +131,7 @@ def handle_assembly_submission(request, assembly, building, simulation):
 
 def handle_assembly_load(building_id, assembly, context):
     if assembly:
-        products = Product.objects.filter(assembly=assembly).select_related("epd")
+        products = StructuralProduct.objects.filter(assembly=assembly).select_related("epd")
         selected_epds = [SelectedEPD.parse_product(p, True) for p in products]
         context["selected_epds"] = selected_epds
         context["selected_epds_ids"] = [

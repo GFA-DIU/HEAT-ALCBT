@@ -4,7 +4,7 @@ from typing import Optional
 
 from django.core.paginator import Paginator, Page
 
-from pages.models.assembly import AssemblyDimension, Product
+from pages.models.assembly import AssemblyDimension, StructuralProduct
 from pages.models.epd import EPD
 from pages.views.assembly.epd_filtering import (
     get_epd_info,
@@ -26,7 +26,7 @@ class SelectedEPD:
     classification: Optional[str]
 
     @classmethod
-    def parse_product(cls, product: Product, is_boq_product=False):
+    def parse_product(cls, product: StructuralProduct, is_boq_product=False):
         """
         Parses a Product instance into a SelectedEPD dataclass.
         """
