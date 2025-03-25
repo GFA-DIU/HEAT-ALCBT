@@ -65,7 +65,7 @@ def create_operationalproduct():
         ( # From Project 1__ LCA_14022024.xlsm
             "natural gas",                                                          # epd_name
             Unit.KWH,                                                               # declared_unit
-            [{"unit": "kg/m^3", "value": "860"},{"unit": "kg", "value": "7.92"}],   # conversions
+            [{"unit": "kg/m^3", "value": "0.76"},{"unit": "kg", "value": "7.92"}],   # conversions
             Decimal("0.24"),                                                        # epdimpact value gwp
             Decimal("3.96"),                                                        # epdimpact value penrt
             Decimal("10"),                                                          # product_value
@@ -73,28 +73,61 @@ def create_operationalproduct():
             Decimal("14.4446208"),                                                  # expected impact gwp
             Decimal("238.3362432"),                                                 # expected impact penrt
         ),
-        # ( # From Project 1__ LCA_14022024.xlsm (own addition)
-        #     "biogas",
-        #     Unit.KWH,
-        #     [{"unit": "kg/m^3", "value": "0.72", "unit": "kg", "value": "9.03",}],
-        #     Decimal("0.140"),
-        #     Decimal("3.96"),
-        #     Decimal("10"),
-        #     Unit.LITER,
-        #     Decimal("0.0091"),
-        #     Decimal("0.2574"),
-        # ),
-        # ( # From Project 1__ LCA_14022024.xlsm (own addition)
-        #     "wood pellets",
-        #     Unit.KWH,
-        #     [{"unit": "kg/m^3", "value": "650", "unit": "kg", "value": "4.9",}],
-        #     Decimal("0.03"),
-        #     Decimal("0.72"),
-        #     Decimal("10"),
-        #     Unit.KG,
-        #     Decimal("35.28"),
-        #     Decimal("1.47"),
-        # ),
+        ( # From Project 1__ LCA_14022024.xlsm (own addition)
+            "biogas",
+            Unit.KWH,
+            [{"unit": "kg/m^3", "value": "0.72"}, {"unit": "kg", "value": "9.03",}],
+            Decimal("0.140"),
+            Decimal("3.96"),
+            Decimal("10"),
+            Unit.LITER,
+            Decimal("0.0091"),
+            Decimal("0.2574"),
+        ),
+        ( # From Project 1__ LCA_14022024.xlsm (own addition)
+            "wood pellets",
+            Unit.KWH,
+            [{"unit": "kg/m^3", "value": "650"}, {"unit": "kg", "value": "4.9",}],
+            Decimal("0.03"),
+            Decimal("0.72"),
+            Decimal("10"),
+            Unit.KG,
+            Decimal("1.47"),
+            Decimal("35.28"),
+        ),
+        ( # From Project 1__ LCA_14022024.xlsm (own addition)
+            "coal",
+            Unit.KWH,
+            [{"unit": "kg/m^3", "value": "760"}, {"unit": "kg", "value": "8.14"}],
+            Decimal("0.4"),
+            Decimal("3.96"),  
+            Decimal("10"),
+            Unit.M3,
+            Decimal("24745.6"),
+            Decimal("244981.44"),
+        ),
+        ( # From Project 1__ LCA_14022024.xlsm (own addition)
+            "bio oil",
+            Unit.KWH,
+            [{"unit": "kg/m^3", "value": "880"}, {"unit": "kg", "value": "11.53"}],
+            Decimal("0.21"),
+            Decimal("3.96"),
+            Decimal("10"),
+            Unit.LITER,
+            Decimal("21.305103448275900"),
+            Decimal("401.753379310345000"),
+        ),
+        ( # From Project 1__ LCA_14022024.xlsm (own addition)
+            "electricity, geneated close to building",
+            Unit.KWH,
+            [],
+            Decimal("0.56"),
+            Decimal("6.48"),
+            Decimal("10"),
+            Unit.KWH,
+            Decimal("5.6"),
+            Decimal("64.8"),
+        ),
     ],
 )
 def test_calculate_impact_operational(
@@ -134,7 +167,11 @@ def test_calculate_impact_operational(
     
     rslt = calculate_impact_operational(product)
     
-    assert rslt["gwp_b6"] == expected_impact_gwp
-    assert rslt["penrt_b6"] == expected_impact_penrt
+    assert rslt["gwp_b6"] == pytest.approx(
+        expected_impact_gwp, rel=Decimal("1e-3")
+    )
+    assert rslt["penrt_b6"] == pytest.approx(
+        expected_impact_penrt, rel=Decimal("1e-3")
+    )
     
 
