@@ -10,42 +10,45 @@ from pages.views.assembly.epd_filtering import filter_by_dimension
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "declared_unit, conversions, dimension, expected_empty",
+    "declared_unit, conversions, dimension, expect_match",
     [
         # PCS EPDs
-        (Unit.PCS, [], AssemblyDimension.AREA, False),
-        (Unit.PCS, [], AssemblyDimension.LENGTH, False),
-        (Unit.PCS, [], AssemblyDimension.MASS, False),
-        (Unit.PCS, [], AssemblyDimension.VOLUME, False),
+        (Unit.PCS, [], AssemblyDimension.AREA, True),
+        (Unit.PCS, [], AssemblyDimension.LENGTH, True),
+        (Unit.PCS, [], AssemblyDimension.MASS, True),
+        (Unit.PCS, [], AssemblyDimension.VOLUME, True),
         # M2 EPDs
-        (Unit.M2, [], AssemblyDimension.AREA, False),
-        (Unit.M2, [], AssemblyDimension.LENGTH, True),
-        (Unit.M2, [], AssemblyDimension.MASS, True),
-        (Unit.M2, [], AssemblyDimension.VOLUME, True),
+        (Unit.M2, [], AssemblyDimension.AREA, True),
+        (Unit.M2, [], AssemblyDimension.LENGTH, False),
+        (Unit.M2, [], AssemblyDimension.MASS, False),
+        (Unit.M2, [], AssemblyDimension.VOLUME, False),
         # M EPDs
-        (Unit.M, [], AssemblyDimension.AREA, True),
-        (Unit.M, [], AssemblyDimension.LENGTH, False),
-        (Unit.M, [], AssemblyDimension.MASS, True),
-        (Unit.M, [], AssemblyDimension.VOLUME, True),
+        (Unit.M, [], AssemblyDimension.AREA, False),
+        (Unit.M, [], AssemblyDimension.LENGTH, True),
+        (Unit.M, [], AssemblyDimension.MASS, False),
+        (Unit.M, [], AssemblyDimension.VOLUME, False),
         # KG EPDs - without conversion
-        (Unit.KG, [], AssemblyDimension.AREA, True),
-        (Unit.KG, [], AssemblyDimension.LENGTH, True),
-        (Unit.KG, [], AssemblyDimension.MASS, False),
-        (Unit.KG, [], AssemblyDimension.VOLUME, True),
+        (Unit.KG, [], AssemblyDimension.AREA, False),
+        (Unit.KG, [], AssemblyDimension.LENGTH, False),
+        (Unit.KG, [], AssemblyDimension.MASS, True),
+        (Unit.KG, [], AssemblyDimension.VOLUME, False),
         # KG EPDs - with conversion
-        (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.AREA, False),
-        (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.LENGTH, False),
-        (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.MASS, False),
-        (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.VOLUME, False),
+        (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.AREA, True),
+        (Unit.KG, [{"unit": "kg/m^2"}], AssemblyDimension.AREA, False),
+        (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.LENGTH, True),
+        (Unit.KG, [{"unit": "kg/m"}], AssemblyDimension.LENGTH, False),
+        (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.MASS, True),
+        (Unit.KG, [{"unit": "kg/m^3"}], AssemblyDimension.VOLUME, True),
         # M3 EPDs
-        (Unit.M3, [], AssemblyDimension.AREA, False),
-        (Unit.M3, [], AssemblyDimension.LENGTH, False),
+        (Unit.M3, [], AssemblyDimension.AREA, True),
+        (Unit.M3, [], AssemblyDimension.LENGTH, True),
         (Unit.M3, [], AssemblyDimension.MASS, False),
-        (Unit.M3, [], AssemblyDimension.VOLUME, False),
+        (Unit.M3, [{"unit": "kg/m^3"}], AssemblyDimension.MASS, True),
+        (Unit.M3, [], AssemblyDimension.VOLUME, True),
     ],
 )
 def test_filter_by_dimension(
-    declared_unit, conversions, dimension, expected_empty, create_epd
+    declared_unit, conversions, dimension, expect_match, create_epd
 ):
     """Check if EPDs are correctly filtered by dimension.
     
@@ -64,7 +67,7 @@ def test_filter_by_dimension(
     rslt = filter_by_dimension(filtered_epds, dimension)
 
     # Assert
-    if expected_empty:
-        assert list(rslt) == []
-    else:
+    if expect_match:
         assert list(rslt) == [test_epd]
+    else:
+        assert list(rslt) == []
