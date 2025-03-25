@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pages', '0009_load_edge_epds_and_category'),
+        ("pages", "0009_remove_assembly_classification_assembly_is_boq_and_more"),
     ]
 
     operations = [

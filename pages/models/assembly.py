@@ -123,13 +123,16 @@ class Assembly(BaseModel):
     @property
     def classification(self):
         """Return the classification of the assembly from the epds."""
-        product = self.product_set.first()  # Access Product instances
+        product = self.structuralproduct_set.first()  # Access Product instances
         return product.classification if product else None
 
 
 class StructuralProduct(BaseProduct):
     """Join Table for EPDs and Assemblies. Products are EPDs with quantity and results."""
 
+    classification = models.ForeignKey(
+        AssemblyCategoryTechnique, on_delete=models.SET_NULL, null=True, blank=True
+    )
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
 
     def clean(self):

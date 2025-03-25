@@ -3,7 +3,6 @@ import logging
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import HttpResponseServerError
-from django.shortcuts import get_object_or_404
 
 from pages.forms.assembly_form import AssemblyForm
 from pages.forms.boq_assembly_form import BOQAssemblyForm
