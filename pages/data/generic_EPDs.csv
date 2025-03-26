@@ -15,8 +15,7 @@ level_0_index;level_0_text;level_1_index;level_1_text;level_2_index;level_2_text
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;IN;Concrete masonry brick;m^3;2000.0;2000.0;;;3111.345635698363;;;;630.5293367919691;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;IN;"Precast concrete slab, ceiling, thickness 20cm; 504 kg/m2";m^2;504.0;2520.0;504.0;;1361.0072103767263;;;;234.2320117069555;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;IN;"Precast concrete wall, thickness 12cm; 291,3 kg/m2";m^2;291.3;2427.5;291.3;;525.0739935643165;;;;100.66442162932049;;;
-1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;IN;"	
-Marble slab";m^2;52.0;;52.0;;542.9711144776257;;;;41.4387184223543;;;
+1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;IN;"Marble slab";m^2;52.0;;52.0;;542.9711144776257;;;;41.4387184223543;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;IN;"Natural stone slab, rigid, facade (30 mm); 78 kg/m2";m^2;78.0;;78.0;;1076.305317694239;;;;82.13401797600191;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;IN;"Natural stone slab, rigid, indoor usage (20 mm); 52 kg/m2";m^2;52.0;;52.0;;1050.974008093863;;;;80.20663572379938;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;IN;"Natural stone slab, flexible, facade (40 mm); 104 kg/m2";m^2;104.0;;104.0;;548.4779209124902;;;;41.824194872794806;;;
@@ -33,11 +32,9 @@ Marble slab";m^2;52.0;;52.0;;542.9711144776257;;;;41.4387184223543;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;IN;Ready-mix concrete C25/30;m^3;2300.0;2300.0;;;2105.527440370388;;;;610.4294933047141;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;IN;Ready-mix concrete C30/37;m^3;2306.0;2306.0;;;2404.5470297835222;;;;709.5520091322726;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;IN;Ready-mix concrete C50/60;m^3;2316.6;2316.6;;;2962.661861957025;;;;895.9574069524311;;;
-1;Mineral building products;4;Mortar and Concrete;2;Mortar (masonry);IN;"	
-Cement mortar";m^3;2000.0;2000.0;;;3070.04458743688;;;;866.4959925259068;;;
+1;Mineral building products;4;Mortar and Concrete;2;Mortar (masonry);IN;"Cement mortar";m^3;2000.0;2000.0;;;3070.04458743688;;;;866.4959925259068;;;
 1;Mineral building products;4;Mortar and Concrete;3;Screed dry mortar;IN;Cement screed;kg;1.0;2400.0;;;3.2875634416140223;;;;0.5093795952249532;;;
-1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;IN;"	
-Lime plaster";m^3;1800.0;1800.0;;;7015.6713980171935;;;;1088.1449515291972;;;
+1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;IN;"Lime plaster";m^3;1800.0;1800.0;;;7015.6713980171935;;;;1088.1449515291972;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;IN;"Lime gypsum interior plaster; lime-gypsum";m^3;900.0;900.0;;;5242.47972599087;;;;559.4915337822189;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;IN;"Synthtic resin plaster; Synthetic resin";m^3;1700.0;1700.0;;;7056.972446278676;;;;3405.959779963606;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;IN;Clay plaster;m^3;900.0;900.0;;;2570.026563151196;;;;275.61566206496116;;;
@@ -79,8 +76,7 @@ Lime plaster";m^3;1800.0;1800.0;;;7015.6713980171935;;;;1088.1449515291972;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;ID;Concrete masonry brick;m^3;2000.0;2000.0;;;2636.5746694446043;;;;534.3146896485083;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;ID;"Precast concrete slab, ceiling, thickness 20cm; 504 kg/m2";m^2;504.0;2520.0;504.0;;1153.3264239880245;;;;198.4897408227013;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;ID;"Precast concrete wall, thickness 12cm; 291,3 kg/m2";m^2;291.3;2427.5;291.3;;444.9511411177752;;;;85.30369019017233;;;
-1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;ID;"	
-Marble slab";m^2;52.0;;52.0;;460.1172785968813;;;;35.11544139393035;;;
+1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;ID;"Marble slab";m^2;52.0;;52.0;;460.1172785968813;;;;35.11544139393035;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;ID;"Natural stone slab, rigid, facade (30 mm); 78 kg/m2";m^2;78.0;;78.0;;912.068175474244;;;;69.60090476949782;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;ID;"Natural stone slab, rigid, indoor usage (20 mm); 52 kg/m2";m^2;52.0;;52.0;;890.6022578115092;;;;67.96762842559409;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;ID;"Natural stone slab, flexible, facade (40 mm); 104 kg/m2";m^2;104.0;;104.0;;464.78378243660626;;;;35.442096662711094;;;
@@ -97,11 +93,9 @@ Marble slab";m^2;52.0;;52.0;;460.1172785968813;;;;35.11544139393035;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;ID;Ready-mix concrete C25/30;m^3;2300.0;2300.0;;;1784.2377431188397;;;;517.2819506335121;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;ID;Ready-mix concrete C30/37;m^3;2306.0;2306.0;;;2037.628901615905;;;;601.2790197485615;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;ID;Ready-mix concrete C50/60;m^3;2316.6;2316.6;;;2510.57906577203;;;;759.2401747232515;;;
-1;Mineral building products;4;Mortar and Concrete;2;Mortar (masonry);ID;"	
-Cement mortar";m^3;2000.0;2000.0;;;2601.5758906466667;;;;734.2743791807229;;;
+1;Mineral building products;4;Mortar and Concrete;2;Mortar (masonry);ID;"Cement mortar";m^3;2000.0;2000.0;;;2601.5758906466667;;;;734.2743791807229;;;
 1;Mineral building products;4;Mortar and Concrete;3;Screed dry mortar;ID;Cement screed;kg;1.0;2400.0;;;2.785902792315803;;;;0.4316516051745591;;;
-1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;ID;"	
-Lime plaster";m^3;1800.0;1800.0;;;5945.125891809603;;;;922.1011587296526;;;
+1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;ID;"Lime plaster";m^3;1800.0;1800.0;;;5945.125891809603;;;;922.1011587296526;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;ID;"Lime gypsum interior plaster; lime-gypsum";m^3;900.0;900.0;;;4442.511655418165;;;;474.1167901160562;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;ID;"Synthtic resin plaster; Synthetic resin";m^3;1700.0;1700.0;;;5980.12467060754;;;;2886.2326248698896;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;ID;Clay plaster;m^3;900.0;900.0;;;2177.85734199964;;;;233.55851717823438;;;
@@ -143,8 +137,7 @@ Lime plaster";m^3;1800.0;1800.0;;;5945.125891809603;;;;922.1011587296526;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;VN;Concrete masonry brick;m^3;2000.0;2000.0;;;1150.8067536570056;;;;233.21658990040203;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;VN;"Precast concrete slab, ceiling, thickness 20cm; 504 kg/m2";m^2;504.0;2520.0;504.0;;503.401573745715;;;;86.63639870230217;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;VN;"Precast concrete wall, thickness 12cm; 291,3 kg/m2";m^2;291.3;2427.5;291.3;;194.21136984282387;;;;37.23318133955764;;;
-1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;VN;"	
-Marble slab";m^2;52.0;;52.0;;200.83105470899247;;;;15.327116497821182;;;
+1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;VN;"Marble slab";m^2;52.0;;52.0;;200.83105470899247;;;;15.327116497821182;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;VN;"Natural stone slab, rigid, facade (30 mm); 78 kg/m2";m^2;78.0;;78.0;;398.09766372081725;;;;30.37926147043228;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;VN;"Natural stone slab, rigid, indoor usage (20 mm); 52 kg/m2";m^2;52.0;;52.0;;388.7282636025478;;;;29.666372330998737;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;VN;"Natural stone slab, flexible, facade (40 mm); 104 kg/m2";m^2;104.0;;104.0;;202.86788082165975;;;;15.46969432570789;;;
@@ -161,11 +154,9 @@ Marble slab";m^2;52.0;;52.0;;200.83105470899247;;;;15.327116497821182;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;VN;Ready-mix concrete C25/30;m^3;2300.0;2300.0;;;778.7804641783295;;;;225.7821745891665;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;VN;Ready-mix concrete C30/37;m^3;2306.0;2306.0;;;889.3801220961619;;;;262.4450446171773;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;VN;Ready-mix concrete C50/60;m^3;2316.6;2316.6;;;1095.8124486149895;;;;331.3916085309643;;;
-1;Mineral building products;4;Mortar and Concrete;2;Mortar (masonry);VN;"	
-Cement mortar";m^3;2000.0;2000.0;;;1135.5305578120012;;;;320.4945888281944;;;
+1;Mineral building products;4;Mortar and Concrete;2;Mortar (masonry);VN;"Cement mortar";m^3;2000.0;2000.0;;;1135.5305578120012;;;;320.4945888281944;;;
 1;Mineral building products;4;Mortar and Concrete;3;Screed dry mortar;VN;Cement screed;kg;1.0;2400.0;;;1.215985189262358;;;;0.18840641542172215;;;
-1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;VN;"	
-Lime plaster";m^3;1800.0;1800.0;;;2594.9164675380975;;;;402.4768398630519;;;
+1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;VN;"Lime plaster";m^3;1800.0;1800.0;;;2594.9164675380975;;;;402.4768398630519;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;VN;"Lime gypsum interior plaster; lime-gypsum";m^3;900.0;900.0;;;1939.058459259238;;;;206.9415330469943;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;VN;"Synthtic resin plaster; Synthetic resin";m^3;1700.0;1700.0;;;2610.192663383102;;;;1259.7769506847044;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;VN;Clay plaster;m^3;900.0;900.0;;;950.5867467818133;;;;101.94314693899669;;;
@@ -207,8 +198,7 @@ Lime plaster";m^3;1800.0;1800.0;;;2594.9164675380975;;;;402.4768398630519;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;KH;Concrete masonry brick;m^3;2000.0;2000.0;;;1952.7320869597027;;;;395.7306618705946;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;KH;"Precast concrete slab, ceiling, thickness 20cm; 504 kg/m2";m^2;504.0;2520.0;504.0;;854.1906819329035;;;;147.0078925997008;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;KH;"Precast concrete wall, thickness 12cm; 291,3 kg/m2";m^2;291.3;2427.5;291.3;;329.54514069311085;;;;63.178659379864364;;;
-1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;KH;"	
-Marble slab";m^2;52.0;;52.0;;340.77767039686137;;;;26.007626467914626;;;
+1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;KH;"Marble slab";m^2;52.0;;52.0;;340.77767039686137;;;;26.007626467914626;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;KH;"Natural stone slab, rigid, facade (30 mm); 78 kg/m2";m^2;78.0;;78.0;;675.5070555686262;;;;51.548670932750376;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;KH;"Natural stone slab, rigid, indoor usage (20 mm); 52 kg/m2";m^2;52.0;;52.0;;659.6087058340871;;;;50.33901388773109;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;KH;"Natural stone slab, flexible, facade (40 mm); 104 kg/m2";m^2;104.0;;104.0;;344.23383338263073;;;;26.24955787691848;;;
@@ -225,11 +215,9 @@ Marble slab";m^2;52.0;;52.0;;340.77767039686137;;;;26.007626467914626;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;KH;Ready-mix concrete C25/30;m^3;2300.0;2300.0;;;1321.4639176089245;;;;383.1156669725363;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;KH;Ready-mix concrete C30/37;m^3;2306.0;2306.0;;;1509.133567736202;;;;445.32660071638526;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;KH;Ready-mix concrete C50/60;m^3;2316.6;2316.6;;;1859.4156863439293;;;;562.317717784679;;;
-1;Mineral building products;4;Mortar and Concrete;2;Mortar (masonry);KH;"	
-Cement mortar";m^3;2000.0;2000.0;;;1926.8108645664322;;;;543.8272458108128;;;
+1;Mineral building products;4;Mortar and Concrete;2;Mortar (masonry);KH;"Cement mortar";m^3;2000.0;2000.0;;;1926.8108645664322;;;;543.8272458108128;;;
 1;Mineral building products;4;Mortar and Concrete;3;Screed dry mortar;KH;Cement screed;kg;1.0;2400.0;;;2.063329302504323;;;;0.3196950761836681;;;
-1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;KH;"	
-Lime plaster";m^3;1800.0;1800.0;;;4403.1516438701965;;;;682.9378059880305;;;
+1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;KH;"Lime plaster";m^3;1800.0;1800.0;;;4403.1516438701965;;;;682.9378059880305;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;KH;"Lime gypsum interior plaster; lime-gypsum";m^3;900.0;900.0;;;3290.2671624524546;;;;351.1461593541695;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;KH;"Synthtic resin plaster; Synthetic resin";m^3;1700.0;1700.0;;;4429.072866263467;;;;2137.6368066983646;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;KH;Clay plaster;m^3;900.0;900.0;;;1612.9912654585721;;;;172.98095743775772;;;
@@ -271,8 +259,7 @@ Lime plaster";m^3;1800.0;1800.0;;;4403.1516438701965;;;;682.9378059880305;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;TH;Concrete masonry brick;m^3;2000.0;2000.0;;;1952.7320869597027;;;;395.7306618705946;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;TH;"Precast concrete slab, ceiling, thickness 20cm; 504 kg/m2";m^2;504.0;2520.0;504.0;;854.1906819329035;;;;147.0078925997008;;;
 1;Mineral building products;3;Bricks, blocks and elements;5;Precast concrete elements and goods;TH;"Precast concrete wall, thickness 12cm; 291,3 kg/m2";m^2;291.3;2427.5;291.3;;329.54514069311085;;;;63.178659379864364;;;
-1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;TH;"	
-Marble slab";m^2;52.0;;52.0;;340.77767039686137;;;;26.007626467914626;;;
+1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;TH;"Marble slab";m^2;52.0;;52.0;;340.77767039686137;;;;26.007626467914626;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;TH;"Natural stone slab, rigid, facade (30 mm); 78 kg/m2";m^2;78.0;;78.0;;675.5070555686262;;;;51.548670932750376;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;TH;"Natural stone slab, rigid, indoor usage (20 mm); 52 kg/m2";m^2;52.0;;52.0;;659.6087058340871;;;;50.33901388773109;;;
 1;Mineral building products;3;Bricks, blocks and elements;8;Natural cut stone;TH;"Natural stone slab, flexible, facade (40 mm); 104 kg/m2";m^2;104.0;;104.0;;344.23383338263073;;;;26.24955787691848;;;
@@ -289,11 +276,9 @@ Marble slab";m^2;52.0;;52.0;;340.77767039686137;;;;26.007626467914626;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;TH;Ready-mix concrete C25/30;m^3;2300.0;2300.0;;;1321.4639176089245;;;;383.1156669725363;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;TH;Ready-mix concrete C30/37;m^3;2306.0;2306.0;;;1509.133567736202;;;;445.32660071638526;;;
 1;Mineral building products;4;Mortar and Concrete;1;Ready mixed concrete;TH;Ready-mix concrete C50/60;m^3;2316.6;2316.6;;;1859.4156863439293;;;;562.317717784679;;;
-1;Mineral building products;4;Mortar and Concrete;2;Mortar (masonry);TH;"	
-Cement mortar";m^3;2000.0;2000.0;;;1926.8108645664322;;;;543.8272458108128;;;
+1;Mineral building products;4;Mortar and Concrete;2;Mortar (masonry);TH;"Cement mortar";m^3;2000.0;2000.0;;;1926.8108645664322;;;;543.8272458108128;;;
 1;Mineral building products;4;Mortar and Concrete;3;Screed dry mortar;TH;Cement screed;kg;1.0;2400.0;;;2.063329302504323;;;;0.3196950761836681;;;
-1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;TH;"	
-Lime plaster";m^3;1800.0;1800.0;;;4403.1516438701965;;;;682.9378059880305;;;
+1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;TH;"Lime plaster";m^3;1800.0;1800.0;;;4403.1516438701965;;;;682.9378059880305;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;TH;"Lime gypsum interior plaster; lime-gypsum";m^3;900.0;900.0;;;3290.2671624524546;;;;351.1461593541695;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;TH;"Synthtic resin plaster; Synthetic resin";m^3;1700.0;1700.0;;;4429.072866263467;;;;2137.6368066983646;;;
 1;Mineral building products;4;Mortar and Concrete;4;Renders and plasters;TH;Clay plaster;m^3;900.0;900.0;;;1612.9912654585721;;;;172.98095743775772;;;
