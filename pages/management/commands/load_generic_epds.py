@@ -141,7 +141,7 @@ class Command(BaseCommand):
                     declared_unit=row["declared_unit"],
                     type=EPDType.GENERIC,
                     declared_amount=1,
-                    comment=f"Created based on (ÖkobdautURL+UUID)", 
+                    comment=f"Created based on {row["UUID"]} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row["UUID"]})", 
                     created_by_id=superuser.id, 
                 )
                 new_epd.save()
