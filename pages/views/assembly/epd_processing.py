@@ -50,6 +50,7 @@ class SelectedEPD:
 class FilteredEPD:
     id: str
     name: str
+    type: str
     country: str
     category: Optional[str]
     impact_gwp: float
@@ -104,6 +105,7 @@ class LazyProcessor:
         return FilteredEPD(
             id=epd.pk,
             name=epd.name,
+            type=epd.type,
             country=epd.country.name if epd.country else "",
             category=epd.category.name_en if epd.category else None,
             impact_gwp=epd.get_gwp_impact_sum(),
