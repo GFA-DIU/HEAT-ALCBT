@@ -5,7 +5,7 @@ from crispy_forms.layout import Layout, Row, Column, Submit
 from cities_light.models import Country
 
 
-from pages.models.epd import MaterialCategory
+from pages.models.epd import MaterialCategory, EPDType
 
 
 class EPDsFilterForm(forms.Form):
@@ -55,6 +55,11 @@ class EPDsFilterForm(forms.Form):
         label="Country",
         required=False,
     )
+    type = forms.ChoiceField(
+        choices=[('', '---------')] + [(choice.value, choice.value) for choice in EPDType],
+        label="EPD type",
+        required=False,
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -96,6 +101,9 @@ class EPDsFilterForm(forms.Form):
                 Column("category", css_class="col-md-4"),
                 Column("subcategory", css_class="col-md-4"),
                 Column("childcategory", css_class="col-md-4"),
+            ),
+            Row(
+                Column("type", css_class="col-md-3"),
             ),
             Submit("submit", "Search", css_class="btn btn-primary"),
         )
