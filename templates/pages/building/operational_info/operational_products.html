@@ -1,0 +1,89 @@
+{% if building_id %}
+    {% if simulation is True %}
+    <form hx-post="{% url 'building_simulation' building_id=building_id %}" 
+        hx-vals='{"action": "save_op_products"}' 
+        hx-target="#operational-epd-list" 
+        hx-swap="innerHTML">
+    {% else %}
+    <form hx-post="{% url 'building' building_id=building_id %}" 
+        hx-vals='{"action": "save_op_products"}' 
+        hx-target="#operational-epd-list" 
+        hx-swap="innerHTML">
+    {% endif %}
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#epdSearchModal">
+        Add from EPD Library
+    </button>
+    <div class="card mb-3 card-body border-0 d-flex justify-content-center align-items-center"
+        style="min-height: 150px; max-height: 500px; overflow-y: auto; position: relative;">
+        <span id="select_epd_text" 
+                class="text-warning position-absolute card card-body"
+                style="font-weight: bold;"
+                {% if operational_products %} hidden {% endif %}>
+            Please select at least one EPD
+        </span>
+
+        <ul id="selected_op_product" class="list-group w-100">
+            {% for product in operational_products %}
+                {% include "pages/building/operational_info/selected_operational_product.html" with product=product edit=edit %}
+            {% endfor %}
+        </ul>
+    </div>
+    <button id="save_button" type="submit" class="btn btn-primary">Save</button>
+    </form>
+{% else %} Please save the building before adding any components {% endif %}
+
+
+<div id="epdSearchModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title w-100 text-center">EPD Library</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="container">
+                <div id="operational-epd-list">
+                    {% include "pages/building/operational_info/operational_product_list.html" %}
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const epdList = document.getElementById('epd-list');
+    const selectedEpdList = document.getElementById('selected_epds');
+    const saveButton = document.getElementById('save_button');
+    const selectEpdText = document.getElementById('select_epd_text');
+
+    // Remove material from selected list
+    selectedEpdList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('remove-epd')) {
+            event.preventDefault(); // Prevent form submission
+            event.stopPropagation(); // Stop the event from bubbling up
+            
+            // Compare with 1 because this code is executed before hx-post response
+            if (selectedEpdList && selectedEpdList.children.length === 1) {
+                saveButton.disabled = true;
+                selectEpdText.hidden = false;
+            }
+
+            const epdId = event.target.dataset.id;
+            // Optionally, re-enable the "Add" button in the library
+            const addButton = document.querySelector(`#epd-list button.add-epd[data-id="${epdId}"]`);
+            if (addButton) {
+                addButton.disabled = false;
+            }
+        }
+    });
+    // Add material to selected list
+    epdList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('add-epd')) {
+            saveButton.disabled = false;
+            selectEpdText.hidden = true;
+        }
+    });
+});
+</script>

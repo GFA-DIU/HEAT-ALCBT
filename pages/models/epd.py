@@ -153,6 +153,7 @@ class EPDType(models.TextChoices):
     OFFICIAL = "official", "From a verified ILCD+EPD source"
     CUSTOM = "custom", "Created by user"
     GENERIC = "generic", "Representative EPD for a country"
+    OPERATIONAL = "operational", "Operational EPD used for the op. carbon calculation (Electricity, Gas...)"
 
 
 class epdLCAx(models.Model):

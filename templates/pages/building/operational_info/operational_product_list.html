@@ -1,0 +1,112 @@
+{% load crispy_forms_tags %}
+{% if simulation is True %}
+<form hx-post="{% url 'building_simulation' building_id=building_id %}" hx-target="#operational-epd-list" hx-vals='{"action": "filter" }'>
+{% else %}
+<form hx-post="{% url 'building' building_id=building_id %}" hx-target="#operational-epd-list" hx-vals='{"action": "filter" }'>
+{% endif %}
+    <!-- Create an identifier for this post request -->
+    {% crispy epd_filters_form %}
+</form> 
+
+<ul class="list-group mt-3">
+    {% for epd in epd_list %}
+    <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ epd.id }}">
+        <div class="col-10">
+            <h6 class="mb-1" title="{{epd.name}}">{{ epd.name |truncatechars:75}}</h6>
+            <div class="row">
+                <span class="text-muted col-3">{{ epd.country }}</span>
+                <div class="col gap-3">
+                    <span class="badge border bg-transparent rounded-pill" style="border-color: #6f42c1 !important; color: #6f42c1; ">{{epd.category}}</span>
+                    <span class="badge border border-dark text-dark bg-transparent rounded-pill">Unit: {{epd.declared_unit}}</span>
+                    <span class="badge border border-success text-success bg-transparent rounded-pill">{{epd.impact_gwp}} kgCO2e</span>
+                    <span class="badge border bg-transparent rounded-pill" style="border-color: #f26716 !important; color: #f26716; ">{{epd.impact_penrt}} MJ</span>
+                </div>
+            </div>
+        </div>
+        <div class="ms-auto d-flex flex-column gap-2">
+            <a href="{{epd.source}}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="align-self-end">  
+                <i class="bi bi-arrow-up-right-square"></i>
+            </a>
+            <button class="btn btn-success add-epd"
+                    data-id="{{ epd.id }}"
+                    hx-post=""
+                    hx-vals='{"action": "select_op_product", "id": "{{ epd.id }}" }'
+                    hx-target="#selected_op_product"
+                    hx-swap="beforeend">
+            Add
+            </button>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+
+<div class="mt-3">
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            <!-- Jump to First Button -->
+            {% if epd_list.has_previous %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page=1&dimension={{dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="First">
+                    <span aria-hidden="true">Start</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">Start</span>
+            </li>
+            {% endif %}
+
+            <!-- Previous Button -->
+            {% if epd_list.has_previous %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.previous_page_number }}&dimension={{dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+            </li>
+            {% endif %}
+
+            <!-- Page Numbers -->
+            {% for num in epd_list.paginator.page_range %}
+                {% if num >= epd_list.number|add:-2 and num <= epd_list.number|add:2 %}
+                <li class="page-item {% if num == epd_list.number %}active{% endif %}">
+                    <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ num }}&dimension={{dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Next Button -->
+            {% if epd_list.has_next %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.next_page_number }}&dimension={{dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+            </li>
+            {% endif %}
+
+            <!-- Jump to Last Button -->
+            {% if epd_list.has_next %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.paginator.num_pages }}&dimension={{dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Last">
+                    <span aria-hidden="true">End</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">End</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
