@@ -109,7 +109,9 @@ class Command(BaseCommand):
             self.stderr.write(f"Error reading CSV file: {e}")
             return
         # Iterate through each row and access the data
-
+        success = 0
+        failure = 0
+        failure_list = []
         for index, row in df.iterrows():
             self.stdout.write(f"Row {index} is being processed.")
             try:
@@ -140,12 +142,20 @@ class Command(BaseCommand):
                     category=category,
                     declared_unit=row["declared_unit"],
                     type=EPDType.GENERIC,
-                    declared_amount=1,
+                    declared_amount=row["declared_amount"],
                     comment=f"Created based on {row["UUID"]} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row["UUID"]})", 
                     created_by_id=superuser.id, 
                 )
                 new_epd.save()
                 self.add_impacts(row, new_epd)
-                self.stdout.write(f"Row {index} processed.")
+                #self.stdout.write(f"Row {index} processed.")
+                success += 1
+            
             except Exception as e:
                 self.stderr.write(f"Error in row {index}: {e}")
+                failure += 1
+                failure_list.append(index)
+        if failure == 0:
+            self.stderr.write(f"\033[32mSuccessfully uploaded {success} generic EPDs. Errors occured in {failure} cases. Rows: {failure_list}")
+        else:
+            self.stderr.write(f"Successfully uploaded {success} generic EPDs. Errors occured in {failure} cases. Rows: {failure_list}")      
