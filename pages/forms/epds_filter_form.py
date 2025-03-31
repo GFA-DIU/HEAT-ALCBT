@@ -1,7 +1,9 @@
 from django import forms
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Submit
+from crispy_forms.layout import Layout, Row, Column, Submit, Div
+from crispy_forms.bootstrap import Accordion, AccordionGroup
 from cities_light.models import Country
 
 
@@ -97,13 +99,23 @@ class EPDsFilterForm(forms.Form):
                 Column("search_query", css_class="col-md-9"),
                 Column("country", css_class="col-md-3"),
             ),
-            Row(
-                Column("category", css_class="col-md-4"),
-                Column("subcategory", css_class="col-md-4"),
-                Column("childcategory", css_class="col-md-4"),
+            Accordion(
+                AccordionGroup(
+                    mark_safe('<strong>Advanced Search</strong>'),
+                    Row(
+                        Column("category", css_class="col-md-4"),
+                        Column("subcategory", css_class="col-md-4"),
+                        Column("childcategory", css_class="col-md-4"),
+                    ),
+                    Row(
+                        Column("type", css_class="col-md-3"),
+                    ),
+                    active=False
+                ),
             ),
-            Row(
-                Column("type", css_class="col-md-3"),
+            Div(
+                Submit("submit", "Search", css_class="btn btn-primary"),
+                css_class="mt-3"
             ),
-            Submit("submit", "Search", css_class="btn btn-primary"),
+                
         )
