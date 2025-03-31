@@ -4,10 +4,10 @@ from typing import Optional
 
 from django.core.paginator import Paginator, Page
 
-from pages.models.assembly import AssemblyDimension, Product
+from pages.models.assembly import AssemblyDimension, StructuralProduct
 from pages.models.epd import EPD
 from pages.views.assembly.epd_filtering import (
-    get_epd_dimension_info,
+    get_epd_info,
     get_filtered_epd_list,
 )
 
@@ -23,15 +23,19 @@ class SelectedEPD:
     category: Optional[str]
     country: Optional[str]
     source: Optional[str]
+    classification: Optional[str]
 
     @classmethod
-    def parse_product(cls, product: Product):
+    def parse_product(cls, product: StructuralProduct, is_boq_product=False):
         """
         Parses a Product instance into a SelectedEPD dataclass.
         """
-        sel_text, _ = get_epd_dimension_info(
-            product.assembly.dimension, product.epd.declared_unit
-        )
+        if is_boq_product:
+            sel_text = "Quantity"
+        else:
+            sel_text, _ = get_epd_info(
+                product.assembly.dimension, product.epd.declared_unit
+            )
 
         return cls(
             id=str(product.epd.id),
@@ -43,6 +47,7 @@ class SelectedEPD:
             category=product.epd.category.name_en if product.epd.category else None,
             country=product.epd.country.name if product.epd.country else "",
             source=product.epd.source,
+            classification=product.classification,
         )
 
 
@@ -101,7 +106,7 @@ class LazyProcessor:
 
     def epd_parsing(self, epd: EPD):
         """Encapsulates the logic for preprocessing EPDs."""
-        sel_text, sel_unit = get_epd_dimension_info(self.dimension, epd.declared_unit)
+        sel_text, sel_unit = get_epd_info(self.dimension, epd.declared_unit)
         return FilteredEPD(
             id=epd.pk,
             name=epd.name,
@@ -118,11 +123,9 @@ class LazyProcessor:
         )
 
 
-def get_epd_list(request, component) -> tuple[Page, AssemblyDimension]:
+def get_epd_list(request, dimension) -> tuple[Page, AssemblyDimension]:
     # Dimension can never be None, since we need dimension info to parse epds
-    filtered_list, dimension = get_filtered_epd_list(
-        request, component.dimension if component else AssemblyDimension.AREA
-    )
+    filtered_list, dimension = get_filtered_epd_list(request, dimension)
     # Pagination setup for EPD list
     lazy_queryset = LazyProcessor(filtered_list, dimension)
     paginator = Paginator(lazy_queryset, 5)  # Show 10 items per page

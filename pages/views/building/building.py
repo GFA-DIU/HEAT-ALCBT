@@ -191,7 +191,7 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
     structural_components = []
     for b_assembly in assembly_list:
         assembly_impact_list = []
-        for p in b_assembly.assembly.product_set.all():
+        for p in b_assembly.assembly.structuralproduct_set.all():
             assembly_impact_list.extend(
                 calculate_impacts(
                     b_assembly.assembly.dimension,
@@ -220,6 +220,7 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
                 "quantity": b_assembly.quantity,
                 "impacts": sum(gwpa1a3),
                 "unit": DIMENSION_UNIT_MAPPING.get(b_assembly.assembly.dimension),
+                "is_boq": b_assembly.assembly.is_boq,
             }
         )
         impact_list.extend(assembly_impact_list)

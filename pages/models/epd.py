@@ -73,7 +73,14 @@ class Unit(models.TextChoices):
     KGN = "kgne", "kg N eq."
     M3WE = "m3we", "m³ world equiv."
     KGSB = "kgsbe", "kg Sb eq."
-
+    ## Operational carbon
+    TR = "tr", "Ton of Refrigeration"
+    KW = "kw", "Kilowatt"
+    M3_H = "m^3/h", "Cubic Meters per Hour"
+    CFM = "cfm", "Cubic Feet per Minute"
+    CELSIUS = "celsius", "°Celsius"
+    FAHRENHEIT = "fahrenheit", "°Fahrenheit"
+    LITER = "liter", "Liter"
 
 class ImpactCategoryKey(models.TextChoices):
     """Taken from LCAx."""

@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 import pytest
+from django.core.exceptions import ValidationError
 
 from pages.models.assembly import (
     Assembly,
@@ -9,7 +10,7 @@ from pages.models.assembly import (
     AssemblyDimension,
     AssemblyMode,
     AssemblyTechnique,
-    Product,
+    StructuralProduct,
 )
 from pages.models.epd import (
     EPD,
@@ -63,16 +64,10 @@ def create_epd_impact(create_impact):
 
 @pytest.fixture
 def create_assembly():
-    def _create_assembly():
-        assemblycategorytechnique = AssemblyCategoryTechnique.objects.create(
-            category=AssemblyCategory.objects.first(),
-            technique=AssemblyTechnique.objects.first(),
-            description="Created for test",
-        )
+    def _create_assembly(dimension):
         return Assembly.objects.create(
             mode=AssemblyMode.CUSTOM,
-            dimension=AssemblyDimension.AREA,
-            classification=assemblycategorytechnique,
+            dimension=dimension,
         )
 
     return _create_assembly
@@ -81,8 +76,16 @@ def create_assembly():
 @pytest.fixture
 def create_product():
     def _create_product(assembly, epd, quantity, unit):
-        return Product.objects.create(
+        assemblycategorytechnique = AssemblyCategoryTechnique.objects.create(
+            category=AssemblyCategory.objects.first(),
+            technique=AssemblyTechnique.objects.first(),
+            description="Created for test",
+        )
+        return StructuralProduct.objects.create(
+            # Struct. Product
             assembly=assembly,
+            classification=assemblycategorytechnique,
+            # Base product
             epd=epd,
             quantity=quantity,
             input_unit=unit,
@@ -143,7 +146,7 @@ def create_product():
         ),
     ],
 )
-def test_calculate_impacts_area(
+def test_calculate_impacts_area_assembly_benchmark(
     epd_name,
     declared_unit,
     conversions,
@@ -158,12 +161,12 @@ def test_calculate_impacts_area(
     create_assembly,
     create_product,
 ):
-    """Test if calculate impact matches Excel.
+    """Test if calculate impact matches Excel calculation of area assembly.
     
     Note:
      - Excel comparison implies `reporting_life_cycle=1` and `assembly_quantity=1`
 
-    ARRANGE: Create simple Ökobaudat EPD and set to product from Excel.
+    ARRANGE: Create simple Ökobaudat EPD and set to product from Excel with an area assembly.
     ACT: Calculate impact of product
     ASSERT: Matches expected values from Excel
     """
@@ -172,7 +175,7 @@ def test_calculate_impacts_area(
     impact = create_impact
     epd = create_epd(epd_name, declared_unit, conversions)
     create_epd_impact(epd, epdimpact_value)
-    assembly = create_assembly()
+    assembly = create_assembly(dimension=AssemblyDimension.AREA)
     product = create_product(assembly, epd, product_quantity, product_unit)
 
     # Act: Perform the calculation
@@ -191,3 +194,186 @@ def test_calculate_impacts_area(
         assert impact["impact_value"] == pytest.approx(
             expected_impact, rel=Decimal("1e-15")
         )
+
+
+# Parametrized test with fixtures
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "epd_name, declared_unit, conversions, epdimpact_value, product_quantity, product_unit, dimension, expected_impact",
+    [
+        ( # Ensure kg/m^3 is used for KG conversion
+            "Test KG with M^2 & M^3",                                                   # epd_name
+            Unit.KG,                                                                    # declared_unit
+            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m^2", "value": "300"}],     # conversions
+            Decimal("3"),                                                               # epdimpact value
+            Decimal("4"),                                                               # product_quantity
+            Unit.CM,                                                                    # product unit  
+            AssemblyDimension.AREA,                                                     # dimension
+            Decimal("0.24"),   # 3 * 4 * 2 / 100                                        # expected impact
+        ),
+        ( # Ensure kg/m^3 is prioritized for KG conversion
+            "Test KG with M & M^3",
+            Unit.KG,
+            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m", "value": "300"}],
+            Decimal("3"),
+            Decimal("4"),
+            Unit.CM2,
+            AssemblyDimension.LENGTH,
+            Decimal("0.0024"),  # 3 * 4 * 2 / 1000
+        ),
+        ( # Ensure KG fallback to m^3 works
+            "Test KG with M^3",
+            Unit.KG,
+            [{"unit": "kg/m^3", "value": "2"}],
+            Decimal("3"),
+            Decimal("4"),
+            Unit.CM2,
+            AssemblyDimension.LENGTH,
+            Decimal("0.0024"),  # 3 * 4 * 2 / 1000
+        ),
+        ( # Ensure M3 conversion for Volume Dimension
+            "Test M3 for Mass",
+            Unit.M3,
+            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m^2", "value": "300"}],
+            Decimal("3"),
+            Decimal("4"),
+            Unit.PERCENT,
+            AssemblyDimension.MASS,
+            Decimal("0.06"),  # 3 * 4 / 2 / 100 (because percent)
+        ),
+        ( # Ensure for PCS Dimension
+            "Test PCS",
+            Unit.PCS,
+            [{"unit": "kg/m^3", "value": "8"}, {"unit": "kg/m^2", "value": "300"}],
+            Decimal("3"),
+            Decimal("4"),
+            Unit.PCS,
+            AssemblyDimension.MASS,
+            Decimal("12"),  # 3 * 4
+        ),
+    ],
+)
+def test_calculate_impacts_dimension_logic(
+    epd_name,
+    declared_unit,
+    conversions,
+    epdimpact_value,
+    product_quantity,
+    product_unit,
+    dimension,
+    expected_impact,
+    ### Functions
+    create_impact,
+    create_epd,
+    create_epd_impact,
+    create_assembly,
+    create_product,
+):
+    """Test if calculate impact satisfies dimension logic.
+    
+    # Note:
+     - KG needs special consideration since these are scaled
+
+    ARRANGE: Create simple EPD and set dimension of assembly.
+    ACT: Calculate impact of product.
+    ASSERT: Matches expected value.
+    """
+
+    # Arrange: Set up test data
+    impact = create_impact
+    epd = create_epd(epd_name, declared_unit, conversions)
+    create_epd_impact(epd, epdimpact_value)
+    assembly = create_assembly(dimension=dimension)
+    product = create_product(assembly, epd, product_quantity, product_unit)
+
+    # Act: Perform the calculation
+    impacts = calculate_impacts(
+        dimension=assembly.dimension,
+        assembly_quantity=1,
+        reporting_life_cycle=1,
+        p=product,
+    )
+
+    # Assert: Verify the results
+    assert len(impacts) == 1
+    for impact in impacts:
+        assert impact["impact_type"].__str__() == "gwp a1a3"
+        assert isinstance(impact["impact_value"], Decimal)
+        assert impact["impact_value"] == pytest.approx(
+            expected_impact, rel=Decimal("1e-15")
+        )
+
+
+
+# Parametrized test with fixtures
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "epd_name, declared_unit, conversions, epdimpact_value, product_quantity, product_unit, dimension",
+    [
+        ( # Ensure KG conversion for Volume Dimension
+            #TODO changed dimension to KG
+            "Test M3 for Mass",
+            Unit.M3,
+            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m^2", "value": "20"}],
+            Decimal("3"),
+            Decimal("4"),
+            Unit.CM,
+            AssemblyDimension.MASS,
+        ),
+        ( # Ensure KG fallback to m works
+            "Test KG with M",
+            Unit.KG,
+            [{"unit": "kg/m", "value": "2"}],
+            Decimal("3"),
+            Decimal("4"),
+            Unit.UNKNOWN,
+            AssemblyDimension.LENGTH,
+        ),
+        ( # Ensure KG fallback to m^2 works
+            "Test KG with M^2",
+            Unit.KG,
+            [{"unit": "kg/m^2", "value": "2"}],
+            Decimal("3"),
+            Decimal("4"),
+            Unit.UNKNOWN,
+            AssemblyDimension.AREA,
+        ),
+        ( # Boq Entry
+            "BoQ entry: Test M",
+            Unit.M,
+            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m", "value": "300"}],
+            Decimal("3"),
+            Decimal("4"),
+            Unit.M,
+            AssemblyDimension.AREA,
+        ),
+    ],
+)
+def test_calculate_impacts_errors(
+    epd_name,
+    declared_unit,
+    conversions,
+    epdimpact_value,
+    product_quantity,
+    product_unit,
+    dimension,
+    ### Functions
+    create_epd,
+    create_epd_impact,
+    create_assembly,
+    create_product,
+):
+    """Test if calculate impact satisfies dimension logic.
+
+    ARRANGE: Create simple EPD and set dimension of assembly.
+    ACT: Create product.
+    ASSERT: Raises validation error.
+    """
+
+    # Arrange: Set up test data
+    epd = create_epd(epd_name, declared_unit, conversions)
+    create_epd_impact(epd, epdimpact_value)
+    assembly = create_assembly(dimension=dimension)
+    
+    with pytest.raises(ValidationError):
+        create_product(assembly, epd, product_quantity, product_unit)

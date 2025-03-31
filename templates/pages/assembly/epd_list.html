@@ -39,8 +39,7 @@
                     hx-post=""
                     hx-vals='{"action": "select_epd", "id": "{{ epd.id }}", "dimension": "{{dimension}}" }'
                     hx-target="#selected_epds"
-                    hx-swap="beforeend"
-                    {% if epd.id|stringformat:"s" in selected_epds_ids %}disabled{% endif %}>
+                    hx-swap="beforeend">
             Add
             </button>
         </div>
@@ -55,7 +54,7 @@
             <!-- Jump to First Button -->
             {% if epd_list.has_previous %}
             <li class="page-item">
-                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page=1&dimension={{filters.dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="First">
+                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page=1&dimension={{dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="First">
                     <span aria-hidden="true">Start</span>
                 </a>
             </li>
@@ -68,7 +67,7 @@
             <!-- Previous Button -->
             {% if epd_list.has_previous %}
             <li class="page-item">
-                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.previous_page_number }}&dimension={{filters.dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Previous">
+                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.previous_page_number }}&dimension={{dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
@@ -82,7 +81,7 @@
             {% for num in epd_list.paginator.page_range %}
                 {% if num >= epd_list.number|add:-2 and num <= epd_list.number|add:2 %}
                 <li class="page-item {% if num == epd_list.number %}active{% endif %}">
-                    <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ num }}&dimension={{filters.dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML">{{ num }}</a>
+                    <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ num }}&dimension={{dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML">{{ num }}</a>
                 </li>
                 {% endif %}
             {% endfor %}
@@ -90,7 +89,7 @@
             <!-- Next Button -->
             {% if epd_list.has_next %}
             <li class="page-item">
-                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.next_page_number }}&dimension={{filters.dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Next">
+                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.next_page_number }}&dimension={{dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
@@ -103,7 +102,7 @@
             <!-- Jump to Last Button -->
             {% if epd_list.has_next %}
             <li class="page-item">
-                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.paginator.num_pages }}&dimension={{filters.dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Last">
+                <a class="page-link" style="cursor: pointer" hx-get="{% url 'component' building_id=building_id %}?page={{ epd_list.paginator.num_pages }}&dimension={{dimension}}&childcategory={{filters.childcategory}}&subcategory={{filters.subcategory}}&category={{filters.category}}&search_query={{filters.search_query}}&country={{filters.country}}{% if simulation %}&simulation=true{% endif %}" hx-target="#epd-list" hx-swap="innerHTML" aria-label="Last">
                     <span aria-hidden="true">End</span>
                 </a>
             </li>

@@ -141,6 +141,11 @@
   },
   {
     "model": "pages.assemblycategorytechnique",
+    "pk": 142,
+    "fields": { "category": 15, "technique": null, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
     "pk": 122,
     "fields": { "category": 15, "technique": 71, "description": null }
   },
@@ -168,6 +173,11 @@
     "model": "pages.assemblycategorytechnique",
     "pk": 127,
     "fields": { "category": 15, "technique": 76, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 143,
+    "fields": { "category": 16, "technique": null, "description": null }
   },
   {
     "model": "pages.assemblycategorytechnique",
@@ -208,6 +218,11 @@
     "model": "pages.assemblycategorytechnique",
     "pk": 135,
     "fields": { "category": 16, "technique": 84, "description": null }
+  },
+  {
+    "model": "pages.assemblycategorytechnique",
+    "pk": 144,
+    "fields": { "category": 17, "technique": null, "description": null }
   },
   {
     "model": "pages.assemblycategorytechnique",
