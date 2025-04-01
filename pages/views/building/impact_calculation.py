@@ -1,9 +1,12 @@
 from decimal import Decimal
-from typing import Literal
+from typing import Literal, TYPE_CHECKING
 
 from pages.models.assembly import AssemblyDimension, StructuralProduct
-from pages.models.building import OperationalProduct
 from pages.models.epd import Unit
+
+if TYPE_CHECKING:
+    # Use a forward reference to avoid circular import at runtime
+    from pages.models.building import OperationalProduct
 
 
 # TODO: Add Try/Catch when trying to fetch a non-existing conversion and handle and display error
@@ -153,7 +156,7 @@ def calculate_impacts(
 
 
 def calculate_impact_operational(
-    p: OperationalProduct,
+    p: "OperationalProduct",
 ) -> dict[Literal["gwp_b6", "penrt_b6"], Decimal]:
     def fetch_conversion(unit) -> Decimal|None:
         """Fetch conversion factor based on the unit."""
@@ -183,7 +186,7 @@ def calculate_impact_operational(
     penrt_b6 = next(
         (i.value for i in impact_set if i.impact.impact_category == "penrt"), None
     )
-
+    p.input_unit = Unit.KG
     # TODO: Flexibilise to other declared_units
     match (p.epd.declared_unit, p.input_unit):
 

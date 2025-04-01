@@ -108,12 +108,12 @@ def handle_building_load(request, building_id, simulation):
         BuildingAssemblyModel = BuildingAssemblySimulated
         relation_name = "buildingassemblysimulated_set"
         BuildingProductModel = SimulatedOperationalProduct
-        op_relation_name = "simulatedoperationalproduct_set"
+        op_relation_name = "simulated_operational_products"
     else:
         BuildingAssemblyModel = BuildingAssembly
         relation_name = "buildingassembly_set"
         BuildingProductModel = OperationalProduct
-        op_relation_name = "operationalproduct_set"
+        op_relation_name = "operational_products"
 
     building = get_object_or_404(
         Building.objects.filter(
