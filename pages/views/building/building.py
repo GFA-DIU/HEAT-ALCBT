@@ -9,10 +9,6 @@ from django.views.decorators.http import require_http_methods
 from pages.forms.building_detailed_info import BuildingDetailedInformation
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.assembly import DIMENSION_UNIT_MAPPING
-<<<<<<< HEAD
-from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
-from pages.views.building.impact_calculation import calculate_impacts
-=======
 from pages.models.building import (
     Building,
     BuildingAssembly,
@@ -23,7 +19,6 @@ from pages.models.building import (
 from pages.models.epd import EPD
 from pages.views.assembly.epd_filtering import get_filtered_epd_list
 from pages.views.building.impact_calculation import calculate_impact_operational, calculate_impacts
->>>>>>> cdac91d (feat: impact summation in building model & basic operational carbon implementation in dashboard)
 
 
 logger = logging.getLogger(__name__)
@@ -71,11 +66,6 @@ def handle_building_load(request, building_id, simulation):
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
         relation_name = "buildingassemblysimulated_set"
-<<<<<<< HEAD
-    else:
-        BuildingAssemblyModel = BuildingAssembly
-        relation_name = "buildingassembly_set"
-=======
         BuildingProductModel = SimulatedOperationalProduct
         op_relation_name = "simulated_operational_products"
     else:
@@ -83,7 +73,6 @@ def handle_building_load(request, building_id, simulation):
         relation_name = "buildingassembly_set"
         BuildingProductModel = OperationalProduct
         op_relation_name = "operational_products"
->>>>>>> cdac91d (feat: impact summation in building model & basic operational carbon implementation in dashboard)
 
     building = get_object_or_404(
         Building.objects.filter(
@@ -249,8 +238,6 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
         impact_list.extend(assembly_impact_list)
 
     return structural_components, impact_list
-<<<<<<< HEAD
-=======
 
 
 def get_operational_products(operational_products):
@@ -329,4 +316,3 @@ def handle_op_products_save(request, building_id):
             input_unit=v.get("unit"),
             description=v.get("description"),
         )
->>>>>>> cdac91d (feat: impact summation in building model & basic operational carbon implementation in dashboard)
