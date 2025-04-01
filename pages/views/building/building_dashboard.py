@@ -39,6 +39,13 @@ def building_dashboard_assembly(user, building_id, simulation):
     df.loc[df["category_short"] == "Intermediate Floor Construction", "category_short"] = "Interm. Floor"
     df.loc[df["category_short"] == "Bottom Floor Construction", "category_short"] = "Bottom Floor"
     df.loc[df["category_short"] == "Roof Construction", "category_short"] = "Roof Const."
+    
+    # Aggregation of operational impacts
+    op_gwp_sum = df.loc[df["type"] == "operational", "gwp"].sum()
+    op_penrt_sum = df.loc[df["type"] == "operational", "penrt"].sum()
+    operational_row = {'category_short': 'Operational carbon', "gwp": op_gwp_sum, "penrt": op_penrt_sum, "type": "operational"}
+    df = df.loc[df["type"] == "structural"]
+    df.loc[len(df)] = operational_row
 
     return _building_dashboard_base(df, "category_short")
 
@@ -103,7 +110,6 @@ def prep_building_dashboard_df(user, building_id, simulation):
     
     # Operational carbon
     operational_impact_list = get_operational_impact(building.prefetched_operational_products)
-    print(f"I'm here {operational_impact_list}")
 
     df_op = pd.DataFrame.from_records(operational_impact_list)
     df_op = df_op.pivot(
@@ -158,7 +164,7 @@ def _building_dashboard_base(df, key_column: str):
     fig.add_trace(
         go.Pie(
             labels=df[key_column],
-            values=df["gwp"],  # using ony positive values
+            values=df["gwp"],  # using only positive values
             name="GWP",
             hole=0.4,
             marker=dict(colors=colorscale_orange),
@@ -173,6 +179,7 @@ def _building_dashboard_base(df, key_column: str):
         go.Pie(
             labels=df[key_column],
             values=df["penrt"],
+            sort=True,
             name="PENRT",
             hole=0.4,
             marker=dict(colors=colorscale_green),

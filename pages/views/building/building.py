@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods
 
 from pages.forms.building_detailed_info import BuildingDetailedInformation
 from pages.forms.building_general_info import BuildingGeneralInformation
+from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.assembly import DIMENSION_UNIT_MAPPING
 from pages.models.building import (
     Building,
