@@ -9,8 +9,21 @@ from django.views.decorators.http import require_http_methods
 from pages.forms.building_detailed_info import BuildingDetailedInformation
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.models.assembly import DIMENSION_UNIT_MAPPING
+<<<<<<< HEAD
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 from pages.views.building.impact_calculation import calculate_impacts
+=======
+from pages.models.building import (
+    Building,
+    BuildingAssembly,
+    BuildingAssemblySimulated,
+    OperationalProduct,
+    SimulatedOperationalProduct,
+)
+from pages.models.epd import EPD
+from pages.views.assembly.epd_filtering import get_filtered_epd_list
+from pages.views.building.impact_calculation import calculate_impact_operational, calculate_impacts
+>>>>>>> cdac91d (feat: impact summation in building model & basic operational carbon implementation in dashboard)
 
 
 logger = logging.getLogger(__name__)
@@ -58,9 +71,19 @@ def handle_building_load(request, building_id, simulation):
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
         relation_name = "buildingassemblysimulated_set"
+<<<<<<< HEAD
     else:
         BuildingAssemblyModel = BuildingAssembly
         relation_name = "buildingassembly_set"
+=======
+        BuildingProductModel = SimulatedOperationalProduct
+        op_relation_name = "simulated_operational_products"
+    else:
+        BuildingAssemblyModel = BuildingAssembly
+        relation_name = "buildingassembly_set"
+        BuildingProductModel = OperationalProduct
+        op_relation_name = "operational_products"
+>>>>>>> cdac91d (feat: impact summation in building model & basic operational carbon implementation in dashboard)
 
     building = get_object_or_404(
         Building.objects.filter(
@@ -226,3 +249,84 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
         impact_list.extend(assembly_impact_list)
 
     return structural_components, impact_list
+<<<<<<< HEAD
+=======
+
+
+def get_operational_products(operational_products):
+    serialised_op_products = []
+    for op_product in operational_products:
+        serialised_op_products.append(
+            {
+                "id": op_product.id,
+                "description": op_product.description,
+                "quantity": op_product.quantity,
+                "unit": op_product.input_unit,
+            }
+        )
+    return serialised_op_products
+
+def get_operational_impact(operational_products):
+    op_impact_list = []
+    for op_product in operational_products:
+        impact = calculate_impact_operational(op_product)
+        for key, value in impact.items():
+            op_impact_list.append(
+                {
+                    "category": op_product.epd.category.name_en,
+                    "impact_type": key,
+                    "impact_value": value,
+                }
+            )
+    return op_impact_list        
+
+def get_op_product_list(request, building_id):
+    # Get Operational Products and impacts
+    epd_list, _ = get_filtered_epd_list(request, operational=True)
+    context = {
+        "building_id": building_id,
+        "simulation": False,
+        "epd_list": epd_list,
+        "epd_filters_form": EPDsFilterForm(request.POST),
+    }
+    return render(
+        request,
+        "pages/building/operational_info/operational_product_list.html",
+        context,
+    )
+
+
+def get_op_product(request):
+    epd_id = request.POST.get("id")
+
+    epd = get_object_or_404(EPD, pk=epd_id)
+    epd.selection_quantity = 1
+    epd.selection_unit = "KG"
+    return render(
+        request,
+        "pages/building/operational_info/selected_operational_product.html",
+        {"epd": epd},
+    )
+
+
+def handle_op_products_save(request, building_id):
+
+    selected_epds = {}
+
+    for key, value in request.POST.items():
+        if key.startswith("material_") and "_quantity" in key:
+            epd_id = key.split("_")[1]
+            selected_epds[epd_id] = {
+                "quantity": float(value),
+                "unit": request.POST[f"material_{epd_id}_unit"],
+                "description": request.POST[f"material_{epd_id}_description"],
+            }
+    for k, v in selected_epds.items():
+        OperationalProduct.objects.create(
+            epd_id=k,
+            building_id=building_id,
+            quantity=v.get("quantity"),
+            input_unit=v.get("unit"),
+            description=v.get("description"),
+        )
+>>>>>>> cdac91d (feat: impact summation in building model & basic operational carbon implementation in dashboard)

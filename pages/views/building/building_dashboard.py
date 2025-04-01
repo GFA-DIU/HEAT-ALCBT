@@ -10,8 +10,8 @@ from django.http import HttpResponse, HttpResponseServerError
 
 from django.shortcuts import get_object_or_404
 
-from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
-from pages.views.building.building import get_assemblies
+from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated, OperationalProduct, SimulatedOperationalProduct
+from pages.views.building.building import get_assemblies, get_operational_impact
 
 logger = logging.getLogger(__name__)
 
@@ -34,38 +34,41 @@ def building_dashboard_material(user, building_id, simulation):
 def building_dashboard_assembly(user, building_id, simulation):
     df = prep_building_dashboard_df(user, building_id, simulation)
 
-    # Create short Assembly category names to enable to show the labels
-    df["assembly_short"] = df["assembly_category"].str.split("- ").str[1]
-    df.loc[
-        df["assembly_short"] == "Intermediate Floor Construction", "assembly_short"
-    ] = "Interm. Floor"
-    df.loc[df["assembly_short"] == "Bottom Floor Construction", "assembly_short"] = (
-        "Bottom Floor"
-    )
-    df.loc[df["assembly_short"] == "Roof Construction", "assembly_short"] = (
-        "Roof Const."
-    )
+    df["category_short"] = df["assembly_category"]
+    df.loc[df["type"] == "structural", "category_short"] = df.loc[df["type"] == "structural", "assembly_category"].str.split("- ").str[1]
+    df.loc[df["category_short"] == "Intermediate Floor Construction", "category_short"] = "Interm. Floor"
+    df.loc[df["category_short"] == "Bottom Floor Construction", "category_short"] = "Bottom Floor"
+    df.loc[df["category_short"] == "Roof Construction", "category_short"] = "Roof Const."
 
-    return _building_dashboard_base(df, "assembly_short")
+    return _building_dashboard_base(df, "category_short")
 
 
 def prep_building_dashboard_df(user, building_id, simulation):
     if simulation == "true":
         BuildingAssemblyModel = BuildingAssemblySimulated
+        relation_name = "buildingassemblysimulated_set"
+        BuildingProductModel = SimulatedOperationalProduct
+        op_relation_name = "simulated_operational_products"
     else:
         BuildingAssemblyModel = BuildingAssembly
+        relation_name = "buildingassembly_set"
+        BuildingProductModel = OperationalProduct
+        op_relation_name = "operational_products"
 
     building = get_object_or_404(
         Building.objects.filter(
             created_by=user
         ).prefetch_related(  # Ensure the building belongs to the user
             Prefetch(
-                "buildingassembly_set",
-                queryset=BuildingAssemblyModel.objects.filter(
-                    # assembly__created_by=request.user  # Ensure the assembly belongs to the user
-                ).select_related("assembly"),
+                relation_name,
+                queryset=BuildingAssemblyModel.objects.filter().select_related("assembly"),
                 to_attr="prefetched_components",
-            )
+            ),
+            Prefetch(
+                op_relation_name,
+                queryset=BuildingProductModel.objects.all(),
+                to_attr="prefetched_operational_products",
+            ),
         ),
         pk=building_id,
     )
@@ -78,26 +81,44 @@ def prep_building_dashboard_df(user, building_id, simulation):
 
     # Prepare DataFrame
     df = pd.DataFrame.from_records(impact_list)
-    # filter to impacts of interest
     df["impact_type"] = df["impact_type"].apply(lambda x: x.__str__())
     df["assembly_category"] = df["assembly_category"].apply(lambda x: x.__str__())
     df["material_category"] = df["material_category"].apply(lambda x: x.__str__())
     df = df[df["impact_type"].isin(["gwp a1a3", "penrt a1a3"])]
-    # bring into wide format for plotting
     df = df.pivot(
         index=["assembly_id", "epd_id", "assembly_category", "material_category"],
         columns="impact_type",
         values="impact_value",
     ).reset_index()
-
+    
     # Decision to only display positive values for embodied carbon and embodied energy, yet indicator below still shows sum.
     # Thus creating a new column
     df["gwp a1a3 pos"] = df["gwp a1a3"]
     df.loc[df["gwp a1a3 pos"] <= 0, "gwp a1a3 pos"] = 0
     df["penrt a1a3 pos"] = df["penrt a1a3"]
     df.loc[df["penrt a1a3 pos"] <= 0, "penrt a1a3 pos"] = 0
+    df["type"] = "structural"
+    df.rename(columns={"gwp a1a3 pos": "gwp", "penrt a1a3 pos": "penrt"}, inplace=True)
+    
+    
+    # Operational carbon
+    operational_impact_list = get_operational_impact(building.prefetched_operational_products)
+    print(f"I'm here {operational_impact_list}")
 
-    return df
+    df_op = pd.DataFrame.from_records(operational_impact_list)
+    df_op = df_op.pivot(
+        index=["category"],
+        columns="impact_type",
+        values="impact_value",
+    ).reset_index()
+    df_op["type"] = "operational"
+    df_op["assembly_category"] = "Operational Carbon"
+    df_op.rename(columns={"category": "material_category", "gwp_b6": "gwp", "penrt_b6": "penrt"}, inplace=True)
+    
+    # Combine & rename long labels
+    df_full = pd.concat([df, df_op], axis=0)[["assembly_category", "material_category", "gwp", "penrt", "type"]]
+    
+    return df_full
 
 
 def _building_dashboard_base(df, key_column: str):
@@ -137,8 +158,8 @@ def _building_dashboard_base(df, key_column: str):
     fig.add_trace(
         go.Pie(
             labels=df[key_column],
-            values=df["gwp a1a3 pos"],  # using ony positive values
-            name="GWP A1A3",
+            values=df["gwp"],  # using ony positive values
+            name="GWP",
             hole=0.4,
             marker=dict(colors=colorscale_orange),
             legendgroup="GWP",
@@ -151,8 +172,8 @@ def _building_dashboard_base(df, key_column: str):
     fig.add_trace(
         go.Pie(
             labels=df[key_column],
-            values=df["penrt a1a3 pos"],
-            name="PENRT A1A3",
+            values=df["penrt"],
+            name="PENRT",
             hole=0.4,
             marker=dict(colors=colorscale_green),
             legendgroup="PENRT",
@@ -209,8 +230,8 @@ def _building_dashboard_base(df, key_column: str):
     fig.update_layout(annotations=new_annotations)
 
     # Calculate initial sums
-    gwp_sum = df["gwp a1a3"].sum()
-    penrt_sum = df["penrt a1a3"].sum()
+    gwp_sum = df["gwp"].sum()
+    penrt_sum = df["penrt"].sum()
 
     # Add Indicators (make them larger)
     fig.add_trace(
