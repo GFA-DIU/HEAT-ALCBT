@@ -18,7 +18,7 @@ def dashboard_view(request):
     model = request.GET.get("model")
     model_id = request.GET.get("id")
     dashboard_type = request.GET.get("dashboard_type")
-    simulation = request.GET.get("simulation")
+    simulation = request.GET.get("simulation") == "True"
     # Check that the parameters are valid
     if not model:
         return JsonResponse({"error": "Missing 'model' parameter."}, status=400)

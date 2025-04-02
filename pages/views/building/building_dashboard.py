@@ -16,7 +16,7 @@ from pages.views.building.building import get_assemblies
 logger = logging.getLogger(__name__)
 
 
-def get_building_dashboard(user, building_id, dashboard_type: str, simulation: str):
+def get_building_dashboard(user, building_id, dashboard_type: str, simulation: bool):
     if dashboard_type == "assembly":
         return building_dashboard_assembly(user, building_id, simulation)
     elif dashboard_type == "material":

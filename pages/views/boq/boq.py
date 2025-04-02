@@ -79,7 +79,7 @@ def boq_edit(request, building_id, assembly_id=None):
 
 def set_up_view(request, building_id, assembly_id):
     """Fetch objects and create baseline context."""
-    simulation = request.GET.get("simulation")
+    simulation = request.GET.get("simulation") == "True"
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
     else:
