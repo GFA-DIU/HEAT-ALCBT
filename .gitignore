@@ -21,3 +21,6 @@ secrets
 *.ipynb
 *.xlsx
 *.csv
+
+# Keep csv files in data folder
+!/pages/data/*.csv
