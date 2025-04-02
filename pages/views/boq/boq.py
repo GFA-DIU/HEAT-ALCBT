@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 from pages.forms.boq_assembly_form import BOQAssemblyForm
 from pages.forms.epds_filter_form import EPDsFilterForm
@@ -18,6 +19,7 @@ from pages.views.assembly.save_to_assembly import save_assembly
 logger = logging.getLogger(__name__)
 
 
+@login_required
 @require_http_methods(["GET", "POST", "DELETE"])
 def boq_edit(request, building_id, assembly_id=None):
     """

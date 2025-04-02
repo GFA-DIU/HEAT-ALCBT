@@ -88,8 +88,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
-    # own
-    "django_project.middleware.LoginRequiredMiddleware",
+    # # own
+    # "django_project.middleware.LoginRequiredMiddleware",
 ]
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ["admin:login", "admin:index"]

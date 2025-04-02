@@ -1,6 +1,7 @@
 import logging
 
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
@@ -19,7 +20,7 @@ from pages.views.assembly.save_to_assembly import save_assembly
 
 logger = logging.getLogger(__name__)
 
-
+@login_required
 @require_http_methods(["GET", "POST", "DELETE"])
 def component_edit(request, building_id, assembly_id=None):
     """

@@ -3,6 +3,7 @@ import logging
 from django.db import transaction
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 from pages.models.assembly import AssemblyMode, Assembly, StructuralProduct
 from pages.models.building import BuildingAssembly, BuildingAssemblySimulated
@@ -13,6 +14,7 @@ from pages.views.building.building import handle_assembly_delete
 logger = logging.getLogger(__name__)
 
 
+@login_required
 @require_http_methods(["GET", "POST", "DELETE"])
 def building_simulation(request, building_id):
     logger.info(
