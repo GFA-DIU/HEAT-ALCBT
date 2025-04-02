@@ -40,14 +40,22 @@ def building_dashboard_assembly(user, building_id, simulation):
     df.loc[df["category_short"] == "Bottom Floor Construction", "category_short"] = "Bottom Floor"
     df.loc[df["category_short"] == "Roof Construction", "category_short"] = "Roof Const."
     
-    # Aggregation of operational impacts
+    # Aggregation for pie chart
     op_gwp_sum = df.loc[df["type"] == "operational", "gwp"].sum()
     op_penrt_sum = df.loc[df["type"] == "operational", "penrt"].sum()
     operational_row = {'category_short': 'Operational carbon', "gwp": op_gwp_sum, "penrt": op_penrt_sum, "type": "operational"}
-    df = df.loc[df["type"] == "structural"]
-    df.loc[len(df)] = operational_row
+    st_gwp_sum = df.loc[df["type"] == "structural", "gwp"].sum()
+    st_penrt_sum = df.loc[df["type"] == "structural", "penrt"].sum()
+    structural_row = {'category_short': 'Embodied carbon', "gwp": st_gwp_sum, "penrt": st_penrt_sum, "type": "structural"}
+    df_list = [structural_row, operational_row]
+    df_pie = pd.DataFrame(data=df_list)
+    
+    # Shorten df for bar chart
+    df_filtered = df[df["type"] == "structural"]
+    df_bar = (df_filtered.groupby('category_short')['gwp'].sum() / df_filtered['gwp'].sum() * 100).reset_index()
+    df_bar.columns = ['category_short', 'gwp_per']
 
-    return _building_dashboard_base(df, "category_short")
+    return _building_dashboard_assembly(df_pie, df_bar, "category_short")
 
 
 def prep_building_dashboard_df(user, building_id, simulation):
@@ -125,6 +133,162 @@ def prep_building_dashboard_df(user, building_id, simulation):
     df_full = pd.concat([df, df_op], axis=0)[["assembly_category", "material_category", "gwp", "penrt", "type"]]
     
     return df_full
+
+
+def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
+    # Generate colors
+    colors = ["rgb(244, 132, 67)", "rgb(224, 180, 215)"]
+
+    # Create a 2x2 layout: top row for pies, bottom row for indicators
+    fig = make_subplots(
+        rows=2,
+        cols=2,
+        specs=[
+            [{"type": "domain"}, {"type": "xy"}],
+            [{"type": "domain"}, {"type": "domain"}],
+        ],
+        subplot_titles=[
+            "<b>Whole life cycle carbon</b><br>[kg CO₂eq/m·yr]<br> ",
+            "<b>Embodied carbon</b><br>[kg CO₂eq/m·yr]<br> ",
+            "",
+            "",
+        ],
+        # Give more vertical space to top row
+        row_heights=[0.6, 0.3],
+        vertical_spacing=0.05,
+    )
+
+    # Update all annotations (including subplot titles)
+    for annotation in fig["layout"]["annotations"]:
+        annotation["font"] = dict(size=20)  # Change 20 to your desired font size
+
+    # Add pies
+    fig.add_trace(
+        go.Pie(
+            labels=df_pie[key_column],
+            values=df_pie["gwp"],  # using only positive values
+            name="GWP",
+            hole=0.4,
+            marker=dict(colors=colors),
+            legendgroup="GWP",
+            showlegend=True,
+        ),
+        row=1,
+        col=1,
+    )
+
+    fig.add_trace(
+        go.Bar(
+            y=df_bar[key_column],
+            x=df_bar["gwp_per"],
+            orientation='h',
+            text=df_bar[key_column],
+            textposition='inside',
+            insidetextanchor='start',
+            textfont_size=20,
+            textfont=dict(color='black'),
+            showlegend=False,
+            hoverinfo="y+x",
+            hovertemplate="%{label}<br><b>Value: %{value:.2f}</b>%<extra></extra>",
+        ),
+        row=1,
+        col=2,
+    )
+
+    # Update pies formatting
+    fig.update_traces(
+        hoverinfo="label+value",
+        hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
+        hoverlabel=dict(font_color="white", namelength=-1),
+        textposition="auto",
+        textfont=dict(
+            size=14,  # Default font size
+            family="Arial, sans-serif",  # Use a modern sans-serif font
+            color="white",  # Default high contrast text color
+        ),
+        texttemplate="<b>%{label}</b><br>%{percent:.0%}",
+        selector=dict(type="pie"),
+        # connector=dict(line=dict(color="black", width=1, dash="solid")),
+    )
+    
+    # Update bar formatting
+    fig.update_traces(
+        marker_color=colors[0], 
+        marker_cornerradius=15,
+        hoverlabel_font_color="white", 
+        hoverlabel_namelength=-1,
+        selector=dict(type='bar')
+    )
+    
+    fig.update_yaxes(autorange='reversed')
+
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',  
+        plot_bgcolor='rgba(0,0,0,0)',
+        bargap=0.05,
+        bargroupgap=0.5,
+        uniformtext=dict(mode='show', minsize=12),
+        yaxis=dict(showticklabels=False)
+    )
+
+    # Store existing annotations (subplot titles)
+    #existing_annotations = list(fig.layout.annotations)
+
+    # Calculate centers for pie hole annotations
+
+    # gwp_annotation = dict(
+    #     text="GWP",
+    #     x=0.5,
+    #     y=0.5,
+    #     xref="x domain", 
+    #     yref="y domain",
+    #     font_size=20,
+    #     showarrow=False,
+    #     xanchor="center",
+    #     yanchor="middle",
+    # )
+
+    # Combine original titles + new annotations
+    #new_annotations = existing_annotations + [gwp_annotation]
+    #fig.update_layout(annotations=new_annotations)
+
+    # Calculate initial sums
+    gwp_sum = df_pie["gwp"].sum()
+    gwp_embodied_sum = df_pie.loc[df_pie["type"] == "structural", "gwp"].sum()
+
+    # Add Indicators (make them larger)
+    fig.add_trace(
+        go.Indicator(
+            mode="number",
+            value=gwp_sum,
+            title={"text": "<b>Total GWP</b>", "font": {"size": 20}},
+            number={"font": {"size": 30}},
+        ),
+        row=2,
+        col=1,
+    )
+
+    fig.add_trace(
+        go.Indicator(
+            mode="number",
+            value=gwp_embodied_sum,
+            title={"text": "<b>Total embodied GWP</b>", "font": {"size": 20}},
+            number={"font": {"size": 30}},
+        ),
+        row=2,
+        col=2,
+    )
+
+    # Increase figure size and reduce margins
+    fig.update_layout(
+        height=500, width=900, margin=dict(l=50, r=50, t=100, b=50), showlegend=True
+    )
+
+    pie_plot = plot(
+        fig, output_type="div", config={"displaylogo": False, "displayModeBar": False}
+    )
+    return pie_plot
+
 
 
 def _building_dashboard_base(df, key_column: str):
