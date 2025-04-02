@@ -118,10 +118,10 @@ class Command(BaseCommand):
                 conversions = self.get_conversions(row)
                 if not pd.isna(row["level_2_index"]):
                     if len(str(row["level_2_index"])) == 1:
-                        level_2_index = f"0{row["level_2_index"]}"
+                        level_2_index = f"0{row['level_2_index']}"
                     else:
                         level_2_index = str(row["level_2_index"])
-                    category_id = f"{row["level_0_index"]}.{row["level_1_index"]}.{level_2_index}"
+                    category_id = f"{row['level_0_index']}.{row['level_1_index']}.{level_2_index}"
                     category, _ = MaterialCategory.objects.get_or_create(
                         category_id=category_id, level=3
                     )
@@ -133,17 +133,14 @@ class Command(BaseCommand):
                     ),
                     source="GFA-HEAT",
                     name=row["name"],
-                    names=[
-                        {"lang": "en", "value": row["name"]},
-                        {"lang": "de", "value": row["name"]},
-                    ],
+                    names=[{"lang": "en", "value": row["name"]}],
                     public=True,
                     conversions=conversions,
                     category=category,
                     declared_unit=row["declared_unit"],
                     type=EPDType.GENERIC,
                     declared_amount=row["declared_amount"],
-                    comment=f"Created based on {row["UUID"]} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row["UUID"]})", 
+                    comment=f"Created based on {row['UUID']} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row['UUID']})", 
                     created_by_id=superuser.id, 
                 )
                 new_epd.save()
