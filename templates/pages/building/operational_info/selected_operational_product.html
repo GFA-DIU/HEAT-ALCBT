@@ -47,7 +47,6 @@ data-id="{{ epd.id }}">
             </div>      
         {% else %}
             <span class="badge border border-success text-success bg-transparent rounded-pill">{{epd.gwp_b6}} kgCO2e</span>
-            <span class="badge border bg-transparent rounded-pill" style="border-color: #f26716 !important; color: #f26716; ">{{epd.penrt_b6}} MJ</span>
         {% endif %}
     </div>
     <div class="d-flex flex-column ms-auto gap-4">
@@ -60,11 +59,8 @@ data-id="{{ epd.id }}">
         {% if edit_mode is True %}
             <!-- Action Buttons -->
             <button class="btn btn-danger"
-                {% if simulation == "true" %}
-                hx-delete="{% url 'building_simulation' building_id=building_id %}?op_product_id={{ epd.product_id  }}" 
-                {% else %}
-                hx-delete="{% url 'building' building_id=building_id %}?op_product_id={{ epd.product_id }}" 
-                {% endif %}
+                {%  if simulation %} hx-delete="{% url 'building_simulation' building_id=building_id %}?op_product_id={{ epd.product_id  }}" 
+                {% else %} hx-delete="{% url 'building' building_id=building_id %}?op_product_id={{ epd.product_id }}" {% endif %}
                 hx-target="#epd-{{epd.id}}-{{epd.timestamp}}" 
                 hx-swap="outerHTML">
                 Delete

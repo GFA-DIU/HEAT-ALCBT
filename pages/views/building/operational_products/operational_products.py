@@ -15,8 +15,13 @@ logger = logging.getLogger(__name__)
 
 
 @transaction.atomic
-def handle_op_products_save(request, building_id):
-    OperationalProduct.objects.filter(building_id=building_id).delete()
+def handle_op_products_save(request, building_id, simulation=False):
+    if simulation:
+        ProductModel = SimulatedOperationalProduct
+    else:
+        ProductModel = OperationalProduct
+
+    ProductModel.objects.filter(building_id=building_id).delete()
     selected_epds = {}
 
     for key, value in request.POST.items():
@@ -33,7 +38,7 @@ def handle_op_products_save(request, building_id):
                 ],
             }
     for _, v in selected_epds.items():
-        OperationalProduct.objects.create(
+        ProductModel.objects.create(
             epd_id=v.get("id"),
             building_id=building_id,
             quantity=v.get("quantity"),

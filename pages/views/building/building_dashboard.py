@@ -50,7 +50,7 @@ def building_dashboard_assembly(user, building_id, simulation):
 
 
 def prep_building_dashboard_df(user, building_id, simulation):
-    if simulation == "true":
+    if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
     else:
         BuildingAssemblyModel = BuildingAssembly

@@ -1,8 +1,8 @@
 {% load crispy_forms_tags %}
 {% if assembly_id %}
-<form hx-post="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}{% if simulation %}?simulation=true{% endif %}">
+<form hx-post="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}?simulation={{simulation}}">
 {% else %}
-<form hx-post="{% url 'component' building_id=building_id %}{% if simulation %}?simulation=true{% endif %}">
+<form hx-post="{% url 'component' building_id=building_id %}?simulation={{simulation}}">
 {% endif %}
     {% csrf_token %}
     <div class="row">

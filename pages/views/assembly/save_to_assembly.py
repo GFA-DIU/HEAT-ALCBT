@@ -18,7 +18,7 @@ def save_assembly(
     request,
     assembly: Assembly,
     building_instance: Building,
-    simulation=None,
+    simulation=False,
     is_boq=False,
 ) -> None:
     # Save to BuildingAssembly or -Simulated, depending on Mode

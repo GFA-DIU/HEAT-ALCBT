@@ -1,15 +1,9 @@
 {% if building_id %}
-    {% if simulation is True %}
-    <form hx-post="{% url 'building_simulation' building_id=building_id %}" 
-        hx-vals='{"action": "save_op_products"}' 
-        hx-target="#operational-epd-list" 
-        hx-swap="innerHTML">
-    {% else %}
-    <form hx-post="{% url 'building' building_id=building_id %}" 
-        hx-vals='{"action": "save_op_products"}' 
-        hx-target="#operational-epd-list" 
-        hx-swap="innerHTML">
-    {% endif %}
+    <form {% if simulation %}hx-post="{% url 'building_simulation' building_id=building_id %}" 
+            {% else %} hx-post="{% url 'building' building_id=building_id %}" {% endif %}
+            hx-vals='{"action": "save_op_products"}' 
+            hx-target="#operational-epd-list" 
+            hx-swap="innerHTML">
     {% if edit_mode %}
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#epdSearchModal">
             Add from EPD Library
@@ -26,7 +20,7 @@
 
         <ul id="selected_op_products" class="list-group w-100">
             {% for product in operational_products %}
-                {% include "pages/building/operational_info/selected_operational_product.html" with epd=product edit_mode=edit_mode %}
+                {% include "pages/building/operational_info/selected_operational_product.html" with epd=product edit_mode=edit_mode simulation=simulation %}
             {% endfor %}
         </ul>
     </div>
@@ -34,7 +28,8 @@
         <a href="" class="btn btn-secondary">Cancel</a>
         <button id="save_button" type="submit" class="btn btn-primary">Save</button>
     {%else%}
-        <button hx-post="{% url 'building' building_id=building_id %}" 
+        <button {% if simulation %} hx-post="{% url 'building_simulation' building_id=building_id %}" 
+                {%else%} hx-post="{% url 'building' building_id=building_id %}" {% endif %}
                 hx-vals='{"action": "edit_products"}' 
                 hx-target="#operational-info-body" 
                 hx-swap="innerHTML"

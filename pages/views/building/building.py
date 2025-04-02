@@ -154,6 +154,7 @@ def handle_building_load(request, building_id, simulation):
         "epd_list": epd_list,
         "epd_filters_form": EPDsFilterForm(request.POST),
         "edit_mode": False,
+        "simulation": simulation,
     }
 
     form = BuildingGeneralInformation(instance=building)
