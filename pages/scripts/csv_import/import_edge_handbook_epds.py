@@ -1,7 +1,13 @@
 import pandas as pd
 
 from pages.models.epd import EPD, EPDType
-from pages.scripts.excel_import.utils import add_impacts, get_category, get_conversions, get_country, get_superuser
+from pages.scripts.csv_import.utils import (
+    add_impacts,
+    get_category,
+    get_conversions,
+    get_country,
+    get_superuser,
+)
 
 
 impact_columns = [
@@ -27,7 +33,7 @@ def import_EDGE_EPDs():
         print(f"Row {index} is being processed.")
         try:
             conversions = get_conversions(row)
-            
+
             new_epd = EPD(
                 country=get_country(row["country"]),
                 source=row["source"],
@@ -42,7 +48,7 @@ def import_EDGE_EPDs():
                 type=EPDType.OFFICIAL,
                 declared_amount=1,
                 comment=row["description"],
-                created_by_id=superuser.id, 
+                created_by_id=superuser.id,
             )
             new_epd.save()
             add_impacts(row, new_epd, impact_columns)
