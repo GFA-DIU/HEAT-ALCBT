@@ -74,6 +74,11 @@ To load the EPD data from Ecoplatform:
 (.venv) $ python manage.py load_ecoplatform_epds
 ```
 
+To load the generic EPD data from `pages/data`:
+```Bash
+(.venv) $ python manage.py load_generic_epds
+```
+
 To load Indian EPDs from Edge:
 
 ```Bash

@@ -174,6 +174,11 @@ def get_filtered_epd_list(request, dimension=None):
             filtered_epds = filtered_epds.filter(
                 country=country
             )  # Adjust the field for your model
+        
+        if type := req.get("type"):
+            filtered_epds = filtered_epds.filter(
+                type=type
+            )
     elif dimension:
         filtered_epds = filter_by_dimension(filtered_epds, dimension)
     return filtered_epds, dimension
