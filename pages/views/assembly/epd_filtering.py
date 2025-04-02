@@ -1,9 +1,7 @@
-from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db.models.manager import BaseManager
 from django.shortcuts import get_object_or_404
 
-from django.apps import apps
 from pages.models.assembly import AssemblyDimension
 from pages.models.epd import EPD, EPDType, MaterialCategory, Unit
 
@@ -132,8 +130,8 @@ def filter_by_dimension(epds: BaseManager[EPD], dimension: AssemblyDimension):
 def get_filtered_epd_list(request, dimension=None, operational=False):
     # Start with the base queryset
     filtered_epds = EPD.objects.exclude(declared_unit=Unit.UNKNOWN).order_by("id")
-    if operational:
-        filtered_epds = filtered_epds.filter(type=EPDType.OPERATIONAL)
+    if operational: 
+        filtered_epds = filtered_epds.filter(declared_unit=Unit.KWH, type=EPDType.GENERIC)
     if (
         request.method == "POST"
         and request.POST.get("action") == "filter"

@@ -2,7 +2,7 @@ import logging
 
 from django.db import transaction
 from django.db.models import Prefetch
-from django.http import HttpResponseServerError
+from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
 
@@ -17,9 +17,14 @@ from pages.models.building import (
     OperationalProduct,
     SimulatedOperationalProduct,
 )
-from pages.models.epd import EPD
 from pages.views.assembly.epd_filtering import get_filtered_epd_list
 from pages.views.building.impact_calculation import calculate_impacts
+from pages.views.building.operational_products.operational_products import (
+    get_op_product,
+    get_op_product_list,
+    serialize_operational_products,
+    handle_op_products_save,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -31,42 +36,64 @@ def building(request, building_id=None):
 
     # General Info
     if request.method == "POST":
-        if request.POST.get("action") == "general_information":
-            return handle_information_submit(request, building_id, True)
-        if request.POST.get("action") == "detailed_information":
-            return handle_information_submit(request, building_id, False)
-        if request.POST.get("action") == "filter":
+        match request.POST.get("action"):
+            case "general_information":
+                return handle_information_submit(request, building_id, True)
+            case "detailed_information":
+                return handle_information_submit(request, building_id, False)
+            case "filter":
+                return get_op_product_list(request, building_id)
+            case "select_op_product":
+                return get_op_product(request, building_id)
+            case "save_op_products":
+                handle_op_products_save(request, building_id)
+                context, form, detailedForm = handle_building_load(
+                    request, building_id, simulation=False
+                )
+                context["edit_mode"] = False
+                response = render(
+                    request,
+                    "pages/building/operational_info/operational_product_list.html",
+                    context,
+                )
+                response["HX-Refresh"] = "true"  # Add the HX-Refresh header
+                return response
+            case "edit_products":
+                context, _, _ = handle_building_load(
+                    request, building_id, simulation=False
+                )
+                context["edit_mode"] = True
+                return render(
+                    request,
+                    "pages/building/operational_info/operational_products.html",
+                    context,
+                )
+            case _:
+                logger.info("No action defined for the POST request")
+
+    elif request.method == "DELETE":
+        if request.GET.get("op_product_id"):
+            return HttpResponse()
+        if request.GET.get("component"):
+            return handle_assembly_delete(request, building_id, simulation=False)
+    elif request.method == "GET":
+        if request.GET.get("page"):
             return get_op_product_list(request, building_id)
-        if request.POST.get("action") == "select_op_product":
-            return get_op_product(request)
-        if request.POST.get("action") == "save_op_products":
-            handle_op_products_save(request, building_id)
+        # Full reload
+        if building_id:
             context, form, detailedForm = handle_building_load(
                 request, building_id, simulation=False
             )
-            context["edit"] = False
-
-    elif request.method == "DELETE":
-        return handle_assembly_delete(request, building_id, simulation=False)
-
-    elif request.GET.get("page"):
-        return get_op_product_list(request, building_id)
-    # Full reload
-    elif building_id:
-        context, form, detailedForm = handle_building_load(
-            request, building_id, simulation=False
-        )
-
-    else:
-        # Blank for new building
-        context = {
-            "building_id": None,
-            "building": None,
-            "structural_components": [],
-            "edit": False,
-        }
-        form = BuildingGeneralInformation()
-        detailedForm = BuildingDetailedInformation()
+        else:
+            # Blank for new building
+            context = {
+                "building_id": None,
+                "building": None,
+                "structural_components": [],
+                "edit_mode": False,
+            }
+            form = BuildingGeneralInformation()
+            detailedForm = BuildingDetailedInformation()
 
     context["form_general_info"] = form
     context["form_detailed_info"] = detailedForm
@@ -112,7 +139,7 @@ def handle_building_load(request, building_id, simulation):
     structural_components, _ = get_assemblies(building.prefetched_components)
 
     # Get Operational Products and impacts
-    operational_products = get_operational_products(
+    operational_products = serialize_operational_products(
         building.prefetched_operational_products
     )
 
@@ -126,7 +153,7 @@ def handle_building_load(request, building_id, simulation):
         "operational_products": operational_products,
         "epd_list": epd_list,
         "epd_filters_form": EPDsFilterForm(request.POST),
-        "edit": True,
+        "edit_mode": False,
     }
 
     form = BuildingGeneralInformation(instance=building)
@@ -269,68 +296,3 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
         impact_list.extend(assembly_impact_list)
 
     return structural_components, impact_list
-
-
-def get_operational_products(operational_products):
-    serialised_op_products = []
-    for op_product in operational_products:
-        serialised_op_products.append(
-            {
-                "id": op_product.id,
-                "description": op_product.description,
-                "quantity": op_product.quantity,
-                "unit": op_product.input_unit,
-            }
-        )
-    return serialised_op_products
-
-
-def get_op_product_list(request, building_id):
-    # Get Operational Products and impacts
-    epd_list, _ = get_filtered_epd_list(request, operational=True)
-    context = {
-        "building_id": building_id,
-        "simulation": False,
-        "epd_list": epd_list,
-        "epd_filters_form": EPDsFilterForm(request.POST),
-    }
-    return render(
-        request,
-        "pages/building/operational_info/operational_product_list.html",
-        context,
-    )
-
-
-def get_op_product(request):
-    epd_id = request.POST.get("id")
-
-    epd = get_object_or_404(EPD, pk=epd_id)
-    epd.selection_quantity = 1
-    epd.selection_unit = "KG"
-    return render(
-        request,
-        "pages/building/operational_info/selected_operational_product.html",
-        {"epd": epd},
-    )
-
-
-def handle_op_products_save(request, building_id):
-
-    selected_epds = {}
-
-    for key, value in request.POST.items():
-        if key.startswith("material_") and "_quantity" in key:
-            epd_id = key.split("_")[1]
-            selected_epds[epd_id] = {
-                "quantity": float(value),
-                "unit": request.POST[f"material_{epd_id}_unit"],
-                "description": request.POST[f"material_{epd_id}_description"],
-            }
-    for k, v in selected_epds.items():
-        OperationalProduct.objects.create(
-            epd_id=k,
-            building_id=building_id,
-            quantity=v.get("quantity"),
-            input_unit=v.get("unit"),
-            description=v.get("description"),
-        )

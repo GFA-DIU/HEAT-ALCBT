@@ -9,7 +9,7 @@
                 <span class="text-muted ms-1 me-3">{{ epd.country }}</span>
                 <textarea 
                 type="text"
-                name="material_{{ epd.id }}_description"
+                name="material_{{ epd.id }}_description_{{epd.timestamp}}"
                 class="form-control form-control-sm"
                 rows="2"
                 placeholder="Add Description ..."
@@ -19,9 +19,9 @@
     </div>
     {% if is_boq %}
     <div class="col container" >
-        <label for="material_{{ epd.id }}_category" class="text-muted">Category</label>
-        <select id="material_{{ epd.id }}_category"
-                name="material_{{ epd.id }}_category"
+        <label for="material_{{ epd.id }}_category_{{epd.timestamp}}" class="text-muted">Category</label>
+        <select id="material_{{ epd.id }}_category_{{epd.timestamp}}"
+                name="material_{{ epd.id }}_category_{{epd.timestamp}}"
                 class="select form-select form-select-sm">
             {% for category in categories %}
             <option value="{{category.id}}"
@@ -32,23 +32,23 @@
     </div>
     {% endif %}
     <div class="col-3 container" >
-            <label for="material_{{ epd.id }}_quantity" class="text-muted">{{ epd.selection_text }}</label>
+            <label for="material_{{ epd.id }}_quantity_{{epd.timestamp}}" class="text-muted">{{ epd.selection_text }}</label>
             {% if epd.selection_unit == "unknown" %} 
             <input type="number"
-                   id="material_{{ epd.id }}_quantity"  
-                   name="material_{{ epd.id }}_quantity" 
+                   id="material_{{ epd.id }}_quantity_{{epd.timestamp}}"  
+                   name="material_{{ epd.id }}_quantity_{{epd.timestamp}}" 
                    class="form-control form-control-sm w-auto"
                    min="1"
                    {% if epd.selection_quantity%}value="{{ epd.selection_quantity}}"{% endif %}
                    required>
-            <input name="material_{{ epd.id }}_unit"
+            <input name="material_{{ epd.id }}_unit_{{epd.timestamp}}"
                        value="{{ epd.selection_unit }}"
                        hidden>
             {% else %}
             <div class="input-group input-group-sm">
                 <input type="number" 
-                       id="material_{{ epd.id }}_quantity"  
-                       name="material_{{ epd.id }}_quantity" 
+                       id="material_{{ epd.id }}_quantity_{{epd.timestamp}}"  
+                       name="material_{{ epd.id }}_quantity_{{epd.timestamp}}" 
                        class="form-control w-auto"
                        placeholder="Quantity"
                        min="{{ epd.selection_unit | get_step }}"
@@ -58,7 +58,7 @@
                        style="max-width: 80px;"
                        required>
 
-                       <input name="material_{{ epd.id }}_unit" 
+                       <input name="material_{{ epd.id }}_unit_{{epd.timestamp}}" 
                        class="input-group-text w-auto"
                        style="max-width: 80px;"
                        value='{{ epd.selection_unit|slice:":10" | strip }}'

@@ -37,7 +37,7 @@ def save_assembly(
 
     try:
         if form.is_valid():
-            selected_epds, epd_map = parse_selected_epds(request)
+            selected_epds = parse_selected_epds(request)
 
             # DB OPERATIONS
             assembly = form.save()  # Save the updated Assembly instance
@@ -50,13 +50,13 @@ def save_assembly(
             ).delete()  # create a clean slate
 
             # Save to products
-            for k, v in selected_epds.items():
+            for _, v in selected_epds.items():
                 classification = AssemblyCategoryTechnique.objects.get(
                     category_id=v.get("category"),
                     technique_id=v.get("technique") or None,
                 )
                 StructuralProduct.objects.create(
-                    epd=epd_map[k],
+                    epd_id=v.get("epd_id"),
                     assembly=assembly,
                     quantity=v.get("quantity"),
                     input_unit=v.get("unit"),
@@ -99,23 +99,19 @@ def parse_selected_epds(request) -> tuple[dict, dict[str, EPD]]:
     # If struct. component classification comes from assembly. If BOQ classification comes from epd
     for key, value in request.POST.items():
         if key.startswith("material_") and "_quantity" in key:
-            epd_id = key.split("_")[1]
-            selected_epds[epd_id] = {
+            key_array = key.split("_")
+            epd_id = key_array[1]
+            timestamp = key_array[-1]
+            selected_epds[epd_id + timestamp] = {
+                "epd_id": epd_id,
                 "quantity": float(value),
-                "unit": request.POST[f"material_{epd_id}_unit"],
-                "description": request.POST[f"material_{epd_id}_description"],
-                "category": request.POST.get(f"material_{epd_id}_category")
+                "unit": request.POST[f"material_{epd_id}_unit_{timestamp}"],
+                "description": request.POST[
+                    f"material_{epd_id}_description_{timestamp}"
+                ],
+                "category": request.POST.get(f"material_{epd_id}_category_{timestamp}")
                 or request.POST.get("assembly_category"),
                 "technique": request.POST.get("assembly_technique", None),
             }
 
-    # Pre-fetch EPDImpact and Impact objects
-    epds = EPD.objects.filter(pk__in=selected_epds.keys()).prefetch_related(
-        Prefetch(
-            "epdimpact_set",
-            queryset=EPDImpact.objects.select_related("impact"),
-            to_attr="prefetched_impacts",
-        )
-    )
-    epd_map = {str(epd.id): epd for epd in epds}
-    return selected_epds, epd_map
+    return selected_epds

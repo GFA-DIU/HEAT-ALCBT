@@ -11,6 +11,7 @@ from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import get_object_or_404
 
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
+from pages.views.building.building import get_assemblies
 
 logger = logging.getLogger(__name__)
 

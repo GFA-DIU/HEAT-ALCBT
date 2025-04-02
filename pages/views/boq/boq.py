@@ -11,7 +11,6 @@ from pages.models.assembly import AssemblyCategory, AssemblyDimension, Structura
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
 
 from pages.models.epd import EPD
-from pages.views.assembly.epd_filtering import get_epd_info
 from pages.views.assembly.epd_processing import SelectedEPD, get_epd_list
 from pages.views.assembly.save_to_assembly import save_assembly
 
@@ -131,7 +130,9 @@ def handle_assembly_submission(request, assembly, building, simulation):
 
 def handle_assembly_load(building_id, assembly, context):
     if assembly:
-        products = StructuralProduct.objects.filter(assembly=assembly).select_related("epd")
+        products = StructuralProduct.objects.filter(assembly=assembly).select_related(
+            "epd"
+        )
         selected_epds = [SelectedEPD.parse_product(p, True) for p in products]
         context["selected_epds"] = selected_epds
         context["selected_epds_ids"] = [

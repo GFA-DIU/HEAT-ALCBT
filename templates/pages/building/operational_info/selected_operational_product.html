@@ -1,59 +1,75 @@
 {% load custom_filters %}
 <li class="d-flex align-items-center list-group-item" 
-id="epd-{{epd.id}}" 
+id="epd-{{epd.id}}-{{epd.timestamp}}" 
 data-id="{{ epd.id }}">
     <div class="col-5" >
-        <h6 class="mb-1" title="{{epd.name}}">{{ epd.name|truncatechars:75}}</h6>
-        <div class="d-flex flex-column">
-            <div class="d-flex align-items-center">
-                <span class="text-muted ms-1 me-3">{{ epd.country }}</span>
-                <textarea 
-                type="text"
-                name="material_{{ epd.id }}_description"
-                class="form-control form-control-sm"
-                rows="2"
-                placeholder="Add Description ..."
-                maxlength="255">{% if epd.description%}{{epd.description}}{% endif %}</textarea>
-            </div>
-        </div>
+        <h6 class="mb-1" 
+            title="{{epd.name}}">
+            {{ epd.name|truncatechars:75}}
+        </h6>
+        {% if edit_mode is True %}
+            <textarea type="text"
+                    name="material_{{ epd.id }}_description_{{epd.timestamp}}"
+                    class="form-control form-control-sm"
+                    rows="2"
+                    placeholder="Add Description ..."
+                    maxlength="255">{% if epd.description%}{{epd.description}}{% endif %}</textarea>
+        {% endif %}
+        <span class="text-muted ms-1 me-3">
+            {{ epd.country }}
+        </span>
     </div>
     <div class="col-3 container" >
-            <label for="material_{{ epd.id }}_quantity" class="text-muted">{{ epd.selection_text }}</label>
+        {% if edit_mode is True %}
+            <label for="material_{{ epd.id }}_quantity_{{epd.timestamp}}" class="text-muted">Quantity</label>
             <div class="input-group input-group-sm">
                 <input type="number" 
-                       id="material_{{ epd.id }}_quantity"  
-                       name="material_{{ epd.id }}_quantity" 
-                       class="form-control w-auto"
-                       placeholder="Quantity"
-                       min="{{ epd.selection_unit | get_step }}"
-                       {% if epd.selection_unit == "percent" %} max="100" {% endif %}
-                       step="{{ epd.selection_unit | get_step }}"
-                       {% if epd.selection_quantity %} value="{{ epd.selection_quantity }}" {% endif %}
-                       style="max-width: 80px;"
-                       required>
+                        id="material_{{ epd.id }}_quantity_{{epd.timestamp}}"  
+                        name="material_{{ epd.id }}_quantity_{{epd.timestamp}}" 
+                        class="form-control w-auto"
+                        placeholder="Quantity"
+                        min="{{ epd.selection_unit | get_step }}"
+                        {% if epd.selection_unit == "percent" %} max="100" {% endif %}
+                        step="{{ epd.selection_unit | get_step }}"
+                        {% if epd.selection_quantity %} value="{{ epd.selection_quantity }}" {% endif %}
+                        style="max-width: 80px;"
+                        required>
 
-                       <input name="material_{{ epd.id }}_unit" 
-                       class="input-group-text w-auto"
-                       style="max-width: 80px;"
-                       value='{{ epd.selection_unit|slice:":10" | strip }}'
-                       title="{{ epd.selection_unit }}"
-                       readonly>
-            </div>
+                        <select id="material_{{ epd.id }}_unit_{{epd.timestamp}}"
+                                name="material_{{ epd.id }}_unit_{{epd.timestamp}}"
+                                class="input-group-text w-auto"
+                                style="max-width: 80px;">
+                            {% for unit in epd.op_units %}
+                            <option value="{{unit}}"
+                                    {% if epd.selection_unit == unit %} selected {% endif %}>{{unit}}</option>
+                            {% endfor %}
+                        </select>
+            </div>      
+        {% else %}
+            <span class="badge border border-success text-success bg-transparent rounded-pill">{{epd.gwp_b6}} kgCO2e</span>
+            <span class="badge border bg-transparent rounded-pill" style="border-color: #f26716 !important; color: #f26716; ">{{epd.penrt_b6}} MJ</span>
+        {% endif %}
     </div>
-    <div class="d-flex flex-column ms-auto gap-2">
+    <div class="d-flex flex-column ms-auto gap-4">
         <a href="{{epd.source}}" 
             target="_blank" 
             rel="noopener noreferrer"
             class="align-self-end">  
             <i class="bi bi-arrow-up-right-square"></i>
         </a>
-        <button class="btn btn-danger remove-epd"  
-                data-id="{{ epd.id }}"
-                hx-post=""
-                hx-vals='{"action": "remove_epd"}'
-                hx-target="#epd-{{epd.id}}"
+        {% if edit_mode is True %}
+            <!-- Action Buttons -->
+            <button class="btn btn-danger"
+                {% if simulation == "true" %}
+                hx-delete="{% url 'building_simulation' building_id=building_id %}?op_product_id={{ epd.product_id  }}" 
+                {% else %}
+                hx-delete="{% url 'building' building_id=building_id %}?op_product_id={{ epd.product_id }}" 
+                {% endif %}
+                hx-target="#epd-{{epd.id}}-{{epd.timestamp}}" 
                 hx-swap="outerHTML">
-            Remove
-        </button>
+                Delete
+            </button>
+        {% endif %}
     </div>
+    
 </li>

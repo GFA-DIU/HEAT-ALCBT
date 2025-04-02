@@ -10,9 +10,11 @@
         hx-target="#operational-epd-list" 
         hx-swap="innerHTML">
     {% endif %}
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#epdSearchModal">
-        Add from EPD Library
-    </button>
+    {% if edit_mode %}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#epdSearchModal">
+            Add from EPD Library
+        </button> 
+    {% endif %}
     <div class="card mb-3 card-body border-0 d-flex justify-content-center align-items-center"
         style="min-height: 150px; max-height: 500px; overflow-y: auto; position: relative;">
         <span id="select_epd_text" 
@@ -22,13 +24,24 @@
             Please select at least one EPD
         </span>
 
-        <ul id="selected_op_product" class="list-group w-100">
+        <ul id="selected_op_products" class="list-group w-100">
             {% for product in operational_products %}
-                {% include "pages/building/operational_info/selected_operational_product.html" with product=product edit=edit %}
+                {% include "pages/building/operational_info/selected_operational_product.html" with epd=product edit_mode=edit_mode %}
             {% endfor %}
         </ul>
     </div>
-    <button id="save_button" type="submit" class="btn btn-primary">Save</button>
+    {% if edit_mode %}
+        <a href="" class="btn btn-secondary">Cancel</a>
+        <button id="save_button" type="submit" class="btn btn-primary">Save</button>
+    {%else%}
+        <button hx-post="{% url 'building' building_id=building_id %}" 
+                hx-vals='{"action": "edit_products"}' 
+                hx-target="#operational-info-body" 
+                hx-swap="innerHTML"
+                class="btn btn-primary">
+            Edit
+        </button>   
+    {% endif %}
     </form>
 {% else %} Please save the building before adding any components {% endif %}
 
