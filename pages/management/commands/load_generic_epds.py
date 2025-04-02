@@ -20,10 +20,10 @@ class Command(BaseCommand):
         if not pd.isna(row["weight [kg]"]):
             conversions.append(
                 {
-                    "name": "weight",
-                    "unit": "kg",
+                    "name": "conversion factor to 1 kg",
+                    "unit": "-",  # following the practice in Ökobaudat, see PR #116.
                     "value": str(row["weight [kg]"]),
-                    "unit_description": "-",
+                    "unit_description": "Without unit",
                 }
             )
         if not pd.isna(row["volume density [kg/m3]"]):
@@ -32,7 +32,7 @@ class Command(BaseCommand):
                     "name": "volume density",
                     "unit": "kg/m^3",
                     "value": str(row["volume density [kg/m3]"]),
-                    "unit_description": "-",
+                    "unit_description": "kilograms per cubic metre",
                 }
             )
         if not pd.isna(row["area density [kg/m2]"]):
@@ -41,7 +41,7 @@ class Command(BaseCommand):
                     "name": "area density",
                     "unit": "kg/m^2",
                     "value": str(row["area density [kg/m2]"]),
-                    "unit_description": "-",
+                    "unit_description": "kilograms per square metre",
                 }
             )
         if not pd.isna(row["linear density [kg/m]"]):
@@ -50,7 +50,7 @@ class Command(BaseCommand):
                     "name": "linear density",
                     "unit": "kg/m",
                     "value": str(row["linear density [kg/m]"]),
-                    "unit_description": "-",
+                    "unit_description": "kilograms per metre",
                 }
             )
         return conversions

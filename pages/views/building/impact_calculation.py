@@ -155,7 +155,7 @@ def calculate_impacts(
 def calculate_impact_operational(
     p: OperationalProduct,
 ) -> dict[Literal["gwp_b6", "penrt_b6"], Decimal]:
-    def fetch_conversion(unit) -> Decimal:
+    def fetch_conversion(unit) -> Decimal|None:
         """Fetch conversion factor based on the unit."""
         try:
             return next(
@@ -206,9 +206,14 @@ def calculate_impact_operational(
                 penrt_b6,
             )
         case (Unit.KWH, Unit.KG):
-            kwh_per_kg = fetch_conversion("kg")
+            kwh_per_kg = fetch_conversion("kg") or fetch_conversion("-")  # "-" is used by Ökobdauat for name:'conversion factor to 1 kg'
             impacts = calculate_impact(
                 Decimal(p.quantity) * Decimal(kwh_per_kg), gwp_b6, penrt_b6
+            )
+
+        case _:
+            raise ValueError(
+                f"Unsupported combination: declared_unit '{p.epd.declared_unit}', input_unit '{p.input_unit}'"
             )
 
     return impacts
