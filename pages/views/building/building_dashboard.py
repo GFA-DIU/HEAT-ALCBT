@@ -206,7 +206,7 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
             y=df_bar[key_column],
             x=df_bar["gwp_per"],
             orientation='h',
-            texttemplate='%{label} - %{value:.2f}%',
+            texttemplate='%{label} - %{value:.0f}%',
             textposition='inside',
             insidetextanchor='start',
             textangle=0,  
