@@ -16,7 +16,7 @@ from pages.views.building.building import get_assemblies, get_operational_impact
 logger = logging.getLogger(__name__)
 
 
-def get_building_dashboard(user, building_id, dashboard_type: str, simulation: str):
+def get_building_dashboard(user, building_id, dashboard_type: str, simulation: bool):
     if dashboard_type == "assembly":
         return building_dashboard_assembly(user, building_id, simulation)
     elif dashboard_type == "material":
@@ -59,7 +59,7 @@ def building_dashboard_assembly(user, building_id, simulation):
 
 
 def prep_building_dashboard_df(user, building_id, simulation):
-    if simulation == "true":
+    if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
         relation_name = "buildingassemblysimulated_set"
         BuildingProductModel = SimulatedOperationalProduct

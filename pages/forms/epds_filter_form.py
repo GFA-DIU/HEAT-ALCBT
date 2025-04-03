@@ -1,11 +1,13 @@
 from django import forms
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Submit
+from crispy_forms.layout import Layout, Row, Column, Submit, Div
+from crispy_forms.bootstrap import Accordion, AccordionGroup
 from cities_light.models import Country
 
 
-from pages.models.epd import MaterialCategory
+from pages.models.epd import MaterialCategory, EPDType
 
 
 class EPDsFilterForm(forms.Form):
@@ -55,6 +57,11 @@ class EPDsFilterForm(forms.Form):
         label="Country",
         required=False,
     )
+    type = forms.ChoiceField(
+        choices=[('', '---------')] + [(choice.value, choice.value) for choice in EPDType],
+        label="EPD type",
+        required=False,
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -92,10 +99,23 @@ class EPDsFilterForm(forms.Form):
                 Column("search_query", css_class="col-md-9"),
                 Column("country", css_class="col-md-3"),
             ),
-            Row(
-                Column("category", css_class="col-md-4"),
-                Column("subcategory", css_class="col-md-4"),
-                Column("childcategory", css_class="col-md-4"),
+            Accordion(
+                AccordionGroup(
+                    mark_safe('<strong>Advanced Search</strong>'),
+                    Row(
+                        Column("category", css_class="col-md-4"),
+                        Column("subcategory", css_class="col-md-4"),
+                        Column("childcategory", css_class="col-md-4"),
+                    ),
+                    Row(
+                        Column("type", css_class="col-md-3"),
+                    ),
+                    active=False
+                ),
             ),
-            Submit("submit", "Search", css_class="btn btn-primary"),
+            Div(
+                Submit("submit", "Search", css_class="btn btn-primary"),
+                css_class="mt-3"
+            ),
+                
         )

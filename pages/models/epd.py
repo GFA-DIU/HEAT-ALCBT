@@ -82,6 +82,7 @@ class Unit(models.TextChoices):
     FAHRENHEIT = "fahrenheit", "°Fahrenheit"
     LITER = "liter", "Liter"
 
+
 class ImpactCategoryKey(models.TextChoices):
     """Taken from LCAx."""
 
@@ -274,6 +275,15 @@ class EPD(BaseModel, epdLCAx):
             epd=self, impact__impact_category="penrt", impact__life_cycle_stage="a1a3"
         )
         return round(sum(impact.value for impact in impacts), 2)
+
+    def get_op_units(self):
+        units = [Unit.KWH]
+        if any(item["unit"] == "kg" for item in self.conversions if "unit" in item):
+            units.append(Unit.KG)
+            if any(item["unit"] == "kg/m^3" for item in self.conversions if "unit" in item):
+                units.append(Unit.M3)
+                units.append(Unit.LITER)
+        return units
 
 
 class EPDImpact(models.Model):

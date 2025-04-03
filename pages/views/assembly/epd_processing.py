@@ -1,5 +1,5 @@
-from collections.abc import Generator
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
 
 from django.core.paginator import Paginator, Page
@@ -18,6 +18,7 @@ class SelectedEPD:
     selection_unit: Optional[str]
     selection_text: Optional[str]
     selection_quantity: float
+    timestamp: str
     name: str
     description: str
     category: Optional[str]
@@ -42,6 +43,7 @@ class SelectedEPD:
             selection_unit=product.input_unit,
             selection_text=sel_text,
             selection_quantity=float(product.quantity),
+            timestamp=datetime.now().strftime("%Y%m%d%H%M%S%f"),
             name=product.epd.name,
             description=product.description,
             category=product.epd.category.name_en if product.epd.category else None,
@@ -55,6 +57,7 @@ class SelectedEPD:
 class FilteredEPD:
     id: str
     name: str
+    type: str
     country: str
     category: Optional[str]
     impact_gwp: float
@@ -109,6 +112,7 @@ class LazyProcessor:
         return FilteredEPD(
             id=epd.pk,
             name=epd.name,
+            type=epd.type,
             country=epd.country.name if epd.country else "",
             category=epd.category.name_en if epd.category else None,
             impact_gwp=epd.get_gwp_impact_sum(),

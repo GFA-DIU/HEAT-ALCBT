@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 
 from django.http import HttpResponse, JsonResponse
@@ -66,6 +67,7 @@ def component_edit(request, building_id, assembly_id=None):
         epd.selection_text, epd.selection_unit = get_epd_info(
             dimension, epd.declared_unit
         )
+        epd.timestamp = datetime.now().strftime("%Y%m%d%H%M%S%f")
         return render(request, "pages/assembly/selected_epd.html", {"epd": epd})
 
     elif request.method == "POST" and request.POST.get("action") == "remove_epd":
@@ -80,7 +82,7 @@ def component_edit(request, building_id, assembly_id=None):
 
 def set_up_view(request, building_id, assembly_id):
     """Fetch objects and create baseline context."""
-    simulation = request.GET.get("simulation", "false").lower() == "true"
+    simulation = request.GET.get("simulation") == "True"
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
     else:
