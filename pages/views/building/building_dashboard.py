@@ -136,10 +136,10 @@ def prep_building_dashboard_df(user, building_id, simulation):
 
 
 def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
-    # Generate colors
+    # Preset colors
     colors = ["rgb(244, 132, 67)", "rgb(224, 180, 215)"]
 
-    # Create a 2x2 layout: top row for pies, bottom row for indicators
+    # Create a 2x2 layout: top row for pie and bar, bottom row for indicators
     fig = make_subplots(
         rows=2,
         cols=2,
@@ -160,7 +160,7 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
 
     # Update all annotations (including subplot titles)
     for annotation in fig["layout"]["annotations"]:
-        annotation["font"] = dict(size=20)  # Change 20 to your desired font size
+        annotation["font"] = dict(size=20)  
 
     # Add pies
     fig.add_trace(
@@ -202,13 +202,12 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
         hoverlabel=dict(font_color="white", namelength=-1),
         textposition="auto",
         textfont=dict(
-            size=14,  # Default font size
-            family="Arial, sans-serif",  # Use a modern sans-serif font
-            color="white",  # Default high contrast text color
+            size=14, 
+            family="Arial, sans-serif",  
+            color="white",
         ),
         texttemplate="<b>%{label}</b><br>%{percent:.0%}",
         selector=dict(type="pie"),
-        # connector=dict(line=dict(color="black", width=1, dash="solid")),
     )
     
     # Update bar formatting
@@ -230,27 +229,6 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
         uniformtext=dict(mode='show', minsize=12),
         yaxis=dict(showticklabels=False)
     )
-
-    # Store existing annotations (subplot titles)
-    #existing_annotations = list(fig.layout.annotations)
-
-    # Calculate centers for pie hole annotations
-
-    # gwp_annotation = dict(
-    #     text="GWP",
-    #     x=0.5,
-    #     y=0.5,
-    #     xref="x domain", 
-    #     yref="y domain",
-    #     font_size=20,
-    #     showarrow=False,
-    #     xanchor="center",
-    #     yanchor="middle",
-    # )
-
-    # Combine original titles + new annotations
-    #new_annotations = existing_annotations + [gwp_annotation]
-    #fig.update_layout(annotations=new_annotations)
 
     # Calculate initial sums
     gwp_sum = df_pie["gwp"].sum()
@@ -324,12 +302,16 @@ def _building_dashboard_base(df, key_column: str):
     for annotation in fig["layout"]["annotations"]:
         annotation["font"] = dict(size=20)  # Change 20 to your desired font size
 
+    
+
     # Add pies
     fig.add_trace(
         go.Pie(
             labels=df[key_column],
-            values=df["gwp"],  # using only positive values
+            values=df["gwp"],  
             name="GWP",
+            direction ='clockwise',
+            sort=True,
             hole=0.4,
             marker=dict(colors=colorscale_orange),
             legendgroup="GWP",
