@@ -88,8 +88,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
-    # own
-    "django_project.middleware.LoginRequiredMiddleware",
+    # # own
+    # "django_project.middleware.LoginRequiredMiddleware",
 ]
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ["admin:login", "admin:index"]
@@ -219,10 +219,16 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.eu.mailgun.org'  # SMTP server host
+EMAIL_PORT = 587  # SMTP server port (587 for TLS, 465 for SSL)
+EMAIL_USE_TLS = True  # True for TLS, False for SSL
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")  # SMTP server username
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")  # SMTP server password
+EMAIL_USE_SSL = False  # Set to True if using SSL
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = "root@localhost"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "") # Default sender email address
 
 # django-debug-toolbar
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html

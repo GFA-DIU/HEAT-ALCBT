@@ -3,6 +3,7 @@ from django.http import JsonResponse
 
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 from pages.views.building.building_dashboard import get_building_dashboard
 
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 APP_NAME = "pages"
 
 
+@login_required
 @require_http_methods(["GET"])
 def dashboard_view(request):
     logger.info("Access dashboard view.")

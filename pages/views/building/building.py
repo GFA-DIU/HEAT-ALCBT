@@ -5,6 +5,7 @@ from django.db.models import Prefetch
 from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 from pages.forms.building_detailed_info import BuildingDetailedInformation
 from pages.forms.building_general_info import BuildingGeneralInformation
@@ -16,6 +17,7 @@ from pages.views.building.impact_calculation import calculate_impacts
 logger = logging.getLogger(__name__)
 
 
+@login_required
 @require_http_methods(["GET", "POST", "DELETE"])
 def building(request, building_id=None):
     logger.info("Building - Request method: %s, user: %s", request.method, request.user)
