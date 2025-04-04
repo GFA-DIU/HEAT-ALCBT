@@ -383,13 +383,14 @@ def _building_dashboard_base(df, key_column: str):
         hoverinfo="label+value",
         hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
         hoverlabel=dict(font_color="white", namelength=-1),
-        textposition="auto",
+        textposition="inside",
         textfont=dict(
             size=14,  # Default font size
             family="Arial, sans-serif",  # Use a modern sans-serif font
             color="white",  # Default high contrast text color
         ),
         texttemplate="<b>%{label}</b><br>%{percent:.0%}",
+        
         # connector=dict(line=dict(color="black", width=1, dash="solid")),
     )
 
@@ -422,7 +423,7 @@ def _building_dashboard_base(df, key_column: str):
 
     # Combine original titles + new annotations
     new_annotations = existing_annotations + [gwp_annotation, penrt_annotation]
-    fig.update_layout(annotations=new_annotations)
+    fig.update_layout(annotations=new_annotations, uniformtext_minsize=12, uniformtext_mode='hide')
 
     # Calculate initial sums
     gwp_sum = df["gwp"].sum()
