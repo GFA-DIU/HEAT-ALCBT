@@ -228,7 +228,7 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")  # SMTP server p
 EMAIL_USE_SSL = False  # Set to True if using SSL
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = "beat-app@heat-international.de" # Default sender email address
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "") # Default sender email address
 
 # django-debug-toolbar
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
