@@ -51,7 +51,10 @@ def import_generic_structural_epds():
         print(f"Row {index} is being processed.")
         try:
             conversions = get_conversions(row)
-
+            declared_amount = row.get("declared_amount", 1.0)
+            if pd.isna(declared_amount):
+                declared_amount = 1.0
+            
             new_epd = EPD(
                 country=get_country(row["country"]),
                 source="GFA-HEAT",
@@ -62,7 +65,7 @@ def import_generic_structural_epds():
                 category=get_category(row),
                 declared_unit=row["declared_unit"],
                 type=EPDType.GENERIC,
-                declared_amount=row["declared_amount"],
+                declared_amount=declared_amount,
                 comment=f"Created based on {row['UUID']} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row['UUID']})",
                 created_by_id=superuser.id,
             )
