@@ -15,9 +15,9 @@ impact_columns = [
     "penrt_c4 [MJ]",
     "penrt_d [MJ]",
     "gwp_a1a3 [kgCo2e]",
-    "gwp_c3  [kgCo2e]",
+    "gwp_c3 [kgCo2e]",
     "gwp_c4 [kgCo2e]",
-    "gwp_d  [kgCo2e]",
+    "gwp_d [kgCo2e]",
 ]
 
 

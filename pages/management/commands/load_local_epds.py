@@ -17,6 +17,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for k, v in local_epd_files.items():
-            self.stdout.write(self.style.SUCCESS(("Starting %s", k)))
+            self.stdout.write(self.style.SUCCESS(("Starting", k)))
             v()
-            self.stdout.write(self.style.SUCCESS(("Successfully uploaded %s", k)))
+            self.stdout.write(self.style.SUCCESS(("Successfully uploaded", k)))
