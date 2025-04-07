@@ -186,7 +186,7 @@ def calculate_impact_operational(
     penrt_b6 = next(
         (i.value for i in impact_set if i.impact.impact_category == "penrt"), None
     )
-    
+
     # TODO: Flexibilise to other declared_units
     match (p.epd.declared_unit, p.input_unit):
 
