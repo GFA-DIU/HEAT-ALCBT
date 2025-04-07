@@ -11,7 +11,8 @@ from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import get_object_or_404
 
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated, OperationalProduct, SimulatedOperationalProduct
-from pages.views.building.building import get_assemblies, get_operational_impact
+from pages.views.building.building import get_assemblies
+from pages.views.building.operational_products.operational_products import serialize_operational_products
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +40,24 @@ def building_dashboard_assembly(user, building_id, simulation):
     df.loc[df["category_short"] == "Intermediate Floor Construction", "category_short"] = "Interm. Floor"
     df.loc[df["category_short"] == "Bottom Floor Construction", "category_short"] = "Bottom Floor"
     df.loc[df["category_short"] == "Roof Construction", "category_short"] = "Roof Const."
+    
+    # Aggregation for pie chart
+    op_gwp_sum = df.loc[df["type"] == "operational", "gwp"].sum()
+    op_penrt_sum = df.loc[df["type"] == "operational", "penrt"].sum()
+    operational_row = {'category_short': 'Operational carbon', "gwp": op_gwp_sum, "penrt": op_penrt_sum, "type": "operational"}
+    st_gwp_sum = df.loc[df["type"] == "structural", "gwp"].sum()
+    st_penrt_sum = df.loc[df["type"] == "structural", "penrt"].sum()
+    structural_row = {'category_short': 'Embodied carbon', "gwp": st_gwp_sum, "penrt": st_penrt_sum, "type": "structural"}
+    df_list = [structural_row, operational_row]
+    df_pie = pd.DataFrame(data=df_list)
+    
+    # Shorten df for bar chart
+    df_filtered = df[df["type"] == "structural"]
+    df_bar = (df_filtered.groupby('category_short')['gwp'].sum() / df_filtered['gwp'].sum() * 100).reset_index()
+    df_bar.columns = ['category_short', 'gwp_per']
+    df_bar = df_bar.sort_values("gwp_per", ascending=False)
 
-    return _building_dashboard_base(df, "category_short")
+    return _building_dashboard_assembly(df_pie, df_bar, "category_short")
 
 
 def prep_building_dashboard_df(user, building_id, simulation):
@@ -73,63 +90,232 @@ def prep_building_dashboard_df(user, building_id, simulation):
         pk=building_id,
     )
 
-    # Build structural components and impacts in one step
+    # Build structural and operational components and impacts in one step
     structural_components, impact_list = get_assemblies(building.prefetched_components)
+    operational_impact_list = serialize_operational_products(building.prefetched_operational_products)
 
-    if not structural_components:
+    if not structural_components and not operational_impact_list:
         return HttpResponse()
+    elif not structural_components:
+        df_op = pd.DataFrame.from_records(operational_impact_list)
+        df_op["type"] = "operational"
+        df_op["assembly_category"] = "Operational Carbon"
+        df_op.rename(columns={"category": "material_category", "gwp_b6": "gwp", "penrt_b6": "penrt"}, inplace=True)
+        
+        df = df_op[["assembly_category", "material_category", "gwp", "penrt", "type"]]
+    elif not operational_impact_list:
 
-    # Prepare DataFrame
-    df = pd.DataFrame.from_records(impact_list)
-    df["impact_type"] = df["impact_type"].apply(lambda x: x.__str__())
-    df["assembly_category"] = df["assembly_category"].apply(lambda x: x.__str__())
-    df["material_category"] = df["material_category"].apply(lambda x: x.__str__())
-    df = df[df["impact_type"].isin(["gwp a1a3", "penrt a1a3"])]
-    df = df.pivot(
-        index=["assembly_id", "epd_id", "assembly_category", "material_category"],
-        columns="impact_type",
-        values="impact_value",
-    ).reset_index()
+        # Prepare DataFrame
+        df = pd.DataFrame.from_records(impact_list)
+        df["impact_type"] = df["impact_type"].apply(lambda x: x.__str__())
+        df["assembly_category"] = df["assembly_category"].apply(lambda x: x.__str__())
+        df["material_category"] = df["material_category"].apply(lambda x: x.__str__())
+        df = df[df["impact_type"].isin(["gwp a1a3", "penrt a1a3"])]
+        df = df.pivot(
+            index=["assembly_id", "epd_id", "assembly_category", "material_category"],
+            columns="impact_type",
+            values="impact_value",
+        ).reset_index()
+        
+        # Decision to only display positive values for embodied carbon and embodied energy, yet indicator below still shows sum.
+        # Thus creating a new column
+        df["gwp a1a3 pos"] = df["gwp a1a3"]
+        df.loc[df["gwp a1a3 pos"] <= 0, "gwp a1a3 pos"] = 0
+        df["penrt a1a3 pos"] = df["penrt a1a3"]
+        df.loc[df["penrt a1a3 pos"] <= 0, "penrt a1a3 pos"] = 0
+        df["type"] = "structural"
+        df.rename(columns={"gwp a1a3 pos": "gwp", "penrt a1a3 pos": "penrt"}, inplace=True)
+    elif operational_impact_list and structural_components:
+        
+        df = pd.DataFrame.from_records(impact_list)
+        df["impact_type"] = df["impact_type"].apply(lambda x: x.__str__())
+        df["assembly_category"] = df["assembly_category"].apply(lambda x: x.__str__())
+        df["material_category"] = df["material_category"].apply(lambda x: x.__str__())
+        df = df[df["impact_type"].isin(["gwp a1a3", "penrt a1a3"])]
+        df = df.pivot(
+            index=["assembly_id", "epd_id", "assembly_category", "material_category"],
+            columns="impact_type",
+            values="impact_value",
+        ).reset_index()
+        
+        # Decision to only display positive values for embodied carbon and embodied energy, yet indicator below still shows sum.
+        # Thus creating a new column
+        df["gwp a1a3 pos"] = df["gwp a1a3"]
+        df.loc[df["gwp a1a3 pos"] <= 0, "gwp a1a3 pos"] = 0
+        df["penrt a1a3 pos"] = df["penrt a1a3"]
+        df.loc[df["penrt a1a3 pos"] <= 0, "penrt a1a3 pos"] = 0
+        df["type"] = "structural"
+        df.rename(columns={"gwp a1a3 pos": "gwp", "penrt a1a3 pos": "penrt"}, inplace=True)
     
-    # Decision to only display positive values for embodied carbon and embodied energy, yet indicator below still shows sum.
-    # Thus creating a new column
-    df["gwp a1a3 pos"] = df["gwp a1a3"]
-    df.loc[df["gwp a1a3 pos"] <= 0, "gwp a1a3 pos"] = 0
-    df["penrt a1a3 pos"] = df["penrt a1a3"]
-    df.loc[df["penrt a1a3 pos"] <= 0, "penrt a1a3 pos"] = 0
-    df["type"] = "structural"
-    df.rename(columns={"gwp a1a3 pos": "gwp", "penrt a1a3 pos": "penrt"}, inplace=True)
-    
-    
-    # Operational carbon
-    operational_impact_list = get_operational_impact(building.prefetched_operational_products)
-    print(f"I'm here {operational_impact_list}")
+        # operational df
+        df_op = pd.DataFrame.from_records(operational_impact_list)
+        df_op["material_category"] = df_op["category"].apply(lambda x: x.__str__())
+        df_op["type"] = "operational"
+        df_op["assembly_category"] = "Operational Carbon"
+        df_op.rename(columns={"gwp_b6": "gwp", "penrt_b6": "penrt"}, inplace=True)
 
-    df_op = pd.DataFrame.from_records(operational_impact_list)
-    df_op = df_op.pivot(
-        index=["category"],
-        columns="impact_type",
-        values="impact_value",
-    ).reset_index()
-    df_op["type"] = "operational"
-    df_op["assembly_category"] = "Operational Carbon"
-    df_op.rename(columns={"category": "material_category", "gwp_b6": "gwp", "penrt_b6": "penrt"}, inplace=True)
+        df = pd.concat([df, df_op], axis=0)[["assembly_category", "material_category", "gwp", "penrt", "type"]]
+    return df
+
+
+def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
+    # Preset colors
+    colors = ["rgb(244, 132, 67)", "rgb(150, 150, 150)"]
+
+    # Create a 2x2 layout: top row for pie and bar, bottom row for indicators
+    fig = make_subplots(
+        rows=2,
+        cols=2,
+        specs=[
+            [{"type": "domain"}, {"type": "xy"}],
+            [{"type": "domain"}, {"type": "domain"}],
+        ],
+        subplot_titles=[
+            "<b>Whole life cycle carbon</b><br>[kg CO₂eq/m·yr]<br> ",
+            "<b>Embodied carbon</b><br>[kg CO₂eq/m·yr]<br> ",
+            "",
+            "",
+        ],
+        # Give more vertical space to top row
+        row_heights=[0.6, 0.3],
+        vertical_spacing=0.05,
+    )
+
+    # Update all annotations (including subplot titles)
+    for annotation in fig["layout"]["annotations"]:
+        annotation["font"] = dict(size=20)  
+
+    # Add pies
+    fig.add_trace(
+        go.Pie(
+            labels=df_pie[key_column],
+            values=df_pie["gwp"],  # using only positive values
+            name="GWP",
+            hole=0.4,
+            marker=dict(colors=colors),
+            legendgroup="GWP",
+            showlegend=True,
+        ),
+        row=1,
+        col=1,
+    )
+
+    # Stacking 2 bars on top of each other to have text appear behind graphs
+    fig.add_trace(
+        go.Bar(
+            y=df_bar[key_column],
+            x=df_bar["gwp_per"],
+            orientation='h',
+            texttemplate='%{label} - %{value:.0f}%',
+            textposition='inside',
+            insidetextanchor='start',
+            textangle=0,  
+            textfont_size=20,
+            textfont=dict(color='black'),
+            marker_opacity=0.4,  
+            showlegend=False,
+            hoverinfo="y+x",
+            hovertemplate="%{label}<br><b>Value: %{value:.2f}</b>%<extra></extra>",
+        ),
+        row=1,
+        col=2,
+    )
     
-    # Combine & rename long labels
-    df_full = pd.concat([df, df_op], axis=0)[["assembly_category", "material_category", "gwp", "penrt", "type"]]
+    # Second bar graph
+    fig.add_trace(
+        go.Bar(
+            y=df_bar[key_column],
+            x=df_bar["gwp_per"],
+            orientation='h',
+            marker_opacity=0.75, 
+            showlegend=False,
+            hoverinfo="y+x",
+            hovertemplate="%{label}<br><b>Value: %{value:.2f}</b>%<extra></extra>",
+        ),
+        row=1,
+        col=2,
+    )
     
-    return df_full
+
+    # Update pies formatting
+    fig.update_traces(
+        hoverinfo="label+value",
+        hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
+        hoverlabel=dict(font_color="white", namelength=-1),
+        textposition="auto",
+        textfont=dict(
+            size=14, 
+            family="Arial, sans-serif",  
+            color="white",
+        ),
+        texttemplate="<b>%{label}</b><br>%{percent:.0%}",
+        selector=dict(type="pie"),
+    )
+    
+    # Update bar formatting
+    fig.update_traces(
+        marker_color=colors[0], 
+        marker_cornerradius=15,
+        hoverlabel_font_color="white", 
+        hoverlabel_namelength=-1,
+        selector=dict(type='bar')
+    )
+    
+    fig.update_yaxes(autorange='reversed')
+
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',  
+        plot_bgcolor='rgba(0,0,0,0)',
+        bargap=0.05,
+        bargroupgap=0.5,
+        uniformtext=dict(mode='show', minsize=12),
+        yaxis=dict(showticklabels=False),
+        barmode='overlay'
+    )
+
+    # Calculate initial sums
+    gwp_sum = df_pie["gwp"].sum()
+    gwp_embodied_sum = df_pie.loc[df_pie["type"] == "structural", "gwp"].sum()
+
+    # Add Indicators (make them larger)
+    fig.add_trace(
+        go.Indicator(
+            mode="number",
+            value=gwp_sum,
+            title={"text": "<b>Total GWP</b>", "font": {"size": 20}},
+            number={"font": {"size": 30}},
+        ),
+        row=2,
+        col=1,
+    )
+
+    fig.add_trace(
+        go.Indicator(
+            mode="number",
+            value=gwp_embodied_sum,
+            title={"text": "<b>Total embodied GWP</b>", "font": {"size": 20}},
+            number={"font": {"size": 30}},
+        ),
+        row=2,
+        col=2,
+    )
+
+    # Increase figure size and reduce margins
+    fig.update_layout(
+        height=500, width=900, margin=dict(l=50, r=50, t=100, b=50), showlegend=True
+    )
+
+    pie_plot = plot(
+        fig, output_type="div", config={"displaylogo": False, "displayModeBar": False}
+    )
+    return pie_plot
+
 
 
 def _building_dashboard_base(df, key_column: str):
-    # Generate colors
-    colorscale_orange = _generate_discrete_colors(
-        start_color=(242, 103, 22), end_color=(250, 199, 165), n=df.shape[0]
-    )
-
-    colorscale_green = _generate_discrete_colors(
-        start_color=(36, 191, 91), end_color=(154, 225, 177), n=df.shape[0]
-    )
+    
+    # Generate colors & correct ordering
+    df_sorted, color_list = _get_color_ordering(df, "carbon")
 
     # Create a 2x2 layout: top row for pies, bottom row for indicators
     fig = make_subplots(
@@ -140,8 +326,8 @@ def _building_dashboard_base(df, key_column: str):
             [{"type": "domain"}, {"type": "domain"}],
         ],
         subplot_titles=[
-            "<b>Embodied Carbon</b><br>[kg CO₂eq/m·yr]<br> ",
-            "<b>Embodied Energy</b><br>[MJ/m²·yr]<br> ",
+            "<b>LCA Carbon</b><br>by resource<br>[kg CO₂eq/m·yr]<br> ",
+            "<b>LCA Energy</b><br>by resource<br>[MJ/m²·yr]<br> ",
             "",
             "",
         ],
@@ -154,28 +340,37 @@ def _building_dashboard_base(df, key_column: str):
     for annotation in fig["layout"]["annotations"]:
         annotation["font"] = dict(size=20)  # Change 20 to your desired font size
 
+
+
     # Add pies
     fig.add_trace(
         go.Pie(
-            labels=df[key_column],
-            values=df["gwp"],  # using ony positive values
+            labels=df_sorted[key_column],
+            values=df_sorted["gwp"],  
             name="GWP",
+            direction ='clockwise',
             hole=0.4,
-            marker=dict(colors=colorscale_orange),
+            marker=dict(colors=color_list),
             legendgroup="GWP",
             showlegend=True,
+            sort=False,
         ),
         row=1,
         col=1,
     )
 
+    # Generate colors & correct ordering
+    df_sorted, color_list = _get_color_ordering(df, "energy")
+
     fig.add_trace(
         go.Pie(
-            labels=df[key_column],
-            values=df["penrt"],
+            labels=df_sorted[key_column],
+            values=df_sorted["penrt"],
+            sort=False,
+            direction ='clockwise',
             name="PENRT",
             hole=0.4,
-            marker=dict(colors=colorscale_green),
+            marker=dict(colors=color_list),
             legendgroup="PENRT",
             showlegend=True,
         ),
@@ -188,13 +383,14 @@ def _building_dashboard_base(df, key_column: str):
         hoverinfo="label+value",
         hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
         hoverlabel=dict(font_color="white", namelength=-1),
-        textposition="auto",
+        textposition="inside",
         textfont=dict(
             size=14,  # Default font size
             family="Arial, sans-serif",  # Use a modern sans-serif font
             color="white",  # Default high contrast text color
         ),
         texttemplate="<b>%{label}</b><br>%{percent:.0%}",
+        
         # connector=dict(line=dict(color="black", width=1, dash="solid")),
     )
 
@@ -227,7 +423,7 @@ def _building_dashboard_base(df, key_column: str):
 
     # Combine original titles + new annotations
     new_annotations = existing_annotations + [gwp_annotation, penrt_annotation]
-    fig.update_layout(annotations=new_annotations)
+    fig.update_layout(annotations=new_annotations, uniformtext_minsize=12, uniformtext_mode='hide')
 
     # Calculate initial sums
     gwp_sum = df["gwp"].sum()
@@ -258,13 +454,46 @@ def _building_dashboard_base(df, key_column: str):
 
     # Increase figure size and reduce margins
     fig.update_layout(
-        height=500, width=900, margin=dict(l=50, r=50, t=100, b=50), showlegend=True
+        height=500, width=900, margin=dict(l=25, r=25, t=125, b=25), showlegend=True
     )
 
     pie_plot = plot(
         fig, output_type="div", config={"displaylogo": False, "displayModeBar": False}
     )
     return pie_plot
+
+
+def _get_color_ordering(df, unit):
+    df_sorted = df.sort_values(["type", "gwp"], ascending=[False, False]).reset_index()
+    df_struct = df_sorted[df_sorted["type"] == "structural"]
+    df_op = df_sorted[df_sorted["type"] == "operational"]
+    
+    if unit == "carbon":  
+        colorscale_struct = _generate_discrete_colors(
+            start_color=(244, 132, 67), end_color=(250, 199, 165), n=df_struct.shape[0]
+        )
+    elif unit == "energy":
+        colorscale_struct = _generate_discrete_colors(
+            start_color=(36, 191, 91), end_color=(154, 225, 177), n=df_struct.shape[0]
+        )
+        
+    colorscale_op = _generate_discrete_colors(
+        start_color=(150, 150, 150), end_color=(180, 180, 180), n=df_op.shape[0]
+    )
+    
+    index_struct = df_sorted[df_sorted['type'] == 'structural'].index.tolist()
+    index_op = df_sorted[df_sorted['type'] == 'operational'].index.tolist()
+    final_size = max(max(index_struct), max(index_op)) + 1
+    color_list = [None] * final_size
+
+    for pos, rgb in zip(index_struct, colorscale_struct):
+        color_list[pos] = rgb
+
+    # Place the values from the second rgb list
+    for pos, rgb in zip(index_op, colorscale_op):
+        color_list[pos] = rgb
+        
+    return df_sorted, color_list
 
 
 def _generate_discrete_colors(

@@ -17,8 +17,9 @@ from pages.models.building import (
     OperationalProduct,
     SimulatedOperationalProduct,
 )
+from pages.models.epd import EPD
 from pages.views.assembly.epd_filtering import get_filtered_epd_list
-from pages.views.building.impact_calculation import calculate_impacts
+from pages.views.building.impact_calculation import calculate_impact_operational, calculate_impacts
 from pages.views.building.operational_products.operational_products import (
     get_op_product,
     get_op_product_list,
@@ -296,4 +297,4 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
         )
         impact_list.extend(assembly_impact_list)
 
-    return structural_components, impact_list
+    return structural_components, impact_list     
