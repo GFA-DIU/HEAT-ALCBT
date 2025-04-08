@@ -151,7 +151,10 @@
       data-bs-parent="#accordionBuilding"
     >
       <div id="operational-info-body" class="accordion-body">
+        {% if building_id %}
         {% include "pages/building/operational_info/operational_products.html" %}
+        {% else %} Please save the building before adding any components {% endif %}
+
       </div>
     </div>
   </div>

@@ -16,6 +16,7 @@ from pages.views.building.building import handle_building_load
 from pages.views.building.building import handle_assembly_delete
 from pages.views.building.operational_products.operational_products import (
     get_op_product,
+    get_op_product_list,
     handle_op_products_save,
 )
 
@@ -44,6 +45,8 @@ def building_simulation(request, building_id):
                 return handle_simulation_reset(building_id)
             case "select_op_product":
                 return get_op_product(request, building_id)
+            case "filter":
+                return get_op_product_list(request, building_id)
             case "save_op_products":
                 handle_op_products_save(request, building_id, simulation=True)
                 context, form, detailedForm = handle_building_load(
@@ -74,7 +77,7 @@ def building_simulation(request, building_id):
             request, building_id, simulation=True
         )
 
-        if not context["structural_components"]:
+        if not context["structural_components"] and not context["operational_products"]:
             return handle_simulation_reset(building_id)
 
         # disable the form fields and button
@@ -129,41 +132,39 @@ def handle_simulation_reset(building_id):
             # simulation is not possible if there is no normal set-up
             return redirect("building", building_id=building_id)
 
-        if normal_assemblies:
-            for a in normal_assemblies:
-                # For custom assemblies, clone the original
-                if a.assembly.mode == AssemblyMode.CUSTOM:
-                    # https://docs.djangoproject.com/en/5.1/topics/db/queries/#copying-model-instances
-                    original_assembly_id = a.assembly.pk
-                    a.assembly.pk = None
-                    a.assembly._state.adding = True
-                    a.assembly.save()
+        for a in normal_assemblies:
+            # For custom assemblies, clone the original
+            if a.assembly.mode == AssemblyMode.CUSTOM:
+                # https://docs.djangoproject.com/en/5.1/topics/db/queries/#copying-model-instances
+                original_assembly_id = a.assembly.pk
+                a.assembly.pk = None
+                a.assembly._state.adding = True
+                a.assembly.save()
 
-                    # Clone associated Products
-                    for product in StructuralProduct.objects.filter(
-                        assembly__id=original_assembly_id
-                    ):
-                        StructuralProduct.objects.create(
-                            description=product.description,
-                            epd=product.epd,
-                            input_unit=product.input_unit,
-                            assembly=a.assembly,  # Use the new cloned assembly
-                            quantity=product.quantity,
-                        )
+                # Clone associated Products
+                for product in StructuralProduct.objects.filter(
+                    assembly__id=original_assembly_id
+                ):
+                    StructuralProduct.objects.create(
+                        description=product.description,
+                        epd=product.epd,
+                        input_unit=product.input_unit,
+                        assembly=a.assembly,  # Use the new cloned assembly
+                        quantity=product.quantity,
+                    )
 
-                BuildingAssemblySimulated.objects.create(
-                    assembly=a.assembly, building=a.building, quantity=a.quantity
-                )
+            BuildingAssemblySimulated.objects.create(
+                assembly=a.assembly, building=a.building, quantity=a.quantity
+            )
 
-        if normal_op_products:
-            for p in normal_op_products:
-                SimulatedOperationalProduct.objects.create(
-                    epd=p.epd,
-                    building=p.building,
-                    quantity=p.quantity,
-                    description=p.description,
-                    input_unit=p.input_unit,
-                )
+        for p in normal_op_products:
+            SimulatedOperationalProduct.objects.create(
+                epd=p.epd,
+                building=p.building,
+                quantity=p.quantity,
+                description=p.description,
+                input_unit=p.input_unit,
+            )
     except Exception:
         logger.exception(
             "Resetting the simulation failed for building %s failed", building_id

@@ -277,12 +277,19 @@ class EPD(BaseModel, epdLCAx):
         return round(sum(impact.value for impact in impacts), 2)
 
     def get_op_units(self):
-        units = [Unit.KWH]
-        if any(item["unit"] == "kg" for item in self.conversions if "unit" in item):
-            units.append(Unit.KG)
-            if any(item["unit"] == "kg/m^3" for item in self.conversions if "unit" in item):
-                units.append(Unit.M3)
-                units.append(Unit.LITER)
+        units = [self.declared_unit]
+        for item in self.conversions:
+            match (item.get("unit")):
+                case "kg" | "-":
+                    units.append(Unit.KG)
+                case "kg/m^3":
+                    units.extend([Unit.M3, Unit.LITER])
+                case _:
+                    Warning(
+                        "The epd (%s) has a conversion %s for which there is not corresponding unit.",
+                        self.id,
+                        item.get("unit"),
+                    )
         return units
 
 

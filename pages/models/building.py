@@ -313,10 +313,6 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
         verbose_name = "Building"
         verbose_name_plural = "Buildings"
         
-    def get_operational_impact(self):    
-        op_total = sum(sum(op.get_impacts().values()) for op in self.operational_products.all())
-        sop_total = sum(sum(sop.get_impacts().values()) for sop in self.simulated_operational_products.all())
-        return op_total, sop_total
 
 
 class BuildingAssembly(models.Model):
@@ -383,5 +379,4 @@ class SimulatedOperationalProduct(BaseProduct):
     building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='simulated_operational_products')
     
     def get_impacts(self):
-        impacts = calculate_impact_operational(self)
-        return impacts
+        return calculate_impact_operational(self)
