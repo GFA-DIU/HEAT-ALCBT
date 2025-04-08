@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 
 from pages.models.epd import EPD, EPDType, MaterialCategory, Unit
@@ -8,6 +10,7 @@ from pages.scripts.csv_import.utils import (
     get_superuser,
 )
 
+logger = logging.getLogger(__name__)
 
 impact_columns = [
     "penrt_b6 [MJ]",
@@ -29,9 +32,10 @@ def get_category(row):
 
 
 def get_comment(row):
-    if row["UUID"] == "GEG":
-        return "GEG (German Building Energy Law, additonal data)"
-    return f"Created based on {row['UUID']} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row['UUID']})"
+    if not pd.isna(row["Source"]):
+        return row["Source"]
+    else:
+        return f"Created based on {row['UUID']} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row['UUID']})"
 
 def import_generic_operational_epds():
     file_path = "pages/data/generic_operational_EPDs.csv"
@@ -71,6 +75,7 @@ def import_generic_operational_epds():
             success += 1
 
         except Exception as e:
+            logger.exception("Error in row %s", index)
             print(f"Error in row {index}: {e}")
             failure += 1
             failure_list.append(index)

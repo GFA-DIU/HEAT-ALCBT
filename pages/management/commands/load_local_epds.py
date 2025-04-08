@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 
+from pages.scripts.csv_import.import_generic_operational_epds import import_generic_operational_epds
 from pages.scripts.csv_import.import_generic_structural_epds import (
     import_generic_structural_epds,
 )
@@ -9,6 +10,7 @@ from pages.scripts.csv_import.import_edge_handbook_epds import import_EDGE_EPDs
 local_epd_files = {
     "EDGE_HANDBOOK_EPDs": import_EDGE_EPDs,
     "generic_EPDs": import_generic_structural_epds,
+    "generic_operationaL_EPDs": import_generic_operational_epds
 }
 
 
