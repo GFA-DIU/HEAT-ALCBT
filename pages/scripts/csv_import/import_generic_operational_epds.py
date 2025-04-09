@@ -37,6 +37,7 @@ def get_comment(row):
     else:
         return f"Created based on {row['UUID']} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row['UUID']})"
 
+
 def import_generic_operational_epds():
     file_path = "pages/data/generic_operational_EPDs.csv"
     superuser = get_superuser()
@@ -65,7 +66,7 @@ def import_generic_operational_epds():
                 category=get_category(row),
                 declared_unit=Unit.KWH,  ## TODO check if really the case
                 type=EPDType.GENERIC,
-                declared_amount=1, ## TODO check if really the case
+                declared_amount=1,  ## TODO check if really the case
                 comment=get_comment(row),  ## TODO adapt GEG text
                 created_by_id=superuser.id,
             )
@@ -76,9 +77,9 @@ def import_generic_operational_epds():
 
         except Exception as e:
             logger.exception("Error in row %s", index)
-            print(f"Error in row {index}: {e}")
             failure += 1
             failure_list.append(index)
+            raise Exception(f"Error in row {index}: {e} \n  Row: {row}")
 
     if failure == 0:
         print(

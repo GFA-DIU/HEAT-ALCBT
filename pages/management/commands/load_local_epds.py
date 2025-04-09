@@ -1,6 +1,9 @@
+from django.db import transaction
 from django.core.management.base import BaseCommand
 
-from pages.scripts.csv_import.import_generic_operational_epds import import_generic_operational_epds
+from pages.scripts.csv_import.import_generic_operational_epds import (
+    import_generic_operational_epds,
+)
 from pages.scripts.csv_import.import_generic_structural_epds import (
     import_generic_structural_epds,
 )
@@ -17,6 +20,7 @@ local_epd_files = {
 class Command(BaseCommand):
     help = "Load all EPDs from local Csv files in `pages/data/` to the database."
 
+    @transaction.atomic
     def handle(self, *args, **options):
         for k, v in local_epd_files.items():
             self.stdout.write(self.style.SUCCESS(("Starting", k)))

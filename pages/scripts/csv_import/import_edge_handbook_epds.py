@@ -56,3 +56,4 @@ def import_EDGE_EPDs():
         except Exception as e:
             print(f"Error in row {index}:")
             print(e)
+            raise Exception(f"Error in row {index}: {e}\n  Row: {row}")

@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 
 from pages.models.epd import EPD, EPDType, MaterialCategory
@@ -8,6 +9,7 @@ from pages.scripts.csv_import.utils import (
     get_superuser,
 )
 
+logger = logging.getLogger(__name__)
 
 impact_columns = [
     "penrt_a1a3 [MJ]",
@@ -72,9 +74,10 @@ def import_generic_structural_epds():
             success += 1
 
         except Exception as e:
-            print(f"Error in row {index}: {e}")
+            logger.exception("Error in row %s", index)
             failure += 1
             failure_list.append(index)
+            raise Exception(f"Error in row {index}: {e}\n  Row: {row}")
 
     if failure == 0:
         print(
