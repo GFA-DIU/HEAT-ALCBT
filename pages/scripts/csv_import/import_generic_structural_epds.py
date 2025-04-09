@@ -33,6 +33,12 @@ def get_category(row):
         )
         return category
 
+def get_declared_amount(row):
+    declared_amount = row.get("declared_amount", 1.0)
+    if pd.isna(declared_amount):
+        declared_amount = 1.0
+    return declared_amount
+
 def import_generic_structural_epds():
     file_path = "pages/data/generic_EPDs.csv"
     superuser = get_superuser()
@@ -51,9 +57,7 @@ def import_generic_structural_epds():
         print(f"Row {index} is being processed.")
         try:
             conversions = get_conversions(row)
-            declared_amount = row.get("declared_amount", 1.0)
-            if pd.isna(declared_amount):
-                declared_amount = 1.0
+            declared_amount = get_declared_amount(row)
             
             new_epd = EPD(
                 country=get_country(row["country"]),
