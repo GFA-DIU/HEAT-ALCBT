@@ -193,7 +193,9 @@ def calculate_impact_operational(
         case (Unit.KWH, Unit.KWH):
             impacts = calculate_impact(Decimal(p.quantity), gwp_b6, penrt_b6)
         case (Unit.KWH, Unit.M3):
-            kwh_per_kg = fetch_conversion("kg")
+            kwh_per_kg = fetch_conversion("kg") or fetch_conversion(
+                "-"
+            )  # "-" is used by Ökobdauat for name:'conversion
             kg_per_m3 = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
                 Decimal(p.quantity) * Decimal(kwh_per_kg) * Decimal(kg_per_m3),
@@ -201,7 +203,9 @@ def calculate_impact_operational(
                 penrt_b6,
             )
         case (Unit.KWH, Unit.LITER):
-            kwh_per_kg = fetch_conversion("kg")
+            kwh_per_kg = fetch_conversion("kg") or fetch_conversion(
+                "-"
+            )  # "-" is used by Ökobdauat for name:'conversion
             kg_per_m3 = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
                 Decimal(p.quantity) * Decimal(kwh_per_kg) * Decimal(kg_per_m3) / 1000,
