@@ -2,6 +2,8 @@ from django.db import models
 from django.utils.translation import gettext as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from pages.views.building.impact_calculation import calculate_impact_operational
+
 from .assembly import Assembly
 from .base import BaseGeoModel, BaseModel
 from .product import BaseProduct
@@ -310,6 +312,7 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
     class Meta:
         verbose_name = "Building"
         verbose_name_plural = "Buildings"
+        
 
 
 class BuildingAssembly(models.Model):
@@ -364,10 +367,16 @@ class BuildingAssemblySimulated(models.Model):
 class OperationalProduct(BaseProduct):
     """Join Table for EPDs and Building. Products are EPDs with quantity and results."""
 
-    building = models.ForeignKey(Building, on_delete=models.CASCADE)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='operational_products')
+    
+    def get_impacts(self):
+        return calculate_impact_operational(self)
 
 
 class SimulatedOperationalProduct(BaseProduct):
     """Join Table for EPDs and Simulated Building. Products are EPDs with quantity and results."""
 
-    building = models.ForeignKey(Building, on_delete=models.CASCADE)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='simulated_operational_products')
+    
+    def get_impacts(self):
+        return calculate_impact_operational(self)

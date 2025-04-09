@@ -1,14 +1,25 @@
 import logging
 
 from django.db import transaction
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 
 from pages.models.assembly import AssemblyMode, Assembly, StructuralProduct
-from pages.models.building import BuildingAssembly, BuildingAssemblySimulated
+from pages.models.building import (
+    BuildingAssembly,
+    BuildingAssemblySimulated,
+    OperationalProduct,
+    SimulatedOperationalProduct,
+)
 from pages.views.building.building import handle_building_load
 from pages.views.building.building import handle_assembly_delete
+from pages.views.building.operational_products.operational_products import (
+    get_op_product,
+    get_op_product_list,
+    handle_op_products_save,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -24,10 +35,43 @@ def building_simulation(request, building_id):
     )
 
     if request.method == "DELETE":
-        return handle_assembly_delete(request, building_id, simulation=True)
+        if request.GET.get("op_product_id"):
+            return HttpResponse()
+        if request.GET.get("component"):
+            return handle_assembly_delete(request, building_id, simulation=True)
 
-    elif request.method == "POST" and request.POST.get("action") == "reset":
-        return handle_simulation_reset(building_id)
+    # General Info
+    elif request.method == "POST":
+        match request.POST.get("action"):
+            case "reset":
+                return handle_simulation_reset(building_id)
+            case "select_op_product":
+                return get_op_product(request, building_id)
+            case "filter":
+                return get_op_product_list(request, building_id)
+            case "save_op_products":
+                handle_op_products_save(request, building_id, simulation=True)
+                context, form, detailedForm = handle_building_load(
+                    request, building_id, simulation=True
+                )
+                context["edit_mode"] = False
+                response = render(
+                    request,
+                    "pages/building/operational_info/operational_product_list.html",
+                    context,
+                )
+                response["HX-Refresh"] = "true"  # Add the HX-Refresh header
+                return response
+            case "edit_products":
+                context, _, _ = handle_building_load(
+                    request, building_id, simulation=True
+                )
+                context["edit_mode"] = True
+                return render(
+                    request,
+                    "pages/building/operational_info/operational_products.html",
+                    context,
+                )
 
     # Full reload
     else:
@@ -35,7 +79,7 @@ def building_simulation(request, building_id):
             request, building_id, simulation=True
         )
 
-        if not context["structural_components"]:
+        if not context["structural_components"] and not context["operational_products"]:
             return handle_simulation_reset(building_id)
 
         # disable the form fields and button
@@ -77,10 +121,16 @@ def handle_simulation_reset(building_id):
         # Clear existing simulated assemblies
         simulated_buildingassemblies.delete()
 
+        # Clear existing simulated operational products
+        SimulatedOperationalProduct.objects.filter(building__id=building_id).delete()
+
         ###### Create from Building Assembly
         normal_assemblies = BuildingAssembly.objects.filter(building__id=building_id)
 
-        if not normal_assemblies:
+        ###### Create from Building Assembly
+        normal_op_products = OperationalProduct.objects.filter(building__id=building_id)
+
+        if not normal_assemblies and not normal_op_products:
             # simulation is not possible if there is no normal set-up
             return redirect("building", building_id=building_id)
 
@@ -107,6 +157,15 @@ def handle_simulation_reset(building_id):
 
             BuildingAssemblySimulated.objects.create(
                 assembly=a.assembly, building=a.building, quantity=a.quantity
+            )
+
+        for p in normal_op_products:
+            SimulatedOperationalProduct.objects.create(
+                epd=p.epd,
+                building=p.building,
+                quantity=p.quantity,
+                description=p.description,
+                input_unit=p.input_unit,
             )
     except Exception:
         logger.exception(

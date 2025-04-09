@@ -14,7 +14,7 @@
   {% if building_id %}
   <div class="col-auto">
     <div class="d-flex pt-2">
-      {% if structural_components%}
+      {% if structural_components or operational_products%}
       <a
         href="{% url 'building_simulation' building_id=building_id %}"
         class="btn btn-secondary me-2"
@@ -28,6 +28,6 @@
   {% endif %}
 </div>
 
-{% include "pages/building/building_core.html" with simulation="false" %}
+{% include "pages/building/building_core.html" %}
 
 {% endblock %}

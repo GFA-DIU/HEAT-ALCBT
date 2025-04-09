@@ -30,7 +30,7 @@ class BOQAssemblyForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         building_id = kwargs.pop("building_id", None)
-        simulation = kwargs.pop("simulation", None)
+        simulation = kwargs.pop("simulation", False)
         if simulation:
             BuildingAssemblyModel = BuildingAssemblySimulated
         else:
