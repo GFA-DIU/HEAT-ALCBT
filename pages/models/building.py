@@ -104,8 +104,8 @@ class BuildingOperationalInfo(models.Model):
         blank=True,
         validators=[MinValueValidator(0)],
     )
-    hours_per_week = models.IntegerField(
-        _("Operation hours per week"),
+    hours_per_workday = models.IntegerField(
+        _("Operation hours per workday"),
         null=True,
         blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(24)],
@@ -312,7 +312,6 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
     class Meta:
         verbose_name = "Building"
         verbose_name_plural = "Buildings"
-        
 
 
 class BuildingAssembly(models.Model):
@@ -367,8 +366,10 @@ class BuildingAssemblySimulated(models.Model):
 class OperationalProduct(BaseProduct):
     """Join Table for EPDs and Building. Products are EPDs with quantity and results."""
 
-    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='operational_products')
-    
+    building = models.ForeignKey(
+        Building, on_delete=models.CASCADE, related_name="operational_products"
+    )
+
     def get_impacts(self):
         return calculate_impact_operational(self)
 
@@ -376,7 +377,11 @@ class OperationalProduct(BaseProduct):
 class SimulatedOperationalProduct(BaseProduct):
     """Join Table for EPDs and Simulated Building. Products are EPDs with quantity and results."""
 
-    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='simulated_operational_products')
-    
+    building = models.ForeignKey(
+        Building,
+        on_delete=models.CASCADE,
+        related_name="simulated_operational_products",
+    )
+
     def get_impacts(self):
         return calculate_impact_operational(self)

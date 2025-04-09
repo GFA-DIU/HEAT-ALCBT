@@ -75,7 +75,7 @@ def building_simulation(request, building_id):
 
     # Full reload
     else:
-        context, form, detailedForm = handle_building_load(
+        context, form, detailedForm, operationalInfoForm = handle_building_load(
             request, building_id, simulation=True
         )
 
@@ -87,13 +87,18 @@ def building_simulation(request, building_id):
             form.fields[field].disabled = True
         for field in detailedForm.fields:
             detailedForm.fields[field].disabled = True
+        for field in operationalInfoForm.fields:
+            operationalInfoForm.fields[field].disabled = True
         if hasattr(form.helper.layout[3], "flat_attrs"):
             form.helper.layout[3].flat_attrs = "disabled"
         if hasattr(detailedForm.helper.layout[3], "flat_attrs"):
             detailedForm.helper.layout[3].flat_attrs = "disabled"
+        if hasattr(operationalInfoForm.helper.layout[3], "flat_attrs"):
+            operationalInfoForm.helper.layout[3].flat_attrs = "disabled"
 
         context["form_general_info"] = form
         context["form_detailed_info"] = detailedForm
+        context["form_operational_info"] = operationalInfoForm
 
     context["simulation"] = True
     # Full page load for GET request

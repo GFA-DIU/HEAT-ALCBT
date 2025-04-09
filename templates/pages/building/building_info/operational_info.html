@@ -1,0 +1,7 @@
+{% load crispy_forms_tags %} {% if building_id %}
+<form action="{% url 'building' building_id=building_id %}" method="post">
+  <!-- Create an identifier for this post request -->
+  <input type="hidden" name="action" value="operational_info" />
+  {% crispy form_operational_info %}
+</form>
+{% endif %}
