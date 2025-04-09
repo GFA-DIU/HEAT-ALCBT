@@ -5,7 +5,8 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 
-from pages.models.epd import EPDImpact, Impact, MaterialCategory
+from pages.models.epd import INDICATOR_UNIT_MAPPING, EPDImpact, Impact, MaterialCategory
+
 
 def get_conversions(row) -> list[dict]:
     conversions = []
@@ -53,32 +54,30 @@ def add_impacts(row, epd, impact_columns) -> None:
         # Only process if the value is not NaN
         if pd.isna(row[col]):
             continue
-        
+
         # Split the column name to extract the impact category and life cycle stage.
         # "penrt_a1a3 [MJ]" -> "penrt_a1a3" -> split by "_" gives ("penrt", "a1a3")
         impact_category, life_cycle_stage = col.split(" ")[0].split("_")
-        
+
         # Get the impact object based on the extracted category and stage.
-        impact = Impact.objects.get(
+        impact, _ = Impact.objects.get_or_create(
             impact_category=impact_category,
-            life_cycle_stage=life_cycle_stage
+            life_cycle_stage=life_cycle_stage,
+            unit=INDICATOR_UNIT_MAPPING.get(
+                impact_category
+            ),  # Default unit, update as needed
         )
-        
+
         # Update or create the EPDImpact record.
         EPDImpact.objects.update_or_create(
-            epd=epd,
-            impact=impact,
-            defaults={"value": row[col]}
+            epd=epd, impact=impact, defaults={"value": row[col]}
         )
 
 
 def get_country(country) -> Country:
-    return Country.objects.get(
-                Q(name=country)
-                | Q(code2=country)
-                | Q(code3=country)
-            )
-    
+    return Country.objects.get(Q(name=country) | Q(code2=country) | Q(code3=country))
+
+
 def get_category(row) -> MaterialCategory:
     if not pd.isna(row["level_2_index"]):
         category = MaterialCategory.objects.get(
@@ -88,9 +87,12 @@ def get_category(row) -> MaterialCategory:
         category = MaterialCategory.objects.get(
             category_id=row["level_1_index"], level=2
         )
-    
+
     return category
+
 
 def get_superuser() -> User:
     User = get_user_model()
-    return User.objects.filter(is_superuser=True).order_by('date_joined').first() # Gets the first superuser on the deployment
+    return (
+        User.objects.filter(is_superuser=True).order_by("date_joined").first()
+    )  # Gets the first superuser on the deployment

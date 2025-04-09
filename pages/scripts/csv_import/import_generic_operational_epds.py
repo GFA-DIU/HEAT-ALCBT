@@ -1,7 +1,8 @@
 import logging
+
 import pandas as pd
 
-from pages.models.epd import EPD, EPDType, MaterialCategory
+from pages.models.epd import EPD, EPDType, MaterialCategory, Unit
 from pages.scripts.csv_import.utils import (
     add_impacts,
     get_conversions,
@@ -12,14 +13,8 @@ from pages.scripts.csv_import.utils import (
 logger = logging.getLogger(__name__)
 
 impact_columns = [
-    "penrt_a1a3 [MJ]",
-    "penrt_c3 [MJ]",
-    "penrt_c4 [MJ]",
-    "penrt_d [MJ]",
-    "gwp_a1a3 [kgCo2e]",
-    "gwp_c3 [kgCo2e]",
-    "gwp_c4 [kgCo2e]",
-    "gwp_d [kgCo2e]",
+    "penrt_b6 [MJ]",
+    "gwp_b6 [kgCo2e]",
 ]
 
 
@@ -35,8 +30,16 @@ def get_category(row):
         )
         return category
 
-def import_generic_structural_epds():
-    file_path = "pages/data/generic_EPDs.csv"
+
+def get_comment(row):
+    if not pd.isna(row["Source"]):
+        return row["Source"]
+    else:
+        return f"Created based on {row['UUID']} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row['UUID']})"
+
+
+def import_generic_operational_epds():
+    file_path = "pages/data/generic_operational_EPDs.csv"
     superuser = get_superuser()
 
     try:
@@ -52,7 +55,6 @@ def import_generic_structural_epds():
     for index, row in df.iterrows():
         print(f"Row {index} is being processed.")
         try:
-            conversions = get_conversions(row)
 
             new_epd = EPD(
                 country=get_country(row["country"]),
@@ -60,12 +62,12 @@ def import_generic_structural_epds():
                 name=row["name"],
                 names=[{"lang": "en", "value": row["name"]}],
                 public=True,
-                conversions=conversions,
+                conversions=get_conversions(row),
                 category=get_category(row),
-                declared_unit=row["declared_unit"],
+                declared_unit=Unit.KWH,  ## TODO check if really the case
                 type=EPDType.GENERIC,
-                declared_amount=row["declared_amount"],
-                comment=f"Created based on {row['UUID']} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row['UUID']})",
+                declared_amount=1,  ## TODO check if really the case
+                comment=get_comment(row),  ## TODO adapt GEG text
                 created_by_id=superuser.id,
             )
             new_epd.save()
@@ -77,7 +79,7 @@ def import_generic_structural_epds():
             logger.exception("Error in row %s", index)
             failure += 1
             failure_list.append(index)
-            raise Exception(f"Error in row {index}: {e}\n  Row: {row}")
+            raise Exception(f"Error in row {index}: {e} \n  Row: {row}")
 
     if failure == 0:
         print(

@@ -1,0 +1,66 @@
+level_0_index;level_0_text;level_1_index;level_1_text;level_2_index;level_2_text;country;name;declared_unit;weight [kg];volume density [kg/m3];area density [kg/m2];linear density [kg/m];penrt_b6 [MJ];gwp_b6 [kgCo2e];Source;UUID
+9;Others;2;Energy carrier - delivery free user;5;Electricity;IN;electricity ;kWh;;;;;3.021578549390258;0.7051314;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;IN;Light fuel oil;kWh;11.72;860;;;4.732252559726963;0.06290273037542662;;de4f1273-f63f-4c2e-998c-639cb0e6e2c3
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;IN;Heavy fuel oil;kWh;11.75;930;;;4.1060425531914895;0.057649361702127665;;2efcb539-f2f6-4db4-97ae-ece46761395d
+9;Others;2;Energy carrier - delivery free user;2;Liquid gas;IN;Liquefied petroleum gas (LPG);kWh;12.777777777777779;550;;;4.645252173913043;0.08703391304347825;;ac476639-0ef2-4485-bb73-d446948eb7c6
+9;Others;2;Energy carrier - delivery free user;1;natural gas;IN;natural gas;kWh;7.92;760;;;4.356000000000001;0.264;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;IN;coal;kWh;8.14;760;;;4.356000000000001;0.44000000000000006;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;IN;lignite;kWh;2.68;700;;;4.752000000000001;0.47300000000000003;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;IN;diesel;kWh;11.57;840;;;4.356000000000001;0.3013828867761452;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;IN;cerosin;kWh;11.11111111111111;800;;;4.356000000000001;0.31383;Source:  [Rhetors-Kerosin](https://www.rhetos.de/html/lex/kerosin.htm);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;IN;fire wood (log wood);kWh;4.2;500;;;0.7920000000000001;0.013200000000000002;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;IN;fire wood (wood chips);kWh;4.3;230;;;0.7920000000000001;0.0242;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;IN;fire wood (wood pellets);kWh;4.9;650;;;0.7920000000000001;0.033;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;IN;char coal;kWh;9.027777777777779;350;;;0.7920000000000001;0.038500000000000006;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;5;Electricity;ID;electricity ;kWh;;;;;2.8964506591396324;0.6759309;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;ID;Light fuel oil;kWh;11.72;860;;;4.732252559726963;0.06290273037542662;;de4f1273-f63f-4c2e-998c-639cb0e6e2c3
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;ID;Heavy fuel oil;kWh;11.75;930;;;4.1060425531914895;0.057649361702127665;;2efcb539-f2f6-4db4-97ae-ece46761395d
+9;Others;2;Energy carrier - delivery free user;2;Liquid gas;ID;Liquefied petroleum gas (LPG);kWh;12.777777777777779;550;;;4.645252173913043;0.08703391304347825;;ac476639-0ef2-4485-bb73-d446948eb7c6
+9;Others;2;Energy carrier - delivery free user;1;natural gas;ID;natural gas;kWh;7.92;760;;;4.356000000000001;0.264;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;ID;coal;kWh;8.14;760;;;4.356000000000001;0.44000000000000006;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;ID;lignite;kWh;2.68;700;;;4.752000000000001;0.47300000000000003;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;ID;diesel;kWh;11.57;840;;;4.356000000000001;0.3013828867761452;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;ID;cerosin;kWh;11.11111111111111;800;;;4.356000000000001;0.31383;Source:  [Rhetors-Kerosin](https://www.rhetos.de/html/lex/kerosin.htm);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;ID;fire wood (log wood);kWh;4.2;500;;;0.7920000000000001;0.013200000000000002;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;ID;fire wood (wood chips);kWh;4.3;230;;;0.7920000000000001;0.0242;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;ID;fire wood (wood pellets);kWh;4.9;650;;;0.7920000000000001;0.033;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;ID;char coal;kWh;9.027777777777779;350;;;0.7920000000000001;0.038500000000000006;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;5;Electricity;VN;electricity ;kWh;;;;;1.7560486812481808;0.40980072;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;VN;Light fuel oil;kWh;11.72;860;;;4.732252559726963;0.06290273037542662;;de4f1273-f63f-4c2e-998c-639cb0e6e2c3
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;VN;Heavy fuel oil;kWh;11.75;930;;;4.1060425531914895;0.057649361702127665;;2efcb539-f2f6-4db4-97ae-ece46761395d
+9;Others;2;Energy carrier - delivery free user;2;Liquid gas;VN;Liquefied petroleum gas (LPG);kWh;12.777777777777779;550;;;4.645252173913043;0.08703391304347825;;ac476639-0ef2-4485-bb73-d446948eb7c6
+9;Others;2;Energy carrier - delivery free user;1;natural gas;VN;natural gas;kWh;7.92;760;;;4.356000000000001;0.264;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;VN;coal;kWh;8.14;760;;;4.356000000000001;0.44000000000000006;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;VN;lignite;kWh;2.68;700;;;4.752000000000001;0.47300000000000003;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;VN;diesel;kWh;11.57;840;;;4.356000000000001;0.3013828867761452;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;VN;cerosin;kWh;11.11111111111111;800;;;4.356000000000001;0.31383;Source:  [Rhetors-Kerosin](https://www.rhetos.de/html/lex/kerosin.htm);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;VN;fire wood (log wood);kWh;4.2;500;;;0.7920000000000001;0.013200000000000002;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;VN;fire wood (wood chips);kWh;4.3;230;;;0.7920000000000001;0.0242;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;VN;fire wood (wood pellets);kWh;4.9;650;;;0.7920000000000001;0.033;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;VN;char coal;kWh;9.027777777777779;350;;;0.7920000000000001;0.038500000000000006;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;5;Electricity;KH;electricity ;kWh;;;;;1.7899286199984605;0.41770712;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;KH;Light fuel oil;kWh;11.72;860;;;4.732252559726963;0.06290273037542662;;de4f1273-f63f-4c2e-998c-639cb0e6e2c3
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;KH;Heavy fuel oil;kWh;11.75;930;;;4.1060425531914895;0.057649361702127665;;2efcb539-f2f6-4db4-97ae-ece46761395d
+9;Others;2;Energy carrier - delivery free user;2;Liquid gas;KH;Liquefied petroleum gas (LPG);kWh;12.777777777777779;550;;;4.645252173913043;0.08703391304347825;;ac476639-0ef2-4485-bb73-d446948eb7c6
+9;Others;2;Energy carrier - delivery free user;1;natural gas;KH;natural gas;kWh;7.92;760;;;4.356000000000001;0.264;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;KH;coal;kWh;8.14;760;;;4.356000000000001;0.44000000000000006;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;KH;lignite;kWh;2.68;700;;;4.752000000000001;0.47300000000000003;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;KH;diesel;kWh;11.57;840;;;4.356000000000001;0.3013828867761452;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;KH;cerosin;kWh;11.11111111111111;800;;;4.356000000000001;0.31383;Source:  [Rhetors-Kerosin](https://www.rhetos.de/html/lex/kerosin.htm);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;KH;fire wood (log wood);kWh;4.2;500;;;0.7920000000000001;0.013200000000000002;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;KH;fire wood (wood chips);kWh;4.3;230;;;0.7920000000000001;0.0242;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;KH;fire wood (wood pellets);kWh;4.9;650;;;0.7920000000000001;0.033;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;KH;char coal;kWh;9.027777777777779;350;;;0.7920000000000001;0.038500000000000006;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;5;Electricity;TH;electricity ;kWh;;;;;2.4028552952866464;0.5607428999999999;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;TH;Light fuel oil;kWh;11.72;860;;;4.732252559726963;0.06290273037542662;;de4f1273-f63f-4c2e-998c-639cb0e6e2c3
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;TH;Heavy fuel oil;kWh;11.75;930;;;4.1060425531914895;0.057649361702127665;;2efcb539-f2f6-4db4-97ae-ece46761395d
+9;Others;2;Energy carrier - delivery free user;2;Liquid gas;TH;Liquefied petroleum gas (LPG);kWh;12.777777777777779;550;;;4.645252173913043;0.08703391304347825;;ac476639-0ef2-4485-bb73-d446948eb7c6
+9;Others;2;Energy carrier - delivery free user;1;natural gas;TH;natural gas;kWh;7.92;760;;;4.356000000000001;0.264;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;TH;coal;kWh;8.14;760;;;4.356000000000001;0.44000000000000006;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;TH;lignite;kWh;2.68;700;;;4.752000000000001;0.47300000000000003;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;TH;diesel;kWh;11.57;840;;;4.356000000000001;0.3013828867761452;GEG (German Building Energy Law, additonal data);
+9;Others;2;Energy carrier - delivery free user;3;Heating oil;TH;cerosin;kWh;11.11111111111111;800;;;4.356000000000001;0.31383;Source:  [Rhetors-Kerosin](https://www.rhetos.de/html/lex/kerosin.htm);
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;TH;fire wood (log wood);kWh;4.2;500;;;0.7920000000000001;0.013200000000000002;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;TH;fire wood (wood chips);kWh;4.3;230;;;0.7920000000000001;0.0242;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;TH;fire wood (wood pellets);kWh;4.9;650;;;0.7920000000000001;0.033;Rechnagel, T2.9.2-1;
+9;Others;2;Energy carrier - delivery free user;10;solid fuel;TH;char coal;kWh;9.027777777777779;350;;;0.7920000000000001;0.038500000000000006;GEG (German Building Energy Law, additonal data);
