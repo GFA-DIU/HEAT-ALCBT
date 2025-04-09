@@ -122,7 +122,9 @@ def filter_by_dimension(epds: BaseManager[EPD], dimension: AssemblyDimension):
                 ) | ~Q(declared_unit=Unit.KG)
             )
         case _:
-            return epds
+            raise ValueError(
+                f"Unsupported dimension '{dimension}'"
+            )
 
     return epds.filter(declared_unit__in=declared_units).filter(additional_filters)
 
@@ -135,6 +137,11 @@ def get_filtered_epd_list(request, dimension=None, operational=False):
         filtered_epds = filtered_epds.filter(
             category__parent__category_id="9.2", declared_unit=Unit.KWH, type=EPDType.GENERIC
         )
+    else:
+        filtered_epds = filtered_epds.filter(
+            ~(Q(category__parent__category_id="9.2") | Q(declared_unit=Unit.KWH))
+        )
+        
     if (
         request.method == "POST"
         and request.POST.get("action") == "filter"
