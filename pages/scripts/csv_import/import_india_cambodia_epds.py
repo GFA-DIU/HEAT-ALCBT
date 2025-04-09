@@ -1,4 +1,3 @@
-import logging
 import pandas as pd
 
 from pages.models.epd import EPD, EPDType, MaterialCategory
@@ -7,9 +6,25 @@ from pages.scripts.csv_import.utils import (
     get_conversions,
     get_country,
     get_superuser,
+    get_category
 )
 
+import logging
+# Configure the logger
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # or the appropriate level for your use case
+
+# Create a console handler with a specific log level
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+
+# Create a formatter and add it to the handler
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+console_handler.setFormatter(formatter)
+
+# Add the handler to the logger
+logger.addHandler(console_handler)
+
 
 impact_columns = [
     "penrt_a1a3 [MJ]",
@@ -22,27 +37,8 @@ impact_columns = [
     "gwp_d [kgCo2e]",
 ]
 
-
-def get_category(row):
-    if not pd.isna(row["level_2_index"]):
-        if len(str(row["level_2_index"])) == 1:
-            level_2_index = f"0{row['level_2_index']}"
-        else:
-            level_2_index = str(row["level_2_index"])
-        category_id = f"{row['level_0_index']}.{row['level_1_index']}.{level_2_index}"
-        category, _ = MaterialCategory.objects.get_or_create(
-            category_id=category_id, level=3
-        )
-        return category
-
-def get_declared_amount(row):
-    declared_amount = row.get("declared_amount", 1.0)
-    if pd.isna(declared_amount):
-        declared_amount = 1.0
-    return declared_amount
-
-def import_generic_structural_epds():
-    file_path = "pages/data/generic_EPDs.csv"
+def import_epds():
+    file_path = "pages/data/india_cambodia_EPDs_20250324.csv"
     superuser = get_superuser()
 
     try:
@@ -59,20 +55,22 @@ def import_generic_structural_epds():
         print(f"Row {index} is being processed.")
         try:
             conversions = get_conversions(row)
-            declared_amount = get_declared_amount(row)
+            declared_amount = row.get("declared_amount", 1.0)
+            if pd.isna(declared_amount):
+                declared_amount = 1.0
             
             new_epd = EPD(
                 country=get_country(row["country"]),
-                source="GFA-HEAT",
+                source=row["source"],
                 name=row["name"],
                 names=[{"lang": "en", "value": row["name"]}],
                 public=True,
                 conversions=conversions,
                 category=get_category(row),
                 declared_unit=row["declared_unit"],
-                type=EPDType.GENERIC,
+                type=EPDType.OFFICIAL,
                 declared_amount=declared_amount,
-                comment=f"Created based on {row['UUID']} (https://oekobaudat.de/OEKOBAU.DAT/datasetdetail/process.xhtml?uuid={row['UUID']})",
+                comment=row['description'],
                 created_by_id=superuser.id,
             )
             new_epd.save()
@@ -81,10 +79,11 @@ def import_generic_structural_epds():
             success += 1
 
         except Exception as e:
-            logger.exception("Error in row %s", index)
+            logger.exception(f"Error in row {index}: {e}")
+            # print(f"Error in row {index}: {e}")
+            # print(f"{type(e).__name__}")
             failure += 1
             failure_list.append(index)
-            raise Exception(f"Error in row {index}: {e}\n  Row: {row}")
 
     if failure == 0:
         print(

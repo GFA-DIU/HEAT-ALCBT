@@ -1,4 +1,6 @@
+from decimal import Decimal
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext as _
 
@@ -6,6 +8,7 @@ from cities_light.models import Country
 from accounts.models import CustomCity
 
 from .base import BaseModel
+
 
 
 INDICATOR_UNIT_MAPPING = {
@@ -257,6 +260,7 @@ class EPD(BaseModel, epdLCAx):
         _("Reference Quantity of EPD"),
         max_digits=10,
         decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
         null=False,
         blank=False,
     )

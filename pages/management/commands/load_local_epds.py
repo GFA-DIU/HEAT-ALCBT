@@ -8,11 +8,13 @@ from pages.scripts.csv_import.import_generic_structural_epds import (
     import_generic_structural_epds,
 )
 from pages.scripts.csv_import.import_edge_handbook_epds import import_EDGE_EPDs
+from pages.scripts.csv_import.import_india_cambodia_epds import import_epds
 
 
 local_epd_files = {
     "EDGE_HANDBOOK_EPDs": import_EDGE_EPDs,
     "generic_EPDs": import_generic_structural_epds,
+    "india_cambodia_EPDs_20250324": import_epds,
     "generic_operationaL_EPDs": import_generic_operational_epds
 }
 
