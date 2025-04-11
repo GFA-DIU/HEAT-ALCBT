@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from pages.forms.building_detailed_info import BuildingDetailedInformation
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.forms.epds_filter_form import EPDsFilterForm
+from pages.forms.operational_info_form import OperationalInfoForm
 from pages.models.assembly import DIMENSION_UNIT_MAPPING
 from pages.models.building import (
     Building,
@@ -41,16 +42,18 @@ def building(request, building_id=None):
     if request.method == "POST":
         match request.POST.get("action"):
             case "general_information":
-                return handle_information_submit(request, building_id, True)
+                return handle_information_submit(request, building_id, "general")
             case "detailed_information":
-                return handle_information_submit(request, building_id, False)
+                return handle_information_submit(request, building_id, "detailed")
+            case "operational_info":
+                return handle_information_submit(request, building_id, "operational")
             case "filter":
                 return get_op_product_list(request, building_id)
             case "select_op_product":
                 return get_op_product(request, building_id)
             case "save_op_products":
                 handle_op_products_save(request, building_id)
-                context, form, detailedForm = handle_building_load(
+                context, form, detailedForm, _ = handle_building_load(
                     request, building_id, simulation=False
                 )
                 context["edit_mode"] = False
@@ -62,7 +65,7 @@ def building(request, building_id=None):
                 response["HX-Refresh"] = "true"  # Add the HX-Refresh header
                 return response
             case "edit_products":
-                context, _, _ = handle_building_load(
+                context, _, _, _ = handle_building_load(
                     request, building_id, simulation=False
                 )
                 context["edit_mode"] = True
@@ -84,7 +87,7 @@ def building(request, building_id=None):
             return get_op_product_list(request, building_id)
         # Full reload
         if building_id:
-            context, form, detailedForm = handle_building_load(
+            context, form, detailedForm, operationalInfoForm = handle_building_load(
                 request, building_id, simulation=False
             )
         else:
@@ -97,9 +100,12 @@ def building(request, building_id=None):
             }
             form = BuildingGeneralInformation()
             detailedForm = BuildingDetailedInformation()
+            operationalInfoForm = OperationalInfoForm()
 
     context["form_general_info"] = form
     context["form_detailed_info"] = detailedForm
+    context["form_operational_info"] = operationalInfoForm
+    
     context["simulation"] = False
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
@@ -162,6 +168,7 @@ def handle_building_load(request, building_id, simulation):
 
     form = BuildingGeneralInformation(instance=building)
     detailedForm = BuildingDetailedInformation(instance=building)
+    operationalInfoForm = OperationalInfoForm(instance=building)
 
     logger.info(
         "Found building: %s with %d structural components",
@@ -169,24 +176,29 @@ def handle_building_load(request, building_id, simulation):
         len(context["structural_components"]),
     )
 
-    return context, form, detailedForm
+    return context, form, detailedForm, operationalInfoForm
 
 
 @transaction.atomic
-def handle_information_submit(request, building_id, general):
+def handle_information_submit(request, building_id, form):
     building = (
         get_object_or_404(Building, created_by=request.user, pk=building_id)
         if building_id
         else None
     )
-    if general:
-        form = BuildingGeneralInformation(
-            request.POST, instance=building
-        )  # Bind form to instance
-    else:
-        form = BuildingDetailedInformation(
-            request.POST, instance=building
-        )  # Bind form to instance
+    match form:
+        case "general":
+            form = BuildingGeneralInformation(
+                request.POST, instance=building
+            )  # Bind form to instance
+        case "detailed":
+            form = BuildingDetailedInformation(
+                request.POST, instance=building
+            )  # Bind form to instance
+        case "operational":
+            form = OperationalInfoForm(
+                request.POST, instance=building
+            )  # Bind form to instance
     try:
         if form.is_valid():
             building = form.save(commit=False)
@@ -215,7 +227,6 @@ def handle_information_submit(request, building_id, general):
             form.errors,
         )
         return HttpResponseServerError()
-
 
 @transaction.atomic
 def handle_assembly_delete(request, building_id, simulation):

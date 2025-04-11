@@ -1,0 +1,164 @@
+{% load crispy_forms_tags %} {% if building_id %}
+<form action="{% url 'building' building_id=building_id %}" method="post">
+  <!-- Create an identifier for this post request -->
+  <input type="hidden" name="action" value="operational_info" />
+  {% csrf_token %}
+
+  <div class="row align-items-start">
+    <!-- Number of Residents -->
+    <div class="col-md-2">
+      <label for="{{ form_operational_info.num_residents.id_for_label }}" class="form-label">
+        {{ form_operational_info.num_residents.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_operational_info.num_residents }}
+      </div>
+    </div>
+  
+    <!-- Operations Fields -->
+    <div class="col-md-10">
+      <label class="form-label">Operations</label>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="input-group mb-1">
+            {{ form_operational_info.hours_per_workday }}
+            <span class="input-group-text">
+              <small class="text-muted fw-light" style="font-size: 0.8rem;">
+                {{ form_operational_info.hours_per_workday.help_text }}
+              </small>
+            </span>
+          </div>
+        </div>
+  
+        <div class="col-md-4">
+          <div class="input-group mb-1">
+            {{ form_operational_info.workdays_per_week }}
+            <span class="input-group-text">
+              <small class="text-muted fw-light" style="font-size: 0.8rem;">
+                {{ form_operational_info.workdays_per_week.help_text }}
+              </small>
+            </span>
+          </div>
+        </div>
+  
+        <div class="col-md-4">
+          <div class="input-group mb-1">
+            {{ form_operational_info.weeks_per_year }}
+            <span class="input-group-text">
+              <small class="text-muted fw-light" style="font-size: 0.8rem;">
+                {{ form_operational_info.weeks_per_year.help_text }}
+              </small>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="row">
+    <div class="col-md-6">
+      <label for="{{ form_operational_info.heating_temp.id_for_label }}" class="form-label">
+        {{ form_operational_info.heating_temp.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_operational_info.heating_temp }} {{ form_operational_info.heating_temp_unit }}
+      </div>
+    </div>
+    <div class="col-md-6">
+      <label for="{{ form_operational_info.cooling_temp.id_for_label }}" class="form-label">
+        {{ form_operational_info.cooling_temp.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_operational_info.cooling_temp }} {{ form_operational_info.cooling_temp_unit }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Heating -->
+  <div class="row">
+    <div class="col-md-7">
+      <label for="{{ form_operational_info.heating_type.id_for_label }}" class="form-label">
+        {{ form_operational_info.heating_type.label }}
+      </label>
+      <div class="input-group mb-1">{{ form_operational_info.heating_type }}</div>
+    </div>
+  
+    <div class="col-md-5">
+      <label for="{{ form_operational_info.heating_capacity.id_for_label }}" class="form-label">
+        {{ form_operational_info.heating_capacity.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_operational_info.heating_capacity }} {{ form_operational_info.heating_unit }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Cooling -->
+  <div class="row">
+    <div class="col-md-7">
+      <label for="{{ form_operational_info.cooling_type.id_for_label }}" class="form-label">
+        {{ form_operational_info.cooling_type.label }}
+      </label>
+      <div class="input-group mb-1">{{ form_operational_info.cooling_type }}</div>
+    </div>
+  
+    <div class="col-md-5">
+      <label for="{{ form_operational_info.cooling_capacity.id_for_label }}" class="form-label">
+        {{ form_operational_info.cooling_capacity.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_operational_info.cooling_capacity }} {{ form_operational_info.cooling_unit }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Ventilation -->
+   <div class="row">
+     <div class="col-md-7">
+       <label for="{{ form_operational_info.ventilation_type.id_for_label }}" class="form-label">
+         {{ form_operational_info.ventilation_type.label }}
+       </label>
+       <div class="input-group mb-1">{{ form_operational_info.ventilation_type }}</div>
+     </div>
+   
+     <div class="col-md-5">
+       <label
+         for="{{ form_operational_info.ventilation_capacity.id_for_label }}"
+         class="form-label"
+       >
+         {{ form_operational_info.ventilation_capacity.label }}
+       </label>
+       <div class="input-group mb-1">
+         {{ form_operational_info.ventilation_capacity }} {{ form_operational_info.ventilation_unit }}
+       </div>
+     </div>
+   </div>
+
+  <!-- Lighting -->
+   <div class="row">
+     <div class="col-md-7">
+       <label for="{{ form_operational_info.lighting_type.id_for_label }}" class="form-label">
+         {{ form_operational_info.lighting_type.label }}
+       </label>
+       <div class="input-group mb-1">{{ form_operational_info.lighting_type }}</div>
+     </div>
+   
+     <div class="col-md-5">
+       <label for="{{ form_operational_info.lighting_capacity.id_for_label }}" class="form-label">
+         {{ form_operational_info.lighting_capacity.label }}
+       </label>
+       <div class="input-group mb-1">
+         {{ form_operational_info.lighting_capacity }} {{ form_operational_info.lighting_unit }}
+       </div>
+     </div>
+   </div>
+
+
+  <button id="save_button" type="submit" class="btn btn-primary mt-1"
+  {% if simulation %}disabled{%endif%}
+  >
+    Save
+  </button>
+</form>
+{% endif %}
