@@ -51,7 +51,7 @@ def building_simulation(request, building_id):
                 return get_op_product_list(request, building_id)
             case "save_op_products":
                 handle_op_products_save(request, building_id, simulation=True)
-                context, form, detailedForm = handle_building_load(
+                context, form, detailedForm, _ = handle_building_load(
                     request, building_id, simulation=True
                 )
                 context["edit_mode"] = False
@@ -63,7 +63,7 @@ def building_simulation(request, building_id):
                 response["HX-Refresh"] = "true"  # Add the HX-Refresh header
                 return response
             case "edit_products":
-                context, _, _ = handle_building_load(
+                context, _, _, _ = handle_building_load(
                     request, building_id, simulation=True
                 )
                 context["edit_mode"] = True
