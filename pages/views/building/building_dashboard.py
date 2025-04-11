@@ -111,8 +111,11 @@ def prep_building_dashboard_df(user, building_id, simulation):
         df["assembly_category"] = df["assembly_category"].apply(lambda x: x.__str__())
         df["material_category"] = df["material_category"].apply(lambda x: x.__str__())
         df = df[df["impact_type"].isin(["gwp a1a3", "penrt a1a3"])]
+        df['assembly_epd_id'] = df.groupby(
+            ["assembly_id", "epd_id", "assembly_category", "material_category"]
+        ).cumcount()
         df = df.pivot(
-            index=["assembly_id", "epd_id", "assembly_category", "material_category"],
+            index=["assembly_id", "epd_id", "assembly_category", "material_category", "assembly_epd_id"],
             columns="impact_type",
             values="impact_value",
         ).reset_index()
