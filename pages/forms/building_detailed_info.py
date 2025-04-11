@@ -17,11 +17,6 @@ class BuildingDetailedInformation(forms.ModelForm):
             "floors_below_ground",
         ]
 
-        error_messages = {
-            "name": {
-                "max_length": _("This writer's name is too long."),
-            },
-        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
