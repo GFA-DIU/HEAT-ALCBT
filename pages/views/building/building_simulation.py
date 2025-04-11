@@ -93,8 +93,10 @@ def building_simulation(request, building_id):
             form.helper.layout[3].flat_attrs = "disabled"
         if hasattr(detailedForm.helper.layout[3], "flat_attrs"):
             detailedForm.helper.layout[3].flat_attrs = "disabled"
-        if hasattr(operationalInfoForm.helper.layout[3], "flat_attrs"):
-            operationalInfoForm.helper.layout[3].flat_attrs = "disabled"
+        
+        # operational form does this in the template
+        # if hasattr(operationalInfoForm.helper.layout[3], "flat_attrs"):
+        #     operationalInfoForm.helper.layout[3].flat_attrs = "disabled"
 
         context["form_general_info"] = form
         context["form_detailed_info"] = detailedForm

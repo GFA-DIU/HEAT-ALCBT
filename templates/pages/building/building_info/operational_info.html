@@ -154,7 +154,10 @@
      </div>
    </div>
 
-  <button id="save_button" type="submit" class="btn btn-primary mt-1">
+
+  <button id="save_button" type="submit" class="btn btn-primary mt-1"
+  {% if simulation %}disabled{%endif%}
+  >
     Save
   </button>
 </form>
