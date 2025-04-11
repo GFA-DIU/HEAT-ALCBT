@@ -170,4 +170,25 @@ class OperationalInfoForm(forms.ModelForm):
 
     class Meta:
         model = Building
-        fields = []
+        fields = [
+            "num_residents",
+            "weeks_per_year",
+            "hours_per_workday",
+            "heating_temp",
+            "heating_temp_unit",
+            "workdays_per_week",
+            "cooling_temp",
+            "cooling_temp_unit",
+            "heating_type",
+            "heating_capacity",
+            "heating_unit",
+            "cooling_type",
+            "cooling_capacity",
+            "cooling_unit",
+            "ventilation_type",
+            "ventilation_capacity",
+            "ventilation_unit",
+            "lighting_type",
+            "lighting_capacity",
+            "lighting_unit",
+        ]
