@@ -47,7 +47,7 @@ class AssemblyTechnique(models.Model):
     Represents an individual assembly category within a group.
     """
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     class Meta:
         # ordering = ["numeric_identifier"]  # Default ordering by order field
@@ -85,6 +85,9 @@ class AssemblyCategoryTechnique(models.Model):
         AssemblyTechnique, on_delete=models.CASCADE, null=True, blank=True
     )
     description = models.TextField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("category", "technique")
 
 
 class Assembly(BaseModel):
