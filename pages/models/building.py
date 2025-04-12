@@ -48,7 +48,7 @@ class LightingType(models.TextChoices):
 
 
 class BuildingSubcategory(models.Model):
-    name = models.CharField(_("Name"), max_length=255)
+    name = models.CharField(_("Name"), max_length=255, unique=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -59,7 +59,7 @@ class BuildingSubcategory(models.Model):
 
 
 class BuildingCategory(models.Model):
-    name = models.CharField(_("Name"), max_length=255)
+    name = models.CharField(_("Name"), max_length=255, unique=True)
     subcategories = models.ManyToManyField(
         BuildingSubcategory,
         through="CategorySubcategory",
