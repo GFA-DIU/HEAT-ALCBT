@@ -700,8 +700,8 @@
         "pk": 1,
         "fields": {
             "category": 1,
-            "technique": 1,
-            "description": "One of the most popular and conventional floor slab construction types, this floor slab uses Portland cement, sand, aggregate, water and reinforcing steel."
+            "technique": null,
+            "description": null
         }
     },
     {
@@ -709,13 +709,22 @@
         "pk": 2,
         "fields": {
             "category": 1,
+            "technique": 1,
+            "description": "One of the most popular and conventional floor slab construction types, this floor slab uses Portland cement, sand, aggregate, water and reinforcing steel."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 3,
+        "fields": {
+            "category": 1,
             "technique": 2,
             "description": "Filler slab construction is technology based on the principal of using filler materials such as brick, clay tiles and cellular concrete blocks instead of concrete. The filler materials are used in the lower tensile region of the slab, which needs only enough concrete to hold the steel reinforcement together. Filler slab uses less concrete as well as steel due to the lightweight quality of the slab. It is also more cost-effective compared to conventional in-situ reinforced concrete slab."
         }
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 3,
+        "pk": 4,
         "fields": {
             "category": 1,
             "technique": 3,
@@ -724,7 +733,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 4,
+        "pk": 5,
         "fields": {
             "category": 1,
             "technique": 4,
@@ -733,7 +742,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 5,
+        "pk": 6,
         "fields": {
             "category": 1,
             "technique": 5,
@@ -742,7 +751,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 6,
+        "pk": 7,
         "fields": {
             "category": 1,
             "technique": 6,
@@ -751,7 +760,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 7,
+        "pk": 8,
         "fields": {
             "category": 1,
             "technique": 7,
@@ -760,7 +769,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 8,
+        "pk": 9,
+        "fields": {
+            "category": 2,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 10,
         "fields": {
             "category": 2,
             "technique": 1,
@@ -769,7 +787,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 9,
+        "pk": 11,
         "fields": {
             "category": 2,
             "technique": 2,
@@ -778,7 +796,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 10,
+        "pk": 12,
         "fields": {
             "category": 2,
             "technique": 3,
@@ -787,7 +805,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 11,
+        "pk": 13,
         "fields": {
             "category": 2,
             "technique": 4,
@@ -796,7 +814,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 12,
+        "pk": 14,
         "fields": {
             "category": 2,
             "technique": 5,
@@ -805,7 +823,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 13,
+        "pk": 15,
         "fields": {
             "category": 2,
             "technique": 6,
@@ -814,7 +832,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 14,
+        "pk": 16,
         "fields": {
             "category": 2,
             "technique": 7,
@@ -823,7 +841,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 15,
+        "pk": 17,
+        "fields": {
+            "category": 3,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 18,
         "fields": {
             "category": 3,
             "technique": 8,
@@ -832,7 +859,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 16,
+        "pk": 19,
         "fields": {
             "category": 3,
             "technique": 9,
@@ -841,7 +868,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 17,
+        "pk": 20,
         "fields": {
             "category": 3,
             "technique": 10,
@@ -850,7 +877,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 18,
+        "pk": 21,
+        "fields": {
+            "category": 4,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 22,
         "fields": {
             "category": 4,
             "technique": 11,
@@ -859,7 +895,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 19,
+        "pk": 23,
         "fields": {
             "category": 4,
             "technique": 2,
@@ -868,7 +904,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 20,
+        "pk": 24,
         "fields": {
             "category": 4,
             "technique": 3,
@@ -877,7 +913,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 21,
+        "pk": 25,
         "fields": {
             "category": 4,
             "technique": 12,
@@ -886,7 +922,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 22,
+        "pk": 26,
         "fields": {
             "category": 4,
             "technique": 5,
@@ -895,7 +931,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 23,
+        "pk": 27,
         "fields": {
             "category": 4,
             "technique": 13,
@@ -904,7 +940,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 24,
+        "pk": 28,
         "fields": {
             "category": 4,
             "technique": 14,
@@ -913,7 +949,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 25,
+        "pk": 29,
         "fields": {
             "category": 4,
             "technique": 15,
@@ -922,7 +958,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 26,
+        "pk": 30,
         "fields": {
             "category": 4,
             "technique": 16,
@@ -931,7 +967,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 27,
+        "pk": 31,
         "fields": {
             "category": 4,
             "technique": 17,
@@ -940,7 +976,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 28,
+        "pk": 32,
         "fields": {
             "category": 4,
             "technique": 18,
@@ -949,7 +985,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 29,
+        "pk": 33,
         "fields": {
             "category": 4,
             "technique": 19,
@@ -958,7 +994,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 30,
+        "pk": 34,
+        "fields": {
+            "category": 5,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 35,
         "fields": {
             "category": 5,
             "technique": 20,
@@ -967,7 +1012,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 31,
+        "pk": 36,
         "fields": {
             "category": 5,
             "technique": 21,
@@ -976,7 +1021,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 32,
+        "pk": 37,
         "fields": {
             "category": 5,
             "technique": 22,
@@ -985,7 +1030,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 33,
+        "pk": 38,
+        "fields": {
+            "category": 6,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 39,
         "fields": {
             "category": 6,
             "technique": 23,
@@ -994,7 +1048,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 34,
+        "pk": 40,
         "fields": {
             "category": 6,
             "technique": 24,
@@ -1003,7 +1057,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 35,
+        "pk": 41,
+        "fields": {
+            "category": 7,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 42,
         "fields": {
             "category": 7,
             "technique": 25,
@@ -1012,7 +1075,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 36,
+        "pk": 43,
         "fields": {
             "category": 7,
             "technique": 26,
@@ -1021,7 +1084,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 37,
+        "pk": 44,
+        "fields": {
+            "category": 8,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 45,
         "fields": {
             "category": 8,
             "technique": 27,
@@ -1030,7 +1102,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 38,
+        "pk": 46,
         "fields": {
             "category": 8,
             "technique": 28,
@@ -1039,7 +1111,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 39,
+        "pk": 47,
         "fields": {
             "category": 8,
             "technique": 29,
@@ -1048,7 +1120,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 40,
+        "pk": 48,
         "fields": {
             "category": 8,
             "technique": 30,
@@ -1057,7 +1129,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 41,
+        "pk": 49,
         "fields": {
             "category": 8,
             "technique": 31,
@@ -1066,7 +1138,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 42,
+        "pk": 50,
         "fields": {
             "category": 8,
             "technique": 32,
@@ -1075,7 +1147,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 43,
+        "pk": 51,
         "fields": {
             "category": 8,
             "technique": 33,
@@ -1084,7 +1156,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 44,
+        "pk": 52,
         "fields": {
             "category": 8,
             "technique": 34,
@@ -1093,7 +1165,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 45,
+        "pk": 53,
         "fields": {
             "category": 8,
             "technique": 35,
@@ -1102,7 +1174,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 46,
+        "pk": 54,
         "fields": {
             "category": 8,
             "technique": 36,
@@ -1111,7 +1183,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 47,
+        "pk": 55,
         "fields": {
             "category": 8,
             "technique": 37,
@@ -1120,7 +1192,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 48,
+        "pk": 56,
         "fields": {
             "category": 8,
             "technique": 19,
@@ -1129,7 +1201,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 49,
+        "pk": 57,
+        "fields": {
+            "category": 9,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 58,
         "fields": {
             "category": 9,
             "technique": 38,
@@ -1138,7 +1219,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 50,
+        "pk": 59,
         "fields": {
             "category": 9,
             "technique": 39,
@@ -1147,7 +1228,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 51,
+        "pk": 60,
         "fields": {
             "category": 9,
             "technique": 29,
@@ -1156,7 +1237,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 52,
+        "pk": 61,
         "fields": {
             "category": 9,
             "technique": 30,
@@ -1165,7 +1246,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 53,
+        "pk": 62,
         "fields": {
             "category": 9,
             "technique": 31,
@@ -1174,7 +1255,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 54,
+        "pk": 63,
         "fields": {
             "category": 9,
             "technique": 32,
@@ -1183,7 +1264,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 55,
+        "pk": 64,
         "fields": {
             "category": 9,
             "technique": 33,
@@ -1192,7 +1273,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 56,
+        "pk": 65,
         "fields": {
             "category": 9,
             "technique": 40,
@@ -1201,7 +1282,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 57,
+        "pk": 66,
         "fields": {
             "category": 9,
             "technique": 34,
@@ -1210,7 +1291,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 58,
+        "pk": 67,
         "fields": {
             "category": 9,
             "technique": 41,
@@ -1219,7 +1300,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 59,
+        "pk": 68,
         "fields": {
             "category": 9,
             "technique": 42,
@@ -1228,7 +1309,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 60,
+        "pk": 69,
         "fields": {
             "category": 9,
             "technique": 43,
@@ -1237,7 +1318,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 61,
+        "pk": 70,
         "fields": {
             "category": 9,
             "technique": 44,
@@ -1246,7 +1327,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 62,
+        "pk": 71,
         "fields": {
             "category": 9,
             "technique": 45,
@@ -1255,7 +1336,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 63,
+        "pk": 72,
         "fields": {
             "category": 9,
             "technique": 46,
@@ -1264,7 +1345,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 64,
+        "pk": 73,
         "fields": {
             "category": 9,
             "technique": 47,
@@ -1273,7 +1354,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 65,
+        "pk": 74,
+        "fields": {
+            "category": 10,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 75,
         "fields": {
             "category": 10,
             "technique": 48,
@@ -1282,7 +1372,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 66,
+        "pk": 76,
         "fields": {
             "category": 10,
             "technique": 49,
@@ -1291,7 +1381,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 67,
+        "pk": 77,
         "fields": {
             "category": 10,
             "technique": 50,
@@ -1300,7 +1390,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 68,
+        "pk": 78,
         "fields": {
             "category": 10,
             "technique": 51,
@@ -1309,7 +1399,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 69,
+        "pk": 79,
         "fields": {
             "category": 10,
             "technique": 52,
@@ -1318,7 +1408,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 70,
+        "pk": 80,
         "fields": {
             "category": 10,
             "technique": 53,
@@ -1327,7 +1417,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 71,
+        "pk": 81,
+        "fields": {
+            "category": 11,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 82,
         "fields": {
             "category": 11,
             "technique": 54,
@@ -1336,7 +1435,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 72,
+        "pk": 83,
         "fields": {
             "category": 11,
             "technique": 55,
@@ -1345,7 +1444,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 73,
+        "pk": 84,
         "fields": {
             "category": 11,
             "technique": 56,
@@ -1354,116 +1453,134 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 74,
-        "fields": {
-            "category": 12,
-            "technique": 57,
-            "description": "Polystyrene has the highest embodied energy per square meter of any other insulation type. There are two types of polystyrene insulation: Expanded Polystyrene (EPS) insulation is made from small beads of polystyrene that when heated cause them to expand; they are then mixed with a blowing agent (pentane). Expanded polystyrene is available in board form or as beads. Boards are produced by placing the beads in molds and heating them to fuse the beads together. Typical applications of EPS boards are for insulation of walls, roofs and floors. Polystyrene beads are frequently used as cavity fill in masonry walls. Extruded Polystyrene (XPS) is made by mixing polystyrene with a blowing agent under pressure and forcing it through a die. As it emerges from the die it expands into foam; it can then be shaped and trimmed. XPS is slightly stronger than EPS, and although it is used in many of the same applications as EPS, it is particularly suitable for use below ground or where extra loading and/or impacts might be anticipated."
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
-        "pk": 75,
-        "fields": {
-            "category": 12,
-            "technique": 58,
-            "description": "Rock-based mineral wool is made by melting rock and recycled steel slag and spinning it into fibers. The insulation is available in different densities depending on the required functionality. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls and insulation for roof rafters, lofts and suspended floors. Mineral wool has low resistance for moisture."
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
-        "pk": 76,
-        "fields": {
-            "category": 12,
-            "technique": 59,
-            "description": "Glass wool insulation is manufactured in a similar way to rock wool, though the raw materials are different as well as the melting process. Glass wool is made from silica sand, recycled glass, limestone and soda ash. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls, and insulation for roof rafters, lofts and suspended floors."
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
-        "pk": 77,
-        "fields": {
-            "category": 12,
-            "technique": 60,
-            "description": "Polyurethane (PUR), a closed-cell plastic, is formed by reacting two monomers in the presence of a blowing agent catalyst (polymerization). Polyisocyanurate foam (PIR) is an improvement on polyurethane (there is a slight difference in the constituents and the reaction is conducted at higher temperatures). PIR is more fire-resistant and has a slightly higher R Value. Applications include wall, floor and roof insulation. Polyurethane is also popular in laminate form in SIPS and as an insulation backing to rigid boarding such as plasterboard."
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
-        "pk": 78,
-        "fields": {
-            "category": 12,
-            "technique": 61,
-            "description": "Four major types of loose-fill cellulose products have been developed for differing uses in a building under a variety of brand names. These are characterized as: 1. Dry cellulose 2. Spray applied cellulose 3. Stabilized cellulose 4. Low dust cellulose."
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
-        "pk": 79,
-        "fields": {
-            "category": 12,
-            "technique": 62,
-            "description": "Cork has low embodied energy and is environmentally friendly. It can be harvested from the same tree for about two hundred years. Harvesting is done with minimal impact on the environment and no trees are cut down to manufacture cork products."
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
-        "pk": 80,
-        "fields": {
-            "category": 12,
-            "technique": 63,
-            "description": "Woodwool boards have been used in buildings for decades and are a popular substrate for lime plaster. Strands of wood, bound together with a small proportion of Portland cement, provide a good background for lime plasters, eliminate thermal bridges in pillars, beams, inter-story facings and radiator niches and provide insulation of flat and sloping roofs; provide acoustic insulation of walls and insulation from floor noise; as well as fire resistant coverings."
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
-        "pk": 81,
-        "fields": {
-            "category": 12,
-            "technique": 64,
-            "description": "In principle, the use of cavities is like the use of an insulating material. Air is a poor conductor of heat, therefore still air trapped in an air space between two layers of a wall or roof acts as a barrier to heat transfer."
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
-        "pk": 82,
-        "fields": {
-            "category": 12,
-            "technique": 65,
-            "description": "Gaps larger than 100mm encourage convection and are not effective insulators."
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
-        "pk": 83,
-        "fields": {
-            "category": 12,
-            "technique": 66,
-            "description": "This option must be selected if no insulation is specified for the roof or walls."
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
-        "pk": 84,
-        "fields": {
-            "category": 12,
-            "technique": 67,
-            "description": ""
-        }
-    },
-    {
-        "model": "pages.assemblycategorytechnique",
         "pk": 85,
         "fields": {
-            "category": 13,
-            "technique": 57,
-            "description": "Polystyrene has the highest embodied energy per square meter of any other insulation type. There are two types of polystyrene insulation: Expanded Polystyrene (EPS) insulation is made from small beads of polystyrene that when heated cause them to expand; they are then mixed with a blowing agent (pentane). Expanded polystyrene is available in board form or as beads. Boards are produced by placing the beads in molds and heating them to fuse the beads together. Typical applications of EPS boards are for insulation of walls, roofs and floors. Polystyrene beads are frequently used as cavity fill in masonry walls. Extruded Polystyrene (XPS) is made by mixing polystyrene with a blowing agent under pressure and forcing it through a die. As it emerges from the die it expands into foam; it can then be shaped and trimmed. XPS is slightly stronger than EPS, and although it is used in many of the same applications as EPS, it is particularly suitable for use below ground or where extra loading and/or impacts might be anticipated."
+            "category": 12,
+            "technique": null,
+            "description": null
         }
     },
     {
         "model": "pages.assemblycategorytechnique",
         "pk": 86,
         "fields": {
+            "category": 12,
+            "technique": 57,
+            "description": "Polystyrene has the highest embodied energy per square meter of any other insulation type. There are two types of polystyrene insulation: Expanded Polystyrene (EPS) insulation is made from small beads of polystyrene that when heated cause them to expand; they are then mixed with a blowing agent (pentane). Expanded polystyrene is available in board form or as beads. Boards are produced by placing the beads in molds and heating them to fuse the beads together. Typical applications of EPS boards are for insulation of walls, roofs and floors. Polystyrene beads are frequently used as cavity fill in masonry walls. Extruded Polystyrene (XPS) is made by mixing polystyrene with a blowing agent under pressure and forcing it through a die. As it emerges from the die it expands into foam; it can then be shaped and trimmed. XPS is slightly stronger than EPS, and although it is used in many of the same applications as EPS, it is particularly suitable for use below ground or where extra loading and/or impacts might be anticipated."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 87,
+        "fields": {
+            "category": 12,
+            "technique": 58,
+            "description": "Rock-based mineral wool is made by melting rock and recycled steel slag and spinning it into fibers. The insulation is available in different densities depending on the required functionality. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls and insulation for roof rafters, lofts and suspended floors. Mineral wool has low resistance for moisture."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 88,
+        "fields": {
+            "category": 12,
+            "technique": 59,
+            "description": "Glass wool insulation is manufactured in a similar way to rock wool, though the raw materials are different as well as the melting process. Glass wool is made from silica sand, recycled glass, limestone and soda ash. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls, and insulation for roof rafters, lofts and suspended floors."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 89,
+        "fields": {
+            "category": 12,
+            "technique": 60,
+            "description": "Polyurethane (PUR), a closed-cell plastic, is formed by reacting two monomers in the presence of a blowing agent catalyst (polymerization). Polyisocyanurate foam (PIR) is an improvement on polyurethane (there is a slight difference in the constituents and the reaction is conducted at higher temperatures). PIR is more fire-resistant and has a slightly higher R Value. Applications include wall, floor and roof insulation. Polyurethane is also popular in laminate form in SIPS and as an insulation backing to rigid boarding such as plasterboard."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 90,
+        "fields": {
+            "category": 12,
+            "technique": 61,
+            "description": "Four major types of loose-fill cellulose products have been developed for differing uses in a building under a variety of brand names. These are characterized as: 1. Dry cellulose 2. Spray applied cellulose 3. Stabilized cellulose 4. Low dust cellulose."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 91,
+        "fields": {
+            "category": 12,
+            "technique": 62,
+            "description": "Cork has low embodied energy and is environmentally friendly. It can be harvested from the same tree for about two hundred years. Harvesting is done with minimal impact on the environment and no trees are cut down to manufacture cork products."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 92,
+        "fields": {
+            "category": 12,
+            "technique": 63,
+            "description": "Woodwool boards have been used in buildings for decades and are a popular substrate for lime plaster. Strands of wood, bound together with a small proportion of Portland cement, provide a good background for lime plasters, eliminate thermal bridges in pillars, beams, inter-story facings and radiator niches and provide insulation of flat and sloping roofs; provide acoustic insulation of walls and insulation from floor noise; as well as fire resistant coverings."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 93,
+        "fields": {
+            "category": 12,
+            "technique": 64,
+            "description": "In principle, the use of cavities is like the use of an insulating material. Air is a poor conductor of heat, therefore still air trapped in an air space between two layers of a wall or roof acts as a barrier to heat transfer."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 94,
+        "fields": {
+            "category": 12,
+            "technique": 65,
+            "description": "Gaps larger than 100mm encourage convection and are not effective insulators."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 95,
+        "fields": {
+            "category": 12,
+            "technique": 66,
+            "description": "This option must be selected if no insulation is specified for the roof or walls."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 96,
+        "fields": {
+            "category": 12,
+            "technique": 67,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 97,
+        "fields": {
+            "category": 13,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 98,
+        "fields": {
+            "category": 13,
+            "technique": 57,
+            "description": "Polystyrene has the highest embodied energy per square meter of any other insulation type. There are two types of polystyrene insulation: Expanded Polystyrene (EPS) insulation is made from small beads of polystyrene that when heated cause them to expand; they are then mixed with a blowing agent (pentane). Expanded polystyrene is available in board form or as beads. Boards are produced by placing the beads in molds and heating them to fuse the beads together. Typical applications of EPS boards are for insulation of walls, roofs and floors. Polystyrene beads are frequently used as cavity fill in masonry walls. Extruded Polystyrene (XPS) is made by mixing polystyrene with a blowing agent under pressure and forcing it through a die. As it emerges from the die it expands into foam; it can then be shaped and trimmed. XPS is slightly stronger than EPS, and although it is used in many of the same applications as EPS, it is particularly suitable for use below ground or where extra loading and/or impacts might be anticipated."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 99,
+        "fields": {
             "category": 13,
             "technique": 58,
             "description": "Rock-based mineral wool is made by melting rock and recycled steel slag and spinning it into fibers. The insulation is available in different densities depending on the required functionality. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls and insulation for roof rafters, lofts and suspended floors. Mineral wool has low resistance for moisture."
@@ -1471,7 +1588,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 87,
+        "pk": 100,
         "fields": {
             "category": 13,
             "technique": 59,
@@ -1480,7 +1597,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 88,
+        "pk": 101,
         "fields": {
             "category": 13,
             "technique": 60,
@@ -1489,7 +1606,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 89,
+        "pk": 102,
         "fields": {
             "category": 13,
             "technique": 61,
@@ -1498,7 +1615,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 90,
+        "pk": 103,
         "fields": {
             "category": 13,
             "technique": 62,
@@ -1507,7 +1624,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 91,
+        "pk": 104,
         "fields": {
             "category": 13,
             "technique": 63,
@@ -1516,7 +1633,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 92,
+        "pk": 105,
         "fields": {
             "category": 13,
             "technique": 64,
@@ -1525,7 +1642,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 93,
+        "pk": 106,
         "fields": {
             "category": 13,
             "technique": 65,
@@ -1534,7 +1651,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 94,
+        "pk": 107,
         "fields": {
             "category": 13,
             "technique": 66,
@@ -1543,7 +1660,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 95,
+        "pk": 108,
         "fields": {
             "category": 13,
             "technique": 67,
@@ -1552,7 +1669,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 96,
+        "pk": 109,
+        "fields": {
+            "category": 14,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 110,
         "fields": {
             "category": 14,
             "technique": 57,
@@ -1561,7 +1687,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 97,
+        "pk": 111,
         "fields": {
             "category": 14,
             "technique": 58,
@@ -1570,7 +1696,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 98,
+        "pk": 112,
         "fields": {
             "category": 14,
             "technique": 59,
@@ -1579,7 +1705,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 99,
+        "pk": 113,
         "fields": {
             "category": 14,
             "technique": 60,
@@ -1588,7 +1714,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 100,
+        "pk": 114,
         "fields": {
             "category": 14,
             "technique": 61,
@@ -1597,7 +1723,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 101,
+        "pk": 115,
         "fields": {
             "category": 14,
             "technique": 62,
@@ -1606,7 +1732,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 102,
+        "pk": 116,
         "fields": {
             "category": 14,
             "technique": 63,
@@ -1615,7 +1741,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 103,
+        "pk": 117,
         "fields": {
             "category": 14,
             "technique": 64,
@@ -1624,7 +1750,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 104,
+        "pk": 118,
         "fields": {
             "category": 14,
             "technique": 65,
@@ -1633,7 +1759,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 105,
+        "pk": 119,
         "fields": {
             "category": 14,
             "technique": 66,
@@ -1642,7 +1768,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 106,
+        "pk": 120,
         "fields": {
             "category": 14,
             "technique": 67,
@@ -1651,7 +1777,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 107,
+        "pk": 121,
+        "fields": {
+            "category": 15,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 122,
         "fields": {
             "category": 15,
             "technique": 68,
@@ -1660,7 +1795,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 108,
+        "pk": 123,
         "fields": {
             "category": 15,
             "technique": 69,
@@ -1669,7 +1804,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 109,
+        "pk": 124,
         "fields": {
             "category": 15,
             "technique": 70,
@@ -1678,7 +1813,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 110,
+        "pk": 125,
         "fields": {
             "category": 15,
             "technique": 71,
@@ -1687,7 +1822,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 111,
+        "pk": 126,
+        "fields": {
+            "category": 16,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 127,
         "fields": {
             "category": 16,
             "technique": 72,
@@ -1696,7 +1840,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 112,
+        "pk": 128,
         "fields": {
             "category": 16,
             "technique": 73,
@@ -1705,7 +1849,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 113,
+        "pk": 129,
         "fields": {
             "category": 16,
             "technique": 74,
@@ -1714,7 +1858,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 114,
+        "pk": 130,
         "fields": {
             "category": 16,
             "technique": 75,
@@ -1723,7 +1867,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 115,
+        "pk": 131,
         "fields": {
             "category": 16,
             "technique": 76,
@@ -1732,7 +1876,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 116,
+        "pk": 132,
         "fields": {
             "category": 16,
             "technique": 77,
@@ -1741,7 +1885,16 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 117,
+        "pk": 133,
+        "fields": {
+            "category": 17,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 134,
         "fields": {
             "category": 17,
             "technique": 78,
@@ -1750,7 +1903,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 118,
+        "pk": 135,
         "fields": {
             "category": 17,
             "technique": 79,
@@ -1759,7 +1912,7 @@
     },
     {
         "model": "pages.assemblycategorytechnique",
-        "pk": 119,
+        "pk": 136,
         "fields": {
             "category": 17,
             "technique": 80,
