@@ -466,8 +466,7 @@ def _get_color_ordering(df, unit):
     
     index_struct = df_sorted[df_sorted['type'] == 'structural'].index.tolist()
     index_op = df_sorted[df_sorted['type'] == 'operational'].index.tolist()
-    final_size = max(max(index_struct), max(index_op)) + 1
-    color_list = [None] * final_size
+    color_list = [None] * (len(index_struct) + len(index_op))
 
     for pos, rgb in zip(index_struct, colorscale_struct):
         color_list[pos] = rgb
