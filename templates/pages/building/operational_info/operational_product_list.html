@@ -24,12 +24,16 @@
             </div>
         </div>
         <div class="ms-auto d-flex flex-column gap-2">
-            <a href="{{epd.source}}" 
+            {% if epd.type == "official" %}
+            <a href="{{ epd.source }}" 
                target="_blank" 
                rel="noopener noreferrer"
-               class="align-self-end">  
+               class="align-self-end">
                 <i class="bi bi-arrow-up-right-square"></i>
             </a>
+            {% elif epd.type == "generic" %}
+            <span class="badge rounded-pill bg-secondary text-dark fw-bold">Generic</span>
+            {% endif %}
             <button class="btn btn-success add-epd"
                     data-id="{{ epd.id }}"
                     hx-post=""
