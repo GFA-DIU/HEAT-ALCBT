@@ -1,3 +1,5 @@
+import logging
+
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth import get_user_model
 
@@ -18,6 +20,7 @@ from pages.models.epd import (
     INDICATOR_UNIT_MAPPING,
 )
 
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     help = "Load all EPDs from Ökobaudat database."
@@ -26,13 +29,20 @@ class Command(BaseCommand):
         # load EPD data
         uuids = get_all_epds()
 
+        uuid_issue_list = []
         for uuid in uuids:
-            data = get_full_epd(uuid)
-            epd = parse_epd(data)
-            self.stdout.write(self.style.SUCCESS(("Starting %s", epd)))
-            store_epd(epd)
-            self.stdout.write(self.style.SUCCESS(("Successfully uploaded %s", uuid)))
+            try:
+                data = get_full_epd(uuid)
+                epd = parse_epd(data)
+                self.stdout.write(self.style.SUCCESS(("Starting %s", epd)))
+                store_epd(epd)
+                self.stdout.write(self.style.SUCCESS(("Successfully uploaded %s", uuid)))
+            except:
+                uuid_issue_list.append(uuid)
+                logger.exception("Except was triggered.")
+                self.stdout.write(self.style.ERROR(f"Except triggered. An error occurred."))            
 
+        self.stdout.write(self.style.ERROR(f"List of problem uuids: {uuid_issue_list}"))
 
 def store_epd(epd_data: dict):
     """
