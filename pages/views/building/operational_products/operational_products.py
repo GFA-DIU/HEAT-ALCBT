@@ -73,10 +73,19 @@ def serialize_operational_products(operational_products):
 
 def get_op_product_list(request, building_id):
     # Get Operational Products and impacts
-    epd_list, _ = get_epd_list(request, None, operational=False)
+    epd_list, _ = get_epd_list(request, None, operational=True)
     req = request.POST if request.method == "POST" else request.GET
     form = EPDsFilterForm(req)
+    op_field_fix = {
+        "category": "Others",
+        "subcategory": "Energy carrier - delivery free user",
+    }
+    for field, value in op_field_fix.items():
+        form.fields[field].queryset = MaterialCategory.objects
+        form.fields[field].initial = MaterialCategory.objects.get(name_en=value)
+        form.fields[field].disabled = True
 
+    form.fields["childcategory"].queryset = MaterialCategory.objects.filter(parent=MaterialCategory.objects.get(name_en=value))
     context = {
         "building_id": building_id,
         "simulation": False,

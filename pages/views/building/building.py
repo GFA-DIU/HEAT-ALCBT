@@ -19,7 +19,7 @@ from pages.models.building import (
     OperationalProduct,
     SimulatedOperationalProduct,
 )
-from pages.models.epd import EPD
+from pages.models.epd import EPD, MaterialCategory
 from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.impact_calculation import calculate_impact_operational, calculate_impacts
 from pages.views.building.operational_products.operational_products import (
@@ -154,14 +154,24 @@ def handle_building_load(request, building_id, simulation):
 
     # Get Operational Products and impacts
     epd_list, _ = get_epd_list(request, None, operational=True)
+    form = EPDsFilterForm(request.POST)
+    op_field_fix = {
+        "category": "Others",
+        "subcategory": "Energy carrier - delivery free user",
+    }
+    for field, value in op_field_fix.items():
+        form.fields[field].queryset = MaterialCategory.objects
+        form.fields[field].initial = MaterialCategory.objects.get(name_en=value)
+        form.fields[field].disabled = True
 
+    form.fields["childcategory"].queryset = MaterialCategory.objects.filter(parent=MaterialCategory.objects.get(name_en=value))
     context = {
         "building_id": building.id,
         "building": building,
         "structural_components": structural_components,
         "operational_products": operational_products,
         "epd_list": epd_list,
-        "epd_filters_form": EPDsFilterForm(request.POST),
+        "epd_filters_form": form,
         "edit_mode": False,
         "simulation": simulation,
     }
