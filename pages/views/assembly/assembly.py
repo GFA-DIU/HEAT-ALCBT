@@ -102,7 +102,7 @@ def set_up_view(request, building_id, assembly_id):
         assembly = None
 
 
-    epd_list, dimension = get_epd_list(request, assembly.dimension if assembly else AssemblyDimension.AREA)
+    epd_list, dimension = get_epd_list(request, assembly.dimension if assembly else AssemblyDimension.AREA, operational=False)
 
     req = request.POST if request.method == "POST" else request.GET
     context = {

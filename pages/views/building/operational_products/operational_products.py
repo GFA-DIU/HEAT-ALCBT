@@ -7,8 +7,8 @@ from django.shortcuts import get_object_or_404, render
 
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.building import OperationalProduct, SimulatedOperationalProduct
-from pages.models.epd import EPD, Unit
-from pages.views.assembly.epd_filtering import get_filtered_epd_list
+from pages.models.epd import EPD, MaterialCategory, Unit
+from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.impact_calculation import calculate_impact_operational
 
 logger = logging.getLogger(__name__)
@@ -73,12 +73,25 @@ def serialize_operational_products(operational_products):
 
 def get_op_product_list(request, building_id):
     # Get Operational Products and impacts
-    epd_list, _ = get_filtered_epd_list(request, operational=True)
+    epd_list, _ = get_epd_list(request, None, operational=True)
+    req = request.POST if request.method == "POST" else request.GET
+    form = EPDsFilterForm(req)
+    op_field_fix = {
+        "category": "Others",
+        "subcategory": "Energy carrier - delivery free user",
+    }
+    for field, value in op_field_fix.items():
+        form.fields[field].queryset = MaterialCategory.objects
+        form.fields[field].initial = MaterialCategory.objects.get(name_en=value)
+        form.fields[field].disabled = True
+
+    form.fields["childcategory"].queryset = MaterialCategory.objects.filter(parent=MaterialCategory.objects.get(name_en=value))
     context = {
         "building_id": building_id,
         "simulation": False,
+        "filters": req,
         "epd_list": epd_list,
-        "epd_filters_form": EPDsFilterForm(request.POST),
+        "epd_filters_form": form,
     }
     return render(
         request,
