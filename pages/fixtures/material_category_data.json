@@ -4456,17 +4456,6 @@
     },
     {
         "model": "pages.materialcategory",
-        "pk": 406,
-        "fields": {
-            "name_de": "Trinkwasser",
-            "name_en": "Drinking water",
-            "category_id": "9.2.07",
-            "level": 3,
-            "parent": 399
-        }
-    },
-    {
-        "model": "pages.materialcategory",
         "pk": 407,
         "fields": {
             "name_de": "Biogas",
@@ -4483,6 +4472,17 @@
             "name_de": "Pflanzenölkraftstoff",
             "name_en": "Fuel from vegetable oil",
             "category_id": "9.2.09",
+            "level": 3,
+            "parent": 399
+        }
+    },
+    {
+        "model": "pages.materialcategory",
+        "pk": 408,
+        "fields": {
+            "name_de": "fester Brennstoff",
+            "name_en": "Solid fuel",
+            "category_id": "9.2.10",
             "level": 3,
             "parent": 399
         }
