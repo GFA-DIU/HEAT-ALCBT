@@ -70,9 +70,13 @@ class FilteredEPD:
 
 
 class LazyProcessor:
-    def __init__(self, queryset, dimension: AssemblyDimension):
+    def __init__(self, queryset, dimension: AssemblyDimension, operational: bool):
         self.queryset = queryset
         self.dimension = dimension
+        if operational:
+            self.life_cycle_stage = "b6"
+        else:
+            self.life_cycle_stage = "a1a3"
 
     def __iter__(self):
         for epd in self.queryset:
@@ -108,15 +112,18 @@ class LazyProcessor:
 
     def epd_parsing(self, epd: EPD):
         """Encapsulates the logic for preprocessing EPDs."""
-        sel_text, sel_unit = get_epd_info(self.dimension, epd.declared_unit)
+        if self.life_cycle_stage == "a1a3":
+            sel_text, sel_unit = get_epd_info(self.dimension, epd.declared_unit)
+        else:
+            sel_text = sel_unit = ""
         return FilteredEPD(
             id=epd.pk,
             name=epd.name,
             type=epd.type,
             country=epd.country.name if epd.country else "",
             category=epd.category.name_en if epd.category else None,
-            impact_gwp=epd.get_gwp_impact_sum(),
-            impact_penrt=epd.get_penrt_impact_sum(),
+            impact_gwp=epd.get_gwp_impact_sum(life_cycle_stage=self.life_cycle_stage),
+            impact_penrt=epd.get_penrt_impact_sum(life_cycle_stage=self.life_cycle_stage),
             conversions=[],
             declared_unit=epd.declared_unit,
             selection_text=sel_text,
@@ -125,11 +132,11 @@ class LazyProcessor:
         )
 
 
-def get_epd_list(request, dimension) -> tuple[Page, AssemblyDimension]:
+def get_epd_list(request, dimension, operational: bool) -> tuple[Page, AssemblyDimension]:
     # Dimension can never be None, since we need dimension info to parse epds
-    filtered_list, dimension = get_filtered_epd_list(request, dimension)
+    filtered_list, dimension = get_filtered_epd_list(request, dimension, operational=operational)
     # Pagination setup for EPD list
-    lazy_queryset = LazyProcessor(filtered_list, dimension)
+    lazy_queryset = LazyProcessor(filtered_list, dimension, operational)
     paginator = Paginator(lazy_queryset, 5)  # Show 10 items per page
     page_number = request.GET.get("page", 1)
     return paginator.get_page(page_number), dimension

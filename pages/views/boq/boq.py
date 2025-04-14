@@ -100,7 +100,7 @@ def set_up_view(request, building_id, assembly_id):
         building = get_object_or_404(Building, pk=building_id)
         assembly = None
 
-    epd_list, dimension = get_epd_list(request, None)
+    epd_list, dimension = get_epd_list(request, None, operational=False)
     context = {
         "assembly_id": assembly_id,
         "building_id": building_id,

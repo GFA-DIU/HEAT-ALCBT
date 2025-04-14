@@ -20,7 +20,7 @@ from pages.models.building import (
     SimulatedOperationalProduct,
 )
 from pages.models.epd import EPD
-from pages.views.assembly.epd_filtering import get_filtered_epd_list
+from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.impact_calculation import calculate_impact_operational, calculate_impacts
 from pages.views.building.operational_products.operational_products import (
     get_op_product,
@@ -153,7 +153,7 @@ def handle_building_load(request, building_id, simulation):
     )
 
     # Get Operational Products and impacts
-    epd_list, _ = get_filtered_epd_list(request, operational=True)
+    epd_list, _ = get_epd_list(request, None, operational=True)
 
     context = {
         "building_id": building.id,
