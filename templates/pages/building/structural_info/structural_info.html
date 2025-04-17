@@ -1,4 +1,9 @@
 {% if building_id %}
+<div class="container mb-0">
+  <span class="text-muted small">
+    *If the data is available in the form of total quantity used per material, please select “Add from BoQ”. If material quantities are available per structural components (foundation, bottom floor, roof,.. etc.) use “Add component”. (For more detail please refer to BEAT handbook)
+  </span>
+</div>
 <a
   class="btn btn-primary m-2 mt-3"
   href="{% url 'boq' building_id=building_id %}?simulation={{simulation}}"

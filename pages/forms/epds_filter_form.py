@@ -11,7 +11,7 @@ from pages.models.epd import MaterialCategory, EPDType
 
 
 class EPDsFilterForm(forms.Form):
-    search_query = forms.CharField(label="Textsearch", max_length=100, required=False)
+    search_query = forms.CharField(label="Text search", max_length=100, required=False)
     category = forms.ModelChoiceField(
         queryset=MaterialCategory.objects.filter(level=1).order_by("name_en"),
         widget=forms.Select(
