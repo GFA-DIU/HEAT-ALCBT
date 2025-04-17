@@ -303,8 +303,8 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
         blank=True,
     )
     reference_period = models.IntegerField(
-        _("Ref. period"),
-        help_text=_("Number of years of building usage"),
+        _("Assessment time frame"),
+        help_text=_("Years of building use"),
         null=False,
         blank=False,
         default=50,
