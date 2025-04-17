@@ -274,7 +274,7 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
     )
     total_floor_area = models.DecimalField(
         _("Total Floor Area"),
-        help_text=_("Gross floor area [m^2]"),
+        help_text=_("Gross floor area [m²]"),
         max_digits=10,
         decimal_places=2,
         null=False,
@@ -282,7 +282,7 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
     )
     cond_floor_area = models.DecimalField(
         _("Conditioned Floor Area"),
-        help_text=_("Gross floor area [m^2]"),
+        help_text=_("Gross floor area [m²]"),
         max_digits=10,
         decimal_places=2,
         null=True,
