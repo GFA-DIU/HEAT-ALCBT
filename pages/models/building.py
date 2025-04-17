@@ -16,6 +16,7 @@ class ClimateZone(models.TextChoices):
     COMPOSITE = "composite", "composite"
     TEMPERATE = "temperate", "temperate"
     COLD = "cold", "cold"
+    TROPICAL_WET = "tropical-wet", "tropical wet"
 
 
 class HeatingType(models.TextChoices):
