@@ -13,7 +13,7 @@ from pages.models.epd import Unit
 class OperationalInfoForm(forms.ModelForm):
 
     num_residents = forms.IntegerField(
-        label="# residents",
+        label="No. of residents",
         help_text="Apprximation",
         min_value=0,
         required=False,
@@ -22,7 +22,7 @@ class OperationalInfoForm(forms.ModelForm):
 
     hours_per_workday = forms.IntegerField(
         label="Operation hours per workday",
-        help_text="hours per workday",
+        help_text="hours per day",
         min_value=0,
         max_value=24,
         required=False,
@@ -48,7 +48,7 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     heating_temp = forms.DecimalField(
-        label="Typical Heating Temperature",
+        label="Room Heating Temperature",
         min_value=0,
         max_value=120,
         decimal_places=2,
@@ -64,7 +64,7 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     cooling_temp = forms.DecimalField(
-        label="Typical Cooling Temperature",
+        label="Room Cooling Temperature",
         min_value=0,
         max_value=120,
         decimal_places=2,
@@ -103,7 +103,7 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     cooling_type = forms.ChoiceField(
-        label="Coolingting Type",
+        label="Cooling Type",
         choices=[('', '---------')]+CoolingType.choices,
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
