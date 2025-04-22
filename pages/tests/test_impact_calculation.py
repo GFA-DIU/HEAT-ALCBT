@@ -31,7 +31,6 @@ def create_impact():
     return Impact.objects.create(
         impact_category=ImpactCategoryKey.GWP,
         life_cycle_stage=LifeCycleStage.A1A3,
-        unit=Unit.KGCO2E,
     )
 
 

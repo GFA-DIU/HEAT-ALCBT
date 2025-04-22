@@ -10,42 +10,6 @@ from accounts.models import CustomCity
 from .base import BaseModel
 
 
-
-INDICATOR_UNIT_MAPPING = {
-    "pere": "mj",
-    "perm": "mj",
-    "pert": "mj",
-    "penre": "mj",
-    "penrm": "mj",
-    "penrt": "mj",
-    "sm": "kg",
-    "sf": "mj",
-    "nrsf": "mj",
-    "fw": "m³",
-    "hwd": "kg",
-    "nhwd": "kg",
-    "rwd": "kg",
-    "cru": "kg",
-    "mfr": "kg",
-    "mer": "kg",
-    "eee": "mj",
-    "eet": "mj",
-    "gwp": "kgco2e",
-    "gwp-bio": "kgco2e",
-    "gwp-fos": "kgco2e",
-    "gwp-lul": "kgco2e",
-    "odp": "kgcfc11e",
-    "pocp": "kgnmvoce",
-    "ap": "moleh+e",  # Mole of H+ eq.
-    "ep-terrestrial": "molene",  # Mole of N eq.
-    "ep-freshwater": "kgpe",  # kg P eq.
-    "ep-marine": "kgne",  # kg N eq.
-    "wdp": "m3we",  # m³ world equiv.
-    "adpe": "kgsbe",  # kg Sb eq.
-    "adpf": "mj",
-}
-
-
 class Unit(models.TextChoices):
     """Adapted from LCAx."""
 
@@ -84,6 +48,41 @@ class Unit(models.TextChoices):
     CELSIUS = "celsius", "°Celsius"
     FAHRENHEIT = "fahrenheit", "°Fahrenheit"
     LITER = "liter", "Liter"
+
+
+INDICATOR_UNIT_MAPPING = {
+    "pere": Unit.MJ,
+    "perm": Unit.MJ,
+    "pert": Unit.MJ,
+    "penre": Unit.MJ,
+    "penrm": Unit.MJ,
+    "penrt": Unit.MJ,
+    "sm": Unit.KG,
+    "sf": Unit.MJ,
+    "nrsf": Unit.MJ,
+    "fw": Unit.M3,
+    "hwd": Unit.KG,
+    "nhwd": Unit.KG,
+    "rwd": Unit.KG,
+    "cru": Unit.KG,
+    "mfr": Unit.KG,
+    "mer": Unit.KG,
+    "eee": Unit.MJ,
+    "eet": Unit.MJ,
+    "gwp": Unit.KGCO2E,
+    "gwp-bio": Unit.KGCO2E,
+    "gwp-fos": Unit.KGCO2E,
+    "gwp-lul": Unit.KGCO2E,
+    "odp": Unit.KFCFC11E,
+    "pocp": Unit.KGNMVOCE,
+    "ap": Unit.HPEQ,  # Mole of H+ eq.
+    "ep-terrestrial": Unit.NEQ,  # Mole of N eq.
+    "ep-freshwater": Unit.KGP,  # kg P eq.
+    "ep-marine": Unit.KGN,  # kg N eq.
+    "wdp": Unit.M3WE,  # m³ world equiv.
+    "adpe": Unit.KGSB,  # kg Sb eq.
+    "adpf": Unit.MJ,
+}
 
 
 class ImpactCategoryKey(models.TextChoices):
@@ -207,9 +206,13 @@ class Impact(models.Model):
     life_cycle_stage = models.CharField(
         _("Life Cycle Stage"), max_length=20, choices=LifeCycleStage.choices
     )
-    unit = models.CharField(
-        _("Impact Unit"), max_length=20, choices=Unit.choices, default=Unit.UNKNOWN
-    )
+
+    class Meta:
+        unique_together = ("impact_category", "life_cycle_stage")
+
+    @property
+    def unit(self):
+        return INDICATOR_UNIT_MAPPING[self.impact_category]
 
     def clean(self):
         """
@@ -260,7 +263,7 @@ class EPD(BaseModel, epdLCAx):
         _("Reference Quantity of EPD"),
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(Decimal('0.01'))],
+        validators=[MinValueValidator(Decimal("0.01"))],
         null=False,
         blank=False,
     )
@@ -269,16 +272,20 @@ class EPD(BaseModel, epdLCAx):
         return self.name
 
     def get_gwp_impact_sum(self, life_cycle_stage):
-        impacts = EPDImpact.objects.filter(
-            epd=self, impact__impact_category="gwp", impact__life_cycle_stage=life_cycle_stage
+        impact = EPDImpact.objects.get(
+            epd=self,
+            impact__impact_category="gwp",
+            impact__life_cycle_stage=life_cycle_stage,
         )
-        return round(sum(impact.value for impact in impacts), 2)
+        return round(impact.value, 2) / self.declared_amount
 
     def get_penrt_impact_sum(self, life_cycle_stage):
-        impacts = EPDImpact.objects.filter(
-            epd=self, impact__impact_category="penrt", impact__life_cycle_stage=life_cycle_stage
+        impact = EPDImpact.objects.get(
+            epd=self,
+            impact__impact_category="penrt",
+            impact__life_cycle_stage=life_cycle_stage,
         )
-        return round(sum(impact.value for impact in impacts), 2)
+        return round(impact.value, 2) / self.declared_amount
 
     def get_op_units(self):
         units = [self.declared_unit]
