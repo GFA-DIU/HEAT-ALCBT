@@ -17,7 +17,7 @@
     <strong>Profile Information</strong>
     {{ profile_form|crispy }}
     <div class="d-flex justify-content-between">
-      <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+      <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
       <button type="submit" class="btn btn-primary">Update</button>
     </div>
   </form>
