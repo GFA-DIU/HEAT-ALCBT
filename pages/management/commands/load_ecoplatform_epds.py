@@ -1,4 +1,5 @@
 import traceback
+import logging
 
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth import get_user_model
@@ -21,6 +22,7 @@ from pages.models.epd import (
     INDICATOR_UNIT_MAPPING,
 )
 
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     help = "Load all EPDs from Ökobaudat database."
@@ -48,10 +50,16 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"4. Successfully uploaded {uri}"))
             except Country.DoesNotExist:
                 self.stdout.write(self.style.ERROR(f"Country with code2={geo} does not exist."))
-            except Exception as e:
+            # except Exception as e:
+            #     uri_issue_list.append(uri)
+            #     self.stdout.write(self.style.ERROR(f"An error occurred: {str(e)}"))
+            #     # self.stdout.write(self.style.ERROR(traceback.format_exc()))
+            except:
                 uri_issue_list.append(uri)
-                self.stdout.write(self.style.ERROR(f"An error occurred: {str(e)}"))
-                self.stdout.write(self.style.ERROR(traceback.format_exc()))
+                logger.exception("Except was triggered.")
+                self.stdout.write(self.style.ERROR(f"Except triggered An error occurred"))
+                pass
+                
 
         self.stdout.write(self.style.ERROR(f"List of problem uris: {uri_issue_list}"))
         

@@ -17,6 +17,7 @@ impact_columns = [
     "gwp_b6 [kgCo2e]",
 ]
 
+parent = MaterialCategory.objects.get(category_id="9.2", level=2, name_en="Energy carrier - delivery free user")
 
 def get_category(row):
     if not pd.isna(row["level_2_index"]):
@@ -26,7 +27,7 @@ def get_category(row):
             level_2_index = str(row["level_2_index"])
         category_id = f"{row['level_0_index']}.{row['level_1_index']}.{level_2_index}"
         category, _ = MaterialCategory.objects.get_or_create(
-            category_id=category_id, level=3
+            category_id=category_id, level=3, parent=parent
         )
         return category
 

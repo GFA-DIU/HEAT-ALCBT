@@ -150,6 +150,31 @@
       aria-labelledby="operationInfoHeading"
       data-bs-parent="#accordionBuilding"
     >
+      <div class="accordion-body">
+        {% include "pages/building/building_info/operational_info.html" %}
+      </div>
+    </div>
+  </div>
+  <!-- Option 4 -->
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="opImpactCalcHeading">
+      <button
+        class="accordion-button collapsed"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#opImpactCalc"
+        aria-expanded="true"
+        aria-controls="opImpactCalc"
+      >
+        <strong>Operational Data Entry</strong>
+      </button>
+    </h2>
+    <div
+      id="opImpactCalc"
+      class="accordion-collapse collapse"
+      aria-labelledby="opImpactCalcHeading"
+      data-bs-parent="#accordionBuilding"
+    >
       <div id="operational-info-body" class="accordion-body">
         {% if building_id %}
         {% include "pages/building/operational_info/operational_products.html" %}
@@ -159,7 +184,7 @@
     </div>
   </div>
 
-  <!-- Option 4 -->
+  <!-- Option 5 -->
   <div class="accordion-item">
     <h2 class="accordion-header" id="assembliesHeading">
       <button
@@ -170,7 +195,7 @@
         aria-expanded="true"
         aria-controls="assemblies"
       >
-        <strong>Structural Components</strong>
+        <strong>Building Structural Components</strong>
       </button>
     </h2>
     <div

@@ -1,1638 +1,1922 @@
 [
-{
-    "model": "pages.assemblycategory",
-    "pk": 1,
-    "fields": {
-        "name": "Bottom Floor Construction",
-        "tag": "MEM01"
+    {
+        "model": "pages.assemblycategory",
+        "pk": 1,
+        "fields": {
+            "name": "Bottom Floor Construction",
+            "tag": "MEM01"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 2,
+        "fields": {
+            "name": "Intermediate Floor Construction",
+            "tag": "MEM02"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 3,
+        "fields": {
+            "name": "Floor Finish",
+            "tag": "MEM03"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 4,
+        "fields": {
+            "name": "Roof Construction",
+            "tag": "MEM04"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 5,
+        "fields": {
+            "name": "Foundations",
+            "tag": "extension"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 6,
+        "fields": {
+            "name": "Columns",
+            "tag": "extension"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 7,
+        "fields": {
+            "name": "Beams",
+            "tag": "extension"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 8,
+        "fields": {
+            "name": "Exterior Walls",
+            "tag": "MEM05"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 9,
+        "fields": {
+            "name": "Interior Walls",
+            "tag": "MEM06"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 10,
+        "fields": {
+            "name": "Window Frames",
+            "tag": "MEM07"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 11,
+        "fields": {
+            "name": "Window Glazing",
+            "tag": "MEM08"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 12,
+        "fields": {
+            "name": "Roof Insulation",
+            "tag": "MEM09"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 13,
+        "fields": {
+            "name": "Wall Insulation",
+            "tag": "MEM10"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 14,
+        "fields": {
+            "name": "Floor Insulation",
+            "tag": "MEM11"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 15,
+        "fields": {
+            "name": "Finishes",
+            "tag": "extension"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 16,
+        "fields": {
+            "name": "Miscellaneous",
+            "tag": "extension"
+        }
+    },
+    {
+        "model": "pages.assemblycategory",
+        "pk": 17,
+        "fields": {
+            "name": "Staircases and Ramps",
+            "tag": "extension"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 1,
+        "fields": {
+            "name": "Reinforced Concrete Slab"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 2,
+        "fields": {
+            "name": "Concrete Filler Slab"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 3,
+        "fields": {
+            "name": "Hollow Core Precast Slab"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 4,
+        "fields": {
+            "name": "Precast Concrete Double Tee Floor Units"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 5,
+        "fields": {
+            "name": "Thin Precast Concrete Deck and Composite In-situ Slab"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 6,
+        "fields": {
+            "name": "Timber Floor Construction"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 7,
+        "fields": {
+            "name": "Light Gauge Steel Floor Cassette"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 8,
+        "fields": {
+            "name": "Stones and Tiles"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 9,
+        "fields": {
+            "name": "Woods"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 10,
+        "fields": {
+            "name": "Others"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 11,
+        "fields": {
+            "name": "In-Situ Reinforced Concrete Slab"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 12,
+        "fields": {
+            "name": "Precast Concrete Double Tee Roof Units"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 13,
+        "fields": {
+            "name": "Clay Roofing Tiles on Steel Rafters"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 14,
+        "fields": {
+            "name": "Clay Roofing Tiles on Timber Rafters"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 15,
+        "fields": {
+            "name": "Micro Concrete Tiles on Steel Rafters"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 16,
+        "fields": {
+            "name": "Micro Concrete Tiles on Timber Rafters"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 17,
+        "fields": {
+            "name": "Steel (Zinc or Galvanized Iron) Sheets on Steel Rafters"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 18,
+        "fields": {
+            "name": "Steel (Zinc or Galvanized iron) Sheets on Timber Rafters"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 19,
+        "fields": {
+            "name": "Steel-clad Sandwich Panel"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 20,
+        "fields": {
+            "name": "In-Situ Reinforced Concrete Foundations"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 21,
+        "fields": {
+            "name": "PCC for Footings"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 22,
+        "fields": {
+            "name": "Ready-Mix Concrete Foundations"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 23,
+        "fields": {
+            "name": "In-Situ Reinforced Concrete Columns"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 24,
+        "fields": {
+            "name": "Precast Reinforced Concrete Columns"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 25,
+        "fields": {
+            "name": "In-Situ Reinforced Concrete Beams"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 26,
+        "fields": {
+            "name": "Precast Reinforced Concrete Beams"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 27,
+        "fields": {
+            "name": "Common Brick Wall with Internal & External Plaster"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 28,
+        "fields": {
+            "name": "Cored (with Holes) Bricks with Internal & External Plaster"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 29,
+        "fields": {
+            "name": "Honeycomb Clay Blocks with Plaster on Both Sides"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 30,
+        "fields": {
+            "name": "Medium Weight Hollow Concrete Blocks"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 31,
+        "fields": {
+            "name": "Solid Dense Concrete Blocks"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 32,
+        "fields": {
+            "name": "Autoclaved Aerated Concrete Blocks"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 33,
+        "fields": {
+            "name": "Precast Concrete Panels"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 34,
+        "fields": {
+            "name": "Stone Blocks"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 35,
+        "fields": {
+            "name": "Steel Profile Cladding"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 36,
+        "fields": {
+            "name": "Aluminum Profile Cladding"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 37,
+        "fields": {
+            "name": "Curtain Walling (Opaque Element)"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 38,
+        "fields": {
+            "name": "Common Brick Wall with Plaster Both Sides"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 39,
+        "fields": {
+            "name": "Cored (with Holes) Bricks with Plaster Both Sides"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 40,
+        "fields": {
+            "name": "In-Situ Reinforced Wall"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 41,
+        "fields": {
+            "name": "Precast Concrete Sandwich Panel"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 42,
+        "fields": {
+            "name": "Cement Fiber Boards on Metal Studs"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 43,
+        "fields": {
+            "name": "Cement Fiber Boards on Timber Studs"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 44,
+        "fields": {
+            "name": "Plasterboards on Timber Studs"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 45,
+        "fields": {
+            "name": "Plasterboards on Timber Studs with Insulation"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 46,
+        "fields": {
+            "name": "Plasterboards on Metal Studs"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 47,
+        "fields": {
+            "name": "Plasterboards on Metal Studs with Insulation"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 48,
+        "fields": {
+            "name": "Aluminum"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 49,
+        "fields": {
+            "name": "Steel"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 50,
+        "fields": {
+            "name": "Timber"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 51,
+        "fields": {
+            "name": "UPVC"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 52,
+        "fields": {
+            "name": "Aluminum Clad Timber"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 53,
+        "fields": {
+            "name": "Re-use of Existing Window Frames"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 54,
+        "fields": {
+            "name": "Single Glazing"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 55,
+        "fields": {
+            "name": "Double Glazing"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 56,
+        "fields": {
+            "name": "Triple Glazing"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 57,
+        "fields": {
+            "name": "Polystyrene"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 58,
+        "fields": {
+            "name": "Mineral Wool"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 59,
+        "fields": {
+            "name": "Glass Wool"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 60,
+        "fields": {
+            "name": "Polyurethane"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 61,
+        "fields": {
+            "name": "Cellulose"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 62,
+        "fields": {
+            "name": "Cork"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 63,
+        "fields": {
+            "name": "Woodwool"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 64,
+        "fields": {
+            "name": "Air Gap <100mm Wide"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 65,
+        "fields": {
+            "name": "Air Gap >100mm Wide"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 66,
+        "fields": {
+            "name": "No Insulation"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 67,
+        "fields": {
+            "name": "BRICKBAT COBA"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 68,
+        "fields": {
+            "name": "Paint and Coatings"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 69,
+        "fields": {
+            "name": "Additives"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 70,
+        "fields": {
+            "name": "Surface layers"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 71,
+        "fields": {
+            "name": "Special Treatments"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 72,
+        "fields": {
+            "name": "Lintel, Sunshade and Sill Beam"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 73,
+        "fields": {
+            "name": "Construction chemical"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 74,
+        "fields": {
+            "name": "Cement Mortar for Tiles"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 75,
+        "fields": {
+            "name": "Aluminium Doors"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 76,
+        "fields": {
+            "name": "Aluminium  Windows"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 77,
+        "fields": {
+            "name": "Fire Doors"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 78,
+        "fields": {
+            "name": "In-Situ Reinforced Concrete Staircases and Ramps"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 79,
+        "fields": {
+            "name": "Railings"
+        }
+    },
+    {
+        "model": "pages.assemblytechnique",
+        "pk": 80,
+        "fields": {
+            "name": "Stainless Steel Guard Railing"
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 1,
+        "fields": {
+            "category": 1,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 2,
+        "fields": {
+            "category": 1,
+            "technique": 1,
+            "description": "One of the most popular and conventional floor slab construction types, this floor slab uses Portland cement, sand, aggregate, water and reinforcing steel."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 3,
+        "fields": {
+            "category": 1,
+            "technique": 2,
+            "description": "Filler slab construction is technology based on the principal of using filler materials such as brick, clay tiles and cellular concrete blocks instead of concrete. The filler materials are used in the lower tensile region of the slab, which needs only enough concrete to hold the steel reinforcement together. Filler slab uses less concrete as well as steel due to the lightweight quality of the slab. It is also more cost-effective compared to conventional in-situ reinforced concrete slab."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 4,
+        "fields": {
+            "category": 1,
+            "technique": 3,
+            "description": "Hollow-core floor planks are precast concrete elements with continuous longitudinal voids providing an efficient lightweight section. When grouted, the effective shear key between adjacent hollow-core planks ensures that the system behaves similarly to a monolithic slab. Hollow-core planks may be used to produce a diaphragm to resist horizontal forces, either with or without a structural topping. Hollow-core planks, supported on masonry or steel can be used in domestic, commercial and industrial applications."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 5,
+        "fields": {
+            "category": 1,
+            "technique": 4,
+            "description": "Double tee units reduce the number of pieces to erect and minimize the number of connections between beams and columns. Double tees provide a safe, unobstructed work platform, immediately after erection, that is usable for light construction loads. Reinforced, cast-in-place concrete topping over the double tees provides a leveling course, proper drainage slopes and a structural floor diaphragm."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 6,
+        "fields": {
+            "category": 1,
+            "technique": 5,
+            "description": "The most common type of composite beam is one where a composite slab sits on top of a downstand beam, connected by a through deck welded shear studs. This form of construction offers advantages: the decking acts as external reinforcement at the composite stage, and during the construction stage as formwork and a working platform. It may also provide lateral restraint to the beams during construction. The decking is lifted into place in bundles, which are then distributed across the floor area by hand. This dramatically reduces the crane lifts when compared with a precast based alternative."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 7,
+        "fields": {
+            "category": 1,
+            "technique": 6,
+            "description": "Timber floor construction is generally supported on timber joists. These joists are rectangular sections of solid timber spaced at regular intervals, built into the external wall. The covering to the floor is generally timber floorboards or sheet chipboard. The finish to the underside is generally sheet plasterboard. Joist hangers have become very common as the method of supporting the joist, avoiding building joists into walls. These are formed from galvanized steel and effectively form a shoe or seat for the joist to fit into, which is then built into the wall. They are also very useful for junctions between joists where previously a complicated carpentry joint would have been required."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 8,
+        "fields": {
+            "category": 1,
+            "technique": 7,
+            "description": "Pre-assembled sheet steel floor cassettes are manufactured off-site to stringent factory tolerances and can be bolted into the structure as a complete unit, providing a secure platform that can take a load straight away. This significantly speeds up the building process and ensures precise accuracy."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 9,
+        "fields": {
+            "category": 2,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 10,
+        "fields": {
+            "category": 2,
+            "technique": 1,
+            "description": "One of the most popular and conventional floor slab construction types, this floor slab uses Portland cement, sand, aggregate, water and reinforcing steel."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 11,
+        "fields": {
+            "category": 2,
+            "technique": 2,
+            "description": "Filler slab construction is technology based on the principal of using filler materials such as brick, clay tiles and cellular concrete blocks instead of concrete. The filler materials are used in the lower tensile region of the slab, which needs only enough concrete to hold the steel reinforcement together. Filler slab uses less concrete as well as steel due to the lightweight quality of the slab. It is also more cost-effective compared to conventional in-situ reinforced concrete slab."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 12,
+        "fields": {
+            "category": 2,
+            "technique": 3,
+            "description": "Hollow-core floor planks are precast concrete elements with continuous longitudinal voids providing an efficient lightweight section. When grouted, the effective shear key between adjacent hollow-core planks ensures that the system behaves similarly to a monolithic slab. Hollow-core planks may be used to produce a diaphragm to resist horizontal forces, either with or without a structural topping. Hollow-core planks, supported on masonry or steel can be used in domestic, commercial and industrial applications."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 13,
+        "fields": {
+            "category": 2,
+            "technique": 4,
+            "description": "Double tee units reduce the number of pieces to erect and minimize the number of connections between beams and columns. Double tees provide a safe, unobstructed work platform, immediately after erection, that is usable for light construction loads. Reinforced, cast-in-place concrete topping over the double tees provides a leveling course, proper drainage slopes and a structural floor diaphragm."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 14,
+        "fields": {
+            "category": 2,
+            "technique": 5,
+            "description": "The most common type of composite beam is one where a composite slab sits on top of a downstand beam, connected by a through deck welded shear studs. This form of construction offers advantages: the decking acts as external reinforcement at the composite stage, and during the construction stage as formwork and a working platform. It may also provide lateral restraint to the beams during construction. The decking is lifted into place in bundles, which are then distributed across the floor area by hand. This dramatically reduces the crane lifts when compared with a precast based alternative."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 15,
+        "fields": {
+            "category": 2,
+            "technique": 6,
+            "description": "Timber floor construction is generally supported on timber joists. These joists are rectangular sections of solid timber spaced at regular intervals, built into the external wall. The covering to the floor is generally timber floorboards or sheet chipboard. The finish to the underside is generally sheet plasterboard. Joist hangers have become very common as the method of supporting the joist, avoiding building joists into walls. These are formed from galvanized steel and effectively form a shoe or seat for the joist to fit into, which is then built into the wall. They are also very useful for junctions between joists where previously a complicated carpentry joint would have been required."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 16,
+        "fields": {
+            "category": 2,
+            "technique": 7,
+            "description": "Pre-assembled sheet steel floor cassettes are manufactured off-site to stringent factory tolerances and can be bolted into the structure as a complete unit, providing a secure platform that can take a load straight away. This significantly speeds up the building process and ensures precise accuracy."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 17,
+        "fields": {
+            "category": 3,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 18,
+        "fields": {
+            "category": 3,
+            "technique": 8,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 19,
+        "fields": {
+            "category": 3,
+            "technique": 9,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 20,
+        "fields": {
+            "category": 3,
+            "technique": 10,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 21,
+        "fields": {
+            "category": 4,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 22,
+        "fields": {
+            "category": 4,
+            "technique": 11,
+            "description": "One of the most popular and conventional of all roof construction types, in-situ reinforced concrete slab uses Portland cement, sand, aggregate, water and reinforcing steel."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 23,
+        "fields": {
+            "category": 4,
+            "technique": 2,
+            "description": "Filler slab construction is technology based on the principal of using filler materials such as brick, clay tiles and cellular concrete blocks instead of concrete. The filler materials are used in the lower tensile region of the slab, which needs only enough concrete to hold the steel reinforcement together."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 24,
+        "fields": {
+            "category": 4,
+            "technique": 3,
+            "description": "Hollow core planks are precast concrete elements with continuous longitudinal voids providing an efficient lightweight section. When grouted, the effective shear key between adjacent hollow core planks ensures that the individual planks behave similarly to a monolithic slab. Hollow core planks may be used to produce a diaphragm to resist horizontal forces, either with or without a structural topping. Hollow core planks, supported on masonry or steel, can be used in domestic, commercial and industrial applications."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 25,
+        "fields": {
+            "category": 4,
+            "technique": 12,
+            "description": "Combined beam/column frame units reduce the number of pieces to erect and minimize the number of connections between beams and columns. Double tees provide a safe, unobstructed work platform, immediately after erection, that is usable for light construction loads. Reinforced, cast-in-place concrete topping over the double tees provides a leveling course, proper drainage slopes and a structural roof diaphragm."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 26,
+        "fields": {
+            "category": 4,
+            "technique": 5,
+            "description": "This construction technique utilizes a composite beam that is a structural beam composed of different materials that are interconnected so that the beam responds to loads as a unit. The most common type of composite beam is one where a steel-concrete composite slab sits on top of a downstand beam, connected by the use of through-deck welded shear studs. This form of construction offers a number of advantages: the decking acts as external reinforcement at the composite stage, and during the construction stage as formwork and a working platform. It may also provide lateral restraint to the beams during construction. The decking is lifted into place in bundles, which are then distributed across the roof area by hand. This dramatically reduces the crane lifts when compared with a precast alternative."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 27,
+        "fields": {
+            "category": 4,
+            "technique": 13,
+            "description": "With this type of roof construction, clay tiles are laid on steel rafters. Steel rafters ensure durability and strength but the embodied energy content of steel is higher than that of timber rafters, which need maintenance but have less embodied energy. EDGE estimates the embodied energy based on a thickness of 10mm for the clay roofing tiles and 8mm for the steel or timber rafters."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 28,
+        "fields": {
+            "category": 4,
+            "technique": 14,
+            "description": "Same as above, except with timber rafters instead of steel rafters. Timber rafters need maintenance but have less embodied energy than steel. Timber sourced from a responsible forest management agency or from re-growth forests ensures the protection and conservation of natural forest communities."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 29,
+        "fields": {
+            "category": 4,
+            "technique": 15,
+            "description": "Micro Concrete Roofing (MCR) Tiles are a cost-effective, aesthetic and durable alternative sloping roof technology. They have less embodied energy content than clay roof tiles and, as MCR tiles are lighter than other roofing tiles, they can be laid on a lighter weight structure."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 30,
+        "fields": {
+            "category": 4,
+            "technique": 16,
+            "description": "Same as above, except on timber rafters."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 31,
+        "fields": {
+            "category": 4,
+            "technique": 17,
+            "description": "Zinc is a very dense and corrosion-resistant architectural material. It is non-ferrous, thus not subject to rusting. Its manufacturing includes crushing the zinc ore into particles, which are then concentrated by floatation. Then they are cast on a continuously rotating cylinder and rolled through pressure rolls to a specified thickness. They are often used as vertical cladding or on pitched roofs. Corrugated zinc sheets are widely used for roofs as they are easy to install due to being prefabricated; also, they are cheap and very light. The corrugations increase the bending strength of the sheet in the direction perpendicular to the corrugations, but not parallel to them."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 32,
+        "fields": {
+            "category": 4,
+            "technique": 18,
+            "description": "Same as above, but on timber rafters."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 33,
+        "fields": {
+            "category": 4,
+            "technique": 19,
+            "description": "Sandwich panels provide a combination of high structural rigidity and low weight and are used in a variety of applications. A steel-clad sandwich panel is made of three layers: a low-density core with a thin skin-layer of steel bonded to each side. The core may be empty or honeycombed and may contain insulation. Steel is stronger than aluminum, so there is less likelihood of the core being honeycombed for strength."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 34,
+        "fields": {
+            "category": 5,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 35,
+        "fields": {
+            "category": 5,
+            "technique": 20,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 36,
+        "fields": {
+            "category": 5,
+            "technique": 21,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 37,
+        "fields": {
+            "category": 5,
+            "technique": 22,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 38,
+        "fields": {
+            "category": 6,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 39,
+        "fields": {
+            "category": 6,
+            "technique": 23,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 40,
+        "fields": {
+            "category": 6,
+            "technique": 24,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 41,
+        "fields": {
+            "category": 7,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 42,
+        "fields": {
+            "category": 7,
+            "technique": 25,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 43,
+        "fields": {
+            "category": 7,
+            "technique": 26,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 44,
+        "fields": {
+            "category": 8,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 45,
+        "fields": {
+            "category": 8,
+            "technique": 27,
+            "description": "Common bricks, also known as fired clay bricks, are popular with builders as they are easily available and inexpensive. However, because common bricks are fired at high temperatures, normally achieved by the combustion of fossil fuels, they have high embodied energy."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 46,
+        "fields": {
+            "category": 8,
+            "technique": 28,
+            "description": "Cored clay blocks are made of fired clay and have a holed cross-section. The holed structure means that there is less material per square meter of finished wall."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 47,
+        "fields": {
+            "category": 8,
+            "technique": 29,
+            "description": "Honeycomb clay blocks are made of fired clay and have a honeycombed cross-section. The large size of the blocks enables rapid construction, and the honeycomb structure means that there is less material per square meter of finished wall. The honeycomb structure leads"
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 48,
+        "fields": {
+            "category": 8,
+            "technique": 30,
+            "description": "Hollow concrete blocks are lightweight and easier to handle than solid concrete blocks. The lightness of the blocks helps in reducing the dead load of the masonry on the structure. The voids also marginally improve the thermal insulation and sound insulation of the block. The larger size of the blocks (compared to conventional burnt clay bricks) also reduces the number of mortar joints and the amount of cement mortar."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 49,
+        "fields": {
+            "category": 8,
+            "technique": 31,
+            "description": "Solid dense concrete blocks can be used in virtually any part of a building. They provide excellent sound insulation and their high strength makes them applicable for use in structural walls. However, the use of virgin aggregates and sand can lead to land or marine degradation and resource depletion, and the lack of supplementary materials in the cement results in increased embodied energy."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 50,
+        "fields": {
+            "category": 8,
+            "technique": 32,
+            "description": "Aerated concrete is a versatile, lightweight building material. Compared to solid dense concrete blocks, aerated concrete blocks have a lower density and excellent insulation properties. They are durable and have good resistance to sulfate attack and damage by fire and frost. Aerated concrete blocks are excellent thermal insulators. Based on volume, the manufacture of aerated blocks typically uses 25% less energy than other concrete blocks. They are lighter in weight which makes them easier to work with and saves energy in transportation."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 51,
+        "fields": {
+            "category": 8,
+            "technique": 33,
+            "description": "Precast concrete is a construction product made by casting concrete in a reusable molding or “form” which is then cured in a controlled environment, transported to the construction site, and lifted into place. Precast cladding or curtain walls are the most common use of precast concrete for building envelopes. These types of precast concrete panels do not transfer vertical loads but simply enclose the space. They are only designed to resist wind, seismic forces generated by their own weight, and forces requiring transferring the weight of the panel to the support. Common cladding units include wall panels, window wall units, spandrels, mullions and column covers. These units can usually be removed individually if necessary. In some cases, precast panels are used as formwork for cast-in-place concrete. The precast panels act as a form, providing the visible aesthetics of the system, while the cast-in-place portion provides the structural component."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 52,
+        "fields": {
+            "category": 8,
+            "technique": 34,
+            "description": "Limestone makes up about 10% of the total volume of all sedimentary rocks. Although limestone is found widely, developers and designers should opt for local extracted stone to reduce transport implications. Limestone is readily available and relatively easy to cut into blocks in a quarry. It is also long-lasting and stands up well to exposure, as it is hard, durable and commonly occurs in easily accessible surface exposures. Because of its mass, it has a high thermal inertia. However, limestone is a very heavy material, making it impractical for tall buildings, and relatively expensive as a building material."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 53,
+        "fields": {
+            "category": 8,
+            "technique": 35,
+            "description": "Steel, one of the strongest and most affordable materials, is a ferrous metal, meaning it contains iron. It has a favorable strength-to-weight ratio as well as provides elasticity. Other benefits include stiffness and fire and corrosion resistance. Steel wall cladding profiles create totally new economical solutions in both new building and renovation and in operating and maintenance. The profiles are versatile cladding that comes in a very broad range of shapes, finishing and colors that enable innovative designs. In addition, they can be installed with insulation for better thermal performance."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 54,
+        "fields": {
+            "category": 8,
+            "technique": 36,
+            "description": "Beside steel, aluminum is the most used metal in construction. It is one of the lightest and easiest metals to manipulate, bend, shape, cast, fasten and weld, and is also very ductile, often extruded into shapes for architectural purposes. It can easily be drilled, tapped, sawed, planed and filed with hand tools, making it a yielding material for tradesmen to use. Aluminum is commonly used as wall cladding or curtain-walls, as its resistance to corrosion is higher than steel, and lighter than other metals. However, the disadvantages are the higher cost and embodied energy, greater thermal expansion, and lower fire resistance as compared to steel. Most exterior applications using aluminum alloys are anodized surfaces, which increases the metal durability, traps dyes and adheres to other finishes. Plastic coatings, which are applied electrostatically as a powder and then heat cured, are also used for cladding wall panels. This coating gives a durable protection layer, with a more uniform appearance. The finished appearance can range from clear to a wide variety of colors and textures, depending on the coating applied. In addition, the panels can be installed with insulation for better thermal performance."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 55,
+        "fields": {
+            "category": 8,
+            "technique": 37,
+            "description": "A curtain wall is a vertical building enclosure which supports no load other than its own weight and the environmental forces which act upon it. Curtain walls are not intended to assist in maintaining the structural integrity of a building. Dead loads and live loads are thus not intended to be transferred via the curtain wall to the foundations."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 56,
+        "fields": {
+            "category": 8,
+            "technique": 19,
+            "description": "Sandwich panels provide a combination of high structural rigidity and low weight and are used in a variety of applications. A steel-clad sandwich panel is made of three layers: a low-density core with a thin skin-layer of steel bonded to each side. The core may be empty or honeycombed and may contain insulation. Steel is stronger than aluminum, so there is less likelihood of the core being honeycombed for strength."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 57,
+        "fields": {
+            "category": 9,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 58,
+        "fields": {
+            "category": 9,
+            "technique": 38,
+            "description": "Common bricks, also known as fired clay bricks, are popular with builders as they are easily available and inexpensive. However, because common bricks are fired at high temperatures, normally achieved by the combustion of fossil fuels, they have high embodied energy."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 59,
+        "fields": {
+            "category": 9,
+            "technique": 39,
+            "description": "Cored clay blocks are made of fired clay and have a holed cross-section. The holed structure means that there is less material per square meter of finished wall."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 60,
+        "fields": {
+            "category": 9,
+            "technique": 29,
+            "description": "Honeycomb clay blocks are made of fired clay and have a honeycombed cross-section. The large size of the blocks enables rapid construction, and the honeycomb structure means that there is less material per square meter of finished wall. The features listed below make honeycomb clay blocks an eco-friendlier building product: o The honeycomb structure leads to improved thermal performance. o Blocks can be customized. o No mortar is needed in the vertical joints due to a tongue and grooved edge, reducing mortar use by up to 40%. o The blocks are strong and have a high impact resistance. o Honeycomb clay blocks have post-consumer value if dismantled carefully."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 61,
+        "fields": {
+            "category": 9,
+            "technique": 30,
+            "description": "Hollow concrete blocks are lightweight and easier to handle than solid concrete blocks. The lightness of the blocks helps in reducing the dead load of the masonry on the structure. The voids also marginally improve the thermal insulation and sound insulation of the block. The larger size of the blocks (compared to conventional burnt clay bricks) also reduces the number of mortar joints and hence the amount of cement mortar."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 62,
+        "fields": {
+            "category": 9,
+            "technique": 31,
+            "description": "Solid dense concrete blocks can be used in virtually any part of a building. They provide excellent sound insulation and their high strength makes them applicable for use in structural walls. However, the use of virgin aggregates and sand can lead to land or marine degradation and resource depletion, and the lack of supplementary materials in the cement results in increased embodied energy."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 63,
+        "fields": {
+            "category": 9,
+            "technique": 32,
+            "description": "Aerated concrete is a versatile, lightweight building material. Compared to solid dense concrete blocks, aerated concrete blocks have a lower density and excellent insulation properties. They are durable and have good resistance to sulphate attack and damage by fire and frost. Aerated concrete blocks are excellent thermal insulators. Based on volume, the manufacture of aerated blocks typically uses 25% less energy than other concrete blocks. They are lighter weight which makes them easier to work with and saves energy in transportation."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 64,
+        "fields": {
+            "category": 9,
+            "technique": 33,
+            "description": "Precast concrete is a construction product made by casting concrete in a reusable molding or “form” which is then cured in a controlled environment, transported to the construction site, and lifted into place. Precast cladding or curtain walls are the most common use of precast concrete for building envelopes. These types of precast concrete panels do not transfer vertical loads but simply enclose the space. They are only designed to resist wind, seismic forces generated by their own weight, and forces requiring transferring the weight of the panel to the support. Common cladding units include wall panels, window wall units, spandrels, mullions and column covers. These units can usually be removed individually if necessary. In some cases, precast panels are used as formwork for cast-in-place concrete. The precast panels act as a form, providing the visible aesthetics of the system, while the cast-in-place portion provides the structural component."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 65,
+        "fields": {
+            "category": 9,
+            "technique": 40,
+            "description": "More commonly used for floor slabs and roofs, in-situ reinforced concrete is also used to construct walls. It has a high embodied energy due to the inclusion of Portland cement and uses sand, aggregate, water and reinforcing steel."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 66,
+        "fields": {
+            "category": 9,
+            "technique": 34,
+            "description": "Limestone makes up about 10% of the total volume of all sedimentary rocks. Although limestone is found widely, developers and designers should opt for local extracted stone to reduce transport implications. Limestone is readily available and relatively easy to cut into blocks in a quarry. It is also long-lasting and stands up well to exposure, as it is hard, durable and commonly occurs in easily accessible surface exposures. Because of its mass, it has a high thermal inertia. However, limestone is a very heavy material, making it impractical for tall buildings, and relatively expensive as a building material."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 67,
+        "fields": {
+            "category": 9,
+            "technique": 41,
+            "description": "Precast concrete sandwich panels comprise an outer leaf of precast concrete, an insulating layer “sandwiched” in between, and an inner leaf of plain gray concrete with a power floated finish. The panels may be attached to a steel frame as a cladding panel, or they can form part of a precast structural frame where the inner leaf is load bearing and the external leaf is connected to and supported off the internal leaf using ties. The ties used in the precast structural frames are made of metal, plastic or epoxy and have low thermal conductivity to eliminate cold bridging. The thickness of the insulation depends on the required U-value. The shape, thickness and size of the concrete can also be varied to meet the requirements of the project."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 68,
+        "fields": {
+            "category": 9,
+            "technique": 42,
+            "description": "Cement fiber board used to clad buildings may also be referred to as “siding” or “ship lap cladding.” It has the advantage of being more stable than wood through an extreme range of weather conditions and it won’t rot, twist or warp. It is used to replace timber cladding in new build and refurbishment projects. Boarding is often self-colored so it doesn’t need painting. The board can be fixed to timber or steel studs, and is easily cut by scoring and snapping external corners and edges."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 69,
+        "fields": {
+            "category": 9,
+            "technique": 43,
+            "description": "Same as above, except on timber studs instead of metal studs."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 70,
+        "fields": {
+            "category": 9,
+            "technique": 44,
+            "description": "Plasterboard is a form of wallboard manufactured using a core of gypsum plaster bonded to layers of paper or fiberboard. It can be mounted on timber studs."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 71,
+        "fields": {
+            "category": 9,
+            "technique": 45,
+            "description": "Same as above, except with insulation between the timber studs."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 72,
+        "fields": {
+            "category": 9,
+            "technique": 46,
+            "description": "Same as above, except mounted on metal studs instead of timber studs."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 73,
+        "fields": {
+            "category": 9,
+            "technique": 47,
+            "description": "Same as above, except with insulation between the metal studs."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 74,
+        "fields": {
+            "category": 10,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 75,
+        "fields": {
+            "category": 10,
+            "technique": 48,
+            "description": "The two metals typically used for window frames are aluminum or steel. Aluminum is lighter weight and does not rust like a ferrous metal such as steel, but the embodied energy is much higher. The advantage of using metal window frames is that they are strong, light and require less maintenance than other materials used for window frames. However as metal conducts heat very well, the thermal performance of metal windows is not as good as other materials. To reduce heat flow and U-Value, metal frames can include a thermal break between the inside and outside of the frame."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 76,
+        "fields": {
+            "category": 10,
+            "technique": 49,
+            "description": "Like aluminum windows above, except steel windows are heavier than aluminum and require some maintenance to protect from rust (unless stainless steel is used). Steel has somewhat better thermal performance than aluminum."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 77,
+        "fields": {
+            "category": 10,
+            "technique": 50,
+            "description": "Timber window frames insulate relatively well, but they also expand and contract in response to weather conditions. Timber frames can be made from either softwood or hardwood. Softwood frames are much cheaper, but are likely to require more regular maintenance. The maintenance required can be reduced by using aluminum or vinyl cladding."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 78,
+        "fields": {
+            "category": 10,
+            "technique": 51,
+            "description": "UPVC window frames are made of extruded polyvinyl chloride (PVC) with ultraviolet light (UV) stabilizers to keep sunlight from breaking down the material. uPVC window frames are low maintenance as they do not require painting. If the cavities of uPVC frames are filled with insulation, they have very good thermal performance."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 79,
+        "fields": {
+            "category": 10,
+            "technique": 52,
+            "description": "Aluminum cladding is fixed to wooden framing members with a space for ventilation purposes. Timber and aluminum have high embodied energy. The extruded aluminum sections are designed for strength and rigidity, to prevent deformation at the fastening points. Often used in commercial applications, these windows are also suitable for residential applications where low maintenance is important, such as social housing and high-rise developments."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 80,
+        "fields": {
+            "category": 10,
+            "technique": 53,
+            "description": "Re-using an existing material avoids the use, and therefore embodied energy, of new materials. The re-use of existing materials option in EDGE is highly desirable and assigned an embodied energy value of zero. The material must be verifiably more than five years old to be classified as re-used. The material does not have to have been sourced from the project site."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 81,
+        "fields": {
+            "category": 11,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 82,
+        "fields": {
+            "category": 11,
+            "technique": 54,
+            "description": "A single pane (sheet) of glass in the windows."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 83,
+        "fields": {
+            "category": 11,
+            "technique": 55,
+            "description": "Two panes of glass"
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 84,
+        "fields": {
+            "category": 11,
+            "technique": 56,
+            "description": "Three panes of glass"
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 85,
+        "fields": {
+            "category": 12,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 86,
+        "fields": {
+            "category": 12,
+            "technique": 57,
+            "description": "Polystyrene has the highest embodied energy per square meter of any other insulation type. There are two types of polystyrene insulation: Expanded Polystyrene (EPS) insulation is made from small beads of polystyrene that when heated cause them to expand; they are then mixed with a blowing agent (pentane). Expanded polystyrene is available in board form or as beads. Boards are produced by placing the beads in molds and heating them to fuse the beads together. Typical applications of EPS boards are for insulation of walls, roofs and floors. Polystyrene beads are frequently used as cavity fill in masonry walls. Extruded Polystyrene (XPS) is made by mixing polystyrene with a blowing agent under pressure and forcing it through a die. As it emerges from the die it expands into foam; it can then be shaped and trimmed. XPS is slightly stronger than EPS, and although it is used in many of the same applications as EPS, it is particularly suitable for use below ground or where extra loading and/or impacts might be anticipated."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 87,
+        "fields": {
+            "category": 12,
+            "technique": 58,
+            "description": "Rock-based mineral wool is made by melting rock and recycled steel slag and spinning it into fibers. The insulation is available in different densities depending on the required functionality. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls and insulation for roof rafters, lofts and suspended floors. Mineral wool has low resistance for moisture."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 88,
+        "fields": {
+            "category": 12,
+            "technique": 59,
+            "description": "Glass wool insulation is manufactured in a similar way to rock wool, though the raw materials are different as well as the melting process. Glass wool is made from silica sand, recycled glass, limestone and soda ash. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls, and insulation for roof rafters, lofts and suspended floors."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 89,
+        "fields": {
+            "category": 12,
+            "technique": 60,
+            "description": "Polyurethane (PUR), a closed-cell plastic, is formed by reacting two monomers in the presence of a blowing agent catalyst (polymerization). Polyisocyanurate foam (PIR) is an improvement on polyurethane (there is a slight difference in the constituents and the reaction is conducted at higher temperatures). PIR is more fire-resistant and has a slightly higher R Value. Applications include wall, floor and roof insulation. Polyurethane is also popular in laminate form in SIPS and as an insulation backing to rigid boarding such as plasterboard."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 90,
+        "fields": {
+            "category": 12,
+            "technique": 61,
+            "description": "Four major types of loose-fill cellulose products have been developed for differing uses in a building under a variety of brand names. These are characterized as: 1. Dry cellulose 2. Spray applied cellulose 3. Stabilized cellulose 4. Low dust cellulose."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 91,
+        "fields": {
+            "category": 12,
+            "technique": 62,
+            "description": "Cork has low embodied energy and is environmentally friendly. It can be harvested from the same tree for about two hundred years. Harvesting is done with minimal impact on the environment and no trees are cut down to manufacture cork products."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 92,
+        "fields": {
+            "category": 12,
+            "technique": 63,
+            "description": "Woodwool boards have been used in buildings for decades and are a popular substrate for lime plaster. Strands of wood, bound together with a small proportion of Portland cement, provide a good background for lime plasters, eliminate thermal bridges in pillars, beams, inter-story facings and radiator niches and provide insulation of flat and sloping roofs; provide acoustic insulation of walls and insulation from floor noise; as well as fire resistant coverings."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 93,
+        "fields": {
+            "category": 12,
+            "technique": 64,
+            "description": "In principle, the use of cavities is like the use of an insulating material. Air is a poor conductor of heat, therefore still air trapped in an air space between two layers of a wall or roof acts as a barrier to heat transfer."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 94,
+        "fields": {
+            "category": 12,
+            "technique": 65,
+            "description": "Gaps larger than 100mm encourage convection and are not effective insulators."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 95,
+        "fields": {
+            "category": 12,
+            "technique": 66,
+            "description": "This option must be selected if no insulation is specified for the roof or walls."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 96,
+        "fields": {
+            "category": 12,
+            "technique": 67,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 97,
+        "fields": {
+            "category": 13,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 98,
+        "fields": {
+            "category": 13,
+            "technique": 57,
+            "description": "Polystyrene has the highest embodied energy per square meter of any other insulation type. There are two types of polystyrene insulation: Expanded Polystyrene (EPS) insulation is made from small beads of polystyrene that when heated cause them to expand; they are then mixed with a blowing agent (pentane). Expanded polystyrene is available in board form or as beads. Boards are produced by placing the beads in molds and heating them to fuse the beads together. Typical applications of EPS boards are for insulation of walls, roofs and floors. Polystyrene beads are frequently used as cavity fill in masonry walls. Extruded Polystyrene (XPS) is made by mixing polystyrene with a blowing agent under pressure and forcing it through a die. As it emerges from the die it expands into foam; it can then be shaped and trimmed. XPS is slightly stronger than EPS, and although it is used in many of the same applications as EPS, it is particularly suitable for use below ground or where extra loading and/or impacts might be anticipated."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 99,
+        "fields": {
+            "category": 13,
+            "technique": 58,
+            "description": "Rock-based mineral wool is made by melting rock and recycled steel slag and spinning it into fibers. The insulation is available in different densities depending on the required functionality. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls and insulation for roof rafters, lofts and suspended floors. Mineral wool has low resistance for moisture."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 100,
+        "fields": {
+            "category": 13,
+            "technique": 59,
+            "description": "Glass wool insulation is manufactured in a similar way to rock wool, though the raw materials are different as well as the melting process. Glass wool is made from silica sand, recycled glass, limestone and soda ash. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls, and insulation for roof rafters, lofts and suspended floors."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 101,
+        "fields": {
+            "category": 13,
+            "technique": 60,
+            "description": "Polyurethane (PUR), a closed-cell plastic, is formed by reacting two monomers in the presence of a blowing agent catalyst (polymerization). Polyisocyanurate foam (PIR) is an improvement on polyurethane (there is a slight difference in the constituents and the reaction is conducted at higher temperatures). PIR is more fire-resistant and has a slightly higher R Value. Applications include wall, floor and roof insulation. Polyurethane is also popular in laminate form in SIPS and as an insulation backing to rigid boarding such as plasterboard."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 102,
+        "fields": {
+            "category": 13,
+            "technique": 61,
+            "description": "Four major types of loose-fill cellulose products have been developed for differing uses in a building under a variety of brand names. These are characterized as: 1. Dry cellulose 2. Spray applied cellulose 3. Stabilized cellulose 4. Low dust cellulose."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 103,
+        "fields": {
+            "category": 13,
+            "technique": 62,
+            "description": "Cork has low embodied energy and is environmentally friendly. It can be harvested from the same tree for about two hundred years. Harvesting is done with minimal impact on the environment and no trees are cut down to manufacture cork products."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 104,
+        "fields": {
+            "category": 13,
+            "technique": 63,
+            "description": "Woodwool boards have been used in buildings for decades and are a popular substrate for lime plaster. Strands of wood, bound together with a small proportion of Portland cement, provide a good background for lime plasters, eliminate thermal bridges in pillars, beams, inter-story facings and radiator niches and provide insulation of flat and sloping roofs; provide acoustic insulation of walls and insulation from floor noise; as well as fire resistant coverings."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 105,
+        "fields": {
+            "category": 13,
+            "technique": 64,
+            "description": "In principle, the use of cavities is like the use of an insulating material. Air is a poor conductor of heat, therefore still air trapped in an air space between two layers of a wall or roof acts as a barrier to heat transfer."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 106,
+        "fields": {
+            "category": 13,
+            "technique": 65,
+            "description": "Gaps larger than 100mm encourage convection and are not effective insulators."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 107,
+        "fields": {
+            "category": 13,
+            "technique": 66,
+            "description": "This option must be selected if no insulation is specified for the roof or walls."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 108,
+        "fields": {
+            "category": 13,
+            "technique": 67,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 109,
+        "fields": {
+            "category": 14,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 110,
+        "fields": {
+            "category": 14,
+            "technique": 57,
+            "description": "Polystyrene has the highest embodied energy per square meter of any other insulation type. There are two types of polystyrene insulation: Expanded Polystyrene (EPS) insulation is made from small beads of polystyrene that when heated cause them to expand; they are then mixed with a blowing agent (pentane). Expanded polystyrene is available in board form or as beads. Boards are produced by placing the beads in molds and heating them to fuse the beads together. Typical applications of EPS boards are for insulation of walls, roofs and floors. Polystyrene beads are frequently used as cavity fill in masonry walls. Extruded Polystyrene (XPS) is made by mixing polystyrene with a blowing agent under pressure and forcing it through a die. As it emerges from the die it expands into foam; it can then be shaped and trimmed. XPS is slightly stronger than EPS, and although it is used in many of the same applications as EPS, it is particularly suitable for use below ground or where extra loading and/or impacts might be anticipated."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 111,
+        "fields": {
+            "category": 14,
+            "technique": 58,
+            "description": "Rock-based mineral wool is made by melting rock and recycled steel slag and spinning it into fibers. The insulation is available in different densities depending on the required functionality. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls and insulation for roof rafters, lofts and suspended floors. Mineral wool has low resistance for moisture."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 112,
+        "fields": {
+            "category": 14,
+            "technique": 59,
+            "description": "Glass wool insulation is manufactured in a similar way to rock wool, though the raw materials are different as well as the melting process. Glass wool is made from silica sand, recycled glass, limestone and soda ash. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls, and insulation for roof rafters, lofts and suspended floors."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 113,
+        "fields": {
+            "category": 14,
+            "technique": 60,
+            "description": "Polyurethane (PUR), a closed-cell plastic, is formed by reacting two monomers in the presence of a blowing agent catalyst (polymerization). Polyisocyanurate foam (PIR) is an improvement on polyurethane (there is a slight difference in the constituents and the reaction is conducted at higher temperatures). PIR is more fire-resistant and has a slightly higher R Value. Applications include wall, floor and roof insulation. Polyurethane is also popular in laminate form in SIPS and as an insulation backing to rigid boarding such as plasterboard."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 114,
+        "fields": {
+            "category": 14,
+            "technique": 61,
+            "description": "Four major types of loose-fill cellulose products have been developed for differing uses in a building under a variety of brand names. These are characterized as: 1. Dry cellulose 2. Spray applied cellulose 3. Stabilized cellulose 4. Low dust cellulose."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 115,
+        "fields": {
+            "category": 14,
+            "technique": 62,
+            "description": "Cork has low embodied energy and is environmentally friendly. It can be harvested from the same tree for about two hundred years. Harvesting is done with minimal impact on the environment and no trees are cut down to manufacture cork products."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 116,
+        "fields": {
+            "category": 14,
+            "technique": 63,
+            "description": "Woodwool boards have been used in buildings for decades and are a popular substrate for lime plaster. Strands of wood, bound together with a small proportion of Portland cement, provide a good background for lime plasters, eliminate thermal bridges in pillars, beams, inter-story facings and radiator niches and provide insulation of flat and sloping roofs; provide acoustic insulation of walls and insulation from floor noise; as well as fire resistant coverings."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 117,
+        "fields": {
+            "category": 14,
+            "technique": 64,
+            "description": "In principle, the use of cavities is like the use of an insulating material. Air is a poor conductor of heat, therefore still air trapped in an air space between two layers of a wall or roof acts as a barrier to heat transfer."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 118,
+        "fields": {
+            "category": 14,
+            "technique": 65,
+            "description": "Gaps larger than 100mm encourage convection and are not effective insulators."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 119,
+        "fields": {
+            "category": 14,
+            "technique": 66,
+            "description": "This option must be selected if no insulation is specified for the roof or walls."
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 120,
+        "fields": {
+            "category": 14,
+            "technique": 67,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 121,
+        "fields": {
+            "category": 15,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 122,
+        "fields": {
+            "category": 15,
+            "technique": 68,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 123,
+        "fields": {
+            "category": 15,
+            "technique": 69,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 124,
+        "fields": {
+            "category": 15,
+            "technique": 70,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 125,
+        "fields": {
+            "category": 15,
+            "technique": 71,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 126,
+        "fields": {
+            "category": 16,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 127,
+        "fields": {
+            "category": 16,
+            "technique": 72,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 128,
+        "fields": {
+            "category": 16,
+            "technique": 73,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 129,
+        "fields": {
+            "category": 16,
+            "technique": 74,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 130,
+        "fields": {
+            "category": 16,
+            "technique": 75,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 131,
+        "fields": {
+            "category": 16,
+            "technique": 76,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 132,
+        "fields": {
+            "category": 16,
+            "technique": 77,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 133,
+        "fields": {
+            "category": 17,
+            "technique": null,
+            "description": null
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 134,
+        "fields": {
+            "category": 17,
+            "technique": 78,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 135,
+        "fields": {
+            "category": 17,
+            "technique": 79,
+            "description": ""
+        }
+    },
+    {
+        "model": "pages.assemblycategorytechnique",
+        "pk": 136,
+        "fields": {
+            "category": 17,
+            "technique": 80,
+            "description": ""
+        }
     }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 2,
-    "fields": {
-        "name": "Intermediate Floor Construction",
-        "tag": "MEM02"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 3,
-    "fields": {
-        "name": "Floor Finish",
-        "tag": "MEM03"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 4,
-    "fields": {
-        "name": "Roof Construction",
-        "tag": "MEM04"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 5,
-    "fields": {
-        "name": "Foundations",
-        "tag": "extension"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 6,
-    "fields": {
-        "name": "Columns",
-        "tag": "extension"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 7,
-    "fields": {
-        "name": "Beams",
-        "tag": "extension"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 8,
-    "fields": {
-        "name": "Exterior Walls",
-        "tag": "MEM05"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 9,
-    "fields": {
-        "name": "Interior Walls",
-        "tag": "MEM06"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 10,
-    "fields": {
-        "name": "Window Frames",
-        "tag": "MEM07"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 11,
-    "fields": {
-        "name": "Window Glazing",
-        "tag": "MEM08"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 12,
-    "fields": {
-        "name": "Roof Insulation",
-        "tag": "MEM09"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 13,
-    "fields": {
-        "name": "Wall Insulation",
-        "tag": "MEM10"
-    }
-},
-{
-    "model": "pages.assemblycategory",
-    "pk": 14,
-    "fields": {
-        "name": "Floor Insulation",
-        "tag": "MEM11"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 1,
-    "fields": {
-        "name": "Reinforced Concrete Slab"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 2,
-    "fields": {
-        "name": "Concrete Filler Slab"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 3,
-    "fields": {
-        "name": "Hollow Core Precast Slab"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 4,
-    "fields": {
-        "name": "Precast Concrete Double Tee Floor Units"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 5,
-    "fields": {
-        "name": "Thin Precast Concrete Deck and Composite In-situ Slab"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 6,
-    "fields": {
-        "name": "Timber Floor Construction"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 7,
-    "fields": {
-        "name": "Light Gauge Steel Floor Cassette"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 8,
-    "fields": {
-        "name": "Ceramic Tile"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 9,
-    "fields": {
-        "name": "Stone Tiles/Slabs"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 10,
-    "fields": {
-        "name": "Finished Concrete Floor"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 11,
-    "fields": {
-        "name": "Vinyl Flooring"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 12,
-    "fields": {
-        "name": "Nylon Carpets"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 13,
-    "fields": {
-        "name": "Linoleum Sheet"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 14,
-    "fields": {
-        "name": "Laminated Wooden Flooring"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 15,
-    "fields": {
-        "name": "Parquet/Wood Block Finishes"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 16,
-    "fields": {
-        "name": "In-Situ Reinforced Concrete Slab"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 17,
-    "fields": {
-        "name": "Precast Concrete Double Tee Roof Units"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 18,
-    "fields": {
-        "name": "Clay Roofing Tiles on Steel Rafters"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 19,
-    "fields": {
-        "name": "Clay Roofing Tiles on Timber Rafters"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 20,
-    "fields": {
-        "name": "Micro Concrete Tiles on Steel Rafters"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 21,
-    "fields": {
-        "name": "Micro Concrete Tiles on Timber Rafters"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 22,
-    "fields": {
-        "name": "Steel (Zinc or Galvanized Iron) Sheets on Steel Rafters"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 23,
-    "fields": {
-        "name": "Steel (Zinc or Galvanized iron) Sheets on Timber Rafters"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 24,
-    "fields": {
-        "name": "Steel-clad Sandwich Panel"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 25,
-    "fields": {
-        "name": "In-Situ Reinforced Concrete Columns"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 26,
-    "fields": {
-        "name": "In-Situ Reinforced Concrete Beam"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 27,
-    "fields": {
-        "name": "Common Brick Wall with Internal & External Plaster"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 28,
-    "fields": {
-        "name": "Cored (with Holes) Bricks with Internal & External Plaster"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 29,
-    "fields": {
-        "name": "Honeycomb Clay Blocks with Plaster on Both Sides"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 30,
-    "fields": {
-        "name": "Medium Weight Hollow Concrete Blocks"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 31,
-    "fields": {
-        "name": "Solid Dense Concrete Blocks"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 32,
-    "fields": {
-        "name": "Autoclaved Aerated Concrete Blocks"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 33,
-    "fields": {
-        "name": "Precast Concrete Panels"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 34,
-    "fields": {
-        "name": "Stone Blocks"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 35,
-    "fields": {
-        "name": "Steel Profile Cladding"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 36,
-    "fields": {
-        "name": "Aluminum Profile Cladding"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 37,
-    "fields": {
-        "name": "Curtain Walling (Opaque Element)"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 38,
-    "fields": {
-        "name": "Common Brick Wall with Plaster Both Sides"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 39,
-    "fields": {
-        "name": "Cored (with Holes) Bricks with Plaster Both Sides"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 40,
-    "fields": {
-        "name": "In-Situ Reinforced Wall"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 41,
-    "fields": {
-        "name": "Precast Concrete Sandwich Panel"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 42,
-    "fields": {
-        "name": "Cement Fiber Boards on Metal Studs"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 43,
-    "fields": {
-        "name": "Cement Fiber Boards on Timber Studs"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 44,
-    "fields": {
-        "name": "Plasterboards on Timber Studs"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 45,
-    "fields": {
-        "name": "Plasterboards on Timber Studs with Insulation"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 46,
-    "fields": {
-        "name": "Plasterboards on Metal Studs"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 47,
-    "fields": {
-        "name": "Plasterboards on Metal Studs with Insulation"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 48,
-    "fields": {
-        "name": "Aluminum"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 49,
-    "fields": {
-        "name": "Steel"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 50,
-    "fields": {
-        "name": "Timber"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 51,
-    "fields": {
-        "name": "UPVC"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 52,
-    "fields": {
-        "name": "Aluminum Clad Timber"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 53,
-    "fields": {
-        "name": "Re-use of Existing Window Frames"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 54,
-    "fields": {
-        "name": "Single Glazing"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 55,
-    "fields": {
-        "name": "Double Glazing"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 56,
-    "fields": {
-        "name": "Triple Glazing"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 57,
-    "fields": {
-        "name": "Polystyrene"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 58,
-    "fields": {
-        "name": "Mineral Wool"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 59,
-    "fields": {
-        "name": "Glass Wool"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 60,
-    "fields": {
-        "name": "Polyurethane"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 61,
-    "fields": {
-        "name": "Cellulose"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 62,
-    "fields": {
-        "name": "Cork"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 63,
-    "fields": {
-        "name": "Woodwool"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 64,
-    "fields": {
-        "name": "Air Gap <100mm Wide"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 65,
-    "fields": {
-        "name": "Air Gap >100mm Wide"
-    }
-},
-{
-    "model": "pages.assemblytechnique",
-    "pk": 66,
-    "fields": {
-        "name": "No Insulation"
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 1,
-    "fields": {
-        "category": 1,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 2,
-    "fields": {
-        "category": 1,
-        "technique": 1,
-        "description": "One of the most popular and conventional floor slab construction types, this floor slab uses Portland cement, sand, aggregate, water and reinforcing steel."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 3,
-    "fields": {
-        "category": 1,
-        "technique": 2,
-        "description": "Filler slab construction is technology based on the principal of using filler materials such as brick, clay tiles and cellular concrete blocks instead of concrete. The filler materials are used in the lower tensile region of the slab, which needs only enough concrete to hold the steel reinforcement together. Filler slab uses less concrete as well as steel due to the lightweight quality of the slab. It is also more cost-effective compared to conventional in-situ reinforced concrete slab."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 4,
-    "fields": {
-        "category": 1,
-        "technique": 3,
-        "description": "Hollow-core floor planks are precast concrete elements with continuous longitudinal voids providing an efficient lightweight section. When grouted, the effective shear key between adjacent hollow-core planks ensures that the system behaves similarly to a monolithic slab. Hollow-core planks may be used to produce a diaphragm to resist horizontal forces, either with or without a structural topping. Hollow-core planks, supported on masonry or steel can be used in domestic, commercial and industrial applications."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 5,
-    "fields": {
-        "category": 1,
-        "technique": 4,
-        "description": "Double tee units reduce the number of pieces to erect and minimize the number of connections between beams and columns. Double tees provide a safe, unobstructed work platform, immediately after erection, that is usable for light construction loads. Reinforced, cast-in-place concrete topping over the double tees provides a leveling course, proper drainage slopes and a structural floor diaphragm."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 6,
-    "fields": {
-        "category": 1,
-        "technique": 5,
-        "description": "The most common type of composite beam is one where a composite slab sits on top of a downstand beam, connected by a through deck welded shear studs. This form of construction offers advantages: the decking acts as external reinforcement at the composite stage, and during the construction stage as formwork and a working platform. It may also provide lateral restraint to the beams during construction. The decking is lifted into place in bundles, which are then distributed across the floor area by hand. This dramatically reduces the crane lifts when compared with a precast based alternative."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 7,
-    "fields": {
-        "category": 1,
-        "technique": 6,
-        "description": "Timber floor construction is generally supported on timber joists. These joists are rectangular sections of solid timber spaced at regular intervals, built into the external wall. The covering to the floor is generally timber floorboards or sheet chipboard. The finish to the underside is generally sheet plasterboard. Joist hangers have become very common as the method of supporting the joist, avoiding building joists into walls. These are formed from galvanized steel and effectively form a shoe or seat for the joist to fit into, which is then built into the wall. They are also very useful for junctions between joists where previously a complicated carpentry joint would have been required."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 8,
-    "fields": {
-        "category": 1,
-        "technique": 7,
-        "description": "Pre-assembled sheet steel floor cassettes are manufactured off-site to stringent factory tolerances and can be bolted into the structure as a complete unit, providing a secure platform that can take a load straight away. This significantly speeds up the building process and ensures precise accuracy."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 9,
-    "fields": {
-        "category": 2,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 10,
-    "fields": {
-        "category": 2,
-        "technique": 1,
-        "description": "One of the most popular and conventional floor slab construction types, this floor slab uses Portland cement, sand, aggregate, water and reinforcing steel."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 11,
-    "fields": {
-        "category": 2,
-        "technique": 2,
-        "description": "Filler slab construction is technology based on the principal of using filler materials such as brick, clay tiles and cellular concrete blocks instead of concrete. The filler materials are used in the lower tensile region of the slab, which needs only enough concrete to hold the steel reinforcement together. Filler slab uses less concrete as well as steel due to the lightweight quality of the slab. It is also more cost-effective compared to conventional in-situ reinforced concrete slab."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 12,
-    "fields": {
-        "category": 2,
-        "technique": 3,
-        "description": "Hollow-core floor planks are precast concrete elements with continuous longitudinal voids providing an efficient lightweight section. When grouted, the effective shear key between adjacent hollow-core planks ensures that the system behaves similarly to a monolithic slab. Hollow-core planks may be used to produce a diaphragm to resist horizontal forces, either with or without a structural topping. Hollow-core planks, supported on masonry or steel can be used in domestic, commercial and industrial applications."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 13,
-    "fields": {
-        "category": 2,
-        "technique": 4,
-        "description": "Double tee units reduce the number of pieces to erect and minimize the number of connections between beams and columns. Double tees provide a safe, unobstructed work platform, immediately after erection, that is usable for light construction loads. Reinforced, cast-in-place concrete topping over the double tees provides a leveling course, proper drainage slopes and a structural floor diaphragm."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 14,
-    "fields": {
-        "category": 2,
-        "technique": 5,
-        "description": "The most common type of composite beam is one where a composite slab sits on top of a downstand beam, connected by a through deck welded shear studs. This form of construction offers advantages: the decking acts as external reinforcement at the composite stage, and during the construction stage as formwork and a working platform. It may also provide lateral restraint to the beams during construction. The decking is lifted into place in bundles, which are then distributed across the floor area by hand. This dramatically reduces the crane lifts when compared with a precast based alternative."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 15,
-    "fields": {
-        "category": 2,
-        "technique": 6,
-        "description": "Timber floor construction is generally supported on timber joists. These joists are rectangular sections of solid timber spaced at regular intervals, built into the external wall. The covering to the floor is generally timber floorboards or sheet chipboard. The finish to the underside is generally sheet plasterboard. Joist hangers have become very common as the method of supporting the joist, avoiding building joists into walls. These are formed from galvanized steel and effectively form a shoe or seat for the joist to fit into, which is then built into the wall. They are also very useful for junctions between joists where previously a complicated carpentry joint would have been required."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 16,
-    "fields": {
-        "category": 2,
-        "technique": 7,
-        "description": "Pre-assembled sheet steel floor cassettes are manufactured off-site to stringent factory tolerances and can be bolted into the structure as a complete unit, providing a secure platform that can take a load straight away. This significantly speeds up the building process and ensures precise accuracy."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 17,
-    "fields": {
-        "category": 3,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 18,
-    "fields": {
-        "category": 3,
-        "technique": 8,
-        "description": "The advantage of tiles is that they are hard wearing, which minimizes the maintenance required. However, tiles are not maintenance free, as the grout requires maintenance. The manufacture of tiles uses large amounts of energy due to the firing required and therefore tiles have a high embodied energy."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 19,
-    "fields": {
-        "category": 3,
-        "technique": 9,
-        "description": "Stone tiles can often be sourced locally and have low embodied energy compared to some man-made materials. However, machine cut and polished stone tiles can be higher in embodied energy relative to other natural materials and can be expensive."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 20,
-    "fields": {
-        "category": 3,
-        "technique": 10,
-        "description": "More commonly referred to as “screed,” cement plaster is often used as a preparation layer for soft or flexible floor finishes or tiles. Cement plaster can be used as a finish layer, but it can be chipped more easily than other hard flooring options."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 21,
-    "fields": {
-        "category": 3,
-        "technique": 11,
-        "description": "Vinyl flooring is water resistant, low maintenance and inexpensive. It is easy to install and is durable. However, vinyl flooring has a high embodied energy and can release harmful volatile organic compounds after installation. Although durable, vinyl flooring must be laid on a flat, smooth surface. An uneven surface might cause wearing and holes which are difficult to repair, as vinyl is usually laid in a single piece."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 22,
-    "fields": {
-        "category": 3,
-        "technique": 12,
-        "description": "Laminated wooden flooring is more dimensionally stable than solid wood flooring so it can be used in rooms prone to changes in moisture levels or where underfloor heating is used. Due to the thickness of the finish layer the number of times that it can be refinished is reduced, but the initial capital cost is lower than for solid wood flooring."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 23,
-    "fields": {
-        "category": 3,
-        "technique": 13,
-        "description": "Linoleum, often referred to as lino, is a floor covering made from solidified linseed oil (linoxyn), pine rosin, ground cork dust, wood flour and mineral fillers such as calcium carbonate. These materials are added to a canvas backing; pigments are often added to the materials. Lino can be used as an alternative to vinyl and has a much lower embodied energy."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 24,
-    "fields": {
-        "category": 3,
-        "technique": 14,
-        "description": "Laminated wooden flooring is more dimensionally stable than solid wood flooring so it can be used in rooms prone to changes in moisture levels or where underfloor heating is used. Due to the thickness of the finish layer the number of times that it can be refinished is reduced, but the initial capital cost is lower than for solid wood flooring."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 25,
-    "fields": {
-        "category": 3,
-        "technique": 15,
-        "description": "Parquet is wood block flooring in a geometric pattern. It is available in either solid or engineered construction, both of which can be manufactured to have an aged, rustic appearance. Solid parquet wood flooring is more traditional. Engineered wood flooring is composed of layers with a wood species forming the top flooring surface, and two or more under layers of wood running at 90° to each other. The crisscrossed layers increase stability which enables the product to be installed over all types of sub floors and to be used with underfloor heating."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 26,
-    "fields": {
-        "category": 4,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 27,
-    "fields": {
-        "category": 4,
-        "technique": 16,
-        "description": "One of the most popular and conventional of all roof construction types, in-situ reinforced concrete slab uses Portland cement, sand, aggregate, water and reinforcing steel."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 28,
-    "fields": {
-        "category": 4,
-        "technique": 2,
-        "description": "Filler slab construction is technology based on the principal of using filler materials such as brick, clay tiles and cellular concrete blocks instead of concrete. The filler materials are used in the lower tensile region of the slab, which needs only enough concrete to hold the steel reinforcement together."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 29,
-    "fields": {
-        "category": 4,
-        "technique": 3,
-        "description": "Hollow core planks are precast concrete elements with continuous longitudinal voids providing an efficient lightweight section. When grouted, the effective shear key between adjacent hollow core planks ensures that the individual planks behave similarly to a monolithic slab. Hollow core planks may be used to produce a diaphragm to resist horizontal forces, either with or without a structural topping. Hollow core planks, supported on masonry or steel, can be used in domestic, commercial and industrial applications."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 30,
-    "fields": {
-        "category": 4,
-        "technique": 17,
-        "description": "Combined beam/column frame units reduce the number of pieces to erect and minimize the number of connections between beams and columns. Double tees provide a safe, unobstructed work platform, immediately after erection, that is usable for light construction loads. Reinforced, cast-in-place concrete topping over the double tees provides a leveling course, proper drainage slopes and a structural roof diaphragm."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 31,
-    "fields": {
-        "category": 4,
-        "technique": 5,
-        "description": "This construction technique utilizes a composite beam that is a structural beam composed of different materials that are interconnected so that the beam responds to loads as a unit. The most common type of composite beam is one where a steel-concrete composite slab sits on top of a downstand beam, connected by the use of through-deck welded shear studs. This form of construction offers a number of advantages: the decking acts as external reinforcement at the composite stage, and during the construction stage as formwork and a working platform. It may also provide lateral restraint to the beams during construction. The decking is lifted into place in bundles, which are then distributed across the roof area by hand. This dramatically reduces the crane lifts when compared with a precast alternative."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 32,
-    "fields": {
-        "category": 4,
-        "technique": 18,
-        "description": "With this type of roof construction, clay tiles are laid on steel rafters. Steel rafters ensure durability and strength but the embodied energy content of steel is higher than that of timber rafters, which need maintenance but have less embodied energy. EDGE estimates the embodied energy based on a thickness of 10mm for the clay roofing tiles and 8mm for the steel or timber rafters."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 33,
-    "fields": {
-        "category": 4,
-        "technique": 19,
-        "description": "Same as above, except with timber rafters instead of steel rafters. Timber rafters need maintenance but have less embodied energy than steel. Timber sourced from a responsible forest management agency or from re-growth forests ensures the protection and conservation of natural forest communities."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 34,
-    "fields": {
-        "category": 4,
-        "technique": 20,
-        "description": "Micro Concrete Roofing (MCR) Tiles are a cost-effective, aesthetic and durable alternative sloping roof technology. They have less embodied energy content than clay roof tiles and, as MCR tiles are lighter than other roofing tiles, they can be laid on a lighter weight structure."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 35,
-    "fields": {
-        "category": 4,
-        "technique": 21,
-        "description": "Same as above, except on timber rafters."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 36,
-    "fields": {
-        "category": 4,
-        "technique": 22,
-        "description": "Zinc is a very dense and corrosion-resistant architectural material. It is non-ferrous, thus not subject to rusting. Its manufacturing includes crushing the zinc ore into particles, which are then concentrated by floatation. Then they are cast on a continuously rotating cylinder and rolled through pressure rolls to a specified thickness. They are often used as vertical cladding or on pitched roofs. Corrugated zinc sheets are widely used for roofs as they are easy to install due to being prefabricated; also, they are cheap and very light. The corrugations increase the bending strength of the sheet in the direction perpendicular to the corrugations, but not parallel to them."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 37,
-    "fields": {
-        "category": 4,
-        "technique": 23,
-        "description": "Same as above, but on timber rafters."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 38,
-    "fields": {
-        "category": 4,
-        "technique": 24,
-        "description": "Sandwich panels provide a combination of high structural rigidity and low weight and are used in a variety of applications. A steel-clad sandwich panel is made of three layers: a low-density core with a thin skin-layer of steel bonded to each side. The core may be empty or honeycombed and may contain insulation. Steel is stronger than aluminum, so there is less likelihood of the core being honeycombed for strength."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 39,
-    "fields": {
-        "category": 5,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 40,
-    "fields": {
-        "category": 5,
-        "technique": 16,
-        "description": ""
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 41,
-    "fields": {
-        "category": 6,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 42,
-    "fields": {
-        "category": 6,
-        "technique": 25,
-        "description": ""
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 43,
-    "fields": {
-        "category": 7,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 44,
-    "fields": {
-        "category": 7,
-        "technique": 26,
-        "description": ""
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 45,
-    "fields": {
-        "category": 8,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 46,
-    "fields": {
-        "category": 8,
-        "technique": 27,
-        "description": "Common bricks, also known as fired clay bricks, are popular with builders as they are easily available and inexpensive. However, because common bricks are fired at high temperatures, normally achieved by the combustion of fossil fuels, they have high embodied energy."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 47,
-    "fields": {
-        "category": 8,
-        "technique": 28,
-        "description": "Cored clay blocks are made of fired clay and have a holed cross-section. The holed structure means that there is less material per square meter of finished wall."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 48,
-    "fields": {
-        "category": 8,
-        "technique": 29,
-        "description": "Honeycomb clay blocks are made of fired clay and have a honeycombed cross-section. The large size of the blocks enables rapid construction, and the honeycomb structure means that there is less material per square meter of finished wall. The honeycomb structure leads"
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 49,
-    "fields": {
-        "category": 8,
-        "technique": 30,
-        "description": "Hollow concrete blocks are lightweight and easier to handle than solid concrete blocks. The lightness of the blocks helps in reducing the dead load of the masonry on the structure. The voids also marginally improve the thermal insulation and sound insulation of the block. The larger size of the blocks (compared to conventional burnt clay bricks) also reduces the number of mortar joints and the amount of cement mortar."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 50,
-    "fields": {
-        "category": 8,
-        "technique": 31,
-        "description": "Solid dense concrete blocks can be used in virtually any part of a building. They provide excellent sound insulation and their high strength makes them applicable for use in structural walls. However, the use of virgin aggregates and sand can lead to land or marine degradation and resource depletion, and the lack of supplementary materials in the cement results in increased embodied energy."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 51,
-    "fields": {
-        "category": 8,
-        "technique": 32,
-        "description": "Aerated concrete is a versatile, lightweight building material. Compared to solid dense concrete blocks, aerated concrete blocks have a lower density and excellent insulation properties. They are durable and have good resistance to sulfate attack and damage by fire and frost. Aerated concrete blocks are excellent thermal insulators. Based on volume, the manufacture of aerated blocks typically uses 25% less energy than other concrete blocks. They are lighter in weight which makes them easier to work with and saves energy in transportation."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 52,
-    "fields": {
-        "category": 8,
-        "technique": 33,
-        "description": "Precast concrete is a construction product made by casting concrete in a reusable molding or “form” which is then cured in a controlled environment, transported to the construction site, and lifted into place. Precast cladding or curtain walls are the most common use of precast concrete for building envelopes. These types of precast concrete panels do not transfer vertical loads but simply enclose the space. They are only designed to resist wind, seismic forces generated by their own weight, and forces requiring transferring the weight of the panel to the support. Common cladding units include wall panels, window wall units, spandrels, mullions and column covers. These units can usually be removed individually if necessary. In some cases, precast panels are used as formwork for cast-in-place concrete. The precast panels act as a form, providing the visible aesthetics of the system, while the cast-in-place portion provides the structural component."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 53,
-    "fields": {
-        "category": 8,
-        "technique": 34,
-        "description": "Limestone makes up about 10% of the total volume of all sedimentary rocks. Although limestone is found widely, developers and designers should opt for local extracted stone to reduce transport implications. Limestone is readily available and relatively easy to cut into blocks in a quarry. It is also long-lasting and stands up well to exposure, as it is hard, durable and commonly occurs in easily accessible surface exposures. Because of its mass, it has a high thermal inertia. However, limestone is a very heavy material, making it impractical for tall buildings, and relatively expensive as a building material."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 54,
-    "fields": {
-        "category": 8,
-        "technique": 35,
-        "description": "Steel, one of the strongest and most affordable materials, is a ferrous metal, meaning it contains iron. It has a favorable strength-to-weight ratio as well as provides elasticity. Other benefits include stiffness and fire and corrosion resistance. Steel wall cladding profiles create totally new economical solutions in both new building and renovation and in operating and maintenance. The profiles are versatile cladding that comes in a very broad range of shapes, finishing and colors that enable innovative designs. In addition, they can be installed with insulation for better thermal performance."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 55,
-    "fields": {
-        "category": 8,
-        "technique": 36,
-        "description": "Beside steel, aluminum is the most used metal in construction. It is one of the lightest and easiest metals to manipulate, bend, shape, cast, fasten and weld, and is also very ductile, often extruded into shapes for architectural purposes. It can easily be drilled, tapped, sawed, planed and filed with hand tools, making it a yielding material for tradesmen to use. Aluminum is commonly used as wall cladding or curtain-walls, as its resistance to corrosion is higher than steel, and lighter than other metals. However, the disadvantages are the higher cost and embodied energy, greater thermal expansion, and lower fire resistance as compared to steel. Most exterior applications using aluminum alloys are anodized surfaces, which increases the metal durability, traps dyes and adheres to other finishes. Plastic coatings, which are applied electrostatically as a powder and then heat cured, are also used for cladding wall panels. This coating gives a durable protection layer, with a more uniform appearance. The finished appearance can range from clear to a wide variety of colors and textures, depending on the coating applied. In addition, the panels can be installed with insulation for better thermal performance."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 56,
-    "fields": {
-        "category": 8,
-        "technique": 37,
-        "description": "A curtain wall is a vertical building enclosure which supports no load other than its own weight and the environmental forces which act upon it. Curtain walls are not intended to assist in maintaining the structural integrity of a building. Dead loads and live loads are thus not intended to be transferred via the curtain wall to the foundations."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 57,
-    "fields": {
-        "category": 8,
-        "technique": 24,
-        "description": "Sandwich panels provide a combination of high structural rigidity and low weight and are used in a variety of applications. A steel-clad sandwich panel is made of three layers: a low-density core with a thin skin-layer of steel bonded to each side. The core may be empty or honeycombed and may contain insulation. Steel is stronger than aluminum, so there is less likelihood of the core being honeycombed for strength."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 58,
-    "fields": {
-        "category": 9,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 59,
-    "fields": {
-        "category": 9,
-        "technique": 38,
-        "description": "Common bricks, also known as fired clay bricks, are popular with builders as they are easily available and inexpensive. However, because common bricks are fired at high temperatures, normally achieved by the combustion of fossil fuels, they have high embodied energy."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 60,
-    "fields": {
-        "category": 9,
-        "technique": 39,
-        "description": "Cored clay blocks are made of fired clay and have a holed cross-section. The holed structure means that there is less material per square meter of finished wall."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 61,
-    "fields": {
-        "category": 9,
-        "technique": 29,
-        "description": "Honeycomb clay blocks are made of fired clay and have a honeycombed cross-section. The large size of the blocks enables rapid construction, and the honeycomb structure means that there is less material per square meter of finished wall. The features listed below make honeycomb clay blocks an eco-friendlier building product: o The honeycomb structure leads to improved thermal performance. o Blocks can be customized. o No mortar is needed in the vertical joints due to a tongue and grooved edge, reducing mortar use by up to 40%. o The blocks are strong and have a high impact resistance. o Honeycomb clay blocks have post-consumer value if dismantled carefully."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 62,
-    "fields": {
-        "category": 9,
-        "technique": 30,
-        "description": "Hollow concrete blocks are lightweight and easier to handle than solid concrete blocks. The lightness of the blocks helps in reducing the dead load of the masonry on the structure. The voids also marginally improve the thermal insulation and sound insulation of the block. The larger size of the blocks (compared to conventional burnt clay bricks) also reduces the number of mortar joints and hence the amount of cement mortar."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 63,
-    "fields": {
-        "category": 9,
-        "technique": 31,
-        "description": "Solid dense concrete blocks can be used in virtually any part of a building. They provide excellent sound insulation and their high strength makes them applicable for use in structural walls. However, the use of virgin aggregates and sand can lead to land or marine degradation and resource depletion, and the lack of supplementary materials in the cement results in increased embodied energy."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 64,
-    "fields": {
-        "category": 9,
-        "technique": 32,
-        "description": "Aerated concrete is a versatile, lightweight building material. Compared to solid dense concrete blocks, aerated concrete blocks have a lower density and excellent insulation properties. They are durable and have good resistance to sulphate attack and damage by fire and frost. Aerated concrete blocks are excellent thermal insulators. Based on volume, the manufacture of aerated blocks typically uses 25% less energy than other concrete blocks. They are lighter weight which makes them easier to work with and saves energy in transportation."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 65,
-    "fields": {
-        "category": 9,
-        "technique": 33,
-        "description": "Precast concrete is a construction product made by casting concrete in a reusable molding or “form” which is then cured in a controlled environment, transported to the construction site, and lifted into place. Precast cladding or curtain walls are the most common use of precast concrete for building envelopes. These types of precast concrete panels do not transfer vertical loads but simply enclose the space. They are only designed to resist wind, seismic forces generated by their own weight, and forces requiring transferring the weight of the panel to the support. Common cladding units include wall panels, window wall units, spandrels, mullions and column covers. These units can usually be removed individually if necessary. In some cases, precast panels are used as formwork for cast-in-place concrete. The precast panels act as a form, providing the visible aesthetics of the system, while the cast-in-place portion provides the structural component."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 66,
-    "fields": {
-        "category": 9,
-        "technique": 40,
-        "description": "More commonly used for floor slabs and roofs, in-situ reinforced concrete is also used to construct walls. It has a high embodied energy due to the inclusion of Portland cement and uses sand, aggregate, water and reinforcing steel."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 67,
-    "fields": {
-        "category": 9,
-        "technique": 34,
-        "description": "Limestone makes up about 10% of the total volume of all sedimentary rocks. Although limestone is found widely, developers and designers should opt for local extracted stone to reduce transport implications. Limestone is readily available and relatively easy to cut into blocks in a quarry. It is also long-lasting and stands up well to exposure, as it is hard, durable and commonly occurs in easily accessible surface exposures. Because of its mass, it has a high thermal inertia. However, limestone is a very heavy material, making it impractical for tall buildings, and relatively expensive as a building material."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 68,
-    "fields": {
-        "category": 9,
-        "technique": 41,
-        "description": "Precast concrete sandwich panels comprise an outer leaf of precast concrete, an insulating layer “sandwiched” in between, and an inner leaf of plain gray concrete with a power floated finish. The panels may be attached to a steel frame as a cladding panel, or they can form part of a precast structural frame where the inner leaf is load bearing and the external leaf is connected to and supported off the internal leaf using ties. The ties used in the precast structural frames are made of metal, plastic or epoxy and have low thermal conductivity to eliminate cold bridging. The thickness of the insulation depends on the required U-value. The shape, thickness and size of the concrete can also be varied to meet the requirements of the project."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 69,
-    "fields": {
-        "category": 9,
-        "technique": 42,
-        "description": "Cement fiber board used to clad buildings may also be referred to as “siding” or “ship lap cladding.” It has the advantage of being more stable than wood through an extreme range of weather conditions and it won’t rot, twist or warp. It is used to replace timber cladding in new build and refurbishment projects. Boarding is often self-colored so it doesn’t need painting. The board can be fixed to timber or steel studs, and is easily cut by scoring and snapping external corners and edges."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 70,
-    "fields": {
-        "category": 9,
-        "technique": 43,
-        "description": "Same as above, except on timber studs instead of metal studs."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 71,
-    "fields": {
-        "category": 9,
-        "technique": 44,
-        "description": "Plasterboard is a form of wallboard manufactured using a core of gypsum plaster bonded to layers of paper or fiberboard. It can be mounted on timber studs."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 72,
-    "fields": {
-        "category": 9,
-        "technique": 45,
-        "description": "Same as above, except with insulation between the timber studs."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 73,
-    "fields": {
-        "category": 9,
-        "technique": 46,
-        "description": "Same as above, except mounted on metal studs instead of timber studs."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 74,
-    "fields": {
-        "category": 9,
-        "technique": 47,
-        "description": "Same as above, except with insulation between the metal studs."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 75,
-    "fields": {
-        "category": 10,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 76,
-    "fields": {
-        "category": 10,
-        "technique": 48,
-        "description": "The two metals typically used for window frames are aluminum or steel. Aluminum is lighter weight and does not rust like a ferrous metal such as steel, but the embodied energy is much higher. The advantage of using metal window frames is that they are strong, light and require less maintenance than other materials used for window frames. However as metal conducts heat very well, the thermal performance of metal windows is not as good as other materials. To reduce heat flow and U-Value, metal frames can include a thermal break between the inside and outside of the frame."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 77,
-    "fields": {
-        "category": 10,
-        "technique": 49,
-        "description": "Like aluminum windows above, except steel windows are heavier than aluminum and require some maintenance to protect from rust (unless stainless steel is used). Steel has somewhat better thermal performance than aluminum."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 78,
-    "fields": {
-        "category": 10,
-        "technique": 50,
-        "description": "Timber window frames insulate relatively well, but they also expand and contract in response to weather conditions. Timber frames can be made from either softwood or hardwood. Softwood frames are much cheaper, but are likely to require more regular maintenance. The maintenance required can be reduced by using aluminum or vinyl cladding."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 79,
-    "fields": {
-        "category": 10,
-        "technique": 51,
-        "description": "UPVC window frames are made of extruded polyvinyl chloride (PVC) with ultraviolet light (UV) stabilizers to keep sunlight from breaking down the material. uPVC window frames are low maintenance as they do not require painting. If the cavities of uPVC frames are filled with insulation, they have very good thermal performance."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 80,
-    "fields": {
-        "category": 10,
-        "technique": 52,
-        "description": "Aluminum cladding is fixed to wooden framing members with a space for ventilation purposes. Timber and aluminum have high embodied energy. The extruded aluminum sections are designed for strength and rigidity, to prevent deformation at the fastening points. Often used in commercial applications, these windows are also suitable for residential applications where low maintenance is important, such as social housing and high-rise developments."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 81,
-    "fields": {
-        "category": 10,
-        "technique": 53,
-        "description": "Re-using an existing material avoids the use, and therefore embodied energy, of new materials. The re-use of existing materials option in EDGE is highly desirable and assigned an embodied energy value of zero. The material must be verifiably more than five years old to be classified as re-used. The material does not have to have been sourced from the project site."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 82,
-    "fields": {
-        "category": 11,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 83,
-    "fields": {
-        "category": 11,
-        "technique": 54,
-        "description": "A single pane (sheet) of glass in the windows."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 84,
-    "fields": {
-        "category": 11,
-        "technique": 55,
-        "description": "Two panes of glass"
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 85,
-    "fields": {
-        "category": 11,
-        "technique": 56,
-        "description": "Three panes of glass"
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 86,
-    "fields": {
-        "category": 12,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 87,
-    "fields": {
-        "category": 12,
-        "technique": 57,
-        "description": "Polystyrene has the highest embodied energy per square meter of any other insulation type. There are two types of polystyrene insulation: Expanded Polystyrene (EPS) insulation is made from small beads of polystyrene that when heated cause them to expand; they are then mixed with a blowing agent (pentane). Expanded polystyrene is available in board form or as beads. Boards are produced by placing the beads in molds and heating them to fuse the beads together. Typical applications of EPS boards are for insulation of walls, roofs and floors. Polystyrene beads are frequently used as cavity fill in masonry walls. Extruded Polystyrene (XPS) is made by mixing polystyrene with a blowing agent under pressure and forcing it through a die. As it emerges from the die it expands into foam; it can then be shaped and trimmed. XPS is slightly stronger than EPS, and although it is used in many of the same applications as EPS, it is particularly suitable for use below ground or where extra loading and/or impacts might be anticipated."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 88,
-    "fields": {
-        "category": 12,
-        "technique": 58,
-        "description": "Rock-based mineral wool is made by melting rock and recycled steel slag and spinning it into fibers. The insulation is available in different densities depending on the required functionality. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls and insulation for roof rafters, lofts and suspended floors. Mineral wool has low resistance for moisture."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 89,
-    "fields": {
-        "category": 12,
-        "technique": 59,
-        "description": "Glass wool insulation is manufactured in a similar way to rock wool, though the raw materials are different as well as the melting process. Glass wool is made from silica sand, recycled glass, limestone and soda ash. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls, and insulation for roof rafters, lofts and suspended floors."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 90,
-    "fields": {
-        "category": 12,
-        "technique": 60,
-        "description": "Polyurethane (PUR), a closed-cell plastic, is formed by reacting two monomers in the presence of a blowing agent catalyst (polymerization). Polyisocyanurate foam (PIR) is an improvement on polyurethane (there is a slight difference in the constituents and the reaction is conducted at higher temperatures). PIR is more fire-resistant and has a slightly higher R Value. Applications include wall, floor and roof insulation. Polyurethane is also popular in laminate form in SIPS and as an insulation backing to rigid boarding such as plasterboard."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 91,
-    "fields": {
-        "category": 12,
-        "technique": 61,
-        "description": "Four major types of loose-fill cellulose products have been developed for differing uses in a building under a variety of brand names. These are characterized as: 1. Dry cellulose 2. Spray applied cellulose 3. Stabilized cellulose 4. Low dust cellulose."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 92,
-    "fields": {
-        "category": 12,
-        "technique": 62,
-        "description": "Cork has low embodied energy and is environmentally friendly. It can be harvested from the same tree for about two hundred years. Harvesting is done with minimal impact on the environment and no trees are cut down to manufacture cork products."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 93,
-    "fields": {
-        "category": 12,
-        "technique": 63,
-        "description": "Woodwool boards have been used in buildings for decades and are a popular substrate for lime plaster. Strands of wood, bound together with a small proportion of Portland cement, provide a good background for lime plasters, eliminate thermal bridges in pillars, beams, inter-story facings and radiator niches and provide insulation of flat and sloping roofs; provide acoustic insulation of walls and insulation from floor noise; as well as fire resistant coverings."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 94,
-    "fields": {
-        "category": 12,
-        "technique": 64,
-        "description": "In principle, the use of cavities is like the use of an insulating material. Air is a poor conductor of heat, therefore still air trapped in an air space between two layers of a wall or roof acts as a barrier to heat transfer."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 95,
-    "fields": {
-        "category": 12,
-        "technique": 65,
-        "description": "Gaps larger than 100mm encourage convection and are not effective insulators."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 96,
-    "fields": {
-        "category": 12,
-        "technique": 66,
-        "description": "This option must be selected if no insulation is specified for the roof or walls."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 97,
-    "fields": {
-        "category": 13,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 98,
-    "fields": {
-        "category": 13,
-        "technique": 57,
-        "description": "Polystyrene has the highest embodied energy per square meter of any other insulation type. There are two types of polystyrene insulation: Expanded Polystyrene (EPS) insulation is made from small beads of polystyrene that when heated cause them to expand; they are then mixed with a blowing agent (pentane). Expanded polystyrene is available in board form or as beads. Boards are produced by placing the beads in molds and heating them to fuse the beads together. Typical applications of EPS boards are for insulation of walls, roofs and floors. Polystyrene beads are frequently used as cavity fill in masonry walls. Extruded Polystyrene (XPS) is made by mixing polystyrene with a blowing agent under pressure and forcing it through a die. As it emerges from the die it expands into foam; it can then be shaped and trimmed. XPS is slightly stronger than EPS, and although it is used in many of the same applications as EPS, it is particularly suitable for use below ground or where extra loading and/or impacts might be anticipated."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 99,
-    "fields": {
-        "category": 13,
-        "technique": 58,
-        "description": "Rock-based mineral wool is made by melting rock and recycled steel slag and spinning it into fibers. The insulation is available in different densities depending on the required functionality. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls and insulation for roof rafters, lofts and suspended floors. Mineral wool has low resistance for moisture."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 100,
-    "fields": {
-        "category": 13,
-        "technique": 59,
-        "description": "Glass wool insulation is manufactured in a similar way to rock wool, though the raw materials are different as well as the melting process. Glass wool is made from silica sand, recycled glass, limestone and soda ash. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls, and insulation for roof rafters, lofts and suspended floors."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 101,
-    "fields": {
-        "category": 13,
-        "technique": 60,
-        "description": "Polyurethane (PUR), a closed-cell plastic, is formed by reacting two monomers in the presence of a blowing agent catalyst (polymerization). Polyisocyanurate foam (PIR) is an improvement on polyurethane (there is a slight difference in the constituents and the reaction is conducted at higher temperatures). PIR is more fire-resistant and has a slightly higher R Value. Applications include wall, floor and roof insulation. Polyurethane is also popular in laminate form in SIPS and as an insulation backing to rigid boarding such as plasterboard."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 102,
-    "fields": {
-        "category": 13,
-        "technique": 61,
-        "description": "Four major types of loose-fill cellulose products have been developed for differing uses in a building under a variety of brand names. These are characterized as: 1. Dry cellulose 2. Spray applied cellulose 3. Stabilized cellulose 4. Low dust cellulose."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 103,
-    "fields": {
-        "category": 13,
-        "technique": 62,
-        "description": "Cork has low embodied energy and is environmentally friendly. It can be harvested from the same tree for about two hundred years. Harvesting is done with minimal impact on the environment and no trees are cut down to manufacture cork products."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 104,
-    "fields": {
-        "category": 13,
-        "technique": 63,
-        "description": "Woodwool boards have been used in buildings for decades and are a popular substrate for lime plaster. Strands of wood, bound together with a small proportion of Portland cement, provide a good background for lime plasters, eliminate thermal bridges in pillars, beams, inter-story facings and radiator niches and provide insulation of flat and sloping roofs; provide acoustic insulation of walls and insulation from floor noise; as well as fire resistant coverings."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 105,
-    "fields": {
-        "category": 13,
-        "technique": 64,
-        "description": "In principle, the use of cavities is like the use of an insulating material. Air is a poor conductor of heat, therefore still air trapped in an air space between two layers of a wall or roof acts as a barrier to heat transfer."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 106,
-    "fields": {
-        "category": 13,
-        "technique": 65,
-        "description": "Gaps larger than 100mm encourage convection and are not effective insulators."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 107,
-    "fields": {
-        "category": 13,
-        "technique": 66,
-        "description": "This option must be selected if no insulation is specified for the roof or walls."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 108,
-    "fields": {
-        "category": 14,
-        "technique": null,
-        "description": null
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 109,
-    "fields": {
-        "category": 14,
-        "technique": 57,
-        "description": "Polystyrene has the highest embodied energy per square meter of any other insulation type. There are two types of polystyrene insulation: Expanded Polystyrene (EPS) insulation is made from small beads of polystyrene that when heated cause them to expand; they are then mixed with a blowing agent (pentane). Expanded polystyrene is available in board form or as beads. Boards are produced by placing the beads in molds and heating them to fuse the beads together. Typical applications of EPS boards are for insulation of walls, roofs and floors. Polystyrene beads are frequently used as cavity fill in masonry walls. Extruded Polystyrene (XPS) is made by mixing polystyrene with a blowing agent under pressure and forcing it through a die. As it emerges from the die it expands into foam; it can then be shaped and trimmed. XPS is slightly stronger than EPS, and although it is used in many of the same applications as EPS, it is particularly suitable for use below ground or where extra loading and/or impacts might be anticipated."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 110,
-    "fields": {
-        "category": 14,
-        "technique": 58,
-        "description": "Rock-based mineral wool is made by melting rock and recycled steel slag and spinning it into fibers. The insulation is available in different densities depending on the required functionality. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls and insulation for roof rafters, lofts and suspended floors. Mineral wool has low resistance for moisture."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 111,
-    "fields": {
-        "category": 14,
-        "technique": 59,
-        "description": "Glass wool insulation is manufactured in a similar way to rock wool, though the raw materials are different as well as the melting process. Glass wool is made from silica sand, recycled glass, limestone and soda ash. Higher densities provide better sound insulation but poorer thermal insulation. Applications include masonry cavity walls, timber frame walls, and insulation for roof rafters, lofts and suspended floors."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 112,
-    "fields": {
-        "category": 14,
-        "technique": 60,
-        "description": "Polyurethane (PUR), a closed-cell plastic, is formed by reacting two monomers in the presence of a blowing agent catalyst (polymerization). Polyisocyanurate foam (PIR) is an improvement on polyurethane (there is a slight difference in the constituents and the reaction is conducted at higher temperatures). PIR is more fire-resistant and has a slightly higher R Value. Applications include wall, floor and roof insulation. Polyurethane is also popular in laminate form in SIPS and as an insulation backing to rigid boarding such as plasterboard."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 113,
-    "fields": {
-        "category": 14,
-        "technique": 61,
-        "description": "Four major types of loose-fill cellulose products have been developed for differing uses in a building under a variety of brand names. These are characterized as: 1. Dry cellulose 2. Spray applied cellulose 3. Stabilized cellulose 4. Low dust cellulose."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 114,
-    "fields": {
-        "category": 14,
-        "technique": 62,
-        "description": "Cork has low embodied energy and is environmentally friendly. It can be harvested from the same tree for about two hundred years. Harvesting is done with minimal impact on the environment and no trees are cut down to manufacture cork products."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 115,
-    "fields": {
-        "category": 14,
-        "technique": 63,
-        "description": "Woodwool boards have been used in buildings for decades and are a popular substrate for lime plaster. Strands of wood, bound together with a small proportion of Portland cement, provide a good background for lime plasters, eliminate thermal bridges in pillars, beams, inter-story facings and radiator niches and provide insulation of flat and sloping roofs; provide acoustic insulation of walls and insulation from floor noise; as well as fire resistant coverings."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 116,
-    "fields": {
-        "category": 14,
-        "technique": 64,
-        "description": "In principle, the use of cavities is like the use of an insulating material. Air is a poor conductor of heat, therefore still air trapped in an air space between two layers of a wall or roof acts as a barrier to heat transfer."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 117,
-    "fields": {
-        "category": 14,
-        "technique": 65,
-        "description": "Gaps larger than 100mm encourage convection and are not effective insulators."
-    }
-},
-{
-    "model": "pages.assemblycategorytechnique",
-    "pk": 118,
-    "fields": {
-        "category": 14,
-        "technique": 66,
-        "description": "This option must be selected if no insulation is specified for the roof or walls."
-    }
-}
 ]

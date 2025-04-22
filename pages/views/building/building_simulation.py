@@ -51,7 +51,7 @@ def building_simulation(request, building_id):
                 return get_op_product_list(request, building_id)
             case "save_op_products":
                 handle_op_products_save(request, building_id, simulation=True)
-                context, form, detailedForm = handle_building_load(
+                context, form, detailedForm, _ = handle_building_load(
                     request, building_id, simulation=True
                 )
                 context["edit_mode"] = False
@@ -63,7 +63,7 @@ def building_simulation(request, building_id):
                 response["HX-Refresh"] = "true"  # Add the HX-Refresh header
                 return response
             case "edit_products":
-                context, _, _ = handle_building_load(
+                context, _, _, _ = handle_building_load(
                     request, building_id, simulation=True
                 )
                 context["edit_mode"] = True
@@ -75,7 +75,7 @@ def building_simulation(request, building_id):
 
     # Full reload
     else:
-        context, form, detailedForm = handle_building_load(
+        context, form, detailedForm, operationalInfoForm = handle_building_load(
             request, building_id, simulation=True
         )
 
@@ -87,13 +87,20 @@ def building_simulation(request, building_id):
             form.fields[field].disabled = True
         for field in detailedForm.fields:
             detailedForm.fields[field].disabled = True
+        for field in operationalInfoForm.fields:
+            operationalInfoForm.fields[field].disabled = True
         if hasattr(form.helper.layout[3], "flat_attrs"):
             form.helper.layout[3].flat_attrs = "disabled"
         if hasattr(detailedForm.helper.layout[3], "flat_attrs"):
             detailedForm.helper.layout[3].flat_attrs = "disabled"
+        
+        # operational form does this in the template
+        # if hasattr(operationalInfoForm.helper.layout[3], "flat_attrs"):
+        #     operationalInfoForm.helper.layout[3].flat_attrs = "disabled"
 
         context["form_general_info"] = form
         context["form_detailed_info"] = detailedForm
+        context["form_operational_info"] = operationalInfoForm
 
     context["simulation"] = True
     # Full page load for GET request

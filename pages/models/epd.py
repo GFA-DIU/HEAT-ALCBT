@@ -1,4 +1,6 @@
+from decimal import Decimal
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext as _
 
@@ -6,6 +8,7 @@ from cities_light.models import Country
 from accounts.models import CustomCity
 
 from .base import BaseModel
+
 
 
 INDICATOR_UNIT_MAPPING = {
@@ -257,6 +260,7 @@ class EPD(BaseModel, epdLCAx):
         _("Reference Quantity of EPD"),
         max_digits=10,
         decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))],
         null=False,
         blank=False,
     )
@@ -264,15 +268,15 @@ class EPD(BaseModel, epdLCAx):
     def __str__(self):
         return self.name
 
-    def get_gwp_impact_sum(self):
+    def get_gwp_impact_sum(self, life_cycle_stage):
         impacts = EPDImpact.objects.filter(
-            epd=self, impact__impact_category="gwp", impact__life_cycle_stage="a1a3"
+            epd=self, impact__impact_category="gwp", impact__life_cycle_stage=life_cycle_stage
         )
         return round(sum(impact.value for impact in impacts), 2)
 
-    def get_penrt_impact_sum(self):
+    def get_penrt_impact_sum(self, life_cycle_stage):
         impacts = EPDImpact.objects.filter(
-            epd=self, impact__impact_category="penrt", impact__life_cycle_stage="a1a3"
+            epd=self, impact__impact_category="penrt", impact__life_cycle_stage=life_cycle_stage
         )
         return round(sum(impact.value for impact in impacts), 2)
 

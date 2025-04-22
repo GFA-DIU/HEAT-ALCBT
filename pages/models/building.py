@@ -16,6 +16,7 @@ class ClimateZone(models.TextChoices):
     COMPOSITE = "composite", "composite"
     TEMPERATE = "temperate", "temperate"
     COLD = "cold", "cold"
+    TROPICAL_WET = "tropical-wet", "tropical wet"
 
 
 class HeatingType(models.TextChoices):
@@ -48,7 +49,7 @@ class LightingType(models.TextChoices):
 
 
 class BuildingSubcategory(models.Model):
-    name = models.CharField(_("Name"), max_length=255)
+    name = models.CharField(_("Name"), max_length=255, unique=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -59,7 +60,7 @@ class BuildingSubcategory(models.Model):
 
 
 class BuildingCategory(models.Model):
-    name = models.CharField(_("Name"), max_length=255)
+    name = models.CharField(_("Name"), max_length=255, unique=True)
     subcategories = models.ManyToManyField(
         BuildingSubcategory,
         through="CategorySubcategory",
@@ -104,8 +105,8 @@ class BuildingOperationalInfo(models.Model):
         blank=True,
         validators=[MinValueValidator(0)],
     )
-    hours_per_week = models.IntegerField(
-        _("Operation hours per week"),
+    hours_per_workday = models.IntegerField(
+        _("Operation hours per workday"),
         null=True,
         blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(24)],
@@ -273,7 +274,7 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
     )
     total_floor_area = models.DecimalField(
         _("Total Floor Area"),
-        help_text=_("Gross floor area [m^2]"),
+        help_text=_("Gross floor area [m²]"),
         max_digits=10,
         decimal_places=2,
         null=False,
@@ -281,7 +282,7 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
     )
     cond_floor_area = models.DecimalField(
         _("Conditioned Floor Area"),
-        help_text=_("Gross floor area [m^2]"),
+        help_text=_("Gross floor area [m²]"),
         max_digits=10,
         decimal_places=2,
         null=True,
@@ -302,8 +303,8 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
         blank=True,
     )
     reference_period = models.IntegerField(
-        _("Ref. period"),
-        help_text=_("Number of years of building usage"),
+        _("Assessment time frame"),
+        help_text=_("Years of building use"),
         null=False,
         blank=False,
         default=50,
@@ -312,7 +313,6 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
     class Meta:
         verbose_name = "Building"
         verbose_name_plural = "Buildings"
-        
 
 
 class BuildingAssembly(models.Model):
@@ -367,8 +367,10 @@ class BuildingAssemblySimulated(models.Model):
 class OperationalProduct(BaseProduct):
     """Join Table for EPDs and Building. Products are EPDs with quantity and results."""
 
-    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='operational_products')
-    
+    building = models.ForeignKey(
+        Building, on_delete=models.CASCADE, related_name="operational_products"
+    )
+
     def get_impacts(self):
         return calculate_impact_operational(self)
 
@@ -376,7 +378,11 @@ class OperationalProduct(BaseProduct):
 class SimulatedOperationalProduct(BaseProduct):
     """Join Table for EPDs and Simulated Building. Products are EPDs with quantity and results."""
 
-    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='simulated_operational_products')
-    
+    building = models.ForeignKey(
+        Building,
+        on_delete=models.CASCADE,
+        related_name="simulated_operational_products",
+    )
+
     def get_impacts(self):
         return calculate_impact_operational(self)

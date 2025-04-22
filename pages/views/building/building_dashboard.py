@@ -97,65 +97,48 @@ def prep_building_dashboard_df(user, building_id, simulation):
     if not structural_components and not operational_impact_list:
         return HttpResponse()
     elif not structural_components:
-        df_op = pd.DataFrame.from_records(operational_impact_list)
-        df_op["type"] = "operational"
-        df_op["assembly_category"] = "Operational Carbon"
-        df_op.rename(columns={"category": "material_category", "gwp_b6": "gwp", "penrt_b6": "penrt"}, inplace=True)
-        
-        df = df_op[["assembly_category", "material_category", "gwp", "penrt", "type"]]
+        df = prep_operational_df(operational_impact_list)
     elif not operational_impact_list:
-
-        # Prepare DataFrame
-        df = pd.DataFrame.from_records(impact_list)
-        df["impact_type"] = df["impact_type"].apply(lambda x: x.__str__())
-        df["assembly_category"] = df["assembly_category"].apply(lambda x: x.__str__())
-        df["material_category"] = df["material_category"].apply(lambda x: x.__str__())
-        df = df[df["impact_type"].isin(["gwp a1a3", "penrt a1a3"])]
-        df = df.pivot(
-            index=["assembly_id", "epd_id", "assembly_category", "material_category"],
-            columns="impact_type",
-            values="impact_value",
-        ).reset_index()
-        
-        # Decision to only display positive values for embodied carbon and embodied energy, yet indicator below still shows sum.
-        # Thus creating a new column
-        df["gwp a1a3 pos"] = df["gwp a1a3"]
-        df.loc[df["gwp a1a3 pos"] <= 0, "gwp a1a3 pos"] = 0
-        df["penrt a1a3 pos"] = df["penrt a1a3"]
-        df.loc[df["penrt a1a3 pos"] <= 0, "penrt a1a3 pos"] = 0
-        df["type"] = "structural"
-        df.rename(columns={"gwp a1a3 pos": "gwp", "penrt a1a3 pos": "penrt"}, inplace=True)
+        df = prep_structural_df(impact_list)
     elif operational_impact_list and structural_components:
         
-        df = pd.DataFrame.from_records(impact_list)
-        df["impact_type"] = df["impact_type"].apply(lambda x: x.__str__())
-        df["assembly_category"] = df["assembly_category"].apply(lambda x: x.__str__())
-        df["material_category"] = df["material_category"].apply(lambda x: x.__str__())
-        df = df[df["impact_type"].isin(["gwp a1a3", "penrt a1a3"])]
-        df = df.pivot(
-            index=["assembly_id", "epd_id", "assembly_category", "material_category"],
-            columns="impact_type",
-            values="impact_value",
-        ).reset_index()
-        
-        # Decision to only display positive values for embodied carbon and embodied energy, yet indicator below still shows sum.
-        # Thus creating a new column
-        df["gwp a1a3 pos"] = df["gwp a1a3"]
-        df.loc[df["gwp a1a3 pos"] <= 0, "gwp a1a3 pos"] = 0
-        df["penrt a1a3 pos"] = df["penrt a1a3"]
-        df.loc[df["penrt a1a3 pos"] <= 0, "penrt a1a3 pos"] = 0
-        df["type"] = "structural"
-        df.rename(columns={"gwp a1a3 pos": "gwp", "penrt a1a3 pos": "penrt"}, inplace=True)
+        df = prep_structural_df(impact_list)
     
         # operational df
-        df_op = pd.DataFrame.from_records(operational_impact_list)
-        df_op["material_category"] = df_op["category"].apply(lambda x: x.__str__())
-        df_op["type"] = "operational"
-        df_op["assembly_category"] = "Operational Carbon"
-        df_op.rename(columns={"gwp_b6": "gwp", "penrt_b6": "penrt"}, inplace=True)
+        df_op = prep_operational_df(operational_impact_list)
 
         df = pd.concat([df, df_op], axis=0)[["assembly_category", "material_category", "gwp", "penrt", "type"]]
     return df
+
+def prep_structural_df(impact_list):
+    df = pd.DataFrame.from_records(impact_list)
+    df["impact_type"] = df["impact_type"].apply(lambda x: x.__str__())
+    df["assembly_category"] = df["assembly_category"].apply(lambda x: x.__str__())
+    df["material_category"] = df["material_category"].apply(lambda x: x.__str__())
+    df = df[df["impact_type"].isin(["gwp a1a3", "penrt a1a3"])]
+    df = df.pivot(
+            index=["assembly_id", "epd_id", "assembly_category", "material_category"],
+            columns="impact_type",
+            values="impact_value",
+        ).reset_index()
+        
+        # Decision to only display positive values for embodied carbon and embodied energy, yet indicator below still shows sum.
+        # Thus creating a new column
+    df["gwp a1a3 pos"] = df["gwp a1a3"]
+    df.loc[df["gwp a1a3 pos"] <= 0, "gwp a1a3 pos"] = 0
+    df["penrt a1a3 pos"] = df["penrt a1a3"]
+    df.loc[df["penrt a1a3 pos"] <= 0, "penrt a1a3 pos"] = 0
+    df["type"] = "structural"
+    df.rename(columns={"gwp a1a3 pos": "gwp", "penrt a1a3 pos": "penrt"}, inplace=True)
+    return df
+
+def prep_operational_df(operational_impact_list):
+    df_op = pd.DataFrame.from_records(operational_impact_list)
+    df_op["material_category"] = df_op["category"].apply(lambda x: x.__str__())
+    df_op["type"] = "operational"
+    df_op["assembly_category"] = "Operational Carbon"
+    df_op.rename(columns={"gwp_b6": "gwp", "penrt_b6": "penrt"}, inplace=True)
+    return df_op
 
 
 def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
@@ -483,8 +466,7 @@ def _get_color_ordering(df, unit):
     
     index_struct = df_sorted[df_sorted['type'] == 'structural'].index.tolist()
     index_op = df_sorted[df_sorted['type'] == 'operational'].index.tolist()
-    final_size = max(max(index_struct), max(index_op)) + 1
-    color_list = [None] * final_size
+    color_list = [None] * (len(index_struct) + len(index_op))
 
     for pos, rgb in zip(index_struct, colorscale_struct):
         color_list[pos] = rgb
