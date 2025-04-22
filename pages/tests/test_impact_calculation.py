@@ -76,10 +76,13 @@ def create_assembly():
 @pytest.fixture
 def create_product():
     def _create_product(assembly, epd, quantity, unit):
-        assemblycategorytechnique = AssemblyCategoryTechnique.objects.create(
-            category=AssemblyCategory.objects.first(),
-            technique=AssemblyTechnique.objects.first(),
-            description="Created for test",
+        category = AssemblyCategory.objects.first()
+        technique = AssemblyTechnique.objects.first()
+
+        assemblycategorytechnique, _ = AssemblyCategoryTechnique.objects.get_or_create(
+            category=category,
+            technique=technique,
+            defaults={"description": "Created for test"},
         )
         return StructuralProduct.objects.create(
             # Struct. Product
@@ -302,7 +305,6 @@ def test_calculate_impacts_dimension_logic(
         assert impact["impact_value"] == pytest.approx(
             expected_impact, rel=Decimal("1e-15")
         )
-
 
 
 # Parametrized test with fixtures
