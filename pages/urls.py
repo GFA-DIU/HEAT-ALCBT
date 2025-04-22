@@ -28,7 +28,7 @@ urlpatterns = [
     path("select_lists/", select_lists, name="select-lists"),
     path("map/", map_view, name="map"),
     path("dashboard/", dashboard_view, name="dashboard"),
-    path("building/_new/", building, name="new_building"),
+    path("building/_new", building, name="new_building"),
     path("building/<uuid:building_id>/", building, name="building"),
     path(
         "building/<uuid:building_id>/simulation",
