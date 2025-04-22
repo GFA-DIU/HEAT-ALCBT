@@ -277,7 +277,7 @@ class EPD(BaseModel, epdLCAx):
             impact__impact_category="gwp",
             impact__life_cycle_stage=life_cycle_stage,
         )
-        return round(impact.value, 2) / self.declared_amount
+        return Decimal(round(impact.value, 2)) / self.declared_amount
 
     def get_penrt_impact_sum(self, life_cycle_stage):
         impact = EPDImpact.objects.get(
@@ -285,7 +285,7 @@ class EPD(BaseModel, epdLCAx):
             impact__impact_category="penrt",
             impact__life_cycle_stage=life_cycle_stage,
         )
-        return round(impact.value, 2) / self.declared_amount
+        return Decimal(round(impact.value, 2)) / self.declared_amount
 
     def get_op_units(self):
         units = [self.declared_unit]

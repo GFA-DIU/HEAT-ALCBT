@@ -19,7 +19,7 @@
 
         <!-- Emissions (centered) -->
         <div class="col-3 d-flex justify-content-center align-items-center">
-            <span class="badge border border-success text-success bg-transparent rounded-pill" style="font-size: medium;"> Carbon: {{ component.impacts|floatformat:"-2" }}kg CO₂eq/m·yr</span>
+            <span class="badge border border-success text-success bg-transparent rounded-pill" style="font-size: medium;" title='{{component.impacts |floatformat:"-6" }}kg CO₂eq/m·yr'> Carbon: {{ component.impacts|floatformat:"-3" }}kg CO₂eq/m·yr</span>
         </div>
         <!-- Action Buttons -->
         <div class="col-3 d-flex justify-content-end align-items-center gap-2">
