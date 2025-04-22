@@ -100,14 +100,15 @@ def set_up_view(request, building_id, assembly_id):
         building = get_object_or_404(Building, pk=building_id)
         assembly = None
 
-    epd_list, dimension = get_epd_list(request, None, operational=False)
+    epd_list, _ = get_epd_list(request, None, operational=False)
     context = {
         "assembly_id": assembly_id,
         "building_id": building_id,
         "epd_list": epd_list,
         "epd_filters_form": EPDsFilterForm(request.POST),
-        "dimension": dimension,  # Is also required for full reload
+        "dimension": None,
         "simulation": simulation,
+        "is_boq": True,
     }
     return assembly, building, context
 
@@ -140,11 +141,9 @@ def handle_assembly_load(building_id, assembly, context):
         context["selected_epds_ids"] = [
             selected_epd.id for selected_epd in selected_epds
         ]
-    context["is_boq"] = True
     context["categories"] = AssemblyCategory.objects.all()
     context["form"] = BOQAssemblyForm(
         instance=assembly, building_id=building_id, simulation=context.get("simulation")
     )
-    context["dimension"] = assembly.dimension if assembly else AssemblyDimension.AREA
 
     return context
