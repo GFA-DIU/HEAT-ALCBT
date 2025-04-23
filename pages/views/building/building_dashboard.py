@@ -154,8 +154,8 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
             [{"type": "domain"}, {"type": "domain"}],
         ],
         subplot_titles=[
-            "<b>Whole life cycle carbon</b>",
-            "<b>Embodied carbon</b>",
+            "<b>Whole life cycle carbon</b><br> ",
+            "<b>Embodied carbon</b><br> ",
             "",
             "",
         ],
