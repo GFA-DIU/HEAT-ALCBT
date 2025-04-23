@@ -291,7 +291,7 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
                 calculate_impacts(
                     b_assembly.assembly.dimension,
                     b_assembly.quantity,
-                    b_assembly.reporting_life_cycle,
+                    b_assembly.building.total_floor_area,
                     p,
                 )
             )
