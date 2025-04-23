@@ -50,6 +50,7 @@ def building_dashboard_assembly(user, building_id, simulation):
     structural_row = {'category_short': 'Embodied carbon', "gwp": st_gwp_sum, "penrt": st_penrt_sum, "type": "structural"}
     df_list = [structural_row, operational_row]
     df_pie = pd.DataFrame(data=df_list)
+    print(df_pie)
     
     # Shorten df for bar chart
     df_filtered = df[df["type"] == "structural"]
@@ -163,18 +164,25 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
             "",
         ],
         # Give more vertical space to top row
-        row_heights=[0.6, 0.3],
-        vertical_spacing=0.05,
+        row_heights=[0.7, 0.25],
+        vertical_spacing=0.3,
     )
 
     # Update all annotations (including subplot titles)
     for annotation in fig["layout"]["annotations"]:
         annotation["font"] = dict(size=20)  
 
+
+    # Add custom labels for legend
+    df_pie["Label"] = df_pie.apply(
+        lambda x: f"{x[key_column]}: {x['gwp']:.1f} kg CO₂eq/m²", 
+        axis=1
+    )
+
     # Add pies
     fig.add_trace(
         go.Pie(
-            labels=df_pie[key_column],
+            labels=df_pie["Label"],
             values=df_pie["gwp"],  # using only positive values
             name="GWP",
             hole=0.4,
@@ -226,7 +234,7 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
     # Update pies formatting
     fig.update_traces(
         hoverinfo="label+value",
-        hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
+        hovertemplate="%{label}<extra></extra>",
         hoverlabel=dict(font_color="white", namelength=-1),
         textposition="auto",
         textfont=dict(
@@ -234,7 +242,7 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
             family="Arial, sans-serif",  
             color="white",
         ),
-        texttemplate="<b>%{label}</b><br>%{percent:.0%}",
+        texttemplate="<b>%{percent:.0%}</b>",
         selector=dict(type="pie"),
     )
     
@@ -256,7 +264,15 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
         bargroupgap=0.5,
         uniformtext=dict(mode='show', minsize=12),
         yaxis=dict(showticklabels=False),
-        barmode='overlay'
+        barmode='overlay',
+        legend=dict(
+            orientation="h",     # horizontal legend
+            x=0.25,              # center in the left (first) column
+            xanchor="center",
+            y=0.30,              # just above the indicators
+            yanchor="bottom",
+            font=dict(size=14),  # optional
+        )
     )
 
     # Calculate initial sums
@@ -268,7 +284,7 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
         go.Indicator(
             mode="number",
             value=gwp_sum,
-            title={"text": "<b>Total GWP</b>", "font": {"size": 20}},
+            title={"text": "<b>Building Carbon Footprint</b>", "font": {"size": 20}},
             number={"font": {"size": 30}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
         ),
         row=2,
