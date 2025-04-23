@@ -16,7 +16,6 @@ def create_impact_B6():
         return Impact.objects.create(
         impact_category=impact,
         life_cycle_stage=LifeCycleStage.B6,
-        unit=Unit.KGCO2E if impact == "gwp" else Unit.MJ,
     )
     
     return _create_impact_B6
