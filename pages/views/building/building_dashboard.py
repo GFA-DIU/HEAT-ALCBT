@@ -93,11 +93,12 @@ def prep_building_dashboard_df(user, building_id, simulation):
     # Build structural and operational components and impacts in one step
     structural_components, impact_list = get_assemblies(building.prefetched_components)
     operational_impact_list = serialize_operational_products(building.prefetched_operational_products)
+    reference_period = building.reference_period
 
     if not structural_components and not operational_impact_list:
         return HttpResponse()
     elif not structural_components:
-        df = prep_operational_df(operational_impact_list)
+        df = prep_operational_df(operational_impact_list, reference_period)
     elif not operational_impact_list:
         df = prep_structural_df(impact_list)
     elif operational_impact_list and structural_components:
@@ -105,7 +106,7 @@ def prep_building_dashboard_df(user, building_id, simulation):
         df = prep_structural_df(impact_list)
     
         # operational df
-        df_op = prep_operational_df(operational_impact_list)
+        df_op = prep_operational_df(operational_impact_list, reference_period)
 
         df = pd.concat([df, df_op], axis=0)[["assembly_category", "material_category", "gwp", "penrt", "type"]]
     return df
@@ -132,11 +133,13 @@ def prep_structural_df(impact_list):
     df.rename(columns={"gwp a1a3 pos": "gwp", "penrt a1a3 pos": "penrt"}, inplace=True)
     return df
 
-def prep_operational_df(operational_impact_list):
+def prep_operational_df(operational_impact_list, reference_period):
     df_op = pd.DataFrame.from_records(operational_impact_list)
     df_op["material_category"] = df_op["category"].apply(lambda x: x.__str__())
     df_op["type"] = "operational"
     df_op["assembly_category"] = "Operational Carbon"
+    df_op["year"] = reference_period
+    df_op["gwp_b6"] = df_op["gwp_b6"] * df_op["year"]
     df_op.rename(columns={"gwp_b6": "gwp", "penrt_b6": "penrt"}, inplace=True)
     return df_op
 
