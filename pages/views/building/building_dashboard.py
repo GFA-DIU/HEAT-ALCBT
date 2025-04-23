@@ -50,7 +50,6 @@ def building_dashboard_assembly(user, building_id, simulation):
     structural_row = {'category_short': 'Embodied carbon', "gwp": st_gwp_sum, "penrt": st_penrt_sum, "type": "structural"}
     df_list = [structural_row, operational_row]
     df_pie = pd.DataFrame(data=df_list)
-    print(df_pie)
     
     # Shorten df for bar chart
     df_filtered = df[df["type"] == "structural"]
@@ -296,7 +295,7 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
             mode="number",
             value=gwp_sum,
             title={"text": "<b>Building Carbon Footprint</b>", "font": {"size": 20}},
-            number={"font": {"size": 30}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
+            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
         ),
         row=2,
         col=1,
@@ -307,7 +306,7 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
             mode="number",
             value=gwp_embodied_sum,
             title={"text": "<b>Total embodied carbon</b>", "font": {"size": 20}},
-            number={"font": {"size": 30}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
+            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
         ),
         row=2,
         col=2,
@@ -334,8 +333,8 @@ def _building_dashboard_base(df, key_column: str):
             [{"type": "domain"}, {"type": "domain"}],
         ],
         subplot_titles=[
-            "<b>LCA Carbon</b><br>by resource<br>[kg CO₂eq/m·yr]<br> ",
-            "<b>LCA Energy</b><br>by resource<br>[MJ/m²·yr]<br> ",
+            "<b>LCA Carbon</b><br>by resource<br> ",
+            "<b>LCA Energy</b><br>by resource<br> ",
             "",
             "",
         ],
@@ -443,7 +442,7 @@ def _building_dashboard_base(df, key_column: str):
             mode="number",
             value=gwp_sum,
             title={"text": "<b>Total GWP</b>", "font": {"size": 20}},
-            number={"font": {"size": 30}},
+            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
         ),
         row=2,
         col=1,
@@ -454,7 +453,7 @@ def _building_dashboard_base(df, key_column: str):
             mode="number",
             value=penrt_sum,
             title={"text": "<b>Total PENRT</b>", "font": {"size": 20}},
-            number={"font": {"size": 30}},
+            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " MJ/m²"},
         ),
         row=2,
         col=2,
