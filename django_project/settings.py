@@ -66,10 +66,10 @@ INSTALLED_APPS = [
     # Third-party
     "allauth",
     "allauth.account",
+    "cities_light",
     "crispy_forms",
     "crispy_bootstrap5",
     "debug_toolbar",
-    "cities_light",
     "encrypted_json_fields",
     # Local
     "accounts",
