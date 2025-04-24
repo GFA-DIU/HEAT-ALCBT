@@ -63,9 +63,6 @@ def add_impacts(row, epd, impact_columns) -> None:
         impact, _ = Impact.objects.get_or_create(
             impact_category=impact_category,
             life_cycle_stage=life_cycle_stage,
-            unit=INDICATOR_UNIT_MAPPING.get(
-                impact_category
-            ),  # Default unit, update as needed
         )
 
         # Update or create the EPDImpact record.

@@ -92,9 +92,6 @@ def store_epd(epd_data: dict):
                 impact, _ = Impact.objects.get_or_create(
                     impact_category=impact_category_key,
                     life_cycle_stage=life_cycle_stage_key,
-                    unit=INDICATOR_UNIT_MAPPING.get(
-                        impact_category_key
-                    ),  # Default unit, update as needed
                 )
 
                 # Create or update the EPDImpact linking table
