@@ -37,7 +37,7 @@ impact_columns = [
     "gwp_d [kgCo2e]",
 ]
 
-def import_epds():
+def import_india_and_cambodia_epds():
     file_path = "pages/data/India_and_Cambodia_updated_20250424.csv"
     superuser = get_superuser()
 
