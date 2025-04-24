@@ -114,7 +114,7 @@ def test_calculate_impacts_boq(
     impacts = calculate_impacts(
         dimension=None,
         assembly_quantity=1,
-        reporting_life_cycle=1,
+        total_floor_area=1,
         p=product,
     )
 
