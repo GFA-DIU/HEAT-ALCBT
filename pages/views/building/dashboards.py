@@ -27,5 +27,8 @@ def dashboard_view(request):
 
 
     if model == "building":
-        dashboard_html = get_building_dashboard(request.user, model_id, dashboard_type, simulation)
+        try: 
+            dashboard_html = get_building_dashboard(request.user, model_id, dashboard_type, simulation)
+        except:
+            dashboard_html = ""
         return render(request, "pages/building/dashboard/dashboard.html", {"dashboard_html": dashboard_html})

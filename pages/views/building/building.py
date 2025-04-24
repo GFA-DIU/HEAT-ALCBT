@@ -80,7 +80,9 @@ def building(request, building_id=None):
 
     elif request.method == "DELETE":
         if request.GET.get("op_product_id"):
-            return HttpResponse()
+            response = HttpResponse()
+            response['HX-Trigger-After-Swap'] = 'componentDeleted'
+            return
         if request.GET.get("component"):
             return handle_assembly_delete(request, building_id, simulation=False)
     elif request.method == "GET":
@@ -284,10 +286,12 @@ def handle_assembly_delete(request, building_id, simulation):
         component_id,
         simulation,
     )
-    return render(
+    response = render(
         request, "pages/building/structural_info/assemblies_list.html", context
-    )  # Partial update for DELETE
-
+    )
+    response["HX-Trigger-After-Swap"] = "componentDeleted"
+    
+    return response
 
 def get_assemblies(assembly_list: list[BuildingAssembly]):
     impact_list = []
