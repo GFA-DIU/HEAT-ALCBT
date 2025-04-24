@@ -48,7 +48,7 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     heating_temp = forms.DecimalField(
-        label="Room Heating Temperature",
+        label="Room heating temperature",
         min_value=0,
         max_value=120,
         decimal_places=2,
@@ -57,14 +57,14 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     heating_temp_unit = forms.ChoiceField(
-        label="Heating Temperature Unit",
+        label="Heating temperature unit",
         choices=[c for c in Unit.choices if c[0] in (Unit.CELSIUS, Unit.FAHRENHEIT)],
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     cooling_temp = forms.DecimalField(
-        label="Room Cooling Temperature",
+        label="Room cooling temperature",
         min_value=0,
         max_value=120,
         decimal_places=2,
@@ -73,21 +73,21 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     cooling_temp_unit = forms.ChoiceField(
-        label="Cooling Temperature Unit",
+        label="Cooling temperature unit",
         choices=[c for c in Unit.choices if c[0] in (Unit.CELSIUS, Unit.FAHRENHEIT)],
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     heating_type = forms.ChoiceField(
-        label="Heating Type",
+        label="Heating type",
         choices=[('', '---------')] + HeatingType.choices,
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     heating_capacity = forms.DecimalField(
-        label="Heating Capacity",
+        label="Heating capacity",
         min_value=0,
         decimal_places=2,
         required=False,
@@ -95,7 +95,7 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     heating_unit = forms.ChoiceField(
-        label="Heating Unit",
+        label="Heating unit",
         choices=[c for c in Unit.choices if c[0] in (Unit.KW,)],
         required=False,
         initial="",
@@ -103,14 +103,14 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     cooling_type = forms.ChoiceField(
-        label="Cooling Type",
+        label="Cooling type",
         choices=[('', '---------')]+CoolingType.choices,
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     cooling_capacity = forms.DecimalField(
-        label="Cooling Capacity",
+        label="Cooling capacity",
         min_value=0,
         decimal_places=2,
         required=False,
@@ -118,21 +118,21 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     cooling_unit = forms.ChoiceField(
-        label="Cooling Unit",
+        label="Cooling unit",
         choices=[c for c in Unit.choices if c[0] in (Unit.KW, Unit.TR)],
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     ventilation_type = forms.ChoiceField(
-        label="Ventilation Type",
+        label="Ventilation type",
         choices=[('', '---------')]+VentilationType.choices,
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     ventilation_capacity = forms.DecimalField(
-        label="Ventilation Capacity",
+        label="Ventilation capacity",
         min_value=0,
         decimal_places=2,
         required=False,
@@ -140,21 +140,21 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     ventilation_unit = forms.ChoiceField(
-        label="Ventilation Unit",
+        label="Ventilation unit",
         choices=[c for c in Unit.choices if c[0] in (Unit.M3_H, Unit.CFM)],
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     lighting_type = forms.ChoiceField(
-        label="Lighting Type",
+        label="Lighting type",
         choices=[('', '---------')]+LightingType.choices,
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     lighting_capacity = forms.DecimalField(
-        label="Lighting Capacity",
+        label="Lighting capacity",
         min_value=0,
         decimal_places=2,
         required=False,
@@ -162,7 +162,7 @@ class OperationalInfoForm(forms.ModelForm):
     )
 
     lighting_unit = forms.ChoiceField(
-        label="Lighting Unit",
+        label="Lighting unit",
         choices=[c for c in Unit.choices if c[0] in (Unit.KW,)],
         required=False,
         widget=forms.Select(attrs={"class": "form-select"}),

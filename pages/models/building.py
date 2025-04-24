@@ -273,7 +273,7 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
         _("Climate"), choices=ClimateZone.choices, max_length=50
     )
     total_floor_area = models.DecimalField(
-        _("Total Floor Area"),
+        _("Total floor area"),
         help_text=_("Gross floor area [m²]"),
         max_digits=10,
         decimal_places=2,
@@ -281,7 +281,7 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
         blank=False,
     )
     cond_floor_area = models.DecimalField(
-        _("Conditioned Floor Area"),
+        _("Conditioned floor area"),
         help_text=_("Gross floor area [m²]"),
         max_digits=10,
         decimal_places=2,
