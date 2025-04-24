@@ -42,6 +42,9 @@ class UserProfile(models.Model):
     country = models.ForeignKey(
         Country, on_delete=models.SET_NULL, null=True, blank=True
     )
+    region = models.ForeignKey(
+        CustomRegion, on_delete=models.SET_NULL, null=True, blank=True
+    )
     city = models.ForeignKey(
         CustomCity, on_delete=models.SET_NULL, null=True, blank=True
     )    
