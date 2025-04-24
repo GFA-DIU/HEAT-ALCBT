@@ -154,11 +154,20 @@
      </div>
    </div>
 
-
-  <button id="save_button" type="submit" class="btn btn-primary mt-1"
-  {% if simulation %}disabled{%endif%}
+<div hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=assembly&simulation={{simulation}}"
+    hx-target="#assembly_dashboard"
+    hx-swap="innerHTML"
   >
-    Save
-  </button>
+    <div hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=material&simulation={{simulation}}"
+        hx-target="#material_dashboard"
+        hx-swap="innerHTML"
+    >
+      <button id="save_button" type="submit" class="btn btn-primary mt-1"
+      {% if simulation %}disabled{%endif%}
+        >
+        Save
+      </button>
+  </div>
+</div>
 </form>
 {% endif %}

@@ -28,13 +28,23 @@
             {%else%}
             <a href="{% url 'component_edit' assembly_id=component.assembly_id building_id=building_id %}?simulation={{simulation}}" class="btn btn-secondary">Edit</a>
             {% endif%}
-            <button class="btn btn-danger"
-                    {% if simulation %} hx-delete="{% url 'building_simulation' building_id=building_id %}?component={{ component.assembly_id }}" 
-                    {% else %} hx-delete="{% url 'building' building_id=building_id %}?component={{ component.assembly_id }}" {% endif %}
-                    hx-target="#item-list" 
-                    hx-swap="innerHTML">
-                Delete
-            </button>
+            <div hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=assembly&simulation={{simulation}}"
+                hx-target="#assembly_dashboard"
+                hx-swap="innerHTML"
+            >
+                <div hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=material&simulation={{simulation}}"
+                    hx-target="#material_dashboard"
+                    hx-swap="innerHTML"
+                >
+                    <button class="btn btn-danger"
+                            {% if simulation %} hx-delete="{% url 'building_simulation' building_id=building_id %}?component={{ component.assembly_id }}" 
+                            {% else %} hx-delete="{% url 'building' building_id=building_id %}?component={{ component.assembly_id }}" {% endif %}
+                            hx-target="#item-list" 
+                            hx-swap="innerHTML">
+                        Delete
+                    </button>
+                </div>
+            </div>
         </div>
     </li>
     {% endfor %}
