@@ -1,3 +1,4 @@
+<script src="https://unpkg.com/htmx.org@1.9.12"></script>
 {% load custom_filters %}
 {% if structural_components %}
 <h6 class="mt-2">Components/materials added</h6>
@@ -28,14 +29,24 @@
             {%else%}
             <a href="{% url 'component_edit' assembly_id=component.assembly_id building_id=building_id %}?simulation={{simulation}}" class="btn btn-secondary">Edit</a>
             {% endif%}
+
             <button class="btn btn-danger"
                     {% if simulation %} hx-delete="{% url 'building_simulation' building_id=building_id %}?component={{ component.assembly_id }}" 
                     {% else %} hx-delete="{% url 'building' building_id=building_id %}?component={{ component.assembly_id }}" {% endif %}
                     hx-target="#item-list" 
-                    hx-swap="innerHTML">
+                    hx-swap="innerHTML"
+                    >
                 Delete
             </button>
         </div>
     </li>
     {% endfor %}
 </ul>
+
+<script>
+    document.body.addEventListener('componentDeleted', function() {
+      console.log('Server told us deletion finished');
+      htmx.trigger('#assembly_dashboard', 'refresh');
+      htmx.trigger('#material_dashboard', 'refresh');
+    });
+  </script>

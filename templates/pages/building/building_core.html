@@ -1,4 +1,5 @@
 {% if has_structural or has_operational %}
+
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item" role="presentation">
     <button
@@ -10,9 +11,7 @@
       role="tab"
       aria-controls="assembly"
       aria-selected="true"
-    >
-      Assembly
-    </button>
+    >Assembly</button>
   </li>
   <li class="nav-item" role="presentation">
     <button
@@ -24,24 +23,24 @@
       role="tab"
       aria-controls="material"
       aria-selected="false"
-    >
-      Material
-    </button>
+    >Material</button>
   </li>
 </ul>
+
 <div class="tab-content" id="myTabContent">
+
+  <!-- ASSEMBLY -->
   <div
-    class="tab-pane fade show active"
+    class="tab-pane fade show active p-3"
     id="assembly"
     role="tabpanel"
     aria-labelledby="assembly-tab"
   >
     <div
-      hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=assembly&simulation={{simulation}}"
-      hx-trigger="load"
-      hx-target="#assembly_dashboard"
-      hx-swap="innerHTML"
       id="assembly_dashboard"
+      hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=assembly&simulation={{simulation}}"
+      hx-trigger="load, refresh"
+      hx-swap="innerHTML"
     >
       <div class="text-center">
         <img
@@ -53,18 +52,19 @@
       </div>
     </div>
   </div>
+
+  <!-- MATERIAL -->
   <div
-    class="tab-pane fade"
+    class="tab-pane fade p-3"
     id="material"
     role="tabpanel"
     aria-labelledby="material-tab"
   >
     <div
-      hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=material&simulation={{simulation}}"
-      hx-trigger="shown.bs.tab from:#material-tab"
-      hx-target="#material_dashboard"
-      hx-swap="innerHTML"
       id="material_dashboard"
+      hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=material&simulation={{simulation}}"
+      hx-trigger="shown.bs.tab from:#material-tab, refresh"
+      hx-swap="innerHTML"
     >
       <div class="text-center">
         <img
@@ -76,7 +76,10 @@
       </div>
     </div>
   </div>
+
 </div>
+
+
 {% endif %}
 
 <div class="accordion pt-3 pb-3" id="accordionBuilding">
