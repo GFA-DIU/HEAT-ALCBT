@@ -294,7 +294,7 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
         go.Indicator(
             mode="number",
             value=gwp_sum,
-            title={"text": "<b>Building Carbon Footprint</b>", "font": {"size": 20}},
+            title={"text": "<b>Building carbon footprint</b>", "font": {"size": 20}},
             number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
         ),
         row=2,

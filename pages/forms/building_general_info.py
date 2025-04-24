@@ -63,7 +63,7 @@ class BuildingGeneralInformation(forms.ModelForm):
         required=False,
     )
     category = forms.ModelChoiceField(
-        queryset=CategorySubcategory.objects.all(), label="Building Type"
+        queryset=CategorySubcategory.objects.all(), label="Building type"
     )
     construction_year = forms.IntegerField(widget=YearInput(), required=False)
     # forms.DateField(input_formats="%y-%m-%d", widget=forms.widgets.DateInput(attrs={'type': 'date'}))
