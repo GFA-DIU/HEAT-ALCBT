@@ -37,8 +37,8 @@ impact_columns = [
     "gwp_d [kgCo2e]",
 ]
 
-def import_india_and_cambodia_epds():
-    file_path = "pages/data/India_and_Cambodia_updated_20250424.csv"
+def import_global_epds():
+    file_path = "pages/data/ECO_Platform_Global_EPDs.csv"
     superuser = get_superuser()
 
     try:
@@ -59,27 +59,22 @@ def import_india_and_cambodia_epds():
             if pd.isna(declared_amount):
                 declared_amount = 1.0
             
-            new_epd, created = EPD.objects.update_or_create(
-                country=get_country(row["country"]),
+            new_epd = EPD(
+                country=get_country("IN"), # decision to set all global EPDs to country=India as they are meant for Indian application. Actual country reported by ECO Platform is stored in EPD.comment
                 source=row["source"],
                 name=row["name"],
-                type=EPDType.OFFICIAL,
+                names=[{"lang": "en", "value": row["name"]}],
                 public=True,
+                conversions=conversions,
+                category=get_category(row),
+                declared_unit=row["declared_unit"],
+                type=EPDType.OFFICIAL,
+                declared_amount=declared_amount,
+                comment=f"Declared country in source is: {row['country']}",
                 created_by_id=superuser.id,
-                defaults={
-                    "names": [{"lang": "en", "value": row["name"]}],
-                    "source": row["source"],
-                    "conversions": conversions,
-                    "category": get_category(row),
-                    "declared_unit": row["declared_unit"],
-                    "declared_amount": declared_amount,  
-                    "UUID": row["epd identifier"]
-                }
+                UUID=row["epd identifier"]
             )
-            if created:
-                logger.info("Created EPD %s", new_epd)
-            else:
-                logger.info("Updated EPD %s", new_epd)
+            new_epd.save()
             add_impacts(row, new_epd, impact_columns)
             success += 1
 
@@ -90,9 +85,9 @@ def import_india_and_cambodia_epds():
 
     if failure == 0:
         print(
-            f"\033[32mSuccessfully uploaded {success} generic EPDs. Errors occured in {failure} cases. Rows: {failure_list}"
+            f"\033[32mSuccessfully uploaded {success} Global EPDs. Errors occured in {failure} cases. Rows: {failure_list}"
         )
     else:
         print(
-            f"Successfully uploaded {success} generic EPDs. Errors occured in {failure} cases. Rows: {failure_list}"
+            f"Successfully uploaded {success} Global EPDs. Errors occured in {failure} cases. Rows: {failure_list}"
         )

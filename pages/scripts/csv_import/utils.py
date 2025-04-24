@@ -77,11 +77,11 @@ def get_country(country) -> Country:
 
 def get_category(row) -> MaterialCategory:
     if not pd.isna(row["level_2_index"]):
-        category = MaterialCategory.objects.get(
+        category, _ = MaterialCategory.objects.get_or_create(
             category_id=row["level_2_index"], level=3
         )
     else:
-        category = MaterialCategory.objects.get(
+        category, _ = MaterialCategory.objects.get_or_create(
             category_id=row["level_1_index"], level=2
         )
 

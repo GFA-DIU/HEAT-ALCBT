@@ -177,6 +177,8 @@ def handle_building_load(request, building_id, simulation):
         "building": building,
         "structural_components": structural_components,
         "operational_products": operational_products,
+        "has_structural": bool(structural_components),
+        "has_operational": bool(operational_products),
         "epd_list": epd_list,
         "epd_filters_form": form,
         "edit_mode": False,

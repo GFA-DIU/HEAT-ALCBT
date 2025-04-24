@@ -101,7 +101,7 @@ class EPDsFilterForm(forms.Form):
             ),
             Accordion(
                 AccordionGroup(
-                    mark_safe('<strong>Advanced Search</strong>'),
+                    mark_safe('<strong>Advanced search</strong>'),
                     Row(
                         Column("category", css_class="col-md-4"),
                         Column("subcategory", css_class="col-md-4"),
