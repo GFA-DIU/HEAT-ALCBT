@@ -163,18 +163,25 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
             "",
         ],
         # Give more vertical space to top row
-        row_heights=[0.6, 0.3],
-        vertical_spacing=0.05,
+        row_heights=[0.7, 0.25],
+        vertical_spacing=0.3,
     )
 
     # Update all annotations (including subplot titles)
     for annotation in fig["layout"]["annotations"]:
         annotation["font"] = dict(size=20)  
 
+
+    # Add custom labels for legend
+    df_pie["Label"] = df_pie.apply(
+        lambda x: f"{x[key_column]}: {x['gwp']:.1f} kg CO₂eq/m²", 
+        axis=1
+    )
+
     # Add pies
     fig.add_trace(
         go.Pie(
-            labels=df_pie[key_column],
+            labels=df_pie["Label"],
             values=df_pie["gwp"],  # using only positive values
             name="GWP",
             hole=0.4,
@@ -186,47 +193,64 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
         col=1,
     )
 
-    # Stacking 2 bars on top of each other to have text appear behind graphs
+    # Stacking 2 bars on top of each other to have grey bars be behind orange bars
+    fig.add_trace(
+        go.Bar(
+            y=df_bar[key_column],
+            x=[100] * len(df_bar),
+            orientation='h',
+            marker=dict(
+                color="rgba(200,200,200,0.3)",
+                cornerradius=8,
+            ),
+            showlegend=False,
+            hoverinfo='none',
+            cliponaxis=False,
+            # use the grey bars to carry the text
+            text=[f"{cat} - {val:.1f}%" 
+                for cat,val in zip(df_bar[key_column], df_bar["gwp_per"])],
+            textposition='outside',
+            textfont=dict(size=12, color='black'),
+        ),
+        row=1, col=2
+    )
+    
+    # 2) Overlay the actual % bars in orange
     fig.add_trace(
         go.Bar(
             y=df_bar[key_column],
             x=df_bar["gwp_per"],
             orientation='h',
-            texttemplate='%{label} - %{value:.0f}%',
-            textposition='inside',
-            insidetextanchor='start',
-            textangle=0,  
-            textfont_size=20,
-            textfont=dict(color='black'),
-            marker_opacity=0.4,  
+            marker=dict(
+                cornerradius=8,
+                color=colors[0],
+            ),
             showlegend=False,
-            hoverinfo="y+x",
-            hovertemplate="%{label}<br><b>Value: %{value:.2f}</b>%<extra></extra>",
+            hoverinfo='none',
         ),
-        row=1,
-        col=2,
+        row=1, col=2
     )
     
-    # Second bar graph
-    fig.add_trace(
-        go.Bar(
-            y=df_bar[key_column],
-            x=df_bar["gwp_per"],
-            orientation='h',
-            marker_opacity=0.75, 
-            showlegend=False,
-            hoverinfo="y+x",
-            hovertemplate="%{label}<br><b>Value: %{value:.2f}</b>%<extra></extra>",
-        ),
-        row=1,
-        col=2,
+    # 4a) Flip the y-order so your biggest bars sit at the top
+    fig.update_yaxes(autorange='reversed',
+        showticklabels=False,       # no labels on the left
+        side='right',               # ticks would go on the right
+        row=1, col=2
+        )
+
+    # 4c) Clean up the x-axis (no grid, no numbers)
+    fig.update_xaxes(
+        range=[0, 100],
+        automargin=True,
+        showgrid=False,
+        showticklabels=False,
+        row=1, col=2
     )
-    
 
     # Update pies formatting
     fig.update_traces(
         hoverinfo="label+value",
-        hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
+        hovertemplate="%{label}<extra></extra>",
         hoverlabel=dict(font_color="white", namelength=-1),
         textposition="auto",
         textfont=dict(
@@ -234,29 +258,31 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
             family="Arial, sans-serif",  
             color="white",
         ),
-        texttemplate="<b>%{label}</b><br>%{percent:.0%}",
+        texttemplate="<b>%{percent:.0%}</b>",
         selector=dict(type="pie"),
     )
-    
-    # Update bar formatting
-    fig.update_traces(
-        marker_color=colors[0], 
-        marker_cornerradius=15,
-        hoverlabel_font_color="white", 
-        hoverlabel_namelength=-1,
-        selector=dict(type='bar')
-    )
-    
-    fig.update_yaxes(autorange='reversed')
 
+    fig.update_traces(cliponaxis=False, selector=dict(type='bar'))
+    
     fig.update_layout(
+        height=500, 
+        width=900,
+        margin=dict(l=50, r=200, t=100, b=50),
         paper_bgcolor='rgba(0,0,0,0)',  
         plot_bgcolor='rgba(0,0,0,0)',
         bargap=0.05,
         bargroupgap=0.5,
         uniformtext=dict(mode='show', minsize=12),
         yaxis=dict(showticklabels=False),
-        barmode='overlay'
+        barmode='overlay',
+        legend=dict(
+            orientation="h",
+            x=0.25,              
+            xanchor="center",
+            y=0.30,              
+            yanchor="bottom",
+            font=dict(size=14),  
+        ),
     )
 
     # Calculate initial sums
@@ -268,8 +294,8 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
         go.Indicator(
             mode="number",
             value=gwp_sum,
-            title={"text": "<b>Total GWP</b>", "font": {"size": 20}},
-            number={"font": {"size": 30}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
+            title={"text": "<b>Building Carbon Footprint</b>", "font": {"size": 20}},
+            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
         ),
         row=2,
         col=1,
@@ -279,16 +305,11 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
         go.Indicator(
             mode="number",
             value=gwp_embodied_sum,
-            title={"text": "<b>Total embodied GWP</b>", "font": {"size": 20}},
-            number={"font": {"size": 30}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
+            title={"text": "<b>Total embodied carbon</b>", "font": {"size": 20}},
+            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
         ),
         row=2,
         col=2,
-    )
-
-    # Increase figure size and reduce margins
-    fig.update_layout(
-        height=500, width=900, margin=dict(l=50, r=50, t=100, b=50), showlegend=True
     )
 
     pie_plot = plot(
@@ -312,8 +333,8 @@ def _building_dashboard_base(df, key_column: str):
             [{"type": "domain"}, {"type": "domain"}],
         ],
         subplot_titles=[
-            "<b>LCA Carbon</b><br>by resource<br>[kg CO₂eq/m·yr]<br> ",
-            "<b>LCA Energy</b><br>by resource<br>[MJ/m²·yr]<br> ",
+            "<b>LCA Carbon</b><br>by resource<br> ",
+            "<b>LCA Energy</b><br>by resource<br> ",
             "",
             "",
         ],
@@ -421,7 +442,7 @@ def _building_dashboard_base(df, key_column: str):
             mode="number",
             value=gwp_sum,
             title={"text": "<b>Total GWP</b>", "font": {"size": 20}},
-            number={"font": {"size": 30}},
+            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
         ),
         row=2,
         col=1,
@@ -432,7 +453,7 @@ def _building_dashboard_base(df, key_column: str):
             mode="number",
             value=penrt_sum,
             title={"text": "<b>Total PENRT</b>", "font": {"size": 20}},
-            number={"font": {"size": 30}},
+            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " MJ/m²"},
         ),
         row=2,
         col=2,
