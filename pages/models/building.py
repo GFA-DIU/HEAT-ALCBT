@@ -11,41 +11,45 @@ from .epd import EPD, Unit
 
 
 class ClimateZone(models.TextChoices):
-    HOT_DRY = "hot-dry", "hot-dry"
-    WARM_HUMID = "warm-humid", "warm-humid"
-    COMPOSITE = "composite", "composite"
-    TEMPERATE = "temperate", "temperate"
-    COLD = "cold", "cold"
-    TROPICAL_WET = "tropical-wet", "tropical wet"
+    HOT_DRY = "hot-dry", "Hot-dry"
+    WARM_HUMID = "warm-humid", "Warm-humid"
+    COMPOSITE = "composite", "Composite"
+    TEMPERATE = "temperate", "Temperate"
+    COLD = "cold", "Cold"
+    TROPICAL_WET = "tropical-wet", "Tropical wet"
 
 
 class HeatingType(models.TextChoices):
-    ROOM_HEATER = "room-heater", "Room Heaters"
-    REVERSE_CYCLE_AC = "reverse_cycle_ac", "Reverse Cycle Air Conditioners (Heat Pumps)"
-    SPLIT_AC = "split-ac", "Split AC with Heating Mode"
-    PACKAGED_AC = "packaged-ac", "Packaged Air Conditioners with Electric Heating Coils"
+    ROOM_HEATER = "room-heater", "Room heaters"
+    REVERSE_CYCLE_AC = "reverse_cycle_ac", "Reverse cycle air conditioners (Heat pumps)"
+    SPLIT_AC = "split-ac", "Split AC with heating mode"
+    PACKAGED_AC = "packaged-ac", "Packaged air conditioners with electric heating coils"
     BOILER = "boiler", "Boiler"
+    OTHER = "other", "Other heating type"
 
 
 class CoolingType(models.TextChoices):
-    WINDOW_AC = "window-ac", "Window Air Conditioners"
-    SPLIT_AC = "split-ac", "Split Air Conditioners"
-    VRF_SYSTEM = "vrf-system", "Variable Refrigerant Flow (VRF) Systems"
-    PACKAGED_AC = "packaged-ac", "Packaged Air Conditioners"
-    CHILLER_SYSTEM = "chiller-system", "Chiller Systems"
+    WINDOW_AC = "window-ac", "Window air conditioners"
+    SPLIT_AC = "split-ac", "Split air conditioners"
+    VRF_SYSTEM = "vrf-system", "Variable refrigerant flow (VRF) systems"
+    PACKAGED_AC = "packaged-ac", "Packaged air conditioners"
+    CHILLER_SYSTEM = "chiller-system", "Chiller systems"
+    OTHER = "other", "Other cooling type"
 
 
 class VentilationType(models.TextChoices):
-    AHU = "ahu", "Air Handling Units (AHUs)"
-    FCU = "fcu", "Fan Coil Units (FCUs)"
-    CASSETTE_AC = "cassette-ac", "Ceiling or Wall-Mounted Cassette Acs"
+    AHU = "ahu", "Air handling units (AHUs)"
+    FCU = "fcu", "Fan coil units (FCUs)"
+    CASSETTE_AC = "cassette-ac", "Ceiling or wall-mounted cassette ACs"
     DOAS = "doas", "DOAS"
+    OTHER = "other", "Other ventilation type"
 
 
 class LightingType(models.TextChoices):
-    LED = "led", "LED (Light Emitting Diode) Lights"
-    CFL = "cfl", "CFL (Compact Fluorescent Lamp) Lights"
-    FLUORESCENT_TUBE = "fluorescent-tube", "T5 and T8 Fluorescent Tube Lights"
+    LED = "led", "LED (Light emitting diode) lights"
+    CFL = "cfl", "CFL (Compact fluorescent lamp) lights"
+    FLUORESCENT_TUBE = "fluorescent-tube", "T5 and T8 fluorescent tube lights"
+    OTHER = "other", "Other lighting type"
 
 
 class BuildingSubcategory(models.Model):
