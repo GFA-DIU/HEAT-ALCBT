@@ -19,9 +19,10 @@ from pages.models.building import (
     OperationalProduct,
     SimulatedOperationalProduct,
 )
-from pages.models.epd import EPD, MaterialCategory
+from pages.models.epd import MaterialCategory
 from pages.views.assembly.epd_processing import get_epd_list
-from pages.views.building.impact_calculation import calculate_impact_operational, calculate_impacts
+from pages.views.building.impact_calculation import calculate_impacts
+
 from pages.views.building.operational_products.operational_products import (
     get_op_product,
     get_op_product_list,
@@ -105,7 +106,7 @@ def building(request, building_id=None):
     context["form_general_info"] = form
     context["form_detailed_info"] = detailedForm
     context["form_operational_info"] = operationalInfoForm
-    
+
     context["simulation"] = False
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
@@ -132,7 +133,9 @@ def handle_building_load(request, building_id, simulation):
                 relation_name,
                 queryset=BuildingAssemblyModel.objects.filter(
                     # assembly__created_by=request.user  # Ensure the assembly belongs to the user
-                ).select_related("assembly"),
+                )
+                .order_by("-assembly__created_at")
+                .select_related("assembly"),
                 to_attr="prefetched_components",
             ),
             Prefetch(
@@ -164,7 +167,9 @@ def handle_building_load(request, building_id, simulation):
         form.fields[field].initial = MaterialCategory.objects.get(name_en=value)
         form.fields[field].disabled = True
 
-    form.fields["childcategory"].queryset = MaterialCategory.objects.filter(parent=MaterialCategory.objects.get(name_en=value))
+    form.fields["childcategory"].queryset = MaterialCategory.objects.filter(
+        parent=MaterialCategory.objects.get(name_en=value)
+    )
     context = {
         "building_id": building.id,
         "building": building,
@@ -238,6 +243,7 @@ def handle_information_submit(request, building_id, form):
         )
         return HttpResponseServerError()
 
+
 @transaction.atomic
 def handle_assembly_delete(request, building_id, simulation):
     if simulation:
@@ -258,12 +264,14 @@ def handle_assembly_delete(request, building_id, simulation):
         )
 
     # Fetch the updated list of assemblies for the building
-    updated_list = BuildingAssemblyModel.objects.filter(
-        building__created_by=request.user,
-        assembly__created_by=request.user,
-        building_id=building_id,
-    ).select_related(
-        "assembly"
+    updated_list = (
+        BuildingAssemblyModel.objects.filter(
+            building__created_by=request.user,
+            assembly__created_by=request.user,
+            building_id=building_id,
+        )
+        .order_by("-assembly__created_at")
+        .select_related("assembly")
     )  # Optimize query by preloading related Assembly
     structural_components, _ = get_assemblies(updated_list)
     context = {
@@ -320,4 +328,4 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
         )
         impact_list.extend(assembly_impact_list)
 
-    return structural_components, impact_list     
+    return structural_components, impact_list
