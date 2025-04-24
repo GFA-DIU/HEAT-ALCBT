@@ -184,7 +184,7 @@ def test_calculate_impacts_area_assembly_benchmark(
     impacts = calculate_impacts(
         dimension=assembly.dimension,
         assembly_quantity=1,
-        reporting_life_cycle=1,
+        total_floor_area=1,
         p=product,
     )
 
@@ -292,7 +292,7 @@ def test_calculate_impacts_dimension_logic(
     impacts = calculate_impacts(
         dimension=assembly.dimension,
         assembly_quantity=1,
-        reporting_life_cycle=1,
+        total_floor_area=1,
         p=product,
     )
 

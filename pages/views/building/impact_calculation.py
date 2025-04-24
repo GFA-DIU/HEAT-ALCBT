@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 def calculate_impacts(
     dimension: AssemblyDimension,
     assembly_quantity: int,
-    reporting_life_cycle: int,
+    total_floor_area: int,
     p: StructuralProduct,
 ):
     """Calculate EPDs using the dimension approach.
@@ -69,9 +69,7 @@ def calculate_impacts(
                     "impact_value": Decimal(factor)
                     * Decimal(epdimpact.value)
                     / Decimal(p.epd.declared_amount)  # Normalise by base amount
-                    / Decimal(
-                        reporting_life_cycle
-                    ),  # Normalise by reporting_life_cycle
+                    / Decimal(total_floor_area),  # Normalise by total floor area
                 }
             )
         return container
