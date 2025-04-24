@@ -57,21 +57,27 @@ def import_generic_operational_epds():
         print(f"Row {index} is being processed.")
         try:
 
-            new_epd = EPD(
+            new_epd, created = EPD.objects.update_or_create(
                 country=get_country(row["country"]),
                 source="GFA-HEAT",
                 name=row["name"],
-                names=[{"lang": "en", "value": row["name"]}],
                 public=True,
-                conversions=get_conversions(row),
-                category=get_category(row),
-                declared_unit=Unit.KWH,  ## TODO check if really the case
-                type=EPDType.GENERIC,
-                declared_amount=1,  ## TODO check if really the case
-                comment=get_comment(row),  ## TODO adapt GEG text
                 created_by_id=superuser.id,
+                defaults={
+                    "names": [{"lang": "en", "value": row["name"]}],
+                    "conversions": get_conversions(row),
+                    "category": get_category(row),
+                    "declared_unit": Unit.KWH,  ## TODO check if really the case
+                    "type": EPDType.GENERIC,
+                    "declared_amount":1,  ## TODO check if really the case
+                    "comment": get_comment(row),  ## TODO adapt GEG text
+                }
             )
-            new_epd.save()
+            if created:
+                logger.info("Created EPD %s", new_epd)
+            else:
+                logger.info("Updated EPD %s", new_epd)
+
             add_impacts(row, new_epd, impact_columns)
             # print(f"Row {index} processed.")
             success += 1
