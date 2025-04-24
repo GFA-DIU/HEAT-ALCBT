@@ -1,12 +1,22 @@
-<footer class="footer">
-  <div class="container">
-    <span class="text-muted" style="font-size: 0.875rem">
-      Copyright © 2025 •
-      <a href="{% url 'terms_of_use' %}" class="text-muted text-decoration-underscore"> Terms of Use </a>
-      &
-      <a href="{% url 'privacy_policy' %}" class="text-muted text-decoration-underscore">
-        Privacy Policy
-      </a>
-    </span>
+{% load static %}
+<footer class="footer mt-auto">
+  <div class="container pt-2">
+    <div class="row justify-content-between">
+      <div class="col-auto">
+        <a href="https://alcbt.gggi.org/">
+          <img src="{% static 'images/logos/ALCBT_logo.png' %}" style="height: 6rem;" alt="ALCBT logo">
+        </a>
+      </div>
+      <div class="col-auto">
+        <span class="text-muted" style="font-size: 0.875rem">
+          Copyright © 2025 •
+          <a href="{% url 'terms_of_use' %}" class="text-muted text-decoration-underscore"> Terms of Use </a>
+          &
+          <a href="{% url 'privacy_policy' %}" class="text-muted text-decoration-underscore">
+            Privacy Policy
+          </a>
+        </span>
+      </div>
+    </div>
   </div>
 </footer>
