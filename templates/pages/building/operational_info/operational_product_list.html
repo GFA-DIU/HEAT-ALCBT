@@ -18,7 +18,7 @@
                 <div class="col gap-3">
                     <span class="badge border bg-transparent rounded-pill" style="border-color: #6f42c1 !important; color: #6f42c1; ">{{epd.category}}</span>
                     <span class="badge border border-dark text-dark bg-transparent rounded-pill">Unit: {{epd.declared_unit}}</span>
-                    <span class="badge border border-success text-success bg-transparent rounded-pill">{{epd.impact_gwp}} kgCO2eq</span>
+                    <span class="badge border border-success text-success bg-transparent rounded-pill">{{epd.impact_gwp|floatformat:"-2"}} kgCO2eq</span>
                     <!-- <span class="badge border bg-transparent rounded-pill" style="border-color: #f26716 !important; color: #f26716; ">{{epd.impact_penrt}} MJ</span> -->
                 </div>
             </div>
