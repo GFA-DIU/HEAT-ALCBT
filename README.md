@@ -79,6 +79,12 @@ To load all generic EPDs found under `pages/data`:
 (.venv) $ python manage.py load_local_epds
 ```
 
+To load a specific set of local EPDs, name the relevant file with one of the keynames found in `pages/management/commands/load_local_epds.py`. See for example below:
+
+```Bash
+(.venv) $ python manage.py load_local_epds --file EDGE_HANDBOOK_EPDs
+```
+
 ### PostGres
 
 To inspect the data tables in postgres instead of Django admin
