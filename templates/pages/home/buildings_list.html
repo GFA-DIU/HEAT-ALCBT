@@ -1,48 +1,62 @@
-<ul class="list-group">
+{% if not buildings %}
+<div class="text-center">
+  <span
+    class="d-inline-block text-warning card card-body fw-bold"
+    {% if selected_epds %} hidden {% endif %}>
+    Add your first building!
+  </span>
+</div>
+{% endif%}
+
+<ul class="list-group" id="buildings_list">
   {% for building in buildings %}
-  <a href="/building/{{ building.id }}/" class="list-group-item list-group-item-action" title="{{ building.name }}">
-    <div class="row align-items-center">
-      <!-- Left column -->
-      <div class="col-5">
-        <h5 class="mb-0">{{ building.name | truncatechars:20 }}</h5>
-        <div class="text-muted lh-1">
-            {% if building.street and building.number %}
-            {{ building.street }} {{ building.number}}
-            {% endif %}
-            <br>
-            {% if building.city %}
-              {{ building.city | truncatechars:20 }}
-            {% endif %}
-            <br>
-            {{ building.country | truncatechars:20 }}
+    <li class="list-group-item">
+      <div class="row align-items-center">
+        
+        <!-- Left column: clickable info -->
+        <div class="col-5">
+          <a href="/building/{{ building.id }}/"
+             class="text-decoration-none text-reset"
+             title="{{ building.name }}">
+            
+            <h5 class="mb-0">{{ building.name|truncatechars:20 }}</h5>
+            <div class="text-muted lh-1">
+              {% if building.street and building.number %}
+                {{ building.street }} {{ building.number }}<br>
+              {% endif %}
+              {% if building.city %}
+                {{ building.city|truncatechars:20 }}<br>
+              {% endif %}
+              {{ building.country|truncatechars:20 }}
+            </div>
+            
+          </a>
         </div>
+        
+        <!-- Middle column: badges (non-clickable) -->
+        <div class="col d-flex align-items-center justify-content-center">
+          <span class="badge border border-info text-info bg-transparent rounded-pill m-1">
+            {{ building.category }}
+          </span>
+          <span class="badge border border-info text-info bg-transparent rounded-pill">
+            {{ building.total_floor_area|floatformat:"0" }} m<sup>2</sup>
+          </span>
+        </div>
+        
+        <!-- Right column: Delete button outside any <a> -->
+        <div class="col-md-auto d-flex align-items-center">
+          <button type="button" 
+                  class="btn btn-danger"
+                  hx-delete="{% url 'home' %}?building_id={{ building.id }}" 
+                  hx-confirm="Are you sure you wish to delete this building?"
+                  hx-target="#buildings_list"
+                  hx-swap="innerHTML">
+            Delete
+          </button>
+        </div>
+      
       </div>
-  
-      <!-- Middle column: Centered badge -->
-      <div class="col d-flex align-items-center justify-content-center">
-        <span class="badge border border-info text-info bg-transparent rounded-pill">
-          {{ building.category }}
-        </span>
-        <span class="badge border border-info text-info bg-transparent rounded-pill">
-          {{ building.total_floor_area | floatformat:"0" }} m<sup>2</sup>
-        </span>
-      </div>
-  
-      <!-- Right column: Delete button -->
-      <div class="col-md-auto d-flex align-items-center">
-        <button type="button" 
-          class="btn btn-danger"
-          hx-delete="{% url 'home' %}?building_id={{ building.id }}" 
-          hx-confirm="Are you sure you wish to delete this building?"
-          hx-target="#buildings_list"
-          hx-swap="innerHTML">
-          Delete
-        </button>
-      </div>
-    </div>
-  </a>
-  
-  
-  
+    </li>
   {% endfor %}
 </ul>
+

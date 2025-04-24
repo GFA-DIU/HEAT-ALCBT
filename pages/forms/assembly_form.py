@@ -38,7 +38,7 @@ class AssemblyForm(forms.ModelForm):
                 "class": "select form-select",
             }
         ),
-        label="Category",
+        label="Building Component",
         required=True,
     )
     assembly_technique = forms.ModelChoiceField(

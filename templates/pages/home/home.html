@@ -5,7 +5,37 @@
 
 {% block title %}List view{% endblock title %}
 {% block content %}
-<h1>Buildings overview</h1>
+<!-- Header + subtitle -->
+<div class="mb-4">
+  <h1 class="mb-1">
+    Welcome to <span style="color:#F26716">BEAT</span>
+  </h1>
+  <p class="lead text-muted">
+    Begin assessing your building’s whole life cycle emissions – from embodied to operational
+  </p>
+</div>
+
+<!-- Logo + project note -->
+<div class="row mb-3">
+  <div class="col-6 d-flex justify-content-center align-items-center" style="min-height:6rem;">
+    <a href="https://alcbt.gggi.org/">
+      <img
+        src="{% static 'images/logos/ALCBT_logo.png' %}"
+        alt="ALCBT logo"
+        style="height:6rem;"
+      >
+    </a>
+  </div>
+  <div class="col-6 d-flex justify-content-center align-items-center" style="min-height:6rem;">
+    <span class="text-center text-muted">
+      The tool has been developed under the IKI-ALCBT project. To find out more, go to
+      <a href="https://alcbt.gggi.org/">alcbt.gggi.org</a>.
+    </span>
+  </div>
+</div>
+
+
+<h2>Buildings overview</h2>
 
 <div hx-get="{% url 'map' %}?model=building&ids=[]" 
      hx-trigger="load"
@@ -16,7 +46,7 @@
   <img alt="Result loading..." class="htmx-indicator" width="150" src="https://htmx.org/img/bars.svg"/>
 </div>
 <div class="row my-2">
-  <div class='fs-3 fw-bold col-10'>Your buildings</div>
+  <div class='fs-4 fw-bold col-10'>Your buildings</div>
  <!-- Button to trigger modal -->
   <a href="{% url 'new_building' %}"  class="icon-button btn btn-primary fs-6 col">
     Add building
