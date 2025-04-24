@@ -63,14 +63,15 @@ def import_india_and_cambodia_epds():
                 country=get_country(row["country"]),
                 source=row["source"],
                 name=row["name"],
+                type=EPDType.OFFICIAL,
                 public=True,
                 created_by_id=superuser.id,
                 defaults={
                     "names": [{"lang": "en", "value": row["name"]}],
+                    "source": row["source"],
                     "conversions": conversions,
                     "category": get_category(row),
                     "declared_unit": row["declared_unit"],
-                    "type": EPDType.OFFICIAL,
                     "declared_amount": declared_amount,  
                     "UUID": row["epd identifier"]
                 }
