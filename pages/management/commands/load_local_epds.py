@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.core.management.base import BaseCommand
 
+from pages.scripts.csv_import.import_global_epds import import_global_epds
 from pages.scripts.csv_import.import_generic_operational_epds import (
     import_generic_operational_epds,
 )
@@ -15,7 +16,8 @@ local_epd_files = {
     "EDGE_HANDBOOK_EPDs": import_EDGE_EPDs,
     "generic_EPDs": import_generic_structural_epds,
     "india_cambodia_EPDs_20250324": import_epds,
-    "generic_operational_EPDs": import_generic_operational_epds
+    "generic_operationaL_EPDs": import_generic_operational_epds,
+    "ECO_Platform_Global_EPDs": import_global_epds
 }
 
 
