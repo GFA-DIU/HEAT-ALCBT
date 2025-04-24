@@ -126,7 +126,9 @@
       data-bs-parent="#accordionBuilding"
     >
       <div class="accordion-body">
+        {% if building_id %}
         {% include "pages/building/building_info/detailed_info.html" %}
+        {% else %} Please save the building before adding any detailed information {% endif %}
       </div>
     </div>
   </div>
@@ -151,7 +153,9 @@
       data-bs-parent="#accordionBuilding"
     >
       <div class="accordion-body">
+        {% if building_id %}
         {% include "pages/building/building_info/operational_info.html" %}
+        {% else %} Please save the building before adding any operational information {% endif %}
       </div>
     </div>
   </div>
@@ -178,7 +182,7 @@
       <div id="operational-info-body" class="accordion-body">
         {% if building_id %}
         {% include "pages/building/operational_info/operational_products.html" %}
-        {% else %} Please save the building before adding any components {% endif %}
+        {% else %} Please save the building before adding any energy carriers {% endif %}
 
       </div>
     </div>
