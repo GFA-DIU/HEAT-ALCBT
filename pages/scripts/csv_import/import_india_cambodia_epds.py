@@ -1,6 +1,6 @@
 import pandas as pd
 
-from pages.models.epd import EPD, EPDType, MaterialCategory
+from pages.models.epd import EPD, EPDType
 from pages.scripts.csv_import.utils import (
     add_impacts,
     get_conversions,
@@ -38,7 +38,7 @@ impact_columns = [
 ]
 
 def import_epds():
-    file_path = "pages/data/india_cambodia_EPDs_20250324.csv"
+    file_path = "pages/data/India_and_Cambodia_updated_20250424.csv"
     superuser = get_superuser()
 
     try:
@@ -59,29 +59,31 @@ def import_epds():
             if pd.isna(declared_amount):
                 declared_amount = 1.0
             
-            new_epd = EPD(
+            new_epd, created = EPD.objects.update_or_create(
                 country=get_country(row["country"]),
                 source=row["source"],
                 name=row["name"],
-                names=[{"lang": "en", "value": row["name"]}],
                 public=True,
-                conversions=conversions,
-                category=get_category(row),
-                declared_unit=row["declared_unit"],
-                type=EPDType.OFFICIAL,
-                declared_amount=declared_amount,
-                comment=row['description'],
                 created_by_id=superuser.id,
+                defaults={
+                    "names": [{"lang": "en", "value": row["name"]}],
+                    "conversions": conversions,
+                    "category": get_category(row),
+                    "declared_unit": row["declared_unit"],
+                    "type": EPDType.OFFICIAL,
+                    "declared_amount": declared_amount,  
+                    "UUID": row["epd identifier"]
+                }
             )
-            new_epd.save()
+            if created:
+                logger.info("Created EPD %s", new_epd)
+            else:
+                logger.info("Updated EPD %s", new_epd)
             add_impacts(row, new_epd, impact_columns)
-            # print(f"Row {index} processed.")
             success += 1
 
         except Exception as e:
             logger.exception(f"Error in row {index}: {e}")
-            # print(f"Error in row {index}: {e}")
-            # print(f"{type(e).__name__}")
             failure += 1
             failure_list.append(index)
 

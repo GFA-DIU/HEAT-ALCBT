@@ -17,7 +17,8 @@ local_epd_files = {
     "generic_EPDs": import_generic_structural_epds,
     "india_cambodia_EPDs_20250324": import_epds,
     "generic_operationaL_EPDs": import_generic_operational_epds,
-    "ECO_Platform_Global_EPDs": import_global_epds
+    "ECO_Platform_Global_EPDs": import_global_epds,
+    "India_and_Cambodia_updated_20250424": import_epds,
 }
 
 
