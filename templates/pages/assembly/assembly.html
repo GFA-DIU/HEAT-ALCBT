@@ -6,7 +6,16 @@
 {% endif %}
     {% csrf_token %}
     <div class="row">
-        <!-- Name and Type in the first row -->
+        <!-- Category and Technique in the first row -->
+        <div class="col-6">
+            {{ form.assembly_category |as_crispy_field }} 
+        </div>
+        <div class="col-6">
+            {{ form.assembly_technique |as_crispy_field }}
+        </div>
+    </div>
+    <div class="row">
+        <!-- Name and Type in the second row -->
         <div class="col-md-6">
             {{ form.name |as_crispy_field }}
         </div>
@@ -23,7 +32,7 @@
         </div>
     </div>
     <div class="row">
-        <!-- Country and Classification in the second row -->
+        <!-- Quantity and comment in the third wrow -->
         <div class="col-6">
             <div class="row">
                 <div class="col-md-7">
@@ -45,19 +54,9 @@
                     </div>
                 </div>
             </div>
-
-            <div class="row">
-                {{ form.comment |as_crispy_field }}
-            </div>
         </div>
-        
         <div class="col-6">
-            <div class="row">
-                {{ form.assembly_category |as_crispy_field }}
-            </div>
-            <div class="row">
-                {{ form.assembly_technique |as_crispy_field }}
-            </div>
+            {{ form.comment |as_crispy_field }}
         </div>
     </div>
 
@@ -83,7 +82,6 @@
             {% endfor %}
         </ul>
     </div>
-
 
     <div class="d-flex flex-row justify-content-between align-items-center">
         <div>
