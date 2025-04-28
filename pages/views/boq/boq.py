@@ -101,9 +101,12 @@ def set_up_view(request, building_id, assembly_id):
         assembly = None
 
     epd_list, _ = get_epd_list(request, None, operational=False)
+
+    req = request.POST if request.method == "POST" else request.GET
     context = {
         "assembly_id": assembly_id,
         "building_id": building_id,
+        "filters": req,
         "epd_list": epd_list,
         "epd_filters_form": EPDsFilterForm(request.POST),
         "dimension": None,

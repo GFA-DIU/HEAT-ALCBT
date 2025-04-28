@@ -43,7 +43,7 @@ urlpatterns = [
     ),  # For editing an existing component
     path("boq/<uuid:building_id>/_new", boq_edit, name="boq"),
     path(
-        "boq/<uuid:assembly_id>/<uuid:building_id>/_new",
+        "boq/<uuid:assembly_id>/<uuid:building_id>/",
         boq_edit,
         name="boq_edit",
     ),
