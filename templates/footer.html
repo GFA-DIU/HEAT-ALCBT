@@ -8,15 +8,31 @@
         </a>
         <img src="{% static 'images/logos/BMWK+IKI_transparent_Web_en.png' %}" style="height: 6rem;" alt="ALCBT logo">
       </div>
-      <div class="col-auto">
-        <span class="text-muted" style="font-size: 0.875rem">
-          Copyright © 2025 •
-          <a href="{% url 'terms_of_use' %}" class="text-muted text-decoration-underscore"> Terms of Use </a>
-          &
-          <a href="{% url 'privacy_policy' %}" class="text-muted text-decoration-underscore">
-            Privacy Policy
-          </a>
-        </span>
+      <!-- Policy & Disclaimer -->
+      <div class="col-auto mb-1">
+        <div class="d-flex flex-column text-muted" style="font-size: 0.875rem;">
+          <!-- Terms / Privacy links -->
+          <span>
+            Copyright © 2025 •
+            <a
+              href="{% url 'terms_of_use' %}"
+              class="text-muted text-decoration-underscore"
+            >
+              Terms of Use
+            </a>
+            &amp;
+            <a
+              href="{% url 'privacy_policy' %}"
+              class="text-muted text-decoration-underscore"
+            >
+              Privacy Policy
+            </a>
+          </span>
+          <!-- Disclaimer -->
+          <span class="text-center mt-4 fw-bold border badge border border-dark text-dark bg-dark-subtle rounded-pill" style="font-size: 1rem;">
+            Under Active Development
+          </span>
+        </div>
       </div>
     </div>
   </div>
