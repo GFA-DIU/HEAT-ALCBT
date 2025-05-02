@@ -53,8 +53,8 @@ def building_dashboard_assembly(user, building_id, simulation):
     
     # Shorten df for bar chart
     df_filtered = df[df["type"] == "structural"]
-    df_bar = (df_filtered.groupby('category_short')['gwp'].sum() / df_filtered['gwp'].sum() * 100).reset_index()
-    df_bar.columns = ['category_short', 'gwp_per']
+    df_bar = df_filtered.groupby('category_short')['gwp'].sum().reset_index(name='gwp_abs')
+    df_bar['gwp_per'] = df_bar['gwp_abs'] / df_bar['gwp_abs'].sum() * 100
     df_bar = df_bar.sort_values("gwp_per", ascending=False)
 
     return _building_dashboard_assembly(df_pie, df_bar, "category_short")
@@ -220,13 +220,17 @@ def _building_dashboard_assembly(df_pie, df_bar, key_column: str):
         go.Bar(
             y=df_bar[key_column],
             x=df_bar["gwp_per"],
+            customdata=df_bar["gwp_abs"],
             orientation='h',
             marker=dict(
                 cornerradius=8,
                 color=colors[0],
             ),
             showlegend=False,
-            hoverinfo='none',
+            hovertemplate="%{customdata:,.1f} kg CO₂eq/m²<extra></extra>",
+            hoverlabel=dict(
+                font=dict(color="white")
+            )
         ),
         row=1, col=2
     )
