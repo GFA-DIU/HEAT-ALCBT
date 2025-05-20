@@ -54,17 +54,17 @@ def get_all_uuids_ecoplatform() -> list[dict]:
     data = get_epds(num_epds)
     
     # Get UUID
-    epd_list = []
+    epd_list = {}
     for i in data["data"]:
         if isinstance(i.get("geo"), str) and i.get("geo").strip().upper() in country_list:
             if i.get("name"):
-                epd_list.append({
+                epd_list[i["uuid"]] = {
                     "geo": i["geo"],
                     "uuid": i["uuid"],
                     "uri": i["uri"],
                     "name": i["name"],
                     "nodeid": i["nodeid"]
-                })
+                }
             else:
                 continue
         

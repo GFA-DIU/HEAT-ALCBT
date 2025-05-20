@@ -21,8 +21,12 @@ from pages.models.epd import (
     Impact,
     INDICATOR_UNIT_MAPPING,
 )
+from pages.scripts.utils import find_missing_uuids
 
 logger = logging.getLogger(__name__)
+
+User = get_user_model()
+superuser = User.objects.filter(is_superuser=True).first()
 
 class Command(BaseCommand):
     help = "Load all EPDs from Ökobaudat database."
@@ -30,11 +34,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Load EPD data
         epd_info = get_all_uuids_ecoplatform()
-        epd_info = [(e["uri"], e["geo"]) for e in epd_info]
-
+        
+        uuids = list(epd_info.keys())
+        filtered_uuids = find_missing_uuids(uuids, chunk_size=1000)
+        filtered_epds = [(epd_info[id]["uri"], epd_info[id]["keys"]) for id in filtered_uuids]
 
         uri_issue_list = []
-        for uri, geo in epd_info:
+        for uri, geo in filtered_epds:
             try:
                 # Fetch related country
                 country = Country.objects.get(code2=geo)
@@ -83,10 +89,7 @@ def store_epd(epd_data: dict, country: Country, data: dict):
             else:
                 classification = MaterialCategory.objects.get(name_en="Unknown")
         except MaterialCategory.DoesNotExist:
-            classification = None  # Or handle this case as needed
-            
-    User = get_user_model()
-    superuser = User.objects.filter(is_superuser=True).first()
+            classification = None  # Or handle this case as neede
 
     # Step 2: Create or update the EPD record
     epd, created = EPD.objects.update_or_create(
@@ -131,3 +134,5 @@ def store_epd(epd_data: dict, country: Country, data: dict):
                     epd=epd, impact=impact, defaults={"value": value}
                 )
     return epd
+
+
