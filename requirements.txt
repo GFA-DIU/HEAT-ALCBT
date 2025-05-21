@@ -46,3 +46,4 @@ openpyxl
 
 ## Heroku
 newrelic
+honeybadger
