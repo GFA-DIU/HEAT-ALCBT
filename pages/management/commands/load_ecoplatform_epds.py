@@ -34,10 +34,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Load EPD data
         epd_info = get_all_uuids_ecoplatform()
-        
         uuids = list(epd_info.keys())
+        logger.info("Found a total of %s ECO-Platform EPDs.", len(uuids))
+        
+        # Filter-out EPDs that already exist in DB
         filtered_uuids = find_missing_uuids(uuids, chunk_size=1000)
-        filtered_epds = [(epd_info[id]["uri"], epd_info[id]["keys"]) for id in filtered_uuids]
+        filtered_epds = [(epd_info[id]["uri"], epd_info[id]["geo"]) for id in filtered_uuids]
+        logger.info("Found %s new EPDs out of %s total.", len(uuids)-len(filtered_epds), len(uuids))
+        self.stdout.write(self.style.HTTP_INFO(f"Found {len(filtered_epds)} new EPDs out of {len(uuids)} total."))
 
         uri_issue_list = []
         for uri, geo in filtered_epds:
