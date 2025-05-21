@@ -78,6 +78,7 @@ INSTALLED_APPS = [
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
+    'honeybadger.contrib.DjangoHoneybadgerMiddleware', # needs to be at the top wrap entire request process
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -90,7 +91,6 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
     # # own
     # "django_project.middleware.LoginRequiredMiddleware",
-    'honeybadger.contrib.DjangoHoneybadgerMiddleware',
 ]
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ["admin:login", "admin:index"]
