@@ -90,6 +90,7 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
     # # own
     # "django_project.middleware.LoginRequiredMiddleware",
+    'honeybadger.contrib.DjangoHoneybadgerMiddleware',
 ]
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ["admin:login", "admin:index"]
@@ -315,6 +316,14 @@ CITIES_LIGHT_INCLUDE_CITY_TYPES = [
     "PPLA5",
     "PPLC",
 ]
+
+
+
+## Honeybadger
+# https://docs.honeybadger.io/lib/python/#django
+HONEYBADGER = {
+  'API_KEY': os.environ.get("HONEYBADGER_API_KEY", "")
+}
 
 
 if IS_HEROKU_APP:
