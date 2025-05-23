@@ -7,6 +7,10 @@ from .models.assembly import Assembly, AssemblyCategory, AssemblyTechnique
 from .models.building import Building, BuildingCategory, BuildingSubcategory
 from .scripts.Excel_export.export_EPDs_to_excel import to_excel_bytes
 
+
+admin.site.site_header = "BEAT Admin"
+admin.site.site_title = "BEAT Admin Portal"
+admin.site.index_title = "Welcome to the BEAT Admin Area"
 # Register your models here.
 
 # Inline for Many-to-Many (impacts in EPD)
