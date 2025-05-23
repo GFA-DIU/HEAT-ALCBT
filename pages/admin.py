@@ -14,8 +14,15 @@ class ImpactsInline(admin.TabularInline):  # or admin.StackedInline
 class ProductsInline(admin.TabularInline):  # or admin.StackedInline
     model = Assembly.products.through  # Use the through model for the many-to-many field
     extra = 1  # Number of empty rows to display
-  
 
+class StructuralProductsInline(admin.TabularInline):
+    model = Building.operational_components.through  # Use the through model for the many-to-many field
+    extra = 1  # Number of empty rows to display
+  
+class StructuralProductsSimulationInline(admin.TabularInline):
+    model = Building.simulated_operational_components.through  # Use the through model for the many-to-many field
+    extra = 1  # Number of empty rows to display
+    
 class AssembliesClassificationInline(admin.TabularInline):
     model = AssemblyCategory.techniques.through
 
@@ -49,18 +56,15 @@ class AssemblyCategoryAdmin(admin.ModelAdmin):
 
 # Custom admin for Building
 class BuildingAdmin(admin.ModelAdmin):
-    inlines = [AssembliesInline, AssembliesSimulationInline]  # Add the inline for products
+    inlines = [AssembliesInline, AssembliesSimulationInline, StructuralProductsInline, StructuralProductsSimulationInline]  # Add the inline for products
     list_display = ["name", "country", "category"]
 
 # Register your models with custom admin
 admin.site.register(MaterialCategory)
 admin.site.register(EPD, EPDAdmin)
-admin.site.register(StructuralProduct)
-admin.site.register(OperationalProduct)
 admin.site.register(Assembly, AssemblyAdmin)
 admin.site.register(AssemblyCategory, AssemblyCategoryAdmin)
 admin.site.register(AssemblyTechnique)
 admin.site.register(Building, BuildingAdmin)
 admin.site.register(BuildingSubcategory)
-admin.site.register(EPDImpact)
 admin.site.register(Impact)
