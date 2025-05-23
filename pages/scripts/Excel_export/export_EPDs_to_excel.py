@@ -15,7 +15,7 @@ def to_excel_bytes(epds: list[EPD]):
     df = to_excel(epds)
     
     buffer = BytesIO()
-    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
         df.to_excel(writer, sheet_name='EPDs', index=False)
 
     excel_bytes = buffer.getvalue()
