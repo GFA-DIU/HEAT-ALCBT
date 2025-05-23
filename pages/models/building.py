@@ -71,6 +71,9 @@ class BuildingCategory(models.Model):
         blank=True,
         related_name="categories",
     )
+    
+    def __str__(self):
+        return f"{self.name}"
 
     class Meta:
         verbose_name = "Building category"
