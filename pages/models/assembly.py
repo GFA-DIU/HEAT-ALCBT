@@ -86,6 +86,10 @@ class AssemblyCategoryTechnique(models.Model):
     )
     description = models.TextField(null=True, blank=True)
 
+    def __str__(self):
+        tech = self.technique if self.technique else "No Technique"
+        return f"{self.category}/ {tech}"
+
     class Meta:
         unique_together = ("category", "technique")
 
