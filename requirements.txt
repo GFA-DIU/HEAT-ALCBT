@@ -40,5 +40,6 @@ psycopg==3.2.3
 psycopg-binary==3.2.3
 pytest==8.3.5
 pytest-django==4.10.0
+openpyxl
 # psycopg[c]; sys_platform == "linux"
 # psycopg[binary]; sys_platform != "linux"

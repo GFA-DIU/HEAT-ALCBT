@@ -1,3 +1,5 @@
+from io import BytesIO
+
 import pandas as pd
 
 from pages.models.epd import EPD, EPDImpact, MaterialCategory
@@ -9,6 +11,15 @@ def to_excel(epds: list[EPD]) -> None:
     
     return pd.DataFrame.from_records(epd_list)
 
+def to_excel_bytes(epds: list[EPD]):
+    df = to_excel(epds)
+    
+    buffer = BytesIO()
+    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        df.to_excel(writer, sheet_name='EPDs', index=False)
+
+    excel_bytes = buffer.getvalue()
+    return excel_bytes
 
 def parse_EPD(epd: EPD):
     return {

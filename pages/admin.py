@@ -1,10 +1,11 @@
 from django.contrib import admin
-from django.utils.html import format_html
-from django.utils.safestring import mark_safe
+from django.db.models import Q, Prefetch
+from django.http import HttpResponse
 
-from .models.epd import MaterialCategory, EPD, Impact
+from .models.epd import MaterialCategory, EPD, Impact, EPDImpact
 from .models.assembly import Assembly, AssemblyCategory, AssemblyTechnique
-from .models.building import Building, BuildingCategory, BuildingSubcategory, CategorySubcategory
+from .models.building import Building, BuildingCategory, BuildingSubcategory
+from .scripts.Excel_export.export_EPDs_to_excel import to_excel_bytes
 
 # Register your models here.
 
@@ -46,11 +47,78 @@ class BuildingCategoryInline(admin.StackedInline):
     model = BuildingCategory.subcategories.through
     extra = 0
 
+
+class TopLevelCategoryFilter(admin.SimpleListFilter):
+    title = "Top-level category"        # Displayed in the sidebar
+    parameter_name = "top_cat"          # URL query parameter
+
+    def lookups(self, request, model_admin):
+        # return only those MaterialCategorys whose level == 1
+        qs = MaterialCategory.objects.filter(level=1).order_by("name_en")
+        return [(c.pk, c.name_en) for c in qs]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            # match any EPD whose category_id == "X" (the root)
+            # or starts with "X." (all its descendants)
+            val = self.value()
+            return queryset.filter(
+                Q(category__parent__pk=val) |
+                Q(category__parent__parent__pk=val)
+            )
+        return queryset
+
+
+@admin.action(description="Export selected EPDs to Excel.")
+def export_epds_action(modeladmin, request, queryset):
+    queryset = (
+        queryset.select_related(
+            "country",
+            "city",
+            "category",
+            "category__parent",
+            "category__parent__parent",
+        )
+        # grab all the reverse/M2M data in one shot each
+        .prefetch_related(
+            # impacts are through the EPDImpact intermediary; prefetch both sides
+            Prefetch(
+                "epdimpact_set",
+                queryset=EPDImpact.objects.select_related("impact"),
+                to_attr="all_impacts",
+            ),
+            # if you ever do `epd.impacts.all()`, you can also prefetch that:
+            "impacts",
+        )
+    )
+    excel_data = to_excel_bytes(queryset)
+    # Build response
+    response = HttpResponse(
+        excel_data,
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="export.xlsx"'
+    return response
+
+
 # Custom admin for EPD
 class EPDAdmin(admin.ModelAdmin):
     inlines = [ImpactsInline]  # Add the inline for impacts
-    list_display = ["name", "country", "category"]  # Show all fields in list view
+    list_display = ["name", "country", "category", "type"]  # Show all fields in list view
+    list_display_links = ["name"]
+    ordering = ["name", "country"]
+    list_filter  = [
+        "country",
+        "type",
+        TopLevelCategoryFilter,  # ← our custom filter
+    ]
+    search_fields = (
+        "name",
+        "category__name_en",
+    )    
+    actions = [export_epds_action]
 
+    
 # Custom admin for Assembly
 class AssemblyAdmin(admin.ModelAdmin):
     inlines = [ProductsInline]  # Add the inline for products
@@ -79,6 +147,7 @@ class ChildCategoryInline(admin.TabularInline):
 class MaterialCategoryAdmin(admin.ModelAdmin):
     inlines = [ChildCategoryInline]
     list_display = ("category_id", "name_en", "parent")
+    list_display_links = ["name_en"]
     ordering    = ("category_id",)
 
 # Register your models with custom admin
