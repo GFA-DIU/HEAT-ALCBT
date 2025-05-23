@@ -1,5 +1,6 @@
 # dev
 pytest-django==4.9.0
+locust
 
 # default
 asgiref==3.8.1
@@ -43,3 +44,8 @@ psycopg==3.2.3
 psycopg-binary==3.2.3
 # psycopg[c]; sys_platform == "linux"
 # psycopg[binary]; sys_platform != "linux"
+
+
+## Heroku
+newrelic
+honeybadger
