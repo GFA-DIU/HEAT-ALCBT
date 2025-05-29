@@ -67,12 +67,6 @@
                                     {% if epd.selection_unit == unit %} selected {% endif %}>{{unit | slice:":10"| strip}}</option>
                             {% endfor %}
                         </select>
-                       {% comment %} <input name="material_{{ epd.id }}_unit_{{epd.timestamp}}" 
-                       class="input-group-text w-auto"
-                       style="max-width: 80px;"
-                       value='{{ epd.selection_unit|slice:":10" | strip }}'
-                       title="{{ epd.selection_unit }}"
-                       readonly> {% endcomment %}
             </div>
             {% endif %}
     </div>
