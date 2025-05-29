@@ -287,7 +287,7 @@ class EPD(BaseModel, epdLCAx):
         )
         return Decimal(round(impact.value, 2)) / self.declared_amount
 
-    def get_op_units(self):
+    def get_available_units(self):
         units = [self.declared_unit]
         for item in self.conversions:
             match (item.get("unit")):
