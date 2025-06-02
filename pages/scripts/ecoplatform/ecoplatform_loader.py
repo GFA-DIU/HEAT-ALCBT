@@ -44,7 +44,7 @@ def get_epds(limit) -> dict:
     return data
 
 
-def get_all_uuids_ecoplatform() -> list[dict]:
+def get_all_uuids_ecoplatform() -> dict[str, dict]:
     """Get UUIDs and info from Eco-platform."""
     # get total number of EPDs
     data = get_epds(1)
