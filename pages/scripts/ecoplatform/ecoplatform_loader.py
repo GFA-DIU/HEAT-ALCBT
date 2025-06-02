@@ -63,25 +63,23 @@ def get_all_uuids_ecoplatform() -> dict[str, dict]:
             logger.error("Missing required key %s in EPD entry: %s.\nSkipping", exc, i)
             continue
         
-        if not uuid:
-            logger.error("The EPD with URI: '%s' did not contain a UUID.\nSkipping", uri)
-            continue
+        # Filter EPD for target countries
+        if isinstance(geo, str) and geo.strip().upper() in country_list:
+            if not uuid:
+                logger.error("The EPD with URI: '%s' did not contain a UUID.\nSkipping", uri)
+                continue
+            
+            if not name:
+                logger.error("The EPD with UUID: '%s' did not contain a name.\nSkipping", uuid)
+                continue
         
-        if not name:
-            logger.error("The EPD with UUID: '%s' did not contain a name.\nSkipping", uuid)
-            continue
-        
-        if not isinstance(geo, str) or geo.strip().upper() not in country_list:
-            logger.error("Invalid georeference %s for the EPD with UUID: '%s'.\nSkipping", geo, uuid)
-            continue
-        
-        epd_list[uuid] = {
-            "geo": geo,
-            "uuid": uuid,
-            "uri": uri,
-            "name": name,
-            "nodeid": nodeid
-        }
+            epd_list[uuid] = {
+                "geo": geo,
+                "uuid": uuid,
+                "uri": uri,
+                "name": name,
+                "nodeid": nodeid
+            }
 
     return epd_list
 
