@@ -10,7 +10,7 @@
            L180,110
            L60,110
            Z"
-        fill="#EC6607"/>
+        fill="#E30713"/>
   
   <!-- white panel -->
   <rect x="180" y="0" width="60" height="110" fill="#FFFFFF"/>
@@ -36,7 +36,7 @@
         stroke="#000"
         stroke-width="4"
         text-anchor="middle"
-        dominant-baseline="middle">F</text>
+        dominant-baseline="middle">G</text>
 
   <!-- small "A" -->
   <text x="210" y="23"
