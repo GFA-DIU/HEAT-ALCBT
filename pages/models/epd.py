@@ -288,14 +288,18 @@ class EPD(BaseModel, epdLCAx):
         return Decimal(round(impact.value, 2)) / self.declared_amount
 
     def get_available_units(self):
-        units = [self.declared_unit]
+        units = {self.declared_unit}
+        if self.declared_unit not in [Unit.KG, Unit.M3, Unit.KWH]:
+            return list(units)
         for item in self.conversions:
-            match (item.get("unit")):
-                case "kg" | "-":
-                    units.append(Unit.KG)
-                case "kg/m^3":
-                    units.extend([Unit.M3, Unit.LITER])
-                case _:
+            match (self.declared_unit, item.get("unit")):
+                case (Unit.KWH | Unit.M3, "kg" | "-"):
+                    units.add(Unit.KG)
+                case (Unit.KWH, "kg/m^3"):
+                    units.update({Unit.M3, Unit.LITER})
+                case (Unit.M3 | Unit.KG, "kg/m^3"):
+                    units.update({Unit.M3, Unit.KG})
+                case (_, _):
                     Warning(
                         "The epd (%s) has a conversion %s for which there is not corresponding unit.",
                         self.id,

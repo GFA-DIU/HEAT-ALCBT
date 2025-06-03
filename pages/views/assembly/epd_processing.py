@@ -25,6 +25,7 @@ class SelectedEPD:
     country: Optional[str]
     source: Optional[str]
     classification: Optional[str]
+    available_units: Optional[str]
 
     @classmethod
     def parse_product(cls, product: StructuralProduct, is_boq_product=False):
@@ -50,6 +51,7 @@ class SelectedEPD:
             country=product.epd.country.name if product.epd.country else "",
             source=product.epd.source,
             classification=product.classification,
+            available_units=product.epd.get_available_units(),
         )
 
 
@@ -123,7 +125,9 @@ class LazyProcessor:
             country=epd.country.name if epd.country else "",
             category=epd.category.name_en if epd.category else None,
             impact_gwp=epd.get_gwp_impact_sum(life_cycle_stage=self.life_cycle_stage),
-            impact_penrt=epd.get_penrt_impact_sum(life_cycle_stage=self.life_cycle_stage),
+            impact_penrt=epd.get_penrt_impact_sum(
+                life_cycle_stage=self.life_cycle_stage
+            ),
             conversions=[],
             declared_unit=epd.declared_unit,
             selection_text=sel_text,
@@ -132,9 +136,13 @@ class LazyProcessor:
         )
 
 
-def get_epd_list(request, dimension, operational: bool) -> tuple[Page, AssemblyDimension]:
+def get_epd_list(
+    request, dimension, operational: bool
+) -> tuple[Page, AssemblyDimension]:
     # Dimension can never be None, since we need dimension info to parse epds
-    filtered_list, dimension = get_filtered_epd_list(request, dimension, operational=operational)
+    filtered_list, dimension = get_filtered_epd_list(
+        request, dimension, operational=operational
+    )
     # Pagination setup for EPD list
     lazy_queryset = LazyProcessor(filtered_list, dimension, operational)
     paginator = Paginator(lazy_queryset, 5)  # Show 10 items per page
