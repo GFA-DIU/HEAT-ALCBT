@@ -24,3 +24,8 @@ def get_step(selection_unit):
     if selection_unit in [Unit.PCS]:
         return "1"
     return "0.01"
+
+@register.filter(is_safe=True)
+def get_item(dictionary, key):
+    return dictionary.get(key)
+

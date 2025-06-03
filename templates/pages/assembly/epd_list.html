@@ -1,4 +1,6 @@
+{% load static %}
 {% load crispy_forms_tags %}
+{% load custom_filters %}
 
 {% comment %} FILTERS {% endcomment %}
 {% if assembly_id %}
@@ -36,6 +38,15 @@
                     <span class="badge border bg-transparent rounded-pill" style="border-color: #6f42c1 !important; color: #6f42c1; ">{{epd.category}}</span>
                     <span class="badge border border-dark text-dark bg-transparent rounded-pill">Unit: {{epd.declared_unit}}</span>
                     <span class="badge border border-success text-success bg-transparent rounded-pill">{{epd.impact_gwp|floatformat:"-2"}} kgCO2e</span>
+                    {% with label=epd.labels|get_item:"GCCA Global Reference Threshold Low Carbon and Near Zero Emissions Concrete" %}
+                        {% if label %}
+                            <img 
+                                src="{% static 'images/svg/GCCA_label_' %}{{ label }}.svg"
+                                alt="GCCA label {{ label }}"
+                                title="GCCA label {{ label }}"
+                            >
+                        {% endif %}
+                    {% endwith%}
                     <!-- <span class="badge border bg-transparent rounded-pill" style="border-color: #f26716 !important; color: #f26716; ">{{epd.impact_penrt}} MJ</span> -->
                 </div>
             </div>
