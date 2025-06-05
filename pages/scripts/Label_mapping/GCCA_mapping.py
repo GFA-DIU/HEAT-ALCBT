@@ -40,7 +40,7 @@ def add_GCCA_labels():
             EPDLabel.objects.update_or_create(
                 epd=epd,
                 label=label,
-                score=row["Band threshold"]
+                score=row["label_score"]
             )
         except Exception as e:
             logger.exception("Error in row %s", id)
