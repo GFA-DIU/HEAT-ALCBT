@@ -44,7 +44,7 @@ def get_epds(limit) -> dict:
     return data
 
 
-def get_all_uuids_ecoplatform() -> list[dict]:
+def get_all_uuids_ecoplatform() -> dict[str, dict]:
     """Get UUIDs and info from Eco-platform."""
     # get total number of EPDs
     data = get_epds(1)
@@ -54,20 +54,33 @@ def get_all_uuids_ecoplatform() -> list[dict]:
     data = get_epds(num_epds)
     
     # Get UUID
-    epd_list = []
+    required = ("uuid", "uri", "nodeid", "geo", "name")
+    epd_list = {}
     for i in data["data"]:
-        if isinstance(i.get("geo"), str) and i.get("geo").strip().upper() in country_list:
-            if i.get("name"):
-                epd_list.append({
-                    "geo": i["geo"],
-                    "uuid": i["uuid"],
-                    "uri": i["uri"],
-                    "name": i["name"],
-                    "nodeid": i["nodeid"]
-                })
-            else:
+        try:
+            uuid, uri, nodeid, geo, name = (i[k] for k in required)
+        except KeyError as exc:
+            logger.error("Missing required key %s in EPD entry: %s.\nSkipping", exc, i)
+            continue
+        
+        # Filter EPD for target countries
+        if isinstance(geo, str) and geo.strip().upper() in country_list:
+            if not uuid:
+                logger.error("The EPD with URI: '%s' did not contain a UUID.\nSkipping", uri)
+                continue
+            
+            if not name:
+                logger.error("The EPD with UUID: '%s' did not contain a name.\nSkipping", uuid)
                 continue
         
+            epd_list[uuid] = {
+                "geo": geo,
+                "uuid": uuid,
+                "uri": uri,
+                "name": name,
+                "nodeid": nodeid
+            }
+
     return epd_list
 
 
