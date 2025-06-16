@@ -9,7 +9,6 @@ from django.db.models.manager import BaseManager
 from pages.models.assembly import AssemblyDimension, StructuralProduct
 from pages.models.epd import EPD, EPDLabel
 from pages.views.assembly.epd_filtering import (
-    get_epd_info,
     get_filtered_epd_list,
 )
 
@@ -27,6 +26,7 @@ class SelectedEPD:
     country: Optional[str]
     source: Optional[str]
     classification: Optional[str]
+    available_units: Optional[str]
 
     @classmethod
     def parse_product(cls, product: StructuralProduct, is_boq_product=False):
@@ -36,9 +36,7 @@ class SelectedEPD:
         if is_boq_product:
             sel_text = "Quantity"
         else:
-            sel_text, _ = get_epd_info(
-                product.assembly.dimension, product.epd.declared_unit
-            )
+            sel_text, _ = product.epd.get_epd_info(product.assembly.dimension)
 
         return cls(
             id=str(product.epd.id),
@@ -52,6 +50,7 @@ class SelectedEPD:
             country=product.epd.country.name if product.epd.country else "",
             source=product.epd.source,
             classification=product.classification,
+            available_units=product.epd.get_available_units(),
         )
 
 
@@ -67,7 +66,7 @@ class FilteredEPD:
     conversions: str
     declared_unit: str
     selection_text: str
-    selection_unit: str
+    selection_unit: str | list[str]
     source: Optional[str]
     labels: Optional[dict[str, str]]
 
@@ -116,7 +115,7 @@ class LazyProcessor:
     def epd_parsing(self, epd: EPD):
         """Encapsulates the logic for preprocessing EPDs."""
         if self.life_cycle_stage == "a1a3":
-            sel_text, sel_unit = get_epd_info(self.dimension, epd.declared_unit)
+            sel_text, sel_unit = epd.get_epd_info(self.dimension)
         else:
             sel_text = sel_unit = ""
         return FilteredEPD(
@@ -126,7 +125,9 @@ class LazyProcessor:
             country=epd.country.name if epd.country else "",
             category=epd.category.name_en if epd.category else None,
             impact_gwp=epd.get_gwp_impact_sum(life_cycle_stage=self.life_cycle_stage),
-            impact_penrt=epd.get_penrt_impact_sum(life_cycle_stage=self.life_cycle_stage),
+            impact_penrt=epd.get_penrt_impact_sum(
+                life_cycle_stage=self.life_cycle_stage
+            ),
             conversions=[],
             declared_unit=epd.declared_unit,
             selection_text=sel_text,
@@ -136,9 +137,13 @@ class LazyProcessor:
         )
 
 
-def get_epd_list(request, dimension, operational: bool) -> tuple[Page, AssemblyDimension]:
+def get_epd_list(
+    request, dimension, operational: bool
+) -> tuple[Page, AssemblyDimension]:
     # Dimension can never be None, since we need dimension info to parse epds
-    filtered_list, dimension = get_filtered_epd_list(request, dimension, operational=operational)
+    filtered_list, dimension = get_filtered_epd_list(
+        request, dimension, operational=operational
+    )
     fetched_list = prefetch_epds(filtered_list)
     # Pagination setup for EPD list
     lazy_queryset = LazyProcessor(fetched_list, dimension, operational)

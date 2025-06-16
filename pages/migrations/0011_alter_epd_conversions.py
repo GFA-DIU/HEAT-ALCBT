@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pages', '0008_alter_building_climate_zone_and_more'),
+        ('pages', '0010_label_data_migration'),
     ]
 
     operations = [

@@ -62,7 +62,7 @@ def serialize_operational_products(operational_products):
                 "selection_unit": op_product.input_unit,
                 "selection_quantity": op_product.quantity,
                 "timestamp": datetime.now().strftime("%Y%m%d%H%M%S%f"),
-                "op_units": op_product.epd.get_op_units(),
+                "op_units": op_product.epd.get_available_units(),
                 "source": op_product.epd.source,
                 "gwp_b6": round(impacts["gwp_b6"], 2),
                 "penrt_b6": round(impacts["penrt_b6"], 2),
@@ -85,7 +85,9 @@ def get_op_product_list(request, building_id):
         form.fields[field].initial = MaterialCategory.objects.get(name_en=value)
         form.fields[field].disabled = True
 
-    form.fields["childcategory"].queryset = MaterialCategory.objects.filter(parent=MaterialCategory.objects.get(name_en=value))
+    form.fields["childcategory"].queryset = MaterialCategory.objects.filter(
+        parent=MaterialCategory.objects.get(name_en=value)
+    )
     context = {
         "building_id": building_id,
         "simulation": False,
@@ -107,7 +109,7 @@ def get_op_product(request, building_id):
     epd.selection_quantity = 1
     epd.selection_unit = Unit.KG
     epd.timestamp = datetime.now().strftime("%Y%m%d%H%M%S%f")
-    epd.op_units = epd.get_op_units()
+    epd.op_units = epd.get_available_units()
     epd.product_id = None
     context = {
         "epd": epd,
