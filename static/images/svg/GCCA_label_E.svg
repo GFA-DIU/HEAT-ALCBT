@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="-4 -2 246 114"
+     width="100"
+     height="auto">
+
+  <!-- Coloured arrow -->
+  <path d="M0,50
+           L60,0
+           L180,0
+           L180,110
+           L60,110
+           Z"
+        fill="#97999B"/>
+  
+  <!-- white panel -->
+  <rect x="180" y="0" width="60" height="110" fill="#FFFFFF"/>
+
+  <!-- full-outline path -->
+  <path d="M0,50
+           L60,0
+           L240,0
+           L240,110
+           L60,110
+           Z"
+        fill="none"
+        stroke="#000"
+        stroke-width="4"
+        stroke-linejoin="miter"/>
+
+  <!-- Big Label -->
+  <text x="120" y="63"
+        font-family="Arial, sans-serif"
+        font-size="90"
+        font-weight="bold"
+        fill="#FFFFFF"
+        stroke="#000"
+        stroke-width="4"
+        text-anchor="middle"
+        dominant-baseline="middle">E</text>
+
+  <!-- small "A" -->
+  <text x="210" y="23"
+        font-family="Arial, sans-serif"
+        font-size="36"
+        font-weight="bold"
+        fill="#000"
+        text-anchor="middle"
+        dominant-baseline="middle">A</text>
+
+  <!-- up-arrow -->
+  <text x="210" y="54"
+        font-family="Arial, sans-serif"
+        font-size="36"
+        font-weight="950"
+        fill="#000"
+        text-anchor="middle"
+        alignment-baseline="middle">↑</text>
+
+  <!-- Bottom scale -->
+  <text x="210" y="94"
+        font-family="Arial, sans-serif"
+        font-size="36"
+        font-weight="bold"
+        fill="#000"
+        text-anchor="middle"
+        dominant-baseline="middle">G</text>
+</svg>
