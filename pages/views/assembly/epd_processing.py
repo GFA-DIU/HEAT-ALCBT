@@ -9,7 +9,6 @@ from django.db.models.manager import BaseManager
 from pages.models.assembly import AssemblyDimension, StructuralProduct
 from pages.models.epd import EPD, EPDLabel
 from pages.views.assembly.epd_filtering import (
-    get_epd_info,
     get_filtered_epd_list,
 )
 
@@ -37,9 +36,7 @@ class SelectedEPD:
         if is_boq_product:
             sel_text = "Quantity"
         else:
-            sel_text, _ = get_epd_info(
-                product.assembly.dimension, product.epd.declared_unit
-            )
+            sel_text, _ = product.epd.get_epd_info(product.assembly.dimension)
 
         return cls(
             id=str(product.epd.id),
@@ -69,7 +66,7 @@ class FilteredEPD:
     conversions: str
     declared_unit: str
     selection_text: str
-    selection_unit: str
+    selection_unit: str | list[str]
     source: Optional[str]
     labels: Optional[dict[str, str]]
 
@@ -118,7 +115,7 @@ class LazyProcessor:
     def epd_parsing(self, epd: EPD):
         """Encapsulates the logic for preprocessing EPDs."""
         if self.life_cycle_stage == "a1a3":
-            sel_text, sel_unit = get_epd_info(self.dimension, epd.declared_unit)
+            sel_text, sel_unit = epd.get_epd_info(self.dimension)
         else:
             sel_text = sel_unit = ""
         return FilteredEPD(

@@ -9,7 +9,6 @@ from accounts.models import CustomCity
 
 from .base import BaseModel
 
-
 class Unit(models.TextChoices):
     """Adapted from LCAx."""
 
@@ -335,6 +334,17 @@ class EPD(BaseModel, epdLCAx):
                         item.get("unit"),
                     )
         return units
+
+
+    def get_epd_info(self, dimension):
+        """Takes an assembly dimension"""
+        from pages.views.assembly.epd_dimension_info import get_epd_dimension_info
+        if dimension and dimension != "None":
+            return get_epd_dimension_info(dimension, self.declared_unit)
+        else:
+            selection_text = []
+            selection_units = self.get_available_units()
+            return selection_text, selection_units
 
 
 class EPDImpact(models.Model):

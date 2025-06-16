@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from cities_light.models import Country
 from accounts.models import CustomCity
 
-from .epd import EPD, Unit
+from .epd import EPD
 from .base import BaseModel
 from .product import BaseProduct
 
@@ -148,16 +148,14 @@ class StructuralProduct(BaseProduct):
         """
         super().clean()
 
-        from pages.views.assembly.epd_filtering import get_epd_info
-
         dimension = None if self.assembly.is_boq else self.assembly.dimension
-        _, expected_unit = get_epd_info(dimension, self.epd.declared_unit)
-        if self.input_unit != expected_unit:
+        _, expected_units = self.epd.get_epd_info(dimension)
+        if self.input_unit not in expected_units:
             raise ValidationError(
                 {
                     "input_unit": (
                         f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
-                        f"Expected unit: '{expected_unit}'."
+                        f"Expected unit: '{expected_units}'."
                     )
                 }
             )
