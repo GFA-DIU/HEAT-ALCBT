@@ -9,7 +9,6 @@ from accounts.models import CustomCity
 
 from .base import BaseModel
 
-
 class Unit(models.TextChoices):
     """Adapted from LCAx."""
 
@@ -241,6 +240,32 @@ class Impact(models.Model):
         return f"{self.impact_category} {self.life_cycle_stage}"
 
 
+class Label(models.Model):
+    SCALE_TYPE_CHOICES = [
+        ('nominal', 'Unordered categories (nominal)'),
+        ('ordinal',  'Ordered categories (ordinal)'),
+        ('cardinal',  'Numeric (interval/ratio)'),
+    ]
+
+    name = models.CharField(max_length=255, unique=True)
+    source = models.CharField(_("Source"), max_length=255, null=True, blank=True)
+    comment = models.CharField(_("Comment"), max_length=255, null=True, blank=True)
+    scale_type  = models.CharField(_("Scale Type"), max_length=10, choices=SCALE_TYPE_CHOICES)
+    scale_parameters  = models.JSONField(_("Scale Parameters"),blank=True, null=True, help_text=_("Scale-specific metadata"))  # list of tuples
+    
+    def clean(self):
+        super.clean()
+        if not isinstance(self.scale_parameters, list):
+            raise ValidationError("Scale Parameters must be a list.")
+        
+    def save(self, *args, **kwargs):
+        """
+        Override save to include clean validation.
+        """
+        self.clean()
+        super().save(*args, **kwargs)
+
+
 class EPD(BaseModel, epdLCAx):
     """EPDs are the material information from official databases."""
 
@@ -267,41 +292,117 @@ class EPD(BaseModel, epdLCAx):
         null=False,
         blank=False,
     )
+    labels = models.ManyToManyField(
+        Label, blank=True, related_name="epd_labels", through="EPDLabel"
+    )
 
     def __str__(self):
         return self.name
 
     def get_gwp_impact_sum(self, life_cycle_stage):
-        impact = EPDImpact.objects.get(
-            epd=self,
-            impact__impact_category="gwp",
-            impact__life_cycle_stage=life_cycle_stage,
-        )
-        return Decimal(round(impact.value, 2)) / self.declared_amount
+        """
+        Finds the EPDImpact for GWP + given life_cycle_stage and returns
+        Decimal(round(value, 2)) divided by self.declared_amount.
+        If `all_impacts` was prefetched, it will use that; otherwise it falls
+        back to a database query.
+        """
+        # 1) Try to use the prefetched list first
+        impacts_list = getattr(self, "all_impacts", None)
+
+        if impacts_list is not None:
+            for epdimpact in impacts_list:
+                # Because you did select_related("impact"), these fields are cached
+                if (
+                    epdimpact.impact.impact_category == "gwp"
+                    and epdimpact.impact.life_cycle_stage == life_cycle_stage
+                ):
+                    # Round to two decimals, wrap in Decimal, then divide
+                    rounded = round(epdimpact.value, 2)
+                    return Decimal(rounded) / self.declared_amount
+
+            # If no matching GWP impact was found among the prefetched items:
+            return Decimal("0")
+
+        # 2) Prefetch wasn’t used, fall back to a DB lookup
+        try:
+            db_impact = EPDImpact.objects.get(
+                epd=self,
+                impact__impact_category="gwp",
+                impact__life_cycle_stage=life_cycle_stage,
+            )
+        except EPDImpact.DoesNotExist:
+            return Decimal("0")
+        else:
+            rounded = round(db_impact.value, 2)
+            return Decimal(rounded) / self.declared_amount
 
     def get_penrt_impact_sum(self, life_cycle_stage):
-        impact = EPDImpact.objects.get(
-            epd=self,
-            impact__impact_category="penrt",
-            impact__life_cycle_stage=life_cycle_stage,
-        )
-        return Decimal(round(impact.value, 2)) / self.declared_amount
+        """
+        Finds the EPDImpact for PENRT + given life_cycle_stage and returns
+        Decimal(round(value, 2)) divided by self.declared_amount.
+        If `all_impacts` was prefetched, it will use that; otherwise it falls
+        back to a database query.
+        """
+        # 1) Try to use the prefetched list first
+        impacts_list = getattr(self, "all_impacts", None)
 
-    def get_op_units(self):
-        units = [self.declared_unit]
+        if impacts_list is not None:
+            for epdimpact in impacts_list:
+                # Because you did select_related("impact"), these fields are cached
+                if (
+                    epdimpact.impact.impact_category == "penrt"
+                    and epdimpact.impact.life_cycle_stage == life_cycle_stage
+                ):
+                    # Round to two decimals, wrap in Decimal, then divide
+                    rounded = round(epdimpact.value, 2)
+                    return Decimal(rounded) / self.declared_amount
+
+            # If no matching GWP impact was found among the prefetched items:
+            return Decimal("0") / self.declared_amount
+
+        # 2) Prefetch wasn’t used, fall back to a DB lookup
+        try:
+            db_impact = EPDImpact.objects.get(
+                epd=self,
+                impact__impact_category="penrt",
+                impact__life_cycle_stage=life_cycle_stage,
+            )
+        except EPDImpact.DoesNotExist:
+            return Decimal("0") / self.declared_amount
+        else:
+            rounded = round(db_impact.value, 2)
+            return Decimal(rounded) / self.declared_amount
+
+    def get_available_units(self):
+        units = {self.declared_unit}
+        if self.declared_unit not in [Unit.KG, Unit.M3, Unit.KWH]:
+            return list(units)
         for item in self.conversions:
-            match (item.get("unit")):
-                case "kg" | "-":
-                    units.append(Unit.KG)
-                case "kg/m^3":
-                    units.extend([Unit.M3, Unit.LITER])
-                case _:
+            match (self.declared_unit, item.get("unit")):
+                case (Unit.KWH | Unit.M3, "kg" | "-"):
+                    units.add(Unit.KG)
+                case (Unit.KWH, "kg/m^3"):
+                    units.update({Unit.M3, Unit.LITER})
+                case (Unit.M3 | Unit.KG, "kg/m^3"):
+                    units.update({Unit.M3, Unit.KG})
+                case (_, _):
                     Warning(
                         "The epd (%s) has a conversion %s for which there is not corresponding unit.",
                         self.id,
                         item.get("unit"),
                     )
         return units
+
+
+    def get_epd_info(self, dimension):
+        """Takes an assembly dimension"""
+        from pages.views.assembly.epd_dimension_info import get_epd_dimension_info
+        if dimension and dimension != "None":
+            return get_epd_dimension_info(dimension, self.declared_unit)
+        else:
+            selection_text = []
+            selection_units = self.get_available_units()
+            return selection_text, selection_units
 
 
 class EPDImpact(models.Model):
@@ -313,3 +414,34 @@ class EPDImpact(models.Model):
 
     class Meta:
         unique_together = ("epd", "impact")
+
+
+class EPDLabel(models.Model):
+    """Join Table for EPDs and Label"""
+    
+    epd = models.ForeignKey(EPD, on_delete=models.CASCADE)
+    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+    score = models.CharField(
+        _("Score"), max_length=255, blank=False, null=False
+    )
+    comment = models.CharField(_("Comment"), max_length=255, null=True, blank=True)
+    
+    class Meta:
+        unique_together = ("epd", "label")
+    
+    
+    def clean(self):
+        super().clean()
+        valid_options = list(self.label.scale_parameters)
+        if not self.score in valid_options:
+            raise ValidationError(
+                f"Label score {self.score} needs to be in Scale Parameters: {self.label.scale_parameters}."
+            )
+
+
+    def save(self, *args, **kwargs):
+        """
+        Override save to include clean validation.
+        """
+        self.clean()
+        super().save(*args, **kwargs)

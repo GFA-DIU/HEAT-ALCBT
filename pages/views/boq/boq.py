@@ -62,6 +62,7 @@ def boq_edit(request, building_id, assembly_id=None):
         epd.selection_quantity = 1
         epd.selection_text = "Quantity"
         epd.selection_unit = epd.declared_unit
+        epd.available_units = epd.get_available_units()
 
         categories = AssemblyCategory.objects.all()
 

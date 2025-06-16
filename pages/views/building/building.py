@@ -166,11 +166,12 @@ def handle_building_load(request, building_id, simulation):
     }
     for field, value in op_field_fix.items():
         form.fields[field].queryset = MaterialCategory.objects
-        form.fields[field].initial = MaterialCategory.objects.get(name_en=value)
+        initial = MaterialCategory.objects.get(name_en=value)
+        form.fields[field].initial = initial
         form.fields[field].disabled = True
 
     form.fields["childcategory"].queryset = MaterialCategory.objects.filter(
-        parent=MaterialCategory.objects.get(name_en=value)
+        parent=initial
     )
     context = {
         "building_id": building.id,
