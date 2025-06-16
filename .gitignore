@@ -24,3 +24,6 @@ secrets
 
 # Keep csv files in data folder
 !/pages/data/*.csv
+
+# django
+staticfiles
