@@ -1,0 +1,21 @@
+[
+{
+    "model": "pages.label",
+    "pk": 1,
+    "fields": {
+        "name": "GCCA Global Reference Threshold Low Carbon and Near Zero Emissions Concrete",
+        "source": "https://gccassociation.org/wp-content/uploads/2025/03/GCCA_Concrete_Definitions_for_Low_Carbon_and_NearZeroPolicy_Digital.pdf",
+        "comment": "This is valid for OPC-based cooncrete. Countries for the global reference calculation included the ALCBT countries India, Vietnam, Indonesia. Ordered from best to worst.",
+        "scale_type": "ordinal",
+        "scale_parameters": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G"
+        ]
+    }
+}
+]

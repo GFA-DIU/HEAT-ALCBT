@@ -164,7 +164,7 @@ class epdLCAx(models.Model):
     """
 
     comment = models.CharField(_("Comment"), max_length=255, null=True, blank=True)
-    conversions = models.JSONField(_("Conversions for units, follwoing EPDx"))
+    conversions = models.JSONField(_("Conversions for units, follwoing EPDx"), null=True, blank=True)
     declared_unit = models.CharField(
         _("Declared Unit"), max_length=20, choices=Unit.choices, default=Unit.UNKNOWN
     )
@@ -241,6 +241,32 @@ class Impact(models.Model):
         return f"{self.impact_category} {self.life_cycle_stage}"
 
 
+class Label(models.Model):
+    SCALE_TYPE_CHOICES = [
+        ('nominal', 'Unordered categories (nominal)'),
+        ('ordinal',  'Ordered categories (ordinal)'),
+        ('cardinal',  'Numeric (interval/ratio)'),
+    ]
+
+    name = models.CharField(max_length=255, unique=True)
+    source = models.CharField(_("Source"), max_length=255, null=True, blank=True)
+    comment = models.CharField(_("Comment"), max_length=255, null=True, blank=True)
+    scale_type  = models.CharField(_("Scale Type"), max_length=10, choices=SCALE_TYPE_CHOICES)
+    scale_parameters  = models.JSONField(_("Scale Parameters"),blank=True, null=True, help_text=_("Scale-specific metadata"))  # list of tuples
+    
+    def clean(self):
+        super.clean()
+        if not isinstance(self.scale_parameters, list):
+            raise ValidationError("Scale Parameters must be a list.")
+        
+    def save(self, *args, **kwargs):
+        """
+        Override save to include clean validation.
+        """
+        self.clean()
+        super().save(*args, **kwargs)
+
+
 class EPD(BaseModel, epdLCAx):
     """EPDs are the material information from official databases."""
 
@@ -266,6 +292,9 @@ class EPD(BaseModel, epdLCAx):
         validators=[MinValueValidator(Decimal("0.01"))],
         null=False,
         blank=False,
+    )
+    labels = models.ManyToManyField(
+        Label, blank=True, related_name="epd_labels", through="EPDLabel"
     )
 
     def __str__(self):
@@ -317,3 +346,34 @@ class EPDImpact(models.Model):
 
     class Meta:
         unique_together = ("epd", "impact")
+
+
+class EPDLabel(models.Model):
+    """Join Table for EPDs and Label"""
+    
+    epd = models.ForeignKey(EPD, on_delete=models.CASCADE)
+    label = models.ForeignKey(Label, on_delete=models.CASCADE)
+    score = models.CharField(
+        _("Score"), max_length=255, blank=False, null=False
+    )
+    comment = models.CharField(_("Comment"), max_length=255, null=True, blank=True)
+    
+    class Meta:
+        unique_together = ("epd", "label")
+    
+    
+    def clean(self):
+        super().clean()
+        valid_options = list(self.label.scale_parameters)
+        if not self.score in valid_options:
+            raise ValidationError(
+                f"Label score {self.score} needs to be in Scale Parameters: {self.label.scale_parameters}."
+            )
+
+
+    def save(self, *args, **kwargs):
+        """
+        Override save to include clean validation.
+        """
+        self.clean()
+        super().save(*args, **kwargs)

@@ -85,6 +85,13 @@ To load a specific set of local EPDs, name the relevant file with one of the key
 (.venv) $ python manage.py load_local_epds --file EDGE_HANDBOOK_EPDs
 ```
 
+### Loading Labels
+
+Load EPD (manual) label mappings from label file
+```Bash
+(.venv) $ python manage.py map_GCCA_EPD_label
+```
+
 ### PostGres
 
 To inspect the data tables in postgres instead of Django admin

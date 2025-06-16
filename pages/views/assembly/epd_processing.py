@@ -3,9 +3,11 @@ from datetime import datetime
 from typing import Optional
 
 from django.core.paginator import Paginator, Page
+from django.db.models import Prefetch
+from django.db.models.manager import BaseManager
 
 from pages.models.assembly import AssemblyDimension, StructuralProduct
-from pages.models.epd import EPD
+from pages.models.epd import EPD, EPDLabel
 from pages.views.assembly.epd_filtering import (
     get_epd_info,
     get_filtered_epd_list,
@@ -69,6 +71,7 @@ class FilteredEPD:
     selection_text: str
     selection_unit: str
     source: Optional[str]
+    labels: Optional[dict[str, str]]
 
 
 class LazyProcessor:
@@ -133,6 +136,7 @@ class LazyProcessor:
             selection_text=sel_text,
             selection_unit=sel_unit,
             source=epd.source,
+            labels={l.label.name: l.score for l in epd.prefetched_epdlabels}
         )
 
 
@@ -143,8 +147,20 @@ def get_epd_list(
     filtered_list, dimension = get_filtered_epd_list(
         request, dimension, operational=operational
     )
+    fetched_list = prefetch_epds(filtered_list)
     # Pagination setup for EPD list
-    lazy_queryset = LazyProcessor(filtered_list, dimension, operational)
+    lazy_queryset = LazyProcessor(fetched_list, dimension, operational)
     paginator = Paginator(lazy_queryset, 5)  # Show 10 items per page
     page_number = request.GET.get("page", 1)
     return paginator.get_page(page_number), dimension
+
+
+def prefetch_epds(epds: BaseManager[EPD]):
+    return epds.prefetch_related(
+        # impacts are through the EPDImpact intermediary; prefetch both sides
+        Prefetch(
+            "epdimpact_set",
+            queryset=EPDLabel.objects.select_related("label"),
+            to_attr="prefetched_epdlabels",
+        ),
+    )
