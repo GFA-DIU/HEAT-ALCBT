@@ -55,8 +55,12 @@ def calculate_impacts(
 
     def calculate_impact(factor=1):
         """Calculate impacts using a given factor and normalized by EPD base amount and reporting life_cycle."""
+        impacts_list = getattr(p.epd, "all_impacts", None)
+        if not impacts_list:
+            impacts_list = p.epd.epdimpact_set.all()
+        
         container = []
-        for epdimpact in p.epd.epdimpact_set.all():
+        for epdimpact in impacts_list:
             container.append(
                 {
                     "assembly_id": p.assembly.pk,
