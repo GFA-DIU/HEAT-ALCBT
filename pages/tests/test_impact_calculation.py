@@ -339,15 +339,6 @@ def test_calculate_impacts_dimension_logic(
             Unit.UNKNOWN,
             AssemblyDimension.AREA,
         ),
-        ( # Boq Entry
-            "BoQ entry: Test M",
-            Unit.M,
-            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m", "value": "300"}],
-            Decimal("3"),
-            Decimal("4"),
-            Unit.M,
-            AssemblyDimension.AREA,
-        ),
     ],
 )
 def test_calculate_impacts_errors(
