@@ -7,7 +7,7 @@ from django.db.models import Prefetch
 from django.db.models.manager import BaseManager
 
 from pages.models.assembly import AssemblyDimension, StructuralProduct
-from pages.models.epd import EPD, EPDLabel
+from pages.models.epd import EPD, EPDImpact, EPDLabel
 from pages.views.assembly.epd_filtering import (
     get_epd_info,
     get_filtered_epd_list,
@@ -148,11 +148,24 @@ def get_epd_list(request, dimension, operational: bool) -> tuple[Page, AssemblyD
 
 
 def prefetch_epds(epds: BaseManager[EPD]):
-    return epds.prefetch_related(
-        # impacts are through the EPDImpact intermediary; prefetch both sides
-        Prefetch(
-            "epdimpact_set",
-            queryset=EPDLabel.objects.select_related("label"),
-            to_attr="prefetched_epdlabels",
-        ),
+    return (
+            epds
+            .select_related(
+                "country",
+                "city",
+                "category",
+            )
+            .prefetch_related(
+            # impacts are through the EPDImpact intermediary; prefetch both sides
+            Prefetch(
+                "epdlabel_set",
+                queryset=EPDLabel.objects.select_related("label"),
+                to_attr="prefetched_epdlabels",
+            ),
+           Prefetch(
+               "epdimpact_set",
+               queryset=EPDImpact.objects.select_related("impact"),
+               to_attr="all_impacts",
+           ),
+        )
     )
