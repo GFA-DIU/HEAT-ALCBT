@@ -167,7 +167,7 @@ def handle_building_load(request, building_id, simulation):
     for field, value in op_field_fix.items():
         form.fields[field].queryset = MaterialCategory.objects
         initial = MaterialCategory.objects.get(name_en=value)
-        form.fields[field].initial = MaterialCategory.objects.get(name_en=value)
+        form.fields[field].initial = initial
         form.fields[field].disabled = True
 
     form.fields["childcategory"].queryset = MaterialCategory.objects.filter(
