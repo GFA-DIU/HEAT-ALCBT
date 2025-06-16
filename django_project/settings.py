@@ -76,9 +76,11 @@ INSTALLED_APPS = [
     "pages",
 ]
 
+
+
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
-    'honeybadger.contrib.DjangoHoneybadgerMiddleware', # needs to be at the top wrap entire request process
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -92,6 +94,10 @@ MIDDLEWARE = [
     # # own
     # "django_project.middleware.LoginRequiredMiddleware",
 ]
+
+if IS_HEROKU_APP:
+    honeybadger = 'honeybadger.contrib.DjangoHoneybadgerMiddleware'  # needs to be at the top wrap entire request process
+    MIDDLEWARE.insert(0, honeybadger)
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ["admin:login", "admin:index"]
 
