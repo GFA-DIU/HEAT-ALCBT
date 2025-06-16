@@ -300,20 +300,78 @@ class EPD(BaseModel, epdLCAx):
         return self.name
 
     def get_gwp_impact_sum(self, life_cycle_stage):
-        impact = EPDImpact.objects.get(
-            epd=self,
-            impact__impact_category="gwp",
-            impact__life_cycle_stage=life_cycle_stage,
-        )
-        return Decimal(round(impact.value, 2)) / self.declared_amount
+        """
+        Finds the EPDImpact for GWP + given life_cycle_stage and returns
+        Decimal(round(value, 2)) divided by self.declared_amount.
+        If `all_impacts` was prefetched, it will use that; otherwise it falls
+        back to a database query.
+        """
+        # 1) Try to use the prefetched list first
+        impacts_list = getattr(self, "all_impacts", None)
+
+        if impacts_list is not None:
+            for epdimpact in impacts_list:
+                # Because you did select_related("impact"), these fields are cached
+                if (
+                    epdimpact.impact.impact_category == "gwp"
+                    and epdimpact.impact.life_cycle_stage == life_cycle_stage
+                ):
+                    # Round to two decimals, wrap in Decimal, then divide
+                    rounded = round(epdimpact.value, 2)
+                    return Decimal(rounded) / self.declared_amount
+
+            # If no matching GWP impact was found among the prefetched items:
+            return Decimal("0")
+
+        # 2) Prefetch wasn’t used, fall back to a DB lookup
+        try:
+            db_impact = EPDImpact.objects.get(
+                epd=self,
+                impact__impact_category="gwp",
+                impact__life_cycle_stage=life_cycle_stage,
+            )
+        except EPDImpact.DoesNotExist:
+            return Decimal("0")
+        else:
+            rounded = round(db_impact.value, 2)
+            return Decimal(rounded) / self.declared_amount
 
     def get_penrt_impact_sum(self, life_cycle_stage):
-        impact = EPDImpact.objects.get(
-            epd=self,
-            impact__impact_category="penrt",
-            impact__life_cycle_stage=life_cycle_stage,
-        )
-        return Decimal(round(impact.value, 2)) / self.declared_amount
+        """
+        Finds the EPDImpact for PENRT + given life_cycle_stage and returns
+        Decimal(round(value, 2)) divided by self.declared_amount.
+        If `all_impacts` was prefetched, it will use that; otherwise it falls
+        back to a database query.
+        """
+        # 1) Try to use the prefetched list first
+        impacts_list = getattr(self, "all_impacts", None)
+
+        if impacts_list is not None:
+            for epdimpact in impacts_list:
+                # Because you did select_related("impact"), these fields are cached
+                if (
+                    epdimpact.impact.impact_category == "penrt"
+                    and epdimpact.impact.life_cycle_stage == life_cycle_stage
+                ):
+                    # Round to two decimals, wrap in Decimal, then divide
+                    rounded = round(epdimpact.value, 2)
+                    return Decimal(rounded) / self.declared_amount
+
+            # If no matching GWP impact was found among the prefetched items:
+            return Decimal("0") / self.declared_amount
+
+        # 2) Prefetch wasn’t used, fall back to a DB lookup
+        try:
+            db_impact = EPDImpact.objects.get(
+                epd=self,
+                impact__impact_category="penrt",
+                impact__life_cycle_stage=life_cycle_stage,
+            )
+        except EPDImpact.DoesNotExist:
+            return Decimal("0") / self.declared_amount
+        else:
+            rounded = round(db_impact.value, 2)
+            return Decimal(rounded) / self.declared_amount
 
     def get_available_units(self):
         units = {self.declared_unit}
