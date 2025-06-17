@@ -343,7 +343,7 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
     structural_components = []
     for b_assembly in assembly_list:
         assembly_impact_list = []
-        for p in getattr(b_assembly, "prefetched_products", []):
+        for p in getattr(b_assembly.assembly, "prefetched_products", []):
             assembly_impact_list.extend(
                 calculate_impacts(
                     b_assembly.assembly.dimension,
