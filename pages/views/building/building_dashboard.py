@@ -10,7 +10,9 @@ from django.http import HttpResponse, HttpResponseServerError
 
 from django.shortcuts import get_object_or_404
 
+from pages.models.assembly import StructuralProduct
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated, OperationalProduct, SimulatedOperationalProduct
+from pages.models.epd import EPDImpact
 from pages.views.building.building import get_assemblies
 from pages.views.building.operational_products.operational_products import serialize_operational_products
 
@@ -72,21 +74,57 @@ def prep_building_dashboard_df(user, building_id, simulation):
         BuildingProductModel = OperationalProduct
         op_relation_name = "operational_products"
 
+
     building = get_object_or_404(
-        Building.objects.filter(
-            created_by=user
-        ).prefetch_related(  # Ensure the building belongs to the user
-            Prefetch(
-                relation_name,
-                queryset=BuildingAssemblyModel.objects.filter().select_related("assembly"),
-                to_attr="prefetched_components",
+        Building.objects
+            .filter(created_by=user)
+            .prefetch_related(
+                # 1) grab each BuildingAssemblyModel …
+                Prefetch(
+                    relation_name,
+                    queryset=BuildingAssemblyModel.objects
+                        .filter(building__created_by=user)
+                        .select_related("assembly")     # pull in the Assembly
+                        .prefetch_related(
+                            # 2) … and on *each* BuildingAssemblyModel, pull its assembly's products …
+                            Prefetch(
+                                "assembly__structuralproduct_set",
+                                queryset=StructuralProduct.objects
+                                    .select_related("epd", "classification")
+                                    .prefetch_related(
+                                        # 3) fetch EPD impacts…
+                                        Prefetch(
+                                            "epd__epdimpact_set",
+                                            queryset=EPDImpact.objects.select_related("impact"),
+                                            to_attr="all_impacts",
+                                        ),
+                                        # 4) and EPD/category, classification/category
+                                        "epd__category",
+                                        "classification__category",
+                                    ),
+                                to_attr="prefetched_products",
+                            ),
+                        ),
+                    to_attr="prefetched_components",
+                ),
+                # 5) plus any operational products
+                Prefetch(
+                    op_relation_name,
+                    queryset=BuildingProductModel.objects
+                        .filter(building__created_by=user)
+                        .select_related("epd")     # pull in the Assembly
+                        .prefetch_related(
+                            Prefetch(
+                                "epd__epdimpact_set",
+                                queryset=EPDImpact.objects.select_related("impact"),
+                                to_attr="all_impacts",
+                            ),
+                            # 4) and EPD/category, classification/category
+                            "epd__category",
+                        ),
+                    to_attr="prefetched_operational_products",
+                ),
             ),
-            Prefetch(
-                op_relation_name,
-                queryset=BuildingProductModel.objects.all(),
-                to_attr="prefetched_operational_products",
-            ),
-        ),
         pk=building_id,
     )
 
