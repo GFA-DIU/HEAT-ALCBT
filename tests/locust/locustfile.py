@@ -1,15 +1,12 @@
 import os
 import re
 import logging
+import queue
 
 from dotenv import load_dotenv
 
 from locust import HttpUser, SequentialTaskSet, task, between
 
-load_dotenv()
-
-LOAD_TESTING_USERNAME = os.getenv("LOAD_TESTING_USERNAME")
-LOAD_TESTING_PASSWORD = os.getenv("LOAD_TESTING_PASSWORD")
 # ---------------------------------------------------------
 # 1. Configure Python Logging
 # ---------------------------------------------------------
@@ -22,6 +19,14 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)  # Our module-level logger
+
+load_dotenv()
+
+credential_queue = queue.Queue()
+LOAD_TESTING_PASSWORD = os.getenv("LOAD_TESTING_PASSWORD")
+for i in range(10, 20):
+    credential_queue.put((f"test1{i:02d}@test.com", LOAD_TESTING_PASSWORD))
+
 # ---------------------------------------------------------
 
 ## Remote
@@ -70,12 +75,14 @@ class LoginAndViewRoot(SequentialTaskSet):
         # Step 2: POST credentials
         # -------------------------------
         login_payload = {
-            "login": LOAD_TESTING_USERNAME,
-            "password": LOAD_TESTING_PASSWORD,
+            "login": self.user.username,
+            "password": self.user.password,
             "csrfmiddlewaretoken": csrftoken,
         }
         # Django expects Referer header for CSRF validation
         headers = {"Referer": f"{self.client.base_url}/accounts/login/"}
+        
+        logger.info("User %s: Using username: %s", self.user.environment.runner.user_count, self.user.username)
 
         logger.info("User %s: Submitting login form", self.user.environment.runner.user_count)
         with self.client.post(
@@ -134,7 +141,7 @@ class LoginAndViewRoot(SequentialTaskSet):
         # ---------------------------------------------------------
         # Step 3: GET the new-building form to retrieve CSRF token
         # ---------------------------------------------------------
-        logger.info("Loading new building form at '/building/_new'")
+        logger.info("User %s: Loading new building form at '/building/_new'", self.user.environment.runner.user_count)
         form_response = self.client.get("/building/_new", name="Load New Building Form")
 
         csrftoken = form_response.cookies["csrftoken"]
@@ -146,7 +153,7 @@ class LoginAndViewRoot(SequentialTaskSet):
             form_response.failure("Unable to find CSRF token on new building form")
             return
 
-        logger.info("CSRF token for building form extracted successfully")
+        logger.info("User %s: CSRF token for building form extracted successfully", self.user.environment.runner.user_count)
 
         # ---------------------------------------------------------
         # Step 4: POST the new building data
@@ -170,7 +177,7 @@ class LoginAndViewRoot(SequentialTaskSet):
             "X-CSRFToken": csrftoken,
         }
 
-        logger.info("Submitting new building form")
+        logger.info("User %s: Submitting new building form", self.user.environment.runner.user_count)
         with self.client.post(
             "/building/_new",
             data=building_payload,
@@ -185,29 +192,32 @@ class LoginAndViewRoot(SequentialTaskSet):
             # ---------------------------------------------------------
             if create_response.status_code != 302 and create_response.status_code != 200:
                 logger.error(
-                    "New building creation failed (status_code=%s)",
+                    "User %s: New building creation failed (status_code=%s)",
+                    self.user.environment.runner.user_count,
                     create_response.status_code,
                 )
                 create_response.failure(f"Unexpected status: {create_response.status_code}")
             else:
                 logger.info(
-                    "New building creation succeeded (status_code=%s)",
+                    "User %s: New building creation succeeded (status_code=%s)",
+                    self.user.environment.runner.user_count,
                     create_response.status_code,
                 )
-                logger.info("Find next: %s", create_response.headers.get("Location"))
+                logger.info("User %s: Find next: %s", self.user.environment.runner.user_count, create_response.headers.get("Location"))
                 
                 location = create_response.headers.get("Location", "")
-                logger.info("New building creation succeeded (status_code=%s), redirect to %s",
+                logger.info("User %s: New building creation succeeded (status_code=%s), redirect to %s",
+                            self.user.environment.runner.user_count,
                             create_response.status_code, location)
 
                 # Use a regex to grab the UUID portion of "/building/<uuid>/"
                 match = re.search(r"/building/([0-9a-fA-F\-]+)/", location)
                 if match:
                     self.building_id = match.group(1)
-                    logger.info("Extracted building_id: %s", self.building_id)
+                    logger.info("User %s: Extracted building_id: %s", self.user.environment.runner.user_count, self.building_id)
                 else:
                     # If for some reason regex fails, mark this step as failure.
-                    logger.error("Could not parse building ID from Location header: %s", location)
+                    logger.error("User %s: Could not parse building ID from Location header: %s", self.user.environment.runner.user_count, location)
                     create_response.failure(f"Failed to parse building ID from redirect: {location}")
                     return
 
@@ -227,7 +237,7 @@ class LoginAndViewRoot(SequentialTaskSet):
             return
 
         new_assembly_path = f"/boq/{self.building_id}/_new?simulation=False"
-        logger.info("Loading new assembly form at '%s'", new_assembly_path)
+        logger.info("User %s: Loading new assembly form at '%s'", self.user.environment.runner.user_count, new_assembly_path)
         
         form_response = self.client.get(
             new_assembly_path,
@@ -243,7 +253,7 @@ class LoginAndViewRoot(SequentialTaskSet):
             page_2_path,
             name="Load Page 2 Form",
         )
-        logger.info("Loaded the second page of EPDs")
+        logger.info("User %s: Loaded the second page of EPDs", self.user.environment.runner.user_count)
 
         csrftoken = form_response.cookies.get("csrftoken")
         
@@ -289,7 +299,8 @@ class LoginAndViewRoot(SequentialTaskSet):
             # Check for redirect or success code
             if assembly_response.status_code not in (200, 302):
                 logger.error(
-                    "New assembly creation failed (status_code=%s)",
+                    "User %s: New assembly creation failed (status_code=%s)",
+                    self.user.environment.runner.user_count,
                     assembly_response.status_code,
                 )
                 assembly_response.failure(
@@ -297,7 +308,8 @@ class LoginAndViewRoot(SequentialTaskSet):
                 )
             else:
                 logger.info(
-                    "New assembly creation succeeded (status_code=%s) for building %s",
+                    "User %s: New assembly creation succeeded (status_code=%s) for building %s",
+                    self.user.environment.runner.user_count,
                     assembly_response.status_code,
                     self.building_id,
                 )
@@ -345,7 +357,7 @@ class LoginAndViewRoot(SequentialTaskSet):
             return
 
         new_assembly_path = f"/boq/{self.building_id}/_new?simulation=False"
-        logger.info("Loading new assembly form at '%s'", new_assembly_path)
+        logger.info("User %s: Loading new assembly form at '%s'", self.user.environment.runner.user_count, new_assembly_path)
         
         form_response = self.client.get(
             new_assembly_path,
@@ -361,7 +373,7 @@ class LoginAndViewRoot(SequentialTaskSet):
             page_2_path,
             name="Load Page 2 Form",
         )
-        logger.info("Loaded the second page of EPDs")
+        logger.info("User %s: Loaded the second page of EPDs", self.user.environment.runner.user_count)
 
         csrftoken = form_response.cookies.get("csrftoken")
         
@@ -407,7 +419,8 @@ class LoginAndViewRoot(SequentialTaskSet):
             # Check for redirect or success code
             if assembly_response.status_code not in (200, 302):
                 logger.error(
-                    "New assembly creation failed (status_code=%s)",
+                    "User %s: New assembly creation failed (status_code=%s)",
+                    self.user.environment.runner.user_count,
                     assembly_response.status_code,
                 )
                 assembly_response.failure(
@@ -415,7 +428,8 @@ class LoginAndViewRoot(SequentialTaskSet):
                 )
             else:
                 logger.info(
-                    "New assembly creation succeeded (status_code=%s) for building %s",
+                    "User %s: New assembly creation succeeded (status_code=%s) for building %s",
+                    self.user.environment.runner.user_count,
                     assembly_response.status_code,
                     self.building_id,
                 )
@@ -458,6 +472,17 @@ class WebsiteUser(HttpUser):
     # host = "http://127.0.0.1:8000"
     # HttpUser (and its underlying client) automatically persists session cookies
     # between requests by default. :contentReference[oaicite:3]{index=3}
+
+
+    def __init__(self, environment, *args, **kwargs):
+        super().__init__(environment, *args, **kwargs)
+        try:
+            # pop one unique credential for this user
+            self.username, self.password = credential_queue.get_nowait()
+        except queue.Empty:
+            # if you spawn more than 10 users, stop the extras
+            logger.error("No more credentials available – stopping this user")
+            raise Exception
 
 
 # call: locust -f tests/locust/locustfile.py       --host https://beat-alcbt.gggi.org
