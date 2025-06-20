@@ -43,3 +43,7 @@ pytest-django==4.10.0
 openpyxl
 # psycopg[c]; sys_platform == "linux"
 # psycopg[binary]; sys_platform != "linux"
+
+## Heroku
+newrelic
+honeybadger

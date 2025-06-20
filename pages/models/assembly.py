@@ -129,9 +129,19 @@ class Assembly(BaseModel):
 
     @property
     def classification(self):
-        """Return the classification of the assembly from the epds."""
-        product = self.structuralproduct_set.first()  # Access Product instances
-        return product.classification if product else None
+        # 1) do we already have a .products list from prefetch?
+        prods = getattr(self, "prefetched_products", None)
+        if prods is not None:
+            # we do – just grab the first one (or None)
+            first = prods[0] if prods else None
+        else:
+            # we don’t – fall back to a single‐query lookup
+            first = (
+                self.structuralproduct_set
+                    .select_related("classification")
+                    .first()
+            )
+        return first.classification if first else None
 
 
 class StructuralProduct(BaseProduct):

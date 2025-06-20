@@ -76,6 +76,9 @@ INSTALLED_APPS = [
     "pages",
 ]
 
+
+
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -91,6 +94,10 @@ MIDDLEWARE = [
     # # own
     # "django_project.middleware.LoginRequiredMiddleware",
 ]
+
+if IS_HEROKU_APP:
+    honeybadger = 'honeybadger.contrib.DjangoHoneybadgerMiddleware'  # needs to be at the top wrap entire request process
+    MIDDLEWARE.insert(0, honeybadger)
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ["admin:login", "admin:index"]
 
@@ -317,46 +324,85 @@ CITIES_LIGHT_INCLUDE_CITY_TYPES = [
 ]
 
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "standard": {
-            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+
+## Honeybadger
+# https://docs.honeybadger.io/lib/python/#django
+HONEYBADGER = {
+  'API_KEY': os.environ.get("HONEYBADGER_API_KEY", "")
+}
+
+
+if IS_HEROKU_APP:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "standard": {
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            },
+            "django.server": DEFAULT_LOGGING["formatters"][
+                "django.server"
+            ],  # Use Django's default formatter for server logs
         },
-        "django.server": DEFAULT_LOGGING["formatters"][
-            "django.server"
-        ],  # Use Django's default formatter for server logs
-    },
-    "handlers": {
-        "file": {
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+            },
+        },
+        "root": {
+            "handlers": ["console"],
             "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": "logs/root.log",
-            "formatter": "standard",
-            "encoding": "utf-8",
-            "mode": "a",
         },
-        "django.server": {
-            "level": "INFO",
-            "class": "logging.StreamHandler",  # Typically used for console output in development
-            "formatter": "django.server",
+        "loggers": {
+            "django": {
+                "handlers": ["console"],
+                "level": "INFO",
+                "propagate": False,
+            },
         },
-    },
-    "root": {
-        "handlers": ["file"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "django": {
+    }
+
+else:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "standard": {
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            },
+            "django.server": DEFAULT_LOGGING["formatters"][
+                "django.server"
+            ],  # Use Django's default formatter for server logs
+        },
+        "handlers": {
+            "file": {
+                "level": "INFO",
+                "class": "logging.FileHandler",
+                "filename": "logs/root.log",
+                "formatter": "standard",
+                "encoding": "utf-8",
+                "mode": "a",
+            },
+            "django.server": {
+                "level": "INFO",
+                "class": "logging.StreamHandler",  # Typically used for console output in development
+                "formatter": "django.server",
+            },
+        },
+        "root": {
             "handlers": ["file"],
             "level": "INFO",
-            "propagate": False,
         },
-        "django.server": {  # Specific logger for server logs
-            "handlers": ["django.server"],
-            "level": "INFO",
-            "propagate": False,
+        "loggers": {
+            "django": {
+                "handlers": ["file"],
+                "level": "INFO",
+                "propagate": False,
+            },
+            "django.server": {  # Specific logger for server logs
+                "handlers": ["django.server"],
+                "level": "INFO",
+                "propagate": False,
+            },
         },
-    },
-}
+    }

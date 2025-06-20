@@ -11,7 +11,7 @@ from pages.forms.building_detailed_info import BuildingDetailedInformation
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.forms.operational_info_form import OperationalInfoForm
-from pages.models.assembly import DIMENSION_UNIT_MAPPING
+from pages.models.assembly import DIMENSION_UNIT_MAPPING, StructuralProduct
 from pages.models.building import (
     Building,
     BuildingAssembly,
@@ -19,7 +19,7 @@ from pages.models.building import (
     OperationalProduct,
     SimulatedOperationalProduct,
 )
-from pages.models.epd import MaterialCategory
+from pages.models.epd import EPDImpact, MaterialCategory
 from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.impact_calculation import calculate_impacts
 
@@ -128,24 +128,45 @@ def handle_building_load(request, building_id, simulation):
         op_relation_name = "operational_products"
 
     building = get_object_or_404(
-        Building.objects.filter(
-            created_by=request.user
-        ).prefetch_related(  # Ensure the building belongs to the user
-            Prefetch(
-                relation_name,
-                queryset=BuildingAssemblyModel.objects.filter(
-                    # assembly__created_by=request.user  # Ensure the assembly belongs to the user
-                )
-                .order_by("-assembly__created_at")
-                .select_related("assembly"),
-                to_attr="prefetched_components",
+        Building.objects
+            .filter(created_by=request.user)
+            .prefetch_related(
+                # 1) grab each BuildingAssemblyModel …
+                Prefetch(
+                    relation_name,
+                    queryset=BuildingAssemblyModel.objects
+                        .filter(building__created_by=request.user)
+                        .select_related("assembly")                           # pull in the Assembly in same query
+                        .order_by("-assembly__created_at")
+                        .prefetch_related(
+                            # 2) … and on *each* BuildingAssemblyModel, pull its assembly's products …
+                            Prefetch(
+                                "assembly__structuralproduct_set",
+                                queryset=StructuralProduct.objects
+                                    .select_related("epd", "classification")
+                                    .prefetch_related(
+                                        # 3) … and on each product’s EPD, grab its impacts …
+                                        Prefetch(
+                                            "epd__epdimpact_set",
+                                            queryset=EPDImpact.objects.select_related("impact"),
+                                            to_attr="all_impacts",
+                                        ),
+                                        # 4) … and also fetch the categories to avoid extra queries
+                                        "epd__category",
+                                        "classification__category",
+                                    ),
+                                to_attr="prefetched_products",       # <–– now Assembly.products is that list
+                            ),
+                        ),
+                    to_attr="prefetched_components",  # <–– Building.prefetched_components is list of BuildingAssemblyModel
+                ),
+                # 5) plus grab any BuildingProductModel in one go
+                Prefetch(
+                    op_relation_name,
+                    queryset=BuildingProductModel.objects.all(),
+                    to_attr="prefetched_operational_products",
+                ),
             ),
-            Prefetch(
-                op_relation_name,
-                queryset=BuildingProductModel.objects.all(),
-                to_attr="prefetched_operational_products",
-            ),
-        ),
         pk=building_id,
     )
 
@@ -270,14 +291,35 @@ def handle_assembly_delete(request, building_id, simulation):
 
     # Fetch the updated list of assemblies for the building
     updated_list = (
-        BuildingAssemblyModel.objects.filter(
-            building__created_by=request.user,
-            assembly__created_by=request.user,
-            building_id=building_id,
-        )
-        .order_by("-assembly__created_at")
-        .select_related("assembly")
-    )  # Optimize query by preloading related Assembly
+        BuildingAssemblyModel.objects
+            .filter(
+                building__created_by=request.user,
+                assembly__created_by=request.user,
+                building_id=building_id,
+            )
+            .select_related("assembly", "building")
+            .order_by("-assembly__created_at")
+            .prefetch_related(
+                # 1: Grab each StructuralProduct on assembly
+                Prefetch(
+                    "assembly__structuralproduct_set",
+                    queryset=StructuralProduct.objects
+                        .select_related("epd", "classification")
+                        .prefetch_related(
+                            # 2: Within each EPD, grab its impacts
+                            Prefetch(
+                                "epd__epdimpact_set",
+                                queryset=EPDImpact.objects.select_related("impact"),
+                                to_attr="all_impacts",
+                            ),
+                            # 3: Also fetch the categories to avoid extra queries
+                            "epd__category",
+                            "classification__category",
+                        ),
+                    to_attr="prefetched_products",  # <-- this will be assembly.products
+                ),
+            )
+    )
     structural_components, _ = get_assemblies(updated_list)
     context = {
         "building_id": building_id,
@@ -301,7 +343,7 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
     structural_components = []
     for b_assembly in assembly_list:
         assembly_impact_list = []
-        for p in b_assembly.assembly.structuralproduct_set.all():
+        for p in getattr(b_assembly.assembly, "prefetched_products", []):
             assembly_impact_list.extend(
                 calculate_impacts(
                     b_assembly.assembly.dimension,

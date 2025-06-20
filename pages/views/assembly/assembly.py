@@ -136,7 +136,17 @@ def handle_assembly_submission(request, assembly, building, simulation):
 
 def handle_assembly_load(building_id, assembly, context):
     if assembly:
-        products = StructuralProduct.objects.filter(assembly=assembly).select_related("epd")
+        products = (
+            StructuralProduct.objects
+            .filter(assembly=assembly)
+            .select_related(
+                "epd",
+                "epd__category",
+                "epd__country",
+                "classification",
+            )    
+        )
+            
         selected_epds = [SelectedEPD.parse_product(p) for p in products]
         context["selected_epds"] = selected_epds
         context["selected_epds_ids"] = [
