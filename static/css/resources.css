@@ -1,0 +1,9 @@
+.beat-block {
+background-color: #16af98;
+color: #fff;
+padding: 1rem;
+}
+.beat-block a {
+color: #fff;
+text-decoration: underline;
+}
