@@ -1,8 +1,18 @@
 {% extends '_base.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}Log out{% endblock %}
+{% load static %}
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/account/signup.css' %}">
+{% endblock css %}
+
+{% block title %}Log in{% endblock %}
+{% block body_class %}bg-cover{% endblock %}
+
+{% block title %}Log out{% endblock %}
+{% block body_class %}bg-cover{% endblock %}
 
 {% block content %}
 <h1>Sign Out</h1>
