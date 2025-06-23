@@ -341,3 +341,23 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    // Add interactivity
+    document.querySelectorAll('input[type="range"]').forEach(slider => {
+        slider.addEventListener('input', function() {
+            // Update the background gradient based on value
+            const value = (this.value - this.min) / (this.max - this.min) * 100;
+            this.style.background = `linear-gradient(to right, #2ecc71 0%, #2ecc71 ${value}%, #e0e0e0 ${value}%, #e0e0e0 100%)`;
+        });
+    });
+    
+    // Material chip selection
+    document.querySelectorAll('.material-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            this.parentElement.querySelectorAll('.material-chip').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+</script>
