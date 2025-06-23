@@ -160,6 +160,7 @@ def handle_simulation_reset(building_id):
                         input_unit=product.input_unit,
                         assembly=a.assembly,  # Use the new cloned assembly
                         quantity=product.quantity,
+                        classification=product.classification
                     )
 
             BuildingAssemblySimulated.objects.create(
