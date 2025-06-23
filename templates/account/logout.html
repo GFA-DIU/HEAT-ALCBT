@@ -13,9 +13,9 @@
 {% block body_class %}bg-cover{% endblock %}
 
 {% block content %}
-<h1>Sign Out</h1>
+<h1 style="color: #fff">Sign Out</h1>
 
-<p>Are you sure you want to sign out?</p>
+<p style="color: #fff">Are you sure you want to sign out?</p>
 
 <form method="post" action="{% url 'account_logout' %}">
   {% csrf_token %}
