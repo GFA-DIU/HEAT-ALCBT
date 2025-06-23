@@ -15,26 +15,6 @@
   </p>
 </div>
 
-<!-- Logo + project note -->
-<div class="row mb-3">
-  <div class="col-5 d-flex justify-content-center align-items-center" style="min-height:6rem;">
-    <a href="https://alcbt.gggi.org/">
-      <img
-        src="{% static 'images/logos/ALCBT_logo.png' %}"
-        alt="ALCBT logo"
-        style="height:6rem;"
-      >
-    </a>
-  </div>
-  <div class="col-7 d-flex flex-column justify-content-center flex-direction: column align-items-center" style="min-height:6rem;">
-    <span class="text-center text-muted mb-2">
-      📄 For guidance, please refer to the BEAT
-      <a href="https://heat365.sharepoint.com/:b:/s/beat-public/EasMEDhJC91Aor4_1Hc8zFsBbBuAoyum_JIX6CdaKVob_A?e=bC5a78">user documentation</a>.
-    </span>
-  </div>
-</div>
-
-
 <h2>Buildings overview</h2>
 
 <div hx-get="{% url 'map' %}?model=building&ids=[]" 

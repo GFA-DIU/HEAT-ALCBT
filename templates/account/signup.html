@@ -10,19 +10,16 @@
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/account/signup.css' %}">
 {% endblock css %}
+{% block body_class %}bg-cover{% endblock %}
+
 {% block content %}
 <div class="row mt-5">
   <!-- Info -->
   <div class="col-sm-7">
-    <div class="container">
-      <div class="p-4">
-        <h2 class="mb-3">BEAT Tool</h2>
-
-        <span
-          >LCA Modelling for Building Climate and Environmental Impact
-          Assessment</span
-        >
-      </div>
+    <div class="p-4 ps-0 beat-title">
+      <h1 class="mb-3 text-white">BEAT</h1>
+      <h4 class="mb-3 text-white">Building Emission Assessment Tool</h4>
+      <span class="text-white fst-italic">Accelerating the transition towards zero and low carbon buildings through data-driven decisions</span>
     </div>
   </div>
 

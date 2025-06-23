@@ -7,6 +7,7 @@ from pages.views.building.dashboards import dashboard_view
 from pages.views.map import map_view
 from pages.views.select_lists import select_lists
 
+from .views.resources import resources
 from .views.home import buildings_list
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
@@ -25,6 +26,7 @@ urlpatterns = [
         TemplateView.as_view(template_name="compliance/terms_of_use.html"),
         name="terms_of_use",
     ),
+    path("resources/", resources, name="resources"),
     path("select_lists/", select_lists, name="select-lists"),
     path("map/", map_view, name="map"),
     path("dashboard/", dashboard_view, name="dashboard"),

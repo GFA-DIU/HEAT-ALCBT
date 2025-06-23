@@ -1,0 +1,114 @@
+{% extends '_base.html' %}
+{% block css %}
+{% load static %}
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/resources.css' %}">
+{% endblock css %}
+
+{% block title %}Resource page{% endblock %}
+
+{% block content %}
+<h1 class="mb-1">Resources</h1>
+<span class="text-muted mb-5">
+Welcome to the <span class="fw-bold">Resources</span> section of the <span class="fw-bolder" style="color:#F26716">BEAT</span>. Here you'll find key materials to help you understand, navigate, and maximise the use of the Building Emissions Assessment Tool.
+</span>
+
+<div class="row mb-3">
+  <!-- Video -->
+    <!-- <div class="col-sm-6 p-4 pt-3">
+      <div style="padding-top: 1rem">
+        <h4 class="text-center">Introduction video</h4>
+            <span class="text-center text-muted mb-2">
+                Watch our short video to get a quick overview of <span class="fw-bolder" style="color:#F26716">BEAT</span> — what it does, how it works, and how it can support your low-carbon building strategies.
+            </span>
+            <div class="mt-3 d-flex justify-content-center">
+                <iframe width="auto" src="https://www.youtube-nocookie.com/embed/u31qwQUeGuM?si=0j393m6XNfHBozM4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+      </div>
+            
+    </div> -->
+
+        <!-- <div class="col-sm-6 p-4 pt-3"> -->
+        <div class="col-sm-6 offset-sm-3 p-4 pt-3">
+           <div class="beat-block card">
+             <!-- User manual -->
+             <h4 class="text-center">User Handbook</h4>
+             <span class="mb-2">
+                 Download the official <span class="fw-bolder">BEAT</span> Handbook (Part 1) for a detailed, step-by-step guide on using the tool effectively. The handbook covers:
+             </span>
+             <span>
+                 <ul>
+                     <li>Key functionalities and workflow</li>
+                     <li>Data input requirements</li>
+                     <li>Methodology</li>
+                 </ul>
+                 📄 For guidance, please refer to the BEAT
+                 <a href="https://alcbt.gggi.org/beat-handbook-part-1-core-concept-guide/">user documentation</a>.
+             </span>
+           </div>
+        </div>
+</div>
+
+<h3 class="mb-1">The <span style="color:#F26716">BEAT</span> Community</h1>
+<span >
+    Join a growing community of policymakers, planners, and practitioners working to reduce building emissions. Together, we will work on advancing practical, data-driven solutions for a low-carbon future.
+</span>
+
+<h4 class="text-center text-muted mt-4 fs-4">Host</h4>
+  <div class="col d-flex justify-content-center">
+    {% with logo_path='images/logos/'|add:'Heat_green.svg' %}
+    <img
+      src="{% static logo_path %}"
+      alt="Host logo"
+      class="img-fluid"
+      style="max-height: 80px; width: auto;"
+      loading="lazy"
+    >
+    {% endwith %}
+  </div>
+
+<h4 class="text-center text-muted mt-4 fs-4">Lead partners</h4>
+<div class="mb-3 row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 align-items-center justify-content-center">
+  {% for logo in lead_partner_logos %}
+    {% with logo_path='images/logos/lead_partners/'|add:logo %}
+      <div class="col d-flex justify-content-center">
+        <img
+          src="{% static logo_path %}"
+          alt="Lead partner logo"
+          class="img-fluid"
+          style="max-height: 80px; width: auto;"
+          loading="lazy"
+        >
+      </div>
+    {% endwith %}
+  {% endfor %}
+</div>
+
+<h4 class="text-center text-muted mt-4 fs-4">Development partners</h4>
+<div class="mt-2 mb-3 row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 align-items-center justify-content-center">
+  {% for logo in dev_partner_logos %}
+    {% with logo_path='images/logos/development_partners/'|add:logo %}
+      <div class="col d-flex justify-content-center">
+        <img
+          src="{% static logo_path %}"
+          alt="Lead partner logo"
+          class="img-fluid"
+          style="max-height: 80px; width: auto;"
+          loading="lazy"
+        >
+      </div>
+    {% endwith %}
+  {% endfor %}
+</div>
+
+<div class="text-center m-4 mt-4">
+  <div class="beat-block card d-inline-block p-3">
+    💡 Interested in contributing or partnering? We’d love to
+    <a href="https://alcbt.gggi.org/contact-us/">hear from you</a>.
+  </div>
+</div>
+
+
+{% endblock content %}
