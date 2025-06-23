@@ -1,0 +1,343 @@
+{% load static %}
+{% block css %}
+    <style>       
+        .chart-container {
+            margin-bottom: 1rem;
+        }
+        
+        .bar-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            height: 48px;
+            position: relative;
+        }
+        
+        .bar-wrapper {
+            position: absolute;
+            left: 0;
+            width: 450px;
+            height: 36px;
+            background-color: #ffffff;
+            border-radius: 2px;
+        }
+        
+        .bar {
+            height: 100%;
+            background-color: #ff7043;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        .label {
+            position: absolute;
+            left: 465px;
+            font-size: 16px;
+            color: #333333;
+            white-space: nowrap;
+        }
+        
+        .total-section {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .total-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: rgb(42, 63, 95);
+            margin-bottom: 0.2rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .total-value {
+            font-size: 32px;
+            font-weight: 600;
+            color: rgb(42, 63, 95);
+            letter-spacing: -0.5px;
+        }
+    </style>
+{% endblock css %}
+
+<!-- Interactive Improvements Page -->
+<div>
+    <div>
+        <h2 style="font-size: 24px; margin-bottom: 30px; color: #333;">Interactive Carbon Optimization</h2>
+        
+        <!-- Real-time Impact Dashboard -->
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px;">
+            <div style="background: #f8f8f8; padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Current Total</p>
+                <p style="font-size: 24px; font-weight: bold; color: #333;">983</p>
+                <p style="font-size: 11px; color: #666;">kg CO₂eq/m²</p>
+            </div>
+            <div style="background: #fff3e0; padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Embodied Reduction</p>
+                <p style="font-size: 24px; font-weight: bold; color: #ff6b35;">-85</p>
+                <p style="font-size: 11px; color: #666;">kg CO₂eq/m²</p>
+            </div>
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Operational Reduction</p>
+                <p style="font-size: 24px; font-weight: bold; color: #2196f3;">-120</p>
+                <p style="font-size: 11px; color: #666;">kg CO₂eq/m²</p>
+            </div>
+            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Optimized Total</p>
+                <p style="font-size: 24px; font-weight: bold; color: #2ecc71;">778</p>
+                <p style="font-size: 11px; color: #666;">kg CO₂eq/m²</p>
+            </div>
+            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Total Savings</p>
+                <p style="font-size: 24px; font-weight: bold; color: #2ecc71;">20.9%</p>
+                <p style="font-size: 11px; color: #666;">reduction</p>
+            </div>
+        </div>
+        
+        <!-- Two Column Layout for Interactive Improvements -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            
+            <!-- Embodied Carbon Interactive Section -->
+            <div>
+                <h3 style="font-size: 18px; color: rgb(42, 63, 95); margin-bottom: 20px; text-align: center;">
+                    Embodied Carbon Optimization
+                </h3>
+                
+                <!-- Material-based Carbon Reduction Chart -->
+                <div style="background: white; padding: 20px; border-radius: 5px;">
+                    <!-- Ready-mix Concrete & Cement -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 14px; font-weight: 600; color: #333;">Ready-mix concrete &amp; cement</span>
+                            <span style="font-size: 14px; color: #666;">30.0% of total</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div style="width: 200px; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                <div style="width: 30%; height: 100%; background: #ff6b35; position: relative;">
+                                    <div style="position: absolute; right: 0; width: 20%; height: 100%; background: #2ecc71; opacity: 0.8;"></div>
+                                </div>
+                            </div>
+                            <span style="font-size: 12px; color: #2ecc71; font-weight: bold;">-25% with GGBS/Fly Ash</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-left: 210px;">139 kg CO₂eq/m² → 104 kg CO₂eq/m² (-35 kg)</div>
+                    </div>
+
+                    <!-- Steel -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 14px; font-weight: 600; color: #333;">Steel</span>
+                            <span style="font-size: 14px; color: #666;">15.0% of total</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div style="width: 200px; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                <div style="width: 15%; height: 100%; background: #ff6b35; position: relative;">
+                                    <div style="position: absolute; right: 0; width: 30%; height: 100%; background: #2ecc71; opacity: 0.8;"></div>
+                                </div>
+                            </div>
+                            <span style="font-size: 12px; color: #2ecc71; font-weight: bold;">-20% with recycled content</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-left: 210px;">69 kg CO₂eq/m² → 55 kg CO₂eq/m² (-14 kg)</div>
+                    </div>
+
+                    <!-- Rebar -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 14px; font-weight: 600; color: #333;">Rebar</span>
+                            <span style="font-size: 14px; color: #666;">10.0% of total</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div style="width: 200px; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                <div style="width: 10%; height: 100%; background: #ff6b35; position: relative;">
+                                    <div style="position: absolute; right: 0; width: 35%; height: 100%; background: #2ecc71; opacity: 0.8;"></div>
+                                </div>
+                            </div>
+                            <span style="font-size: 12px; color: #2ecc71; font-weight: bold;">-30% with high recycled content</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-left: 210px;">46 kg CO₂eq/m² → 32 kg CO₂eq/m² (-14 kg)</div>
+                    </div>
+
+                    <!-- Pre-cast Concrete -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 14px; font-weight: 600; color: #333;">Pre-cast concrete</span>
+                            <span style="font-size: 14px; color: #666;">7.0% of total</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div style="width: 200px; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                <div style="width: 7%; height: 100%; background: #ff6b35; position: relative;">
+                                    <div style="position: absolute; right: 0; width: 28%; height: 100%; background: #2ecc71; opacity: 0.8;"></div>
+                                </div>
+                            </div>
+                            <span style="font-size: 12px; color: #2ecc71; font-weight: bold;">-22% with blended cement</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-left: 210px;">32 kg CO₂eq/m² → 25 kg CO₂eq/m² (-7 kg)</div>
+                    </div>
+
+                    <!-- Masonry -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 14px; font-weight: 600; color: #333;">Masonry</span>
+                            <span style="font-size: 14px; color: #666;">8.0% of total</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div style="width: 200px; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                <div style="width: 8%; height: 100%; background: #ff6b35; position: relative;">
+                                    <div style="position: absolute; right: 0; width: 25%; height: 100%; background: #2ecc71; opacity: 0.8;"></div>
+                                </div>
+                            </div>
+                            <span style="font-size: 12px; color: #2ecc71; font-weight: bold;">-18% with AAC blocks</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-left: 210px;">37 kg CO₂eq/m² → 30 kg CO₂eq/m² (-7 kg)</div>
+                    </div>
+
+                    <!-- Finishing Materials -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 14px; font-weight: 600; color: #333;">Finishing materials</span>
+                            <span style="font-size: 14px; color: #666;">6.0% of total</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div style="width: 200px; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                <div style="width: 6%; height: 100%; background: #ff6b35; position: relative;">
+                                    <div style="position: absolute; right: 0; width: 20%; height: 100%; background: #2ecc71; opacity: 0.8;"></div>
+                                </div>
+                            </div>
+                            <span style="font-size: 12px; color: #2ecc71; font-weight: bold;">-15% with low-carbon options</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-left: 210px;">28 kg CO₂eq/m² → 24 kg CO₂eq/m² (-4 kg)</div>
+                    </div>
+
+                    <!-- Others -->
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 14px; font-weight: 600; color: #333;">Others (Insulation, Wood, etc.)</span>
+                            <span style="font-size: 14px; color: #666;">9.5% of total</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div style="width: 200px; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                <div style="width: 9.5%; height: 100%; background: #ff6b35; position: relative;">
+                                    <div style="position: absolute; right: 0; width: 10%; height: 100%; background: #2ecc71; opacity: 0.8;"></div>
+                                </div>
+                            </div>
+                            <span style="font-size: 12px; color: #2ecc71; font-weight: bold;">-8% with sustainable alternatives</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-left: 210px;">44 kg CO₂eq/m² → 40 kg CO₂eq/m² (-4 kg)</div>
+                    </div>
+
+                    <!-- Total Reduction Summary -->
+                    <div style="margin-top: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #2ecc71;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 16px; font-weight: bold; color: #2e7d32;">Total Embodied Carbon Reduction</span>
+                            <span style="font-size: 18px; font-weight: bold; color: #2e7d32;">-85 kg CO₂eq/m² (18.4%)</span>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 14px; color: #666;">
+                            From 463 kg CO₂eq/m² to 378 kg CO₂eq/m² through optimized material selection
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Operational Carbon Interactive Section -->
+            <div>
+                <h3 style="font-size: 18px; color: rgb(42, 63, 95); margin-bottom: 20px; text-align: center;">
+                    Operational Carbon Optimization
+                </h3>
+                
+                <!-- Real-time Energy Model -->
+                <div style="background: white; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 14px; font-weight: 600;">Annual Energy Consumption</span>
+                        <span style="font-size: 16px; font-weight: bold; color: #2196f3;">125 kWh/m²/yr</span>
+                    </div>
+                    <div style="background: #e0e0e0; height: 20px; border-radius: 10px; overflow: hidden;">
+                        <div style="display: flex; height: 100%;">
+                            <div style="width: 35%; background: #ff9800;"></div>
+                            <div style="width: 25%; background: #2196f3;"></div>
+                            <div style="width: 20%; background: #9c27b0;"></div>
+                            <div style="width: 20%; background: #4caf50;"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-around; margin-top: 10px; font-size: 11px;">
+                        <span style="color: #ff9800;">● Cooling 35%</span>
+                        <span style="color: #2196f3;">● Heating 25%</span>
+                        <span style="color: #9c27b0;">● Lighting 20%</span>
+                        <span style="color: #4caf50;">● Others 20%</span>
+                    </div>
+                </div>
+                
+                <!-- Interactive Controls -->
+                <div style="background: white; padding: 20px; border-radius: 5px;">
+                    <!-- Building Envelope -->
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span class="slider-title">Building Envelope Performance</span>
+                            <div class="slider-value">
+                                <span class="reduction-value">-30 kg CO₂eq/m²</span>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                            <div>
+                                <label style="font-size: 12px; color: #666;">Wall U-value (W/m²K)</label>
+                                <input type="range" min="10" max="50" value="30" style="width: 100%; margin-top: 5px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #999;">
+                                    <span>0.5</span>
+                                    <span>0.3</span>
+                                    <span>0.1</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; color: #666;">Window SHGC</label>
+                                <input type="range" min="20" max="80" value="40" style="width: 100%; margin-top: 5px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #999;">
+                                    <span>0.8</span>
+                                    <span>0.4</span>
+                                    <span>0.2</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- HVAC Efficiency -->
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span class="slider-title">HVAC System Efficiency</span>
+                            <div class="slider-value">
+                                <span class="reduction-value">-20 kg CO₂eq/m²</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label style="font-size: 12px; color: #666;">AC System ISEER Rating</label>
+                            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                <button style="padding: 8px 16px; border: 1px solid #ddd; background: white; border-radius: 5px; font-size: 12px; cursor: pointer;">3 Star<br>3.5</button>
+                                <button style="padding: 8px 16px; border: 1px solid #ddd; background: white; border-radius: 5px; font-size: 12px; cursor: pointer;">4 Star<br>4.0</button>
+                                <button style="padding: 8px 16px; border: 1px solid #ff6b35; background: #fff3e0; border-radius: 5px; font-size: 12px; cursor: pointer; color: #ff6b35;">5 Star<br>5.0+</button>
+                                <button style="padding: 8px 16px; border: 1px solid #ddd; background: white; border-radius: 5px; font-size: 12px; cursor: pointer;">VRF<br>6.0+</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Solar PV System -->
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span class="slider-title">Solar PV Installation</span>
+                            <div class="slider-value">
+                                <span class="reduction-value">-15 kg CO₂eq/m²</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label style="font-size: 12px; color: #666;">System Capacity (kWp)</label>
+                            <input type="range" min="0" max="50" value="25" style="width: 100%; margin-top: 5px; background: linear-gradient(to right, #4caf50 0%, #4caf50 50%, #e0e0e0 50%, #e0e0e0 100%);">
+                            <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                                <span style="font-size: 11px; color: #999;">0 kWp</span>
+                                <span style="font-size: 12px; color: #4caf50; font-weight: bold;">25 kWp</span>
+                                <span style="font-size: 11px; color: #999;">50 kWp</span>
+                            </div>
+                            <p style="font-size: 12px; color: #666; margin-top: 8px; text-align: center;">
+                                Annual Generation: <strong>35,000 kWh</strong> | Coverage: <strong>28%</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

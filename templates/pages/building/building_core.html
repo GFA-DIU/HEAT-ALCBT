@@ -37,6 +37,18 @@
       aria-selected="false"
     >Benchmarking</button>
   </li>
+  <li class="nav-item" role="presentation">
+    <button
+      class="nav-link"
+      id="savings-tab"
+      data-bs-toggle="tab"
+      data-bs-target="#savings"
+      type="button"
+      role="tab"
+      aria-controls="savings"
+      aria-selected="false"
+    >Savings Potential</button>
+  </li>
 </ul>
 
 <div class="tab-content" id="myTabContent">
@@ -104,6 +116,14 @@
     aria-labelledby="benchmarking-tab"
   >
   {% include "pages/building/benchmarking_dashboard_placeholder.html" %}
+  </div>
+  <div
+    class="tab-pane fade p-3"
+    id="savings"
+    role="tabpanel"
+    aria-labelledby="savings-tab"
+  >
+  {% include "pages/building/savings_dashboard_placeholder.html" %}
   </div>
 </div>
 
