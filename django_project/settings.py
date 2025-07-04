@@ -178,6 +178,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = "en-us"
 
+LANGUAGES = [
+    ('en', 'English'),
+    ('vi', 'Vietnamnese'),
+]
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
 TIME_ZONE = "UTC"
 
