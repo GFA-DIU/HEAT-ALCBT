@@ -126,7 +126,7 @@ To execute Unit tests, run
 For support, please reach out to the maintainers or [kontakt@heat-international.de](mailto:kontakt@heat-international.de).
 
 ## License
-MIT License
+[Apache 2.0](LICENSE)
 
 The tool was built with the public Django template `wsvincent/lithium`. As requested, the copyright notice is included below:
 
