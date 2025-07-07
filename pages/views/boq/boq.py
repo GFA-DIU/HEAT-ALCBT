@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 
 from django.http import HttpResponse, JsonResponse
@@ -63,6 +64,7 @@ def boq_edit(request, building_id, assembly_id=None):
         epd.selection_text = "Quantity"
         epd.selection_unit = epd.declared_unit
         epd.available_units = epd.get_available_units()
+        epd.timestamp = datetime.now().strftime("%Y%m%d%H%M%S%f")
 
         categories = AssemblyCategory.objects.all()
 
