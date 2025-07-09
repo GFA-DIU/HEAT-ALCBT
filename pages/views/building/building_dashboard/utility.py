@@ -119,11 +119,13 @@ def prep_structural_df(impact_list):
     df["assembly_category"] = df["assembly_category"].apply(lambda x: x.__str__())
     df["material_category"] = df["material_category"].apply(lambda x: x.__str__())
     df = df[df["impact_type"].isin(["gwp a1a3", "penrt a1a3"])]
-    df = df.pivot(
+    df = df.pivot_table(
             index=["assembly_id", "epd_id", "assembly_category", "material_category"],
             columns="impact_type",
             values="impact_value",
+            aggfunc="sum",         # sum duplicates
         ).reset_index()
+
         
         # Decision to only display positive values for embodied carbon and embodied energy, yet indicator below still shows sum.
         # Thus creating a new column

@@ -23,11 +23,12 @@ def building_dashboard_material(user, building_id, simulation):
     
     # ADDED: Filter to only structural (embodied) carbon - NO operational carbon
     df_filtered = df[df["type"] == "structural"]
-    df_bar = df_filtered.groupby('material_category')['gwp'].sum().reset_index(name='gwp_abs')
+    df_filtered['mapped_material_category'] = df_filtered['material_category'].apply(map_category)
+    
+    df_bar = df_filtered.groupby('mapped_material_category')['gwp'].sum().reset_index(name='gwp_abs')
     df_bar['gwp_per'] = df_bar['gwp_abs'] / df_bar['gwp_abs'].sum() * 100
     df_bar = df_bar.sort_values("gwp_per", ascending=False)
     
-    df_bar['mapped_material_category'] = df_bar['material_category'].apply(map_category)
     
     return _building_dashboard_base(df_bar, "mapped_material_category")
 
