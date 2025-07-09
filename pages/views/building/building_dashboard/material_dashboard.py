@@ -22,211 +22,39 @@ def building_dashboard_material(user, building_id, simulation):
     df = prep_building_dashboard_df(user, building_id, simulation)
     
     # ADDED: Filter to only structural (embodied) carbon - NO operational carbon
-    df_embodied_only = df[df["type"] == "structural"].copy()
+    df_filtered = df[df["type"] == "structural"]
+    df_bar = df_filtered.groupby('material_category')['gwp'].sum().reset_index(name='gwp_abs')
+    df_bar['gwp_per'] = df_bar['gwp_abs'] / df_bar['gwp_abs'].sum() * 100
+    df_bar = df_bar.sort_values("gwp_per", ascending=False)
     
-    return _building_dashboard_base(df_embodied_only, "material_category")
+    df_bar['mapped_material_category'] = df_bar['material_category'].apply(map_category)
+    
+    return _building_dashboard_base(df_bar, "mapped_material_category")
 
 
 def map_category(original_category):
     return material_mapping[original_category] if original_category in material_mapping.keys() else "Others"
 
 
-def material_categories(df):
-    df['mapped_material_category'] = df['material_category'].apply(map_category)
-    return df
+def _building_dashboard_base(df_bar, key_column: str):
+    # Preset colors
+    colors = ["rgb(244, 132, 67)", "rgb(150, 150, 150)"]
 
-
-def _get_color_ordering(df, unit):
-    # UPDATED: Simplified since material view only contains structural materials now
-    df_sorted = df.sort_values(["gwp"], ascending=[False]).reset_index(drop=True)
-    
-    # REMOVED: Separation of structural vs operational since only structural exists
-    if unit == "carbon":  
-        color_list = _generate_discrete_colors(
-            start_color=(244, 132, 67), end_color=(250, 199, 165), n=df_sorted.shape[0]
-        )
-    elif unit == "energy":
-        color_list = _generate_discrete_colors(
-            start_color=(36, 191, 91), end_color=(154, 225, 177), n=df_sorted.shape[0]
-        )
-        
-    return df_sorted, color_list
-
-
-def _building_dashboard_base(df, key_column: str):
-    
-    # Generate colors & correct ordering
-    df_sorted, color_list = _get_color_ordering(df, "carbon")
-
-    # Create a 2x2 layout: top row for pies, bottom row for indicators
+    # Create a 1x2 layout: top row for pies, bottom row for indicators
     fig = make_subplots(
         rows=2,
-        cols=2,
+        cols=1,
         specs=[
-            [{"type": "domain"}, {"type": "domain"}],
-            [{"type": "domain"}, {"type": "domain"}],
+            [{"type": "xy"}],
+            [{"type": "domain"}],
         ],
         subplot_titles=[
             "<b>Embodied Carbon</b><br>by material<br> ",  # UPDATED: Changed from "LCA Carbon"
-            "<b>Embodied Energy</b><br>by material<br> ",  # UPDATED: Changed from "LCA Energy"
-            "",
             "",
         ],
         # Give more vertical space to top row
         row_heights=[0.6, 0.3],
         vertical_spacing=0.05,
-    )
-
-    # Update all annotations (including subplot titles)
-    for annotation in fig["layout"]["annotations"]:
-        annotation["font"] = dict(size=20)  
-
-
-
-    # Add pies
-    fig.add_trace(
-        go.Pie(
-            labels=df_sorted[key_column],
-            values=df_sorted["gwp"],  
-            name="GWP",
-            direction ='clockwise',
-            hole=0.4,
-            marker=dict(colors=color_list),
-            legendgroup="GWP",
-            showlegend=True,
-            sort=False,
-        ),
-        row=1,
-        col=1,
-    )
-
-    # Generate colors & correct ordering
-    df_sorted, color_list = _get_color_ordering(df, "energy")
-
-    fig.add_trace(
-        go.Pie(
-            labels=df_sorted[key_column],
-            values=df_sorted["penrt"],
-            sort=False,
-            direction ='clockwise',
-            name="PENRT",
-            hole=0.4,
-            marker=dict(colors=color_list),
-            legendgroup="PENRT",
-            showlegend=True,
-        ),
-        row=1,
-        col=2,
-    )
-
-    # Update pies formatting
-    fig.update_traces(
-        hoverinfo="label+value",
-        hovertemplate="%{label}<br><b>Value: %{value:.2f}</b><extra></extra>",
-        hoverlabel=dict(font_color="white", namelength=-1),
-        textposition="inside",
-        textfont=dict(
-            size=14,  # Default font size
-            family="Arial, sans-serif",  # Use a modern sans-serif font
-            color="white",  # Default high contrast text color
-        ),
-        texttemplate="<b>%{label}</b><br>%{percent:.0%}",
-        
-        # connector=dict(line=dict(color="black", width=1, dash="solid")),
-    )
-
-    # Store existing annotations (subplot titles)
-    existing_annotations = list(fig.layout.annotations)
-
-    # Calculate centers for pie hole annotations
-    first_pie_domain = fig.data[0].domain
-    second_pie_domain = fig.data[1].domain
-
-    gwp_annotation = dict(
-        text="GWP",
-        x=(first_pie_domain.x[0] + first_pie_domain.x[1]) / 2,
-        y=(first_pie_domain.y[0] + first_pie_domain.y[1]) / 2,
-        font_size=20,
-        showarrow=False,
-        xanchor="center",
-        yanchor="middle",
-    )
-
-    penrt_annotation = dict(
-        text="PENRT",
-        x=(second_pie_domain.x[0] + second_pie_domain.x[1]) / 2,
-        y=(second_pie_domain.y[0] + second_pie_domain.y[1]) / 2,
-        font_size=20,
-        showarrow=False,
-        xanchor="center",
-        yanchor="middle",
-    )
-
-    # Combine original titles + new annotations
-    new_annotations = existing_annotations + [gwp_annotation, penrt_annotation]
-    fig.update_layout(annotations=new_annotations, uniformtext_minsize=12, uniformtext_mode='hide')
-
-    # Calculate initial sums
-    gwp_sum = df["gwp"].sum()
-    penrt_sum = df["penrt"].sum()
-
-    # Add Indicators (make them larger)
-    fig.add_trace(
-        go.Indicator(
-            mode="number",
-            value=gwp_sum,
-            title={"text": "<b>Total Embodied Carbon</b>", "font": {"size": 20}},  # UPDATED: Changed from "Total GWP"
-            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
-        ),
-        row=2,
-        col=1,
-    )
-
-    fig.add_trace(
-        go.Indicator(
-            mode="number",
-            value=penrt_sum,
-            title={"text": "<b>Total Embodied Energy</b>", "font": {"size": 20}},  # UPDATED: Changed from "Total PENRT"
-            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " MJ/m²"},
-        ),
-        row=2,
-        col=2,
-    )
-
-    # Increase figure size and reduce margins
-    fig.update_layout(
-        height=500, width=900, margin=dict(l=25, r=25, t=125, b=25), showlegend=True
-    )
-
-    pie_plot = plot(
-        fig, output_type="div", config={"displaylogo": False, "displayModeBar": False}
-    )
-    return pie_plot
-
-
-def _building_dashboard_material_bar(df_bar, df_full, key_column: str):
-    """
-    NEW FUNCTION: Material dashboard showing ONLY bar chart for embodied carbon by materials
-    Similar to assembly view but only showing bar chart, no pie chart
-    """
-    
-    # Create a 2x1 layout: top row for bar chart, bottom row for indicators
-    fig = make_subplots(
-        rows=2,
-        cols=2,
-        specs=[
-            [{"type": "xy", "colspan": 2}, None],
-            [{"type": "domain"}, {"type": "domain"}],
-        ],
-        subplot_titles=[
-            "<b>Embodied carbon by material</b><br> ",
-            "",
-            "",
-            "",
-        ],
-        # Give more vertical space to top row
-        row_heights=[0.7, 0.25],
-        vertical_spacing=0.3,
     )
 
     # Update all annotations (including subplot titles)
@@ -264,7 +92,7 @@ def _building_dashboard_material_bar(df_bar, df_full, key_column: str):
             orientation='h',
             marker=dict(
                 cornerradius=8,
-                color="rgb(244, 132, 67)",  # Orange color for embodied carbon
+                color=colors[0],
             ),
             showlegend=False,
             hovertemplate="%{customdata:,.1f} kg CO₂eq/m²<extra></extra>",
@@ -291,6 +119,21 @@ def _building_dashboard_material_bar(df_bar, df_full, key_column: str):
         row=1, col=1
     )
 
+    # Update pies formatting
+    fig.update_traces(
+        hoverinfo="label+value",
+        hovertemplate="%{label}<extra></extra>",
+        hoverlabel=dict(font_color="white", namelength=-1),
+        textposition="auto",
+        textfont=dict(
+            size=14, 
+            family="Arial, sans-serif",  
+            color="white",
+        ),
+        texttemplate="<b>%{percent:.0%}</b>",
+        selector=dict(type="pie"),
+    )
+
     fig.update_traces(cliponaxis=False, selector=dict(type='bar'))
     
     fig.update_layout(
@@ -304,33 +147,29 @@ def _building_dashboard_material_bar(df_bar, df_full, key_column: str):
         uniformtext=dict(mode='show', minsize=12),
         yaxis=dict(showticklabels=False),
         barmode='overlay',
+        legend=dict(
+            orientation="h",
+            x=0.25,              
+            xanchor="center",
+            y=0.30,              
+            yanchor="bottom",
+            font=dict(size=14),  
+        ),
     )
 
-    # Calculate sums for indicators
-    gwp_sum = df_full["gwp"].sum()
-    penrt_sum = df_full["penrt"].sum()
+    # Calculate initial sums
+    gwp_sum = df_bar["gwp_abs"].sum()
 
     # Add Indicators (make them larger)
     fig.add_trace(
         go.Indicator(
             mode="number",
             value=gwp_sum,
-            title={"text": "<b>Total Embodied Carbon</b>", "font": {"size": 20}},
+            title={"text": "<b>Total embodied carbon</b>", "font": {"size": 20}},
             number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " kg CO₂eq/m²"},
         ),
         row=2,
         col=1,
-    )
-
-    fig.add_trace(
-        go.Indicator(
-            mode="number",
-            value=penrt_sum,
-            title={"text": "<b>Total Embodied Energy</b>", "font": {"size": 20}},
-            number={"font": {"size": 20, "weight": "bold"}, 'valueformat': ',.0f', 'suffix': " MJ/m²"},
-        ),
-        row=2,
-        col=2,
     )
 
     pie_plot = plot(
