@@ -91,7 +91,7 @@ def _building_dashboard_base(df_bar, key_column: str):
             cliponaxis=False,
             # use the grey bars to carry the text
             text=[
-                f"{cat} - {val:.1f}%"
+                f"{val:.1f}% - {cat}"
                 for cat, val in zip(df_bar[key_column], df_bar["gwp_per"])
             ],
             textposition="outside",
