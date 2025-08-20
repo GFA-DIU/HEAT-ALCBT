@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/cookie-consent.css' %}">
   {% endblock css%}
 </head>
 
@@ -83,6 +84,11 @@
   {% include 'footer.html' %}
   {% endif %}
 
+  <!-- Cookie Consent Banner and Modal -->
+  {% load cookie_consent %}
+  {% cookie_consent_banner %}
+  {% cookie_settings_modal %}
+
   {% block javascript %}
   <!-- Bootstrap JavaScript -->
   <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
@@ -92,6 +98,9 @@
 
   <!-- HTMX -->
   <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script>
+
+  <!-- Cookie Consent -->
+  <script src="{% static 'js/cookie-consent.js' %}"></script>
 
   {% endblock javascript %}
 </body>

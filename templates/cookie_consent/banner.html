@@ -1,0 +1,29 @@
+{% if show_banner %}
+<div id="cookie-consent-banner">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <p>
+                    <strong>We use cookies to improve your experience</strong><br>
+                    This website uses essential cookies for basic functionality and optional cookies for analytics and marketing. 
+                    You can choose which cookies to accept. Essential cookies cannot be disabled.
+                    <a href="{% url 'cookie_policy' %}" class="text-white text-decoration-underline">Learn more about our cookie policy</a>
+                </p>
+            </div>
+            <div class="col-lg-4">
+                <div class="btn-group d-flex flex-wrap justify-content-end">
+                    <button type="button" id="cookie-accept-all" class="btn btn-accept text-white">
+                        Accept All
+                    </button>
+                    <button type="button" id="cookie-reject-all" class="btn btn-reject text-white">
+                        Reject Optional
+                    </button>
+                    <button type="button" id="cookie-settings" class="btn btn-settings text-white">
+                        Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
