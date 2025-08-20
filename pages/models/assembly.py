@@ -9,6 +9,9 @@ from .epd import EPD
 from .base import BaseModel
 from .product import BaseProduct
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 class AssemblyMode(models.TextChoices):
     """Part of default or not.
@@ -93,6 +96,15 @@ class AssemblyCategoryTechnique(models.Model):
     class Meta:
         unique_together = ("category", "technique")
 
+# Signal: auto-create a (category, null) join when new category is added
+@receiver(post_save, sender=AssemblyCategory)
+def create_null_join_for_category(sender, instance, created, **kwargs):
+    if created:
+        AssemblyCategoryTechnique.objects.get_or_create(
+            category=instance,
+            technique=None,
+            defaults={"description": None},
+        )
 
 class Assembly(BaseModel):
     """Structural Element consisting of Products."""
