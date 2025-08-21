@@ -84,12 +84,7 @@ class CookieConsent {
         const enableYoutubeBtn = document.querySelectorAll('.enable-youtube');
         enableYoutubeBtn.forEach(btn => {
             btn.addEventListener('click', () => {
-                const consent = this.getConsent();
-                if (consent) {
-                    consent.marketing = true;
-                    this.setConsent(consent);
-                    window.location.reload();
-                }
+                this.showSettingsModal();
             });
         });
     }
@@ -126,7 +121,7 @@ class CookieConsent {
             modal.hide();
         }
 
-        window.location.reload();
+        this.updateContent(consent);
     }
 
     setConsent(consent) {
@@ -200,14 +195,40 @@ class CookieConsent {
         const enableBtn = placeholder.querySelector('.enable-youtube');
         if (enableBtn) {
             enableBtn.addEventListener('click', () => {
-                const consent = this.getConsent();
-                if (consent) {
-                    consent.marketing = true;
-                    this.setConsent(consent);
-                    window.location.reload();
-                }
+                this.showSettingsModal();
             });
         }
+    }
+
+    updateContent(consent) {
+        // Update YouTube videos if marketing cookies are now enabled
+        if (consent.marketing) {
+            const placeholders = document.querySelectorAll('.youtube-placeholder');
+            placeholders.forEach(placeholder => {
+                this.replaceWithVideo(placeholder);
+            });
+        } else {
+            const youtubeIframes = document.querySelectorAll('iframe[src*="youtube"]');
+            youtubeIframes.forEach(iframe => {
+                this.replaceWithPlaceholder(iframe);
+            });
+        }
+    }
+
+    replaceWithVideo(placeholder) {
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'ratio ratio-16x9';
+        videoContainer.innerHTML = `
+            <iframe src="https://www.youtube-nocookie.com/embed/4dBHXjpFMwA?si=_gVEw6TvZHadBMrN" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin" 
+                    allowfullscreen>
+            </iframe>
+        `;
+        
+        placeholder.parentNode.replaceChild(videoContainer, placeholder);
     }
 
     hasConsent(category) {
