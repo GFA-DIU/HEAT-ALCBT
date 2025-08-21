@@ -81,6 +81,7 @@ INSTALLED_APPS = [
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
+    "pages.middleware.ConditionalNewRelicMiddleware",  # Cookie consent for New Relic
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -91,6 +92,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
+    "pages.middleware.CookieConsentMiddleware",  # Cookie consent checker
     # # own
     # "django_project.middleware.LoginRequiredMiddleware",
 ]

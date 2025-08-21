@@ -31,7 +31,7 @@ class CookieConsent {
     }
 
     bindEvents() {
-        // Recept all cookies
+        // Accept all cookies
         const acceptBtn = document.getElementById('cookie-accept-all');
         if (acceptBtn) {
             acceptBtn.addEventListener('click', () => {
