@@ -121,6 +121,12 @@ To execute Unit tests, run
 (.venv) $ pytest
 ```
 
+### Load testing
+Execute for production server with the GUI as follows:
+```Bash
+(.venv) $ locust -f load_testing/locust/locustfile.py --host https://beat-alcbt.gggi.org
+```
+
 ## Support
 
 For support, please reach out to the maintainers or [kontakt@heat-international.de](mailto:kontakt@heat-international.de).
