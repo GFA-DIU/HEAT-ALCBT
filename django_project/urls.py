@@ -11,6 +11,7 @@ urlpatterns = [
     path(f"{DJANGO_ADMIN_URL}/admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),  # include custom views
     path("accounts/", include("allauth.urls")),
+    path('cookies/', include('cookie_consent.urls')),
     path("", include("pages.urls")),
     
     
