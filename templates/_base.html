@@ -1,4 +1,5 @@
 {% load static %}
+{% load cookie_consent_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,8 +19,11 @@
   <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
-  <link rel="stylesheet" href="{% static 'css/cookie-consent.css' %}">
   {% endblock css%}
+  
+  <!-- Cookie Banner CSS - Always included -->
+  <link rel="stylesheet" href="{% static 'css/cookie-consent.css' %}">
+
 </head>
 
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="d-flex flex-column h-100 min-vh-100 {% block body_class %}{% endblock %}">
@@ -53,6 +57,7 @@
                   <hr class="dropdown-divider">
                 </li>
                 <li><a class="dropdown-item" href="{% url 'account_change_password' %}">Change password</a></li>
+                <li><a class="dropdown-item" href="#" onclick="showCookieSettings()">Cookie Settings</a></li>
                 <li><a class="dropdown-item" href="{% url 'account_logout' %}">Sign out</a></li>
               </ul>
             </li>
@@ -62,7 +67,7 @@
     </div>
   </nav>
   {% endif %}
-  <!--Any flash messages pop up in any page because this is the base template-->
+
   {% if messages %}
   <div class="container mt-3">
     {% for message in messages %}
@@ -74,20 +79,224 @@
   </div>
   {% endif %}
 
-
   <div class="container pb-2 mt-2 flex-grow-1">
     {% block content %}
     <p>Default content...</p>
     {% endblock content %}
   </div>
+
   {% if user.is_authenticated %}
   {% include 'footer.html' %}
   {% endif %}
 
-  <!-- Cookie Consent Banner and Modal -->
-  {% load cookie_consent %}
-  {% cookie_consent_banner %}
-  {% cookie_settings_modal %}
+  <!-- Cookie Consent Banner -->
+  {% if not request|all_cookies_accepted %}
+  <div id="cookieBanner" class="cookie-banner">
+    <div class="container-fluid">
+      <div class="cookie-content">
+        <div class="cookie-text">
+          <h5><i class="bi bi-shield-check"></i> We Value Your Privacy</h5>
+          <p>We use cookies to enhance your experience, provide analytics, and enable embedded content. You can manage your preferences at any time.</p>
+        </div>
+        <div class="cookie-actions">
+          <button type="button" class="cookie-btn cookie-btn-accept" onclick="acceptAllCookies()">
+            Accept All
+          </button>
+          <button type="button" class="cookie-btn cookie-btn-decline" onclick="declineOptionalCookies()">
+            Decline Optional
+          </button>
+          <button type="button" class="cookie-btn cookie-btn-settings" onclick="showCookieSettings()">
+            Manage Preferences
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Cookie Settings Modal -->
+  <div class="modal fade cookie-settings-modal" id="cookieSettingsModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-gear"></i> Cookie Settings</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted mb-4">
+            Manage your cookie preferences below. Essential cookies are required for the website to function properly.
+          </p>
+
+          <div id="cookieCategories">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" onclick="declineOptionalCookies()">Decline Optional</button>
+          <button type="button" class="btn btn-success" onclick="saveCustomSettings()">Save Preferences</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showCookieBanner() {
+      const banner = document.getElementById('cookieBanner');
+      if (banner) {
+        setTimeout(() => {
+          banner.classList.add('show');
+        }, 500);
+      }
+    }
+
+    function hideCookieBanner() {
+      const banner = document.getElementById('cookieBanner');
+      if (banner) {
+        banner.classList.remove('show');
+      }
+    }
+
+    function acceptAllCookies() {
+      fetch('{% url "cookie_consent_status" %}', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'accept_all'
+        })
+      }).then(response => {
+        if (response.ok) {
+          hideCookieBanner();
+          setTimeout(() => location.reload(), 300);
+        }
+      }).catch(error => {
+        console.error('Error accepting cookies:', error);
+      });
+    }
+
+    function declineOptionalCookies() {
+      fetch('{% url "cookie_consent_status" %}', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'decline_optional'
+        })
+      }).then(response => {
+        if (response.ok) {
+          hideCookieBanner();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('cookieSettingsModal'));
+          if (modal) modal.hide();
+          setTimeout(() => location.reload(), 300);
+        }
+      }).catch(error => {
+        console.error('Error declining cookies:', error);
+      });
+    }
+
+    function showCookieSettings() {
+      loadCookieCategories();
+      const modal = new bootstrap.Modal(document.getElementById('cookieSettingsModal'));
+      modal.show();
+    }
+
+    function loadCookieCategories() {
+      fetch('{% url "cookie_groups" %}')
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById('cookieCategories');
+          container.innerHTML = '';
+
+          data.groups.forEach(group => {
+            let cookiesHtml = '';
+            if (group.cookies && group.cookies.length > 0) {
+              cookiesHtml = `
+                <div class="cookies-list">
+                  ${group.cookies.map(cookie => `
+                    <div class="cookie-item">
+                      <div class="cookie-name">${cookie.name}</div>
+                      ${cookie.description ? `<div class="cookie-description">${cookie.description}</div>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              `;
+            }
+
+            const categoryHtml = `
+              <div class="cookie-category ${group.required ? 'required' : ''}">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="flex-grow-1">
+                    <h6>${group.name}</h6>
+                    <p class="description">${group.description}</p>
+                    ${cookiesHtml}
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="cookie-${group.id}"
+                           ${group.enabled ? 'checked' : ''}
+                           ${group.required ? 'disabled' : ''}>
+                    <label class="form-check-label" for="cookie-${group.id}">
+                      ${group.required ? 'Always Active' : 'Enable'}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            `;
+            container.innerHTML += categoryHtml;
+          });
+        })
+        .catch(error => {
+          console.error('Error loading cookie categories:', error);
+        });
+    }
+
+    function saveCustomSettings() {
+      fetch('{% url "cookie_groups" %}')
+        .then(response => response.json())
+        .then(data => {
+          const settings = {};
+          
+          data.groups.forEach(group => {
+            const checkbox = document.getElementById(`cookie-${group.id}`);
+            if (checkbox) {
+              settings[group.id] = group.required ? true : checkbox.checked;
+            }
+          });
+
+          return fetch('{% url "cookie_consent_status" %}', {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'save_custom',
+              settings: settings
+            })
+          });
+        })
+        .then(response => {
+          if (response.ok) {
+            hideCookieBanner();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('cookieSettingsModal'));
+            if (modal) modal.hide();
+            setTimeout(() => location.reload(), 300);
+          }
+        })
+        .catch(error => {
+          console.error('Error saving cookie settings:', error);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      {% if not request|all_cookies_accepted %}
+        showCookieBanner();
+      {% endif %}
+    });
+  </script>
 
   {% block javascript %}
   <!-- Bootstrap JavaScript -->
@@ -98,10 +307,6 @@
 
   <!-- HTMX -->
   <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script>
-
-  <!-- Cookie Consent -->
-  <script src="{% static 'js/cookie-consent.js' %}"></script>
-
   {% endblock javascript %}
 </body>
 

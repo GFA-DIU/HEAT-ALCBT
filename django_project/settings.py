@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "debug_toolbar",
     "encrypted_json_fields",
+    "cookie_consent",
     # Local
     "accounts",
     "pages",
@@ -81,7 +82,6 @@ INSTALLED_APPS = [
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
-    "pages.middleware.ConditionalNewRelicMiddleware",  # Cookie consent for New Relic
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -92,7 +92,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
-    "pages.middleware.CookieConsentMiddleware",  # Cookie consent checker
     # # own
     # "django_project.middleware.LoginRequiredMiddleware",
 ]
@@ -102,6 +101,9 @@ if IS_HEROKU_APP:
     MIDDLEWARE.insert(0, honeybadger)
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ["admin:login", "admin:index"]
+
+COOKIE_CONSENT_NAME = "cookie_consent"
+COOKIE_CONSENT_CACHE_BACKEND = "default"
 
 # https://github.com/morlandi/django-encrypted-json-fields
 EJF_ENCRYPTION_KEYS = [os.environ.get("FIELD_ENCRYPTION_KEY", "")]
