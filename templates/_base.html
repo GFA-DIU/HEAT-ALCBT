@@ -90,7 +90,7 @@
   {% endif %}
 
   <!-- Cookie Consent Banner -->
-  {% if not request|all_cookies_accepted %}
+  {% if not request|all_cookies_accepted and not request.COOKIES.banner_shown %}
   <div id="cookieBanner" class="cookie-banner">
     <div class="container-fluid">
       <div class="cookie-content">
@@ -156,19 +156,25 @@
       }
     }
 
+    function setBannerShownCookie() {
+      const expires = new Date();
+      expires.setDate(expires.getDate() + 30);
+      document.cookie = `banner_shown=true; expires=${expires.toUTCString()}; path=/`;
+    }
+
     function acceptAllCookies() {
-      fetch('{% url "cookie_consent_status" %}', {
+      fetch('/cookies/accept/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': '{{ csrf_token }}',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'accept_all'
-        })
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
       }).then(response => {
         if (response.ok) {
+          setBannerShownCookie();
           hideCookieBanner();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('cookieSettingsModal'));
+          if (modal) modal.hide();
           setTimeout(() => location.reload(), 300);
         }
       }).catch(error => {
@@ -177,17 +183,15 @@
     }
 
     function declineOptionalCookies() {
-      fetch('{% url "cookie_consent_status" %}', {
+      fetch('/cookies/decline/', {
         method: 'POST',
         headers: {
           'X-CSRFToken': '{{ csrf_token }}',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'decline_optional'
-        })
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
       }).then(response => {
         if (response.ok) {
+          setBannerShownCookie();
           hideCookieBanner();
           const modal = bootstrap.Modal.getInstance(document.getElementById('cookieSettingsModal'));
           if (modal) modal.hide();
@@ -257,33 +261,38 @@
       fetch('{% url "cookie_groups" %}')
         .then(response => response.json())
         .then(data => {
-          const settings = {};
+          const promises = [];
           
           data.groups.forEach(group => {
             const checkbox = document.getElementById(`cookie-${group.id}`);
             if (checkbox) {
-              settings[group.id] = group.required ? true : checkbox.checked;
+              const isEnabled = group.required ? true : checkbox.checked;
+              const url = isEnabled ? `/cookies/accept/${group.id}/` : `/cookies/decline/${group.id}/`;
+              
+              promises.push(
+                fetch(url, {
+                  method: 'POST',
+                  headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  }
+                })
+              );
             }
           });
 
-          return fetch('{% url "cookie_consent_status" %}', {
-            method: 'POST',
-            headers: {
-              'X-CSRFToken': '{{ csrf_token }}',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              action: 'save_custom',
-              settings: settings
-            })
-          });
+          return Promise.all(promises);
         })
-        .then(response => {
-          if (response.ok) {
+        .then(responses => {
+          const allOk = responses.every(response => response.ok);
+          if (allOk) {
+            setBannerShownCookie();
             hideCookieBanner();
             const modal = bootstrap.Modal.getInstance(document.getElementById('cookieSettingsModal'));
             if (modal) modal.hide();
             setTimeout(() => location.reload(), 300);
+          } else {
+            console.error('Some cookie settings failed to save');
           }
         })
         .catch(error => {
@@ -292,7 +301,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      {% if not request|all_cookies_accepted %}
+      {% if not request|all_cookies_accepted and not request.COOKIES.banner_shown %}
         showCookieBanner();
       {% endif %}
     });
