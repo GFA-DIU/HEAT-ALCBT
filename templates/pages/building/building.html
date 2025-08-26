@@ -11,6 +11,8 @@
     <p class="text-muted">{{ building.country }}</p>
   </div>
   <!-- Buttons -->
+  {% comment %}
+  Simulation button temporarily disabled due to bug where original components were being removed
   {% if building_id %}
   <div class="col-auto">
     <div class="d-flex pt-2">
@@ -26,6 +28,7 @@
     </div>
   </div>
   {% endif %}
+  {% endcomment %}
 </div>
 
 {% include "pages/building/building_core.html" %}
