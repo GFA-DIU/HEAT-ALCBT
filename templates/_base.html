@@ -1,5 +1,6 @@
 {% load static %}
 {% load cookie_consent_tags %}
+{% load newrelic_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,6 +12,10 @@
   <meta name="description" content="A framework for launching new Django projects quickly.">
   <meta name="author" content="">
   <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+  
+  {% if request|cookie_group_accepted:"analytics" %}
+    {% newrelic_browser_timing_header %}
+  {% endif %}
 
   {% block css %}
   <!-- Bootstrap CSS -->
@@ -317,6 +322,10 @@
   <!-- HTMX -->
   <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script>
   {% endblock javascript %}
+  
+  {% if request|cookie_group_accepted:"analytics" %}
+    {% newrelic_browser_timing_footer %}
+  {% endif %}
 </body>
 
 </html>

@@ -72,9 +72,11 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "encrypted_json_fields",
     "cookie_consent",
+    "newrelic.extras.framework_django",
     # Local
     "accounts",
     "pages",
+    "cookie_management",
 ]
 
 
