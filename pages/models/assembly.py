@@ -60,6 +60,17 @@ class AssemblyTechnique(models.Model):
     def __str__(self):
         return self.name
 
+class AssemblyCategoryManager(models.Manager):
+    """Custom manager to auto-create a null technique join."""
+    @transaction.atomic
+    def create(self, **kwargs):
+        category = super().create(**kwargs)
+        AssemblyCategoryTechnique.objects.get_or_create(
+            category=category,
+            technique=None,
+            defaults={"description": None},
+        )
+        return category
 
 class AssemblyCategory(models.Model):
     """
