@@ -16,9 +16,9 @@
     "model": "cookie_consent.cookiegroup",
     "pk": 2,
     "fields": {
-      "varname": "marketing",
-      "name": "Marketing",
-      "description": "Cookies used for marketing and advertising purposes, including tracking user behavior across websites and personalizing ads. Required for YouTube video embedding.",
+      "varname": "media",
+      "name": "Media",
+      "description": "Cookies used for external media services, which may include tracking user behavior across websites. Required for YouTube video embedding.",
       "is_required": false,
       "is_deletable": true,
       "ordering": 2,
