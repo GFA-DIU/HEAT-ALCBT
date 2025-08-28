@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext as _
 from django.core.exceptions import ValidationError
 
@@ -8,6 +8,9 @@ from accounts.models import CustomCity
 from .epd import EPD
 from .base import BaseModel
 from .product import BaseProduct
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class AssemblyMode(models.TextChoices):
@@ -57,6 +60,17 @@ class AssemblyTechnique(models.Model):
     def __str__(self):
         return self.name
 
+class AssemblyCategoryManager(models.Manager):
+    """Custom manager to auto-create a null technique join."""
+    @transaction.atomic
+    def create(self, **kwargs):
+        category = super().create(**kwargs)
+        AssemblyCategoryTechnique.objects.get_or_create(
+            category=category,
+            technique=None,
+            defaults={"description": None},
+        )
+        return category
 
 class AssemblyCategory(models.Model):
     """
@@ -93,6 +107,15 @@ class AssemblyCategoryTechnique(models.Model):
     class Meta:
         unique_together = ("category", "technique")
 
+# Signal: auto-create a (category, null) join when new category is added
+@receiver(post_save, sender=AssemblyCategory)
+def create_null_join_for_category(sender, instance, created, **kwargs):
+    if created:
+        AssemblyCategoryTechnique.objects.get_or_create(
+            category=instance,
+            technique=None,
+            defaults={"description": None},
+        )
 
 class Assembly(BaseModel):
     """Structural Element consisting of Products."""
