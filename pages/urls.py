@@ -12,6 +12,7 @@ from .views.home import buildings_list
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
 from .views.assembly.assembly import component_edit
+from cookie_management.views import get_cookie_groups
 
 
 urlpatterns = [
@@ -49,4 +50,5 @@ urlpatterns = [
         boq_edit,
         name="boq_edit",
     ),
+    path("cookie_groups/", get_cookie_groups, name="cookie_groups"),
 ]

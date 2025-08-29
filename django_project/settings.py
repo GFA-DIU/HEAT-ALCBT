@@ -71,9 +71,12 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     "debug_toolbar",
     "encrypted_json_fields",
+    "cookie_consent",
+    "newrelic.extras.framework_django",
     # Local
     "accounts",
     "pages",
+    "cookie_management",
 ]
 
 
@@ -100,6 +103,9 @@ if IS_HEROKU_APP:
     MIDDLEWARE.insert(0, honeybadger)
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = ["admin:login", "admin:index"]
+
+COOKIE_CONSENT_NAME = "cookie_consent"
+COOKIE_CONSENT_CACHE_BACKEND = "default"
 
 # https://github.com/morlandi/django-encrypted-json-fields
 EJF_ENCRYPTION_KEYS = [os.environ.get("FIELD_ENCRYPTION_KEY", "")]

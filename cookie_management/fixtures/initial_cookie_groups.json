@@ -1,0 +1,113 @@
+[
+  {
+    "model": "cookie_consent.cookiegroup",
+    "pk": 1,
+    "fields": {
+      "varname": "essential",
+      "name": "Essential",
+      "description": "Essential cookies required for basic site functionality. These cannot be disabled.",
+      "is_required": true,
+      "is_deletable": false,
+      "ordering": 1,
+      "created": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cookie_consent.cookiegroup",
+    "pk": 2,
+    "fields": {
+      "varname": "media",
+      "name": "Media",
+      "description": "Cookies used for external media services, which may include tracking user behavior across websites. Required for YouTube video embedding.",
+      "is_required": false,
+      "is_deletable": true,
+      "ordering": 2,
+      "created": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cookie_consent.cookiegroup",
+    "pk": 3,
+    "fields": {
+      "varname": "analytics",
+      "name": "Analytics",
+      "description": "Cookies used to collect information about how visitors use our website, helping us improve performance and user experience. Includes New Relic monitoring.",
+      "is_required": false,
+      "is_deletable": true,
+      "ordering": 3,
+      "created": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cookie_consent.cookie",
+    "pk": 1,
+    "fields": {
+      "name": "sessionid",
+      "description": "Session identifier cookie required for user authentication and maintaining session state.",
+      "cookiegroup": 1,
+      "domain": "",
+      "path": "/",
+      "created": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cookie_consent.cookie",
+    "pk": 2,
+    "fields": {
+      "name": "csrftoken",
+      "description": "CSRF protection token required for secure form submissions and preventing cross-site request forgery attacks.",
+      "cookiegroup": 1,
+      "domain": "",
+      "path": "/",
+      "created": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cookie_consent.cookie",
+    "pk": 3,
+    "fields": {
+      "name": "VISITOR_INFO1_LIVE",
+      "description": "YouTube cookie that tracks user behavior and preferences for embedded video content.",
+      "cookiegroup": 2,
+      "domain": ".youtube.com",
+      "path": "/",
+      "created": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cookie_consent.cookie",
+    "pk": 4,
+    "fields": {
+      "name": "YSC",
+      "description": "YouTube cookie that registers a unique ID to keep statistics of what videos from YouTube the user has seen.",
+      "cookiegroup": 2,
+      "domain": ".youtube.com",
+      "path": "/",
+      "created": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cookie_consent.cookie",
+    "pk": 5,
+    "fields": {
+      "name": "JSESSIONID",
+      "description": "New Relic browser monitoring cookie for session tracking and performance analytics (deprecated in newer versions).",
+      "cookiegroup": 3,
+      "domain": "",
+      "path": "/",
+      "created": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "cookie_consent.cookie",
+    "pk": 6,
+    "fields": {
+      "name": "NREUM",
+      "description": "New Relic browser monitoring cookie for real user monitoring and performance tracking.",
+      "cookiegroup": 3,
+      "domain": "",
+      "path": "/",
+      "created": "2024-01-01T00:00:00Z"
+    }
+  }
+]
