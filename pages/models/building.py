@@ -90,7 +90,23 @@ class CategorySubcategory(models.Model):
     def __str__(self):
         return f"{self.category.name} - {self.subcategory.name}"
 
+class BuildingType(models.Model):
+    name = models.CharField(_("Name"), max_length=255, unique=True)
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="children"
+    )
 
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Building type"
+        verbose_name_plural = "Building types"
+        
 class BuildingOperationalInfo(models.Model):
     ### Operational Emissions
     operational_components = models.ManyToManyField(
