@@ -46,6 +46,7 @@ $ source .venv/bin/activate
 (.venv) $ python manage.py createsuperuser
 (.venv) $ python manage.py create_email_address # Creates an email_address for the superuser (Needed for all_auth to work)
 (.venv) $ python manage.py cities_light
+(.venv) $ python manage.py global_country # Adds a "Global" country option for EPDs
 (.venv) $ python manage.py load_default_cookies # Creates the default cookies
 (.venv) $ python manage.py runserver
 # Load the site at http://127.0.0.1:8000
