@@ -1,0 +1,18 @@
+[
+  {
+    "model": "cities_light.country",
+    "pk": null,
+    "fields": {
+      "name": "Global",
+      "code2": "ZZ",
+      "code3": "ZZZ",
+      "continent": "",
+      "tld": "",
+      "phone": "",
+      "geoname_id": 0,
+      "alternate_names": "",
+      "name_ascii": "Global",
+      "slug": "global"
+    }
+  }
+]
