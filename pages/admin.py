@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db.models import Q, Prefetch
 from django.http import HttpResponse
 
-from .models.epd import MaterialCategory, EPD, Impact, EPDImpact
+from .models.epd import MaterialCategory, EPD, Impact, EPDImpact, Label, EPDLabel
 from .models.assembly import Assembly, AssemblyCategory, AssemblyTechnique
 from .models.building import Building, BuildingCategory, BuildingSubcategory
 from .scripts.Excel_export.export_EPDs_to_excel import to_excel_bytes
@@ -16,6 +16,11 @@ admin.site.index_title = "Welcome to the BEAT Admin Area"
 # Inline for Many-to-Many (impacts in EPD)
 class ImpactsInline(admin.TabularInline):  # or admin.StackedInline
     model = EPD.impacts.through  # Use the through model for the many-to-many field
+    extra = 1  # Number of empty rows to display
+
+# Inline for Many-to-Many (labels in EPD)
+class LabelsInline(admin.TabularInline):  # or admin.StackedInline
+    model = EPD.labels.through  # Use the through model for the many-to-many field
     extra = 1  # Number of empty rows to display
 
 # Inline for Many-to-Many (products in Assembly)
@@ -107,7 +112,7 @@ def export_epds_action(modeladmin, request, queryset):
 
 # Custom admin for EPD
 class EPDAdmin(admin.ModelAdmin):
-    inlines = [ImpactsInline]  # Add the inline for impacts
+    inlines = [ImpactsInline, LabelsInline]  # Add the inline for impacts and labels
     list_display = ["name", "country", "category", "type"]  # Show all fields in list view
     list_display_links = ["name"]
     ordering = ["name", "country"]
@@ -154,6 +159,22 @@ class MaterialCategoryAdmin(admin.ModelAdmin):
     list_display_links = ["name_en"]
     ordering    = ("category_id",)
 
+# Custom admin for Label
+class LabelAdmin(admin.ModelAdmin):
+    list_display = ["name", "source", "scale_type"]
+    list_display_links = ["name"]
+    ordering = ["name"]
+    list_filter = ["scale_type", "source"]
+    search_fields = ("name", "source")
+
+# Custom admin for EPDLabel
+class EPDLabelAdmin(admin.ModelAdmin):
+    list_display = ["epd", "label", "score"]
+    list_display_links = ["epd"]
+    ordering = ["epd", "label"]
+    list_filter = ["label"]
+    search_fields = ("epd__name", "label__name")
+
 # Register your models with custom admin
 admin.site.register(MaterialCategory, MaterialCategoryAdmin)
 admin.site.register(EPD, EPDAdmin)
@@ -164,3 +185,5 @@ admin.site.register(Building, BuildingAdmin)
 admin.site.register(BuildingCategory, BuildingCategoryAdmin)
 admin.site.register(BuildingSubcategory)
 admin.site.register(Impact)
+admin.site.register(Label, LabelAdmin)
+admin.site.register(EPDLabel, EPDLabelAdmin)
