@@ -75,15 +75,15 @@ class AssemblyForm(forms.ModelForm):
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control", "type": "number"}),
     )
-    reporting_life_cycle = forms.IntegerField(
-        label="Life Span",
-        min_value=1,
-        max_value=10000,
-        help_text="Report in years",
-        required=True,
-        initial=50,
-        widget=forms.NumberInput(attrs={"class": "form-control", "type": "number"}),
-    )
+    # reporting_life_cycle = forms.IntegerField(
+    #     label="Life Span",
+    #     min_value=1,
+    #     max_value=10000,
+    #     help_text="Report in years",
+    #     required=True,
+    #     initial=50,
+    #     widget=forms.NumberInput(attrs={"class": "form-control", "type": "number"}),
+    # )
 
     class Meta:
         model = Assembly
@@ -120,11 +120,11 @@ class AssemblyForm(forms.ModelForm):
             self.fields["quantity"].initial = BuildingAssemblyModel.objects.get(
                 assembly=self.instance, building__pk=building_id
             ).quantity
-            self.fields["reporting_life_cycle"].initial = (
-                BuildingAssemblyModel.objects.get(
-                    assembly=self.instance, building__pk=building_id
-                ).reporting_life_cycle
-            )
+            # self.fields["reporting_life_cycle"].initial = (
+            #     BuildingAssemblyModel.objects.get(
+            #         assembly=self.instance, building__pk=building_id
+            #     ).reporting_life_cycle
+            # )
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA
