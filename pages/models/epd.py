@@ -264,6 +264,9 @@ class Label(models.Model):
         """
         self.clean()
         super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.name} ({self.source})"
 
 
 class EPD(BaseModel, epdLCAx):
@@ -432,12 +435,12 @@ class EPDLabel(models.Model):
     
     def clean(self):
         super().clean()
-        valid_options = list(self.label.scale_parameters)
-        if not self.score in valid_options:
-            raise ValidationError(
-                f"Label score {self.score} needs to be in Scale Parameters: {self.label.scale_parameters}."
-            )
-
+        if self.label and self.label.scale_parameters:
+            valid_options = list(self.label.scale_parameters)
+            if self.score not in valid_options:
+                raise ValidationError(
+                    f"Label score '{self.score}' needs to be in Scale Parameters: {self.label.scale_parameters}."
+                )
 
     def save(self, *args, **kwargs):
         """
@@ -445,3 +448,6 @@ class EPDLabel(models.Model):
         """
         self.clean()
         super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.epd.name} - {self.label.name}: {self.score}"

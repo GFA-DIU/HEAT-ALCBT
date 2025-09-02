@@ -49,6 +49,6 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"Successfully uploaded {file_key}"))
         else:
             for k, v in local_epd_files.items():
-                self.stdout.write(self.style.SUCCESS(("Starting", k)))
+                self.stdout.write(self.style.SUCCESS(f"Starting {k}"))
                 v()
-                self.stdout.write(self.style.SUCCESS(("Successfully uploaded", k)))
+                self.stdout.write(self.style.SUCCESS(f"Successfully uploaded {k}"))

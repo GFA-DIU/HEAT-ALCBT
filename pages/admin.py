@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from django.db.models import Q, Prefetch
 from django.http import HttpResponse
@@ -168,7 +169,58 @@ class LabelAdmin(admin.ModelAdmin):
     search_fields = ("name", "source")
 
 # Custom admin for EPDLabel
+class EPDLabelForm(forms.ModelForm):
+    class Meta:
+        model = EPDLabel
+        fields = ['epd', 'label', 'score', 'comment']
+        widgets = {
+            'epd': forms.Select(attrs={
+                'style': 'width: 100%; max-width: 350px; overflow: hidden; text-overflow: ellipsis;'
+            }),
+            'label': forms.Select(attrs={
+                'style': 'width: 100%; max-width: 250px; overflow: hidden; text-overflow: ellipsis;'
+            }),
+            'comment': forms.TextInput(attrs={
+                'style': 'width: 100%; max-width: 300px;'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Set up score field based on label's scale_parameters
+        score_choices = [('', '---------')]
+
+        if 'label' in self.data:
+            try:
+                label_id = int(self.data.get('label'))
+                label = Label.objects.get(id=label_id)
+                if label.scale_parameters:
+                    score_choices.extend([
+                        (param, f"{param} - {label.scale_type} scale") 
+                        for param in label.scale_parameters
+                    ])
+            except (ValueError, Label.DoesNotExist):
+                pass
+        elif self.instance and self.instance.label and self.instance.label.scale_parameters:
+            label = self.instance.label
+            score_choices.extend([
+                (param, f"{param} - {label.scale_type} scale") 
+                for param in label.scale_parameters
+            ])
+        
+        # Always make score a ChoiceField with better styling
+        self.fields['score'] = forms.ChoiceField(
+            choices=score_choices,
+            required=True,
+            widget=forms.Select(attrs={
+                'style': 'width: 100%; max-width: 250px;'
+            })
+        )
+
+# Custom admin for EPDLabel
 class EPDLabelAdmin(admin.ModelAdmin):
+    form = EPDLabelForm
     list_display = ["epd", "label", "score"]
     list_display_links = ["epd"]
     ordering = ["epd", "label"]
