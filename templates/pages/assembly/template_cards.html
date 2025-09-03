@@ -1,0 +1,112 @@
+{% load custom_filters %}
+
+{% if user_templates %}
+<div class="mb-4">
+    <h6 class="text-primary mb-3">Your Templates</h6>
+    <div class="row">
+        {% for template in user_templates %}
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-title">{{ template.name }}</h6>
+                    <div class="small text-muted mb-2">
+                        <div><strong>Category:</strong> {{ template.classification.category|default:"Not specified" }}</div>
+                        <div><strong>Technique:</strong> {{ template.classification.technique|default:"Not specified" }}</div>
+                        <div><strong>Dimension:</strong> {{ template.get_dimension_display }}</div>
+                        <div><strong>Materials:</strong> {{ template.structuralproduct_set.count }} item{{ template.structuralproduct_set.count|pluralize }}</div>
+                    </div>
+                    {% if template.comment %}
+                    <p class="card-text small">{{ template.comment|truncatewords:20 }}</p>
+                    {% endif %}
+                    
+                    <form hx-post="{% url 'copy_template' building_id=building_id template_id=template.id %}" class="mt-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="simulation" value="{{ simulation }}">
+                        
+                        <div class="row mb-2">
+                            <div class="col-8">
+                                <label class="form-label small">Quantity</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" name="quantity" class="form-control" value="1" step="0.01" min="0" required>
+                                    <span class="input-group-text">{{ template.get_dimension_display }}</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label small">Life Span</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" name="reporting_life_cycle" class="form-control" value="50" min="1" max="10000" required>
+                                    <span class="input-group-text">yrs</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            Use This Template
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if generic_templates %}
+<div class="mb-4">
+    <h6 class="text-success mb-3">Generic Templates</h6>
+    <div class="row">
+        {% for template in generic_templates %}
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h6 class="card-title">{{ template.name }}</h6>
+                    <div class="small text-muted mb-2">
+                        <div><strong>Category:</strong> {{ template.classification.category|default:"Not specified" }}</div>
+                        <div><strong>Technique:</strong> {{ template.classification.technique|default:"Not specified" }}</div>
+                        <div><strong>Dimension:</strong> {{ template.get_dimension_display }}</div>
+                        <div><strong>Materials:</strong> {{ template.structuralproduct_set.count }} item{{ template.structuralproduct_set.count|pluralize }}</div>
+                    </div>
+                    {% if template.comment %}
+                    <p class="card-text small">{{ template.comment|truncatewords:20 }}</p>
+                    {% endif %}
+                    
+                    <form hx-post="{% url 'copy_template' building_id=building_id template_id=template.id %}" class="mt-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="simulation" value="{{ simulation }}">
+                        
+                        <div class="row mb-2">
+                            <div class="col-8">
+                                <label class="form-label small">Quantity</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" name="quantity" class="form-control" value="1" step="0.01" min="0" required>
+                                    <span class="input-group-text">{{ template.get_dimension_display }}</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label small">Life Span</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" name="reporting_life_cycle" class="form-control" value="50" min="1" max="10000" required>
+                                    <span class="input-group-text">yrs</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success btn-sm w-100">
+                            Use This Template
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if not user_templates and not generic_templates %}
+<div class="text-center text-muted">
+    <p>No assembly templates match your current filters.</p>
+    <p class="small">Try adjusting your search criteria or create assemblies and mark them as templates!</p>
+</div>
+{% endif %}

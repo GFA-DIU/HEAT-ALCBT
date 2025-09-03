@@ -1,0 +1,79 @@
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+
+<div class="modal-header">
+    <h5 class="modal-title">Select Assembly Template</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="container-fluid">
+        <p class="text-muted small mb-3">
+            Choose from your own saved templates or generic assemblies to quickly add components to your building.
+        </p>
+        
+        <!-- Filter Form -->
+        <form hx-post="{% url 'assembly_templates' building_id=building_id %}?simulation={{ simulation }}"
+              hx-target="#template-cards" 
+              hx-vals='{"action": "filter"}' 
+              class="mb-4">
+            {% csrf_token %}
+            
+            <div class="row g-2">
+                <div class="col-md-6">
+                    <input type="text" 
+                           name="search_query" 
+                           class="form-control form-control-sm" 
+                           placeholder="Search templates by name..."
+                           value="{{ filters.search_query }}"
+                           hx-post="{% url 'assembly_templates' building_id=building_id %}?simulation={{ simulation }}"
+                           hx-target="#template-cards"
+                           hx-vals='{"action": "filter"}'
+                           hx-trigger="keyup changed delay:500ms">
+                </div>
+                <div class="col-md-3">
+                    <select name="template_type" 
+                            class="form-select form-select-sm"
+                            hx-post="{% url 'assembly_templates' building_id=building_id %}?simulation={{ simulation }}"
+                            hx-target="#template-cards"
+                            hx-vals='{"action": "filter"}'
+                            hx-trigger="change">
+                        <option value="">All templates</option>
+                        <option value="user" {% if filters.template_type == 'user' %}selected{% endif %}>My templates only</option>
+                        <option value="generic" {% if filters.template_type == 'generic' %}selected{% endif %}>Generic templates only</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="dimension" 
+                            class="form-select form-select-sm"
+                            hx-post="{% url 'assembly_templates' building_id=building_id %}?simulation={{ simulation }}"
+                            hx-target="#template-cards"
+                            hx-vals='{"action": "filter"}'
+                            hx-trigger="change">
+                        <option value="">All dimensions</option>
+                        <option value="area" {% if filters.dimension == 'area' %}selected{% endif %}>m²</option>
+                        <option value="length" {% if filters.dimension == 'length' %}selected{% endif %}>m</option>
+                        <option value="mass" {% if filters.dimension == 'mass' %}selected{% endif %}>kg</option>
+                        <option value="volume" {% if filters.dimension == 'volume' %}selected{% endif %}>m³</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Template Cards Container -->
+        <div id="template-cards">
+            {% include "pages/assembly/template_cards.html" %}
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    <a href="{% url 'component' building_id=building_id %}?simulation={{ simulation }}" 
+       class="btn btn-outline-primary"
+       hx-get="{% url 'component' building_id=building_id %}?add_component=step_1&simulation={{ simulation }}"
+       hx-target="#modal-body"
+       hx-swap="innerHTML">
+        Create New Assembly
+    </a>
+</div>

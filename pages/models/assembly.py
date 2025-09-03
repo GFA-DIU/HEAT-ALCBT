@@ -146,9 +146,49 @@ class Assembly(BaseModel):
         EPD, blank=True, related_name="assemblies", through="StructuralProduct"
     )
     is_boq = models.BooleanField(default=False)
+    is_template = models.BooleanField(
+        _("Use as template"),
+        default=False,
+        help_text=_("Mark this assembly as a template that can be reused in other buildings")
+    )
 
     def __str__(self):
         return self.name
+
+    def copy_as_template_instance(self, new_name=None, user=None):
+        """
+        Create a copy of this assembly for use in a building (non-template instance).
+        """
+        # Create new assembly instance
+        new_assembly = Assembly(
+            country=self.country,
+            city=self.city,
+            mode=self.mode,
+            dimension=self.dimension,
+            comment=self.comment,
+            description=self.description,
+            name=new_name or f"{self.name} (Copy)",
+            is_boq=self.is_boq,
+            is_template=False,  # New instance is not a template
+        )
+        
+        if user:
+            new_assembly.user = user
+            
+        new_assembly.save()
+        
+        # Copy all structural products
+        for structural_product in self.structuralproduct_set.all():
+            StructuralProduct.objects.create(
+                epd=structural_product.epd,
+                classification=structural_product.classification,
+                assembly=new_assembly,
+                input_unit=structural_product.input_unit,
+                quantity=structural_product.quantity,
+                user=user if user else structural_product.user,
+            )
+        
+        return new_assembly
 
     @property
     def classification(self):

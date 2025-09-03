@@ -10,6 +10,14 @@
   >Add from BoQ</a
 >
 <button
+  class="btn btn-success m-2 mt-3"
+  hx-get="{% url 'assembly_templates' building_id=building_id %}?simulation={{simulation}}"
+  hx-target="#modal-body"
+  hx-swap="innerHTML"
+>
+  Choose from templates
+</button>
+<button
   class="btn btn-primary m-2 mt-3"
   hx-get="{% url 'component' building_id=building_id %}?add_component=step_1&simulation={{simulation}}"
   hx-target="#modal-body"
@@ -21,7 +29,7 @@
 
 <div id="modal" class="modal fade" tabindex="-1">
   <div
-    class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"
   >
     <div class="modal-content">
       <div id="modal-body"></div>

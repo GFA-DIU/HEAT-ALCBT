@@ -12,6 +12,7 @@ from .views.home import buildings_list
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
 from .views.assembly.assembly import component_edit
+from .views.assembly.assembly_templates import assembly_templates_list, copy_template
 from cookie_management.views import get_cookie_groups
 
 
@@ -49,6 +50,12 @@ urlpatterns = [
         "boq/<uuid:assembly_id>/<uuid:building_id>/",
         boq_edit,
         name="boq_edit",
+    ),
+    path("templates/<uuid:building_id>/", assembly_templates_list, name="assembly_templates"),
+    path(
+        "copy-template/<uuid:building_id>/<uuid:template_id>/",
+        copy_template,
+        name="copy_template",
     ),
     path("cookie_groups/", get_cookie_groups, name="cookie_groups"),
 ]

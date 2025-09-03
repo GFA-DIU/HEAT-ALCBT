@@ -26,8 +26,13 @@
             <div class="ms-2 flex-grow-1">
                 {{ form.country |as_crispy_field }}
             </div>
-            <div class="form-check form-switch">
-                {{ form.public |as_crispy_field }}
+            <div class="d-flex gap-3">
+                <div class="form-check form-switch">
+                    {{ form.public |as_crispy_field }}
+                </div>
+                <div class="form-check form-switch">
+                    {{ form.is_template |as_crispy_field }}
+                </div>
             </div>
         </div>
     </div>

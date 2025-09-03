@@ -22,6 +22,12 @@ class AssemblyForm(forms.ModelForm):
         required=False,
         widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
     )
+    is_template = forms.BooleanField(
+        required=False,
+        label="Save as template",
+        help_text="Check to save this assembly as a reusable template",
+        widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
+    )
     mode = forms.ChoiceField(
         required=False,
         choices=AssemblyMode.choices,
@@ -92,6 +98,7 @@ class AssemblyForm(forms.ModelForm):
             "country",
             "comment",
             "public",
+            "is_template",
             "dimension",
         ]
 
