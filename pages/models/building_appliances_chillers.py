@@ -10,8 +10,6 @@ from .building import (
 )
 from cities_light.models import Country
 
-logger = logging.getLogger(__name__)
-
 
 class Refrigerant(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -99,9 +97,9 @@ def preload_default_data(sender, **kwargs):
         for ref in refrigerants:
             obj, created = Refrigerant.objects.get_or_create(name=ref)
             if created:
-                logger.info(f"Preloaded refrigerant: {ref}")
+                print(f"Preloaded refrigerant: {ref}")
     except Exception as e:
-        logger.error(f"Error preloading refrigerants: {e}")
+        print(f"Error preloading refrigerants: {e}")
 
 
 class ChillerBenchmark(models.Model):
@@ -110,7 +108,8 @@ class ChillerBenchmark(models.Model):
         ('air', 'Air Cooled Chiller'),
     ]
 
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, related_name='chiller_benchmarks')  # blank = universal
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True,
+                                related_name='chiller_benchmarks')  # blank = universal
     building_type = models.ForeignKey(CategorySubcategory, on_delete=models.CASCADE)
 
     chiller_type = models.CharField(max_length=20, choices=CHILLER_TYPES)
