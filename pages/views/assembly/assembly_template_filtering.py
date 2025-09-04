@@ -11,7 +11,7 @@ def get_filtered_assembly_templates(request, user):
     """
     # Start with base querysets
     user_templates = Assembly.objects.filter(
-        user=user,
+        created_by=user,
         is_template=True,
         is_boq=False
     ).select_related('country', 'city').prefetch_related(

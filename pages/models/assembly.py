@@ -173,7 +173,7 @@ class Assembly(BaseModel):
         )
         
         if user:
-            new_assembly.user = user
+            new_assembly.created_by = user
             
         new_assembly.save()
         
@@ -185,7 +185,7 @@ class Assembly(BaseModel):
                 assembly=new_assembly,
                 input_unit=structural_product.input_unit,
                 quantity=structural_product.quantity,
-                user=user if user else structural_product.user,
+                description=structural_product.description,
             )
         
         return new_assembly

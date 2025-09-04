@@ -18,46 +18,7 @@
               hx-vals='{"action": "filter"}' 
               class="mb-4">
             {% csrf_token %}
-            
-            <div class="row g-2">
-                <div class="col-md-6">
-                    <input type="text" 
-                           name="search_query" 
-                           class="form-control form-control-sm" 
-                           placeholder="Search templates by name..."
-                           value="{{ filters.search_query }}"
-                           hx-post="{% url 'assembly_templates' building_id=building_id %}?simulation={{ simulation }}"
-                           hx-target="#template-cards"
-                           hx-vals='{"action": "filter"}'
-                           hx-trigger="keyup changed delay:500ms">
-                </div>
-                <div class="col-md-3">
-                    <select name="template_type" 
-                            class="form-select form-select-sm"
-                            hx-post="{% url 'assembly_templates' building_id=building_id %}?simulation={{ simulation }}"
-                            hx-target="#template-cards"
-                            hx-vals='{"action": "filter"}'
-                            hx-trigger="change">
-                        <option value="">All templates</option>
-                        <option value="user" {% if filters.template_type == 'user' %}selected{% endif %}>My templates only</option>
-                        <option value="generic" {% if filters.template_type == 'generic' %}selected{% endif %}>Generic templates only</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select name="dimension" 
-                            class="form-select form-select-sm"
-                            hx-post="{% url 'assembly_templates' building_id=building_id %}?simulation={{ simulation }}"
-                            hx-target="#template-cards"
-                            hx-vals='{"action": "filter"}'
-                            hx-trigger="change">
-                        <option value="">All dimensions</option>
-                        <option value="area" {% if filters.dimension == 'area' %}selected{% endif %}>m²</option>
-                        <option value="length" {% if filters.dimension == 'length' %}selected{% endif %}>m</option>
-                        <option value="mass" {% if filters.dimension == 'mass' %}selected{% endif %}>kg</option>
-                        <option value="volume" {% if filters.dimension == 'volume' %}selected{% endif %}>m³</option>
-                    </select>
-                </div>
-            </div>
+            {% crispy template_filters_form %}
         </form>
         
         <!-- Template Cards Container -->

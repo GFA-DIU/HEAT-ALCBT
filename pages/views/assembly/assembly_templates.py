@@ -6,7 +6,7 @@ from django.views.decorators.http import require_http_methods
 
 from pages.models.assembly import Assembly
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
-from pages.forms.epds_filter_form import EPDsFilterForm
+from pages.forms.assembly_template_filter_form import AssemblyTemplateFilterForm
 from pages.views.assembly.assembly_template_filtering import get_filtered_assembly_templates
 import logging
 
@@ -45,7 +45,7 @@ def assembly_templates_list(request, building_id):
     
     # Create filter form
     req = request.POST if request.method == "POST" else request.GET
-    template_filters_form = EPDsFilterForm(req)  # Reusing EPD form for now
+    template_filters_form = AssemblyTemplateFilterForm(req)
     
     context = {
         'building_id': building_id,
@@ -76,23 +76,22 @@ def copy_template(request, building_id, template_id):
         BuildingAssemblyModel = BuildingAssembly
     
     try:
+        # Get quantity and life cycle from form or use defaults
+        quantity = float(request.POST.get('quantity', 1.0))
+        reporting_life_cycle = int(request.POST.get('reporting_life_cycle', 50))
+        
         # Create copy of template
         new_assembly = template.copy_as_template_instance(
             new_name=template.name,
             user=request.user
         )
         
-        # Get quantity and life cycle from form or use defaults
-        quantity = float(request.POST.get('quantity', 1.0))
-        reporting_life_cycle = int(request.POST.get('reporting_life_cycle', 50))
-        
         # Add the new assembly to the building
-        BuildingAssemblyModel.objects.create(
+        building_assembly = BuildingAssemblyModel.objects.create(
             building=building,
             assembly=new_assembly,
             quantity=quantity,
             reporting_life_cycle=reporting_life_cycle,
-            user=request.user
         )
         
         logger.info(
@@ -117,11 +116,13 @@ def copy_template(request, building_id, template_id):
         return response
         
     except Exception as e:
+        import traceback
         logger.error(
-            "Error copying template - User: %s, Template: %s, Building: %s, Error: %s",
+            "Error copying template - User: %s, Template: %s, Building: %s, Error: %s, Traceback: %s",
             request.user,
             template,
             building,
-            str(e)
+            str(e),
+            traceback.format_exc()
         )
-        return JsonResponse({"error": "Failed to copy template"}, status=400)
+        return JsonResponse({"error": f"Failed to copy template: {str(e)}"}, status=400)
