@@ -80,8 +80,8 @@ def update_categories(request):
 
     return render(
         request,
-        "pages/utils/select_lists_building.html",
-        {"building_types": categories, "default_building_text": "Select a building type"},
+        "pages/utils/select_list.html",
+        {"items": categories, "default_building_text": "Select a building type"},
     )
 
 @login_required
