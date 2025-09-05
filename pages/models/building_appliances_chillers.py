@@ -9,6 +9,7 @@ from .building import (
     CategorySubcategory
 )
 from cities_light.models import Country
+from django.utils.translation import gettext_lazy as _
 
 
 class Refrigerant(models.Model):
@@ -33,7 +34,11 @@ class Chiller(models.Model):
     building = models.ForeignKey('Building', on_delete=models.CASCADE, related_name='chillers')
 
     # Mandatory fields
-    chiller_type = models.CharField(max_length=20, choices=CHILLER_TYPES)
+    chiller_type = models.CharField(
+        _("Chiller Type"),
+        max_length=20,
+        choices=CHILLER_TYPES
+    )
     year_of_installation = models.PositiveIntegerField()
     operation_hours_per_workday = models.PositiveIntegerField(default=8)
     workdays_per_week = models.PositiveIntegerField(default=6)
@@ -47,8 +52,14 @@ class Chiller(models.Model):
     total_cooling_load_rt = models.FloatField(help_text="Refrigeration Tonnage (RT)")
     baseline_cooling_efficiency_kw_rt = models.FloatField(default=1.5, help_text="kW/RT")
 
-    vsd_installed = models.CharField(max_length=3, choices=YES_NO)
-    heat_recovery_installed = models.CharField(max_length=3, choices=YES_NO)
+    vsd_installed = models.BooleanField(
+        _("VSD Installed?"),
+        default=False
+    )
+    heat_recovery_installed = models.BooleanField(
+        _("Heat Recovery Installed?"),
+        default=False
+    )
 
     # Optional / calculated fields
     baseline_refrigerant_emission_factor = models.FloatField(null=True, blank=True, help_text="GWP")
@@ -102,7 +113,7 @@ def preload_default_data(sender, **kwargs):
         print(f"Error preloading refrigerants: {e}")
 
 
-class ChillerBenchmark(models.Model):
+class SystemBenchmark(models.Model):
     CHILLER_TYPES = [
         ('water', 'Water Cooled Chiller'),
         ('air', 'Air Cooled Chiller'),
