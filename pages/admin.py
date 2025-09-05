@@ -21,7 +21,7 @@ class ImpactsInline(admin.TabularInline):  # or admin.StackedInline
 
 # Inline for Many-to-Many (labels in EPD)
 class LabelsInline(admin.TabularInline):  # or admin.StackedInline
-    model = EPD.labels.through  # Use the through model for the many-to-many field
+    model = EPDLabel
     extra = 1  # Number of empty rows to display
 
 # Inline for Many-to-Many (products in Assembly)
@@ -168,64 +168,6 @@ class LabelAdmin(admin.ModelAdmin):
     list_filter = ["scale_type", "source"]
     search_fields = ("name", "source")
 
-# Custom admin for EPDLabel
-class EPDLabelForm(forms.ModelForm):
-    class Meta:
-        model = EPDLabel
-        fields = ['epd', 'label', 'score', 'comment']
-        widgets = {
-            'epd': forms.Select(attrs={
-                'style': 'width: 100%; max-width: 350px; overflow: hidden; text-overflow: ellipsis;'
-            }),
-            'label': forms.Select(attrs={
-                'style': 'width: 100%; max-width: 250px; overflow: hidden; text-overflow: ellipsis;'
-            }),
-            'comment': forms.TextInput(attrs={
-                'style': 'width: 100%; max-width: 300px;'
-            })
-        }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        # Set up score field based on label's scale_parameters
-        score_choices = [('', '---------')]
-
-        if 'label' in self.data:
-            try:
-                label_id = int(self.data.get('label'))
-                label = Label.objects.get(id=label_id)
-                if label.scale_parameters:
-                    score_choices.extend([
-                        (param, f"{param} - {label.scale_type} scale") 
-                        for param in label.scale_parameters
-                    ])
-            except (ValueError, Label.DoesNotExist):
-                pass
-        elif self.instance and self.instance.label and self.instance.label.scale_parameters:
-            label = self.instance.label
-            score_choices.extend([
-                (param, f"{param} - {label.scale_type} scale") 
-                for param in label.scale_parameters
-            ])
-        
-        # Always make score a ChoiceField with better styling
-        self.fields['score'] = forms.ChoiceField(
-            choices=score_choices,
-            required=True,
-            widget=forms.Select(attrs={
-                'style': 'width: 100%; max-width: 250px;'
-            })
-        )
-
-# Custom admin for EPDLabel
-class EPDLabelAdmin(admin.ModelAdmin):
-    form = EPDLabelForm
-    list_display = ["epd", "label", "score"]
-    list_display_links = ["epd"]
-    ordering = ["epd", "label"]
-    list_filter = ["label"]
-    search_fields = ("epd__name", "label__name")
 
 # Register your models with custom admin
 admin.site.register(MaterialCategory, MaterialCategoryAdmin)
@@ -238,4 +180,3 @@ admin.site.register(BuildingCategory, BuildingCategoryAdmin)
 admin.site.register(BuildingSubcategory)
 admin.site.register(Impact)
 admin.site.register(Label, LabelAdmin)
-admin.site.register(EPDLabel, EPDLabelAdmin)

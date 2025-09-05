@@ -266,7 +266,7 @@ class Label(models.Model):
         super().save(*args, **kwargs)
     
     def __str__(self):
-        return f"{self.name} ({self.source})"
+        return self.name
 
 
 class EPD(BaseModel, epdLCAx):
@@ -435,7 +435,7 @@ class EPDLabel(models.Model):
     
     def clean(self):
         super().clean()
-        if self.label and self.label.scale_parameters:
+        if self.label.scale_parameters:
             valid_options = list(self.label.scale_parameters)
             if self.score not in valid_options:
                 raise ValidationError(
