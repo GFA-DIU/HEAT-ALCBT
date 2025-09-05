@@ -12,6 +12,17 @@ NOMINATIM_AGENT_STRING = os.environ.get("NOMINATIM_AGENT_STRING")
 logger = logging.getLogger(__name__)
 
 
+class ALCBTCountryManager:
+    @staticmethod
+    def get_alcbt_countries():
+        ALCBT_COUNTRY_CODES = ["ID", "TH", "VN", "KH", "IN"]
+        return Country.objects.filter(code2__in=ALCBT_COUNTRY_CODES).order_by("name")
+    
+    @staticmethod
+    def get_all_countries():
+        return Country.objects.all().order_by("name")
+
+
 class BaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_by = models.ForeignKey(

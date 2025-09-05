@@ -9,6 +9,7 @@ from crispy_forms.layout import HTML, Layout, Fieldset, Row, Column, Submit
 from cities_light.models import Country
 
 from pages.models import Building, CategorySubcategory
+from pages.models.base import ALCBTCountryManager
 from accounts.models import CustomCity, CustomRegion
 
 
@@ -24,7 +25,7 @@ class YearInput(forms.DateInput):
 
 class BuildingGeneralInformation(forms.ModelForm):
     country = forms.ModelChoiceField(
-        queryset=Country.objects.all(),
+        queryset=ALCBTCountryManager.get_alcbt_countries(),
         widget=forms.Select(
             attrs={
                 "id": "country-dropdown",
