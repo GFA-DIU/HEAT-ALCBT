@@ -6,7 +6,21 @@ from django.http import HttpResponse
 from .models.epd import MaterialCategory, EPD, Impact, EPDImpact, Label, EPDLabel
 from .models.assembly import Assembly, AssemblyCategory, AssemblyTechnique
 from .models.building import Building, BuildingCategory, BuildingSubcategory
+from .models.base import ALCBTCountryManager
 from .scripts.Excel_export.export_EPDs_to_excel import to_excel_bytes
+
+
+class CountryFieldMixin:
+    # Mixin to handle country field querysets in admin
+    use_all_countries = False
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "country":
+            if self.use_all_countries:
+                kwargs["queryset"] = ALCBTCountryManager.get_all_countries()
+            else:
+                kwargs["queryset"] = ALCBTCountryManager.get_alcbt_countries()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 admin.site.site_header = "BEAT Admin"
@@ -112,7 +126,8 @@ def export_epds_action(modeladmin, request, queryset):
 
 
 # Custom admin for EPD
-class EPDAdmin(admin.ModelAdmin):
+class EPDAdmin(CountryFieldMixin, admin.ModelAdmin):
+    use_all_countries = True
     inlines = [ImpactsInline, LabelsInline]  # Add the inline for impacts and labels
     list_display = ["name", "country", "category", "type"]  # Show all fields in list view
     list_display_links = ["name"]
@@ -130,7 +145,8 @@ class EPDAdmin(admin.ModelAdmin):
 
     
 # Custom admin for Assembly
-class AssemblyAdmin(admin.ModelAdmin):
+class AssemblyAdmin(CountryFieldMixin, admin.ModelAdmin):
+    use_all_countries = False
     inlines = [ProductsInline]  # Add the inline for products
     list_display = ["name", "country", "classification", "id"]
 
@@ -141,7 +157,8 @@ class AssemblyCategoryAdmin(admin.ModelAdmin):
     list_display = ["name", "tag"]
 
 # Custom admin for Building
-class BuildingAdmin(admin.ModelAdmin):
+class BuildingAdmin(CountryFieldMixin, admin.ModelAdmin):
+    use_all_countries = False  # Building admin shows only ALCBT countries
     inlines = [AssembliesInline, AssembliesSimulationInline, StructuralProductsInline, StructuralProductsSimulationInline]  # Add the inline for products
     list_display = ["name", "country", "category"]
     
