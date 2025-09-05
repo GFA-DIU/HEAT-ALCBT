@@ -72,8 +72,8 @@ def save_assembly(
                         "quantity", 1
                     ),  # Get quantity from POST data
                     "reporting_life_cycle": request.POST.get(
-                        "reporting_life_cycle"
-                    ),  # Get reporting_life_cycle from POST data
+                        "reporting_life_cycle", 50
+                    ),  # Get reporting_life_cycle from POST data, default to 50
                 },
             )
         else:
