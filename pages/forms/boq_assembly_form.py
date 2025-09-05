@@ -11,15 +11,15 @@ class BOQAssemblyForm(forms.ModelForm):
         widget=widgets.Textarea(attrs={"rows": 2}), required=False
     )
 
-    reporting_life_cycle = forms.IntegerField(
-        label="Life Span",
-        min_value=1,
-        max_value=10000,
-        help_text="Report in years",
-        required=True,
-        initial=50,
-        widget=forms.NumberInput(attrs={"class": "form-control", "type": "number"}),
-    )
+    # reporting_life_cycle = forms.IntegerField(
+    #     label="Life Span",
+    #     min_value=1,
+    #     max_value=10000,
+    #     help_text="Report in years",
+    #     required=True,
+    #     initial=50,
+    #     widget=forms.NumberInput(attrs={"class": "form-control", "type": "number"}),
+    # )
 
     class Meta:
         model = Assembly
@@ -38,8 +38,9 @@ class BOQAssemblyForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
         if kwargs.get("instance"):
-            self.fields["reporting_life_cycle"].initial = (
-                BuildingAssemblyModel.objects.get(
-                    assembly=self.instance, building__pk=building_id
-                ).reporting_life_cycle
-            )
+            pass
+            # self.fields["reporting_life_cycle"].initial = (
+            #     BuildingAssemblyModel.objects.get(
+            #         assembly=self.instance, building__pk=building_id
+            #     ).reporting_life_cycle
+            # )
