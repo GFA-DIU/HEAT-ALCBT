@@ -11,9 +11,15 @@ from pages.models.assembly import (
     AssemblyCategoryTechnique,
 )
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
+from pages.models.base import ALCBTCountryManager
 
 
 class AssemblyForm(forms.ModelForm):
+    country = forms.ModelChoiceField(
+        queryset=ALCBTCountryManager.get_alcbt_countries(),
+        label="Country",
+        required=True,
+    )
     comment = forms.CharField(
         widget=widgets.Textarea(attrs={"rows": 2}), required=False
     )
