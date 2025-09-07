@@ -26,19 +26,44 @@ def component_edit(request, building_id, assembly_id=None):
     """
     View to either edit an existing component or create a new one with pagination for EPDs.
     """
-    assembly, building, context = set_up_view(request, building_id, assembly_id)
+    # Check if this is template editing (special case)
+    # First check if template_edit parameter exists
+    template_edit_param = request.GET.get('template_edit') == 'true'
+    
+    # If we have template_edit param and assembly_id, check if it's actually a template
+    is_template_edit = False
+    if template_edit_param and assembly_id:
+        # Verify this assembly is actually a template owned by the user
+        try:
+            template_assembly = Assembly.objects.get(pk=assembly_id, is_template=True, created_by=request.user)
+            is_template_edit = True
+            logger.info(f"Confirmed template editing for assembly {assembly_id}")
+        except Assembly.DoesNotExist:
+            logger.warning(f"Assembly {assembly_id} is not a template or not owned by user {request.user}")
+            is_template_edit = False
+    
+    logger.info(f"Template edit check: template_edit param = {template_edit_param}, assembly_id = {assembly_id}, is_template_edit = {is_template_edit}")
+    
+    if is_template_edit:
+        # Handle template editing separately
+        assembly, building, context = set_up_template_edit_view(request, building_id, assembly_id)
+    else:
+        # Normal assembly editing
+        assembly, building, context = set_up_view(request, building_id, assembly_id)
+    
     logger.info(
-        "Building - Request method: %s, user: %s, building %s, assembly: %s, simulation: %s",
+        "Building - Request method: %s, user: %s, building %s, assembly: %s, simulation: %s, template_edit: %s",
         request.method,
         request.user,
         building,
         assembly,
         context["simulation"],
+        is_template_edit,
     )
 
     if request.method == "POST" and request.POST.get("action") == "form_submission":
         return handle_assembly_submission(
-            request, assembly, building, context["simulation"]
+            request, assembly, building, context["simulation"], is_template_edit
         )
 
     # Update EPD List
@@ -80,6 +105,32 @@ def component_edit(request, building_id, assembly_id=None):
     return render(request, "pages/assembly/editor_own_page.html", context)
 
 
+def set_up_template_edit_view(request, building_id, assembly_id):
+    """Fetch objects and create baseline context for template editing."""
+    simulation = request.GET.get("simulation") == "True"
+    
+    # Get the assembly template directly (no BuildingAssembly relationship)
+    assembly = get_object_or_404(Assembly, pk=assembly_id, is_template=True, created_by=request.user)
+    
+    # For template editing, we don't need a real building - use a dummy or None
+    building = None
+    
+    epd_list, dimension = get_epd_list(request, assembly.dimension if assembly else AssemblyDimension.AREA, operational=False)
+    
+    req = request.POST if request.method == "POST" else request.GET
+    context = {
+        "assembly_id": assembly_id,
+        "building_id": building_id,  # Keep the dummy building_id for URL consistency
+        "filters": req,
+        "epd_list": epd_list,
+        "epd_filters_form": EPDsFilterForm(req),
+        "dimension": dimension,
+        "simulation": simulation,
+        "template_edit": True,  # Flag to indicate template editing mode
+    }
+    return assembly, building, context
+
+
 def set_up_view(request, building_id, assembly_id):
     """Fetch objects and create baseline context."""
     simulation = request.GET.get("simulation") == "True"
@@ -116,13 +167,17 @@ def set_up_view(request, building_id, assembly_id):
     return assembly, building, context
 
 
-def handle_assembly_submission(request, assembly, building, simulation):
+def handle_assembly_submission(request, assembly, building, simulation, is_template_edit=False):
     save_assembly(request, assembly, building, simulation)
     # The redirect shortcut is not working properly with HTMX
     # return redirect("building", building_id=building_instance.id)
     # instead use the following:
     response = JsonResponse({"message": "Redirecting"})
-    if simulation:
+    
+    if is_template_edit:
+        # Redirect to template management page after editing template
+        response["HX-Redirect"] = reverse("assembly_template_management")
+    elif simulation:
         response["HX-Redirect"] = reverse(
             "building_simulation", kwargs={"building_id": building.pk}
         )

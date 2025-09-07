@@ -64,11 +64,13 @@ def _delete_building(building_id):
     )
 
     # Find and delete associated assemblies with AssemblyMode.CUSTOM
+    # But preserve assemblies that are templates (should not be deleted when building is deleted)
     assemblies_to_delete = Assembly.objects.filter(
             id__in=assemblies_list,
-            mode=AssemblyMode.CUSTOM
+            mode=AssemblyMode.CUSTOM,
+            is_template=False  # Only delete non-template assemblies
         )
-    logger.info("Delete %s out of %s assemblies from building %s", len(assemblies_list), len(assemblies_to_delete), building_id)
+    logger.info("Delete %s out of %s assemblies from building %s (templates preserved)", len(assemblies_to_delete), len(assemblies_list), building_id)
     assemblies_to_delete.delete()
     
     

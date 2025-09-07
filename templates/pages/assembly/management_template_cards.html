@@ -2,15 +2,22 @@
 
 {% if user_templates %}
 <div class="mb-4">
-    <h6 class="text-primary mb-3">Your Templates</h6>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="text-primary mb-0">Your Templates</h5>
+        <span class="badge bg-primary">{{ user_templates.paginator.count }} template{{ user_templates.paginator.count|pluralize }}</span>
+    </div>
+    
     <div class="row">
         {% for template in user_templates %}
-        <div class="col-lg-6 mb-3">
-            <div class="card h-100">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100" data-template-id="{{ template.id }}" data-template-name="{{ template.name }}">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="card-title mb-0">{{ template.name }}</h6>
-                        {% if template.created_by == request.user and is_management_view %}
+                        <div class="d-flex align-items-center">
+                            <input type="checkbox" class="form-check-input template-checkbox me-2" 
+                                   onchange="toggleTemplateSelection('{{ template.id }}', this)">
+                            <h6 class="card-title mb-0">{{ template.name }}</h6>
+                        </div>
                         <div class="dropdown">
                             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-ellipsis-v"></i>
@@ -34,55 +41,88 @@
                                 </li>
                             </ul>
                         </div>
-                        {% endif %}
                     </div>
-                    <div class="small text-muted mb-2">
+                    
+                    <div class="small text-muted mb-3">
                         <div><strong>Category:</strong> {{ template.classification.category|default:"Not specified" }}</div>
                         <div><strong>Technique:</strong> {{ template.classification.technique|default:"Not specified" }}</div>
                         <div><strong>Dimension:</strong> {{ template.get_dimension_display }}</div>
                         <div><strong>Materials:</strong> {{ template.structuralproduct_set.count }} item{{ template.structuralproduct_set.count|pluralize }}</div>
+                        <div><strong>Country:</strong> {{ template.country.name|default:"Not specified" }}</div>
+                        <div><strong>Created:</strong> {{ template.created_at|date:"M d, Y" }}</div>
                     </div>
+                    
                     {% if template.comment %}
-                    <p class="card-text small">{{ template.comment|truncatewords:20 }}</p>
+                    <p class="card-text small mb-3">{{ template.comment|truncatewords:15 }}</p>
                     {% endif %}
                     
-                    {% if not is_management_view and building_id %}
-                    <form hx-post="{% url 'copy_template' building_id=building_id template_id=template.id %}" class="mt-3">
-                        {% csrf_token %}
-                        <input type="hidden" name="simulation" value="{{ simulation }}">
-                        
-                        <div class="mb-2">
-                            <label class="form-label small">Quantity</label>
-                            <div class="input-group input-group-sm">
-                                <input type="number" name="quantity" class="form-control" value="1" step="0.01" min="0" required>
-                                <span class="input-group-text">{{ template.get_dimension_display }}</span>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-sm w-100">
-                            Use This Template
-                        </button>
-                    </form>
-                    {% endif %}
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-success">
+                            <i class="fas fa-check me-1"></i>Template Active
+                        </span>
+                        {% if template.mode == 'generic' %}
+                        <span class="badge bg-info">
+                            <i class="fas fa-globe me-1"></i>Generic
+                        </span>
+                        {% else %}
+                        <span class="badge bg-secondary">
+                            <i class="fas fa-user me-1"></i>Custom
+                        </span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    
+    <!-- Pagination for user templates -->
+    {% if user_templates.has_other_pages %}
+    <nav aria-label="Template pagination" class="mb-4">
+        <ul class="pagination justify-content-center">
+            {% if user_templates.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">&laquo; First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ user_templates.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+            
+            <li class="page-item active">
+                <span class="page-link">
+                    Page {{ user_templates.number }} of {{ user_templates.paginator.num_pages }}
+                </span>
+            </li>
+            
+            {% if user_templates.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ user_templates.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ user_templates.paginator.num_pages }}">Last &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 {% endif %}
 
 {% if generic_templates %}
 <div class="mb-4">
-    <h6 class="text-success mb-3">Generic Templates</h6>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="text-success mb-0">Generic Templates</h5>
+        <span class="small text-muted">Showing first 6 generic templates</span>
+    </div>
+    
     <div class="row">
         {% for template in generic_templates %}
-        <div class="col-lg-6 mb-3">
-            <div class="card h-100">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-success">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <h6 class="card-title mb-0">{{ template.name }}</h6>
-                        {% if is_management_view %}
                         <div class="dropdown">
                             <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-ellipsis-v"></i>
@@ -95,36 +135,28 @@
                                 </li>
                             </ul>
                         </div>
-                        {% endif %}
                     </div>
-                    <div class="small text-muted mb-2">
+                    
+                    <div class="small text-muted mb-3">
                         <div><strong>Category:</strong> {{ template.classification.category|default:"Not specified" }}</div>
                         <div><strong>Technique:</strong> {{ template.classification.technique|default:"Not specified" }}</div>
                         <div><strong>Dimension:</strong> {{ template.get_dimension_display }}</div>
                         <div><strong>Materials:</strong> {{ template.structuralproduct_set.count }} item{{ template.structuralproduct_set.count|pluralize }}</div>
+                        <div><strong>Country:</strong> {{ template.country.name|default:"Global" }}</div>
                     </div>
+                    
                     {% if template.comment %}
-                    <p class="card-text small">{{ template.comment|truncatewords:20 }}</p>
+                    <p class="card-text small mb-3">{{ template.comment|truncatewords:15 }}</p>
                     {% endif %}
                     
-                    {% if not is_management_view and building_id %}
-                    <form hx-post="{% url 'copy_template' building_id=building_id template_id=template.id %}" class="mt-3">
-                        {% csrf_token %}
-                        <input type="hidden" name="simulation" value="{{ simulation }}">
-                        
-                        <div class="mb-2">
-                            <label class="form-label small">Quantity</label>
-                            <div class="input-group input-group-sm">
-                                <input type="number" name="quantity" class="form-control" value="1" step="0.01" min="0" required>
-                                <span class="input-group-text">{{ template.get_dimension_display }}</span>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success btn-sm w-100">
-                            Use This Template
-                        </button>
-                    </form>
-                    {% endif %}
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-success">
+                            <i class="fas fa-globe me-1"></i>Generic Template
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-eye me-1"></i>Read Only
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -134,16 +166,43 @@
 {% endif %}
 
 {% if not user_templates and not generic_templates %}
-<div class="text-center text-muted">
-    <p>No assembly templates match your current filters.</p>
-    <p class="small">Try adjusting your search criteria or create assemblies and mark them as templates!</p>
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="fas fa-layer-group fa-3x text-muted"></i>
+    </div>
+    <h4 class="text-muted mb-3">No Templates Found</h4>
+    <p class="text-muted mb-4">You haven't created any templates yet, or no templates match your current filters.</p>
+    <div class="d-flex gap-2 justify-content-center">
+        <a href="{% url 'home' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Create Your First Assembly
+        </a>
+        <button type="button" class="btn btn-outline-secondary" onclick="document.querySelector('form').reset(); document.querySelector('form').submit();">
+            <i class="fas fa-filter me-2"></i>Clear Filters
+        </button>
+    </div>
+</div>
+{% elif not user_templates %}
+<div class="text-center py-4 mb-4">
+    <div class="mb-3">
+        <i class="fas fa-user-plus fa-2x text-muted"></i>
+    </div>
+    <h5 class="text-muted mb-2">No Personal Templates</h5>
+    <p class="text-muted mb-3">Create assemblies in your buildings and mark them as templates to reuse them.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Go to Buildings
+    </a>
 </div>
 {% endif %}
 
 <script>
 function refreshTemplateCards() {
+    // Clear selection when refreshing
+    if (typeof clearSelection === 'function') {
+        clearSelection();
+    }
+    
     // Find the filter form and trigger it to refresh the cards
-    const templateForm = document.querySelector('form[hx-target="#template-cards"]');
+    const templateForm = document.querySelector('form[hx-target="#template-management-cards"]');
     if (templateForm) {
         htmx.trigger(templateForm, 'submit');
     } else {

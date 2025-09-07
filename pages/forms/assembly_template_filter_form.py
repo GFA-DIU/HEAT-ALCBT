@@ -7,6 +7,7 @@ from crispy_forms.bootstrap import Accordion, AccordionGroup
 from cities_light.models import Country
 
 from pages.models.assembly import AssemblyCategory, AssemblyTechnique, AssemblyDimension
+from pages.models.base import ALCBTCountryManager
 
 
 class AssemblyTemplateFilterForm(forms.Form):
@@ -36,7 +37,7 @@ class AssemblyTemplateFilterForm(forms.Form):
     )
     
     country = forms.ModelChoiceField(
-        queryset=Country.objects.all().order_by("name"),
+        queryset=ALCBTCountryManager.get_alcbt_countries(),
         label="Country",
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})

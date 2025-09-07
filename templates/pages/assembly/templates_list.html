@@ -29,6 +29,11 @@
 </div>
 
 <div class="modal-footer">
+    <div class="me-auto">
+        <a href="{% url 'assembly_template_management' %}" class="btn btn-outline-info btn-sm">
+            <i class="fas fa-cog me-1"></i>Manage All Templates
+        </a>
+    </div>
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
     <a href="{% url 'component' building_id=building_id %}?simulation={{ simulation }}" 
        class="btn btn-outline-primary"

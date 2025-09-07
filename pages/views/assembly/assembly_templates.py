@@ -76,9 +76,8 @@ def copy_template(request, building_id, template_id):
         BuildingAssemblyModel = BuildingAssembly
     
     try:
-        # Get quantity and life cycle from form or use defaults
+        # Get quantity from form or use default
         quantity = float(request.POST.get('quantity', 1.0))
-        reporting_life_cycle = int(request.POST.get('reporting_life_cycle', 50))
         
         # Create copy of template
         new_assembly = template.copy_as_template_instance(
@@ -86,12 +85,12 @@ def copy_template(request, building_id, template_id):
             user=request.user
         )
         
-        # Add the new assembly to the building
+        # Add the new assembly to the building with default reporting_life_cycle of 50
         building_assembly = BuildingAssemblyModel.objects.create(
             building=building,
             assembly=new_assembly,
             quantity=quantity,
-            reporting_life_cycle=reporting_life_cycle,
+            reporting_life_cycle=50,  # Default value as per CLAUDE.md instructions
         )
         
         logger.info(
