@@ -26,7 +26,9 @@ class AssemblyTemplateFilterForm(forms.Form):
         ],
         label="Template Type",
         required=False,
-        widget=forms.Select(attrs={'class': 'form-select'})
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        })
     )
     
     dimension = forms.ChoiceField(
@@ -47,7 +49,7 @@ class AssemblyTemplateFilterForm(forms.Form):
         queryset=AssemblyCategory.objects.all().order_by("tag"),
         widget=forms.Select(
             attrs={
-                "hx-get": "/select_lists/",  # HTMX request to update techniques
+                "hx-get": "/select_lists/",
                 "hx-trigger": "change",
                 "hx-target": "#template-technique",
                 "class": "select form-select",
@@ -58,7 +60,7 @@ class AssemblyTemplateFilterForm(forms.Form):
     )
     
     technique = forms.ModelChoiceField(
-        queryset=AssemblyTechnique.objects.none(),  # Start with empty queryset
+        queryset=AssemblyTechnique.objects.none(),
         widget=forms.Select(
             attrs={
                 "id": "template-technique",
@@ -109,7 +111,7 @@ class AssemblyTemplateFilterForm(forms.Form):
                 ),
             ),
             Div(
-                Submit("filter", "Apply Filters", css_class="btn btn-primary"),
+                Submit("filter", "Search", css_class="btn btn-primary"),
                 css_class="mt-3"
             ),
         )

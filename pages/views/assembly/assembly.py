@@ -3,7 +3,7 @@ import logging
 
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
@@ -22,37 +22,41 @@ logger = logging.getLogger(__name__)
 
 @login_required
 @require_http_methods(["GET", "POST", "DELETE"])
-def component_edit(request, building_id, assembly_id=None):
+def component_edit(request, assembly_id=None, building_id=None):
     """
     View to either edit an existing component or create a new one with pagination for EPDs.
     """
-    # Check if this is template editing (special case)
-    # First check if template_edit parameter exists
-    template_edit_param = request.GET.get('template_edit') == 'true'
-    
-    # If we have template_edit param and assembly_id, check if it's actually a template
-    is_template_edit = False
-    if template_edit_param and assembly_id:
-        # Verify this assembly is actually a template owned by the user
+    # Handle template editing case when building_id is None
+    if building_id is None:
+        building_id = '00000000-0000-0000-0000-000000000000'
+        is_template_edit = True
+        logger.info(f"Template editing mode detected for assembly {assembly_id}")
+    else:
+        # Check if this is template editing
+        template_edit_param = request.GET.get('template_edit') == 'true'
+        is_dummy_building = str(building_id) == '00000000-0000-0000-0000-000000000000'
+        is_template_edit = template_edit_param or is_dummy_building
+
+    # Verify template ownership when editing template
+    if is_template_edit and assembly_id:
         try:
-            template_assembly = Assembly.objects.get(pk=assembly_id, is_template=True, created_by=request.user)
-            is_template_edit = True
+            Assembly.objects.get(pk=assembly_id, is_template=True, created_by=request.user)
             logger.info(f"Confirmed template editing for assembly {assembly_id}")
         except Assembly.DoesNotExist:
-            logger.warning(f"Assembly {assembly_id} is not a template or not owned by user {request.user}")
-            is_template_edit = False
-    
-    logger.info(f"Template edit check: template_edit param = {template_edit_param}, assembly_id = {assembly_id}, is_template_edit = {is_template_edit}")
-    
+            logger.error(
+                f"Template edit failed: Assembly {assembly_id} is not a template or not owned by user {request.user}")
+
+            return redirect('assembly_template_management')
+
+    logger.info(f"Template edit mode: {is_template_edit}, assembly_id: {assembly_id}")
+
     if is_template_edit:
-        # Handle template editing separately
         assembly, building, context = set_up_template_edit_view(request, building_id, assembly_id)
     else:
-        # Normal assembly editing
         assembly, building, context = set_up_view(request, building_id, assembly_id)
-    
+
     logger.info(
-        "Building - Request method: %s, user: %s, building %s, assembly: %s, simulation: %s, template_edit: %s",
+        "Request method: %s, user: %s, building %s, assembly: %s, simulation: %s, template_edit: %s",
         request.method,
         request.user,
         building,
@@ -66,7 +70,6 @@ def component_edit(request, building_id, assembly_id=None):
             request, assembly, building, context["simulation"], is_template_edit
         )
 
-    # Update EPD List
     elif (
         request.method == "GET"
         and request.GET.get("page")
@@ -74,12 +77,10 @@ def component_edit(request, building_id, assembly_id=None):
         and request.POST.get("action") == "filter"
     ):
         # Handle partial rendering for HTMX
-        # Does not need own logic since filtering is also part of full-load
         return render(request, "pages/assembly/epd_list.html", context)
 
     # Open Modal in Building View
     elif request.method == "GET" and request.GET.get("add_component") == "step_1":
-        # TODO: Only makes sense for new component, maybe make part of Building view?
         return render(request, "pages/assembly/modal_step_1.html", context)
 
     elif request.method == "POST" and request.POST.get("action") == "select_epd":
@@ -89,9 +90,7 @@ def component_edit(request, building_id, assembly_id=None):
 
         epd = get_object_or_404(EPD, pk=epd_id)
         epd.selection_quantity = 1
-        epd.selection_text, epd.selection_unit = epd.get_epd_info(
-            dimension
-        )
+        epd.selection_text, epd.selection_unit = epd.get_epd_info(dimension)
         epd.timestamp = datetime.now().strftime("%Y%m%d%H%M%S%f")
         return render(request, "pages/assembly/selected_epd.html", {"epd": epd})
 
@@ -99,20 +98,20 @@ def component_edit(request, building_id, assembly_id=None):
         return HttpResponse()
 
     else:
-        context = handle_assembly_load(building_id, assembly, context)
+        if not is_template_edit:
+            context = handle_assembly_load(building_id, assembly, context)
+        else:
+            context = handle_template_assembly_load(assembly, context)
 
-    # Render full template for non-HTMX requests
     return render(request, "pages/assembly/editor_own_page.html", context)
 
-
 def set_up_template_edit_view(request, building_id, assembly_id):
-    """Fetch objects and create baseline context for template editing."""
     simulation = request.GET.get("simulation") == "True"
     
     # Get the assembly template directly (no BuildingAssembly relationship)
     assembly = get_object_or_404(Assembly, pk=assembly_id, is_template=True, created_by=request.user)
     
-    # For template editing, we don't need a real building - use a dummy or None
+    # For template editing, we don't need a real building
     building = None
     
     epd_list, dimension = get_epd_list(request, assembly.dimension if assembly else AssemblyDimension.AREA, operational=False)
@@ -161,19 +160,17 @@ def set_up_view(request, building_id, assembly_id):
         "filters": req,
         "epd_list": epd_list,
         "epd_filters_form": EPDsFilterForm(req),
-        "dimension": dimension,  # Is also required for full reload
+        "dimension": dimension,
         "simulation": simulation,
     }
     return assembly, building, context
 
 
 def handle_assembly_submission(request, assembly, building, simulation, is_template_edit=False):
-    save_assembly(request, assembly, building, simulation)
-    # The redirect shortcut is not working properly with HTMX
-    # return redirect("building", building_id=building_instance.id)
-    # instead use the following:
+    save_assembly(request, assembly, building, simulation, is_template_edit=is_template_edit)
+
     response = JsonResponse({"message": "Redirecting"})
-    
+
     if is_template_edit:
         # Redirect to template management page after editing template
         response["HX-Redirect"] = reverse("assembly_template_management")
@@ -187,7 +184,6 @@ def handle_assembly_submission(request, assembly, building, simulation, is_templ
         )
 
     return response
-
 
 def handle_assembly_load(building_id, assembly, context):
     if assembly:
@@ -209,6 +205,37 @@ def handle_assembly_load(building_id, assembly, context):
         ]
     context["form"] = AssemblyForm(
         instance=assembly, building_id=building_id, simulation=context.get("simulation")
+    )
+    context["dimension"] = assembly.dimension if assembly else AssemblyDimension.AREA
+
+    return context
+
+
+def handle_template_assembly_load(assembly, context):
+    if assembly:
+        products = (
+            StructuralProduct.objects
+            .filter(assembly=assembly)
+            .select_related(
+                "epd",
+                "epd__category",
+                "epd__country",
+                "classification",
+            )
+        )
+
+        selected_epds = [SelectedEPD.parse_product(p) for p in products]
+        context["selected_epds"] = selected_epds
+        context["selected_epds_ids"] = [
+            selected_epd.id for selected_epd in selected_epds
+        ]
+
+    # For templates, we use dummy building_id and set template_edit=True to avoid BuildingAssembly lookup
+    context["form"] = AssemblyForm(
+        instance=assembly,
+        building_id='00000000-0000-0000-0000-000000000000',
+        simulation=context.get("simulation"),
+        template_edit=True
     )
     context["dimension"] = assembly.dimension if assembly else AssemblyDimension.AREA
 

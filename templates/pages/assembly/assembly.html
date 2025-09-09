@@ -1,5 +1,7 @@
 {% load crispy_forms_tags %}
-{% if assembly_id %}
+{% if template_edit %}
+<form hx-post="{% url 'template_edit' assembly_id=assembly_id %}?simulation={{simulation}}">
+{% elif assembly_id %}
 <form hx-post="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}?simulation={{simulation}}">
 {% else %}
 <form hx-post="{% url 'component' building_id=building_id %}?simulation={{simulation}}">

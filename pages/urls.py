@@ -52,6 +52,11 @@ urlpatterns = [
         component_edit,
         name="component_edit",
     ),  # For editing an existing component
+    path(
+        "template-edit/<uuid:assembly_id>/",
+        component_edit,
+        name="template_edit",
+),
     path("boq/<uuid:building_id>/_new", boq_edit, name="boq"),
     path(
         "boq/<uuid:assembly_id>/<uuid:building_id>/",

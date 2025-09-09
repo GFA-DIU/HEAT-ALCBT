@@ -151,6 +151,11 @@ class Assembly(BaseModel):
         default=False,
         help_text=_("Mark this assembly as a template that can be reused in other buildings")
     )
+    is_public = models.BooleanField(
+        _("Public template"),
+        default=False,
+        help_text=_("Make this template available to all users as a generic template")
+    )
 
     def __str__(self):
         return self.name

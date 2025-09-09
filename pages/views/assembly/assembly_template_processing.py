@@ -9,7 +9,7 @@ from pages.models.assembly import Assembly
 @dataclass
 class ProcessedAssemblyTemplate:
     """Dataclass to hold processed assembly template information for display."""
-    
+
     id: str
     name: str
     mode: str
@@ -24,6 +24,7 @@ class ProcessedAssemblyTemplate:
     material_count: int
     created_at: str
     is_template: bool
+    is_public: bool
 
 
 class AssemblyTemplateLazyProcessor:
@@ -31,7 +32,7 @@ class AssemblyTemplateLazyProcessor:
     Lazy processor for Assembly templates to handle efficient pagination
     and preprocessing of template data for display.
     """
-    
+
     def __init__(self, queryset):
         self.queryset = queryset
 
@@ -40,8 +41,13 @@ class AssemblyTemplateLazyProcessor:
             yield self.template_processing(template)
 
     def __len__(self):
-        # Use the queryset's count method to avoid full evaluation
-        return self.queryset.count()
+        # Handle both querysets and lists
+        if hasattr(self.queryset, 'model') and hasattr(self.queryset, 'count'):
+            # This is a Django queryset - use the count method to avoid full evaluation
+            return self.queryset.count()
+        else:
+            # This is a list or other iterable - use len()
+            return len(self.queryset)
 
     def __getitem__(self, index):
         """
@@ -69,10 +75,10 @@ class AssemblyTemplateLazyProcessor:
 
     def template_processing(self, template: Assembly):
         """Encapsulates the logic for preprocessing Assembly templates."""
-        
+
         # Get first classification for display
         classification = template.classification
-        
+
         return ProcessedAssemblyTemplate(
             id=str(template.pk),
             name=template.name,
@@ -88,27 +94,28 @@ class AssemblyTemplateLazyProcessor:
             material_count=len(getattr(template, 'prefetched_products', [])) if hasattr(template, 'prefetched_products') else template.structuralproduct_set.count(),
             created_at=template.created_at.strftime("%B %d, %Y") if template.created_at else "",
             is_template=template.is_template,
+            is_public=template.is_public,
         )
 
 
 def get_paginated_templates(queryset, page_number=1, per_page=12):
     """
     Get paginated assembly templates with lazy processing.
-    
+
     Args:
         queryset: Assembly queryset
         page_number: Page number to retrieve
         per_page: Number of items per page
-        
+
     Returns:
         Paginated Page object with processed templates
     """
     # Prefetch related data for efficiency
     prefetched_queryset = prefetch_assembly_templates(queryset)
-    
+
     # Create lazy processor
     lazy_queryset = AssemblyTemplateLazyProcessor(prefetched_queryset)
-    
+
     # Setup pagination
     paginator = Paginator(lazy_queryset, per_page)
     return paginator.get_page(page_number)
@@ -119,7 +126,7 @@ def prefetch_assembly_templates(templates):
     Prefetch related data for Assembly templates to improve performance.
     """
     from pages.models.assembly import StructuralProduct
-    
+
     return (
         templates
         .select_related(

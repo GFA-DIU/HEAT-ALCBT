@@ -2,235 +2,141 @@
 
 {% if user_templates %}
 <div class="mb-4">
-    <h6 class="text-primary mb-3">Your Templates</h6>
-    <div class="row">
+    <!-- All Templates List -->
+    <ul class="list-group">
         {% for template in user_templates %}
-        <div class="col-lg-6 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="card-title mb-0">{{ template.name }}</h6>
-                        {% if template.created_by == request.user and is_management_view %}
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'component_edit' assembly_id=template.id building_id='00000000-0000-0000-0000-000000000000' %}?template_edit=true">
-                                        <i class="fas fa-edit me-2"></i>Edit Template
-                                    </a>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item" onclick="duplicateTemplate('{{ template.id }}', '{{ template.name }}')">
-                                        <i class="fas fa-copy me-2"></i>Duplicate
-                                    </button>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <button class="dropdown-item text-danger" onclick="deleteTemplate('{{ template.id }}', '{{ template.name }}')">
-                                        <i class="fas fa-trash me-2"></i>Delete
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
+        <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ template.id }}">
+            <div class="col-10">
+                <h6 class="mb-1" title="{{ template.name }}">{{ template.name|truncatechars:75 }}</h6>
+                <div class="row">
+                    <span class="text-muted col-3">{{ template.country_name|default:"Not specified" }}</span>
+                    <div class="col gap-3">
+                        <span class="badge border bg-transparent rounded-pill" style="border-color: #6f42c1 !important; color: #6f42c1;">{{ template.category_name|default:"Not specified" }}</span>
+                        <span class="badge border border-dark text-dark bg-transparent rounded-pill">{{ template.dimension_display }}</span>
+                        <span class="badge border border-info text-info bg-transparent rounded-pill">{{ template.material_count }} material{{ template.material_count|pluralize }}</span>
+                        {% if template.technique_name %}
+                            <span class="badge border border-secondary text-secondary bg-transparent rounded-pill">{{ template.technique_name }}</span>
                         {% endif %}
                     </div>
-                    <div class="small text-muted mb-2">
-                        <div><strong>Category:</strong> {{ template.classification.category|default:"Not specified" }}</div>
-                        <div><strong>Technique:</strong> {{ template.classification.technique|default:"Not specified" }}</div>
-                        <div><strong>Dimension:</strong> {{ template.get_dimension_display }}</div>
-                        <div><strong>Materials:</strong> {{ template.structuralproduct_set.count }} item{{ template.structuralproduct_set.count|pluralize }}</div>
-                    </div>
-                    {% if template.comment %}
-                    <p class="card-text small">{{ template.comment|truncatewords:20 }}</p>
-                    {% endif %}
-                    
-                    {% if not is_management_view and building_id %}
-                    <form hx-post="{% url 'copy_template' building_id=building_id template_id=template.id %}" class="mt-3">
-                        {% csrf_token %}
-                        <input type="hidden" name="simulation" value="{{ simulation }}">
-                        
-                        <div class="mb-2">
-                            <label class="form-label small">Quantity</label>
-                            <div class="input-group input-group-sm">
-                                <input type="number" name="quantity" class="form-control" value="1" step="0.01" min="0" required>
-                                <span class="input-group-text">{{ template.get_dimension_display }}</span>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-sm w-100">
-                            Use This Template
-                        </button>
-                    </form>
-                    {% endif %}
                 </div>
             </div>
-        </div>
+            <div class="ms-auto d-flex flex-column gap-2">
+                {% if template.is_public %}
+                    <span class="badge rounded-pill bg-secondary text-dark fw-bold">Generic</span>
+                {% endif %}
+                {% if not is_management_view and building_id %}
+                <form hx-post="{% url 'copy_template' building_id=building_id template_id=template.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="simulation" value="{{ simulation }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button class="btn btn-primary btn-sm" type="submit">
+                        Use
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </li>
         {% endfor %}
-    </div>
+    </ul>
 </div>
 {% endif %}
 
-{% if generic_templates %}
-<div class="mb-4">
-    <h6 class="text-success mb-3">Generic Templates</h6>
-    <div class="row">
-        {% for template in generic_templates %}
-        <div class="col-lg-6 mb-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="card-title mb-0">{{ template.name }}</h6>
-                        {% if is_management_view %}
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <button class="dropdown-item" onclick="duplicateTemplate('{{ template.id }}', '{{ template.name }}')">
-                                        <i class="fas fa-copy me-2"></i>Copy to My Templates
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="small text-muted mb-2">
-                        <div><strong>Category:</strong> {{ template.classification.category|default:"Not specified" }}</div>
-                        <div><strong>Technique:</strong> {{ template.classification.technique|default:"Not specified" }}</div>
-                        <div><strong>Dimension:</strong> {{ template.get_dimension_display }}</div>
-                        <div><strong>Materials:</strong> {{ template.structuralproduct_set.count }} item{{ template.structuralproduct_set.count|pluralize }}</div>
-                    </div>
-                    {% if template.comment %}
-                    <p class="card-text small">{{ template.comment|truncatewords:20 }}</p>
-                    {% endif %}
-                    
-                    {% if not is_management_view and building_id %}
-                    <form hx-post="{% url 'copy_template' building_id=building_id template_id=template.id %}" class="mt-3">
-                        {% csrf_token %}
-                        <input type="hidden" name="simulation" value="{{ simulation }}">
-                        
-                        <div class="mb-2">
-                            <label class="form-label small">Quantity</label>
-                            <div class="input-group input-group-sm">
-                                <input type="number" name="quantity" class="form-control" value="1" step="0.01" min="0" required>
-                                <span class="input-group-text">{{ template.get_dimension_display }}</span>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success btn-sm w-100">
-                            Use This Template
-                        </button>
-                    </form>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
-
-{% if not user_templates and not generic_templates %}
-<div class="text-center text-muted">
-    <p>No assembly templates match your current filters.</p>
+{% if not user_templates %}
+<div class="text-center text-muted py-4">
+    <i class="fas fa-layer-group fa-2x mb-3"></i>
+    <p class="mb-1">No assembly templates match your current filters.</p>
     <p class="small">Try adjusting your search criteria or create assemblies and mark them as templates!</p>
 </div>
 {% endif %}
 
-<script>
-function refreshTemplateCards() {
-    // Find the filter form and trigger it to refresh the cards
-    const templateForm = document.querySelector('form[hx-target="#template-cards"]');
-    if (templateForm) {
-        htmx.trigger(templateForm, 'submit');
-    } else {
-        // Fallback to page reload if form not found
-        location.reload();
-    }
-}
+<!-- Pagination -->
+<div class="mt-3">
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            <!-- Jump to First Button -->
+            {% if user_templates.has_previous %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" 
+                   hx-post="{% url 'assembly_templates' building_id=building_id %}?page=1&simulation={{ simulation }}&search_query={{ filters.search_query }}&country={{ filters.country }}&template_type={{ filters.template_type }}&category={{ filters.category }}&technique={{ filters.technique }}&dimension={{ filters.dimension }}" 
+                   hx-target="#template-cards" 
+                   hx-swap="innerHTML"
+                   hx-vals='{"action": "filter"}' 
+                   aria-label="First">
+                    <span aria-hidden="true">Start</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">Start</span>
+            </li>
+            {% endif %}
 
-function duplicateTemplate(templateId, templateName) {
-    if (confirm(`Do you want to duplicate "${templateName}" template?`)) {
-        fetch(`/template-management/duplicate/${templateId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `new_name=${encodeURIComponent(templateName + ' (Copy)')}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert('Error: ' + data.error);
-            } else {
-                alert(data.message);
-                refreshTemplateCards();
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while duplicating the template');
-        });
-    }
-}
+            <!-- Previous Button -->
+            {% if user_templates.has_previous %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" 
+                   hx-post="{% url 'assembly_templates' building_id=building_id %}?page={{ user_templates.previous_page_number }}&simulation={{ simulation }}&search_query={{ filters.search_query }}&country={{ filters.country }}&template_type={{ filters.template_type }}&category={{ filters.category }}&technique={{ filters.technique }}&dimension={{ filters.dimension }}" 
+                   hx-target="#template-cards" 
+                   hx-swap="innerHTML"
+                   hx-vals='{"action": "filter"}' 
+                   aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+            </li>
+            {% endif %}
 
-function deleteTemplate(templateId, templateName) {
-    if (confirm(`Are you sure you want to delete "${templateName}" template?`)) {
-        fetch(`/template-management/delete/${templateId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'force_delete=false'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.warning) {
-                if (confirm(data.message + '\n\nThis will create separate copies for each building. Continue?')) {
-                    // Force delete with confirmation
-                    return fetch(`/template-management/delete/${templateId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'force_delete=true'
-                    });
-                }
-                return null;
-            } else if (data.error) {
-                alert('Error: ' + data.error);
-            } else {
-                alert(data.message);
-                refreshTemplateCards();
-            }
-            return null;
-        })
-        .then(response => {
-            if (response) {
-                return response.json();
-            }
-            return null;
-        })
-        .then(data => {
-            if (data) {
-                if (data.error) {
-                    alert('Error: ' + data.error);
-                } else {
-                    alert(data.message);
-                    refreshTemplateCards();
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the template');
-        });
-    }
-}
-</script>
+            <!-- Page Numbers -->
+            {% for num in user_templates.paginator.page_range %}
+                {% if num >= user_templates.number|add:-2 and num <= user_templates.number|add:2 %}
+                <li class="page-item {% if num == user_templates.number %}active{% endif %}">
+                    <a class="page-link" style="cursor: pointer" 
+                       hx-post="{% url 'assembly_templates' building_id=building_id %}?page={{ num }}&simulation={{ simulation }}&search_query={{ filters.search_query }}&country={{ filters.country }}&template_type={{ filters.template_type }}&category={{ filters.category }}&technique={{ filters.technique }}&dimension={{ filters.dimension }}" 
+                       hx-target="#template-cards" 
+                       hx-swap="innerHTML"
+                       hx-vals='{"action": "filter"}'>{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Next Button -->
+            {% if user_templates.has_next %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" 
+                   hx-post="{% url 'assembly_templates' building_id=building_id %}?page={{ user_templates.next_page_number }}&simulation={{ simulation }}&search_query={{ filters.search_query }}&country={{ filters.country }}&template_type={{ filters.template_type }}&category={{ filters.category }}&technique={{ filters.technique }}&dimension={{ filters.dimension }}" 
+                   hx-target="#template-cards" 
+                   hx-swap="innerHTML"
+                   hx-vals='{"action": "filter"}' 
+                   aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+            </li>
+            {% endif %}
+
+            <!-- Jump to Last Button -->
+            {% if user_templates.has_next %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" 
+                   hx-post="{% url 'assembly_templates' building_id=building_id %}?page={{ user_templates.paginator.num_pages }}&simulation={{ simulation }}&search_query={{ filters.search_query }}&country={{ filters.country }}&template_type={{ filters.template_type }}&category={{ filters.category }}&technique={{ filters.technique }}&dimension={{ filters.dimension }}" 
+                   hx-target="#template-cards" 
+                   hx-swap="innerHTML"
+                   hx-vals='{"action": "filter"}' 
+                   aria-label="Last">
+                    <span aria-hidden="true">End</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">End</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
