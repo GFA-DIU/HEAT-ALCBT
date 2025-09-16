@@ -1,0 +1,49 @@
+<div class="flex items-center gap-2 p-2 rounded-lg bg-base-300 mb-10">
+  <span>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+    >
+      <path
+        d="M8 13C5.23857 13 3 10.7614 3 8C3 5.23857 5.23857 3 8 3C10.7614 3 13 5.23857 13 8C13 10.7614 10.7614 13 8 13ZM8 12C10.2092 12 12 10.2092 12 8C12 5.79086 10.2092 4 8 4C5.79086 4 4 5.79086 4 8C4 10.2092 5.79086 12 8 12ZM8.5 7.25V9.5H9V10.5H7V9.5H7.5V8.25H7V7.25H8.5ZM8.75 6C8.75 6.41421 8.4142 6.75 8 6.75C7.5858 6.75 7.25 6.41421 7.25 6C7.25 5.58579 7.5858 5.25 8 5.25C8.4142 5.25 8.75 5.58579 8.75 6Z"
+        fill="#0E121B"
+      />
+    </svg>
+  </span>
+  You need to add at least one energy carrier to continue
+</div>
+
+<div class="w-full flex flex-col gap-3 items-center justify-center">
+  <img src="/src/assets/energy-carrier.png" alt="Energy Carrier Image" />
+  <p class="text-sm/5 font-medium">
+    Click button below to add a energy carrier
+  </p>
+  <button class="btn btn-primary" onclick="energy_carrier_modal.showModal()">
+    Add an energy carrier
+  </button>
+</div>
+
+<dialog id="energy_carrier_modal" class="modal modal-bottom sm:modal-end">
+  <div
+    class="modal-box !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto"
+  >
+    <h3 class="text-lg font-bold">Hello!</h3>
+    <p class="py-4">Press ESC key or click the button below to close</p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button
+          type="button"
+          onclick="energy_carrier_modal.close()"
+          class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+        >
+          ✕
+        </button>
+        <!-- if there is a button in form, it will close the modal -->
+        <button type="button" class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>
