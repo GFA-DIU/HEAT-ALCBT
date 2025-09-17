@@ -52,11 +52,14 @@
       <legend class="fieldset-legend">
         Room heating temperature<span class="text-error">*</span>
       </legend>
-      <label class="input validator w-full">
+      <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" placeholder="eg. 18" required />
-        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-          >°Celsius</span
+        <select
+          class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[calc(max-content+1rem)]"
         >
+          <option value="celsius" selected>°Celsius</option>
+          <option value="fahrenheit">°Fahrenheit</option>
+        </select>
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -64,11 +67,14 @@
       <legend class="fieldset-legend">
         Room cooling temperature<span class="text-error">*</span>
       </legend>
-      <label class="input validator w-full">
+      <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" placeholder="eg. 32" required />
-        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-          >°Celsius</span
+        <select
+          class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[calc(max-content+1rem)]"
         >
+          <option value="celsius" selected>°Celsius</option>
+          <option value="fahrenheit">°Fahrenheit</option>
+        </select>
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
