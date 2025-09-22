@@ -127,6 +127,15 @@ Execute for production server with the GUI as follows:
 (.venv) $ locust -f load_testing/locust/locustfile.py --host https://beat-alcbt.gggi.org
 ```
 
+### Utility
+
+For executing scripts not warranting their own command, execute them as follows with `python manage.py shell`:
+
+```Python
+with open('path/to/your_script.py') as f:
+    exec(f.read())
+```
+
 ## Support
 
 For support, please reach out to the maintainers or [kontakt@heat-international.de](mailto:kontakt@heat-international.de).
