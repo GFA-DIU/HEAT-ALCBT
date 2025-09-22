@@ -21,7 +21,7 @@
 
 <div id="modal" class="modal fade" tabindex="-1">
   <div
-    class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"
   >
     <div class="modal-content">
       <div id="modal-body"></div>
@@ -42,12 +42,9 @@
     console.log("Modal Element:", modalElement);
     const modal = new bootstrap.Modal(modalElement);
 
-    // Listen for HTMX swaps
+    // Listen for HTMX swaps to show modal
     htmx.on("htmx:afterSwap", (e) => {
-      console.log("HTMX Swap Event:", e);
-      console.log("Target ID:", e.detail.target.id);
       if (e.detail.target.id === "modal-body") {
-        console.log("Showing modal...");
         modal.show();
       }
     });

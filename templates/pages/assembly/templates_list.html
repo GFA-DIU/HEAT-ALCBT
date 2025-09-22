@@ -1,0 +1,45 @@
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+
+<div class="modal-header">
+    <h5 class="modal-title">Select Assembly Template</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+    <div class="container-fluid">
+        <p class="text-muted small mb-3">
+            Choose from your own saved templates or generic assemblies to quickly add components to your building.
+        </p>
+        
+        <!-- Filter Form -->
+        <form hx-post="{% url 'assembly_templates' building_id=building_id %}?simulation={{ simulation }}"
+              hx-target="#template-cards" 
+              hx-vals='{"action": "filter"}' 
+              class="mb-4">
+            {% csrf_token %}
+            {% crispy template_filters_form %}
+        </form>
+        
+        <!-- Template Cards Container -->
+        <div id="template-cards">
+            {% include "pages/assembly/template_cards.html" %}
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <div class="me-auto">
+        <a href="{% url 'assembly_template_management' %}" class="btn btn-outline-info btn-sm">
+            <i class="fas fa-cog me-1"></i>Manage All Templates
+        </a>
+    </div>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    <a href="{% url 'component' building_id=building_id %}?simulation={{ simulation }}" 
+       class="btn btn-outline-primary"
+       hx-get="{% url 'component' building_id=building_id %}?add_component=step_1&simulation={{ simulation }}"
+       hx-target="#modal-body"
+       hx-swap="innerHTML">
+        Create New Assembly
+    </a>
+</div>

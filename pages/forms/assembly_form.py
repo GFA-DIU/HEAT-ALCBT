@@ -28,6 +28,11 @@ class AssemblyForm(forms.ModelForm):
         required=False,
         widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
     )
+    is_template = forms.BooleanField(
+        required=False,
+        label="Save as template",
+        widget=widgets.CheckboxInput(attrs={"class": "form-check-input"}),
+    )
     mode = forms.ChoiceField(
         required=False,
         choices=AssemblyMode.choices,
@@ -38,9 +43,9 @@ class AssemblyForm(forms.ModelForm):
         queryset=AssemblyCategory.objects.all().order_by("tag"),
         widget=forms.Select(
             attrs={
-                "hx-get": "/select_lists/",  # HTMX request to the root URL
-                "hx-trigger": "change",  # Trigger HTMX on change event
-                "hx-target": "#assembly-technique",  # Update the City dropdown
+                "hx-get": "/select_lists/",
+                "hx-trigger": "change",
+                "hx-target": "#assembly-technique",
                 "class": "select form-select",
             }
         ),
@@ -48,7 +53,7 @@ class AssemblyForm(forms.ModelForm):
         required=True,
     )
     assembly_technique = forms.ModelChoiceField(
-        queryset=AssemblyTechnique.objects.none(),  # Start with an empty queryset
+        queryset=AssemblyTechnique.objects.none(),
         widget=forms.Select(
             attrs={
                 "id": "assembly-technique",
@@ -64,10 +69,10 @@ class AssemblyForm(forms.ModelForm):
         widget=forms.Select(
             attrs={
                 "id": "dimension-select",
-                "hx-post": "",  # HTMX request to the current url path
-                "hx-trigger": "change",  # Trigger HTMX on change event
-                "hx-target": "#epd-list",  # Update the City dropdown
-                "hx-vals": '{"action": "filter"}',  # Dynamically include the dropdown value
+                "hx-post": "",
+                "hx-trigger": "change",
+                "hx-target": "#epd-list",
+                "hx-vals": '{"action": "filter"}',
                 "class": "form-select flex-grow-0 w-auto",
             }
         ),
@@ -81,6 +86,7 @@ class AssemblyForm(forms.ModelForm):
         max_digits=10,
         widget=forms.NumberInput(attrs={"class": "form-control", "type": "number"}),
     )
+
     # reporting_life_cycle = forms.IntegerField(
     #     label="Life Span",
     #     min_value=1,
@@ -98,12 +104,15 @@ class AssemblyForm(forms.ModelForm):
             "country",
             "comment",
             "public",
+            "is_template",
             "dimension",
         ]
 
     def __init__(self, *args, **kwargs):
         building_id = kwargs.pop("building_id", None)
         simulation = kwargs.pop("simulation", False)
+        template_edit = kwargs.pop("template_edit", False)
+
         if simulation:
             BuildingAssemblyModel = BuildingAssemblySimulated
         else:
@@ -123,30 +132,41 @@ class AssemblyForm(forms.ModelForm):
             self.fields["assembly_technique"].initial = (
                 assembly_classification.technique
             )
-            self.fields["quantity"].initial = BuildingAssemblyModel.objects.get(
-                assembly=self.instance, building__pk=building_id
-            ).quantity
-            # self.fields["reporting_life_cycle"].initial = (
-            #     BuildingAssemblyModel.objects.get(
-            #         assembly=self.instance, building__pk=building_id
-            #     ).reporting_life_cycle
-            # )
+
+            # Only try to get BuildingAssembly data if NOT editing a template
+            if not template_edit:
+                try:
+                    building_assembly = BuildingAssemblyModel.objects.get(
+                        assembly=self.instance, building__pk=building_id
+                    )
+                    self.fields["quantity"].initial = building_assembly.quantity
+                    # self.fields["reporting_life_cycle"].initial = building_assembly.reporting_life_cycle
+                except BuildingAssemblyModel.DoesNotExist:
+                    self.fields["quantity"].initial = 1
+                    # self.fields["reporting_life_cycle"].initial = 50
+            else:
+                # For template editing, use default or template-specific values
+                self.fields["quantity"].initial = 1  # Default quantity for templates
+                # self.fields["reporting_life_cycle"].initial = 50
         else:
             self.fields["mode"].initial = AssemblyMode.CUSTOM
             self.fields["dimension"].initial = AssemblyDimension.AREA
-            self.fields["country"].initial = Building.objects.get(
-                id=building_id
-            ).country
 
-        # Dynamically update the queryset for assembly_technique to enable form validation
+            # Only try to get building country if NOT editing a template
+            if not template_edit and building_id:
+                try:
+                    self.fields["country"].initial = Building.objects.get(
+                        id=building_id
+                    ).country
+                except Building.DoesNotExist:
+                    pass
+
         if category_id := self.data.get("assembly_category"):
             category_id = int(category_id)
-            # update queryset
             self.fields["assembly_technique"].queryset = (
                 AssemblyTechnique.objects.filter(categories__id=category_id)
             )
 
-        # parse into Assembly classification
         if category_id or self.fields["assembly_technique"].initial:
             category_id = (
                 category_id
@@ -165,7 +185,7 @@ class AssemblyForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         if not cleaned_data.get("classification") and self.initial.get(
-            "classification"
+                "classification"
         ):
             cleaned_data["classification"] = self.initial["classification"]
         return cleaned_data

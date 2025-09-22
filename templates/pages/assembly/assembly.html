@@ -1,5 +1,7 @@
 {% load crispy_forms_tags %}
-{% if assembly_id %}
+{% if template_edit %}
+<form hx-post="{% url 'template_edit' assembly_id=assembly_id %}?simulation={{simulation}}">
+{% elif assembly_id %}
 <form hx-post="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}?simulation={{simulation}}">
 {% else %}
 <form hx-post="{% url 'component' building_id=building_id %}?simulation={{simulation}}">
@@ -26,8 +28,13 @@
             <div class="ms-2 flex-grow-1">
                 {{ form.country |as_crispy_field }}
             </div>
-            <div class="form-check form-switch">
-                {{ form.public |as_crispy_field }}
+            <div class="d-flex gap-3">
+                <div class="form-check form-switch">
+                    {{ form.public |as_crispy_field }}
+                </div>
+                <div class="form-check form-switch">
+                    {{ form.is_template |as_crispy_field }}
+                </div>
             </div>
         </div>
     </div>

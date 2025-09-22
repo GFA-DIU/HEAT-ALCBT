@@ -15,12 +15,18 @@ logger = logging.getLogger(__name__)
 
 @transaction.atomic
 def save_assembly(
-    request,
-    assembly: Assembly,
-    building_instance: Building,
-    simulation=False,
-    is_boq=False,
+        request,
+        assembly: Assembly,
+        building_instance: Building,
+        simulation=False,
+        is_boq=False,
+        is_template_edit=False,
 ) -> None:
+    # If this is template editing, handle it without BuildingAssembly logic
+    if is_template_edit:
+        save_template(request, assembly, is_boq)
+        return
+
     # Save to BuildingAssembly or -Simulated, depending on Mode
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
@@ -92,6 +98,69 @@ def save_assembly(
         raise HttpResponseServerError()
 
 
+@transaction.atomic
+def save_template(request, assembly: Assembly, is_boq=False) -> None:
+
+    # Save template assembly without involving BuildingAssembly relationships.
+    # This is used when editing templates directly.
+    assembly_form = BOQAssemblyForm if is_boq else AssemblyForm
+
+    # Bind the form to the existing Assembly instance with template_edit=True to avoid BuildingAssembly lookups
+    form = assembly_form(
+        request.POST,
+        instance=assembly,
+        building_id='00000000-0000-0000-0000-000000000000',
+        simulation=False,
+        template_edit=True
+    )
+
+    try:
+        if form.is_valid():
+            selected_epds = parse_selected_epds(request)
+
+            # DB OPERATIONS
+            assembly = form.save()
+            assembly.is_boq = is_boq
+            assembly.created_by = request.user
+            assembly.is_template = True
+            assembly.save()
+
+            StructuralProduct.objects.filter(
+                assembly=assembly
+            ).delete()
+
+            # Save to products
+            for _, v in selected_epds.items():
+                classification = AssemblyCategoryTechnique.objects.get(
+                    category_id=v.get("category"),
+                    technique_id=v.get("technique") or None,
+                )
+                StructuralProduct.objects.create(
+                    epd_id=v.get("epd_id"),
+                    assembly=assembly,
+                    quantity=v.get("quantity"),
+                    input_unit=v.get("unit"),
+                    description=v.get("description"),
+                    classification=classification,
+                )
+
+            # NO BuildingAssembly operations for templates
+            logger.info(f"Template {assembly.name} saved successfully by user {request.user}")
+        else:
+            logger.error(
+                "Template submit failed for user %s because form is invalid, with these errors: %s",
+                request.user,
+                form.errors,
+            )
+            raise HttpResponseServerError()
+    except Exception:
+        logger.exception(
+            "Saving template %s failed",
+            assembly.pk,
+        )
+        raise HttpResponseServerError()
+
+
 def parse_selected_epds(request) -> tuple[dict, dict[str, EPD]]:
     """Get user input and db info for selected EPDs."""
     # Identify selected EPDs
@@ -110,7 +179,7 @@ def parse_selected_epds(request) -> tuple[dict, dict[str, EPD]]:
                     f"material_{epd_id}_description_{timestamp}"
                 ],
                 "category": request.POST.get(f"material_{epd_id}_category_{timestamp}")
-                or request.POST.get("assembly_category"),
+                            or request.POST.get("assembly_category"),
                 "technique": request.POST.get("assembly_technique", None),
             }
 
