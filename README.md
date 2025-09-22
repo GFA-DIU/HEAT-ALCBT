@@ -12,8 +12,9 @@
   - [PostGres](#postgres)
 
 - [Contribute](#contribute)
-  - [Unit Tests](#unit-tests)
   - [Deploy to Heroku](#deploy-to-heroku)
+  - [Unit Tests](#unit-tests)
+  - [Load testing](#load-testing)
 - [Support](#support)
 - [License](#license)
 
@@ -113,6 +114,15 @@ $ heroku login -i
 $ git push heroku main
 ```
 
+For executing any necessary migrations, connect via `SSH` or the Heroku-Webinterface.
+
+For executing scripts not warranting their own command, execute them as follows with `python manage.py shell`:
+
+```Python
+with open('path/to/your_script.py') as f:
+    exec(f.read())
+```
+
 ### Unit Tests
 
 To execute Unit tests, run
@@ -125,15 +135,6 @@ To execute Unit tests, run
 Execute for production server with the GUI as follows:
 ```Bash
 (.venv) $ locust -f load_testing/locust/locustfile.py --host https://beat-alcbt.gggi.org
-```
-
-### Utility
-
-For executing scripts not warranting their own command, execute them as follows with `python manage.py shell`:
-
-```Python
-with open('path/to/your_script.py') as f:
-    exec(f.read())
 ```
 
 ## Support
