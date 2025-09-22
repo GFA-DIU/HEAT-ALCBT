@@ -12,8 +12,9 @@
   - [PostGres](#postgres)
 
 - [Contribute](#contribute)
-  - [Unit Tests](#unit-tests)
   - [Deploy to Heroku](#deploy-to-heroku)
+  - [Unit Tests](#unit-tests)
+  - [Load testing](#load-testing)
 - [Support](#support)
 - [License](#license)
 
@@ -146,6 +147,15 @@ To deploy to the production server you need to be added to the repository with t
 ```Bash
 $ heroku login -i
 $ git push heroku main
+```
+
+For executing any necessary migrations, connect via `SSH` or the Heroku-Webinterface.
+
+For executing scripts not warranting their own command, execute them as follows with `python manage.py shell`:
+
+```Python
+with open('path/to/your_script.py') as f:
+    exec(f.read())
 ```
 
 ### Unit Tests
