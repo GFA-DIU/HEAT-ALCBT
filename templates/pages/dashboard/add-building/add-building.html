@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beat Heat</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+    <link rel="stylesheet" href="/public/output.css" />
+  </head>
+  <body class="min-h-screen bg-[var(--bg--base-500)] flex items-stretch">
+    <section class="flex flex-col">
+      <div class="flex pt-8 pb-5 px-14 border-b border-[var(--bg--soft-200)]">
+        <div class="flex flex-col w-full max-w-[18.125rem]">
+          <img
+            src="/src/assets/logo.svg"
+            alt="logo image"
+            class="w-[3.25rem]"
+          />
+          <h1 class="text-base font-extrabold mt-6">Add New Building</h1>
+          <p class="text-sm font-medium mt-1 text-[var(--text--sub-600)]">
+            Complete the following steps to add a new building
+          </p>
+          <div class="flex flex-col gap-1.5 mt-4">
+            <span
+              class="text-xs font-medium text-[var(--text--sub-600)]"
+              id="progress-text"
+              >0% completed</span
+            >
+            <progress
+              class="progress progress-primary w-full"
+              value="0"
+              max="100"
+              id="progress-bar"
+            ></progress>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex pt-8 pb-5 px-14 flex-1">
+        <div class="flex flex-col w-full max-w-[18.125rem]">
+          <div class="space-y-4" id="step-navigation"></div>
+        </div>
+      </div>
+    </section>
+    <section class="card flex-1">
+      <div
+        class="card-body border-x-2 border-[var(--stroke--soft-200)] bg-[var(--bg--white-0)] rounded-l-[var(--radius-16)] p-0 gap-0"
+      >
+        <div
+          class="px-14 pt-6 pb-4 flex items-center justify-between border-b border-[var(--stroke--soft-200)]"
+        >
+          <button class="btn btn-sm" onclick="goToDashboard()">
+            <span data-icon="logout-box-line"></span>
+            <span>Exit</span>
+          </button>
+
+          <div class="flex items-center gap-4">
+            <button class="btn btn-ghost size-6 p-0">
+              <span data-icon="question-line" data-size="24"></span>
+            </button>
+            <button class="btn btn-ghost size-6 p-0">
+              <span data-icon="bell-simple" data-size="24"></span>
+            </button>
+            <button class="btn btn-ghost size-6 p-0">
+              <span data-icon="settings-5-line" data-size="24"></span>
+            </button>
+            <button class="btn h-9 rounded-full flex items-center gap-1">
+              <div class="avatar avatar-placeholder">
+                <div class="bg-primary text-primary-content w-6 rounded-full">
+                  <span class="text-xs">JJ</span>
+                </div>
+              </div>
+              <span class="text-sm">Joseph J.</span>
+              <span data-icon="caret-down" data-size="16"></span>
+            </button>
+            <button
+              class="btn btn-ghost btn-sm flex items-center gap-1 md:hidden"
+            ></button>
+          </div>
+        </div>
+        <div class="flex-1 p-14">
+          <div class="mx-auto w-full max-w-[31.625rem]">
+            <div class="w-full">
+              <div
+                class="mb-4 bg-[var(--bg--weak-50)] rounded-full p-2.5 w-fit flex items-center"
+                id="current-step-progress"
+              >
+                <span class="text-[0.813rem]/5 font-semibold align-middle"
+                  >1 out of
+                  <span class="font-normal text-[var(--text--sub-600)]"
+                    >2 steps</span
+                  ></span
+                >
+              </div>
+              <h2
+                class="text-base/5 font-extrabold mb-1"
+                id="current-step-title"
+              >
+                Building Name & Location
+              </h2>
+              <p
+                class="text-sm/5 text-[var(--text--sub-600)] mb-6"
+                id="current-step-description"
+              >
+                Add details concerning building name and locations of building.
+              </p>
+
+              <div id="dynamic-content"></div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="card-actions px-14 py-7 border-t border-[var(--stroke--soft-200)] justify-between"
+        >
+          <button class="btn btn-outline" id="go-back">
+            <span data-icon="arrow-left-s-line"></span>
+            Go back
+          </button>
+          <div class="flex items-center gap-2">
+            <button
+              class="btn btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
+              id="skip"
+            >
+              <span>Skip</span>
+            </button>
+            <button class="btn btn-primary" id="save-and-continue" disabled>
+              <span>Save & continue</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="./js/step-manager.js"></script>
+    <script type="module" src="/src/utils/icon.js"></script>
+  </body>
+</html>

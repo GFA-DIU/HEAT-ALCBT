@@ -1,0 +1,119 @@
+<form class="grid grid-cols-2 gap-x-2 gap-y-1">
+  <fieldset class="fieldset col-span-2">
+    <legend class="fieldset-legend">
+      Building name or Code<span class="text-[var(--state--error--base)]"
+        >*</span
+      >
+    </legend>
+    <label class="input validator w-full">
+      <input type="text" placeholder="eg. JP Plaza" required />
+    </label>
+    <p class="validator-hint">This field is required</p>
+  </fieldset>
+  <fieldset class="fieldset col-span-2">
+    <legend class="fieldset-legend w-full">
+      Address (Zip, Street)<span class="text-[var(--state--error--base)]"
+        >*</span
+      ><span class="flex-1 flex justify-end text-[var(--text--sub-600)]">
+        <a class="underline">Find location on map</a>
+      </span>
+    </legend>
+    <label class="input validator w-full">
+      <input type="text" placeholder="eg. 1885 L Street Northwest" required />
+    </label>
+    <p class="validator-hint">This field is required</p>
+  </fieldset>
+  <fieldset class="fieldset col-span-2">
+    <legend class="fieldset-legend">
+      Country<span class="text-[var(--state--error--base)]">*</span>
+    </legend>
+    <label class="w-full flex relative">
+      <div class="select-icon">
+        <span
+          data-icon="global-line"
+          data-size="20"
+          data-color="var(--icon--soft-400)"
+        ></span>
+      </div>
+      <select class="select select-with-icon w-full">
+        <option disabled selected>Pick a country</option>
+        <option>Ghana</option>
+        <option>Nigeria</option>
+        <option>Kenya</option>
+      </select>
+    </label>
+    <p class="validator-hint">This field is required</p>
+  </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">
+      Region or State<span class="text-[var(--state--error--base)]">*</span>
+    </legend>
+    <label class="w-full flex relative">
+      <div class="select-icon">
+        <span
+          data-icon="flashlight-line"
+          data-size="20"
+          data-color="var(--icon--soft-400)"
+        ></span>
+      </div>
+      <select class="select select-with-icon w-full" disabled>
+        <option disabled selected>Pick a region or state</option>
+        <option>Greater Accra</option>
+        <option>Ashanti</option>
+        <option>Eastern</option>
+      </select>
+    </label>
+    <p class="label">
+      <span
+        data-icon="information-fill"
+        data-size="16"
+        data-color="var(--icon--soft-400)"
+      ></span>
+      Select a country first
+    </p>
+  </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">
+      City<span class="text-[var(--state--error--base)]">*</span>
+    </legend>
+    <label class="w-full flex relative">
+      <div class="select-icon">
+        <span
+          data-icon="building-line"
+          data-size="20"
+          data-color="var(--icon--soft-400)"
+        ></span>
+      </div>
+      <select class="select select-with-icon w-full" disabled>
+        <option disabled selected value="">Pick a city</option>
+        <option>Accra</option>
+        <option>Kumasi</option>
+        <option>Nairobi</option>
+      </select>
+    </label>
+    <p class="label">
+      <span
+        data-icon="information-fill"
+        data-size="16"
+        data-color="var(--icon--soft-400)"
+      ></span>
+      Select a region or state first
+    </p>
+  </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">
+      Longitude <span class="text-[var(--text--sub-600)]">(Optional)</span>
+    </legend>
+    <label class="input validator w-full">
+      <input type="text" placeholder="eg. -7.946232" required />
+    </label>
+  </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">
+      Latitude <span class="text-[var(--text--sub-600)]">(Optional)</span>
+    </legend>
+    <label class="input validator w-full">
+      <input type="text" placeholder="eg. 5.603722" required />
+    </label>
+  </fieldset>
+</form>
