@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="ms-auto d-flex flex-column gap-2">
-                {% if template.is_public %}
+                {% if template.public %}
                     <span class="badge rounded-pill bg-secondary text-dark fw-bold">Generic</span>
                 {% endif %}
                 {% if not is_management_view and building_id %}

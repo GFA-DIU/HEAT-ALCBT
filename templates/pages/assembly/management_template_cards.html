@@ -30,7 +30,7 @@
                 </div>
             </div>
             <div class="ms-auto d-flex flex-column gap-2">
-                {% if template.is_public %}
+                {% if template.public %}
                     <span class="badge rounded-pill bg-secondary text-dark fw-bold align-self-end">Generic</span>
                 {% endif %}
                 <div class="btn-group">
@@ -44,11 +44,10 @@
                             data-duplicate-url="{% url 'duplicate_template' template.id %}">
                         <i class="fas fa-copy me-1"></i>Duplicate
                     </button>
-                    <button class="btn btn-outline-danger btn-sm"
-                            data-template-id="{{ template.id }}" 
+                    <button class="btn btn-outline-danger btn-sm delete-template-btn"
+                            data-template-id="{{ template.id }}"
                             data-template-name="{{ template.name }}"
-                            data-delete-url="{% url 'delete_template' template.id %}"
-                            class="delete-template-btn">
+                            data-delete-url="{% url 'delete_template' template.id %}">
                         <i class="fas fa-trash me-1"></i>Delete
                     </button>
                 </div>
@@ -218,59 +217,4 @@ function duplicateTemplate(templateId, templateName) {
     }
 }
 
-function deleteTemplate(templateId, templateName) {
-    if (confirm(`Are you sure you want to delete "${templateName}" template?`)) {
-        fetch(`/template-management/delete/${templateId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'force_delete=false'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.warning) {
-                if (confirm(data.message + '\n\nThis will create separate copies for each building. Continue?')) {
-                    // Force delete with confirmation
-                    return fetch(`/template-management/delete/${templateId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'force_delete=true'
-                    });
-                }
-                return null;
-            } else if (data.error) {
-                alert('Error: ' + data.error);
-            } else {
-                alert(data.message);
-                refreshTemplateCards();
-            }
-            return null;
-        })
-        .then(response => {
-            if (response) {
-                return response.json();
-            }
-            return null;
-        })
-        .then(data => {
-            if (data) {
-                if (data.error) {
-                    alert('Error: ' + data.error);
-                } else {
-                    alert(data.message);
-                    refreshTemplateCards();
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the template');
-        });
-    }
-}
 </script>

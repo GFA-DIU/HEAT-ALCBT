@@ -24,7 +24,7 @@ class ProcessedAssemblyTemplate:
     material_count: int
     created_at: str
     is_template: bool
-    is_public: bool
+    public: bool
 
 
 class AssemblyTemplateLazyProcessor:
@@ -94,7 +94,7 @@ class AssemblyTemplateLazyProcessor:
             material_count=len(getattr(template, 'prefetched_products', [])) if hasattr(template, 'prefetched_products') else template.structuralproduct_set.count(),
             created_at=template.created_at.strftime("%B %d, %Y") if template.created_at else "",
             is_template=template.is_template,
-            is_public=template.is_public,
+            public=template.public,
         )
 
 

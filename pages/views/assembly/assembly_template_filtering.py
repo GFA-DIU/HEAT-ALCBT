@@ -19,9 +19,9 @@ def get_filtered_assembly_templates(request, user):
         'structuralproduct_set__classification__technique'
     )
 
-    # Generic templates are public templates (is_public=True) but exclude user's own templates to avoid duplication where it is user template and is_public=True
+    # Generic templates are public templates (public=True) but exclude user's own templates to avoid duplication where it is user template and public=True
     generic_templates = Assembly.objects.filter(
-        is_public=True,
+        public=True,
         is_template=True,
         is_boq=False
     ).exclude(
@@ -106,14 +106,14 @@ def get_filtered_assembly_templates(request, user):
         # Template type filter
         template_type = req.get("template_type")
         if template_type == "user":
-            # Show only user's private templates (is_public=False)
-            user_templates = user_templates.filter(is_public=False)
+            # Show only user's private templates (public=False)
+            user_templates = user_templates.filter(public=False)
             generic_templates = Assembly.objects.none()
         elif template_type == "generic":
-            # Show only public templates (is_public=True) regardless of who created them
+            # Show only public templates (public=True) regardless of who created them
             user_templates = Assembly.objects.none()
             generic_templates = Assembly.objects.filter(
-                is_public=True,
+                public=True,
                 is_template=True,
                 is_boq=False
             ).select_related('country', 'city').prefetch_related(

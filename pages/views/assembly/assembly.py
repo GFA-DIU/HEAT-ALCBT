@@ -133,6 +133,7 @@ def set_up_template_edit_view(request, building_id, assembly_id):
 def set_up_view(request, building_id, assembly_id):
     """Fetch objects and create baseline context."""
     simulation = request.GET.get("simulation") == "True"
+    template_id = request.GET.get("template_id")
     if simulation:
         BuildingAssemblyModel = BuildingAssemblySimulated
     else:
@@ -150,8 +151,15 @@ def set_up_view(request, building_id, assembly_id):
         building = get_object_or_404(Building, pk=building_id)
         assembly = None
 
+    template_assembly = None
+    if template_id and not assembly_id:
+        try:
+            template_assembly = get_object_or_404(Assembly, pk=template_id, is_template=True)
+            logger.info(f"Loading template {template_id} for new assembly creation")
+        except Assembly.DoesNotExist:
+            logger.warning(f"Template {template_id} not found or not a template")
 
-    epd_list, dimension = get_epd_list(request, assembly.dimension if assembly else AssemblyDimension.AREA, operational=False)
+    epd_list, dimension = get_epd_list(request, assembly.dimension if assembly else (template_assembly.dimension if template_assembly else AssemblyDimension.AREA), operational=False)
 
     req = request.POST if request.method == "POST" else request.GET
     context = {
@@ -162,12 +170,16 @@ def set_up_view(request, building_id, assembly_id):
         "epd_filters_form": EPDsFilterForm(req),
         "dimension": dimension,
         "simulation": simulation,
+        "template_assembly": template_assembly,  # Add template data to context
     }
     return assembly, building, context
 
 
 def handle_assembly_submission(request, assembly, building, simulation, is_template_edit=False):
-    save_assembly(request, assembly, building, simulation, is_template_edit=is_template_edit)
+    # Get template_id if this is a new assembly created from template
+    # Check POST data for template_id from hidden form field
+    template_id = None if assembly else request.POST.get("template_id")
+    save_assembly(request, assembly, building, simulation, is_template_edit=is_template_edit, template_id=template_id)
 
     response = JsonResponse({"message": "Redirecting"})
 
@@ -186,27 +198,44 @@ def handle_assembly_submission(request, assembly, building, simulation, is_templ
     return response
 
 def handle_assembly_load(building_id, assembly, context):
-    if assembly:
+    template_assembly = context.get("template_assembly")
+
+    source_assembly = assembly or template_assembly
+
+    if source_assembly:
         products = (
             StructuralProduct.objects
-            .filter(assembly=assembly)
+            .filter(assembly=source_assembly)
             .select_related(
                 "epd",
                 "epd__category",
                 "epd__country",
                 "classification",
-            )    
+            )
         )
-            
+
         selected_epds = [SelectedEPD.parse_product(p) for p in products]
         context["selected_epds"] = selected_epds
         context["selected_epds_ids"] = [
             selected_epd.id for selected_epd in selected_epds
         ]
-    context["form"] = AssemblyForm(
-        instance=assembly, building_id=building_id, simulation=context.get("simulation")
-    )
-    context["dimension"] = assembly.dimension if assembly else AssemblyDimension.AREA
+
+    # Pre-populate form with template data if creating from template
+    if template_assembly and not assembly:
+        context["form"] = AssemblyForm(
+            instance=template_assembly,
+            building_id=building_id,
+            simulation=context.get("simulation")
+        )
+        context["form"].initial["name"] = f"{template_assembly.name} (Copy)"
+        context["form"].initial["is_template"] = False
+        context["using_template"] = True
+    else:
+        context["form"] = AssemblyForm(
+            instance=assembly, building_id=building_id, simulation=context.get("simulation")
+        )
+
+    context["dimension"] = source_assembly.dimension if source_assembly else AssemblyDimension.AREA
 
     return context
 

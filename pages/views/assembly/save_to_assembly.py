@@ -21,11 +21,12 @@ def save_assembly(
         simulation=False,
         is_boq=False,
         is_template_edit=False,
+        template_id=None,
 ) -> None:
     # If this is template editing, handle it without BuildingAssembly logic
     if is_template_edit:
         save_template(request, assembly, is_boq)
-        return
+        return None
 
     # Save to BuildingAssembly or -Simulated, depending on Mode
     if simulation:
@@ -49,6 +50,21 @@ def save_assembly(
             assembly = form.save()  # Save the updated Assembly instance
             assembly.is_boq = is_boq
             assembly.created_by = request.user
+
+            create_template = form.cleaned_data.get('is_template', False)
+
+            # Building assemblies should NEVER be templates themselves
+            assembly.is_template = False
+
+            # Set from_template if this assembly was created from a template
+            if template_id and not assembly.from_template:  # Only set if not already set
+                try:
+                    template = Assembly.objects.get(pk=template_id, is_template=True)
+                    assembly.from_template = template
+                    logger.info(f"Setting from_template for assembly '{assembly.name}' (ID: {assembly.id}) to template '{template.name}' (ID: {template.id})")
+                except Assembly.DoesNotExist:
+                    logger.warning(f"Template {template_id} not found when trying to set from_template for assembly {assembly.id}")
+
             assembly.save()
 
             StructuralProduct.objects.filter(
@@ -82,6 +98,16 @@ def save_assembly(
                     ),  # Get reporting_life_cycle from POST data, default to 50
                 },
             )
+
+            # Create template if user enabled save as template
+            if create_template:
+                template = assembly.create_template_copy(
+                    user=request.user,
+                    template_name=assembly.name
+                )
+                logger.info(
+                    f"Created separate template '{template.name}' (ID: {template.id}) from assembly '{assembly.name}' (ID: {assembly.id})"
+                )
         else:
             logger.error(
                 "Submit failed for user %s because form is invalid, with these errors: %s",

@@ -151,10 +151,13 @@ class Assembly(BaseModel):
         default=False,
         help_text=_("Mark this assembly as a template that can be reused in other buildings")
     )
-    is_public = models.BooleanField(
-        _("Public template"),
-        default=False,
-        help_text=_("Make this template available to all users as a generic template")
+    from_template = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='derived_assemblies',
+        help_text=_("The template this assembly was created from (if any)")
     )
 
     def __str__(self):
@@ -175,6 +178,7 @@ class Assembly(BaseModel):
             name=new_name or f"{self.name} (Copy)",
             is_boq=self.is_boq,
             is_template=False,  # New instance is not a template
+            from_template=self if self.is_template else None,  # Track source template
         )
         
         if user:
@@ -194,6 +198,42 @@ class Assembly(BaseModel):
             )
         
         return new_assembly
+
+    def create_template_copy(self, user=None, template_name=None):
+        # Create new template instance (completely separate record)
+        template = Assembly(
+            country=self.country,
+            city=self.city,
+            mode=self.mode,
+            dimension=self.dimension,
+            comment=self.comment,
+            description=self.description,
+            name=template_name or f"{self.name} Template",
+            is_boq=self.is_boq,
+            is_template=True,  # This is a template
+            from_template=None,  # Templates don't track origins
+            public=self.public,
+        )
+
+        if user:
+            template.created_by = user
+        else:
+            template.created_by = self.created_by
+
+        template.save()
+
+        # Copy all structural products to the template
+        for structural_product in self.structuralproduct_set.all():
+            StructuralProduct.objects.create(
+                epd=structural_product.epd,
+                classification=structural_product.classification,
+                assembly=template,
+                input_unit=structural_product.input_unit,
+                quantity=structural_product.quantity,
+                description=structural_product.description,
+            )
+
+        return template
 
     @property
     def classification(self):

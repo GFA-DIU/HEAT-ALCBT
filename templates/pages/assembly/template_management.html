@@ -7,16 +7,9 @@
 
 {% block content %}
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1">Assembly Template Management</h2>
-            <p class="text-muted">Manage your assembly templates and discover generic ones</p>
-        </div>
-        <div>
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Buildings
-            </a>
-        </div>
+    <div class="mb-4">
+        <h2 class="mb-1">Assembly Template Management</h2>
+        <p class="text-muted">Manage your assembly templates and discover generic ones</p>
     </div>
 
     <!-- Filter Form -->
@@ -103,6 +96,25 @@
     </div>
 </div>
 
+<!-- Bulk Duplicate Confirmation Modal -->
+<div class="modal fade" id="bulkDuplicateModal" tabindex="-1" aria-labelledby="bulkDuplicateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bulkDuplicateModalLabel">Confirm Bulk Duplicate</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="bulk-duplicate-message">Are you sure you want to duplicate the selected templates?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-bulk-duplicate-btn">Duplicate</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let currentDeleteUrl = '';
@@ -138,7 +150,49 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Confirm delete
     document.getElementById('confirm-delete-btn').addEventListener('click', function() {
-        if (currentDeleteUrl) {
+        const isBulkDelete = this.getAttribute('data-bulk-delete') === 'true';
+
+        if (isBulkDelete) {
+            const promises = Array.from(selectedTemplates).map(templateId => {
+                return fetch(`/template-management/delete/${templateId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'force_delete=true'
+                });
+            });
+
+            Promise.allSettled(promises).then(results => {
+                const successful = results.filter(r => r.status === 'fulfilled').length;
+                const failed = results.length - successful;
+
+                let message = '';
+                if (failed === 0) {
+                    message = `Successfully deleted ${successful} template(s)`;
+                } else {
+                    message = `Deleted ${successful} template(s). ${failed} failed.`;
+                }
+
+                document.getElementById('delete-message').innerHTML = `<div class="alert alert-success mb-0">${message}</div>`;
+
+                const confirmBtn = document.getElementById('confirm-delete-btn');
+                confirmBtn.textContent = 'Close';
+                confirmBtn.onclick = function() {
+                    bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+                    clearSelection();
+                    location.reload();
+                };
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('delete-message').innerHTML = `<div class="alert alert-danger mb-0">An error occurred while deleting templates</div>`;
+            });
+
+            this.removeAttribute('data-bulk-delete');
+
+        } else if (currentDeleteUrl) {
             fetch(currentDeleteUrl, {
                 method: 'POST',
                 headers: {
@@ -150,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.warning) {
-                    // Show warning and ask for confirmation
                     document.getElementById('delete-message').textContent = data.message;
                     return;
                 }
@@ -158,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.error) {
                     alert('Error: ' + data.error);
                 } else {
-                    // Reload the page or refresh the template cards
+
                     location.reload();
                 }
                 
@@ -171,7 +224,50 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
-    
+
+    // Confirm bulk duplicate
+    document.getElementById('confirm-bulk-duplicate-btn').addEventListener('click', function() {
+        const promises = Array.from(selectedTemplates).map(templateId => {
+            const templateName = document.querySelector(`[data-template-id="${templateId}"]`).dataset.templateName;
+            return fetch(`/template-management/duplicate/${templateId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `new_name=${encodeURIComponent(templateName + ' (Copy)')}`
+            });
+        });
+
+        Promise.allSettled(promises).then(results => {
+            const successful = results.filter(r => r.status === 'fulfilled').length;
+            const failed = results.length - successful;
+
+            let message = '';
+            if (failed === 0) {
+                message = `Successfully duplicated ${successful} template(s)`;
+            } else {
+                message = `Duplicated ${successful} template(s). ${failed} failed.`;
+            }
+
+            // Show success message in the modal
+            document.getElementById('bulk-duplicate-message').innerHTML = `<div class="alert alert-success mb-0">${message}</div>`;
+
+            // Change button text and behavior
+            const confirmBtn = document.getElementById('confirm-bulk-duplicate-btn');
+            confirmBtn.textContent = 'Close';
+            confirmBtn.onclick = function() {
+                bootstrap.Modal.getInstance(document.getElementById('bulkDuplicateModal')).hide();
+                clearSelection();
+                location.reload();
+            };
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('bulk-duplicate-message').innerHTML = `<div class="alert alert-danger mb-0">An error occurred while duplicating templates</div>`;
+        });
+    });
+
     // Confirm duplicate
     document.getElementById('confirm-duplicate-btn').addEventListener('click', function() {
         const newName = document.getElementById('new-template-name').value.trim();
@@ -243,65 +339,31 @@ function clearSelection() {
 
 function bulkDuplicate() {
     if (selectedTemplates.size === 0) return;
-    
-    if (confirm(`Do you want to duplicate ${selectedTemplates.size} selected template(s)?`)) {
-        const promises = Array.from(selectedTemplates).map(templateId => {
-            const templateName = document.querySelector(`[data-template-id="${templateId}"]`).dataset.templateName;
-            return fetch(`/template-management/duplicate/${templateId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `new_name=${encodeURIComponent(templateName + ' (Copy)')}`
-            });
-        });
-        
-        Promise.allSettled(promises).then(results => {
-            const successful = results.filter(r => r.status === 'fulfilled').length;
-            const failed = results.length - successful;
-            
-            if (failed === 0) {
-                alert(`Successfully duplicated ${successful} template(s)`);
-            } else {
-                alert(`Duplicated ${successful} template(s). ${failed} failed.`);
-            }
-            
-            clearSelection();
-            location.reload();
-        });
-    }
+
+    // Use Bootstrap modal instead of confirm()
+    const templateCount = selectedTemplates.size;
+    const templateText = templateCount === 1 ? 'template' : 'templates';
+
+    document.getElementById('bulk-duplicate-message').textContent =
+        `Are you sure you want to duplicate ${templateCount} selected ${templateText}? Each will be named "[Original Name] (Copy)".`;
+
+    const modal = new bootstrap.Modal(document.getElementById('bulkDuplicateModal'));
+    modal.show();
 }
 
 function bulkDelete() {
     if (selectedTemplates.size === 0) return;
-    
-    if (confirm(`Are you sure you want to delete ${selectedTemplates.size} selected template(s)?`)) {
-        const promises = Array.from(selectedTemplates).map(templateId => {
-            return fetch(`/template-management/delete/${templateId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'force_delete=true'
-            });
-        });
-        
-        Promise.allSettled(promises).then(results => {
-            const successful = results.filter(r => r.status === 'fulfilled').length;
-            const failed = results.length - successful;
-            
-            if (failed === 0) {
-                alert(`Successfully deleted ${successful} template(s)`);
-            } else {
-                alert(`Deleted ${successful} template(s). ${failed} failed.`);
-            }
-            
-            clearSelection();
-            location.reload();
-        });
-    }
+
+    const templateCount = selectedTemplates.size;
+    const templateText = templateCount === 1 ? 'template' : 'templates';
+
+    currentDeleteUrl = null; // Clear individual delete URL
+    document.getElementById('delete-message').textContent =
+        `Are you sure you want to delete ${templateCount} selected ${templateText}?`;
+    const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    modal.show();
+
+    document.getElementById('confirm-delete-btn').setAttribute('data-bulk-delete', 'true');
 }
 </script>
 

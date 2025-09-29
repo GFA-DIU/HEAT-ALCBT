@@ -70,6 +70,9 @@
 
 
     <input type="hidden" name="action" value="form_submission">
+    {% if template_assembly and not assembly_id %}
+        <input type="hidden" name="template_id" value="{{ template_assembly.id }}">
+    {% endif %}
 
     <h4>Materials</h4>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#epdSearchModal">
@@ -93,10 +96,12 @@
 
     <div class="d-flex flex-row justify-content-between align-items-center">
         <div>
-            <a {% if simulation %}
-               href="{% url 'building_simulation' building_id=building_id %}" 
+            <a {% if template_edit %}
+               href="{% url 'assembly_template_management' %}"
+               {% elif simulation %}
+               href="{% url 'building_simulation' building_id=building_id %}"
                {% else %}
-               href="{% url 'building' building_id=building_id %}" 
+               href="{% url 'building' building_id=building_id %}"
                {% endif %}
                class="btn btn-secondary">Cancel</a>
             <button 

@@ -129,15 +129,11 @@ def duplicate_template(request, assembly_id):
     try:
         # Create a copy with a new name
         new_name = request.POST.get('new_name', f"{original_template.name} (Copy)")
-        
-        new_template = original_template.copy_as_template_instance(
-            new_name=new_name,
+
+        new_template = original_template.create_template_copy(
+            template_name=new_name,
             user=request.user
         )
-        
-        # Make the copy a template as well
-        new_template.is_template = True
-        new_template.save()
         
         messages.success(request, f"Template duplicated as '{new_name}'")
         return JsonResponse({
