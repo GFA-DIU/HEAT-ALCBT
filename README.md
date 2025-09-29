@@ -12,8 +12,9 @@
   - [PostGres](#postgres)
 
 - [Contribute](#contribute)
-  - [Unit Tests](#unit-tests)
   - [Deploy to Heroku](#deploy-to-heroku)
+  - [Unit Tests](#unit-tests)
+  - [Load testing](#load-testing)
 - [Support](#support)
 - [License](#license)
 
@@ -102,6 +103,39 @@ To inspect the data tables in postgres instead of Django admin
 $ pgcli -h localhost -p 5432 -U postgres -d postgres
 ```
 
+
+To load heroku DB snapshot (custom/tar PostgreSQL), follow these steps:
+
+1. Spin-up the DB and identify the container
+```Bash
+$ docker compose up -d db
+$ DB_CID=$(docker compose ps -q db)
+$ echo "$DB_CID"
+```
+
+2. Verify snapshot and move into container
+```Bash
+$ SNAPSHOT=./path/to/snapshot
+# custom/tar shows 'PostgreSQL custom database dump' or 'POSIX tar'
+$ file "$SNAPSHOT"
+$ docker cp "$SNAPSHOT" "$DB_CID":/tmp/snapshot.dump
+```
+
+3. Restore custom dump with `pg_restore`
+```Bash
+# Drop + recreate target DB inside the container (avoid lingering objects)
+$ docker exec -i "$DB_CID" bash -lc 'dropdb -U "$POSTGRES_USER" --if-exists "$POSTGRES_DB" && createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'
+
+# restore from snapshot
+$ docker exec -i "$DB_CID" bash -lc 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists --no-owner --no-privileges -j 4 /tmp/snapshot.dump'
+```
+
+4. Smoke test the restore
+```Bash
+$ docker exec -it "$DB_CID" psql -U postgres -d postgres -c '\dt'    # list tables
+$ docker exec -it "$DB_CID" psql -U postgres -d postgres -c 'select now();'
+```
+
 ## Contribute
 
 Follow the installation steps [above](#installation).
@@ -113,6 +147,15 @@ To deploy to the production server you need to be added to the repository with t
 ```Bash
 $ heroku login -i
 $ git push heroku main
+```
+
+For executing any necessary migrations, connect via `SSH` or the Heroku-Webinterface.
+
+For executing scripts not warranting their own command, execute them as follows with `python manage.py shell`:
+
+```Python
+with open('path/to/your_script.py') as f:
+    exec(f.read())
 ```
 
 ### Unit Tests
