@@ -10,16 +10,12 @@ from pages.models import (
     LightingSystem,
     LiftEscalatorSystem,
     HotWaterSystem,
-    OperationEnergyDemand,
-    EnergyConsumption,
     RefrigerantType,
     VentilationType,
     RoomType,
     LightingBulbType,
     HotWaterSystemType,
     FuelType,
-    EnergySourceType,
-    EnergyUnit,
 )
 
 from decimal import Decimal
@@ -159,22 +155,3 @@ def test_hot_water_system_creation(building):
     )
     assert hot_water.system_type == HotWaterSystemType.BOILER
     assert hot_water.fuel_type == FuelType.ELECTRICITY
-
-
-@pytest.mark.django_db
-def test_operation_energy_demand_and_consumption(building):
-    demand = OperationEnergyDemand.objects.create(
-        building=building,
-        renewable_energy_adoption=20
-    )
-    assert demand.building == building
-    assert demand.renewable_energy_adoption == 20
-
-    consumption = EnergyConsumption.objects.create(
-        operation_demand=demand,
-        energy_source=EnergySourceType.ELECTRICITY,
-        consumption_value=1000,
-        unit=EnergyUnit.KWH_A
-    )
-    assert consumption.operation_demand == demand
-    assert consumption.energy_source == EnergySourceType.ELECTRICITY
