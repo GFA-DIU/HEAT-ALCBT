@@ -6,12 +6,17 @@
       <div class="text-center pb-3">
         <p><strong>What type of component to add?</strong></p>
       <div class="row justify-content-center g-3">
-        <!-- Option 1: Select from Defaults -->
+        <!-- Option 1: Select from Templates -->
         <div class="col-md-6 d-flex">
           <div class="card p-3 flex-grow-1 d-flex flex-column">
-            <h6 class="card-title">Select from defaults</h6>
-            <p class="text-secondary small flex-grow-1">Choose an existing assembly from the list of predefined options.</br>This is best for a LCA quick assessment.</p>
-            <button class="btn btn-primary mt-2" disabled>Select</button>
+            <h6 class="card-title">Select Template</h6>
+            <p class="text-secondary small flex-grow-1">Choose from your saved templates or generic assemblies.</br>This is best for a quick assessment using proven components.</p>
+            <button class="btn btn-primary mt-2" 
+                    hx-get="{% url 'assembly_templates' building_id=building_id %}?simulation={{simulation}}"
+                    hx-target="#modal-body"
+                    hx-swap="innerHTML">
+              Select Template
+            </button>
           </div>
         </div>
         <!-- Option 2: Create Custom -->
