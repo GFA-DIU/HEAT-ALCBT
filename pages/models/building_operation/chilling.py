@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from pages.models.building import Building
 
+
 class RefrigerantType(models.TextChoices):
     R290 = "R-290", _("R-290 (Propane)")
     R600A = "R-600a", _("R-600a (Isobutane)")
@@ -99,47 +100,87 @@ class RefrigerantType(models.TextChoices):
 
 
 class CoolingSystemChiller(models.Model):
-    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name="chillers",
-                                 verbose_name=_("Building"))
+    building = models.ForeignKey(
+        Building,
+        on_delete=models.CASCADE,
+        related_name="chillers",
+        verbose_name=_("Building"),
+    )
     chiller_type = models.CharField(
         max_length=50,
         choices=[
-            ('water_cooled', _("Water Cooled Chillers")),
-            ('air_cooled', _("Air Cooled Chillers"))
+            ("water_cooled", _("Water Cooled Chillers")),
+            ("air_cooled", _("Air Cooled Chillers")),
         ],
-        verbose_name=_("Chiller Type")
+        verbose_name=_("Chiller Type"),
     )
-    year_of_installation = models.PositiveIntegerField(verbose_name=_("Year of Installation"))
-    operation_hours_per_workday = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                                   verbose_name=_("Operation Hours per Workday"))
-    workdays_per_week = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=_("Workdays per Week"))
-    workweeks_per_year = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name=_("Workweeks per Year"))
+    year_of_installation = models.PositiveIntegerField(
+        verbose_name=_("Year of Installation")
+    )
+    operation_hours_per_workday = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name=_("Operation Hours per Workday")
+    )
+    workdays_per_week = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name=_("Workdays per Week")
+    )
+    workweeks_per_year = models.PositiveSmallIntegerField(
+        null=True, blank=True, verbose_name=_("Workweeks per Year")
+    )
     refrigerant_type = models.CharField(
         max_length=50,
         choices=RefrigerantType.choices,
-        verbose_name=_("Type of Refrigerants")
+        verbose_name=_("Type of Refrigerants"),
     )
-    refrigerant_quantity_kg = models.PositiveIntegerField(verbose_name=_("Refrigerant Quantity (Kg)"))
-    total_cooling_load_rt = models.PositiveIntegerField(verbose_name=_("Total Cooling Load for Chiller System (RT)"))
-    baseline_cooling_efficiency_kw_h = models.PositiveIntegerField(null=True, blank=True,
-                                                                   verbose_name=_("Baseline Cooling Efficiency (kW/h)"))
-    variable_speed_drives = models.BooleanField(verbose_name=_("Installation of Variable Speed Drives (VSDs)"),
-                                                default=False)
-    heat_recovery_system = models.BooleanField(verbose_name=_("Installation of Heat Recovery Systems"), default=False)
-    baseline_refrigerant_emission_factor = models.PositiveIntegerField(null=True, blank=True, verbose_name=_(
-        "Baseline Refrigerant Emission Factor (GWP)"))
-    baseline_leakage_factor_percent = models.PositiveIntegerField(default=2,
-                                                                  verbose_name=_("Baseline Leakage Factor (%)"))
-    total_energy_consumption_kwh_per_year = models.PositiveIntegerField(null=True, blank=True, verbose_name=_(
-        "Total Energy Consumption of Chiller System Annually (kWh/year)"))
-    number_of_chillers = models.PositiveIntegerField(verbose_name=_("Number of Chillers"))
-    water_cooled_chiller_cooling_load_factor_percent = models.PositiveIntegerField(null=True, blank=True,
-                                                                                   verbose_name=_(
-                                                                                       "Water-Cooled Chiller Cooling Load Factor (%)"))
-    total_chiller_system_power_input_kw = models.PositiveIntegerField(null=True, blank=True, verbose_name=_(
-        "Total Chiller System Power Input (kW)"))
-    cop = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=_("COP"))
-    ip_lv = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=_("IPLV"))
-    energy_efficiency_label = models.PositiveSmallIntegerField(null=True, blank=True,
-                                                               choices=[(i, _(str(i))) for i in range(1, 6)],
-                                                               verbose_name=_("Energy Efficiency Label"))
+    refrigerant_quantity_kg = models.PositiveIntegerField(
+        verbose_name=_("Refrigerant Quantity (Kg)")
+    )
+    total_cooling_load_rt = models.PositiveIntegerField(
+        verbose_name=_("Total Cooling Load for Chiller System (RT)")
+    )
+    baseline_cooling_efficiency_kw_h = models.PositiveIntegerField(
+        null=True, blank=True, verbose_name=_("Baseline Cooling Efficiency (kW/h)")
+    )
+    variable_speed_drives = models.BooleanField(
+        verbose_name=_("Installation of Variable Speed Drives (VSDs)"), default=False
+    )
+    heat_recovery_system = models.BooleanField(
+        verbose_name=_("Installation of Heat Recovery Systems"), default=False
+    )
+    baseline_refrigerant_emission_factor = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("Baseline Refrigerant Emission Factor (GWP)"),
+    )
+    baseline_leakage_factor_percent = models.PositiveIntegerField(
+        default=2, verbose_name=_("Baseline Leakage Factor (%)")
+    )
+    total_energy_consumption_kwh_per_year = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_(
+            "Total Energy Consumption of Chiller System Annually (kWh/year)"
+        ),
+    )
+    number_of_chillers = models.PositiveIntegerField(
+        verbose_name=_("Number of Chillers")
+    )
+    water_cooled_chiller_cooling_load_factor_percent = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("Water-Cooled Chiller Cooling Load Factor (%)"),
+    )
+    total_chiller_system_power_input_kw = models.PositiveIntegerField(
+        null=True, blank=True, verbose_name=_("Total Chiller System Power Input (kW)")
+    )
+    cop = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=_("COP")
+    )
+    ip_lv = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=_("IPLV")
+    )
+    energy_efficiency_label = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        choices=[(i, _(str(i))) for i in range(1, 6)],
+        verbose_name=_("Energy Efficiency Label"),
+    )

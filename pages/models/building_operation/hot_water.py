@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from pages.models.building import Building
 
+
 class HotWaterSystemType(models.TextChoices):
     HEAT_PUMP = "HEAT_PUMP", _("Heat Pump Water Heater")
     BOILER = "BOILER", _("Boiler")
@@ -31,46 +32,56 @@ class HotWaterSystem(models.Model):
         Building,
         on_delete=models.CASCADE,
         related_name="hot_water_systems",
-        verbose_name=_("Building")
+        verbose_name=_("Building"),
     )
 
     system_type = models.CharField(
         max_length=50,
         choices=HotWaterSystemType.choices,
-        verbose_name=_("Type of Hot Water System")
+        verbose_name=_("Type of Hot Water System"),
     )
 
     operation_hours_per_workday = models.PositiveSmallIntegerField(
         verbose_name=_("Operation Hours for Hot Water per Workday")
     )
-    workdays_per_week = models.PositiveSmallIntegerField(verbose_name=_("Workdays per Week"))
-    workweeks_per_year = models.PositiveSmallIntegerField(verbose_name=_("Workweeks per Year"))
+    workdays_per_week = models.PositiveSmallIntegerField(
+        verbose_name=_("Workdays per Week")
+    )
+    workweeks_per_year = models.PositiveSmallIntegerField(
+        verbose_name=_("Workweeks per Year")
+    )
 
     fuel_type = models.CharField(
-        max_length=50,
-        choices=FuelType.choices,
-        verbose_name=_("Fuel Type")
+        max_length=50, choices=FuelType.choices, verbose_name=_("Fuel Type")
     )
 
-    fuel_consumption = models.PositiveIntegerField(verbose_name=_("Fuel Consumption (Liters/m³)"))
+    fuel_consumption = models.PositiveIntegerField(
+        verbose_name=_("Fuel Consumption (Liters/m³)")
+    )
 
-    power_input_kw = models.PositiveIntegerField(verbose_name=_("Hot Water System Power Input (kW)"))
-    baseline_efficiency_cop = models.PositiveIntegerField(verbose_name=_("Baseline Hot Water System Efficiency (COP)"))
+    power_input_kw = models.PositiveIntegerField(
+        verbose_name=_("Hot Water System Power Input (kW)")
+    )
+    baseline_efficiency_cop = models.PositiveIntegerField(
+        verbose_name=_("Baseline Hot Water System Efficiency (COP)")
+    )
     baseline_equipment_efficiency_percentage = models.PositiveIntegerField(
-        verbose_name=_("Baseline Hot Water System Equipment Efficiency Level (%)"))
+        verbose_name=_("Baseline Hot Water System Equipment Efficiency Level (%)")
+    )
 
     heat_recovery_installed = models.BooleanField(
-        verbose_name=_("Installation of Heat Recovery Systems"),
-        default=False
+        verbose_name=_("Installation of Heat Recovery Systems"), default=False
     )
 
-    number_of_equipments = models.PositiveIntegerField(verbose_name=_("Number of Hot Water Equipment Installed"))
+    number_of_equipments = models.PositiveIntegerField(
+        verbose_name=_("Number of Hot Water Equipment Installed")
+    )
 
     energy_efficiency_label = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
         choices=[(i, _(str(i))) for i in range(1, 6)],
-        verbose_name=_("Energy Efficiency Label")
+        verbose_name=_("Energy Efficiency Label"),
     )
 
     class Meta:
