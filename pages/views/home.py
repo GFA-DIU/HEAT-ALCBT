@@ -95,20 +95,45 @@ def get_material_category_mapping():
         return json.load(f)
 
 
-def get_category_short_name(category_name, is_structural):
-    short_name = category_name
+def get_category_short_name(category_name: str, is_structural: bool) -> str:
 
-    if is_structural and "- " in category_name:
-        short_name = category_name.split("- ")[1]
+    # Strip structural prefix if present
+    short_name = category_name.split("- ", 1)[-1] if is_structural and "- " in category_name else category_name
 
-    if short_name == "Intermediate Floor Construction":
-        return "Interm. Floor"
-    elif short_name == "Bottom Floor Construction":
-        return "Bottom Floor"
-    elif short_name == "Roof Construction":
-        return "Roof Const."
+    # Mapping of full names to short names
+    category_map = {
+        "Intermediate Floor Construction": "Interm. Floor",
+        "Bottom Floor Construction": "Bottom Floor",
+        "Roof Construction": "Roof Const.",
+    }
 
-    return short_name
+    return category_map.get(short_name, short_name)
+
+
+def aggregate_and_append(df, group_field, label_prefix, type_label, material_mapping=None, transform_label=None):
+
+    # Aggregate emissions data by a given field and return formatted CSV rows.
+
+    csv_rows = []
+    grouped = df.groupby(group_field).agg({"gwp": "sum", "penrt": "sum"}).reset_index()
+
+    for _, row in grouped.iterrows():
+        label = row[group_field]
+
+        # Apply transformations if provided
+        if transform_label:
+            label = transform_label(label)
+        if material_mapping:
+            label = material_mapping.get(row[group_field], "Others")
+
+        csv_rows.append([
+            f"{label_prefix} - {label}" if label_prefix else label,
+            row[group_field] if not material_mapping else row[group_field],
+            row["gwp"],
+            row["penrt"],
+            type_label
+        ])
+    return csv_rows
 
 
 def handle_building_export(request, building_id):
@@ -131,72 +156,32 @@ def handle_building_export(request, building_id):
     material_mapping = get_material_category_mapping()
 
     # Calculate aggregated totals
-    total_gwp = df['gwp'].sum()
-    operational_gwp = df[df['type'] == 'operational']['gwp'].sum()
-    embodied_gwp = df[df['type'] == 'structural']['gwp'].sum()
+    csv_data = [
+        ['Total', 'All', df['gwp'].sum(), df['penrt'].sum(), 'total'],
+        ['Operational Total', 'All', df[df['type'] == 'operational']['gwp'].sum(),
+         df[df['type'] == 'operational']['penrt'].sum(), 'operational_total'],
+        ['Embodied Total', 'All', df[df['type'] == 'structural']['gwp'].sum(),
+         df[df['type'] == 'structural']['penrt'].sum(), 'embodied_total']
+    ]
 
-    total_penrt = df['penrt'].sum()
-    operational_penrt = df[df['type'] == 'operational']['penrt'].sum()
-    embodied_penrt = df[df['type'] == 'structural']['penrt'].sum()
+    # Add embodied emissions by category and material
+    structural_df = df[df['type'] == 'structural']
+    if len(structural_df) > 0:
+        csv_data.extend(aggregate_and_append(
+            structural_df, 'assembly_category', 'Embodied', 'embodied_by_category',
+            transform_label=lambda label: get_category_short_name(label, True)
+        ))
+        csv_data.extend(aggregate_and_append(
+            structural_df, 'material_category', 'Embodied', 'embodied_by_material',
+            material_mapping=material_mapping
+        ))
 
-
-    csv_data = []
-
-    # Add summary totals
-    csv_data.append(['Total', 'All', total_gwp, total_penrt, 'total'])
-    csv_data.append(['Operational Total', 'All', operational_gwp, operational_penrt, 'operational_total'])
-    csv_data.append(['Embodied Total', 'All', embodied_gwp, embodied_penrt, 'embodied_total'])
-
-    # Add embodied emissions by category (shortened names from dashboard)
-    if len(df[df['type'] == 'structural']) > 0:
-        embodied_by_category = df[df['type'] == 'structural'].groupby('assembly_category').agg({
-            'gwp': 'sum',
-            'penrt': 'sum'
-        }).reset_index()
-
-        for _, row in embodied_by_category.iterrows():
-            category_short = get_category_short_name(row['assembly_category'], True)
-            csv_data.append([
-                f'Embodied - {category_short}',
-                'Category',
-                row['gwp'],
-                row['penrt'],
-                'embodied_by_category'
-            ])
-
-    # Add embodied emissions by material (using mapping from JSON)
-    if len(df[df['type'] == 'structural']) > 0:
-        embodied_by_material = df[df['type'] == 'structural'].groupby('material_category').agg({
-            'gwp': 'sum',
-            'penrt': 'sum'
-        }).reset_index()
-
-        for _, row in embodied_by_material.iterrows():
-            material_name = row['material_category']
-            mapped_category = material_mapping.get(material_name, 'Others')
-            csv_data.append([
-                f'Embodied - {mapped_category}',
-                material_name,
-                row['gwp'],
-                row['penrt'],
-                'embodied_by_material'
-            ])
-
-    # Add operational emissions by category if any
-    if len(df[df['type'] == 'operational']) > 0:
-        operational_by_category = df[df['type'] == 'operational'].groupby('material_category').agg({
-            'gwp': 'sum',
-            'penrt': 'sum'
-        }).reset_index()
-
-        for _, row in operational_by_category.iterrows():
-            csv_data.append([
-                f'Operational - {row["material_category"]}',
-                row['material_category'],
-                row['gwp'],
-                row['penrt'],
-                'operational_by_category'
-            ])
+    # Add operational emissions by category
+    operational_df = df[df['type'] == 'operational']
+    if len(operational_df) > 0:
+        csv_data.extend(aggregate_and_append(
+            operational_df, 'material_category', 'Operational', 'operational_by_category'
+        ))
 
     # Create CSV response
     response = HttpResponse(content_type='text/csv')
@@ -204,9 +189,7 @@ def handle_building_export(request, building_id):
 
     writer = csv.writer(response, delimiter=';')
     writer.writerow(['Category', 'Material_Category', 'GWP_kg_CO2eq_m2', 'PENRT_MJ_m2', 'Type'])
-
-    for row in csv_data:
-        writer.writerow(row)
+    writer.writerows(csv_data)
 
     logger.info(f"Building {building_id} CSV export completed for user {request.user}")
     return response
