@@ -157,7 +157,7 @@ class BuildingGeneralInformation(forms.ModelForm):
 
                 # Categories filter (building type)
                 self.fields["category"].queryset = CategorySubcategory.objects.filter(
-                    Q(category__country_id=country_id) | Q(category__country__isnull=True)  # universal types
+                    Q(country__id=country_id) | Q(country__isnull=True)  # universal types
                 ).select_related("category", "subcategory")
 
             except (ValueError, TypeError):
@@ -216,5 +216,12 @@ class BuildingGeneralInformation(forms.ModelForm):
                 ),
             ),
             # Update building_simulation.py line 44 if this changes
-            Submit("submit", "Submit", css_class="btn btn-primary"),
+            Submit(
+                "submit",
+                "Submit",
+                css_class="btn btn-primary",
+                hx_post="",  # Posts to the form's action URL
+                hx_target="#building-core-content",
+                hx_swap="outerHTML",
+            ),
         )
