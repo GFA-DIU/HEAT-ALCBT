@@ -157,7 +157,7 @@ class BuildingGeneralInformation(forms.ModelForm):
 
                 # Categories filter (building type)
                 self.fields["category"].queryset = CategorySubcategory.objects.filter(
-                    Q(category__country_id=country_id) | Q(category__country__isnull=True)  # universal types
+                    Q(country__id=country_id) | Q(country__isnull=True)  # universal types
                 ).select_related("category", "subcategory")
 
             except (ValueError, TypeError):
