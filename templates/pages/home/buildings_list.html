@@ -43,11 +43,17 @@
           </span>
         </div>
         
-        <!-- Right column: Delete button outside any <a> -->
-        <div class="col-md-auto d-flex align-items-center">
-          <button type="button" 
-                  class="btn btn-danger"
-                  hx-delete="{% url 'home' %}?building_id={{ building.id }}" 
+        <!-- Right column: Export and Delete buttons outside any <a> -->
+        <div class="col-md-auto d-flex align-items-center gap-2">
+          <button type="button"
+                  class="btn btn-outline-primary btn-sm"
+                  onclick="window.location.href='{% url 'home' %}?export=csv&building_id={{ building.id }}'"
+                  title="Export building emissions to CSV">
+            Export
+          </button>
+          <button type="button"
+                  class="btn btn-danger btn-sm"
+                  hx-delete="{% url 'home' %}?building_id={{ building.id }}"
                   hx-confirm="Are you sure you wish to delete this building?"
                   hx-target="#buildings_list"
                   hx-swap="innerHTML">
