@@ -1,6 +1,6 @@
 import {
-  ICONS_REGISTRY,
   EXCLUDED_FROM_CURRENT_COLOR,
+  ICONS_REGISTRY,
 } from "/src/constants/icons-registry.js";
 
 class IconComponent {

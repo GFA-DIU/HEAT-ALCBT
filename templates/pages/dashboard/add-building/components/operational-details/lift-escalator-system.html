@@ -1,0 +1,161 @@
+<dialog
+  id="lift_escalator_system_modal"
+  class="modal modal-bottom sm:modal-end"
+>
+  <div
+    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
+  >
+    <div class="flex justify-between p-5 w-full">
+      <div class="flex flex-col">
+        <h3 class="text-lg/6 font-medium">Add a lift & escalator system</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">
+          Provide details on lift & escalator system.
+        </p>
+      </div>
+      <button
+        type="button"
+        onclick="lift_escalator_system_modal.close()"
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+      >
+        <span
+          data-icon="close-line"
+          data-size="16"
+          data-color="var(--icon--sub-600)"
+        ></span>
+      </button>
+    </div>
+    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+      <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">
+            Number of lifts<span class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 5" />
+          </label>
+          <p class="validator-hint">This field is required</p>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            Installation of Lift regenerative Features<span
+              class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <select class="select w-full">
+            <option disabled selected value="">Select an option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            Installation of VVVF and sleep mode<span
+              class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <select class="select w-full">
+            <option disabled selected value="">Select an option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </fieldset>
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">
+            Annual lift system energy consumption<span
+              class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 343" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+              >kWh/year</span
+            >
+          </label>
+        </fieldset>
+      </div>
+    </form>
+    <div
+      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
+    >
+      <button
+        type="button"
+        class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
+        onclick="lift_escalator_system_modal.close()"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn flex-1 btn-sm btn-primary">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<template id="lift-escalator-system-template">
+  <div class="w-full flex flex-col">
+    <button
+      class="btn btn-outline w-fit"
+      onclick="lift_escalator_system_modal.showModal()"
+    >
+      Add a lift & escalator system
+    </button>
+    <div
+      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
+    ></div>
+    <ul class="grid grid-cols-1">
+      <li
+        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
+      >
+        <span
+          data-icon="stairs-line"
+          data-size="20"
+          data-color="var(--icon--strong-950)"
+          class="shrink-0 self-start"
+        ></span>
+        <div class="flex flex-col flex-1">
+          <p class="text-sm/5 font-medium">Lift & Escalator 01</p>
+          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+            <span>Lift Regenerative Features</span>
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="edit-line"
+              data-size="16"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="delete-bin-5-line"
+              data-size="16"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<template id="no-lift-escalator-system-template">
+  <div class="w-full flex flex-col gap-3 items-center justify-center">
+    <img
+      src="/src/assets/lift-escalator-system.png"
+      alt="lift-escalator System Image"
+    />
+    <p class="text-sm/5 font-medium">
+      Click button below to add a lift & escalator system
+    </p>
+    <button
+      class="btn btn-primary"
+      onclick="lift_escalator_system_modal.showModal()"
+    >
+      Add lift & escalator system
+    </button>
+  </div>
+</template>

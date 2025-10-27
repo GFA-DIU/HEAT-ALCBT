@@ -192,6 +192,7 @@
             </div>
             <button
               class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+              type="button"
             >
               <span
                 data-icon="add-large-fill"
@@ -235,6 +236,7 @@
             </div>
             <button
               class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+              type="button"
             >
               <span
                 data-icon="add-large-fill"
@@ -278,6 +280,7 @@
             </div>
             <button
               class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+              type="button"
             >
               <span
                 data-icon="add-large-fill"
@@ -321,6 +324,7 @@
             </div>
             <button
               class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+              type="button"
             >
               <span
                 data-icon="add-large-fill"
@@ -347,7 +351,9 @@
         </button>
         <ul class="flex items-center gap-2">
           <li>
-            <button class="btn btn-sm rounded-[var(--radius-8)]">1</button>
+            <button class="btn btn-sm rounded-[var(--radius-8)] btn-neutral">
+              1
+            </button>
           </li>
           <li>
             <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
@@ -380,3 +386,114 @@
     </div>
   </div>
 </dialog>
+
+<dialog id="energy_carrier_modal_delete" class="modal modal-middle">
+  <div class="modal-box w-full max-w-[26.375rem] p-0">
+    <div class="flex flex-col items-center p-5">
+      <div
+        class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]"
+      >
+        <span
+          data-icon="alert-fill"
+          data-size="24"
+          data-color="var(--state--warning--base)"
+        ></span>
+      </div>
+      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
+        You are about to remove or delete a added energy carrier. This will
+        action will permanently remove it.
+      </p>
+    </div>
+    <div
+      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
+    >
+      <button
+        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
+      >
+        Cancel
+      </button>
+      <button class="btn btn-sm btn-error flex-1">Remove</button>
+    </div>
+  </div>
+</dialog>
+
+<template id="energy-carrier-template">
+  <div class="w-full flex flex-col">
+    <button
+      class="btn btn-outline w-fit"
+      onclick="energy_carrier_modal.showModal()"
+    >
+      Add energy carrier
+    </button>
+    <div
+      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
+    ></div>
+    <ul class="grid grid-cols-1">
+      <li
+        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
+      >
+        <span
+          data-icon="gas-station-line"
+          data-size="20"
+          data-color="var(--icon--strong-950)"
+          class="shrink-0 self-start"
+        ></span>
+        <div class="flex flex-col flex-1">
+          <p class="text-sm/5 font-medium">Diesel</p>
+          <div class="flex items-stretch gap-2">
+            <label class="input w-full">
+              <input type="text" placeholder="Add a description" />
+            </label>
+            <label class="input pr-0">
+              <input type="number" placeholder="Quantity" />
+              <select
+                class="select select-ghost w-fit !outline-none !border-none"
+              >
+                <option selected value="kg">kg</option>
+                <option value="liters">liters</option>
+                <option value="kwh">kwh</option>
+                <option value="m³">m³</option>
+              </select>
+            </label>
+          </div>
+
+          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+            <span class="border-r border-[var(--text--sub-600)] pr-1"
+              >Airflow rate: 45CMH</span
+            >
+            <span>Capacity units: m<sup>3</sup>/hr</span>
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="edit-line"
+              data-size="16"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="delete-bin-5-line"
+              data-size="16"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<template id="no-energy-carrier-template">
+  <div class="w-full flex flex-col gap-3 items-center justify-center">
+    <img src="/src/assets/energy-carrier.png" alt="Energy Carrier Image" />
+    <p class="text-sm/5 font-medium">
+      Click button below to add a energy carrier
+    </p>
+    <button class="btn btn-primary" onclick="energy_carrier_modal.showModal()">
+      Add an energy carrier
+    </button>
+  </div>
+</template>

@@ -66,7 +66,7 @@ class StepManager {
             requiredFields: [],
             title: "Lift & Escalator System",
             description:
-              "Provide details on the building's lift and escalator system, including type and capacity.",
+              "Provide details on lift & escalator systems in your building if any.",
           },
           {
             name: "Hot Water System",
@@ -74,7 +74,7 @@ class StepManager {
             requiredFields: ["hot-water-type"],
             title: "Hot Water System",
             description:
-              "Provide details on the building's hot water system, including type and capacity.",
+              "Defines the building’s method of producing and distributing hot water, including equipment type, energy source, and usage patterns.",
           },
         ],
       },
