@@ -31,7 +31,7 @@ In local development we use a dockerized postgres instance.
 Start the postgres DB
 
 ```Bash
-$ docker compose up db
+docker compose up db
 ```
 
 ### Installation
@@ -78,6 +78,7 @@ To load the EPD data from Ecoplatform:
 ```
 
 To load all generic EPDs found under `pages/data`:
+
 ```Bash
 (.venv) $ python manage.py load_local_epds
 ```
@@ -91,6 +92,7 @@ To load a specific set of local EPDs, name the relevant file with one of the key
 ### Loading Labels
 
 Load EPD (manual) label mappings from label file
+
 ```Bash
 (.venv) $ python manage.py map_GCCA_EPD_label
 ```
@@ -100,20 +102,21 @@ Load EPD (manual) label mappings from label file
 To inspect the data tables in postgres instead of Django admin
 
 ```Bash
-$ pgcli -h localhost -p 5432 -U postgres -d postgres
+pgcli -h localhost -p 5432 -U postgres -d postgres
 ```
-
 
 To load heroku DB snapshot (custom/tar PostgreSQL), follow these steps:
 
 1. Spin-up the DB and identify the container
+
 ```Bash
-$ docker compose up -d db
-$ DB_CID=$(docker compose ps -q db)
-$ echo "$DB_CID"
+docker compose up -d db
+DB_CID=$(docker compose ps -q db)
+echo "$DB_CID"
 ```
 
 2. Verify snapshot and move into container
+
 ```Bash
 $ SNAPSHOT=./path/to/snapshot
 # custom/tar shows 'PostgreSQL custom database dump' or 'POSIX tar'
@@ -122,6 +125,7 @@ $ docker cp "$SNAPSHOT" "$DB_CID":/tmp/snapshot.dump
 ```
 
 3. Restore custom dump with `pg_restore`
+
 ```Bash
 # Drop + recreate target DB inside the container (avoid lingering objects)
 $ docker exec -i "$DB_CID" bash -lc 'dropdb -U "$POSTGRES_USER" --if-exists "$POSTGRES_DB" && createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'
@@ -131,9 +135,10 @@ $ docker exec -i "$DB_CID" bash -lc 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRE
 ```
 
 4. Smoke test the restore
+
 ```Bash
-$ docker exec -it "$DB_CID" psql -U postgres -d postgres -c '\dt'    # list tables
-$ docker exec -it "$DB_CID" psql -U postgres -d postgres -c 'select now();'
+docker exec -it "$DB_CID" psql -U postgres -d postgres -c '\dt'    # list tables
+docker exec -it "$DB_CID" psql -U postgres -d postgres -c 'select now();'
 ```
 
 ## Contribute
@@ -145,8 +150,8 @@ Follow the installation steps [above](#installation).
 To deploy to the production server you need to be added to the repository with the relevant roles. Once you obtain an authentication token, you can contribute like this through the Heroku CLI.
 
 ```Bash
-$ heroku login -i
-$ git push heroku main
+heroku login -i
+git push heroku main
 ```
 
 For executing any necessary migrations, connect via `SSH` or the Heroku-Webinterface.
@@ -167,7 +172,9 @@ To execute Unit tests, run
 ```
 
 ### Load testing
+
 Execute for production server with the GUI as follows:
+
 ```Bash
 (.venv) $ locust -f load_testing/locust/locustfile.py --host https://beat-alcbt.gggi.org
 ```
@@ -177,6 +184,7 @@ Execute for production server with the GUI as follows:
 For support, please reach out to the maintainers or [kontakt@heat-international.de](mailto:kontakt@heat-international.de).
 
 ## License
+
 [Apache 2.0](LICENSE)
 
 The tool was built with the public Django template `wsvincent/lithium`. As requested, the copyright notice is included below:

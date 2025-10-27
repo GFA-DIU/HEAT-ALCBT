@@ -1,0 +1,702 @@
+<div id="cooling-system-container" class="w-full">
+  <div class="w-full flex flex-col">
+    <button
+      class="btn btn-outline w-fit"
+      onclick="cooling_system_modal.showModal()"
+    >
+      Add a cooling system
+    </button>
+    <div
+      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
+    ></div>
+    <ul class="grid grid-cols-1">
+      <li
+        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
+      >
+        <span
+          data-icon="snowflake-fill"
+          data-size="20"
+          data-color="var(--icon--strong-950)"
+          class="shrink-0 self-start"
+        ></span>
+        <div class="flex flex-col flex-1">
+          <p class="text-sm/5 font-medium">
+            Chiller system - Water cooled chiller
+          </p>
+          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+            <span class="border-r border-[var(--text--sub-600)] pr-1"
+              >Type: R-290 Propane</span
+            >
+            <span>Refrigerant quantity: 23 kg</span>
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="edit-line"
+              data-size="16"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="delete-bin-5-line"
+              data-size="16"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<dialog id="cooling_system_modal" class="modal modal-bottom sm:modal-end">
+  <div
+    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
+  >
+    <div class="flex justify-between p-5 w-full">
+      <div class="flex flex-col">
+        <h3 class="text-lg/6 font-medium">Add a cooling system</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">
+          Enter details of the building’s cooling system, including type and
+          capacity
+        </p>
+      </div>
+      <button
+        type="button"
+        onclick="cooling_system_modal.close()"
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+      >
+        <span
+          data-icon="close-line"
+          data-size="16"
+          data-color="var(--icon--sub-600)"
+        ></span>
+      </button>
+    </div>
+    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+      <div class="px-5 py-4">
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Type of cooling system</legend>
+          <select
+            class="select w-full"
+            id="cooling-system-type"
+            name="cooling-system-type"
+          >
+            <option disabled selected value="">Select a cooling system</option>
+            <option value="chiller-system">Chiller Systems</option>
+            <option value="air-condition-system">Air condition system</option>
+          </select>
+        </fieldset>
+      </div>
+
+      <div id="selected-cooling-system"></div>
+    </form>
+    <div
+      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
+    >
+      <button
+        type="button"
+        class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn flex-1 btn-sm btn-primary">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<template id="cooling-system-template">
+  <div class="w-full flex flex-col">
+    <button
+      class="btn btn-outline w-fit"
+      onclick="cooling_system_modal.showModal()"
+    >
+      Add a cooling system
+    </button>
+    <div
+      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
+    ></div>
+    <ul class="grid grid-cols-1">
+      <li
+        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
+      >
+        <span
+          data-icon="snowflake-fill"
+          data-size="20"
+          data-color="var(--icon--strong-950)"
+          class="shrink-0 self-start"
+        ></span>
+        <div class="flex flex-col flex-1">
+          <p class="text-sm/5 font-medium">
+            Chiller system - Water cooled chiller
+          </p>
+          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+            <span class="border-r border-[var(--text--sub-600)] pr-1"
+              >Type: R-290 Propane</span
+            >
+            <span>Refrigerant quantity: 23 kg</span>
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="edit-line"
+              data-size="16"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="delete-bin-5-line"
+              data-size="16"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<template id="no-cooling-system-template">
+  <div class="w-full flex flex-col gap-3 items-center justify-center">
+    <img src="/src/assets/cooling-system.png" alt="Cooling System Image" />
+    <p class="text-sm/5 font-medium">
+      Click button below to add a cooling system
+    </p>
+    <button class="btn btn-primary" onclick="cooling_system_modal.showModal()">
+      Add a cooling system
+    </button>
+  </div>
+</template>
+
+<template id="chiller-system-template">
+  <div
+    class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4"
+  >
+    CHILLER SYSTEM DATA
+  </div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Chiller system<span class="text-[var(--state--error--base)]">*</span>
+      </legend>
+      <select class="select w-full">
+        <option disabled selected value="">Select an option</option>
+        <option value="water-cooled">Water cooled chiller</option>
+        <option value="air-cooled">Air cooled chiller</option>
+      </select>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Year of installation<span class="text-[var(--state--error--base)]"
+          >*</span
+        >
+      </legend>
+      <label class="input validator w-full">
+        <input type="text" placeholder="eg. 2012" />
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Type of refrigerants<span class="text-[var(--state--error--base)]"
+          >*</span
+        >
+      </legend>
+      <select class="select w-full">
+        <option disabled selected value="">Select an option</option>
+        <option value="R1234ze">R-134A</option>
+        <option value="R1234ze">R-32</option>
+        <option value="R1234ze">R-410A</option>
+        <option value="R1234ze">R-290 (Propane)</option>
+        <option value="R1234ze">R-600a (Isobutane)</option>
+        <option value="R1234ze">R-717 (Ammonia)</option>
+        <option value="R1234ze">R-744 (C02)</option>
+        <option value="R1234ze">R-404A</option>
+      </select>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Refrigerant quantity<span class="text-[var(--state--error--base)]"
+          >*</span
+        ><span class="text-[var(--text--sub-600)]">(kg)</span>
+      </legend>
+      <label class="input validator w-full">
+        <input type="number" placeholder="eg.  134" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+          >kg</span
+        >
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Installation of variable speed drives<span
+          class="text-[var(--state--error--base)]"
+          >*</span
+        ><span
+          data-icon="info-custom-fill"
+          data-size="20"
+          data-color="var(--icon--disabled-300)"
+        ></span>
+      </legend>
+      <div class="flex items-center gap-2.5">
+        <label class="flex items-center gap-2">
+          <input
+            type="radio"
+            name="installation-of-variable-speed-drives"
+            class="radio radio-xs"
+          />
+          Yes
+        </label>
+        <label class="flex items-center gap-2">
+          <input
+            type="radio"
+            name="installation-of-variable-speed-drives"
+            class="radio radio-xs"
+          />
+          No
+        </label>
+      </div>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Installation of heat recovery systems<span
+          class="text-[var(--state--error--base)]"
+          >*</span
+        ><span
+          data-icon="info-custom-fill"
+          data-size="20"
+          data-color="var(--icon--disabled-300)"
+        ></span>
+      </legend>
+      <div class="flex items-center gap-2.5">
+        <label class="flex items-center gap-2">
+          <input
+            type="radio"
+            name="installation-of-heat-recovery-systems"
+            class="radio radio-xs"
+          />
+          Yes
+        </label>
+        <label class="flex items-center gap-2">
+          <input
+            type="radio"
+            name="installation-of-heat-recovery-systems"
+            class="radio radio-xs"
+          />
+          No
+        </label>
+      </div>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Total cooling load for chiller system<span
+          class="text-[var(--state--error--base)]"
+          >*</span
+        >
+      </legend>
+      <label class="input validator w-full">
+        <input type="text" placeholder="eg. 342" />
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline leakage factor</legend>
+      <label class="input validator w-full">
+        <input type="number" placeholder="eg. 2" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+          >%</span
+        >
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">
+        Annual operating schedule<span
+          data-icon="info-custom-fill"
+          data-size="20"
+          data-color="var(--icon--disabled-300)"
+        ></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 1" required />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+              >Hours / day</span
+            >
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 1" required />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+              >days / week</span
+            >
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 1" required />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+              >weeks / year</span
+            >
+          </label>
+        </div>
+      </div>
+    </fieldset>
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">
+        Baseline Air Cooled/Water Cooled Chiller Cooling Efficiency
+      </legend>
+      <label class="input w-full">
+        <input type="number" placeholder="eg. 2" />
+      </label>
+    </fieldset>
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div
+          class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
+        >
+          OTHER DETAILS
+          <span
+            data-icon="caret-down"
+            data-size="16"
+            data-color="var(--icon--soft-400)"
+            class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"
+          ></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">
+                Number of chillers<span class="text-[var(--text--sub-600)]"
+                  >(Optional)</span
+                >
+              </legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 2" />
+              </label>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">
+                Total chiller system power input<span
+                  class="text-[var(--text--sub-600)]"
+                  >(Optional)</span
+                >
+              </legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 2000" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+                  >kWH</span
+                >
+              </label>
+            </fieldset>
+            <fieldset class="fieldset col-span-2">
+              <legend class="fieldset-legend">
+                Water-cooled chiller cooling load factor<span
+                  class="text-[var(--text--sub-600)]"
+                  >(Optional) %</span
+                >
+              </legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 45" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+                  >%</span
+                >
+              </label>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">COP</legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 2" />
+              </label>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">IPVL</legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 2" />
+              </label>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Energy efficiency label</legend>
+              <select class="select w-full">
+                <option disabled selected value="">Select an option</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="G">G</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Number of stars</legend>
+              <select class="select w-full">
+                <option disabled selected value="">Select an option</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset col-span-2">
+              <legend class="fieldset-legend">
+                Total energy consumption of chiller system anually (kwh/year)
+              </legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 200" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+                  >kWh/year</span
+                >
+              </label>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="air-condition-system-template">
+  <div
+    class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4"
+  >
+    AIR CONDITION SYSTEM DATA
+  </div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Type of air condition<span class="text-[var(--state--error--base)]"
+          >*</span
+        >
+      </legend>
+      <select class="select w-full">
+        <option disabled selected value="">Select an option</option>
+        <option value="split">Split air condition</option>
+        <option value="VRV">
+          Variable Refrigerant Volume (VRV) / Variable Refrigerant Flow (VRF)
+        </option>
+      </select>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Year of installation<span class="text-[var(--state--error--base)]"
+          >*</span
+        >
+      </legend>
+      <label class="input validator w-full">
+        <input type="text" placeholder="eg. 2012" />
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Type of refrigerants<span class="text-[var(--state--error--base)]"
+          >*</span
+        >
+      </legend>
+      <select class="select w-full">
+        <option disabled selected value="">Select an option</option>
+        <option value="R1234ze">R-134A</option>
+        <option value="R1234ze">R-32</option>
+        <option value="R1234ze">R-410A</option>
+        <option value="R1234ze">R-290 (Propane)</option>
+        <option value="R1234ze">R-600a (Isobutane)</option>
+        <option value="R1234ze">R-717 (Ammonia)</option>
+        <option value="R1234ze">R-744 (C02)</option>
+        <option value="R1234ze">R-404A</option>
+      </select>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Refrigerant quantity<span class="text-[var(--state--error--base)]"
+          >*</span
+        ><span class="text-[var(--text--sub-600)]">(kg)</span>
+      </legend>
+      <label class="input validator w-full">
+        <input type="number" placeholder="eg.  134" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+          >kg</span
+        >
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Total cooling load for split/VRV<span
+          class="text-[var(--state--error--base)]"
+          >*</span
+        >
+      </legend>
+      <label class="input validator w-full">
+        <input type="text" placeholder="eg. 342" />
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline leakage factor</legend>
+      <label class="input validator w-full">
+        <input type="number" placeholder="eg. 2" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+          >%</span
+        >
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">
+        System operating schedule<span
+          data-icon="info-custom-fill"
+          data-size="20"
+          data-color="var(--icon--disabled-300)"
+        ></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 1" required />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+              >Hours / day</span
+            >
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 1" required />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+              >days / week</span
+            >
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 1" required />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+              >weeks / year</span
+            >
+          </label>
+        </div>
+      </div>
+    </fieldset>
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div
+          class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
+        >
+          OTHER DETAILS
+          <span
+            data-icon="caret-down"
+            data-size="16"
+            data-color="var(--icon--soft-400)"
+            class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"
+          ></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">
+                Total number of split/VRV units
+              </legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 2" />
+              </label>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">
+                Total split unit//VRV system
+              </legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 400" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+                  >kW</span
+                >
+              </label>
+            </fieldset>
+            <fieldset class="fieldset col-span-2">
+              <legend class="fieldset-legend">
+                Total energy consumption of chiller system annually<span
+                  class="text-[var(--text--sub-600)]"
+                  >(kWh/year)</span
+                >
+              </legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 200" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+                  >%</span
+                >
+              </label>
+            </fieldset>
+            <fieldset class="fieldset col-span-2">
+              <legend class="fieldset-legend">
+                Baseline split unit/VRV system efficiency
+              </legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 333" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+                  >watt</span
+                >
+              </label>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">ISSER rating</legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 4.5" />
+              </label>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">COP</legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 2" />
+              </label>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Energy efficiency label</legend>
+              <select class="select w-full">
+                <option disabled selected value="">Select an option</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="G">G</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Number of stars</legend>
+              <select class="select w-full">
+                <option disabled selected value="">Select an option</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset col-span-2">
+              <legend class="fieldset-legend">
+                Total energy consumption of chiller system anually (kwh/year)
+              </legend>
+              <label class="input w-full">
+                <input type="number" placeholder="eg. 200" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+                  >kWh/year</span
+                >
+              </label>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

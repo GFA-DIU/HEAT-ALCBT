@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beat Heat</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+    <link rel="stylesheet" href="/public/output.css" />
+    <style>
+      a {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-[var(--bg--base-500)] flex items-stretch">
+    <div class="flex items-stretch w-full p-2.5 gap-4">
+      <div class="w-full flex flex-col max-w-[37.875rem] mx-auto">
+        <div class="flex items-center justify-between max-md:mb-10">
+          <img
+            src="/src/assets/logo.svg"
+            alt="logo"
+            class="w-[45px] h-[18px]"
+          />
+          <a href="/src/pages/auth/login.html">
+            <button type="button" class="btn btn-outline btn-sm">Login</button>
+          </a>
+        </div>
+        <div class="flex flex-col h-full justify-between">
+          <div class="m-auto flex flex-col w-full max-w-[22.25rem]">
+            <h1
+              class="text-xl font-bold text-center text-[var(--text--strong-950)]"
+            >
+              Create An Account
+            </h1>
+            <p
+              class="text-sm text-center mt-2 mb-5 text-[var(--text--sub-600)]"
+            >
+              Fill in the details below to create your account and track the
+              carbon mission from your building project.
+            </p>
+
+            <form class="flex flex-col">
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">Full name*</legend>
+                <label class="input validator w-full">
+                  <span
+                    data-icon="user-6-line"
+                    data-color="var(--icon--soft-400)"
+                  ></span>
+                  <input
+                    type="text"
+                    placeholder="First name & Last name"
+                    required
+                  />
+                </label>
+                <p class="validator-hint">This field is required</p>
+              </fieldset>
+
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">Email address*</legend>
+                <label class="input validator w-full">
+                  <span
+                    data-icon="mail-line"
+                    data-color="var(--icon--soft-400)"
+                  ></span>
+                  <input
+                    type="email"
+                    placeholder="someone@gmail.com"
+                    required
+                  />
+                </label>
+                <p class="validator-hint">Please enter a valid email address</p>
+              </fieldset>
+
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">Password*</legend>
+                <label class="input validator w-full">
+                  <span
+                    data-icon="lock-2-line"
+                    data-color="var(--icon--soft-400)"
+                  ></span>
+                  <input
+                    type="password"
+                    placeholder="Enter password"
+                    required
+                    minlength="8"
+                  />
+                  <span
+                    data-icon="eye-line"
+                    data-color="var(--icon--soft-400)"
+                  ></span>
+                </label>
+                <p class="validator-hint">
+                  Password must contain at least 8 characters
+                </p>
+              </fieldset>
+
+              <button class="btn btn-primary w-full" onclick="goToDashboard()">
+                Create account
+              </button>
+            </form>
+            <div class="divider">OR</div>
+            <button class="btn btn-accent w-full">
+              <span data-icon="google"></span> Sign up with Google
+            </button>
+            <span
+              class="text-sm/5 text-center mt-5 text-[var(--text--strong-950)]"
+              >I already have an account.
+              <a href="/src/pages/auth/login.html" class="font-bold"
+                >Log me in</a
+              ></span
+            >
+          </div>
+          <p
+            class="text-sm text-center max-md:mt-6 text-[var(--text--strong-950)]"
+          >
+            <a>Terms of use</a>&nbsp;and&nbsp;<a>Privacy policy</a>
+          </p>
+        </div>
+      </div>
+      <div
+        class="flex w-full rounded-3xl overflow-hidden relative max-lg:hidden max-w-[578px]"
+      >
+        <img
+          src="/src/assets/onboarding.png"
+          alt="background image"
+          class="w-full h-full object-cover absolute top-0 left-0"
+        />
+        <div
+          class="absolute bottom-0 left-0 w-full pl-[3.188rem] pr-[7.375rem] pb-[4.313rem] z-1"
+        >
+          <div class="flex flex-col text-white">
+            <h1 class="text-[2.5rem]/[103%] font-black">
+              Building Emission Assessment Tool
+            </h1>
+            <p class="text-sm">
+              Accelerating the transition towards zero and low carbon buildings
+              through data-driven decisions
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script type="module" src="/src/utils/icon.js"></script>
+  <script>
+    function goToDashboard() {
+      window.location.href = "/src/pages/dashboard/dashboard.html";
+    }
+  </script>
+</html>
