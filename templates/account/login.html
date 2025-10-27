@@ -1,70 +1,80 @@
-{% extends '_base.html' %}
+{% extends 'account/_auth.html' %}
 {% load crispy_forms_tags %}
-{% load cookie_consent_tags %}
 
-{% block css %}
-{{ block.super }}
-{% load static %}
-  <link rel="stylesheet" href="{% static 'css/account/signup.css' %}">
-{% endblock css %}
+ {% block action_content  %}
+    <a href="{% url 'account_signup' %}">
+      <button type="button" class="btn btn-outline btn-sm">Sign Up</button>
+    </a>
+  {% endblock action_content %}
 
-{% block title %}Log in{% endblock %}
-{% block body_class %}bg-cover{% endblock %}
+{% block auth_content %}
+ 
+  <div class="m-auto flex flex-col w-full max-w-[22.25rem]">
+            <h1
+              class="text-xl font-bold text-center text-(--text--strong-950)"
+            >
+              Login
+            </h1>
+            <form  method="post" class="flex flex-col">
+              <div class="crispy-forms"> 
+                {% csrf_token %} {{ form|crispy }}
+              </div>
+              {% comment %} <fieldset class="fieldset">
+                <legend class="fieldset-legend">Email address*</legend>
+                <label class="input validator w-full">
+                  <span
+                    data-icon="mail-line"
+                    data-color="var(--icon--soft-400)"
+                  ></span>
+                  <input
+                    type="email"
+                    placeholder="someone@gmail.com"
+                    required
+                  />
+                </label>
+                <p class="validator-hint">Please enter a valid email address</p>
+              </fieldset>
 
-{% block content %}
-<div class="row mt-5">
-  <!-- Info -->
-  <div class="col-sm-7">
-    <div class="p-4 ps-0 beat-title">
-      <h1 class="mb-3 text-white">BEAT</h1>
-      <h4 class="mb-3 text-white">Building Emission Assessment Tool</h4>
-      <span class="text-white fst-italic">Accelerating the transition towards zero and low carbon buildings through data-driven decisions</span>
-    </div>
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend">Password*</legend>
+                <label class="input validator w-full">
+                  <span
+                    data-icon="lock-2-line"
+                    data-color="var(--icon--soft-400)"
+                  ></span>
+                  <input
+                    type="password"
+                    placeholder="Enter password"
+                    required
+                    minlength="8"
+                  />
+                  <span
+                    data-icon="eye-line"
+                    data-color="var(--icon--soft-400)"
+                  ></span>
+                </label>
+                <p class="validator-hint">
+                  Password must contain at least 8 characters
+                </p>
+              </fieldset> {% endcomment %}
 
-    {% if request|cookie_group_accepted:"media" %}
-    <div class="ratio ratio-16x9">
-      <iframe src="https://www.youtube-nocookie.com/embed/Q2lyuEUx0bg?si=Qlzcf1BAO2wfjgOr"
-              title="YouTube video player"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen>
-      </iframe>
-    </div>
-    {% else %}
-    <div class="ratio ratio-21x9" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); border-radius: 8px; border: 2px solid #F26716; position: relative; overflow: hidden;">
-      <div class="d-flex align-items-center justify-content-center h-100 w-100" style="position: absolute; top: 0; left: 0;">
-        <div class="text-center p-4 text-white">
-          <i class="bi bi-play-circle" style="font-size: 4rem; color: #F26716;" class="mb-3"></i>
-          <p class="mb-3 opacity-75">This content requires media cookies to be enabled for embedded videos.</p>
-          <button class="btn btn-sm px-4 py-2" style="background: #F26716; color: white; border-radius: 25px; font-weight: 500;" onclick="showCookieSettings()">
-            <i class="bi bi-gear me-1"></i>Manage Cookie Settings
-          </button>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-  </div>
-  <div class="col-sm-5">
-    <div class="d-flex justify-content-center align-items-center">
-      <div class="card shadow-lg p-4 w-100">
-        <div class="text-center mb-2">
-          <h2 class="mb-3">Log in</h2>
-          <p class="text-muted">Log in to <span style="color:#F26716; font-weight: bold;">BEAT</span> to continue</p>
-        </div>
-        <form method="post" class="small-bullet-text">
-          {% csrf_token %} {{ form|crispy }}
-          <button class="btn btn-success" type="submit">Log in</button>
-        </form>
+              <button class="btn btn-primary w-full" type="submit">
+                Login
+              </button>
+            </form>
+            <div class="divider">OR</div>
+            <button class="btn btn-accent w-full">
+              <span data-icon="google"></span> Sign up with Google
+            </button>
+            <span
+              class="text-sm/5 text-center mt-5 text-[var(--text--strong-950)]"
+              >Don't have an account.
+              <a href="{% url 'account_signup' %}" class="font-bold"
+                >Sign up</a
+              ></span
+            >
+          </div>
+   
 
-        <div class="text-center mt-3">
-          <p class="mb-1">Don't have an account? <a href="{% url 'account_signup' %}">Sign up</a></p>
-          <p class="mb-1 form-text">
-            <a href="{% url 'terms_of_use' %}">Terms of Use</a> and <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock content %}
+
+{% endblock auth_content %}

@@ -1,0 +1,59 @@
+{% extends '_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sign up{% endblock %}
+ 
+{% load static %}
+ 
+{% block body_class %}page-cover{% endblock %}
+
+{% block content %}
+
+  <div class="flex items-stretch w-full p-2.5 gap-4">
+      <div class="w-full flex flex-col max-w-[37.875rem] mx-auto">
+        <div class="flex items-center justify-between max-md:mb-10">
+          <img
+            src="{% static 'assets/logo.svg' %}"
+            alt="logo"
+            class="w-[45px] h-[18px]"
+          />
+          {% block action_content %} {% endblock action_content %}
+        </div>
+        <div class="flex flex-col h-full justify-between">
+          <div class="m-auto flex flex-col w-full max-w-[22.25rem]">
+            {% block auth_content %} 
+
+            {% endblock auth_content %}
+          </div>
+          <p
+            class="text-sm text-center max-md:mt-6 text-(--text--strong-950)"
+          >
+            <a href="{% url 'terms_of_use' %}">Terms of use</a>&nbsp;and&nbsp;<a href="{% url 'privacy_policy' %}">Privacy policy</a>
+          </p>
+        </div>
+      </div>
+      <div
+        class="flex w-full rounded-3xl overflow-hidden relative max-lg:hidden max-w-[578px]"
+      >
+        <img
+          src="{% static '/assets/onboarding.png' %}"
+          alt="background image"
+          class="w-full h-full object-cover absolute top-0 left-0"
+        />
+        <div
+          class="absolute bottom-0 left-0 w-full pl-[3.188rem] pr-[7.375rem] pb-[4.313rem] z-1"
+        >
+          <div class="flex flex-col text-white">
+            <h1 class="text-[2.5rem]/[103%] font-black">
+              Building Emission Assessment Tool
+            </h1>
+            <p class="text-sm">
+              Accelerating the transition towards zero and low carbon buildings
+              through data-driven decisions
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock content %}

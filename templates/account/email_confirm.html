@@ -1,10 +1,10 @@
-{% extends '_base.html' %}
+{% extends 'account/_base.html' %}
 {% load crispy_forms_tags %}
 
 {% block title %}Email Confirmation{% endblock %}
 
-{% block content %}
-    <h1>
+{% block auth_content %}
+    <h1 class="text-xl font-bold text-center text-(--text--strong-950)">
         "Confirm Email Address"
     </h1>
     {% if confirmation %}
@@ -28,4 +28,4 @@
             This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email confirmation request</a>.
         </p>
     {% endif %}
-{% endblock content %}
+{% endblock auth_content %}

@@ -1,10 +1,10 @@
-{% extends '_base.html' %}
+{% extends 'account/_base.html' %}
 {% load crispy_forms_tags %}
 
-{% block content %}
+{% block auth_content %}
   <div class="d-flex justify-content-between align-items-center">
-    <h2>Update Profile</h2>
-    <button class="btn btn-danger"
+    <h2 class="text-xl font-bold text-center text-(--text--strong-950)">Update Profile</h2>
+    <button class="btn btn-danger w-full"
               hx-confirm="Are you sure you want to delete your profile?"
               hx-delete="{% url 'update_profile' %}">
                   Delete
@@ -17,8 +17,8 @@
     <strong>Profile Information</strong>
     {{ profile_form|crispy }}
     <div class="d-flex justify-content-between">
-      <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
-      <button type="submit" class="btn btn-primary">Update</button>
+      <a href="{% url 'home' %}" class="btn btn-secondary w-full">Cancel</a>
+      <button type="submit" class="btn btn-primary w-full">Update</button>
     </div>
   </form>
 {% endblock %}

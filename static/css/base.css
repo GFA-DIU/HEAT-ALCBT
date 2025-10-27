@@ -34,9 +34,9 @@ html {
   margin-bottom: 60px; /* Margin bottom by footer height */
 /*} */
 
-.container {
+/* .container {
   max-width: 960px;
-}
+} */
 
 .pricing-header {
   max-width: 700px;
@@ -60,3 +60,4 @@ html {
   max-height: calc(100vh - 3.5rem); /* Adjust for header/footer */
   overflow-y: auto;
 }
+

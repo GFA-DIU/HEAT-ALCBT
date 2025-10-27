@@ -2,8 +2,8 @@ import os
 import secrets
 from pathlib import Path
 
-import environ
 import dj_database_url
+import environ
 from django.utils.log import DEFAULT_LOGGING
 from dotenv import load_dotenv
 
@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     "cities_light",
     "crispy_forms",
     "crispy_bootstrap5",
+    'crispy_daisyui',
     "debug_toolbar",
     "encrypted_json_fields",
     "cookie_consent",
@@ -228,8 +229,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # django-crispy-forms
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "daisyui"
+CRISPY_TEMPLATE_PACK = "daisyui"
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
