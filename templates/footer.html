@@ -1,39 +1,17 @@
 {% load static %}
-<footer class="footer mt-auto">
-  <div class="container pt-2">
-    <div class="row justify-content-between">
-      <div class="col-auto mb-1">
-        <a href="https://alcbt.gggi.org/">
-          <img src="{% static 'images/logos/ALCBT_logo.png' %}" style="height: 6rem;" alt="ALCBT logo">
+
+<footer
+      class="bg-[var(--bg--base-700)] pt-5 pb-8 grid place-items-center gap-5"
+    >
+      <div class="flex gap-4">
+        <a href="https://alcbt.gggi.org/" target="_blank" rel="noopener noreferrer">
+          <img src="{% static 'images/logos/ALCBT_logo.png' %}" alt="ALCBT logo" width="206" />
         </a>
-        <img src="{% static 'images/logos/BMWK+IKI_transparent_Web_en.png' %}" style="height: 6rem;" alt="ALCBT logo">
+        <img src="{% static 'images/logos/sponsor-2.png' %}" alt="LOGO" width="174" />
       </div>
-      <!-- Policy & Disclaimer -->
-      <div class="col-auto mb-1">
-        <div class="d-flex flex-column text-muted" style="font-size: 0.875rem;">
-          <!-- Terms / Privacy links -->
-          <span>
-            Copyright © 2025 •
-            <a
-              href="{% url 'terms_of_use' %}"
-              class="text-muted text-decoration-underscore"
-            >
-              Terms of Use
-            </a>
-            &amp;
-            <a
-              href="{% url 'privacy_policy' %}"
-              class="text-muted text-decoration-underscore"
-            >
-              Privacy Policy
-            </a>
-          </span>
-          <!-- Disclaimer -->
-          <span class="text-center mt-4 fw-bold border badge border-dark text-dark bg-transparent rounded-pill" style="font-size: 1rem;">
-            Under Active Development
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
+      <p
+        class="text-center text-xs/xs text-[0.688rem] font-medium uppercase text-[var(--bg--black-0)]"
+      >
+        Copyright © {{ current_year }} • Terms of Use & Privacy Policy
+      </p>
+    </footer>

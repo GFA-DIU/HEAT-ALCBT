@@ -1,15 +1,163 @@
 {% extends '_base.html' %}
 {% load static %}
-
+{% load crispy_forms_tags %}
 {% block title %}Building View{% endblock title %}
 {% block content %}
 
-<div class="row">
+{% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock body_class %}
+
+  <section
+      class="flex-1 card bg-white rounded-none rounded-t-[var(--radius-24)] border border-[var(--stroke--soft-200)] pb-6"
+    >
+<div
+        class="max-w-[68.75rem] mx-auto w-full px-4 mt-10 flex items-center justify-between gap-4"
+      >
+        <div class="flex flex-col gap-2">
+          <h1
+            class="text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]"
+          >
+            {{ building.name }}
+          </h1>
+          <ul class="flex items-center gap-2">
+            <li
+              class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
+            >
+              <span
+                data-icon="sun-foggy-fill"
+                data-size="16"
+                data-color="var(--icon--soft-400)"
+              ></span>
+              <span class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                >{{ building.city }},</span
+              >
+              <span
+                data-country="{{ building.country }}"
+                data-flag="false"
+                data-class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+              ></span>
+            </li>
+            <li
+              class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
+            >
+              <span
+                data-icon="calendar-view"
+                data-size="16"
+                data-color="var(--icon--soft-400)"
+              ></span>
+              <span class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                >Last updated: {{  building.updated_at | date:"d/m/Y - H:i A" }}</span
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-outline p-2 border-[var(--stroke--soft-200)]">
+            <span data-icon="delete-bin-5-line" data-size="20"></span>
+          </button>
+          <button class="btn btn-primary">
+            <span data-icon="edit-fill" data-size="20"></span>
+            <span>Edit</span>
+          </button>
+        </div>
+      </div>
+
+  <div
+        class="w-full border-y border-[var(--stroke--soft-200)] px-4 bg-[var(--bg--weak-50)] mt-4.5"
+      >
+        <div class="w-full mx-auto max-w-[68.75rem]">
+          <ul class="flex gap-4 w-full py-4.5">
+            <li class="flex flex-col flex-1">
+              <span
+                class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
+                >Carbon Footprint</span
+              >
+              <div class="flex px-2.5 items-end">
+                <span class="text-2xl/8 font-medium">78</span>
+                <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
+                  >kgCO<sub>2</sub>eq/m<sup>2</sup></span
+                >
+              </div>
+            </li>
+            <li class="flex flex-col flex-1">
+              <span
+                class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
+                >Total Floor Area</span
+              >
+              <div class="flex px-2.5 items-end">
+                <span class="text-2xl/8 font-medium">{{ building.total_floor_area }}</span>
+                <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
+                  >m<sup>3</sup></span
+                >
+              </div>
+            </li>
+            <li class="flex flex-col flex-1">
+              <span
+                class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
+                >Embodied Carbon</span
+              >
+              <div class="flex px-2.5 items-end">
+                <span class="text-2xl/8 font-medium">55.2</span>
+                <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
+                  >kgCO<sub>2</sub>eq/m<sup>2</sup></span
+                >
+              </div>
+            </li>
+            <li class="flex flex-col flex-1">
+              <span
+                class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
+                >Operational Carbon</span
+              >
+              <div class="flex px-2.5 items-end">
+                <span class="text-2xl/8 font-medium">10</span>
+                <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
+                  >kgCO<sub>2</sub>eq/m<sup>2</sup></span
+                >
+              </div>
+            </li>
+            <li class="flex flex-col flex-1">
+              <span
+                class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
+                >Carbon Savings</span
+              >
+              <div class="flex px-2.5 items-end">
+                <span class="text-2xl/8 font-medium">10.5%</span>
+              </div>
+            </li>
+          </ul>
+          <div id="building-tabs" class="tabs tabs-primary tabs-border">
+            <input
+              type="radio"
+              name="building-tabs"
+              class="tab"
+              aria-label="Assembly"
+              checked
+            />
+            <input
+              type="radio"
+              name="building-tabs"
+              class="tab"
+              aria-label="Materials"
+            />
+            <input
+              type="radio"
+              name="building-tabs"
+              class="tab"
+              aria-label="Energy"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="pt-8 w-full flex-1 px-4">
+        <div
+          id="tab-content-container"
+          class="flex gap-4 flex-1 max-w-[68.75rem] mx-auto max-lg:flex-col"
+        ></div>
+      </div>
+</section>
+
+
   <!-- Title and Subtitle -->
-  <div class="col">
-    <h1>{{ building.name }}</h1>
-    <p class="text-muted">{{ building.country }}</p>
-  </div>
+
   <!-- Buttons -->
   {% comment %}
   Simulation button temporarily disabled due to bug where original components were being removed
@@ -29,8 +177,478 @@
   </div>
   {% endif %}
   {% endcomment %}
-</div>
 
 {% include "pages/building/building_core.html" %}
+  <template id="assembly-template">
+      <div
+        class="border border-[var(--stroke--soft-200)] flex flex-col rounded-2xl shadow-[var(--regular-shadow-x-small)] p-4 md:min-w-[24rem]"
+      >
+        <div class="flex items-center gap-2">
+          <span
+            data-icon="leaf-line"
+            data-size="24"
+            data-color="var(--icon--sub-600)"
+          ></span>
+          <span class="text-base/6 font-medium">Whole Life Carbon Cycle</span>
+        </div>
+        <div class="grid place-items-center mt-6 w-[16.5rem] mx-auto">
+          <canvas id="whole-life-carbon-cycle"></canvas>
+        </div>
+        <div class="flex items-center mt-6 gap-3 justify-center">
+          <div class="flex items-center gap-2">
+            <div
+              class="size-2 rounded-full"
+              style="background-color: var(--state--feature--base)"
+            ></div>
+            <span class="text-sm text-[var(--text--sub-600)]"
+              >Operational carbon:</span
+            >
+          </div>
+          <div class="flex items-center gap-2">
+            <div
+              class="size-2 rounded-full"
+              style="background-color: var(--bg--surface-800)"
+            ></div>
+            <span class="text-sm text-[var(--text--sub-600)]"
+              >Embodied carbon:</span
+            >
+          </div>
+        </div>
+      </div>
+      <div
+        class="flex w-full flex-col border border-[var(--stroke--soft-200)] rounded-2xl shadow-[var(--regular-shadow-x-small)] p-4"
+      >
+        <div
+          class="flex items-center gap-2 pb-4 border-b border-[var(--stroke--soft-200)]"
+        >
+          <span
+            data-icon="bar-chart-box-line"
+            data-size="24"
+            data-color="var(--icon--sub-600)"
+          ></span>
+          <span class="text-base/6 font-medium">Emboided Carbon</span>
+        </div>
+        <div class="w-full">
+          <canvas id="emboided-carbon-chart"></canvas>
+        </div>
+      </div>
+    </template>
 
+    <template id="materials-template">
+      <div
+        class="flex w-full flex-col border border-[var(--stroke--soft-200)] rounded-2xl shadow-[var(--regular-shadow-x-small)] p-4"
+      >
+        <div
+          class="flex items-center gap-2 pb-4 border-b border-[var(--stroke--soft-200)]"
+        >
+          <span
+            data-icon="bar-chart-box-line"
+            data-size="24"
+            data-color="var(--icon--sub-600)"
+          ></span>
+          <span class="text-base/6 font-medium"
+            >Emboided Carbon by Material</span
+          >
+        </div>
+        <div class="w-full">
+          <canvas id="emboided-carbon-by-material-chart"></canvas>
+        </div>
+      </div>
+    </template>
+
+    <template id="energy-template">
+      <div
+        class="flex w-full flex-col border border-[var(--stroke--soft-200)] rounded-2xl shadow-[var(--regular-shadow-x-small)] p-4"
+      >
+        <div
+          class="flex items-center gap-2 pb-4 border-b border-[var(--stroke--soft-200)]"
+        >
+          <span
+            data-icon="bar-chart-box-line"
+            data-size="24"
+            data-color="var(--icon--sub-600)"
+          ></span>
+          <span class="text-base/6 font-medium"
+            >Emboided Carbon by Appliances</span
+          >
+        </div>
+        <div class="w-full">
+          <canvas id="emboided-carbon-by-appliances-chart"></canvas>
+        </div>
+      </div>
+    </template>
+
+
+      <script defer>
+    document.addEventListener("DOMContentLoaded", function () {
+      const tabInputs = document.querySelectorAll(
+        '#building-tabs input[name="building-tabs"]'
+      );
+      const tabContentContainer = document.getElementById(
+        "tab-content-container"
+      );
+
+      const templateMap = {
+        "Assembly": "assembly-template",
+        "Materials": "materials-template",
+        "Energy": "energy-template",
+      };
+
+      function loadTabContent(tabLabel) {
+        const templateId = templateMap[tabLabel];
+        const template = document.getElementById(templateId);
+
+        if (template && tabContentContainer) {
+          tabContentContainer.innerHTML = "";
+
+          const content = template.content.cloneNode(true);
+          tabContentContainer.appendChild(content);
+
+          initializeCharts();
+        }
+      }
+
+      tabInputs.forEach((input) => {
+        input.addEventListener("change", function () {
+          if (this.checked) {
+            const tabLabel = this.getAttribute("aria-label");
+            loadTabContent(tabLabel);
+          }
+        });
+      });
+
+      const checkedTab = document.querySelector(
+        '#building-tabs input[name="building-tabs"]:checked'
+      );
+      if (checkedTab) {
+        const tabLabel = checkedTab.getAttribute("aria-label");
+        loadTabContent(tabLabel);
+      }
+
+      function initializeCharts() {
+        const ctx = document.getElementById("whole-life-carbon-cycle");
+        const styles = getComputedStyle(document.documentElement);
+        const stateFeatureBaseColor = styles
+          .getPropertyValue("--state--feature--base")
+          .trim();
+        const surface800Color = styles
+          .getPropertyValue("--bg--surface-800")
+          .trim();
+        const primaryColor = styles.getPropertyValue("--color-primary").trim();
+        const strongTextColor = styles
+          .getPropertyValue("--text--strong-950")
+          .trim();
+        const gridLineColor = styles
+          .getPropertyValue("--neutral--slate--200")
+          .trim();
+        const softTextColor = styles
+          .getPropertyValue("--text--soft-400")
+          .trim();
+
+        if (ctx) {
+          const operationalColor = stateFeatureBaseColor;
+          const embodiedColor = surface800Color;
+
+          new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: ["Operational carbon", "Embodied carbon"],
+              datasets: [
+                {
+                  // emboided carbon, operational carbon
+                  data: [1.218, 10],
+                  backgroundColor: [embodiedColor, operationalColor],
+                  borderWidth: 0,
+                  cutout: "50%",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+                tooltip: {
+                  enabled: true,
+                  backgroundColor: embodiedColor,
+                  padding: 12,
+                  displayColors: false,
+                  callbacks: {
+                    title: function () {
+                      return "";
+                    },
+                    label: function (context) {
+                      const value = context.parsed;
+                      const formatted = value.toLocaleString("en-US");
+                      return [formatted, "Jan 10 2025"];
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+
+        const barChartDefaults = {
+          type: "bar",
+          options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: true,
+            categoryPercentage: 1.0,
+            layout: {
+              padding: {
+                left: 0,
+                right: 0,
+                top: 16,
+                bottom: 10,
+              },
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                max: 100,
+                grid: {
+                  color: gridLineColor,
+                  drawTicks: false,
+                },
+                border: {
+                  display: false,
+                  dash: [4, 4],
+                },
+                ticks: {
+                  color: softTextColor,
+                  font: {
+                    size: 11,
+                  },
+                  callback: function (value) {
+                    return value + "%";
+                  },
+                  padding: 8,
+                },
+              },
+              y: {
+                grid: {
+                  display: false,
+                  drawBorder: false,
+                },
+                border: {
+                  display: false,
+                },
+                ticks: {
+                  color: strongTextColor,
+                  font: {
+                    size: 13,
+                  },
+                  padding: 12,
+                  crossAlign: "far",
+                  autoSkip: false,
+                  callback: function (value, index, ticks) {
+                    const label = this.getLabelForValue(value);
+                    const maxWidth = 84;
+                    const ctx = this.chart.ctx;
+                    ctx.font = "12px sans-serif";
+
+                    // Measure the text width
+                    const textWidth = ctx.measureText(label).width;
+
+                    if (textWidth > maxWidth) {
+                      // Split label into multiple lines
+                      const words = label.split(" ");
+                      const lines = [];
+                      let currentLine = "";
+
+                      words.forEach((word) => {
+                        const testLine = currentLine
+                          ? currentLine + " " + word
+                          : word;
+                        const testWidth = ctx.measureText(testLine).width;
+
+                        if (testWidth > maxWidth && currentLine) {
+                          lines.push(currentLine);
+                          currentLine = word;
+                        } else {
+                          currentLine = testLine;
+                        }
+                      });
+
+                      if (currentLine) {
+                        lines.push(currentLine);
+                      }
+
+                      return lines;
+                    }
+
+                    return label;
+                  },
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                enabled: true,
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                padding: 10,
+                displayColors: false,
+                callbacks: {
+                  title: function () {
+                    return "";
+                  },
+                  label: function (context) {
+                    return context.parsed.x + "%";
+                  },
+                },
+              },
+              datalabels: {
+                display: true,
+                anchor: "end",
+                align: "end",
+                color: strongTextColor,
+                font: {
+                  size: 12,
+                  weight: "500",
+                },
+                formatter: function (value) {
+                  return value + "%";
+                },
+              },
+            },
+          },
+          plugins: [
+            {
+              id: "customLabels",
+              afterDatasetsDraw: function (chart) {
+                const ctx = chart.ctx;
+                chart.data.datasets.forEach(function (dataset, i) {
+                  const meta = chart.getDatasetMeta(i);
+                  meta.data.forEach(function (bar, index) {
+                    const data = dataset.data[index];
+                    ctx.fillStyle = strongTextColor;
+                    ctx.font = "500 11px sans-serif";
+                    ctx.textAlign = "left";
+                    ctx.textBaseline = "middle";
+                    const text = data + "%";
+                    const padding = 8;
+                    ctx.fillText(text, bar.x + padding, bar.y);
+                  });
+                });
+              },
+            },
+          ],
+        };
+
+        // Initialize the Embodied Carbon bar chart
+        const embodiedCtx = document.getElementById("emboided-carbon-chart");
+
+        if (embodiedCtx) {
+          new Chart(embodiedCtx, {
+            ...barChartDefaults,
+            data: {
+              labels: [
+                "Interm. Floor",
+                "Bottom Floor",
+                "Window\nFrames",
+                "Miscellaneous",
+              ],
+              datasets: [
+                {
+                  data: [93.4, 33, 0.5, 52],
+                  backgroundColor: primaryColor,
+                  borderRadius: 2,
+                  barThickness: 55,
+                },
+              ],
+            },
+          });
+        }
+
+        const embodiedCarbonByMaterialChart = document.getElementById(
+          "emboided-carbon-by-material-chart"
+        );
+
+        if (embodiedCarbonByMaterialChart) {
+          new Chart(embodiedCarbonByMaterialChart, {
+            ...barChartDefaults,
+            data: {
+              labels: [
+                "Others",
+                "Masonry",
+                "Ready mix concrete & cement",
+                "Wood/Timber",
+                "Insulation",
+              ],
+              datasets: [
+                {
+                  data: [67.1, 22, 9, 0.8, 0.3],
+                  backgroundColor: stateFeatureBaseColor,
+                  borderRadius: 2,
+                  barThickness: 55,
+                },
+              ],
+            },
+          });
+        }
+
+        const embodiedCarbonByAppliancesChart = document.getElementById(
+          "emboided-carbon-by-appliances-chart"
+        );
+
+        if (embodiedCarbonByAppliancesChart) {
+          new Chart(embodiedCarbonByAppliancesChart, {
+            ...barChartDefaults,
+            data: {
+              labels: [
+                "Cooling systems",
+                "Ventilation systems",
+                "Lighting systems",
+                "Lift & escalator",
+                "Hot Water Systems",
+                "Other Systems",
+              ],
+              datasets: [
+                {
+                  data: [27.5, 15.2, 29.6, 5.8, 5.3, 0],
+                  backgroundColor: primaryColor,
+                  borderRadius: 2,
+                  barThickness: 55,
+                },
+              ],
+            },
+          });
+        }
+      }
+    });
+  </script>
+
+  <style>
+    .tabs.tabs-primary.tabs-border {
+      .tab {
+        &:is(
+            .tab-active,
+            [aria-selected="true"],
+            [aria-current="true"],
+            [aria-current="page"]
+          ):not(.tab-disabled, [disabled]),
+        &:is(input:checked),
+        &:is(label:has(:checked)) {
+          &:before {
+            --tab-border-color: var(--color-primary);
+            border-bottom-color: var(--tab-border-color);
+            color: var(--tab-border-color);
+          }
+        }
+      }
+    }
+  </style>
 {% endblock %}
+
+  
+
+
+  
+

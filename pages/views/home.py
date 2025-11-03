@@ -1,13 +1,15 @@
 import logging
 
+from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
 
 from pages.models.assembly import Assembly, AssemblyMode
-from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated
-
+from pages.models.building import (Building, BuildingAssembly,
+                                   BuildingAssemblySimulated)
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +37,7 @@ def buildings_list(request):
         
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
+    # return JsonResponse(serializers.serialize('json', buildings), safe=False)
     return render(request, "pages/home/home.html", context)
 
 

@@ -12,7 +12,9 @@
   <meta name="description" content="A framework for launching new Django projects quickly.">
   <meta name="author" content="">
   <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
-  
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+
   {% if request|cookie_group_accepted:"analytics" %}
     {% newrelic_browser_timing_header %}
   {% endif %}
@@ -20,8 +22,8 @@
   {% block css %}
   <!-- Bootstrap CSS -->
   {% load static %}
-  <!-- <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet"> -->
-  <!-- <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}"> -->
+<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet"> 
+   <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   {% endblock css %}
@@ -35,7 +37,98 @@
 
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="{% block body_class %}{% endblock %}">
   {% if user.is_authenticated %}
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <nav class="h-20 px-4 w-full flex items-stretch">
+      <div
+        class="relative flex items-center lg:justify-center justify-between w-full max-w-[78.563rem] mx-auto"
+      >
+        <div class="lg:absolute left-0 lg:top-1/2 lg:-translate-y-1/2">
+          <img src="{% static 'assets/logo.svg' %}" alt="logo" class="w-[3.688rem]" />
+        </div>
+        <div
+          class="navbar-radio-group flex h-full w-fit relative gap-6"
+          style="--navbar-radio-group-count: 2"
+        >
+          <input
+            type="radio"
+            name="navbar-radio-group"
+            id="dashboard"
+            checked
+            style="--navbar-radio-group-index: 0"
+          />
+          <label for="dashboard">
+            <a>
+              <div>
+                <span data-icon="dashboard-horizontal-fill"></span>
+              </div>
+              <span>Dashboard</span>
+            </a>
+          </label>
+
+          <input
+            type="radio"
+            name="navbar-radio-group"
+            id="resources"
+            style="--navbar-radio-group-index: 1"
+          />
+          <label for="resources">
+            <a>
+              <span data-icon="book-shelf-fill"></span>
+              <span>Resources</span>
+            </a>
+          </label>
+          <input
+            type="radio"
+            name="navbar-radio-group"
+            id="templates"
+            style="--navbar-radio-group-index: 2"
+          />
+          <label for="templates">
+            <a>
+              <span data-icon="folder-open"></span>
+              <span>Templates</span>
+            </a>
+          </label>
+          <input
+            type="radio"
+            name="navbar-radio-group"
+            id="dataset"
+            style="--navbar-radio-group-index: 3"
+          />
+          <label for="dataset">
+            <a>
+              <span data-icon="database"></span>
+              <span>Dataset</span>
+            </a>
+          </label>
+        </div>
+        <div
+          class="lg:absolute right-0 lg:top-1/2 lg:-translate-y-1/2 flex items-center gap-4"
+        >
+          <button class="btn btn-ghost size-6 p-0 max-md:hidden">
+            <span data-icon="question-line" data-size="24"></span>
+          </button>
+          <button class="btn btn-ghost size-6 p-0 max-md:hidden">
+            <span data-icon="bell-simple" data-size="24"></span>
+          </button>
+          <button class="btn btn-ghost size-6 p-0 max-md:hidden">
+            <span data-icon="settings-5-line" data-size="24"></span>
+          </button>
+          <button class="btn btn-ghost flex items-center gap-1 max-md:hidden">
+            <div class="avatar avatar-placeholder">
+              <div class="bg-primary text-primary-content w-6 rounded-full">
+                <span class="text-xs">{{ user.username|slice:":1" }}</span>
+              </div>
+            </div>
+            <span class="text-sm">{{ user.username}}</span>
+            <span data-icon="caret-down" data-size="16"></span>
+          </button>
+          <button
+            class="btn btn-ghost btn-sm flex items-center gap-1 md:hidden"
+          ></button>
+        </div>
+      </div>
+    </nav>
+  {% comment %} <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <a class="navbar-brand title" href="{% url 'home' %}">BEAT</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -72,7 +165,7 @@
         </div>
       </div>
     </div>
-  </nav>
+  </nav> {% endcomment %}
   {% endif %}
 
   {% if messages %}
@@ -321,6 +414,19 @@
   </script>
 
   {% block javascript %}
+  <script type="module" src="{% static 'js/countries-registry.js' %}"></script>
+
+  <script>
+    const accountSuccessModal = document.getElementById(
+      "account_success_modal"
+    );
+    // accountSuccessModal.showModal();
+
+    function closeAccountSuccessModal() {
+      accountSuccessModal.close();
+    }
+
+  </script>
   <!-- Bootstrap JavaScript -->
   <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
@@ -328,15 +434,17 @@
   <script src="{% static 'js/base.js' %}"></script>
 
   <!-- icons JS -->
-  <script src="{% static 'js/icons.js' %}"></script>
+  <script type="module" src="{% static 'js/icons.js' %}"></script>
 
   <!-- HTMX -->
-  <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script>
+  {% comment %} <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script> {% endcomment %}
   {% endblock javascript %}
   
   {% if request|cookie_group_accepted:"analytics" %}
     {% newrelic_browser_timing_footer %}
   {% endif %}
+
+ 
 </body>
 
 </html>

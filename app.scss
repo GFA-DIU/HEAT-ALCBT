@@ -326,17 +326,3 @@ body {
   text-overflow: ellipsis;
   text-wrap: nowrap;
 }
-
-.page-cover {
-  @apply min-h-screen bg-(--bg--base-500) flex items-stretch;
-}
-
-.crispy-forms {
-  label{
-    color: var(--text--strong-950);
-    font-weight: 500;
-    padding: 0;
-    line-height: 1.25rem;
-    gap: 0.125rem;
-  }
-}

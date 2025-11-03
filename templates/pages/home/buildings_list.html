@@ -7,8 +7,182 @@
   </span>
 </div>
 {% endif%}
-
-<ul class="list-group" id="buildings_list">
+  <ul class="grid grid-cols-1 gap-4 mt-6" id="buildings_list">
+    {% for building in buildings %}
+    <a  href="/building/{{ building.id }}/"
+             class="text-decoration-none text-reset"
+             title="{{ building.name }}">
+     <li
+              class="bg-[var(--bg--base-600)] rounded-2xl p-1.5 flex flex-col justify-between gap-2 cursor-pointer hover:shadow-[var(--regular-shadow-x-small)]"
+              onclick="goToBuildingDetails()"
+            >
+              <div
+                class="flex justify-between gap-2 bg-[var(--bg--white-0)] border-dashed border border-[var(--stroke--sub-300)] rounded-xl px-2.5 py-4"
+              >
+                <div class="flex flex-col gap-4 flex-1">
+                  <div class="flex items-center gap-2.5">
+                    <div
+                      class="grid place-items-center bg-[var(--bg--weak-50)] rounded-lg size-13"
+                    >
+                      <span
+                        data-icon="building-fill"
+                        data-size="20"
+                        data-color="var(--icon--sub-600)"
+                      ></span>
+                    </div>
+                    <div class="flex flex-col w-full gap-1.5">
+                      <h6 class="text-base/6 font-bold">{{ building.name | truncatechars:20 }}</h6>
+                      <ul class="flex gap-2">
+                        <li
+                          class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
+                        >
+                          <span data-country="{{building.country}}" data-width="16"></span>
+                          <span
+                            data-country="{{building.country}}"
+                            data-flag="false"
+                            data-class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                          ></span>
+                          {% if building.city %}
+                            <span
+                            class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                            >- {{ building.city | truncatechars:20 }}</span
+                          >
+                          {% endif %}
+                        
+                        </li>
+                        <li
+                          class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
+                        >
+                          <span
+                            data-icon="building-2-fill"
+                            data-size="16"
+                          ></span>
+                          <span
+                            class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                            >Building type: {{ building.category }}</span
+                          >
+                        </li>
+                        <li
+                          class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
+                        >
+                          <span data-icon="calendar-view" data-size="16"></span>
+                          <span
+                            class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                            >Created on: {{ building.created_at | date:"jS F, Y" }}</span
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <div
+                      class="bg-[var(--color-primary)] size-10 grid place-items-center rounded-full"
+                    >
+                      <span
+                        data-icon="leaf-line"
+                        data-size="24"
+                        data-color="var(--bg--strong-950)"
+                      ></span>
+                    </div>
+                    <ul class="flex gap-2.5">
+                      <li
+                        class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
+                      >
+                        <span
+                          class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                          >Total carbon footprint</span
+                        >
+                        <span class="text-base/6 font-medium"
+                          >212.5 kgCO2e eq/m2</span
+                        >
+                      </li>
+                      <li
+                        class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
+                      >
+                        <span
+                          class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                          >Total floor area</span
+                        >
+                        <span
+                          class="text-base/6 font-medium text-[var(--text--sub-600)]"
+                          >{{ building.total_floor_area|floatformat:"0" }} m<sup>3</sup></span
+                        >
+                      </li>
+                      <li
+                        class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
+                      >
+                        <span
+                          class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                          >Total embodied carbon</span
+                        >
+                        <span
+                          class="text-base/6 font-medium text-[var(--text--sub-600)]"
+                          >354.3 kgCO2e eq/m2</span
+                        >
+                      </li>
+                      <li
+                        class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
+                      >
+                        <span
+                          class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                          >Carbon Savings</span
+                        >
+                        <span
+                          class="text-base/6 font-medium text-[var(--text--sub-600)]"
+                          >15.5%</span
+                        >
+                      </li>
+                    </ul>
+                    <div class="flex flex-col gap-1.5 pl-2 pr-4">
+                      <span
+                        class="text-xs/4 font-medium text-[var(--text--sub-600)]"
+                        >Progress of completion</span
+                      >
+                      <div class="flex items-center gap-2">
+                        <progress
+                          class="progress progress-primary"
+                          value="80"
+                          max="100"
+                        ></progress>
+                        <span class="text-xs/4 text-[var(--text--sub-600)]"
+                          >80%</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex gap-2 pt-2.5">
+                  <button class="btn size-6 btn-ghost p-0">
+                    <span
+                      data-icon="edit-fill"
+                      data-size="20"
+                      data-color="var(--icon--sub-600)"
+                    ></span>
+                  </button>
+                  <button type="button" 
+                  hx-delete="{% url 'home' %}?building_id={{ building.id }}" 
+                  hx-confirm="Are you sure you wish to delete this building?"
+                  hx-target="#buildings_list"
+                  hx-swap="innerHTML" class="btn size-6 btn-ghost p-0">
+                    <span
+                      data-icon="delete-bin-5-line"
+                      data-size="20"
+                      data-color="var(--icon--sub-600)"
+                    ></span>
+                  </button>
+                </div>
+              </div>
+              <p
+                class="text-xs/4 font-medium text-[var(--text--sub-600)] w-full text-center"
+              >
+                Last Edited: {{ building.updated_at | date:"d/m/Y - H:i A" }}
+              </p>
+            </li>
+            </a>
+    {% endfor %}
+          
+</ul>
+{% comment %} <ul class="list-group" id="buildings_list">
   {% for building in buildings %}
     <li class="list-group-item">
       <div class="row align-items-center">
@@ -58,5 +232,5 @@
       </div>
     </li>
   {% endfor %}
-</ul>
+</ul> {% endcomment %}
 
