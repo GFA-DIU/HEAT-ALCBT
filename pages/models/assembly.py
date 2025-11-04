@@ -107,15 +107,15 @@ class AssemblyCategoryTechnique(models.Model):
     class Meta:
         unique_together = ("category", "technique")
 
-# Signal: auto-create a (category, null) join when new category is added
+# Signal: auto-create a (category, null) join when category is saved
 @receiver(post_save, sender=AssemblyCategory)
 def create_null_join_for_category(sender, instance, created, **kwargs):
-    if created:
-        AssemblyCategoryTechnique.objects.get_or_create(
-            category=instance,
-            technique=None,
-            defaults={"description": None},
-        )
+    # Always ensure empty subcategory exists, not just on creation
+    AssemblyCategoryTechnique.objects.get_or_create(
+        category=instance,
+        technique=None,
+        defaults={"description": None},
+    )
 
 class Assembly(BaseModel):
     """Structural Element consisting of Products."""
