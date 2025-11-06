@@ -1,0 +1,72 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block title %}Home - HEAT Building LCA{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Hero Section -->
+    <section class="hero bg-base-200 rounded-lg mb-8">
+        <div class="hero-content text-center py-12">
+            <div class="max-w-2xl">
+                <h1 class="text-5xl font-bold mb-4">HEAT Building LCA</h1>
+                <p class="text-lg mb-6">
+                    Calculate embodied and operational carbon footprints for buildings across their lifecycle.
+                </p>
+                <div class="flex gap-4 justify-center">
+                    <a href="{% url 'home' %}" class="btn btn-primary">
+                        Get Started
+                    </a>
+                    <a href="#features" class="btn btn-outline">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="mb-12">
+        <h2 class="text-3xl font-bold text-center mb-8">Key Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h3 class="card-title">EPD Database</h3>
+                    <p>Access thousands of Environmental Product Declarations for accurate impact calculations.</p>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h3 class="card-title">Multi-Impact Analysis</h3>
+                    <p>Calculate GWP, ODP, AP, EP, and other environmental impact categories.</p>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h3 class="card-title">Lifecycle Assessment</h3>
+                    <p>Track both embodied and operational carbon across building lifecycles.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats shadow w-full mb-8">
+        <div class="stat">
+            <div class="stat-title">Countries Supported</div>
+            <div class="stat-value">6+</div>
+            <div class="stat-desc">ALCBT Region Coverage</div>
+        </div>
+        <div class="stat">
+            <div class="stat-title">Impact Categories</div>
+            <div class="stat-value">10+</div>
+            <div class="stat-desc">Comprehensive Analysis</div>
+        </div>
+        <div class="stat">
+            <div class="stat-title">EPD Sources</div>
+            <div class="stat-value">3</div>
+            <div class="stat-desc">Verified Databases</div>
+        </div>
+    </section>
+</div>
+{% endblock %}

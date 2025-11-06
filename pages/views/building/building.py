@@ -1,35 +1,27 @@
 import logging
 
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseServerError
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
 
 from pages.forms.building_detailed_info import BuildingDetailedInformation
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.forms.operational_info_form import OperationalInfoForm
 from pages.models.assembly import DIMENSION_UNIT_MAPPING, StructuralProduct
-from pages.models.building import (
-    Building,
-    BuildingAssembly,
-    BuildingAssemblySimulated,
-    OperationalProduct,
-    SimulatedOperationalProduct,
-)
+from pages.models.building import (Building, BuildingAssembly,
+                                   BuildingAssemblySimulated,
+                                   OperationalProduct,
+                                   SimulatedOperationalProduct)
 from pages.models.epd import EPDImpact, MaterialCategory
 from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.impact_calculation import calculate_impacts
-
 from pages.views.building.operational_products.operational_products import (
-    get_op_product,
-    get_op_product_list,
-    serialize_operational_products,
-    handle_op_products_save,
-)
-
+    get_op_product, get_op_product_list, handle_op_products_save,
+    serialize_operational_products)
 
 logger = logging.getLogger(__name__)
 

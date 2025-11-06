@@ -22,10 +22,10 @@
   {% block css %}
   <!-- Bootstrap CSS -->
   {% load static %}
-<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet"> 
-   <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
-  <link rel="stylesheet" href="{% static 'css/home.css' %}">
-  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+{% comment %} <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">  {% endcomment %}
+   {% comment %} <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}"> {% endcomment %}
+  {% comment %} <link rel="stylesheet" href="{% static 'css/home.css' %}"> {% endcomment %}
+  {% comment %} <link rel="stylesheet" href="{% static 'css/base.css' %}"> {% endcomment %}
   {% endblock css %}
 
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
@@ -36,6 +36,7 @@
 </head>
 
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="{% block body_class %}{% endblock %}">
+  {% block nav %} 
   {% if user.is_authenticated %}
       <nav class="h-20 px-4 w-full flex items-stretch">
       <div
@@ -52,54 +53,61 @@
             type="radio"
             name="navbar-radio-group"
             id="dashboard"
-            checked
+            {% url 'home' as home_url %}
+            {% if request.path == home_url %}checked{% endif %}
             style="--navbar-radio-group-index: 0"
           />
-          <label for="dashboard">
-            <a>
+           
+            <a href="{% url 'home' %}" >
               <div>
                 <span data-icon="dashboard-horizontal-fill"></span>
               </div>
               <span>Dashboard</span>
             </a>
-          </label>
+         
 
           <input
             type="radio"
             name="navbar-radio-group"
             id="resources"
+            {% url 'resources' as resources_url %}
+            {% if request.path == resources_url %}checked{% endif %}
             style="--navbar-radio-group-index: 1"
           />
-          <label for="resources">
-            <a>
+          
+            <a href="{% url 'resources' %}" >
               <span data-icon="book-shelf-fill"></span>
               <span>Resources</span>
             </a>
-          </label>
+        
           <input
             type="radio"
             name="navbar-radio-group"
             id="templates"
+            {% url 'templates' as templates_url %}
+            {% if request.path == templates_url %}checked{% endif %}
             style="--navbar-radio-group-index: 2"
           />
-          <label for="templates">
-            <a>
+        
+            <a href="{% url 'templates' %}" >
               <span data-icon="folder-open"></span>
               <span>Templates</span>
             </a>
-          </label>
+      
           <input
             type="radio"
             name="navbar-radio-group"
             id="dataset"
+            {% url 'datasets' as datasets_url %}
+            {% if request.path == datasets_url %}checked{% endif %}
             style="--navbar-radio-group-index: 3"
           />
-          <label for="dataset">
-            <a>
+      
+            <a href="{% url 'datasets' %}">
               <span data-icon="database"></span>
               <span>Dataset</span>
             </a>
-          </label>
+          
         </div>
         <div
           class="lg:absolute right-0 lg:top-1/2 lg:-translate-y-1/2 flex items-center gap-4"
@@ -128,6 +136,7 @@
         </div>
       </div>
     </nav>
+
   {% comment %} <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <a class="navbar-brand title" href="{% url 'home' %}">BEAT</a>
@@ -167,6 +176,8 @@
     </div>
   </nav> {% endcomment %}
   {% endif %}
+    
+{% endblock nav %} 
 
   {% if messages %}
   <div class="container mt-3">
@@ -179,15 +190,16 @@
   </div>
   {% endif %}
 
- 
-    {% block content %}
-    <p>Default content...</p>
-    {% endblock content %}
+      {% block content %}
+      <p>Default content...</p>
+      {% endblock content %}
  
 
-  {% if user.is_authenticated %}
+ {% block footer %}
+   {% if user.is_authenticated %}
   {% include 'footer.html' %}
   {% endif %}
+ {% endblock footer %}
 
   <!-- Cookie Consent Banner -->
   {% if not request|all_cookies_accepted and not request.COOKIES.banner_shown %}

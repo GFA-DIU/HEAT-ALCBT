@@ -1,22 +1,26 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-
+from cookie_management.views import get_cookie_groups
 from pages.views.boq.boq import boq_edit
 from pages.views.building.dashboards import dashboard_view
+from pages.views.datasets import datasets
 from pages.views.map import map_view
 from pages.views.select_lists import select_lists
+from pages.views.templates import templates
 
-from .views.resources import resources
-from .views.home import buildings_list
+from .views.assembly.assembly import component_edit
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
-from .views.assembly.assembly import component_edit
-from cookie_management.views import get_cookie_groups
-
+from .views.building.components import building_components, new_building
+from .views.home import buildings_list
+from .views.resources import resources
 
 urlpatterns = [
     path("", buildings_list, name="home"),
+    path("resource/", resources, name="resources"),
+    path("templates/", templates, name="templates"),
+    path("datasets/", datasets, name="datasets"),
     path(
         "privacy_policy/",
         TemplateView.as_view(template_name="compliance/privacy_policy.html"),
@@ -31,7 +35,8 @@ urlpatterns = [
     path("select_lists/", select_lists, name="select-lists"),
     path("map/", map_view, name="map"),
     path("dashboard/", dashboard_view, name="dashboard"),
-    path("building/_new", building, name="new_building"),
+    path("building/_new", new_building, name="new_building"),
+    path("building/component", building_components),
     path("building/<uuid:building_id>/", building, name="building"),
     path(
         "building/<uuid:building_id>/simulation",

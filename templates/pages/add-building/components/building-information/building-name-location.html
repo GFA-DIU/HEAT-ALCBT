@@ -1,0 +1,214 @@
+<form class="grid grid-cols-2 gap-x-2 gap-y-1">
+  <fieldset class="fieldset col-span-2">
+    <legend class="fieldset-legend">
+      Building name or Code<span class="text-[var(--state--error--base)]"
+        >*</span
+      >
+    </legend>
+    <label class="input validator w-full">
+      <input type="text" placeholder="eg. JP Plaza" required />
+    </label>
+    <p class="validator-hint">This field is required</p>
+  </fieldset>
+  <fieldset class="fieldset col-span-2">
+    <legend class="fieldset-legend w-full">
+      Address (Zip, Street)<span class="text-[var(--state--error--base)]"
+        >*</span
+      ><span class="flex-1 flex justify-end text-[var(--text--sub-600)]">
+        <a class="underline cursor-pointer" onclick="openGeoLocationModal()"
+          >Find location on map</a
+        >
+      </span>
+    </legend>
+    <label class="input validator w-full">
+      <input type="text" placeholder="eg. 1885 L Street Northwest" required />
+    </label>
+    <p class="validator-hint">This field is required</p>
+  </fieldset>
+  <fieldset class="fieldset col-span-2">
+    <legend class="fieldset-legend">
+      Country<span class="text-[var(--state--error--base)]">*</span>
+    </legend>
+    <label class="w-full flex relative">
+      <div class="select-icon" id="country-select-icon">
+        <span
+          data-icon="global-line"
+          data-size="20"
+          data-color="var(--icon--soft-400)"
+        ></span>
+      </div>
+      <select class="select select-with-icon w-full">
+        <option disabled selected>Pick a country</option>
+        <option>
+          <span data-country="US" data-width="20"></span>
+          <span data-country="US" data-flag="false"></span>
+        </option>
+        <option>
+          <span data-country="CA" data-width="20"></span>
+          <span data-country="CA" data-flag="false"></span>
+        </option>
+        <option>
+          <span data-country="GB" data-width="20"></span>
+          <span data-country="GB" data-flag="false"></span>
+        </option>
+        <option>
+          <span data-country="GH" data-width="20"></span>
+          <span data-country="GH" data-flag="false"></span>
+        </option>
+        <option>
+          <span data-country="NG" data-width="20"></span>
+          <span data-country="NG" data-flag="false"></span>
+        </option>
+        <option>
+          <span data-country="KE" data-width="20"></span>
+          <span data-country="KE" data-flag="false"></span>
+        </option>
+      </select>
+    </label>
+    <p class="validator-hint">This field is required</p>
+  </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">
+      Region or State<span class="text-[var(--state--error--base)]">*</span>
+    </legend>
+    <label class="w-full flex relative">
+      <div class="select-icon">
+        <span
+          data-icon="flashlight-line"
+          data-size="20"
+          data-color="var(--icon--soft-400)"
+        ></span>
+      </div>
+      <select class="select select-with-icon w-full" disabled>
+        <option disabled selected>Pick a region or state</option>
+        <option>Greater Accra</option>
+        <option>Ashanti</option>
+        <option>Eastern</option>
+      </select>
+    </label>
+    <p class="label">
+      <span
+        data-icon="information-fill"
+        data-size="16"
+        data-color="var(--icon--soft-400)"
+      ></span>
+      Select a country first
+    </p>
+  </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">
+      City<span class="text-[var(--state--error--base)]">*</span>
+    </legend>
+    <label class="w-full flex relative">
+      <div class="select-icon">
+        <span
+          data-icon="building-line"
+          data-size="20"
+          data-color="var(--icon--soft-400)"
+        ></span>
+      </div>
+      <select class="select select-with-icon w-full" disabled>
+        <option disabled selected value="">Pick a city</option>
+        <option>Accra</option>
+        <option>Kumasi</option>
+        <option>Nairobi</option>
+      </select>
+    </label>
+    <p class="label">
+      <span
+        data-icon="information-fill"
+        data-size="16"
+        data-color="var(--icon--soft-400)"
+      ></span>
+      Select a region or state first
+    </p>
+  </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">
+      Longitude <span class="text-[var(--text--sub-600)]">(Optional)</span>
+    </legend>
+    <label class="input validator w-full">
+      <input type="text" placeholder="eg. -7.946232" required />
+    </label>
+  </fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">
+      Latitude <span class="text-[var(--text--sub-600)]">(Optional)</span>
+    </legend>
+    <label class="input validator w-full">
+      <input type="text" placeholder="eg. 5.603722" required />
+    </label>
+  </fieldset>
+</form>
+
+<dialog
+  id="geo_location_modal"
+  class="modal modal-middle w-screen overflow-y-auto pt-4 lg:pb-4"
+>
+  <div
+    class="modal-box w-full max-w-[36.625rem] !max-h-none h-max flex flex-col p-0"
+  >
+    <div
+      class="flex items-center justify-between px-5 py-4 border-b border-[var(--stroke--soft-200)]"
+    >
+      <div>
+        <h3 class="text-sm/5 font-medium">Geo Location</h3>
+        <p class="text-xs/4 text-[var(--text--sub-600)]">
+          An address is good, but a pin is precise—help us capture your
+          project's exact location.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="btn btn-sm btn-circle btn-ghost"
+        onclick="closeGeoLocationModal()"
+      >
+        <span data-icon="close-line" data-size="20"></span>
+      </button>
+    </div>
+
+    <div class="flex-1 flex flex-col px-5">
+      <p class="text-sm/5 mt-5.5 mb-2.5">Find location on map</p>
+      <div class="relative flex-1 flex rounded-2xl overflow-hidden">
+        <div class="absolute top-4 left-4 z-[9999] w-full pr-4">
+          <label class="input w-full max-w-[18.75rem]">
+            <span
+              data-icon="search-2-line"
+              data-size="16"
+              data-color="var(--icon--soft-400)"
+            ></span>
+            <input
+              type="text"
+              id="location-search"
+              placeholder="Search location or address here"
+            />
+          </label>
+        </div>
+        <div id="map" class="flex-1 min-h-[400px] relative">
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[1000] pointer-events-none"
+          >
+            <span data-icon="map-pin" data-size="32"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-4 px-5 pt-6 pb-8">
+      <button
+        type="button"
+        class="btn btn-outline"
+        onclick="closeGeoLocationModal()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        onclick="selectCurrentLocation()"
+      >
+        Done
+      </button>
+    </div>
+  </div>
+</dialog>

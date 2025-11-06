@@ -1,0 +1,101 @@
+{% extends "pages/add-building/_base.html" %}
+
+{% load static  %}
+
+{% block title %}Add Building{% endblock title %}
+
+
+{% block new-building %}
+
+    <section class="card flex-1">
+      <div
+        class="card-body border-x-2 border-[var(--stroke--soft-200)] bg-[var(--bg--white-0)] rounded-l-[var(--radius-16)] p-0 gap-0"
+      >
+        <div
+          class="px-14 pt-6 pb-4 flex items-center justify-between border-b border-[var(--stroke--soft-200)]"
+        >
+          <a class="btn btn-sm" href="{% url 'home' %}">
+            <span data-icon="logout-box-line"></span>
+            <span>Exit</span>
+          </a>
+
+          <div class="flex items-center gap-4">
+            <button class="btn btn-ghost size-6 p-0">
+              <span data-icon="question-line" data-size="24"></span>
+            </button>
+            <button class="btn btn-ghost size-6 p-0">
+              <span data-icon="bell-simple" data-size="24"></span>
+            </button>
+            <button class="btn btn-ghost size-6 p-0">
+              <span data-icon="settings-5-line" data-size="24"></span>
+            </button>
+            <button class="btn h-9 rounded-full flex items-center gap-1">
+              <div class="avatar avatar-placeholder">
+                <div class="bg-primary text-primary-content w-6 rounded-full">
+                  <span class="text-xs">{{ user.get_initials }}</span>
+                </div>
+              </div>
+              <span class="text-sm">{{ user.get_full_name }}</span>
+              <span data-icon="caret-down" data-size="16"></span>
+            </button>
+            <button
+              class="btn btn-ghost btn-sm flex items-center gap-1 md:hidden"
+            ></button>
+          </div>
+        </div>
+        <div class="flex-1 p-14">
+          <div class="mx-auto w-full max-w-[31.625rem]">
+            <div class="w-full">
+              <div
+                class="mb-4 bg-[var(--bg--weak-50)] rounded-full p-2.5 w-fit flex items-center"
+                id="current-step-progress"
+              >
+                <span class="text-[0.813rem]/5 font-semibold align-middle"
+                  >1 out of
+                  <span class="font-normal text-[var(--text--sub-600)]"
+                    >2 steps</span
+                  ></span
+                >
+              </div>
+              <h2
+                class="text-base/5 font-extrabold mb-1"
+                id="current-step-title"
+              >
+                Building Name & Location
+              </h2>
+              <p
+                class="text-sm/5 text-[var(--text--sub-600)] mb-6"
+                id="current-step-description"
+              >
+                Add details concerning building name and locations of building.
+              </p>
+
+              <div id="dynamic-content"></div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="card-actions px-14 py-7 border-t border-[var(--stroke--soft-200)] justify-between"
+        >
+          <button class="btn btn-outline" id="go-back">
+            <span data-icon="arrow-left-s-line"></span>
+            Go back
+          </button>
+          <div class="flex items-center gap-2">
+            <button
+              class="btn btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
+              id="skip"
+            >
+              <span>Skip</span>
+            </button>
+            <button class="btn btn-primary" id="save-and-continue" disabled>
+              <span>Save & continue</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {% comment %} <script src="{% static 'js/step-manager.js' %}"></script> {% endcomment %}
+
+{% endblock new-building %}

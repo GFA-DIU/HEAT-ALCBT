@@ -1,0 +1,1234 @@
+<div class="flex gap-2 p-2 rounded-lg bg-[var(--state--faded--lighter)]">
+  <span
+    data-icon="information-2-line"
+    data-size="16"
+    data-color="var(--icon--sub-600)"
+  ></span>
+  If data is available as total quantity per material, select “Add from BoQ”.
+  For quantities per components (foundation, floor, roof, etc.), use “Add
+  component”. Refer to BEAT handbook for details.
+</div>
+
+<div id="structural_component_template_container" class="w-full">
+  <div class="w-full mt-4">
+    <div class="flex items-center gap-2">
+      <button
+        class="btn btn-outline"
+        onclick="structural_component_boq_modal.showModal()"
+      >
+        Add from Build of Quantity
+      </button>
+      <button
+        class="btn btn-outline"
+        onclick="structural_component_component_type_modal.showModal()"
+      >
+        Add by Component
+      </button>
+    </div>
+    <div class="divider"></div>
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex-1">
+        <h5 class="text-sm/5 font-bold">Components / Materials Added</h5>
+        <p class="text-xs/4 text-[var(--text--sub-600)]">
+          Added components or materials will appear below
+        </p>
+      </div>
+      <button class="btn btn-outline border-[var(--stroke--soft-200)]">
+        <span
+          data-icon="filter-3-fill"
+          data-size="20"
+          data-color="var(--icon--strong-950)"
+        ></span>
+        Filter
+      </button>
+    </div>
+    <ul class="grid grid-cols-1 gap-2.5">
+      <li
+        class="bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2"
+      >
+        <span
+          data-icon="building-3-line"
+          data-size="20"
+          data-color="var(--icon--strong-950)"
+        ></span>
+        <div class="flex-1 flex flex-col gap-2.5">
+          <h6 class="text-sm/5 font-bold">Joe Mentil’s BOQ</h6>
+          <div class="flex items-center">
+            <div
+              class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center"
+            >
+              <span
+                data-icon="leaf-line"
+                data-size="14"
+                data-color="var(--bg--strong-950)"
+              ></span>
+            </div>
+            <div
+              class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)] mr-3"
+            >
+              0.83kg CO2e eq/m2
+            </div>
+            <p class="text-sm/5 text-[var(--text--sub-600)]">
+              Bill of quantities
+            </p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="edit-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="delete-bin-5-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<dialog
+  id="structural_component_boq_modal"
+  class="modal modal-bottom sm:modal-end"
+>
+  <div
+    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
+  >
+    <div class="flex justify-between p-5 w-full">
+      <h3 class="text-lg/6 font-medium">Build of Quantity (BOQ)</h3>
+      <button
+        type="button"
+        onclick="structural_component_boq_modal.close()"
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+      >
+        <span
+          data-icon="close-line"
+          data-size="16"
+          data-color="var(--icon--sub-600)"
+        ></span>
+      </button>
+    </div>
+    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+      <div class="px-5 py-2.5 grid grid-cols-1 gap-5">
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            Name
+            <span class="text-[var(--state--error--base)]">*</span>
+          </legend>
+          <label class="input w-full">
+            <input type="text" placeholder="eg. Fence wall" />
+          </label>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Comment</legend>
+          <label class="input w-full">
+            <input type="text" placeholder="Add a comment" />
+          </label>
+        </fieldset>
+      </div>
+
+      <h2
+        class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4"
+      >
+        MATERIALS
+      </h2>
+      <div id="structural_component_materials_container" class="w-full">
+        <div class="flex-1 flex flex-col items-center justify-center px-6 pb-4">
+          <img
+            src="/src/assets/structure-materials.png"
+            alt="Materials image"
+            class="w-[12.25rem]"
+          />
+          <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">
+            How would you like to add your building structural conponents.
+          </p>
+          <button
+            class="mt-2.5 btn btn-outline"
+            onclick="structural_component_epd_modal.showModal()"
+          >
+            Add from EPD library
+          </button>
+        </div>
+      </div>
+    </form>
+    <div
+      class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]"
+    >
+      <button
+        class="btn btn-outline"
+        onclick="structural_component_boq_modal.close()"
+      >
+        Cancel
+      </button>
+      <button class="btn btn-primary">Done</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog
+  id="structural_component_component_type_selected_modal"
+  class="modal modal-bottom sm:modal-end"
+>
+  <div
+    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
+  >
+    <div class="flex justify-between p-5 w-full">
+      <h3 class="text-lg/6 font-medium">Create New Component</h3>
+      <button
+        type="button"
+        onclick="structural_component_component_type_selected_modal.close()"
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+      >
+        <span
+          data-icon="close-line"
+          data-size="16"
+          data-color="var(--icon--sub-600)"
+        ></span>
+      </button>
+    </div>
+    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+      <div class="px-5 py-2.5 grid grid-cols-3 gap-4 pb-8">
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            Title
+            <span class="text-[var(--state--error--base)]">*</span>
+          </legend>
+          <label class="input w-full">
+            <input type="text" placeholder="eg. Fence wall" />
+          </label>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Country</legend>
+          <select class="select">
+            <option value="" selected disabled>Select Country</option>
+            <option value="KH">
+              <span data-country="KH" data-width="20"></span>
+              <span data-country="KH" data-flag="false"></span>
+            </option>
+            <option value="IN">
+              <span data-country="IN" data-width="20"></span>
+              <span data-country="IN" data-flag="false"></span>
+            </option>
+            <option value="ID">
+              <span data-country="ID" data-width="20"></span>
+              <span data-country="ID" data-flag="false"></span>
+            </option>
+            <option value="TH">
+              <span data-country="TH" data-width="20"></span>
+              <span data-country="TH" data-flag="false"></span>
+            </option>
+            <option value="VN">
+              <span data-country="VN" data-width="20"></span>
+              <span data-country="VN" data-flag="false"></span>
+            </option>
+          </select>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Building Component</legend>
+          <select class="select">
+            <option value="" selected disabled>Select an option</option>
+            <option value="ext-staircase">
+              Extension - Staircase and Ramps
+            </option>
+            <option value="ext-finishes">Extension - Finishes</option>
+            <option value="ext-misc">Extension - Miscellaneous</option>
+            <option value="hor-structural-elements-beams">
+              Horizontal Structural Elements - Beams, Slabs
+            </option>
+            <option value="mem01">MEM01 - Bottom floor construction</option>
+            <option value="mem02">
+              MEM02 - Intermediate floor construction
+            </option>
+            <option value="mem04">MEM04 - Roof construction</option>
+            <option value="mem05">MEM05 - External walls</option>
+            <option value="mem06">MEM06 - Interior walls</option>
+            <option value="mem08">MEM08 - Window glazing</option>
+            <option value="mem09">MEM09 - Roof insulation</option>
+            <option value="mem10">MEM10 - Wall insulation</option>
+          </select>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Construction technique</legend>
+          <select class="select" disabled>
+            <option value="" selected disabled>Select an option</option>
+            <option value="in-situ">In-Situ Reinforced Concrete Beams</option>
+            <option value="precast">Precast Reinforced Concrete Beams</option>
+          </select>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Mode</legend>
+          <select class="select">
+            <option value="custom" selected>Custom</option>
+            <option value="selection">Selection</option>
+          </select>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Quantity</legend>
+          <label class="input w-full">
+            <input type="number" placeholder="Enter quantity" />
+            <select
+              class="select select-ghost w-fit !outline-none !border-none"
+            >
+              <option value="m2" selected>m²</option>
+              <option value="m">m</option>
+              <option value="kg">kg</option>
+              <option value="m3">m³</option>
+            </select>
+          </label>
+        </fieldset>
+        <fieldset class="fieldset col-span-3">
+          <legend class="fieldset-legend">Comment</legend>
+          <textarea
+            class="textarea w-full"
+            placeholder="Add a comment"
+            rows="3"
+          ></textarea>
+        </fieldset>
+        <div class="col-span-3 gap-2 flex items-center">
+          <input type="checkbox" id="make-public" />
+          <label for="make-public" class="flex items-center gap-1">
+            <span class="text-sm/5">Make Public</span>
+            <span class="text-xs/4 text-[var(--text--sub-600)]">
+              (Make this component public)
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <h2
+        class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4"
+      >
+        MATERIALS
+      </h2>
+      <div id="structural_component_materials_container" class="w-full">
+        <div class="flex-1 flex flex-col items-center justify-center px-6 pb-4">
+          <img
+            src="/src/assets/structure-materials.png"
+            alt="Materials image"
+            class="w-[12.25rem]"
+          />
+          <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">
+            How would you like to add your building structural conponents.
+          </p>
+          <button
+            class="mt-2.5 btn btn-outline"
+            onclick="structural_component_epd_modal.showModal()"
+          >
+            Add from EPD library
+          </button>
+        </div>
+      </div>
+    </form>
+    <div
+      class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]"
+    >
+      <button
+        class="btn btn-outline"
+        onclick="structural_component_component_type_selected_modal.close()"
+      >
+        Cancel
+      </button>
+      <button class="btn btn-primary">Done</button>
+    </div>
+  </div>
+</dialog>
+
+<template id="structural_component_no-materials-template">
+  <div class="flex-1 flex flex-col items-center justify-center px-6 pb-4">
+    <img
+      src="/src/assets/structure-materials.png"
+      alt="Materials image"
+      class="w-[12.25rem]"
+    />
+    <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">
+      How would you like to add your building structural conponents.
+    </p>
+    <button
+      class="mt-2.5 btn btn-outline"
+      onclick="structural_component_epd_modal.showModal()"
+    >
+      Add from EPD library
+    </button>
+  </div>
+</template>
+
+<template id="structural_component_materials_template">
+  <div class="px-5 pb-4 flex-1 flex flex-col">
+    <div
+      class="flex items-end justify-between border-b border-[var(--stroke--soft-200)] pb-4"
+    >
+      <div class="flex-1">
+        <h4 class="text-base/5 font-extrabold mb-1">Added Materials</h4>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">
+          Added from EPD libraries
+        </p>
+      </div>
+      <button
+        class="btn btn-sm btn-outline"
+        onclick="structural_component_epd_modal.showModal()"
+      >
+        <span
+          data-icon="add-large-fill"
+          data-size="20"
+          data-color="var(--icon--strong-950)"
+        ></span>
+        Add from EPD library
+      </button>
+    </div>
+    <ul class="grid grid-cols-1 gap-2.5 mt-4">
+      <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2 w-full">
+          <span class="text-sm/5 font-medium">Shower Hoses</span>
+          <a>
+            <span
+              data-icon="external-link-line"
+              data-size="20"
+              data-color="var(--icon--sub-600)"
+            ></span>
+          </a>
+        </div>
+        <div
+          class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
+        >
+          <div
+            class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
+          >
+            <span data-country="DE" data-width="20"></span>
+          </div>
+          <label class="input w-full">
+            <input type="text" placeholder="Add description" />
+          </label>
+          <select class="select">
+            <option value="" selected disabled>Category</option>
+            <option value="mem01">MEM01 - Bottom floor construction</option>
+            <option value="mem02">
+              MEM02 - Intermediate floor construction
+            </option>
+            <option value="mem04">MEM04 - Roof construction</option>
+            <option value="mem05">MEM05 - External walls</option>
+            <option value="mem06">MEM06 - Interior walls</option>
+            <option value="mem08">MEM08 - Window glazing</option>
+            <option value="mem09">MEM09 - Roof insulation</option>
+            <option value="mem10">MEM10 - Wall insulation</option>
+          </select>
+          <label class="input w-full">
+            <input type="number" placeholder="999999" />
+            <select
+              class="select select-ghost w-fit !outline-none !border-none"
+            >
+              <option selected value="kg">kg</option>
+              <option value="m3">m³</option>
+            </select>
+          </label>
+          <div
+            class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"
+          ></div>
+          <button
+            class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch"
+          >
+            <span
+              data-icon="delete-bin-5-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+      </li>
+      <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2 w-full">
+          <span class="text-sm/5 font-medium">Ready-Mix Concrete C25/30</span>
+          <a>
+            <span
+              data-icon="external-link-line"
+              data-size="20"
+              data-color="var(--icon--sub-600)"
+            ></span>
+          </a>
+        </div>
+        <div
+          class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
+        >
+          <div
+            class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
+          >
+            <span data-country="DE" data-width="20"></span>
+          </div>
+          <label class="input w-full">
+            <input type="text" placeholder="Add description" />
+          </label>
+          <label class="input w-full">
+            <input type="number" placeholder="layer thickness" />
+            <span class="text-xs/5 text-[var(--text--sub-600)]">cm</span>
+          </label>
+          <div
+            class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"
+          ></div>
+          <button
+            class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch"
+          >
+            <span
+              data-icon="delete-bin-5-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+      </li>
+      <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2 w-full">
+          <span class="text-sm/5 font-medium">Ready-Mix Concrete C25/30</span>
+          <a>
+            <span
+              data-icon="external-link-line"
+              data-size="20"
+              data-color="var(--icon--sub-600)"
+            ></span>
+          </a>
+        </div>
+        <div
+          class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
+        >
+          <div
+            class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
+          >
+            <span data-country="DE" data-width="20"></span>
+          </div>
+          <label class="input w-full">
+            <input type="text" placeholder="Add description" />
+          </label>
+          <label class="input w-full">
+            <input type="number" placeholder="150" />
+            <span class="text-xs/5 text-[var(--text--sub-600)]">pcs</span>
+          </label>
+          <div
+            class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"
+          ></div>
+          <button
+            class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch"
+          >
+            <span
+              data-icon="delete-bin-5-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<dialog
+  id="structural_component_epd_modal"
+  class="modal modal-bottom sm:modal-end"
+>
+  <div
+    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[44.5rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
+  >
+    <div class="flex justify-between items-center px-5 w-full">
+      <button
+        type="button"
+        onclick="structural_component_epd_modal.close()"
+        class="btn btn-sm btn-outline"
+      >
+        <span
+          data-icon="arrow-left"
+          data-size="16"
+          data-color="var(--icon--soft-400)"
+        ></span>
+        Go back
+      </button>
+      <h3 class="text-lg/6 font-medium w-full text-left p-5">
+        Add from EPD Library
+      </h3>
+      <button
+        type="button"
+        onclick="structural_component_epd_modal.close()"
+        class="btn btn-sm btn-circle btn-ghost"
+      >
+        <span
+          data-icon="close-line"
+          data-size="16"
+          data-color="var(--icon--sub-600)"
+        ></span>
+      </button>
+    </div>
+    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+      <div class="px-5 py-2.5 w-full">
+        <div
+          class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
+        >
+          <div class="flex items-stretch gap-2">
+            <label class="input w-full">
+              <span
+                data-icon="search-2-line"
+                data-size="16"
+                data-color="var(--icon--soft-400)"
+              ></span>
+              <input type="text" placeholder="Search..." />
+            </label>
+            <select class="select">
+              <option selected value="usa">
+                <span data-country="US" data-width="20"></span>
+                <span data-country="US" data-flag="false"></span>
+              </option>
+              <option value="canada">
+                <span data-country="CA" data-width="20"></span>
+                <span data-country="CA" data-flag="false"></span>
+              </option>
+              <option value="uk">
+                <span data-country="GB" data-width="20"></span>
+                <span data-country="GB" data-flag="false"></span>
+              </option>
+              <option value="australia">
+                <span data-country="AU" data-width="20"></span>
+                <span data-country="AU" data-flag="false"></span>
+              </option>
+            </select>
+          </div>
+          <div class="collapse rounded-none">
+            <input type="checkbox" class="peer" />
+            <div
+              class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
+            >
+              <span class="flex items-center gap-2">
+                <span
+                  data-icon="menu-search-line"
+                  data-size="20"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+                Advanced Search
+                <span class="text-xs/5 text-[var(--text--sub-600)]"
+                  >Click here for a more advanced search option</span
+                >
+              </span>
+              <span
+                data-icon="caret-down"
+                data-size="16"
+                data-color="var(--icon--soft-400)"
+                class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"
+              ></span>
+            </div>
+            <div class="collapse-content mt-0 px-0">
+              <div class="grid grid-cols-4 gap-2">
+                <label class="relative">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  <select
+                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
+                  >
+                    <option disabled selected value="">Category</option>
+                    <option value="building-service-engineering">
+                      Building service engineering
+                    </option>
+                    <option value="components-for-windows">
+                      Components for windows & curtain walls
+                    </option>
+                    <option value="composites">Composites</option>
+                    <option value="end-of-life">End of life</option>
+                    <option value="insulation-materials">
+                      Insulation materials
+                    </option>
+                    <option value="metals">Metals</option>
+                    <option value="minerals-building-products">
+                      Minerals building products
+                    </option>
+                    <option value="plastics">Plastics</option>
+                    <option value="wood">Wood</option>
+                    <option value="others">Others</option>
+                    <option value="unkwown">Unkwown</option>
+                  </select>
+                </label>
+                <label class="relative">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  <select
+                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
+                  >
+                    <option disabled selected value="">Sub-category</option>
+                    <option value="air-conditioning-and-ventilation">
+                      Air conditioning and ventilation
+                    </option>
+                    <option value="conveyance">Conveyance</option>
+                    <option value="electrical">Electrical</option>
+                    <option value="end-of-life-processes">
+                      End of life processes
+                    </option>
+                    <option value="fire-protection">Fire protection</option>
+                    <option value="heating">Heating</option>
+                    <option value="sanitary">Sanitary</option>
+                    <option value="use">Use</option>
+                  </select>
+                </label>
+                <label class="relative">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  <select
+                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
+                  >
+                    <option disabled selected value="">Child-category</option>
+                    <option value="use-conveyor">Use conveyor</option>
+                    <option value="use-heat-generator">
+                      Use heat generator
+                    </option>
+                    <option value="use-heat-generator-enev">
+                      Use heat generator (EnEv)
+                    </option>
+                    <option value="using-lighting">Using lighting</option>
+                    <option value="using-mountings">Using mountings</option>
+                    <option value="use-ventilations-and-air-conditioning">
+                      Use ventilations and air conditioning
+                    </option>
+                  </select>
+                </label>
+                <label class="relative">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  <select
+                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
+                  >
+                    <option disabled selected value="">EPD type</option>
+                    <option value="official">Official</option>
+                    <option value="custom">Custom</option>
+                    <option value="generic">Generic</option>
+                  </select>
+                </label>
+                <label class="relative">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  <select
+                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
+                  >
+                    <option disabled selected value="">Sort by</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-block" disabled>Search</button>
+        </div>
+        <ul class="grid grid-cols-1">
+          <li
+            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+          >
+            <div class="flex flex-col gap-2.5">
+              <div class="flex items-center justify-between">
+                <span
+                  >Structural concrete M6582A09 (C30/37, F4, 16, XC4, XF1, XA1,
+                  XD1, WA, slow)</span
+                >
+              </div>
+              <div class="flex items-stretch gap-1.25">
+                <span
+                  class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                  >Germany</span
+                >
+                <div
+                  class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                ></div>
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >Precast concrete elements and goods</span
+                >
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >169.40 kgCO2e</span
+                >
+              </div>
+            </div>
+            <div class="flex flex-col items-end gap-2.5 w-fit">
+              <span
+                data-icon="external-link-line"
+                data-size="20"
+                data-color="var(--icon--sub-600)"
+              ></span>
+              <button
+                class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                type="button"
+              >
+                <span
+                  data-icon="add-large-fill"
+                  data-size="20"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+                Add
+              </button>
+            </div>
+          </li>
+          <li
+            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+          >
+            <div class="flex flex-col gap-2.5">
+              <div class="flex items-center justify-between">
+                <span>Shower Hoses</span>
+              </div>
+              <div class="flex items-stretch gap-1.25">
+                <span
+                  class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                  >Germany</span
+                >
+                <div
+                  class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                ></div>
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >Mounting</span
+                >
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >0.59 kgCO2e</span
+                >
+              </div>
+            </div>
+            <div class="flex flex-col items-end gap-2.5 w-fit">
+              <span
+                data-icon="external-link-line"
+                data-size="20"
+                data-color="var(--icon--sub-600)"
+              ></span>
+              <button
+                class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                type="button"
+              >
+                <span
+                  data-icon="add-large-fill"
+                  data-size="20"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+                Add
+              </button>
+            </div>
+          </li>
+          <li
+            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+          >
+            <div class="flex flex-col gap-2.5">
+              <div class="flex items-center justify-between">
+                <span>ACC M35 Ready Mixed Concrete (RMC)</span>
+              </div>
+              <div class="flex items-stretch gap-1.25">
+                <span
+                  class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                  >India</span
+                >
+                <div
+                  class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                ></div>
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >Ready mixed concrete</span
+                >
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >396 kgCO2e</span
+                >
+              </div>
+            </div>
+            <div class="flex flex-col items-end gap-2.5 w-fit">
+              <span
+                data-icon="external-link-line"
+                data-size="20"
+                data-color="var(--icon--sub-600)"
+              ></span>
+              <button
+                class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                type="button"
+              >
+                <span
+                  data-icon="add-large-fill"
+                  data-size="20"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+                Add
+              </button>
+            </div>
+          </li>
+          <li
+            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+          >
+            <div class="flex flex-col gap-2.5">
+              <div class="flex items-center justify-between">
+                <span
+                  >semi-finished products - Kunststoffwerke Katzbach GmbH & Co.
+                  KG - EPP mold</span
+                >
+              </div>
+              <div class="flex items-stretch gap-1.25">
+                <span
+                  class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                  >Germany</span
+                >
+                <div
+                  class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                ></div>
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >Ready mixed concrete</span
+                >
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >396 kgCO2e</span
+                >
+              </div>
+            </div>
+            <div class="flex flex-col items-end gap-2.5 w-fit">
+              <span
+                data-icon="external-link-line"
+                data-size="20"
+                data-color="var(--icon--sub-600)"
+              ></span>
+              <button
+                class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                type="button"
+              >
+                <span
+                  data-icon="add-large-fill"
+                  data-size="20"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+                Add
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </form>
+    <div
+      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
+    >
+      <div class="flex items-center gap-2">
+        <button class="btn btn-ghost py-2 px-3">
+          <span
+            data-icon="arrow-left"
+            data-size="20"
+            data-color="var(--icon--soft-400)"
+          ></span>
+          Previous
+        </button>
+        <ul class="flex items-center gap-2">
+          <li>
+            <button class="btn btn-sm rounded-[var(--radius-8)] btn-neutral">
+              1
+            </button>
+          </li>
+          <li>
+            <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
+              2
+            </button>
+          </li>
+          <li>
+            <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
+              3
+            </button>
+          </li>
+        </ul>
+        <button class="btn btn-ghost py-2 px-3">
+          Next
+          <span
+            data-icon="arrow-right"
+            data-size="20"
+            data-color="var(--icon--strong-950)"
+          ></span>
+        </button>
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit"
+          onclick="structural_component_epd_modal.close()"
+        >
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-sm btn-primary w-fit">Save</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="structural_component_modal_delete" class="modal modal-middle">
+  <div class="modal-box w-full max-w-[26.375rem] p-0">
+    <div class="flex flex-col items-center p-5">
+      <div
+        class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]"
+      >
+        <span
+          data-icon="alert-fill"
+          data-size="24"
+          data-color="var(--state--warning--base)"
+        ></span>
+      </div>
+      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
+        You are about to remove or deletedded structural components. This will
+        action will permanently remove it.
+      </p>
+    </div>
+    <div
+      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
+    >
+      <button
+        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
+        onclick="structural_component_modal_delete.close()"
+      >
+        Cancel
+      </button>
+      <button class="btn btn-sm btn-error flex-1">Remove</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog
+  id="structural_component_component_type_modal"
+  class="modal modal-center"
+>
+  <div class="modal-box w-full max-w-[42.5rem] p-4.5 pb-9">
+    <div class="flex items-center mb-6">
+      <h2 class="text-base/6 font-bold flex-1 text-center">
+        What type of component would you like to add?
+      </h2>
+      <button
+        class="btn btn-sm btn-circle btn-ghost"
+        onclick="structural_component_component_type_modal.close()"
+      >
+        <span
+          data-icon="close-line"
+          data-size="20"
+          data-color="var(--icon--sub-600)"
+        ></span>
+      </button>
+    </div>
+    <ul class="flex gap-4 items-stretch px-4">
+      <li
+        class="flex-1 flex flex-col items-center py-6 px-3 gap-4 rounded-2xl border border-[var(--stroke--soft-200)]"
+      >
+        <span
+          data-icon="list-settings-fill"
+          data-size="32"
+          data-color="var(--icon--sub-600)"
+        ></span>
+        <div class="text-center">
+          <h3 class="text-sm/5 font-bold">Select from default</h3>
+          <p class="text-xs/4 text-[var(--text--sub-600)] mt-2">
+            Select an assembly from predefined options for a quick LCA
+            assessment.
+          </p>
+        </div>
+        <button
+          class="btn btn-primary w-full"
+          onclick="structural_component_component_type_selected_modal.showModal()"
+        >
+          Select default
+        </button>
+      </li>
+      <li
+        class="flex-1 flex flex-col items-center py-6 px-3 gap-4 rounded-2xl border border-[var(--stroke--soft-200)]"
+      >
+        <span
+          data-icon="list-settings-fill"
+          data-size="32"
+          data-color="var(--icon--sub-600)"
+        ></span>
+        <div class="text-center">
+          <h3 class="text-sm/5 font-bold">Create custom</h3>
+          <p class="text-xs/4 text-[var(--text--sub-600)] mt-2">
+            Create a custom component from the materials list for a detailed
+            LCA.
+          </p>
+        </div>
+        <button
+          class="btn btn-primary w-full"
+          onclick="structural_component_component_type_selected_modal.showModal()"
+        >
+          Select default
+        </button>
+      </li>
+    </ul>
+  </div>
+</dialog>
+
+<template id="structural-component-template">
+  <div class="w-full mt-4">
+    <div class="flex items-center gap-2">
+      <button
+        class="btn btn-outline"
+        onclick="structural_component_boq_modal.showModal()"
+      >
+        Add from Build of Quantity
+      </button>
+      <button
+        class="btn btn-outline"
+        onclick="structural_component_component_type_modal.showModal()"
+      >
+        Add by Component
+      </button>
+    </div>
+    <div class="divider"></div>
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex-1">
+        <h5 class="text-sm/5 font-bold">Components / Materials Added</h5>
+        <p class="text-xs/4 text-[var(--text--sub-600)]">
+          Added components or materials will appear below
+        </p>
+      </div>
+      <button class="btn btn-outline border-[var(--stroke--soft-200)]">
+        <span
+          data-icon="filter-3-fill"
+          data-size="20"
+          data-color="var(--icon--strong-950)"
+        ></span>
+        Filter
+      </button>
+    </div>
+    <ul class="grid grid-cols-1 gap-2.5">
+      <li
+        class="bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2"
+      >
+        <span
+          data-icon="building-3-line"
+          data-size="20"
+          data-color="var(--icon--strong-950)"
+        ></span>
+        <div class="flex-1 flex flex-col gap-2.5">
+          <h6 class="text-sm/5 font-bold">Joe Mentil’s BOQ</h6>
+          <div class="flex items-center">
+            <div
+              class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center"
+            >
+              <span
+                data-icon="leaf-line"
+                data-size="14"
+                data-color="var(--bg--strong-950)"
+              ></span>
+            </div>
+            <div
+              class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)] mr-3"
+            >
+              0.83kg CO2e eq/m2
+            </div>
+            <p class="text-sm/5 text-[var(--text--sub-600)]">
+              Bill of quantities
+            </p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="edit-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="delete-bin-5-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<template id="no-structural-component-template">
+  <div class="w-full flex flex-col gap-3 items-center justify-center mt-10">
+    <img
+      src="/src/assets/structural-component.png"
+      alt="Energy Carrier Image"
+    />
+    <p class="text-sm/5 font-medium text-[var(--text--sub-600)]">
+      How would you like to add your building structural conponents.
+    </p>
+    <div class="flex items-center gap-2">
+      <div class="tooltip">
+        <div class="tooltip-content max-w-[17rem]">
+          <div class="flex gap-3 py-2">
+            <span
+              data-icon="information-fill"
+              data-size="20"
+              data-color="var(--icon--soft-400)"
+            ></span>
+            <div class="flex flex-col gap-1 w-full text-left">
+              <h3 class="text-sm/5 font-medium text-[var(--text--white-0)]">
+                Add from Build of Quantity(BoQ)
+              </h3>
+              <p class="text-xs/5 text-[var(--text--soft-400)]">
+                If data is available as total quantity per material, select “Add
+                from building of Quantity (BoQ)”
+              </p>
+            </div>
+          </div>
+        </div>
+        <button
+          class="btn btn-outline"
+          onclick="structural_component_boq_modal.showModal()"
+        >
+          Add from Build of Quantity
+          <span
+            data-icon="information-fill"
+            data-size="20"
+            data-color="var(--icon--soft-400)"
+          ></span>
+        </button>
+      </div>
+      <div class="tooltip tooltip-bottom">
+        <div class="tooltip-content max-w-[14.75rem]">
+          <div class="flex gap-3 py-2">
+            <span
+              data-icon="information-fill"
+              data-size="20"
+              data-color="var(--icon--soft-400)"
+            ></span>
+            <div class="flex flex-col gap-1 w-full text-left">
+              <h3 class="text-sm/5 font-medium text-[var(--text--white-0)]">
+                Add by component
+              </h3>
+              <p class="text-xs/5 text-[var(--text--soft-400)]">
+                For quantities per components (foundation, floor, roof, etc.),
+                use “Add component”
+              </p>
+            </div>
+          </div>
+        </div>
+        <button
+          class="btn btn-outline"
+          onclick="structural_component_component_type_modal.showModal()"
+        >
+          Add by component
+          <span
+            data-icon="information-fill"
+            data-size="20"
+            data-color="var(--icon--soft-400)"
+          ></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</template>

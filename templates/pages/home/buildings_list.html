@@ -179,6 +179,20 @@
               </p>
             </li>
             </a>
+
+      {% empty %} 
+      <section class="flex flex-col flex-1">
+        <div class="flex flex-col flex-1 items-center justify-center gap-4">
+          <img src="/src/assets/building.png" alt="map" />
+          <span class="text-sm/5 font-medium text-center">You have no buildings added</span>
+          <a href="/src/pages/dashboard/add-building/add-building.html">
+            <button class="btn btn-outline rounded-lg">
+              <span data-icon="add-large-fill"></span>
+              Add building
+            </button>
+          </a>
+        </div>
+      </section> 
     {% endfor %}
           
 </ul>

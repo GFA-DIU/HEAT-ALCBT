@@ -31,3 +31,11 @@ staticfiles
 #JetBrains IDEs
 .idea/
 .idea
+node_modules
+CLAUDE.md
+.gitignore
+.github/copilot-instructions.md
+.vscode/launch.json
+.vscode/launch.json
+.gitignore
+HEAT-ALCBT.code-workspace

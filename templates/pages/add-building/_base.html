@@ -1,0 +1,53 @@
+{% extends "_base.html" %}
+{% load static  %}
+
+{% block title %}Add Building{% endblock %}
+{% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex items-stretch{% endblock body_class %}
+{% block nav %}{% endblock nav %}
+
+{% block content %}
+
+  <section class="flex flex-col">
+      <div class="flex pt-8 pb-5 px-14 border-b border-[var(--bg--soft-200)]">
+        <div class="flex flex-col w-full max-w-[18.125rem]">
+          <img
+            src="{% static 'assets/logo.svg' %}"
+            alt="logo image"
+            class="w-[3.25rem]"
+          />
+          <h1 class="text-base font-extrabold mt-6">Add New Building</h1>
+          <p class="text-sm font-medium mt-1 text-[var(--text--sub-600)]">
+            Complete the following steps to add a new building
+          </p>
+          <div class="flex flex-col gap-1.5 mt-4">
+            <span
+              class="text-xs font-medium text-[var(--text--sub-600)]"
+              id="progress-text"
+              >0% completed</span
+            >
+            <progress
+              class="progress progress-primary w-full"
+              value="0"
+              max="100"
+              id="progress-bar"
+            ></progress>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex pt-8 pb-5 px-14 flex-1">
+        <div class="flex flex-col w-full max-w-[18.125rem]">
+          <div class="space-y-4" id="step-navigation"></div>
+        </div>
+      </div>
+  </section>
+  
+
+{% block new-building %}
+
+{% endblock new-building %}
+
+  <script src="{% static 'js/step-manager.js' %}"></script>
+{% endblock content %}
+
+{% block footer %}{% endblock footer %}
