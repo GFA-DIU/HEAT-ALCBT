@@ -1,0 +1,142 @@
+{% load custom_filters %}
+
+{% if user_templates %}
+<div class="mb-4">
+    <!-- All Templates List -->
+    <ul class="list-group">
+        {% for template in user_templates %}
+        <li class="list-group-item d-flex justify-content-between align-items-center position-relative" data-id="{{ template.id }}">
+            <div class="col-10">
+                <h6 class="mb-1" title="{{ template.name }}">{{ template.name|truncatechars:75 }}</h6>
+                <div class="row">
+                    <span class="text-muted col-3">{{ template.country_name|default:"Not specified" }}</span>
+                    <div class="col gap-3">
+                        <span class="badge border bg-transparent rounded-pill" style="border-color: #6f42c1 !important; color: #6f42c1;">{{ template.category_name|default:"Not specified" }}</span>
+                        <span class="badge border border-dark text-dark bg-transparent rounded-pill">{{ template.dimension_display }}</span>
+                        <span class="badge border border-info text-info bg-transparent rounded-pill">{{ template.material_count }} material{{ template.material_count|pluralize }}</span>
+                        {% if template.technique_name %}
+                            <span class="badge border border-secondary text-secondary bg-transparent rounded-pill">{{ template.technique_name }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="ms-auto d-flex flex-column gap-2">
+                {% if template.public %}
+                    <span class="badge rounded-pill bg-secondary text-dark fw-bold">Generic</span>
+                {% endif %}
+                {% if not is_management_view and building_id %}
+                <form hx-post="{% url 'copy_template' building_id=building_id template_id=template.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="simulation" value="{{ simulation }}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button class="btn btn-primary btn-sm" type="submit">
+                        Use
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if not user_templates %}
+<div class="text-center text-muted py-4">
+    <i class="fas fa-layer-group fa-2x mb-3"></i>
+    <p class="mb-1">No assembly templates match your current filters.</p>
+    <p class="small">Try adjusting your search criteria or create assemblies and mark them as templates!</p>
+</div>
+{% endif %}
+
+<!-- Pagination -->
+<div class="mt-3">
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            <!-- Jump to First Button -->
+            {% if user_templates.has_previous %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" 
+                   hx-post="{% url 'assembly_templates' building_id=building_id %}?page=1&simulation={{ simulation }}&search_query={{ filters.search_query }}&country={{ filters.country }}&template_type={{ filters.template_type }}&category={{ filters.category }}&technique={{ filters.technique }}&dimension={{ filters.dimension }}" 
+                   hx-target="#template-cards" 
+                   hx-swap="innerHTML"
+                   hx-vals='{"action": "filter"}' 
+                   aria-label="First">
+                    <span aria-hidden="true">Start</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">Start</span>
+            </li>
+            {% endif %}
+
+            <!-- Previous Button -->
+            {% if user_templates.has_previous %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" 
+                   hx-post="{% url 'assembly_templates' building_id=building_id %}?page={{ user_templates.previous_page_number }}&simulation={{ simulation }}&search_query={{ filters.search_query }}&country={{ filters.country }}&template_type={{ filters.template_type }}&category={{ filters.category }}&technique={{ filters.technique }}&dimension={{ filters.dimension }}" 
+                   hx-target="#template-cards" 
+                   hx-swap="innerHTML"
+                   hx-vals='{"action": "filter"}' 
+                   aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+            </li>
+            {% endif %}
+
+            <!-- Page Numbers -->
+            {% for num in user_templates.paginator.page_range %}
+                {% if num >= user_templates.number|add:-2 and num <= user_templates.number|add:2 %}
+                <li class="page-item {% if num == user_templates.number %}active{% endif %}">
+                    <a class="page-link" style="cursor: pointer" 
+                       hx-post="{% url 'assembly_templates' building_id=building_id %}?page={{ num }}&simulation={{ simulation }}&search_query={{ filters.search_query }}&country={{ filters.country }}&template_type={{ filters.template_type }}&category={{ filters.category }}&technique={{ filters.technique }}&dimension={{ filters.dimension }}" 
+                       hx-target="#template-cards" 
+                       hx-swap="innerHTML"
+                       hx-vals='{"action": "filter"}'>{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Next Button -->
+            {% if user_templates.has_next %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" 
+                   hx-post="{% url 'assembly_templates' building_id=building_id %}?page={{ user_templates.next_page_number }}&simulation={{ simulation }}&search_query={{ filters.search_query }}&country={{ filters.country }}&template_type={{ filters.template_type }}&category={{ filters.category }}&technique={{ filters.technique }}&dimension={{ filters.dimension }}" 
+                   hx-target="#template-cards" 
+                   hx-swap="innerHTML"
+                   hx-vals='{"action": "filter"}' 
+                   aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+            </li>
+            {% endif %}
+
+            <!-- Jump to Last Button -->
+            {% if user_templates.has_next %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer" 
+                   hx-post="{% url 'assembly_templates' building_id=building_id %}?page={{ user_templates.paginator.num_pages }}&simulation={{ simulation }}&search_query={{ filters.search_query }}&country={{ filters.country }}&template_type={{ filters.template_type }}&category={{ filters.category }}&technique={{ filters.technique }}&dimension={{ filters.dimension }}" 
+                   hx-target="#template-cards" 
+                   hx-swap="innerHTML"
+                   hx-vals='{"action": "filter"}' 
+                   aria-label="Last">
+                    <span aria-hidden="true">End</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">End</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
