@@ -89,18 +89,16 @@
               >*</span
             >
           </legend>
-          <select class="select w-full">
-            <option disabled selected value="">Select an option</option>
-            <option value="ahu">Air Handling Units (AHUs)</option>
-            <option value="fcu">Fan coil units (FCUs)</option>
-            <option value="ceiling-wall-ac">
-              Ceiling or wall mounted cassette ACs
-            </option>
-            <option value="doas">DOAS</option>
-            <option value="celling-exhaust-wall-fan">
-              Celing/Exhaust/Wall Fan
-            </option>
-            <option value="other">Other ventilation type</option>
+          <select 
+            class="select w-full"
+            id="ventilation-type"
+            name="ventilation-type"
+            hx-get="/select_lists/?ventilation_types"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
+          >
+            <option value="">Select an option</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">

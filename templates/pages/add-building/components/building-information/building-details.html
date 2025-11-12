@@ -4,11 +4,19 @@
       Building type<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full">
-      <select class="select w-full">
-        <option disabled selected>Pick a building type</option>
-        <option>Office</option>
-        <option>Residential</option>
-        <option>Commercial</option>
+      <select 
+        id="building-type-select"
+        name="building_type"
+        class="select w-full"
+        hx-get="/select_lists/?building_categories"
+        hx-trigger="load"
+        hx-target="this"
+        hx-swap="innerHTML"
+      >
+        <option value="">Pick a building type</option>
+        {% for category in building_categories %}
+          <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
       </select>
     </label>
     <p class="validator-hint">This field is required</p>
@@ -18,12 +26,17 @@
       Type of apartments<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full">
-      <select class="select w-full">
-        <option disabled selected>Pick a type of apartments</option>
-        <option>Studio</option>
-        <option>1 Bedroom</option>
-        <option>2 Bedroom</option>
-        <option>3 Bedroom</option>
+      <select 
+        id="apartment-type-select"
+        name="apartment_type"
+        class="select w-full"
+        hx-get="/select_lists/"
+        hx-trigger="change from:#building-type-select"
+        hx-target="this"
+        hx-swap="innerHTML"
+        hx-vals='js:{"building_category": document.getElementById("building-type-select").value}'
+      >
+        <option value="">Pick a type of apartments</option>
       </select>
     </label>
     <p class="validator-hint">This field is required</p>
@@ -33,11 +46,16 @@
       Area climate type<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full flex relative">
-      <select class="select w-full">
-        <option disabled selected>Select climate type</option>
-        <option>Hot</option>
-        <option>Cold</option>
-        <option>Mixed</option>
+      <select 
+        id="climate-type-select"
+        name="climate_type"
+        class="select w-full"
+        hx-get="/select_lists/?climate_zones"
+        hx-trigger="load"
+        hx-target="this"
+        hx-swap="innerHTML"
+      >
+        <option value="">Select climate type</option>
       </select>
     </label>
     <p class="validator-hint">This field is required</p>

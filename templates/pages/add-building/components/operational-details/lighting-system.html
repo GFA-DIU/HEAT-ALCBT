@@ -128,12 +128,16 @@
               >*</span
             >
           </legend>
-          <select class="select w-full">
-            <option disabled selected value="">Select an option</option>
-            <option value="led">LED</option>
-            <option value="cfl">CFL</option>
-            <option value="halogen">Halogen</option>
-            <option value="incandescent">Incandescent</option>
+          <select 
+            class="select w-full"
+            id="lighting-type"
+            name="lighting-type"
+            hx-get="/select_lists/?lighting_types"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
+          >
+            <option value="">Select an option</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">

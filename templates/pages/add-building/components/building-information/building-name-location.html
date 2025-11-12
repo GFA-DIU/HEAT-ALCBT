@@ -1,4 +1,5 @@
 <form class="grid grid-cols-2 gap-x-2 gap-y-1">
+  {% csrf_token %}
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
       Building name or Code<span class="text-[var(--state--error--base)]"
@@ -37,32 +38,24 @@
           data-color="var(--icon--soft-400)"
         ></span>
       </div>
-      <select class="select select-with-icon w-full">
-        <option disabled selected>Pick a country</option>
-        <option>
-          <span data-country="US" data-width="20"></span>
-          <span data-country="US" data-flag="false"></span>
+      <select 
+        id="country-select" 
+        name="country"
+        class="select select-with-icon w-full"
+        hx-get="/select_lists/"
+        hx-target="#region-select"
+        hx-trigger="change[this.value != '']"
+        hx-swap="innerHTML"
+        hx-vals='js:{"country": this.value}'
+        onchange="if(!this.value) { document.getElementById('region-select').innerHTML = '<option value=\"\">Select a region or state</option>'; document.getElementById('city-select').innerHTML = '<option value=\"\">Select a city</option>'; }"
+      >
+        <option disabled>Select a country</option>
+        {% for country in countries %}
+          <option value="{{ country.id }}" >
+            <span data-country="{{ country.name }}" data-width="20"></span>
+            <span data-country="{{ country.name }}" data-flag="false"></span>
         </option>
-        <option>
-          <span data-country="CA" data-width="20"></span>
-          <span data-country="CA" data-flag="false"></span>
-        </option>
-        <option>
-          <span data-country="GB" data-width="20"></span>
-          <span data-country="GB" data-flag="false"></span>
-        </option>
-        <option>
-          <span data-country="GH" data-width="20"></span>
-          <span data-country="GH" data-flag="false"></span>
-        </option>
-        <option>
-          <span data-country="NG" data-width="20"></span>
-          <span data-country="NG" data-flag="false"></span>
-        </option>
-        <option>
-          <span data-country="KE" data-width="20"></span>
-          <span data-country="KE" data-flag="false"></span>
-        </option>
+        {% endfor %}
       </select>
     </label>
     <p class="validator-hint">This field is required</p>
@@ -79,11 +72,18 @@
           data-color="var(--icon--soft-400)"
         ></span>
       </div>
-      <select class="select select-with-icon w-full" disabled>
-        <option disabled selected>Pick a region or state</option>
-        <option>Greater Accra</option>
-        <option>Ashanti</option>
-        <option>Eastern</option>
+      <select 
+        id="region-select"
+        name="region"
+        class="select select-with-icon w-full"
+        hx-get="/select_lists/"
+        hx-trigger="change[this.value != '']"
+        hx-target="#city-select"
+        hx-swap="innerHTML"
+        hx-vals='js:{"region": this.value}'
+        onchange="if(!this.value) { document.getElementById('city-select').innerHTML = '<option value=\"\">Select a city</option>'; }"
+      >
+        <option value="">Select a region or state</option>
       </select>
     </label>
     <p class="label">
@@ -107,11 +107,12 @@
           data-color="var(--icon--soft-400)"
         ></span>
       </div>
-      <select class="select select-with-icon w-full" disabled>
-        <option disabled selected value="">Pick a city</option>
-        <option>Accra</option>
-        <option>Kumasi</option>
-        <option>Nairobi</option>
+      <select 
+        id="city-select"
+        name="city"
+        class="select select-with-icon w-full"
+      >
+        <option value="">Select a city</option>
       </select>
     </label>
     <p class="label">

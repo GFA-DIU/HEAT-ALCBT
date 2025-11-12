@@ -1,0 +1,13 @@
+
+<option disabled selected>select an item</option>
+
+{% for item in  options %}
+    {% if type == 'country' %}
+        <option value="{{ item.value }}" >
+            <span data-country="{{item.name}}" data-width="20"></span>
+            <span data-country="{{item.name}}" data-flag="false"></span>
+        </option>
+    {% else %}
+        <option value="{{ item.value }}" >{{ item.name }}</option>  
+    {% endif %}
+{% endfor %}

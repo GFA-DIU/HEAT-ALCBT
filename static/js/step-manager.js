@@ -305,6 +305,11 @@ class StepManager {
       if (window.CountriesRegistry) {
         window.CountriesRegistry.initCountryFlags();
       }
+
+      // Process HTMX for dynamically loaded content
+      if (typeof htmx !== 'undefined') {
+        htmx.process(contentArea);
+      }
     } catch (error) {
       console.error("Failed to load step component:", error);
       contentArea.innerHTML = `

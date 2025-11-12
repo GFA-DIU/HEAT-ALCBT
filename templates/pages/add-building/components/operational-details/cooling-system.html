@@ -91,10 +91,12 @@
             class="select w-full"
             id="cooling-system-type"
             name="cooling-system-type"
+            hx-get="/select_lists/?cooling_types"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
           >
-            <option disabled selected value="">Select a cooling system</option>
-            <option value="chiller-system">Chiller Systems</option>
-            <option value="air-condition-system">Air condition system</option>
+            <option value="">Select a cooling system</option>
           </select>
         </fieldset>
       </div>

@@ -1,4 +1,10 @@
 <option value="">{{ default_text }}</option>
 {% for item in items %}
-<option value="{{ item.id }}">{{ item }}</option>
+  {% if item.id and item.name %}
+    {# Handle dictionary format for choices #}
+    <option value="{{ item.id }}">{{ item.name }}</option>
+  {% else %}
+    {# Handle model objects #}
+    <option value="{{ item.id }}">{{ item }}</option>
+  {% endif %}
 {% endfor %}
