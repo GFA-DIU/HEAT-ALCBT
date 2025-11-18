@@ -1,6 +1,6 @@
 {% extends '_base.html' %}
 {% load static %}
-
+{% load i18n %}
 {% load crispy_forms_tags %}
 
 {% block title %}List view{% endblock title %}
@@ -8,14 +8,14 @@
 <!-- Header + subtitle -->
 <div class="mb-4">
   <h1 class="mb-1">
-    Welcome to <span style="color:#F26716">BEAT</span>
+    {% translate "Welcome to" %} <span style="color:#F26716">BEAT</span>
   </h1>
   <p class="lead text-muted">
-    Begin assessing your building’s whole life cycle emissions – from embodied to operational
+    {% translate "Begin assessing your building's whole life cycle emissions – from embodied to operational" %}
   </p>
 </div>
 
-<h2>Buildings overview</h2>
+<h2>{% translate "Buildings overview" %}</h2>
 
 <div hx-get="{% url 'map' %}?model=building&ids=[]" 
      hx-trigger="load"
@@ -26,10 +26,10 @@
   <img alt="Result loading..." class="htmx-indicator" width="150" src="https://htmx.org/img/bars.svg"/>
 </div>
 <div class="row my-2">
-  <div class='fs-4 fw-bold col-10'>Your buildings</div>
+  <div class='fs-4 fw-bold col-10'>{% translate "Your buildings" %}</div>
  <!-- Button to trigger modal -->
   <a href="{% url 'new_building' %}"  class="icon-button btn btn-primary fs-6 col">
-    Add building
+    {% translate "Add building" %}
   </a>
 </div>
 <div id="buildings_list">

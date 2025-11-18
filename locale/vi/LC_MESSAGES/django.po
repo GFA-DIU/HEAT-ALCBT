@@ -1,0 +1,1197 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-18 08:09+0200\n"
+"PO-Revision-Date: 2025-07-03 16:28+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Vietnamese <vi@li.org>\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: PO File Editor https://pofile.net/free-po-editor\n"
+
+#: .\pages\forms\building_general_info.py:115
+msgid "This writer's name is too long."
+msgstr "Tên của người viết này quá dài."
+
+#: .\pages\models\assembly.py:130
+msgid "Assembly Mode"
+msgstr "Chế độ lắp ráp"
+
+#: .\pages\models\assembly.py:136
+msgid "Assembly type"
+msgstr "Loại lắp ráp"
+
+#: .\pages\models\assembly.py:142 .\pages\models\epd.py:166
+#: .\pages\models\epd.py:253 .\pages\models\epd.py:431
+msgid "Comment"
+msgstr "Bình luận"
+
+#: .\pages\models\assembly.py:143 .\pages\models\product.py:10
+msgid "Description"
+msgstr "Mô tả"
+
+#: .\pages\models\base.py:31
+msgid "Created at"
+msgstr "Được tạo vào"
+
+#: .\pages\models\base.py:32
+msgid "Updated at"
+msgstr "Cập nhật vào"
+
+#: .\pages\models\base.py:34
+msgid "Public"
+msgstr "Công khai"
+
+#: .\pages\models\base.py:34
+msgid "Is it visible to all roles"
+msgstr "Có hiển thị cho tất cả vai trò không"
+
+#: .\pages\models\base.py:37
+msgid "Draft"
+msgstr "Bản nháp"
+
+#: .\pages\models\base.py:37
+msgid "Is it still a draft"
+msgstr "Vẫn là bản nháp?"
+
+#: .\pages\models\base.py:50
+msgid "Street"
+msgstr "Đường"
+
+#: .\pages\models\base.py:51
+msgid "Number"
+msgstr "Số"
+
+#: .\pages\models\base.py:52
+msgid "ZIP"
+msgstr "Mã bưu điện"
+
+#: .\pages\models\base.py:55
+msgid "Longitude"
+msgstr "Kinh độ"
+
+#: .\pages\models\base.py:56
+msgid "Latitude"
+msgstr "Vĩ độ"
+
+#: .\pages\models\building.py:57 .\pages\models\building.py:68
+msgid "Name"
+msgstr "Tên"
+
+#: .\pages\models\building.py:117
+msgid "Approx. number of residents"
+msgstr "Số lượng cư dân (ước tính)"
+
+#: .\pages\models\building.py:123
+msgid "Operation hours per workday"
+msgstr "Giờ hoạt động mỗi ngày làm việc"
+
+#: .\pages\models\building.py:129
+msgid "Operation days per week"
+msgstr "Số ngày hoạt động mỗi tuần"
+
+#: .\pages\models\building.py:135
+msgid "Operation weeks per year"
+msgstr "Số tuần hoạt động mỗi năm"
+
+#: .\pages\models\building.py:141
+msgid "Typical Heating Temperature"
+msgstr "Nhiệt độ sưởi ấm điển hình"
+
+#: .\pages\models\building.py:149
+msgid "Heating Temperature Unit"
+msgstr "Đơn vị nhiệt độ sưởi"
+
+#: .\pages\models\building.py:156
+msgid "Typical Cooling Temperature (Celsius)"
+msgstr "Nhiệt độ làm mát điển hình (°C)"
+
+#: .\pages\models\building.py:164
+msgid "Cooling Temperature Unit"
+msgstr "Đơn vị nhiệt độ làm mát"
+
+#: .\pages\models\building.py:172
+msgid "Heating Type"
+msgstr "Loại sưởi"
+
+#: .\pages\models\building.py:179 .\pages\models\building.py:201
+msgid "Heating Capacity"
+msgstr "Công suất sưởi"
+
+#: .\pages\models\building.py:187
+msgid "Heating Unit"
+msgstr "Đơn vị sưởi"
+
+#: .\pages\models\building.py:194
+msgid "Coolingting Type"
+msgstr "Loại làm mát"
+
+#: .\pages\models\building.py:209
+msgid "Cooling Unit"
+msgstr "Đơn vị làm mát"
+
+#: .\pages\models\building.py:216
+#: .\pages\models\building_operation\ventilation.py:32
+msgid "Ventilation Type"
+msgstr "Loại thông gió"
+
+#: .\pages\models\building.py:223
+#: .\pages\models\building_operation\ventilation.py:38
+msgid "Ventilation Capacity"
+msgstr "Công suất thông gió"
+
+#: .\pages\models\building.py:231
+msgid "Ventilation Unit"
+msgstr "Đơn vị thông gió"
+
+#: .\pages\models\building.py:238
+msgid "Lighting Type"
+msgstr "Loại chiếu sáng"
+
+#: .\pages\models\building.py:245
+msgid "Lighting Capacity"
+msgstr "Công suất chiếu sáng"
+
+#: .\pages\models\building.py:253
+msgid "Lighting Unit"
+msgstr "Đơn vị chiếu sáng"
+
+#: .\pages\models\building.py:265
+msgid "Building name/code"
+msgstr ""
+
+#: .\pages\models\building.py:282
+msgid "Year of Construction"
+msgstr ""
+
+#: .\pages\models\building.py:287
+msgid "Climate"
+msgstr ""
+
+#: .\pages\models\building.py:290
+msgid "Total floor area"
+msgstr ""
+
+#: .\pages\models\building.py:291 .\pages\models\building.py:299
+msgid "Gross floor area [m²]"
+msgstr ""
+
+#: .\pages\models\building.py:298
+msgid "Conditioned floor area"
+msgstr ""
+
+#: .\pages\models\building.py:306
+msgid "Floors above ground"
+msgstr ""
+
+#: .\pages\models\building.py:307
+msgid "Number of floors above"
+msgstr ""
+
+#: .\pages\models\building.py:313
+msgid "Floors below ground"
+msgstr ""
+
+#: .\pages\models\building.py:314
+msgid "Number of floors below"
+msgstr ""
+
+#: .\pages\models\building.py:320
+msgid "Assessment time frame"
+msgstr ""
+
+#: .\pages\models\building.py:321
+msgid "Years of building use"
+msgstr ""
+
+#: .\pages\models\building.py:336 .\pages\models\building.py:359
+msgid "Quantity"
+msgstr ""
+
+#: .\pages\models\building.py:337
+msgid "How much of this component"
+msgstr ""
+
+#: .\pages\models\building.py:345 .\pages\models\building.py:370
+msgid "Reporting life-cycle"
+msgstr ""
+
+#: .\pages\models\building.py:346 .\pages\models\building.py:371
+msgid "Reporting life-cycle for assembly"
+msgstr ""
+
+#: .\pages\models\building.py:360
+msgid "How many of components"
+msgstr ""
+
+#: .\pages\models\building.py:367
+msgid "Unit of Quantity"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:13
+#: .\pages\models\building_operation\chilling.py:107
+#: .\pages\models\building_operation\general_systems.py:12
+#: .\pages\models\building_operation\hot_water.py:35
+#: .\pages\models\building_operation\lighting.py:26
+#: .\pages\models\building_operation\operational_information.py:12
+#: .\pages\models\building_operation\ventilation.py:26
+msgid "Building"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:18
+msgid "VRV/VRF (Variable Refrigerant Volume/Flow)"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:19
+msgid "Split Air Conditioners"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:21
+msgid "Air Conditioners Type"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:24
+#: .\pages\models\building_operation\chilling.py:118
+msgid "Year of Installation"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:27
+#: .\pages\models\building_operation\chilling.py:121
+#: .\pages\models\building_operation\lighting.py:45
+#: .\pages\models\building_operation\operational_information.py:19
+#: .\pages\models\building_operation\ventilation.py:45
+#, fuzzy
+#| msgid "Operation hours per workday"
+msgid "Operation Hours per Workday"
+msgstr "Giờ hoạt động mỗi ngày làm việc"
+
+#: .\pages\models\building_operation\air_conditioning.py:30
+#: .\pages\models\building_operation\chilling.py:124
+#: .\pages\models\building_operation\hot_water.py:48
+#: .\pages\models\building_operation\lighting.py:48
+#: .\pages\models\building_operation\operational_information.py:23
+#: .\pages\models\building_operation\ventilation.py:48
+#, fuzzy
+#| msgid "Operation days per week"
+msgid "Workdays per Week"
+msgstr "Số ngày hoạt động mỗi tuần"
+
+#: .\pages\models\building_operation\air_conditioning.py:33
+#: .\pages\models\building_operation\chilling.py:127
+#: .\pages\models\building_operation\hot_water.py:51
+#: .\pages\models\building_operation\lighting.py:51
+#: .\pages\models\building_operation\operational_information.py:27
+#: .\pages\models\building_operation\ventilation.py:51
+#, fuzzy
+#| msgid "Operation weeks per year"
+msgid "Workweeks per Year"
+msgstr "Số tuần hoạt động mỗi năm"
+
+#: .\pages\models\building_operation\air_conditioning.py:38
+#: .\pages\models\building_operation\chilling.py:132
+msgid "Type of Refrigerants"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:41
+#: .\pages\models\building_operation\chilling.py:135
+msgid "Refrigerant Quantity (Kg)"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:44
+msgid "Total Cooling Load for Split/VRV (RT)"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:51
+msgid "Baseline Split Unit/VRV System Efficiency (kW/RT)"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:56
+#: .\pages\models\building_operation\chilling.py:152
+msgid "Baseline Refrigerant Emission Factor (GWP)"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:59
+#: .\pages\models\building_operation\chilling.py:155
+msgid "Baseline Leakage Factor (%)"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:65
+msgid "Total Energy Consumption of Cooling System Annually (kWh/year)"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:69
+msgid "Total Number of Split/VRV Units"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:72
+msgid "Total Split Unit/VRV System Power (kW)"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:75
+#: .\pages\models\building_operation\chilling.py:176
+msgid "COP"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:82
+msgid "ISEER Rating"
+msgstr ""
+
+#: .\pages\models\building_operation\air_conditioning.py:88
+#: .\pages\models\building_operation\chilling.py:185
+#: .\pages\models\building_operation\hot_water.py:84
+#: .\pages\models\building_operation\lighting.py:73
+#: .\pages\models\building_operation\ventilation.py:80
+msgid "Energy Efficiency Label"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:8
+msgid "R-290 (Propane)"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:9
+msgid "R-600a (Isobutane)"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:10
+msgid "R-717 (Ammonia)"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:11
+msgid "R-744 (CO2)"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:12
+msgid "R-12"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:13
+msgid "R-13"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:14
+msgid "R-22"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:15
+msgid "R-23"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:16
+msgid "R-32"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:17
+msgid "R-41"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:18
+msgid "R-125"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:19
+msgid "R-134a"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:20
+msgid "R-143a"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:21
+msgid "R-227EA"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:22
+msgid "R-236CB"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:23
+msgid "R-236EA"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:24
+msgid "R-236FA"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:25
+msgid "R-245CA"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:26
+msgid "R-245FA"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:27
+msgid "R-404A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:28
+msgid "R-407A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:29
+msgid "R-407B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:30
+msgid "R-407C"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:31
+msgid "R-407D"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:32
+msgid "R-407E"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:33
+msgid "R-407F"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:34
+msgid "R-407G"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:35
+msgid "R-410A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:36
+msgid "R-410B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:37
+msgid "R-413A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:38
+msgid "R-417A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:39
+msgid "R-417B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:40
+msgid "R-417C"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:41
+msgid "R-419A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:42
+msgid "R-419B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:43
+msgid "R-421A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:44
+msgid "R-421B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:45
+msgid "R-422A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:46
+msgid "R-422B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:47
+msgid "R-422C"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:48
+msgid "R-422D"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:49
+msgid "R-423A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:50
+msgid "R-424A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:51
+msgid "R-425A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:52
+msgid "R-426A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:53
+msgid "R-427A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:54
+msgid "R-428A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:55
+msgid "R-429A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:56
+msgid "R-430A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:57
+msgid "R-431A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:58
+msgid "R-434A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:59
+msgid "R-435A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:60
+msgid "R-437A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:61
+msgid "R-438A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:62
+msgid "R-439A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:63
+msgid "R-440A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:64
+msgid "R-442A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:65
+msgid "R-444A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:66
+msgid "R-444B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:67
+msgid "R-445A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:68
+msgid "R-446A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:69
+msgid "R-447A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:70
+msgid "R-447B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:71
+msgid "R-448A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:72
+msgid "R-449A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:73
+msgid "R-449B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:74
+msgid "R-449C"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:75
+msgid "R-450A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:76
+msgid "R-451A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:77
+msgid "R-451B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:78
+msgid "R-452A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:79
+msgid "R-452B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:80
+msgid "R-452C"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:81
+msgid "R-453A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:82
+msgid "R-454A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:83
+msgid "R-454B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:84
+msgid "R-454C"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:85
+msgid "R-455A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:86
+msgid "R-456A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:87
+msgid "R-457A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:88
+msgid "R-458A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:89
+msgid "R-500"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:90
+msgid "R-502"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:91
+msgid "R-503"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:92
+msgid "R-507A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:93
+msgid "R-508A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:94
+msgid "R-508B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:95
+msgid "R-512A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:96
+msgid "R-513A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:97
+msgid "R-513B"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:98
+msgid "R-515A"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:99
+#: .\pages\models\building_operation\hot_water.py:27
+msgid "Other"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:112
+msgid "Water Cooled Chillers"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:113
+msgid "Air Cooled Chillers"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:115
+msgid "Chiller Type"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:138
+msgid "Total Cooling Load for Chiller System (RT)"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:141
+msgid "Baseline Cooling Efficiency (kW/h)"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:144
+#: .\pages\models\building_operation\ventilation.py:64
+msgid "Installation of Variable Speed Drives (VSDs)"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:147
+#: .\pages\models\building_operation\hot_water.py:73
+msgid "Installation of Heat Recovery Systems"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:161
+msgid "Total Energy Consumption of Chiller System Annually (kWh/year)"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:165
+msgid "Number of Chillers"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:170
+msgid "Water-Cooled Chiller Cooling Load Factor (%)"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:173
+msgid "Total Chiller System Power Input (kW)"
+msgstr ""
+
+#: .\pages\models\building_operation\chilling.py:179
+msgid "IPLV"
+msgstr ""
+
+#: .\pages\models\building_operation\general_systems.py:15
+msgid "Number of Lifts"
+msgstr ""
+
+#: .\pages\models\building_operation\general_systems.py:18
+msgid "Installation of Lift Regenerative Features"
+msgstr ""
+
+#: .\pages\models\building_operation\general_systems.py:22
+msgid "Installation of VVVF and Sleep Mode"
+msgstr ""
+
+#: .\pages\models\building_operation\general_systems.py:28
+msgid "Annual Lift System Energy Consumption (kWh/year)"
+msgstr ""
+
+#: .\pages\models\building_operation\general_systems.py:32
+msgid "Lift and Escalator System"
+msgstr ""
+
+#: .\pages\models\building_operation\general_systems.py:33
+msgid "Lift and Escalator Systems"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:8
+msgid "Heat Pump Water Heater"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:9
+msgid "Boiler"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:10
+msgid "Solar Water Heaters"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:14
+msgid "Electricity"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:15
+msgid "Light Fuel Oil"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:16
+msgid "Heavy Fuel Oil"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:17
+msgid "Liquefied Petroleum Gas (LPG)"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:18
+msgid "Natural Gas"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:19
+msgid "Coal"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:20
+msgid "Lignite"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:21
+msgid "Diesel"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:22
+msgid "Kerosene"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:23
+msgid "Fire Wood (Log Wood)"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:24
+msgid "Fire Wood (Wood Chips)"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:25
+msgid "Fire Wood (Wood Pellets)"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:26
+msgid "Char Coal"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:41
+msgid "Type of Hot Water System"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:45
+#, fuzzy
+#| msgid "Operation hours per workday"
+msgid "Operation Hours for Hot Water per Workday"
+msgstr "Giờ hoạt động mỗi ngày làm việc"
+
+#: .\pages\models\building_operation\hot_water.py:55
+msgid "Fuel Type"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:59
+msgid "Fuel Consumption (Liters/m³)"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:63
+msgid "Hot Water System Power Input (kW)"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:66
+msgid "Baseline Hot Water System Efficiency (COP)"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:69
+msgid "Baseline Hot Water System Equipment Efficiency Level (%)"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:77
+msgid "Number of Hot Water Equipment Installed"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:88
+msgid "Hot Water System"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:89
+msgid "Hot Water Systems"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:8
+msgid "Office: Conference Room"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:9
+msgid "Hospital: Patient Room"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:10
+msgid "Residential: Kitchen"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:11
+msgid "Residential: Dining"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:15
+msgid "CFL (Compact Fluorescent Lamp) Lights"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:16
+msgid "LED (Light Emitting Diode) Lights"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:17
+msgid "T5 and T8 Fluorescent Tube Lights"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:18
+#, fuzzy
+#| msgid "Lighting Type"
+msgid "Other Lighting Type"
+msgstr "Loại chiếu sáng"
+
+#: .\pages\models\building_operation\lighting.py:30
+msgid "Room Type"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:33
+msgid "Area of Room (m²)"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:38
+#, fuzzy
+#| msgid "Lighting Type"
+msgid "Lighting Bulb Type"
+msgstr "Loại chiếu sáng"
+
+#: .\pages\models\building_operation\lighting.py:42
+msgid "Number of Lighting Bulbs"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:54
+msgid "Light Bulb Power Rating (W)"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:57
+msgid "Baseline Lighting Power Density (W/m²)"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:60
+msgid "Installation of Sensors"
+msgstr ""
+
+#: .\pages\models\building_operation\lighting.py:66
+msgid "Total Energy Consumption of Lighting System Annually (kWh/year)"
+msgstr ""
+
+#: .\pages\models\building_operation\operational_information.py:15
+#, fuzzy
+#| msgid "Approx. number of residents"
+msgid "Number of Residents"
+msgstr "Số lượng cư dân (ước tính)"
+
+#: .\pages\models\building_operation\operational_information.py:30
+msgid "Renewable Energy (%)"
+msgstr ""
+
+#: .\pages\models\building_operation\operational_information.py:32
+msgid ""
+"Percentage of the annual energy consumption of the building produced on site "
+"from renewable sources"
+msgstr ""
+
+#: .\pages\models\building_operation\operational_information.py:36
+msgid "Energy Monitoring and Control Systems"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:8
+msgid "Air Handling Units (AHUs)"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:9
+msgid "Fan Coil Units (FCUs)"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:10
+msgid "Ceiling or Wall Mounted Cassette ACs"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:11
+msgid "DOAS"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:12
+msgid "Ceiling/Exhaust/Wall Fan"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:13
+#, fuzzy
+#| msgid "Ventilation Type"
+msgid "Other Ventilation Type"
+msgstr "Loại thông gió"
+
+#: .\pages\models\building_operation\ventilation.py:17
+msgid "m³/hr"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:18
+msgid "ft³/min"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:42
+msgid "Baseline Ventilation System Efficiency (W/CMH)"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:54
+msgid "Total Ventilation System Power Input (W)"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:57
+msgid "Air Flow Rate (CMH/CFM)"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:60
+msgid "Installation of Demand Controlled Ventilation (DCV)"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:67
+msgid "Total Number of Ventilation Type Installed"
+msgstr ""
+
+#: .\pages\models\building_operation\ventilation.py:73
+msgid "Total Energy Consumption of Ventilation System Annually (kWh/year)"
+msgstr ""
+
+#: .\pages\models\epd.py:167
+msgid "Conversions for units, follwoing EPDx"
+msgstr ""
+
+#: .\pages\models\epd.py:169
+msgid "Declared Unit"
+msgstr ""
+
+#: .\pages\models\epd.py:171
+msgid "Unique worldwide EPD identifier"
+msgstr ""
+
+#: .\pages\models\epd.py:172
+msgid "Material name"
+msgstr ""
+
+#: .\pages\models\epd.py:174
+msgid "Name translations"
+msgstr ""
+
+#: .\pages\models\epd.py:177
+msgid "EPD Node Version"
+msgstr ""
+
+#: .\pages\models\epd.py:204
+msgid "Impact Category"
+msgstr ""
+
+#: .\pages\models\epd.py:207
+msgid "Life Cycle Stage"
+msgstr ""
+
+#: .\pages\models\epd.py:252 .\pages\models\epd.py:289
+msgid "Source"
+msgstr ""
+
+#: .\pages\models\epd.py:254
+msgid "Scale Type"
+msgstr ""
+
+#: .\pages\models\epd.py:255
+msgid "Scale Parameters"
+msgstr ""
+
+#: .\pages\models\epd.py:255
+msgid "Scale-specific metadata"
+msgstr ""
+
+#: .\pages\models\epd.py:290
+msgid "Type"
+msgstr ""
+
+#: .\pages\models\epd.py:292
+msgid "Reference Quantity of EPD"
+msgstr ""
+
+#: .\pages\models\epd.py:429
+msgid "Score"
+msgstr ""
+
+#: .\pages\models\product.py:14
+msgid "Unit for quantity of EPD"
+msgstr ""
+
+#: .\pages\models\product.py:20
+msgid "Quantity of EPD"
+msgstr ""
+
+#: .\templates\_base.html:47
+msgid "Overview"
+msgstr ""
+
+#: .\templates\_base.html:50
+msgid "Resources"
+msgstr ""
+
+#: .\templates\_base.html:58
+msgid "Settings"
+msgstr ""
+
+#: .\templates\_base.html:65
+msgid "Change password"
+msgstr ""
+
+#: .\templates\_base.html:66
+msgid "Cookie Settings"
+msgstr ""
+
+#: .\templates\_base.html:71
+msgid "Language"
+msgstr ""
+
+#: .\templates\_base.html:86
+msgid "Sign out"
+msgstr ""
+
+#: .\templates\account\email\password_reset_key_message.txt:2
+#, python-format
+msgid ""
+"Hello from %(site_name)s!\n"
+"\n"
+"We've received a request to reset your password. If you didn't make this "
+"request, you can safely ignore this email. Otherwise, click the button below "
+"to reset your password."
+msgstr ""
+"Xin chào từ %(site_name)s!\n"
+"\n"
+"Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu của bạn. Nếu bạn không thực "
+"hiện yêu cầu này, bạn có thể bỏ qua email này. Nếu không, hãy nhấn vào nút "
+"dưới đây để đặt lại mật khẩu của bạn."
+
+#: .\templates\account\email\password_reset_key_message.txt:8
+#, fuzzy, python-format
+msgid "In case you forgot, your username is %(username)s."
+msgstr "Trong trường hợp bạn quên, tên người dùng của bạn là %(username)s."
+
+#: .\templates\account\email\password_reset_key_message.txt:10
+#, python-format
+msgid ""
+"Thank you for using %(site_name)s!\n"
+"%(site_domain)s"
+msgstr ""
+"Cảm ơn bạn đã sử dụng %(site_name)s!\n"
+"%(site_domain)s"
+
+#: .\templates\pages\home\home.html:11
+msgid "Welcome to"
+msgstr ""
+
+#: .\templates\pages\home\home.html:14
+msgid ""
+"Begin assessing your building's whole life cycle emissions – from embodied "
+"to operational"
+msgstr ""
+
+#: .\templates\pages\home\home.html:18
+msgid "Buildings overview"
+msgstr ""
+
+#: .\templates\pages\home\home.html:29
+msgid "Your buildings"
+msgstr ""
+
+#: .\templates\pages\home\home.html:32
+msgid "Add building"
+msgstr ""
