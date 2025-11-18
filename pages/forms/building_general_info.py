@@ -134,6 +134,12 @@ class BuildingGeneralInformation(forms.ModelForm):
                 self.fields["region"].queryset = CustomRegion.objects.filter(
                     country_id=country_id
                 ).order_by("name")
+
+                # Categories filter (building type)
+                self.fields["category"].queryset = CategorySubcategory.objects.filter(
+                    Q(country__id=country_id) | Q(country__isnull=True)  # universal types
+                ).select_related("category", "subcategory")
+
             except (ValueError, TypeError):
                 self.fields["region"].queryset = CustomRegion.objects.none()
         if "region" in self.data:

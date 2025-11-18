@@ -1,5 +1,7 @@
 {% load crispy_forms_tags %}
-{% if assembly_id %}
+{% if template_edit %}
+<form hx-post="{% url 'template_edit' assembly_id=assembly_id %}?simulation={{simulation}}">
+{% elif assembly_id %}
 <form hx-post="{% url 'component_edit' assembly_id=assembly_id building_id=building_id %}?simulation={{simulation}}">
 {% else %}
 <form hx-post="{% url 'component' building_id=building_id %}?simulation={{simulation}}">
@@ -26,8 +28,13 @@
             <div class="ms-2 flex-grow-1">
                 {{ form.country |as_crispy_field }}
             </div>
-            <div class="form-check form-switch">
-                {{ form.public |as_crispy_field }}
+            <div class="d-flex gap-3">
+                <div class="form-check form-switch">
+                    {{ form.public |as_crispy_field }}
+                </div>
+                <div class="form-check form-switch">
+                    {{ form.is_template |as_crispy_field }}
+                </div>
             </div>
         </div>
     </div>
@@ -63,6 +70,9 @@
 
 
     <input type="hidden" name="action" value="form_submission">
+    {% if template_assembly and not assembly_id %}
+        <input type="hidden" name="template_id" value="{{ template_assembly.id }}">
+    {% endif %}
 
     <h4>Materials</h4>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#epdSearchModal">
@@ -86,10 +96,12 @@
 
     <div class="d-flex flex-row justify-content-between align-items-center">
         <div>
-            <a {% if simulation %}
-               href="{% url 'building_simulation' building_id=building_id %}" 
+            <a {% if template_edit %}
+               href="{% url 'assembly_template_management' %}"
+               {% elif simulation %}
+               href="{% url 'building_simulation' building_id=building_id %}"
                {% else %}
-               href="{% url 'building' building_id=building_id %}" 
+               href="{% url 'building' building_id=building_id %}"
                {% endif %}
                class="btn btn-secondary">Cancel</a>
             <button 
