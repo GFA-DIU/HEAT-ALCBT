@@ -27,6 +27,7 @@ class SelectedEPD:
     source: Optional[str]
     classification: Optional[str]
     available_units: Optional[str]
+    type: str
 
     @classmethod
     def parse_product(cls, product: StructuralProduct, is_boq_product=False):
@@ -51,6 +52,7 @@ class SelectedEPD:
             source=product.epd.source,
             classification=product.classification,
             available_units=product.epd.get_available_units(),
+            type=product.epd.type,
         )
 
 
