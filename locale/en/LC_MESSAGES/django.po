@@ -9,162 +9,161 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-18 08:09+0200\n"
-"PO-Revision-Date: 2025-07-03 16:28+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: Vietnamese <vi@li.org>\n"
-"Language: vi\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: PO File Editor https://pofile.net/free-po-editor\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: .\pages\forms\building_general_info.py:115
 msgid "This writer's name is too long."
-msgstr "Tên của người viết này quá dài."
+msgstr ""
 
 #: .\pages\models\assembly.py:130
 msgid "Assembly Mode"
-msgstr "Chế độ lắp ráp"
+msgstr ""
 
 #: .\pages\models\assembly.py:136
 msgid "Assembly type"
-msgstr "Loại lắp ráp"
+msgstr ""
 
 #: .\pages\models\assembly.py:142 .\pages\models\epd.py:166
 #: .\pages\models\epd.py:253 .\pages\models\epd.py:431
 msgid "Comment"
-msgstr "Bình luận"
+msgstr ""
 
 #: .\pages\models\assembly.py:143 .\pages\models\product.py:10
 msgid "Description"
-msgstr "Mô tả"
+msgstr ""
 
 #: .\pages\models\base.py:31
 msgid "Created at"
-msgstr "Được tạo vào"
+msgstr ""
 
 #: .\pages\models\base.py:32
 msgid "Updated at"
-msgstr "Cập nhật vào"
+msgstr ""
 
 #: .\pages\models\base.py:34
 msgid "Public"
-msgstr "Công khai"
+msgstr ""
 
 #: .\pages\models\base.py:34
 msgid "Is it visible to all roles"
-msgstr "Có hiển thị cho tất cả vai trò không"
+msgstr ""
 
 #: .\pages\models\base.py:37
 msgid "Draft"
-msgstr "Bản nháp"
+msgstr ""
 
 #: .\pages\models\base.py:37
 msgid "Is it still a draft"
-msgstr "Vẫn là bản nháp?"
+msgstr ""
 
 #: .\pages\models\base.py:50
 msgid "Street"
-msgstr "Đường"
+msgstr ""
 
 #: .\pages\models\base.py:51
 msgid "Number"
-msgstr "Số"
+msgstr ""
 
 #: .\pages\models\base.py:52
 msgid "ZIP"
-msgstr "Mã bưu điện"
+msgstr ""
 
 #: .\pages\models\base.py:55
 msgid "Longitude"
-msgstr "Kinh độ"
+msgstr ""
 
 #: .\pages\models\base.py:56
 msgid "Latitude"
-msgstr "Vĩ độ"
+msgstr ""
 
 #: .\pages\models\building.py:57 .\pages\models\building.py:68
 msgid "Name"
-msgstr "Tên"
+msgstr ""
 
 #: .\pages\models\building.py:117
 msgid "Approx. number of residents"
-msgstr "Số lượng cư dân (ước tính)"
+msgstr ""
 
 #: .\pages\models\building.py:123
 msgid "Operation hours per workday"
-msgstr "Giờ hoạt động mỗi ngày làm việc"
+msgstr ""
 
 #: .\pages\models\building.py:129
 msgid "Operation days per week"
-msgstr "Số ngày hoạt động mỗi tuần"
+msgstr ""
 
 #: .\pages\models\building.py:135
 msgid "Operation weeks per year"
-msgstr "Số tuần hoạt động mỗi năm"
+msgstr ""
 
 #: .\pages\models\building.py:141
 msgid "Typical Heating Temperature"
-msgstr "Nhiệt độ sưởi ấm điển hình"
+msgstr ""
 
 #: .\pages\models\building.py:149
 msgid "Heating Temperature Unit"
-msgstr "Đơn vị nhiệt độ sưởi"
+msgstr ""
 
 #: .\pages\models\building.py:156
 msgid "Typical Cooling Temperature (Celsius)"
-msgstr "Nhiệt độ làm mát điển hình (°C)"
+msgstr ""
 
 #: .\pages\models\building.py:164
 msgid "Cooling Temperature Unit"
-msgstr "Đơn vị nhiệt độ làm mát"
+msgstr ""
 
 #: .\pages\models\building.py:172
 msgid "Heating Type"
-msgstr "Loại sưởi"
+msgstr ""
 
 #: .\pages\models\building.py:179 .\pages\models\building.py:201
 msgid "Heating Capacity"
-msgstr "Công suất sưởi"
+msgstr ""
 
 #: .\pages\models\building.py:187
 msgid "Heating Unit"
-msgstr "Đơn vị sưởi"
+msgstr ""
 
 #: .\pages\models\building.py:194
 msgid "Coolingting Type"
-msgstr "Loại làm mát"
+msgstr ""
 
 #: .\pages\models\building.py:209
 msgid "Cooling Unit"
-msgstr "Đơn vị làm mát"
+msgstr ""
 
 #: .\pages\models\building.py:216
 #: .\pages\models\building_operation\ventilation.py:32
 msgid "Ventilation Type"
-msgstr "Loại thông gió"
+msgstr ""
 
 #: .\pages\models\building.py:223
 #: .\pages\models\building_operation\ventilation.py:38
 msgid "Ventilation Capacity"
-msgstr "Công suất thông gió"
+msgstr ""
 
 #: .\pages\models\building.py:231
 msgid "Ventilation Unit"
-msgstr "Đơn vị thông gió"
+msgstr ""
 
 #: .\pages\models\building.py:238
 msgid "Lighting Type"
-msgstr "Loại chiếu sáng"
+msgstr ""
 
 #: .\pages\models\building.py:245
 msgid "Lighting Capacity"
-msgstr "Công suất chiếu sáng"
+msgstr ""
 
 #: .\pages\models\building.py:253
 msgid "Lighting Unit"
-msgstr "Đơn vị chiếu sáng"
+msgstr ""
 
 #: .\pages\models\building.py:265
 msgid "Building name/code"
@@ -270,10 +269,8 @@ msgstr ""
 #: .\pages\models\building_operation\lighting.py:45
 #: .\pages\models\building_operation\operational_information.py:19
 #: .\pages\models\building_operation\ventilation.py:45
-#, fuzzy
-#| msgid "Operation hours per workday"
 msgid "Operation Hours per Workday"
-msgstr "Giờ hoạt động mỗi ngày làm việc"
+msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:30
 #: .\pages\models\building_operation\chilling.py:124
@@ -281,10 +278,8 @@ msgstr "Giờ hoạt động mỗi ngày làm việc"
 #: .\pages\models\building_operation\lighting.py:48
 #: .\pages\models\building_operation\operational_information.py:23
 #: .\pages\models\building_operation\ventilation.py:48
-#, fuzzy
-#| msgid "Operation days per week"
 msgid "Workdays per Week"
-msgstr "Số ngày hoạt động mỗi tuần"
+msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:33
 #: .\pages\models\building_operation\chilling.py:127
@@ -292,10 +287,8 @@ msgstr "Số ngày hoạt động mỗi tuần"
 #: .\pages\models\building_operation\lighting.py:51
 #: .\pages\models\building_operation\operational_information.py:27
 #: .\pages\models\building_operation\ventilation.py:51
-#, fuzzy
-#| msgid "Operation weeks per year"
 msgid "Workweeks per Year"
-msgstr "Số tuần hoạt động mỗi năm"
+msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:38
 #: .\pages\models\building_operation\chilling.py:132
@@ -866,10 +859,8 @@ msgid "Type of Hot Water System"
 msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:45
-#, fuzzy
-#| msgid "Operation hours per workday"
 msgid "Operation Hours for Hot Water per Workday"
-msgstr "Giờ hoạt động mỗi ngày làm việc"
+msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:55
 msgid "Fuel Type"
@@ -932,10 +923,8 @@ msgid "T5 and T8 Fluorescent Tube Lights"
 msgstr ""
 
 #: .\pages\models\building_operation\lighting.py:18
-#, fuzzy
-#| msgid "Lighting Type"
 msgid "Other Lighting Type"
-msgstr "Loại chiếu sáng"
+msgstr ""
 
 #: .\pages\models\building_operation\lighting.py:30
 msgid "Room Type"
@@ -946,10 +935,8 @@ msgid "Area of Room (m²)"
 msgstr ""
 
 #: .\pages\models\building_operation\lighting.py:38
-#, fuzzy
-#| msgid "Lighting Type"
 msgid "Lighting Bulb Type"
-msgstr "Loại chiếu sáng"
+msgstr ""
 
 #: .\pages\models\building_operation\lighting.py:42
 msgid "Number of Lighting Bulbs"
@@ -972,10 +959,8 @@ msgid "Total Energy Consumption of Lighting System Annually (kWh/year)"
 msgstr ""
 
 #: .\pages\models\building_operation\operational_information.py:15
-#, fuzzy
-#| msgid "Approx. number of residents"
 msgid "Number of Residents"
-msgstr "Số lượng cư dân (ước tính)"
+msgstr ""
 
 #: .\pages\models\building_operation\operational_information.py:30
 msgid "Renewable Energy (%)"
@@ -1012,10 +997,8 @@ msgid "Ceiling/Exhaust/Wall Fan"
 msgstr ""
 
 #: .\pages\models\building_operation\ventilation.py:13
-#, fuzzy
-#| msgid "Ventilation Type"
 msgid "Other Ventilation Type"
-msgstr "Loại thông gió"
+msgstr ""
 
 #: .\pages\models\building_operation\ventilation.py:17
 msgid "m³/hr"
@@ -1154,16 +1137,11 @@ msgid ""
 "request, you can safely ignore this email. Otherwise, click the button below "
 "to reset your password."
 msgstr ""
-"Xin chào từ %(site_name)s!\n"
-"\n"
-"Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu của bạn. Nếu bạn không thực "
-"hiện yêu cầu này, bạn có thể bỏ qua email này. Nếu không, hãy nhấn vào nút "
-"dưới đây để đặt lại mật khẩu của bạn."
 
 #: .\templates\account\email\password_reset_key_message.txt:8
-#, fuzzy, python-format
+#, python-format
 msgid "In case you forgot, your username is %(username)s."
-msgstr "Trong trường hợp bạn quên, tên người dùng của bạn là %(username)s."
+msgstr ""
 
 #: .\templates\account\email\password_reset_key_message.txt:10
 #, python-format
@@ -1171,8 +1149,6 @@ msgid ""
 "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
 msgstr ""
-"Cảm ơn bạn đã sử dụng %(site_name)s!\n"
-"%(site_domain)s"
 
 #: .\templates\pages\home\home.html:11
 msgid "Welcome to"

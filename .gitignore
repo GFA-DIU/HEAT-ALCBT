@@ -11,6 +11,9 @@ __pycache__/
 db.sqlite3
 media
 
+# Localization - exclude compiled translation files
+*.mo
+
 # Virtual environment
 .venv*
 

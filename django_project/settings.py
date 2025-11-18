@@ -87,6 +87,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # i18n language detection
     "django.middleware.common.CommonMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",  # Django Debug Toolbar
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -186,7 +187,7 @@ LANGUAGE_CODE = "en-us"
 
 LANGUAGES = [
     ('en', 'English'),
-    ('vi', 'Vietnamnese'),
+    ('vi', 'Vietnamese'),
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#time-zone

@@ -1,6 +1,7 @@
 {% load static %}
 {% load cookie_consent_tags %}
 {% load newrelic_tags %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -43,10 +44,10 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Overview</a>
+            <a class="nav-link active" aria-current="page" href="{% url 'home' %}">{% translate "Overview" %}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'resources' %}">Resources</a>
+            <a class="nav-link" href="{% url 'resources' %}">{% translate "Resources" %}</a>
           </li>
         </ul>
         <div class="mr-auto">
@@ -54,16 +55,35 @@
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">
-                Settings
+                {% translate "Settings" %}
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="{% url 'update_profile' %}">{{ user.email }}</a></li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item" href="{% url 'account_change_password' %}">Change password</a></li>
-                <li><a class="dropdown-item" href="#" onclick="showCookieSettings()">Cookie Settings</a></li>
-                <li><a class="dropdown-item" href="{% url 'account_logout' %}">Sign out</a></li>
+                <li><a class="dropdown-item" href="{% url 'account_change_password' %}">{% translate "Change password" %}</a></li>
+                <li><a class="dropdown-item" href="#" onclick="showCookieSettings()">{% translate "Cookie Settings" %}</a></li>
+                <li class="dropdown-item">
+                  <form action="{% url 'set_language' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ request.path }}">
+                    <label for="language-select" class="form-label mb-1" style="font-size: 0.875rem;">{% translate "Language" %}</label>
+                    <select name="language" id="language-select" class="form-select form-select-sm" onchange="this.form.submit()">
+                      {% get_current_language as CURRENT_LANGUAGE %}
+                      {% get_available_languages as AVAILABLE_LANGUAGES %}
+                      {% for lang_code, lang_name in AVAILABLE_LANGUAGES %}
+                        <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>
+                          {{ lang_name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </form>
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="{% url 'account_logout' %}">{% translate "Sign out" %}</a></li>
               </ul>
             </li>
           </ul>
