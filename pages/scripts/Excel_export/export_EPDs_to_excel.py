@@ -46,7 +46,9 @@ def parse_EPD(epd: EPD):
     }
 
 
-def get_conversion(conversions: list[dict], unit):
+def get_conversion(conversions: list[dict] | None, unit):
+    if not conversions:
+        return ""
     for c in conversions:
         if c.get("unit") == unit:
             return c.get("value")

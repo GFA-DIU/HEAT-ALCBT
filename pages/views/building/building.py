@@ -82,7 +82,7 @@ def building(request, building_id=None):
         if request.GET.get("op_product_id"):
             response = HttpResponse()
             response['HX-Trigger-After-Swap'] = 'componentDeleted'
-            return
+            return response
         if request.GET.get("component"):
             return handle_assembly_delete(request, building_id, simulation=False)
     elif request.method == "GET":

@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 
-from pages.views.building.building_dashboard import get_building_dashboard
+from pages.views.building.building_dashboard.building_dashboard import get_building_dashboard
 
 
 logger = logging.getLogger(__name__)
@@ -31,4 +31,5 @@ def dashboard_view(request):
             dashboard_html = get_building_dashboard(request.user, model_id, dashboard_type, simulation)
         except:
             dashboard_html = ""
+            logger.exception("Dashboard creation failed.")
         return render(request, "pages/building/dashboard/dashboard.html", {"dashboard_html": dashboard_html})

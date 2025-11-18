@@ -5,13 +5,14 @@ from django.views.generic import TemplateView
 from pages.views.boq.boq import boq_edit
 from pages.views.building.dashboards import dashboard_view
 from pages.views.map import map_view
-from pages.views.select_lists import select_lists
+from pages.views.select_lists import select_lists, update_regions, update_categories
 
 from .views.resources import resources
 from .views.home import buildings_list
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
 from .views.assembly.assembly import component_edit
+from cookie_management.views import get_cookie_groups
 
 
 urlpatterns = [
@@ -28,6 +29,8 @@ urlpatterns = [
     ),
     path("resources/", resources, name="resources"),
     path("select_lists/", select_lists, name="select-lists"),
+    path("update_regions/", update_regions, name="update-regions"),
+    path("update_categories/", update_categories, name="update-categories"),
     path("map/", map_view, name="map"),
     path("dashboard/", dashboard_view, name="dashboard"),
     path("building/_new", building, name="new_building"),
@@ -49,4 +52,5 @@ urlpatterns = [
         boq_edit,
         name="boq_edit",
     ),
+    path("cookie_groups/", get_cookie_groups, name="cookie_groups"),
 ]

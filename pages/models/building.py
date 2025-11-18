@@ -8,6 +8,7 @@ from .assembly import Assembly
 from .base import BaseGeoModel, BaseModel
 from .product import BaseProduct
 from .epd import EPD, Unit
+from cities_light.models import Country
 
 
 class ClimateZone(models.TextChoices):
@@ -83,14 +84,20 @@ class BuildingCategory(models.Model):
 class CategorySubcategory(models.Model):
     category = models.ForeignKey(BuildingCategory, on_delete=models.CASCADE)
     subcategory = models.ForeignKey(BuildingSubcategory, on_delete=models.CASCADE)
+    country = models.ForeignKey(
+        Country,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text="Leave blank to mark this as universal"
+    )
 
     class Meta:
-        unique_together = ("category", "subcategory")
+        unique_together = ("category", "subcategory", "country")
 
     def __str__(self):
-        return f"{self.category.name} - {self.subcategory.name}"
-
-
+        return f"{self.category} - {self.subcategory} ({self.country if self.country else 'Universal'})"
+        
 class BuildingOperationalInfo(models.Model):
     ### Operational Emissions
     operational_components = models.ManyToManyField(

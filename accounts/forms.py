@@ -5,6 +5,7 @@ from .models import CustomRegion, CustomUser, UserProfile
 from cities_light.models import Country
 
 from accounts.models import CustomCity
+from pages.models.base import ALCBTCountryManager
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -37,7 +38,7 @@ class CustomUserUpdateForm(forms.ModelForm):
 
 class UserProfileUpdateForm(forms.ModelForm):
     country = forms.ModelChoiceField(
-        queryset=Country.objects.all(),
+        queryset=ALCBTCountryManager.get_all_countries(),
         widget=forms.Select(attrs={
             'hx-get': '/select_lists/',               # HTMX request to the root URL
             'hx-trigger': 'change',      # Trigger HTMX on change event

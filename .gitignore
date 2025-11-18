@@ -27,3 +27,7 @@ secrets
 
 # django
 staticfiles
+
+#JetBrains IDEs
+.idea/
+.idea

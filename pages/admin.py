@@ -1,11 +1,26 @@
+from django import forms
 from django.contrib import admin
 from django.db.models import Q, Prefetch
 from django.http import HttpResponse
 
-from .models.epd import MaterialCategory, EPD, Impact, EPDImpact
+from .models.epd import MaterialCategory, EPD, Impact, EPDImpact, Label, EPDLabel
 from .models.assembly import Assembly, AssemblyCategory, AssemblyTechnique
 from .models.building import Building, BuildingCategory, BuildingSubcategory
+from .models.base import ALCBTCountryManager
 from .scripts.Excel_export.export_EPDs_to_excel import to_excel_bytes
+
+
+class CountryFieldMixin:
+    # Mixin to handle country field querysets in admin
+    use_all_countries = False
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "country":
+            if self.use_all_countries:
+                kwargs["queryset"] = ALCBTCountryManager.get_all_countries()
+            else:
+                kwargs["queryset"] = ALCBTCountryManager.get_alcbt_countries()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 admin.site.site_header = "BEAT Admin"
@@ -16,6 +31,11 @@ admin.site.index_title = "Welcome to the BEAT Admin Area"
 # Inline for Many-to-Many (impacts in EPD)
 class ImpactsInline(admin.TabularInline):  # or admin.StackedInline
     model = EPD.impacts.through  # Use the through model for the many-to-many field
+    extra = 1  # Number of empty rows to display
+
+# Inline for Many-to-Many (labels in EPD)
+class LabelsInline(admin.TabularInline):  # or admin.StackedInline
+    model = EPDLabel
     extra = 1  # Number of empty rows to display
 
 # Inline for Many-to-Many (products in Assembly)
@@ -106,8 +126,9 @@ def export_epds_action(modeladmin, request, queryset):
 
 
 # Custom admin for EPD
-class EPDAdmin(admin.ModelAdmin):
-    inlines = [ImpactsInline]  # Add the inline for impacts
+class EPDAdmin(CountryFieldMixin, admin.ModelAdmin):
+    use_all_countries = True
+    inlines = [ImpactsInline, LabelsInline]  # Add the inline for impacts and labels
     list_display = ["name", "country", "category", "type"]  # Show all fields in list view
     list_display_links = ["name"]
     ordering = ["name", "country"]
@@ -124,7 +145,8 @@ class EPDAdmin(admin.ModelAdmin):
 
     
 # Custom admin for Assembly
-class AssemblyAdmin(admin.ModelAdmin):
+class AssemblyAdmin(CountryFieldMixin, admin.ModelAdmin):
+    use_all_countries = False
     inlines = [ProductsInline]  # Add the inline for products
     list_display = ["name", "country", "classification", "id"]
 
@@ -135,7 +157,8 @@ class AssemblyCategoryAdmin(admin.ModelAdmin):
     list_display = ["name", "tag"]
 
 # Custom admin for Building
-class BuildingAdmin(admin.ModelAdmin):
+class BuildingAdmin(CountryFieldMixin, admin.ModelAdmin):
+    use_all_countries = False  # Building admin shows only ALCBT countries
     inlines = [AssembliesInline, AssembliesSimulationInline, StructuralProductsInline, StructuralProductsSimulationInline]  # Add the inline for products
     list_display = ["name", "country", "category"]
     
@@ -154,6 +177,15 @@ class MaterialCategoryAdmin(admin.ModelAdmin):
     list_display_links = ["name_en"]
     ordering    = ("category_id",)
 
+# Custom admin for Label
+class LabelAdmin(admin.ModelAdmin):
+    list_display = ["name", "source", "scale_type"]
+    list_display_links = ["name"]
+    ordering = ["name"]
+    list_filter = ["scale_type", "source"]
+    search_fields = ("name", "source")
+
+
 # Register your models with custom admin
 admin.site.register(MaterialCategory, MaterialCategoryAdmin)
 admin.site.register(EPD, EPDAdmin)
@@ -164,3 +196,4 @@ admin.site.register(Building, BuildingAdmin)
 admin.site.register(BuildingCategory, BuildingCategoryAdmin)
 admin.site.register(BuildingSubcategory)
 admin.site.register(Impact)
+admin.site.register(Label, LabelAdmin)

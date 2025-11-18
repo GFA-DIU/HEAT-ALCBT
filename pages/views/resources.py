@@ -1,8 +1,8 @@
 import os
-import re
 from pathlib import Path
 
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 
 # List of files to be sorted
@@ -15,7 +15,7 @@ files = [
 # Priority mapping: GGGI first, then ACE, then EESL
 priority = {"GGGI": 0, "ACE": 1, "EESL": 2}
 
-
+@login_required
 def resources(request):
     lead_partner_logos = get_all_files("static/images/logos/lead_partners/")
     lead_partner_logos = sort_files(lead_partner_logos, priority)

@@ -6,8 +6,8 @@ from crispy_forms.layout import Layout, Row, Column, Submit, Div
 from crispy_forms.bootstrap import Accordion, AccordionGroup
 from cities_light.models import Country
 
-
 from pages.models.epd import MaterialCategory, EPDType
+from pages.models.base import ALCBTCountryManager
 
 
 class EPDsFilterForm(forms.Form):
@@ -53,7 +53,7 @@ class EPDsFilterForm(forms.Form):
         required=False,
     )
     country = forms.ModelChoiceField(
-        queryset=Country.objects.all().order_by("name"),
+        queryset=ALCBTCountryManager.get_all_countries(),
         label="Country",
         required=False,
     )
