@@ -13,13 +13,49 @@
         </p>
         
         <!-- Filter Form -->
-        <form hx-post="{% url 'assembly_templates' building_id=building_id %}?simulation={{ simulation }}"
-              hx-target="#template-cards" 
-              hx-vals='{"action": "filter"}' 
+        <form id="template-filter-form"
+              hx-post="{% url 'assembly_templates' building_id=building_id %}?simulation={{ simulation }}"
+              hx-target="#template-cards"
+              hx-vals='{"action": "filter"}'
               class="mb-4">
             {% csrf_token %}
             {% crispy template_filters_form %}
+            <div class="d-flex justify-content-end mt-3">
+                <button type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        onclick="clearTemplateFilters()">
+                    <i class="fas fa-times me-1"></i>Clear All Filters
+                </button>
+            </div>
         </form>
+
+        <script>
+        function clearTemplateFilters() {
+            const form = document.getElementById('template-filter-form');
+
+            // Clear all input fields
+            const inputs = form.querySelectorAll('input[type="text"], input[type="search"]');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+
+            // Reset all select dropdowns to first option
+            const selects = form.querySelectorAll('select');
+            selects.forEach(select => {
+                select.selectedIndex = 0;
+            });
+
+            // Trigger HTMX request to reload data with cleared filters
+            htmx.ajax('POST', form.getAttribute('hx-post'), {
+                target: form.getAttribute('hx-target'),
+                swap: 'innerHTML',
+                values: {
+                    'csrfmiddlewaretoken': form.querySelector('[name="csrfmiddlewaretoken"]').value,
+                    'action': 'filter'
+                }
+            });
+        }
+        </script>
         
         <!-- Template Cards Container -->
         <div id="template-cards">

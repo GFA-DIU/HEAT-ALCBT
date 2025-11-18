@@ -4,27 +4,63 @@
 
 {% comment %} FILTERS {% endcomment %}
 {% if assembly_id %}
-<form 
+<form id="epd-filter-form"
     {% if is_boq %}
     hx-post="{% url 'boq_edit' building_id=building_id assembly_id=assembly_id %}?simulation={{simulation}}"
     {% else %}
     hx-post="{% url 'component_edit' building_id=building_id assembly_id=assembly_id %}?simulation={{simulation}}"
-    {% endif %}  
-    hx-target="#epd-list" 
+    {% endif %}
+    hx-target="#epd-list"
     hx-vals='{"action": "filter", "dimension": "{{dimension}}" }'>
 {% else %}
-<form 
+<form id="epd-filter-form"
     {% if is_boq %}
     hx-post="{% url 'boq' building_id=building_id %}?simulation={{simulation}}"
     {% else %}
     hx-post="{% url 'component' building_id=building_id %}?simulation={{simulation}}"
     {% endif %}
-    hx-target="#epd-list" 
+    hx-target="#epd-list"
     hx-vals='{"action": "filter", "dimension": "{{dimension}}" }'>
 {% endif %}
     <!-- Create an identifier for this post request -->
     {% crispy epd_filters_form %}
-</form> 
+    <div class="d-flex justify-content-end mt-3">
+        <button type="button"
+                class="btn btn-outline-secondary btn-sm"
+                onclick="clearEpdFilters()">
+            <i class="fas fa-times me-1"></i>Clear All Filters
+        </button>
+    </div>
+</form>
+
+<script>
+function clearEpdFilters() {
+    const form = document.getElementById('epd-filter-form');
+
+    // Clear all input fields
+    const inputs = form.querySelectorAll('input[type="text"], input[type="search"]');
+    inputs.forEach(input => {
+        input.value = '';
+    });
+
+    // Reset all select dropdowns to first option
+    const selects = form.querySelectorAll('select');
+    selects.forEach(select => {
+        select.selectedIndex = 0;
+    });
+
+    // Trigger HTMX request to reload data with cleared filters
+    htmx.ajax('POST', form.getAttribute('hx-post'), {
+        target: form.getAttribute('hx-target'),
+        swap: 'innerHTML',
+        values: {
+            'csrfmiddlewaretoken': form.querySelector('[name="csrfmiddlewaretoken"]').value,
+            'action': 'filter',
+            'dimension': form.querySelector('[name="dimension"]') ? form.querySelector('[name="dimension"]').value : ''
+        }
+    });
+}
+</script> 
 
 {% comment %} EPD LIST {% endcomment %}
 <ul class="list-group mt-3">

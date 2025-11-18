@@ -1,12 +1,53 @@
 {% load crispy_forms_tags %}
 {%  if simulation %}
-<form hx-post="{% url 'building_simulation' building_id=building_id %}" hx-target="#operational-epd-list" hx-vals='{"action": "filter" }'>
+<form id="operational-filter-form"
+      hx-post="{% url 'building_simulation' building_id=building_id %}"
+      hx-target="#operational-epd-list"
+      hx-vals='{"action": "filter" }'>
 {% else %}
-<form hx-post="{% url 'building' building_id=building_id %}" hx-target="#operational-epd-list" hx-vals='{"action": "filter" }'>
+<form id="operational-filter-form"
+      hx-post="{% url 'building' building_id=building_id %}"
+      hx-target="#operational-epd-list"
+      hx-vals='{"action": "filter" }'>
 {% endif %}
     <!-- Create an identifier for this post request -->
     {% crispy epd_filters_form %}
-</form> 
+    <div class="d-flex justify-content-end mt-3">
+        <button type="button"
+                class="btn btn-outline-secondary btn-sm"
+                onclick="clearOperationalFilters()">
+            <i class="fas fa-times me-1"></i>Clear All Filters
+        </button>
+    </div>
+</form>
+
+<script>
+function clearOperationalFilters() {
+    const form = document.getElementById('operational-filter-form');
+
+    // Clear all input fields
+    const inputs = form.querySelectorAll('input[type="text"], input[type="search"]');
+    inputs.forEach(input => {
+        input.value = '';
+    });
+
+    // Reset all select dropdowns to first option
+    const selects = form.querySelectorAll('select');
+    selects.forEach(select => {
+        select.selectedIndex = 0;
+    });
+
+    // Trigger HTMX request to reload data with cleared filters
+    htmx.ajax('POST', form.getAttribute('hx-post'), {
+        target: form.getAttribute('hx-target'),
+        swap: 'innerHTML',
+        values: {
+            'csrfmiddlewaretoken': form.querySelector('[name="csrfmiddlewaretoken"]').value,
+            'action': 'filter'
+        }
+    });
+}
+</script> 
 
 <ul class="list-group mt-3">
     {% for epd in epd_list %}
