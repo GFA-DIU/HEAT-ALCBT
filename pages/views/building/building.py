@@ -283,7 +283,19 @@ def handle_assembly_delete(request, building_id, simulation):
         component = get_object_or_404(
             BuildingAssemblyModel, assembly__id=component_id, building__id=building_id
         )
+        assembly = component.assembly
         component.delete()
+        
+        # If the assembly is not a template and has no other building relationships,
+        # delete the assembly itself to avoid orphaned assemblies
+        if not assembly.is_template:
+            building_assembly_count = BuildingAssembly.objects.filter(assembly=assembly).count()
+            building_assembly_sim_count = BuildingAssemblySimulated.objects.filter(assembly=assembly).count()
+            
+            if building_assembly_count == 0 and building_assembly_sim_count == 0:
+                logger.info("Deleting orphaned non-template assembly: %s", assembly)
+                assembly.delete()
+                
     except Exception:
         logger.exception(
             "Deletion of assembly %s for building %s failed.", component_id, building_id

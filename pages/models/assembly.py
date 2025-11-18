@@ -146,9 +146,94 @@ class Assembly(BaseModel):
         EPD, blank=True, related_name="assemblies", through="StructuralProduct"
     )
     is_boq = models.BooleanField(default=False)
+    is_template = models.BooleanField(
+        _("Use as template"),
+        default=False,
+        help_text=_("Mark this assembly as a template that can be reused in other buildings")
+    )
+    from_template = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='derived_assemblies',
+        help_text=_("The template this assembly was created from (if any)")
+    )
 
     def __str__(self):
         return self.name
+
+    def copy_as_template_instance(self, new_name=None, user=None):
+        """
+        Create a copy of this assembly for use in a building (non-template instance).
+        """
+        # Create new assembly instance
+        new_assembly = Assembly(
+            country=self.country,
+            city=self.city,
+            mode=self.mode,
+            dimension=self.dimension,
+            comment=self.comment,
+            description=self.description,
+            name=new_name or f"{self.name} (Copy)",
+            is_boq=self.is_boq,
+            is_template=False,  # New instance is not a template
+            from_template=self if self.is_template else None,  # Track source template
+        )
+        
+        if user:
+            new_assembly.created_by = user
+            
+        new_assembly.save()
+        
+        # Copy all structural products
+        for structural_product in self.structuralproduct_set.all():
+            StructuralProduct.objects.create(
+                epd=structural_product.epd,
+                classification=structural_product.classification,
+                assembly=new_assembly,
+                input_unit=structural_product.input_unit,
+                quantity=structural_product.quantity,
+                description=structural_product.description,
+            )
+        
+        return new_assembly
+
+    def create_template_copy(self, user=None, template_name=None):
+        # Create new template instance (completely separate record)
+        template = Assembly(
+            country=self.country,
+            city=self.city,
+            mode=self.mode,
+            dimension=self.dimension,
+            comment=self.comment,
+            description=self.description,
+            name=template_name or f"{self.name} Template",
+            is_boq=self.is_boq,
+            is_template=True,  # This is a template
+            from_template=None,  # Templates don't track origins
+            public=self.public,
+        )
+
+        if user:
+            template.created_by = user
+        else:
+            template.created_by = self.created_by
+
+        template.save()
+
+        # Copy all structural products to the template
+        for structural_product in self.structuralproduct_set.all():
+            StructuralProduct.objects.create(
+                epd=structural_product.epd,
+                classification=structural_product.classification,
+                assembly=template,
+                input_unit=structural_product.input_unit,
+                quantity=structural_product.quantity,
+                description=structural_product.description,
+            )
+
+        return template
 
     @property
     def classification(self):
