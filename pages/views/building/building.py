@@ -1,5 +1,6 @@
 import logging
 
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseServerError
@@ -87,7 +88,11 @@ def building(request, building_id=None):
             return handle_assembly_delete(request, building_id, simulation=False)
     elif request.method == "GET":
         if request.GET.get("page"):
-            return get_op_product_list(request, building_id)
+            # Check if it's component pagination or operational product pagination
+            if request.GET.get("component_page"):
+                return get_component_list(request, building_id, simulation=False)
+            else:
+                return get_op_product_list(request, building_id)
         # Full reload
         if building_id:
             context, form, detailedForm, operationalInfoForm = handle_building_load(
@@ -173,6 +178,11 @@ def handle_building_load(request, building_id, simulation):
     # Build structural components and impacts in one step
     structural_components, _ = get_assemblies(building.prefetched_components)
 
+    # Apply pagination to structural components
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(structural_components, 10)  # Show 10 components per page
+    structural_components_page = paginator.get_page(page_number)
+
     # Get Operational Products and impacts
     operational_products = serialize_operational_products(
         building.prefetched_operational_products
@@ -197,7 +207,7 @@ def handle_building_load(request, building_id, simulation):
     context = {
         "building_id": building.id,
         "building": building,
-        "structural_components": structural_components,
+        "structural_components": structural_components_page,
         "operational_products": operational_products,
         "has_structural": bool(structural_components),
         "has_operational": bool(operational_products),
@@ -214,10 +224,72 @@ def handle_building_load(request, building_id, simulation):
     logger.info(
         "Found building: %s with %d structural components",
         building.name,
-        len(context["structural_components"]),
+        len(structural_components),
     )
 
     return context, form, detailedForm, operationalInfoForm
+
+
+def get_component_list(request, building_id, simulation):
+    """
+    Handle pagination requests for the component list.
+    Returns only the assemblies_list.html template with paginated components.
+    """
+    if simulation:
+        BuildingAssemblyModel = BuildingAssemblySimulated
+        relation_name = "buildingassemblysimulated_set"
+    else:
+        BuildingAssemblyModel = BuildingAssembly
+        relation_name = "buildingassembly_set"
+
+    building = get_object_or_404(
+        Building.objects
+            .filter(created_by=request.user)
+            .prefetch_related(
+                Prefetch(
+                    relation_name,
+                    queryset=BuildingAssemblyModel.objects
+                        .filter(building__created_by=request.user)
+                        .select_related("assembly")
+                        .order_by("-assembly__created_at")
+                        .prefetch_related(
+                            Prefetch(
+                                "assembly__structuralproduct_set",
+                                queryset=StructuralProduct.objects
+                                    .select_related("epd", "classification")
+                                    .prefetch_related(
+                                        Prefetch(
+                                            "epd__epdimpact_set",
+                                            queryset=EPDImpact.objects.select_related("impact"),
+                                            to_attr="all_impacts",
+                                        ),
+                                        "epd__category",
+                                        "classification__category",
+                                    ),
+                                to_attr="prefetched_products",
+                            ),
+                        ),
+                    to_attr="prefetched_components",
+                ),
+            ),
+        pk=building_id,
+    )
+
+    # Build structural components
+    structural_components, _ = get_assemblies(building.prefetched_components)
+
+    # Apply pagination
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(structural_components, 10)
+    structural_components_page = paginator.get_page(page_number)
+
+    context = {
+        "building_id": building_id,
+        "structural_components": structural_components_page,
+        "simulation": simulation,
+    }
+
+    return render(request, "pages/building/structural_info/assemblies_list.html", context)
 
 
 @transaction.atomic
