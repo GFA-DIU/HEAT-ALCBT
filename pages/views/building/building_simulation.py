@@ -15,6 +15,7 @@ from pages.models.building import (
 )
 from pages.views.building.building import handle_building_load
 from pages.views.building.building import handle_assembly_delete
+from pages.views.building.building import get_component_list
 from pages.views.building.operational_products.operational_products import (
     get_op_product,
     get_op_product_list,
@@ -75,6 +76,14 @@ def building_simulation(request, building_id):
 
     # Full reload
     else:
+        # Handle pagination requests
+        if request.GET.get("page"):
+            # Check if it's component pagination or operational product pagination
+            if request.GET.get("component_page"):
+                return get_component_list(request, building_id, simulation=True)
+            else:
+                return get_op_product_list(request, building_id)
+
         context, form, detailedForm, operationalInfoForm = handle_building_load(
             request, building_id, simulation=True
         )

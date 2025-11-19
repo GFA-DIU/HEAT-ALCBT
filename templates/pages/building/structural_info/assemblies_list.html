@@ -31,9 +31,9 @@
             {% endif%}
 
             <button class="btn btn-danger"
-                    {% if simulation %} hx-delete="{% url 'building_simulation' building_id=building_id %}?component={{ component.assembly_id }}" 
+                    {% if simulation %} hx-delete="{% url 'building_simulation' building_id=building_id %}?component={{ component.assembly_id }}"
                     {% else %} hx-delete="{% url 'building' building_id=building_id %}?component={{ component.assembly_id }}" {% endif %}
-                    hx-target="#item-list" 
+                    hx-target="#item-list"
                     hx-swap="innerHTML"
                     >
                 Delete
@@ -42,6 +42,113 @@
     </li>
     {% endfor %}
 </ul>
+
+<!-- Pagination -->
+<div class="mt-3">
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            <!-- Jump to First Button -->
+            {% if structural_components.has_previous %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer"
+                   {% if simulation %}
+                   hx-get="{% url 'building_simulation' building_id=building_id %}?page=1&component_page=true&simulation={{ simulation }}"
+                   {% else %}
+                   hx-get="{% url 'building' building_id=building_id %}?page=1&component_page=true&simulation={{ simulation }}"
+                   {% endif %}
+                   hx-target="#item-list"
+                   hx-swap="innerHTML"
+                   aria-label="First">
+                    <span aria-hidden="true">Start</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">Start</span>
+            </li>
+            {% endif %}
+
+            <!-- Previous Button -->
+            {% if structural_components.has_previous %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer"
+                   {% if simulation %}
+                   hx-get="{% url 'building_simulation' building_id=building_id %}?page={{ structural_components.previous_page_number }}&component_page=true&simulation={{ simulation }}"
+                   {% else %}
+                   hx-get="{% url 'building' building_id=building_id %}?page={{ structural_components.previous_page_number }}&component_page=true&simulation={{ simulation }}"
+                   {% endif %}
+                   hx-target="#item-list"
+                   hx-swap="innerHTML"
+                   aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+            </li>
+            {% endif %}
+
+            <!-- Page Numbers -->
+            {% for num in structural_components.paginator.page_range %}
+                {% if num >= structural_components.number|add:-2 and num <= structural_components.number|add:2 %}
+                <li class="page-item {% if num == structural_components.number %}active{% endif %}">
+                    <a class="page-link" style="cursor: pointer"
+                       {% if simulation %}
+                       hx-get="{% url 'building_simulation' building_id=building_id %}?page={{ num }}&component_page=true&simulation={{ simulation }}"
+                       {% else %}
+                       hx-get="{% url 'building' building_id=building_id %}?page={{ num }}&component_page=true&simulation={{ simulation }}"
+                       {% endif %}
+                       hx-target="#item-list"
+                       hx-swap="innerHTML">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Next Button -->
+            {% if structural_components.has_next %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer"
+                   {% if simulation %}
+                   hx-get="{% url 'building_simulation' building_id=building_id %}?page={{ structural_components.next_page_number }}&component_page=true&simulation={{ simulation }}"
+                   {% else %}
+                   hx-get="{% url 'building' building_id=building_id %}?page={{ structural_components.next_page_number }}&component_page=true&simulation={{ simulation }}"
+                   {% endif %}
+                   hx-target="#item-list"
+                   hx-swap="innerHTML"
+                   aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+            </li>
+            {% endif %}
+
+            <!-- Jump to Last Button -->
+            {% if structural_components.has_next %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer"
+                   {% if simulation %}
+                   hx-get="{% url 'building_simulation' building_id=building_id %}?page={{ structural_components.paginator.num_pages }}&component_page=true&simulation={{ simulation }}"
+                   {% else %}
+                   hx-get="{% url 'building' building_id=building_id %}?page={{ structural_components.paginator.num_pages }}&component_page=true&simulation={{ simulation }}"
+                   {% endif %}
+                   hx-target="#item-list"
+                   hx-swap="innerHTML"
+                   aria-label="Last">
+                    <span aria-hidden="true">End</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">End</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
 
 <script>
     document.body.addEventListener('componentDeleted', function() {
