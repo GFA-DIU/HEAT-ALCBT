@@ -221,13 +221,13 @@ def handle_building_load(request, building_id, simulation):
 
 
 @transaction.atomic
-def handle_information_submit(request, building_id, form):
+def handle_information_submit(request, building_id, form_type):
     building = (
         get_object_or_404(Building, created_by=request.user, pk=building_id)
         if building_id
         else None
     )
-    match form:
+    match form_type:
         case "general":
             form = BuildingGeneralInformation(
                 request.POST, instance=building
@@ -248,7 +248,25 @@ def handle_information_submit(request, building_id, form):
             logger.info(
                 "User %s successfully saved building %s", request.user, building
             )
-            return redirect("building", building_id=building.id)
+
+            # Check if this is an HTMX request
+            if request.headers.get('HX-Request'):
+                context, form_general, form_detailed, form_operational = handle_building_load(
+                    request, building.id, simulation=False
+                )
+                context["form_general_info"] = form_general
+                context["form_detailed_info"] = form_detailed
+                context["form_operational_info"] = form_operational
+                context["simulation"] = False
+
+                return render(
+                    request,
+                    "pages/building/building_core.html",
+                    context,
+                )
+            else:
+                # For regular requests, redirect as before
+                return redirect("building", building_id=building.id)
         else:
             logger.info(
                 "User %s could not save building %s. Form had following errors",
