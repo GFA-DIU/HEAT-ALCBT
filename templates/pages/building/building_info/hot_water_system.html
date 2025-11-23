@@ -1,0 +1,171 @@
+{% load crispy_forms_tags %} {% if building_id %}
+<form action="{% url 'building' building_id=building_id %}" method="post">
+  <!-- Create an identifier for this post request -->
+  <input type="hidden" name="action" value="hot_water_system" />
+  {% csrf_token %}
+
+  <!-- System Type and Fuel Type -->
+  <div class="row">
+    <div class="col-md-6">
+      <label for="{{ form_hot_water_system.system_type.id_for_label }}" class="form-label">
+        {{ form_hot_water_system.system_type.label }}
+      </label>
+      <div class="input-group mb-1">{{ form_hot_water_system.system_type }}</div>
+    </div>
+
+    <div class="col-md-6">
+      <label for="{{ form_hot_water_system.fuel_type.id_for_label }}" class="form-label">
+        {{ form_hot_water_system.fuel_type.label }}
+      </label>
+      <div class="input-group mb-1">{{ form_hot_water_system.fuel_type }}</div>
+    </div>
+  </div>
+
+  <!-- System Operating Schedule -->
+  <div class="row">
+    <div class="col-md-12">
+      <label class="form-label">System Operating Schedule</label>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="input-group mb-1">
+            {{ form_hot_water_system.operation_hours_per_workday }}
+            <span class="input-group-text">
+              <small class="text-muted fw-light" style="font-size: 0.8rem;">
+                {{ form_hot_water_system.operation_hours_per_workday.help_text }}
+              </small>
+            </span>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="input-group mb-1">
+            {{ form_hot_water_system.workdays_per_week }}
+            <span class="input-group-text">
+              <small class="text-muted fw-light" style="font-size: 0.8rem;">
+                {{ form_hot_water_system.workdays_per_week.help_text }}
+              </small>
+            </span>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="input-group mb-1">
+            {{ form_hot_water_system.workweeks_per_year }}
+            <span class="input-group-text">
+              <small class="text-muted fw-light" style="font-size: 0.8rem;">
+                {{ form_hot_water_system.workweeks_per_year.help_text }}
+              </small>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fuel Consumption -->
+  <div class="row">
+    <div class="col-md-6">
+      <label for="{{ form_hot_water_system.fuel_consumption.id_for_label }}" class="form-label">
+        {{ form_hot_water_system.fuel_consumption.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_hot_water_system.fuel_consumption }}
+        <span class="input-group-text">
+          <small class="text-muted fw-light" style="font-size: 0.8rem;">
+            {{ form_hot_water_system.fuel_consumption.help_text }}
+          </small>
+        </span>
+      </div>
+    </div>
+
+    <!-- Power Input -->
+    <div class="col-md-6">
+      <label for="{{ form_hot_water_system.power_input_kw.id_for_label }}" class="form-label">
+        {{ form_hot_water_system.power_input_kw.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_hot_water_system.power_input_kw }}
+        <span class="input-group-text">
+          <small class="text-muted fw-light" style="font-size: 0.8rem;">
+            {{ form_hot_water_system.power_input_kw.help_text }}
+          </small>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Baseline Efficiency Fields -->
+  <div class="row">
+    <div class="col-md-6">
+      <label for="{{ form_hot_water_system.baseline_efficiency_cop.id_for_label }}" class="form-label">
+        {{ form_hot_water_system.baseline_efficiency_cop.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_hot_water_system.baseline_efficiency_cop }}
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label for="{{ form_hot_water_system.baseline_equipment_efficiency_percentage.id_for_label }}" class="form-label">
+        {{ form_hot_water_system.baseline_equipment_efficiency_percentage.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_hot_water_system.baseline_equipment_efficiency_percentage }}
+        <span class="input-group-text">
+          <small class="text-muted fw-light" style="font-size: 0.8rem;">
+            {{ form_hot_water_system.baseline_equipment_efficiency_percentage.help_text }}
+          </small>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Heat Recovery and Number of Equipment -->
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-check mb-1">
+        {{ form_hot_water_system.heat_recovery_installed }}
+        <label class="form-check-label" for="{{ form_hot_water_system.heat_recovery_installed.id_for_label }}">
+          {{ form_hot_water_system.heat_recovery_installed.label }}
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <label for="{{ form_hot_water_system.number_of_equipments.id_for_label }}" class="form-label">
+        {{ form_hot_water_system.number_of_equipments.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_hot_water_system.number_of_equipments }}
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label for="{{ form_hot_water_system.energy_efficiency_label.id_for_label }}" class="form-label">
+        {{ form_hot_water_system.energy_efficiency_label.label }}
+      </label>
+      <div class="input-group mb-1">
+        {{ form_hot_water_system.energy_efficiency_label }}
+      </div>
+    </div>
+  </div>
+
+  <div hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=assembly&simulation={{simulation}}"
+      hx-target="#assembly_dashboard"
+      hx-swap="innerHTML"
+    >
+      <div hx-get="{% url 'dashboard' %}?model=building&id={{building_id}}&dashboard_type=material&simulation={{simulation}}"
+          hx-target="#material_dashboard"
+          hx-swap="innerHTML"
+      >
+        <button id="save_button" type="submit" class="btn btn-primary mt-1"
+        {% if simulation %}disabled{%endif%}
+          >
+          Save
+        </button>
+    </div>
+  </div>
+</form>
+{% endif %}

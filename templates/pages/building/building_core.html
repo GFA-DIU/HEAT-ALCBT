@@ -215,7 +215,35 @@
     </div>
   </div>
 
-  <!-- Option 5 -->
+  <!-- Option 5 - Hot Water System -->
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="hotWaterSystemHeading">
+      <button
+        class="accordion-button collapsed"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#hotWaterSystem"
+        aria-expanded="true"
+        aria-controls="hotWaterSystem"
+      >
+        <strong>Hot Water System</strong>
+      </button>
+    </h2>
+    <div
+      id="hotWaterSystem"
+      class="accordion-collapse collapse"
+      aria-labelledby="hotWaterSystemHeading"
+      data-bs-parent="#accordionBuilding"
+    >
+      <div class="accordion-body">
+        {% if building_id %}
+        {% include "pages/building/building_info/hot_water_system.html" %}
+        {% else %} Please save the building before adding hot water system information {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Option 6 -->
   <div class="accordion-item">
     <h2 class="accordion-header" id="assembliesHeading">
       <button

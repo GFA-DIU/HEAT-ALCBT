@@ -11,6 +11,7 @@ from pages.forms.building_detailed_info import BuildingDetailedInformation
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.forms.operational_info_form import OperationalInfoForm
+from pages.forms.hot_water_system_form import HotWaterSystemForm
 from pages.models.assembly import DIMENSION_UNIT_MAPPING, StructuralProduct
 from pages.models.building import (
     Building,
@@ -19,6 +20,7 @@ from pages.models.building import (
     OperationalProduct,
     SimulatedOperationalProduct,
 )
+from pages.models.building_operation.hot_water import HotWaterSystem
 from pages.models.epd import EPDImpact, MaterialCategory
 from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.impact_calculation import calculate_impacts
@@ -48,13 +50,15 @@ def building(request, building_id=None):
                 return handle_information_submit(request, building_id, "detailed")
             case "operational_info":
                 return handle_information_submit(request, building_id, "operational")
+            case "hot_water_system":
+                return handle_information_submit(request, building_id, "hot_water_system")
             case "filter":
                 return get_op_product_list(request, building_id)
             case "select_op_product":
                 return get_op_product(request, building_id)
             case "save_op_products":
                 handle_op_products_save(request, building_id)
-                context, form, detailedForm, _ = handle_building_load(
+                context, form, detailedForm, _, _ = handle_building_load(
                     request, building_id, simulation=False
                 )
                 context["edit_mode"] = False
@@ -66,7 +70,7 @@ def building(request, building_id=None):
                 response["HX-Refresh"] = "true"  # Add the HX-Refresh header
                 return response
             case "edit_products":
-                context, _, _, _ = handle_building_load(
+                context, _, _, _, _ = handle_building_load(
                     request, building_id, simulation=False
                 )
                 context["edit_mode"] = True
@@ -90,7 +94,7 @@ def building(request, building_id=None):
             return get_op_product_list(request, building_id)
         # Full reload
         if building_id:
-            context, form, detailedForm, operationalInfoForm = handle_building_load(
+            context, form, detailedForm, operationalInfoForm, hotWaterSystemForm = handle_building_load(
                 request, building_id, simulation=False
             )
         else:
@@ -104,10 +108,12 @@ def building(request, building_id=None):
             form = BuildingGeneralInformation()
             detailedForm = BuildingDetailedInformation()
             operationalInfoForm = OperationalInfoForm()
+            hotWaterSystemForm = HotWaterSystemForm()
 
     context["form_general_info"] = form
     context["form_detailed_info"] = detailedForm
     context["form_operational_info"] = operationalInfoForm
+    context["form_hot_water_system"] = hotWaterSystemForm
 
     context["simulation"] = False
     # Full page load for GET request
@@ -211,23 +217,32 @@ def handle_building_load(request, building_id, simulation):
     detailedForm = BuildingDetailedInformation(instance=building)
     operationalInfoForm = OperationalInfoForm(instance=building)
 
+    # Get or create hot water system for this building
+    try:
+        hot_water_system = HotWaterSystem.objects.get(building=building)
+    except HotWaterSystem.DoesNotExist:
+        hot_water_system = None
+
+    hotWaterSystemForm = HotWaterSystemForm(instance=hot_water_system)
+
     logger.info(
         "Found building: %s with %d structural components",
         building.name,
         len(context["structural_components"]),
     )
 
-    return context, form, detailedForm, operationalInfoForm
+    return context, form, detailedForm, operationalInfoForm, hotWaterSystemForm
 
 
 @transaction.atomic
-def handle_information_submit(request, building_id, form):
+def handle_information_submit(request, building_id, form_type):
     building = (
         get_object_or_404(Building, created_by=request.user, pk=building_id)
         if building_id
         else None
     )
-    match form:
+
+    match form_type:
         case "general":
             form = BuildingGeneralInformation(
                 request.POST, instance=building
@@ -240,6 +255,39 @@ def handle_information_submit(request, building_id, form):
             form = OperationalInfoForm(
                 request.POST, instance=building
             )  # Bind form to instance
+        case "hot_water_system":
+            # Get existing hot water system or None
+            try:
+                hot_water_system = HotWaterSystem.objects.get(building=building)
+            except HotWaterSystem.DoesNotExist:
+                hot_water_system = None
+
+            form = HotWaterSystemForm(request.POST, instance=hot_water_system)
+
+            # Handle hot water system separately as it's not a Building field
+            try:
+                if form.is_valid():
+                    hot_water_instance = form.save(commit=False)
+                    hot_water_instance.building = building
+                    hot_water_instance.save()
+                    logger.info(
+                        "User %s successfully saved hot water system for building %s",
+                        request.user, building
+                    )
+                    return redirect("building", building_id=building.id)
+                else:
+                    logger.info(
+                        "User %s could not save hot water system. Form had following errors: %s",
+                        request.user,
+                        form.errors,
+                    )
+                    return HttpResponseServerError()
+            except Exception:
+                logger.exception(
+                    "Submit of hot water system for building %s failed", building.pk
+                )
+                return HttpResponseServerError()
+
     try:
         if form.is_valid():
             building = form.save(commit=False)
