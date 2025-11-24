@@ -2,7 +2,6 @@ import datetime
 
 from django import forms
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
 from django.utils.translation import gettext as _
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Layout, Fieldset, Row, Column, Submit
@@ -30,15 +29,14 @@ class BuildingGeneralInformation(forms.ModelForm):
         widget=forms.Select(
             attrs={
                 "id": "country-dropdown",
-                "hx-get": "/update_regions/",
-                "hx-trigger": "change",
-                "hx-target": "#region-dropdown",
+                "hx-get": "/select_lists/",  # HTMX request to the root URL
+                "hx-trigger": "change",  # Trigger HTMX on change event
+                "hx-target": "#region-dropdown",  # Update the City dropdown
                 "class": "select form-select",
             }
         ),
         label="Country",
     )
-
     region = forms.ModelChoiceField(
         queryset=CustomRegion.objects.all(),
         widget=forms.Select(
@@ -65,24 +63,8 @@ class BuildingGeneralInformation(forms.ModelForm):
         help_text="Select a country first",
         required=False,
     )
-
     category = forms.ModelChoiceField(
-        queryset=CategorySubcategory.objects.filter(country__isnull=True)
-        .select_related("category", "subcategory")
-        .order_by("category__name", "subcategory__name"),
-        widget=forms.Select(
-            attrs={
-                "id": "category-dropdown",
-                "hx-get": "/update_categories/",
-                "hx-trigger": "change from:#country-dropdown",
-                "hx-target": "#category-dropdown",
-                "hx-include": "#country-dropdown",
-                "class": "select form-select",
-                "name": "category",
-            }
-        ),
-        label="Building type",
-        required=False,
+        queryset=CategorySubcategory.objects.select_related('category', 'subcategory').all(), label="Building type"
     )
     construction_year = forms.IntegerField(widget=YearInput(), required=False)
     # forms.DateField(input_formats="%y-%m-%d", widget=forms.widgets.DateInput(attrs={'type': 'date'}))
@@ -149,8 +131,6 @@ class BuildingGeneralInformation(forms.ModelForm):
         if "country" in self.data:
             try:
                 country_id = int(self.data.get("country"))
-
-                # Regions filter
                 self.fields["region"].queryset = CustomRegion.objects.filter(
                     country_id=country_id
                 ).order_by("name")
@@ -162,7 +142,6 @@ class BuildingGeneralInformation(forms.ModelForm):
 
             except (ValueError, TypeError):
                 self.fields["region"].queryset = CustomRegion.objects.none()
-                self.fields["category"].queryset = CategorySubcategory.objects.none()
         if "region" in self.data:
             try:
                 region_id = int(self.data.get("region"))

@@ -153,7 +153,6 @@ class EPDType(models.TextChoices):
     """Adopted from LCAx."""
 
     OFFICIAL = "official", "From a verified ILCD+EPD source"
-    OFFICIAL_NON_STANDARD = "official_non_standard", "Official from non ILCD + EPD format"
     CUSTOM = "custom", "Created by user"
     GENERIC = "generic", "Representative EPD for a country"
 
