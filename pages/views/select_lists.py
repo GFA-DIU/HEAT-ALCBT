@@ -101,6 +101,7 @@ def select_lists(request):
     # Building Categories and Types
     elif request.GET.get("building_categories"):
         categories = BuildingCategory.objects.all().order_by("name")
+        logging.info(f"Fetched {categories.count()} building categories.")
         return render(
             request,
             "pages/utils/select_list.html",

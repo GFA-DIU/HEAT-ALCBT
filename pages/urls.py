@@ -10,6 +10,10 @@ from pages.views.select_lists import select_lists
 from pages.views.templates import templates
 
 from .views.assembly.assembly import component_edit
+from .views.building.add_building_steps import (building_step_view,
+                                                complete_building_setup,
+                                                get_building_step_data,
+                                                save_building_step)
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
 from .views.building.components import building_components, new_building
@@ -37,6 +41,10 @@ urlpatterns = [
     path("dashboard/", dashboard_view, name="dashboard"),
     path("building/_new", new_building, name="new_building"),
     path("building/component", building_components),
+    path("building/step", building_step_view, name="building_step"),
+    path("building/step/save", save_building_step, name="save_building_step"),
+    path("building/step/data", get_building_step_data, name="get_building_step_data"),
+    path("building/complete", complete_building_setup, name="complete_building_setup"),
     path("building/<uuid:building_id>/", building, name="building"),
     path(
         "building/<uuid:building_id>/simulation",

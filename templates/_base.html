@@ -11,9 +11,9 @@
   <title class="title">{% block title %}BEAT{% endblock title %}</title>
   <meta name="description" content="A framework for launching new Django projects quickly.">
   <meta name="author" content="">
-  <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+  <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
 
   {% if request|cookie_group_accepted:"analytics" %}
     {% newrelic_browser_timing_header %}
@@ -28,10 +28,13 @@
   {% comment %} <link rel="stylesheet" href="{% static 'css/base.css' %}"> {% endcomment %}
   {% endblock css %}
 
-  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <link rel="stylesheet" href="{% static 'css/output.css' %}"/>
   <!-- Cookie Banner CSS - Always included -->
-  <link rel="stylesheet" href="{% static 'css/cookie-consent.css' %}">
+  <link rel="stylesheet" href="{% static 'css/cookie-consent.css' %}"/>
   
+  {% block extra_head %}
+
+  {% endblock extra_head %}
 
 </head>
 

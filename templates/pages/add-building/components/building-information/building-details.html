@@ -8,7 +8,7 @@
         id="building-type-select"
         name="building_type"
         class="select w-full"
-        hx-get="/select_lists/?building_categories"
+        hx-get="/select_lists/?building_categories=1"
         hx-trigger="load"
         hx-target="this"
         hx-swap="innerHTML"
@@ -50,7 +50,7 @@
         id="climate-type-select"
         name="climate_type"
         class="select w-full"
-        hx-get="/select_lists/?climate_zones"
+        hx-get="/select_lists/?climate_zones=1"
         hx-trigger="load"
         hx-target="this"
         hx-swap="innerHTML"
@@ -67,14 +67,14 @@
       >
     </legend>
     <label class="input validator w-full">
-      <input type="number" placeholder="eg. 10" required />
+      <input name="assessment_period" type="number" placeholder="eg. 10" required />
     </label>
     <p class="validator-hint">This field is required</p>
   </fieldset>
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Construction year</legend>
     <label class="input w-full">
-      <input type="text" placeholder="eg. 2020" />
+      <input name="construction_year" type="text" placeholder="eg. 2020" />
     </label>
   </fieldset>
   <fieldset class="fieldset">
@@ -82,7 +82,7 @@
       Total floor area <span class="text-[var(--text--sub-600)]">(m²)</span>
     </legend>
     <label class="input w-full">
-      <input type="number" placeholder="eg. 340" />
+      <input name="total_floor_area" type="number" placeholder="eg. 340" />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">m²</span>
     </label>
   </fieldset>
@@ -97,20 +97,20 @@
       ></span>
     </legend>
     <label class="input w-full">
-      <input type="number" placeholder="eg. 400" />
+      <input name="conditioned_floor_area" type="number" placeholder="eg. 400" />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">m²</span>
     </label>
   </fieldset>
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Room cooling temperature</legend>
     <label class="input w-full">
-      <input type="number" placeholder="eg. 10" />
+      <input name="room_cooling_temperature" type="number" placeholder="eg. 10" />
     </label>
   </fieldset>
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Number of floors below ground</legend>
     <label class="input w-full">
-      <input type="number" placeholder="eg. 3" />
+      <input name="floors_below_ground" type="number" placeholder="eg. 3" />
     </label>
   </fieldset>
   <fieldset class="fieldset">
@@ -119,14 +119,14 @@
       <span class="text-[var(--text--sub-600)]">(%)</span>
     </legend>
     <label class="input w-full">
-      <input type="number" placeholder="eg. 10" />
+      <input name="energy_consumption" type="number" placeholder="eg. 10" />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
     </label>
   </fieldset>
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Energy monitoring & control systems</legend>
     <label class="w-full">
-      <select class="select w-full">
+      <select name="energy_monitoring_control_systems" class="select w-full">
         <option disabled selected value="">eg Yes</option>
         <option>Yes</option>
         <option>No</option>

@@ -4,7 +4,19 @@
 {% block title %}Add Building{% endblock %}
 {% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex items-stretch{% endblock body_class %}
 {% block nav %}{% endblock nav %}
-
+{% block extra_head %}
+  <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+{% endblock extra_head %}
 {% block content %}
 
   <section class="flex flex-col">
@@ -48,6 +60,7 @@
 {% endblock new-building %}
 
   <script src="{% static 'js/step-manager.js' %}"></script>
+  <script src="{% static 'js/geo-location.js' %}"></script>
 {% endblock content %}
 
 {% block footer %}{% endblock footer %}

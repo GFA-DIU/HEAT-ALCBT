@@ -6,19 +6,22 @@ class StepManager {
     this.stepConfig = {
       1: {
         name: "Building Information",
+        id: "building-information",
         subSteps: [
           {
+            id: "building-name-location",
             name: "Building Name & Location",
             component: "building-information/building-name-location.html",
-            requiredFields: ["building-name", "address", "country"],
+            requiredFields: ["building_name", "address", "country"],
             title: "Building Name & Location",
             description:
               "Add details concerning building name and locations of building.",
           },
           {
+            id: "building-details",
             name: "Building Details",
             component: "building-information/building-details.html",
-            requiredFields: ["building-type", "total-floors", "total-area"],
+            requiredFields: ["building_type", "assessment_period", "total_floor_area"],
             title: "Building Details",
             description: "Add detailed information about your building.",
           },
@@ -26,41 +29,47 @@ class StepManager {
       },
       2: {
         name: "Operational Details",
+        id: "operational-details",
         subSteps: [
           {
+            id: "operational-schedule-temperature",
             name: "Operational Schedule & Temperature",
             component:
               "operational-details/operational-schedule-temperature.html",
-            requiredFields: ["operating-hours", "default-temperature"],
+            requiredFields: ["operating_hours", "default_temperature"],
             title: "Operational Schedule & Temperature",
             description:
               "Complete field below to add operations information about your building.",
           },
           {
+            id: "cooling-system",
             name: "Cooling System",
             component: "operational-details/cooling-system.html",
-            requiredFields: ["cooling-system-type"],
+            requiredFields: ["cooling_system_type"],
             title: "Cooling System",
             description:
               "Enter details of the building's cooling system, including type and capacity.",
           },
           {
+            id: "ventilation-system",
             name: "Ventilation System",
             component: "operational-details/ventilation-system.html",
-            requiredFields: ["ventilation-type"],
+            requiredFields: ["ventilation_type"],
             title: "Ventilation System",
             description:
               "Provide details on the building,s ventilation type, capacity, and coverage to assess airflow and indoor air quality.",
           },
           {
+            id: "lighting-system",
             name: "Lighting System",
             component: "operational-details/lighting-system.html",
-            requiredFields: ["lighting-type"],
+            requiredFields: ["lighting_type"],
             title: "Lighting System",
             description:
               "Provide details on lighting types, power use, and controls to assess efficiency.",
           },
           {
+            id: "lift-escalator-system",
             name: "Lift & Escalator System",
             component: "operational-details/lift-escalator-system.html",
             requiredFields: [],
@@ -69,9 +78,10 @@ class StepManager {
               "Provide details on lift & escalator systems in your building if any.",
           },
           {
+            formId: "hot-water-system",
             name: "Hot Water System",
             component: "operational-details/hot-water-system.html",
-            requiredFields: ["hot-water-type"],
+            requiredFields: ["hot_water_type"],
             title: "Hot Water System",
             description:
               "Defines the building’s method of producing and distributing hot water, including equipment type, energy source, and usage patterns.",
@@ -80,11 +90,13 @@ class StepManager {
       },
       3: {
         name: "Operational Data Entry",
+        id: "operational-data-entry",
         subSteps: [
           {
+            id: "operational-data-entry",
             name: "Data Entry",
             component: "operational-data-entry/operational-data-entry.html",
-            requiredFields: ["energy-consumption"],
+            requiredFields: ["energy_consumption"],
             title: "Operational Energy carrier",
             description:
               "Tell us what fuels or energy sources your building runs on.",
@@ -93,12 +105,14 @@ class StepManager {
       },
       4: {
         name: "Building Structural Components",
+        id: "building-structural-components",
         subSteps: [
           {
+            id: "building-structural-components",
             name: "Structural Components",
             component:
               "building-structural-components/building-structural-components.html",
-            requiredFields: ["foundation-type", "structure-type"],
+            requiredFields: ["foundation_type", "structure_type"],
             title: "Building Structural Components",
             description:
               "Enter information about the building’s walls, floors, roofs, and other structural parts.",
@@ -277,7 +291,8 @@ class StepManager {
     `;
 
     try {
-      const response = await fetch(`/building/component?template=${subStep.component}`);
+      // Use the new Django step view endpoint
+      const response = await fetch(`/building/step?step=${subStep.component}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -362,6 +377,7 @@ class StepManager {
   }
 
   updateButtonStates() {
+    console.log("Updating button states...");
     const step = this.stepConfig[this.currentStep];
     const subStep = step.subSteps[this.currentSubStep - 1];
     const saveBtn = document.getElementById("save-and-continue");
@@ -369,7 +385,7 @@ class StepManager {
 
     if (saveBtn) {
       const isValid = this.validateCurrentStep();
-      saveBtn.disabled = !isValid;
+      saveBtn.disabled = false;
 
       // Update button text based on progress
       const isLastSubStep = this.currentSubStep === step.subSteps.length;
@@ -418,7 +434,7 @@ class StepManager {
   }
 
   saveFormData() {
-    const stepKey = `step-${this.currentStep}-${this.currentSubStep}`;
+    const stepKey = this.getCurrentStepKey();
     const formElements = document.querySelectorAll("input, select, textarea");
 
     this.formData[stepKey] = {};
@@ -434,16 +450,60 @@ class StepManager {
 
     // Save to localStorage for persistence
     localStorage.setItem("building-form-data", JSON.stringify(this.formData));
+
+    // Save to server via Django
+    this.saveToServer(stepKey, this.formData[stepKey]);
   }
 
-  restoreFormData() {
-    // Load from localStorage if available
-    const savedData = localStorage.getItem("building-form-data");
-    if (savedData) {
-      this.formData = JSON.parse(savedData);
+  async saveToServer(stepKey, stepData) {
+    try {
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+      
+      const response = await fetch('/building/step/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken || '',
+        },
+        body: JSON.stringify({
+          step_key: stepKey,
+          data: stepData
+        })
+      });
+
+      if (!response.ok) {
+        console.error('Failed to save step data to server');
+      }
+    } catch (error) {
+      console.error('Error saving to server:', error);
+      // Don't block the UI, just log the error
+    }
+  }
+
+  async restoreFormData() {
+    const stepKey = this.getCurrentStepKey();
+    
+    // Try to load from server first
+    try {
+      const response = await fetch(`/building/step/data?step_key=${stepKey}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data && Object.keys(result.data).length > 0) {
+          this.formData[stepKey] = result.data;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading from server:', error);
     }
 
-    const stepKey = `step-${this.currentStep}-${this.currentSubStep}`;
+    // Fallback to localStorage if available
+    if (!this.formData[stepKey] || Object.keys(this.formData[stepKey]).length === 0) {
+      const savedData = localStorage.getItem("building-form-data");
+      if (savedData) {
+        this.formData = JSON.parse(savedData);
+      }
+    }
+
     const stepData = this.formData[stepKey];
 
     if (stepData) {
@@ -568,34 +628,89 @@ class StepManager {
     this.saveAndContinue();
   }
 
-  completeSetup() {
+  async completeSetup() {
     // Save final data
     this.saveFormData();
 
-    // Show completion message
+    // Show loading state
     const contentArea = document.getElementById("dynamic-content");
     if (contentArea) {
       contentArea.innerHTML = `
-        <div class="flex flex-col items-center justify-center h-64 text-center">
-          <div class="alert alert-success max-w-md">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <h3 class="font-bold">Building Setup Completed!</h3>
-              <div class="text-xs">All information has been saved successfully.</div>
-            </div>
-          </div>
-          <div class="mt-6 space-x-2">
-            <button class="btn btn-primary" onclick="window.location.href='/src/pages/dashboard/dashboard.html'">
-              Go to Dashboard
-            </button>
-            <button class="btn btn-outline" onclick="stepManager.resetForm()">
-              Add Another Building
-            </button>
-          </div>
+        <div class="flex items-center justify-center h-64">
+          <div class="loading loading-spinner loading-lg text-primary"></div>
+          <p class="ml-4">Completing building setup...</p>
         </div>
       `;
+    }
+
+    try {
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+      
+      const response = await fetch('/building/complete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken || '',
+        },
+        body: JSON.stringify({
+          all_data: this.formData
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Show completion message
+        if (contentArea) {
+          contentArea.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-64 text-center">
+              <div class="alert alert-success max-w-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <h3 class="font-bold">Building Setup Completed!</h3>
+                  <div class="text-xs">${result.message || 'All information has been saved successfully.'}</div>
+                </div>
+              </div>
+              <div class="mt-6 space-x-2">
+                <button class="btn btn-primary" onclick="window.location.href='${result.redirect_url || '/dashboard/'}'">
+                  Go to Dashboard
+                </button>
+                <button class="btn btn-outline" onclick="stepManager.resetForm()">
+                  Add Another Building
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        // Clear localStorage
+        localStorage.removeItem("building-form-data");
+      } else {
+        throw new Error(result.error || 'Failed to complete building setup');
+      }
+    } catch (error) {
+      console.error('Error completing setup:', error);
+      if (contentArea) {
+        contentArea.innerHTML = `
+          <div class="flex flex-col items-center justify-center h-64 text-center">
+            <div class="alert alert-error max-w-md">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <h3 class="font-bold">Error Completing Setup</h3>
+                <div class="text-xs">${error.message}</div>
+              </div>
+            </div>
+            <button onclick="stepManager.completeSetup()" class="btn btn-primary mt-4">
+              Retry
+            </button>
+          </div>
+        `;
+      }
+      return;
     }
 
     // Hide navigation buttons
@@ -615,10 +730,29 @@ class StepManager {
     if (progressBar) progressBar.value = 100;
   }
 
-  resetForm() {
-    // Clear saved data
+  async resetForm() {
+    // Clear saved data from localStorage
     localStorage.removeItem("building-form-data");
     this.formData = {};
+    this.formValidationStatus = {};
+
+    // Clear server-side session data
+    try {
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+      await fetch('/building/step/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken || '',
+        },
+        body: JSON.stringify({
+          step_key: '__clear_all__',
+          data: {}
+        })
+      });
+    } catch (error) {
+      console.error('Error clearing server data:', error);
+    }
 
     // Reset to first step
     this.currentStep = 1;
@@ -640,6 +774,13 @@ class StepManager {
   // Utility method to get all form data
   getAllFormData() {
     return this.formData;
+  }
+
+  getCurrentStepKey() {
+    const currentStep = this.stepConfig[this.currentStep];
+    const currentSubStep = currentStep.subSteps[this.currentSubStep - 1];
+    
+    return `${currentStep.id}/${currentSubStep.id}`;
   }
 
   // Utility method to get current step info
