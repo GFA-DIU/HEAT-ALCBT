@@ -9,7 +9,7 @@ const excludedFromCurrentColor = ["google"];
 // Configuration
 const config = {
   iconsDir: path.join(__dirname, "./static/assets/icons"),
-  outputFile: path.join(__dirname, "./static/js/icons.js"),
+  outputFile: path.join(__dirname, "./static/js/icons-registry.js"),
   // Optional: Generate TypeScript definitions
   // generateTypes: true,
   // typesFile: path.join(__dirname, "../src/types/icons.d.ts"),

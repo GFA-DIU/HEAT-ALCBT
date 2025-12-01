@@ -1,4 +1,4 @@
-/*! tailwindcss v4.1.16 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.1.17 | MIT License | https://tailwindcss.com */
 @layer properties;
 :root {
   --TRUE: 1;
@@ -286,7 +286,6 @@
     --color-white: #fff;
     --spacing: 0.25rem;
     --container-md: 28rem;
-    --container-2xl: 42rem;
     --text-xs: 0.75rem;
     --text-xs--line-height: calc(1 / 0.75);
     --text-sm: 0.875rem;
@@ -298,10 +297,6 @@
     --text-xl: 1.25rem;
     --text-xl--line-height: calc(1.75 / 1.25);
     --text-2xl: 1.5rem;
-    --text-3xl: 1.875rem;
-    --text-3xl--line-height: calc(2.25 / 1.875);
-    --text-5xl: 3rem;
-    --text-5xl--line-height: 1;
     --font-weight-normal: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
@@ -2321,15 +2316,6 @@
       }
     }
   }
-  .stats {
-    @layer daisyui.component {
-      position: relative;
-      display: inline-grid;
-      grid-auto-flow: column;
-      overflow-x: auto;
-      border-radius: var(--radius-box);
-    }
-  }
   .progress {
     @layer daisyui.component {
       position: relative;
@@ -2463,17 +2449,6 @@
   }
   .left-4 {
     left: calc(var(--spacing) * 4);
-  }
-  .hero-content {
-    @layer daisyui.component {
-      isolation: isolate;
-      display: flex;
-      max-width: 80rem;
-      align-items: center;
-      justify-content: center;
-      gap: calc(0.25rem * 4);
-      padding: calc(0.25rem * 4);
-    }
   }
   .textarea {
     @layer daisyui.component {
@@ -2694,19 +2669,6 @@
   .col-span-3 {
     grid-column: span 3 / span 3;
   }
-  .hero {
-    @layer daisyui.component {
-      display: grid;
-      width: 100%;
-      place-items: center;
-      background-size: cover;
-      background-position: center;
-      & > * {
-        grid-column-start: 1;
-        grid-row-start: 1;
-      }
-    }
-  }
   .modal-box {
     @layer daisyui.component {
       grid-column-start: 1;
@@ -2726,36 +2688,6 @@
       box-shadow: oklch(0% 0 0/ 0.25) 0px 25px 50px -12px;
       overflow-y: auto;
       overscroll-behavior: contain;
-    }
-  }
-  .stat-value {
-    @layer daisyui.component {
-      grid-column-start: 1;
-      white-space: nowrap;
-      font-size: 2rem;
-      font-weight: 800;
-    }
-  }
-  .stat-desc {
-    @layer daisyui.component {
-      grid-column-start: 1;
-      white-space: nowrap;
-      color: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
-      }
-      font-size: 0.75rem;
-    }
-  }
-  .stat-title {
-    @layer daisyui.component {
-      grid-column-start: 1;
-      white-space: nowrap;
-      color: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
-      }
-      font-size: 0.75rem;
     }
   }
   .container {
@@ -2971,8 +2903,14 @@
   .mt-7 {
     margin-top: calc(var(--spacing) * 7);
   }
+  .mt-7\.5 {
+    margin-top: calc(var(--spacing) * 7.5);
+  }
   .mt-10 {
     margin-top: calc(var(--spacing) * 10);
+  }
+  .mr-1\.5 {
+    margin-right: calc(var(--spacing) * 1.5);
   }
   .mr-2 {
     margin-right: calc(var(--spacing) * 2);
@@ -3022,11 +2960,11 @@
   .mb-6 {
     margin-bottom: calc(var(--spacing) * 6);
   }
-  .mb-8 {
-    margin-bottom: calc(var(--spacing) * 8);
+  .ml-1 {
+    margin-left: calc(var(--spacing) * 1);
   }
-  .mb-12 {
-    margin-bottom: calc(var(--spacing) * 12);
+  .ml-4 {
+    margin-left: calc(var(--spacing) * 4);
   }
   .carousel-item {
     @layer daisyui.component {
@@ -3141,23 +3079,6 @@
         & > * {
           place-items: center;
         }
-      }
-    }
-  }
-  .stat {
-    @layer daisyui.component {
-      display: inline-grid;
-      width: 100%;
-      column-gap: calc(0.25rem * 4);
-      padding-inline: calc(0.25rem * 6);
-      padding-block: calc(0.25rem * 4);
-      grid-template-columns: repeat(1, 1fr);
-      &:not(:last-child) {
-        border-inline-end: var(--border) dashed currentColor;
-        @supports (color: color-mix(in lab, red, red)) {
-          border-inline-end: var(--border) dashed color-mix(in oklab, currentColor 10%, #0000);
-        }
-        border-block-end: none;
       }
     }
   }
@@ -3346,6 +3267,9 @@
   .table {
     display: table;
   }
+  .aspect-square {
+    aspect-ratio: 1 / 1;
+  }
   .modal-bottom {
     @layer daisyui.modifier {
       place-items: end;
@@ -3457,6 +3381,9 @@
   .min-h-screen {
     min-height: 100vh;
   }
+  .\!w-\[95vw\] {
+    width: 95vw !important;
+  }
   .\!w-full {
     width: 100% !important;
   }
@@ -3530,9 +3457,6 @@
   .\!max-w-\[57rem\] {
     max-width: 57rem !important;
   }
-  .max-w-2xl {
-    max-width: var(--container-2xl);
-  }
   .max-w-\[14\.75rem\] {
     max-width: 14.75rem;
   }
@@ -3580,6 +3504,12 @@
   }
   .flex-1 {
     flex: 1;
+  }
+  .flex-\[2\.5\] {
+    flex: 2.5;
+  }
+  .flex-\[5\] {
+    flex: 5;
   }
   .shrink-0 {
     flex-shrink: 0;
@@ -3681,6 +3611,9 @@
   }
   .gap-2\.5 {
     gap: calc(var(--spacing) * 2.5);
+  }
+  .gap-2\.75 {
+    gap: calc(var(--spacing) * 2.75);
   }
   .gap-3 {
     gap: calc(var(--spacing) * 3);
@@ -3854,6 +3787,9 @@
   .border-\[var\(--stroke--soft-200\)\] {
     border-color: var(--stroke--soft-200);
   }
+  .border-\[var\(--stroke--strong-950\)\] {
+    border-color: var(--stroke--strong-950);
+  }
   .border-\[var\(--stroke--sub-300\)\] {
     border-color: var(--stroke--sub-300);
   }
@@ -3898,6 +3834,9 @@
   .bg-\[var\(--state--faded--lighter\)\] {
     background-color: var(--state--faded--lighter);
   }
+  .bg-\[var\(--state--information--light\)\] {
+    background-color: var(--state--information--light);
+  }
   .bg-\[var\(--state--information--lighter\)\] {
     background-color: var(--state--information--lighter);
   }
@@ -3912,9 +3851,6 @@
   }
   .bg-base-100 {
     background-color: var(--color-base-100);
-  }
-  .bg-base-200 {
-    background-color: var(--color-base-200);
   }
   .bg-primary {
     background-color: var(--color-primary);
@@ -4062,12 +3998,6 @@
   .py-7 {
     padding-block: calc(var(--spacing) * 7);
   }
-  .py-8 {
-    padding-block: calc(var(--spacing) * 8);
-  }
-  .py-12 {
-    padding-block: calc(var(--spacing) * 12);
-  }
   .pt-2 {
     padding-top: calc(var(--spacing) * 2);
   }
@@ -4165,14 +4095,6 @@
   .text-2xl\/\[110\%\] {
     font-size: var(--text-2xl);
     line-height: 110%;
-  }
-  .text-3xl {
-    font-size: var(--text-3xl);
-    line-height: var(--tw-leading, var(--text-3xl--line-height));
-  }
-  .text-5xl {
-    font-size: var(--text-5xl);
-    line-height: var(--tw-leading, var(--text-5xl--line-height));
   }
   .text-\[0\.813rem\]\/5 {
     font-size: 0.813rem;
@@ -4344,10 +4266,6 @@
   }
   .opacity-75 {
     opacity: 75%;
-  }
-  .shadow {
-    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .shadow-\[var\(--regular-shadow-x-small\)\] {
     --tw-shadow: var(--regular-shadow-x-small);
@@ -4628,11 +4546,6 @@
       min-width: 24rem;
     }
   }
-  .md\:grid-cols-3 {
-    @media (width >= 48rem) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
   .lg\:absolute {
     @media (width >= 64rem) {
       position: absolute;
@@ -4735,6 +4648,7 @@ body {
     color: var(--text--sub-600);
     font-weight: 500;
     user-select: none;
+    height: 100%;
   }
 }
 @media (max-width: 768px) {
@@ -4745,34 +4659,12 @@ body {
     }
   }
 }
-.navbar-radio-group a {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  color: var(--text--sub-600);
-  font-weight: 500;
-  user-select: none;
-}
-@media (max-width: 768px) {
-  .navbar-radio-group a {
-    flex-direction: column;
-    gap: 0;
-  }
-}
 .navbar-radio-group input:checked + label {
   border-bottom: 2px solid var(--color-primary);
   a {
     font-weight: 600;
     color: var(--bg--black-0);
   }
-}
-.navbar-radio-group input:checked + a {
-  border-bottom: 2px solid var(--color-primary);
-  font-weight: 600;
-  color: var(--bg--black-0);
 }
 .filter-radio-group input {
   display: none;
