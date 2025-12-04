@@ -191,10 +191,10 @@ Templates are located at: `templates/pages/add-building/components/`
 
 **Structure**:
 
-- `building-information/`
+- `building-information/ - completed`
   - `building-name-location.html`
   - `building-details.html`
-- `operational-details/`
+- `operational-details/ - completed`
   - `operational-schedule-temperature.html`
   - `cooling-system.html`
   - `ventilation-system.html`
@@ -215,6 +215,40 @@ Templates are located at: `templates/pages/add-building/components/`
 ### Future Implementation
 
 The `complete_building_setup` function has a TODO for creating actual Building and BuildingOperationalInfo model instances from the collected session data.
+
+### URL Routes
+
+Building creation wizard routes in `pages/urls.py`:
+
+| URL Pattern | View Function | Name | Description |
+|------------|---------------|------|-------------|
+| `building/_new` | `new_building` | `new_building` | Entry point to start new building creation wizard |
+| `building/component` | `building_components` | - | Manage building components/assemblies |
+| `building/step` | `building_step_view` | `building_step` | Load specific step template dynamically (GET with `?step=` param) |
+| `building/step/save` | `save_building_step` | `save_building_step` | Save step data to session (POST) |
+| `building/step/data` | `get_building_step_data` | `get_building_step_data` | Retrieve saved step data (GET with `?step_key=` param) |
+| `building/complete` | `complete_building_setup` | `complete_building_setup` | Finalize and create building record (POST) |
+
+**Usage Example**:
+
+```javascript
+// Load a step note: Currently fetch is been url, Will be switching to htmx implementation for consistency
+htmx.ajax('GET', '/building/step?step=building-information/building-name-location.html', '#step-container');
+
+
+
+// Save step data
+fetch('/building/step/save', {
+  method: 'POST',
+  body: JSON.stringify({
+    step_key: 'building-information',
+    data: { name: 'My Building', country: 1 }
+  })
+});
+
+// Complete setup
+fetch('/building/complete', { method: 'POST' });
+```
 
 ---
 
