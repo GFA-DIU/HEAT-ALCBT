@@ -256,5 +256,3 @@ def complete_building_setup(request):
         
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-        return JsonResponse({"error": str(e)}, status=500)
-        return JsonResponse({"error": str(e)}, status=500)

@@ -2,7 +2,7 @@
   <div class="w-full flex flex-col">
     <button
       class="btn btn-outline w-fit"
-      onclick="lighting_system_modal.showModal()"
+      onclick="openLightingSystemModal()"
     >
       <span
         data-icon="add-large-fill"
@@ -14,47 +14,7 @@
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
     ></div>
-    <ul class="grid grid-cols-1">
-      <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="lightbulb-line"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-          class="shrink-0 self-start"
-        ></span>
-        <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">
-            Office: Conference Room,Lobby, office
-          </p>
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Area of room: 445m²</span
-            >
-            <span>Bulb type : LED (Light emitting diode) lights</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="lighting_system_modal_delete.showModal()"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
+    <ul id="lighting-systems-list" class="grid grid-cols-1">
     </ul>
   </div>
 </div>
@@ -73,7 +33,7 @@
       </div>
       <button
         type="button"
-        onclick="lighting_system_modal.close()"
+        onclick="closeLightingSystemModal()"
         class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
       >
         <span
@@ -83,13 +43,13 @@
         ></span>
       </button>
     </div>
-    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+    <form id="lighting-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
             Room type<span class="text-[var(--state--error--base)]">*</span>
           </legend>
-          <select class="select w-full">
+          <select class="select w-full" name="room_type">
             <option disabled selected value="">Select an option</option>
             <option value="office">
               Office:
@@ -116,7 +76,7 @@
             Area of room<span class="text-[var(--state--error--base)]">*</span>
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" />
+            <input type="number" placeholder="eg. 2" name="area_of_room" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >m²</span
             >
@@ -131,7 +91,7 @@
           <select 
             class="select w-full"
             id="lighting-type"
-            name="lighting-type"
+            name="lighting_type"
             hx-get="/select_lists/?lighting_types=1"
             hx-trigger="load"
             hx-target="this"
@@ -148,7 +108,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" />
+            <input type="number" placeholder="eg. 2" name="number_of_bulbs" />
           </label>
         </fieldset>
         <fieldset class="fieldset">
@@ -159,7 +119,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" />
+            <input type="number" placeholder="eg. 2" name="bulb_power_rating" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >W</span
             >
@@ -176,7 +136,7 @@
           <div class="w-full flex gap-1.5 items-center">
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" required />
+                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >Hours / day</span
                 >
@@ -184,7 +144,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" required />
+                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >days / week</span
                 >
@@ -192,7 +152,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" required />
+                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >weeks / year</span
                 >
@@ -211,7 +171,7 @@
               data-color="var(--icon--disabled-300)"
             ></span>
           </legend>
-          <select class="select w-full">
+          <select class="select w-full" name="installation_of_sensors">
             <option disabled selected value="">Select an option</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -225,7 +185,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" />
+            <input type="number" placeholder="eg. 2" name="baseline_lpd" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >W/m²</span
             >
@@ -239,7 +199,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" />
+            <input type="number" placeholder="eg. 2" name="annual_energy_consumption" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >kWh/year</span
             >
@@ -247,7 +207,7 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Energy efficiency label</legend>
-          <select class="select w-full">
+          <select class="select w-full" name="energy_efficiency_label">
             <option disabled selected value="">Select an option</option>
             <option value="bee">BEE Star Rating</option>
             <option value="egat">EGAT</option>
@@ -255,7 +215,7 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Number of stars</legend>
-          <select class="select w-full">
+          <select class="select w-full" name="number_of_stars">
             <option disabled selected value="">Select an option</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -272,10 +232,11 @@
       <button
         type="button"
         class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
+        onclick="closeLightingSystemModal()"
       >
         Cancel
       </button>
-      <button type="submit" class="btn flex-1 btn-sm btn-primary">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLightingSystem()">Save</button>
     </div>
   </div>
 </dialog>
@@ -307,7 +268,7 @@
       >
         Cancel
       </button>
-      <button class="btn btn-sm btn-error flex-1">Remove</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteLightingSystem()">Remove</button>
     </div>
   </div>
 </dialog>
@@ -384,3 +345,237 @@
     </button>
   </div>
 </template>
+
+<script>
+  // Store lighting systems data on window to make it globally accessible
+  if (!window.lightingSystems) {
+    window.lightingSystems = [];
+  }
+  if (!window.editingLightingSystemIndex) {
+    window.editingLightingSystemIndex = null;
+  }
+
+  // Open modal for adding new system
+  window.openLightingSystemModal = function() {
+    window.editingLightingSystemIndex = null;
+    document.getElementById('lighting-system-form').reset();
+    lighting_system_modal.showModal();
+  }
+
+  // Close modal
+  window.closeLightingSystemModal = function() {
+    lighting_system_modal.close();
+    window.editingLightingSystemIndex = null;
+  }
+
+  // Save lighting system
+  window.saveLightingSystem = function() {
+    const form = document.getElementById('lighting-system-form');
+    
+    // Get room type and lighting type for display
+    const roomTypeSelect = form.querySelector('[name="room_type"]');
+    const roomType = roomTypeSelect.value;
+    const roomTypeName = roomTypeSelect.options[roomTypeSelect.selectedIndex].text;
+    
+    const lightingTypeSelect = form.querySelector('[name="lighting_type"]');
+    const lightingType = lightingTypeSelect.value;
+    const lightingTypeName = lightingTypeSelect.options[lightingTypeSelect.selectedIndex].text;
+
+    if (!roomType) {
+      alert('Please select a room type');
+      return;
+    }
+
+    // Collect all form data
+    const systemData = {
+      roomType: roomType,
+      roomTypeName: roomTypeName,
+      lightingType: lightingType,
+      lightingTypeName: lightingTypeName,
+      data: {}
+    };
+
+    // Get all inputs, selects, and textareas from the form
+    const formElements = form.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+      if (element.name && element.name !== 'room-type' && element.name !== 'lighting-type') {
+        if (element.type === 'radio') {
+          if (element.checked) {
+            systemData.data[element.name] = element.value;
+          }
+        } else if (element.type === 'checkbox') {
+          systemData.data[element.name] = element.checked;
+        } else {
+          systemData.data[element.name] = element.value;
+        }
+      }
+    });
+
+    // Add or update system
+    if (window.editingLightingSystemIndex !== null) {
+      window.lightingSystems[window.editingLightingSystemIndex] = systemData;
+    } else {
+      window.lightingSystems.push(systemData);
+    }
+
+    // Update the list display
+    window.renderLightingSystems();
+
+    // Close modal
+    window.closeLightingSystemModal();
+
+    // Emit form status for step validation
+    if (typeof StepManager !== 'undefined') {
+      StepManager.emitFormStatus(window.lightingSystems.length > 0, {
+        lighting_systems: window.lightingSystems
+      });
+    }
+  }
+
+  // Render lighting systems list
+  window.renderLightingSystems = function() {
+    const listContainer = document.getElementById('lighting-systems-list');
+    
+    if (window.lightingSystems.length === 0) {
+      listContainer.innerHTML = `
+        <li class="flex flex-col items-center justify-center py-8 text-center">
+          <span data-icon="lightbulb-line" data-size="48" data-color="var(--icon--soft-400)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No lighting systems added yet</p>
+        </li>
+      `;
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
+      return;
+    }
+
+    listContainer.innerHTML = window.lightingSystems.map((system, index) => {
+      // Extract key details for display
+      const areaOfRoom = system.data['area_of_room'] || 'N/A';
+      const bulbType = system.lightingTypeName || 'N/A';
+      
+      return `
+        <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
+          <span
+            data-icon="lightbulb-line"
+            data-size="20"
+            data-color="var(--icon--strong-950)"
+            class="shrink-0 self-start"
+          ></span>
+          <div class="flex flex-col flex-1">
+            <p class="text-sm/5 font-medium">${system.roomTypeName}</p>
+            <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+              <span class="border-r border-[var(--text--sub-600)] pr-1">Area of room: ${areaOfRoom}m²</span>
+              <span>Bulb type: ${bulbType}</span>
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="btn size-5 btn-ghost p-0" onclick="editLightingSystem(${index})">
+              <span
+                data-icon="edit-line"
+                data-size="16"
+                data-color="var(--icon--strong-950)"
+              ></span>
+            </button>
+            <button
+              class="btn size-5 btn-ghost p-0"
+              onclick="confirmDeleteLightingSystem(${index})"
+            >
+              <span
+                data-icon="delete-bin-5-line"
+                data-size="16"
+                data-color="var(--icon--strong-950)"
+              ></span>
+            </button>
+          </div>
+        </li>
+      `;
+    }).join('');
+
+    // Reinitialize icons
+    if (window.IconComponent) {
+      window.IconComponent.initialize();
+    }
+  }
+
+  // Edit lighting system
+  window.editLightingSystem = function(index) {
+    window.editingLightingSystemIndex = index;
+    const system = window.lightingSystems[index];
+
+    // Reset form
+    document.getElementById('lighting-system-form').reset();
+
+    // Set room type and lighting type
+    const roomTypeSelect = document.querySelector('[name="room_type"]');
+    roomTypeSelect.value = system.roomType;
+    
+    const lightingTypeSelect = document.querySelector('[name="lighting_type"]');
+    lightingTypeSelect.value = system.lightingType;
+
+    // Populate all form fields
+    setTimeout(() => {
+      const form = document.getElementById('lighting-system-form');
+      
+      Object.keys(system.data).forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (field) {
+          if (field.type === 'radio') {
+            const radioButton = form.querySelector(`[name="${fieldName}"][value="${system.data[fieldName]}"]`);
+            if (radioButton) radioButton.checked = true;
+          } else if (field.type === 'checkbox') {
+            field.checked = system.data[fieldName];
+          } else {
+            field.value = system.data[fieldName];
+          }
+        }
+      });
+    }, 100);
+
+    lighting_system_modal.showModal();
+  }
+
+  // Confirm delete
+  if (!window.deleteLightingSystemIndex) {
+    window.deleteLightingSystemIndex = null;
+  }
+  
+  window.confirmDeleteLightingSystem = function(index) {
+    window.deleteLightingSystemIndex = index;
+    lighting_system_modal_delete.showModal();
+  }
+
+  // Delete lighting system
+  window.deleteLightingSystem = function() {
+    if (window.deleteLightingSystemIndex !== null) {
+      window.lightingSystems.splice(window.deleteLightingSystemIndex, 1);
+      window.renderLightingSystems();
+      window.deleteLightingSystemIndex = null;
+      lighting_system_modal_delete.close();
+
+      // Emit form status for step validation
+      if (typeof StepManager !== 'undefined') {
+        StepManager.emitFormStatus(window.lightingSystems.length > 0, {
+          lighting_systems: window.lightingSystems
+        });
+      }
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    window.renderLightingSystems();
+  });
+
+  // If HTMX is processing this content dynamically, also initialize after htmx:afterSwap
+  document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'dynamic-content') {
+      window.renderLightingSystems();
+    }
+  });
+
+  // Initialize immediately for dynamically loaded content
+  if (document.getElementById('lighting-systems-list')) {
+    window.renderLightingSystems();
+  }
+</script>

@@ -2,7 +2,7 @@
   <div class="w-full flex flex-col">
     <button
       class="btn btn-outline w-fit"
-      onclick="ventilation_system_modal.showModal()"
+      onclick="openVentilationSystemModal()"
     >
       <span
         data-icon="add-large-fill"
@@ -14,45 +14,7 @@
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
     ></div>
-    <ul class="grid grid-cols-1">
-      <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="windy-fill"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-          class="shrink-0 self-start"
-        ></span>
-        <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">Air Handling Units (AHUs)</p>
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Airflow rate: 45CMH</span
-            >
-            <span>Capacity units: m<sup>3</sup>/hr</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="ventilation_system_modal_delete.showModal()"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
+    <ul id="ventilation-systems-list" class="grid grid-cols-1">
     </ul>
   </div>
 </div>
@@ -71,7 +33,7 @@
       </div>
       <button
         type="button"
-        onclick="ventilation_system_modal.close()"
+        onclick="closeVentilationSystemModal()"
         class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
       >
         <span
@@ -81,7 +43,7 @@
         ></span>
       </button>
     </div>
-    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+    <form id="ventilation-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
@@ -107,7 +69,7 @@
               >*</span
             >
           </legend>
-          <select class="select w-full">
+          <select class="select w-full" name="ventilation-capacity">
             <option disabled selected value="">Select an option</option>
             <option value="m3-hr">m<sup>3</sup>/hr</option>
             <option value="ft3-min">ft<sup>3</sup>/min</option>
@@ -121,7 +83,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" />
+            <input type="number" placeholder="eg. 2" name="baseline-efficiency" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >W/CMH</span
             >
@@ -138,7 +100,7 @@
           <div class="w-full flex gap-1.5 items-center">
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" required />
+                <input type="number" placeholder="eg. 1" name="operating-hours-per-day" required />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >Hours / day</span
                 >
@@ -146,7 +108,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" required />
+                <input type="number" placeholder="eg. 1" name="operating-days-per-week" required />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >days / week</span
                 >
@@ -154,7 +116,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" required />
+                <input type="number" placeholder="eg. 1" name="operating-weeks-per-year" required />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >weeks / year</span
                 >
@@ -170,7 +132,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" />
+            <input type="number" placeholder="eg. 2" name="power-input" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Watts</span
             >
@@ -181,9 +143,10 @@
             Airflow rate<span class="text-[var(--state--error--base)]">*</span>
           </legend>
           <label class="input w-full pr-0 overflow-hidden">
-            <input type="number" placeholder="eg. 2" />
+            <input type="number" placeholder="eg. 2" name="airflow-rate" />
             <select
               class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25"
+              name="airflow-rate-unit"
             >
               <option value="cmh" selected>CMH</option>
               <option value="cfm">CFM</option>
@@ -205,7 +168,8 @@
             <label class="flex items-center gap-2">
               <input
                 type="radio"
-                name="installation-of-variable-speed-drives"
+                name="demand-controlled-ventilation"
+                value="yes"
                 class="radio radio-xs"
               />
               Yes
@@ -213,7 +177,8 @@
             <label class="flex items-center gap-2">
               <input
                 type="radio"
-                name="installation-of-variable-speed-drives"
+                name="demand-controlled-ventilation"
+                value="no"
                 class="radio radio-xs"
               />
               No
@@ -231,7 +196,7 @@
               data-color="var(--icon--disabled-300)"
             ></span>
           </legend>
-          <select class="select w-full">
+          <select class="select w-full" name="variable-speed-drives">
             <option disabled selected value="">Select an option</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -245,7 +210,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" />
+            <input type="number" placeholder="eg. 2" name="number-of-units" />
           </label>
         </fieldset>
         <fieldset class="fieldset col-span-2">
@@ -256,7 +221,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" />
+            <input type="number" placeholder="eg. 2" name="annual-energy-consumption" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >kWh/year</span
             >
@@ -264,7 +229,7 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Energy efficiency label</legend>
-          <select class="select w-full">
+          <select class="select w-full" name="energy-efficiency-label">
             <option disabled selected value="">Select an option</option>
             <option value="A">A</option>
             <option value="B">B</option>
@@ -277,7 +242,7 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Number of stars</legend>
-          <select class="select w-full">
+          <select class="select w-full" name="number-of-stars">
             <option disabled selected value="">Select an option</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -294,10 +259,11 @@
       <button
         type="button"
         class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
+        onclick="closeVentilationSystemModal()"
       >
         Cancel
       </button>
-      <button type="submit" class="btn flex-1 btn-sm btn-primary">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveVentilationSystem()">Save</button>
     </div>
   </div>
 </dialog>
@@ -329,7 +295,7 @@
       >
         Cancel
       </button>
-      <button class="btn btn-sm btn-error flex-1">Remove</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteVentilationSystem()">Remove</button>
     </div>
   </div>
 </dialog>
@@ -410,3 +376,229 @@
     </button>
   </div>
 </template>
+
+<script>
+  // Store ventilation systems data on window to make it globally accessible
+  if (!window.ventilationSystems) {
+    window.ventilationSystems = [];
+  }
+  if (!window.editingVentilationSystemIndex) {
+    window.editingVentilationSystemIndex = null;
+  }
+
+  // Open modal for adding new system
+  window.openVentilationSystemModal = function() {
+    window.editingVentilationSystemIndex = null;
+    document.getElementById('ventilation-system-form').reset();
+    ventilation_system_modal.showModal();
+  }
+
+  // Close modal
+  window.closeVentilationSystemModal = function() {
+    ventilation_system_modal.close();
+    window.editingVentilationSystemIndex = null;
+  }
+
+  // Save ventilation system
+  window.saveVentilationSystem = function() {
+    const form = document.getElementById('ventilation-system-form');
+    
+    // Get ventilation system type
+    const systemTypeSelect = form.querySelector('[name="ventilation-type"]');
+    const systemType = systemTypeSelect.value;
+    const systemTypeName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+
+    if (!systemType) {
+      alert('Please select a ventilation type');
+      return;
+    }
+
+    // Collect all form data
+    const systemData = {
+      type: systemType,
+      typeName: systemTypeName,
+      data: {}
+    };
+
+    // Get all inputs, selects, and textareas from the form
+    const formElements = form.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+      if (element.name && element.name !== 'ventilation-type') {
+        if (element.type === 'radio') {
+          if (element.checked) {
+            systemData.data[element.name] = element.value || 'Yes';
+          }
+        } else if (element.type === 'checkbox') {
+          systemData.data[element.name] = element.checked;
+        } else {
+          systemData.data[element.name] = element.value;
+        }
+      }
+    });
+
+    // Add or update system
+    if (window.editingVentilationSystemIndex !== null) {
+      window.ventilationSystems[window.editingVentilationSystemIndex] = systemData;
+    } else {
+      window.ventilationSystems.push(systemData);
+    }
+
+    // Update the list display
+    window.renderVentilationSystems();
+
+    // Close modal
+    window.closeVentilationSystemModal();
+
+    // Emit form status for step validation
+    if (typeof StepManager !== 'undefined') {
+      StepManager.emitFormStatus(window.ventilationSystems.length > 0, {
+        ventilation_systems: window.ventilationSystems
+      });
+    }
+  }
+
+  // Render ventilation systems list
+  window.renderVentilationSystems = function() {
+    const listContainer = document.getElementById('ventilation-systems-list');
+    
+    if (window.ventilationSystems.length === 0) {
+      listContainer.innerHTML = `
+        <li class="flex flex-col items-center justify-center py-8 text-center">
+          <span data-icon="windy-fill" data-size="48" data-color="var(--icon--soft-400)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No ventilation systems added yet</p>
+        </li>
+      `;
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
+      return;
+    }
+
+    listContainer.innerHTML = window.ventilationSystems.map((system, index) => {
+      // Extract key details for display
+      const airflowRate = system.data['airflow_rate'] || 'N/A';
+      const airflowUnit = system.data['airflow_rate_unit'] || 'CMH';
+      const capacity = system.data['ventilation_capacity'] || 'N/A';
+      
+      return `
+        <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
+          <span
+            data-icon="windy-fill"
+            data-size="20"
+            data-color="var(--icon--strong-950)"
+            class="shrink-0 self-start"
+          ></span>
+          <div class="flex flex-col flex-1">
+            <p class="text-sm/5 font-medium">${system.typeName}</p>
+            <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+              <span class="border-r border-[var(--text--sub-600)] pr-1">Airflow rate: ${airflowRate} ${airflowUnit}</span>
+              <span>Capacity: ${capacity}</span>
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="btn size-5 btn-ghost p-0" onclick="editVentilationSystem(${index})">
+              <span
+                data-icon="edit-line"
+                data-size="16"
+                data-color="var(--icon--strong-950)"
+              ></span>
+            </button>
+            <button
+              class="btn size-5 btn-ghost p-0"
+              onclick="confirmDeleteVentilationSystem(${index})"
+            >
+              <span
+                data-icon="delete-bin-5-line"
+                data-size="16"
+                data-color="var(--icon--strong-950)"
+              ></span>
+            </button>
+          </div>
+        </li>
+      `;
+    }).join('');
+
+    // Reinitialize icons
+    if (window.IconComponent) {
+      window.IconComponent.initialize();
+    }
+  }
+
+  // Edit ventilation system
+  window.editVentilationSystem = function(index) {
+    window.editingVentilationSystemIndex = index;
+    const system = window.ventilationSystems[index];
+
+    // Reset form
+    document.getElementById('ventilation-system-form').reset();
+
+    // Set system type
+    const systemTypeSelect = document.querySelector('[name="ventilation-type"]');
+    systemTypeSelect.value = system.type;
+
+    // Populate all form fields
+    setTimeout(() => {
+      const form = document.getElementById('ventilation-system-form');
+      
+      Object.keys(system.data).forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (field) {
+          if (field.type === 'radio') {
+            const radioButton = form.querySelector(`[name="${fieldName}"][value="${system.data[fieldName]}"]`);
+            if (radioButton) radioButton.checked = true;
+          } else if (field.type === 'checkbox') {
+            field.checked = system.data[fieldName];
+          } else {
+            field.value = system.data[fieldName];
+          }
+        }
+      });
+    }, 100);
+
+    ventilation_system_modal.showModal();
+  }
+
+  // Confirm delete
+  if (!window.deleteVentilationSystemIndex) {
+    window.deleteVentilationSystemIndex = null;
+  }
+  
+  window.confirmDeleteVentilationSystem = function(index) {
+    window.deleteVentilationSystemIndex = index;
+    ventilation_system_modal_delete.showModal();
+  }
+
+  // Delete ventilation system
+  window.deleteVentilationSystem = function() {
+    if (window.deleteVentilationSystemIndex !== null) {
+      window.ventilationSystems.splice(window.deleteVentilationSystemIndex, 1);
+      window.renderVentilationSystems();
+      window.deleteVentilationSystemIndex = null;
+      ventilation_system_modal_delete.close();
+
+      // Emit form status for step validation
+      if (typeof StepManager !== 'undefined') {
+        StepManager.emitFormStatus(window.ventilationSystems.length > 0, {
+          ventilation_systems: window.ventilationSystems
+        });
+      }
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    window.renderVentilationSystems();
+  });
+
+  // If HTMX is processing this content dynamically, also initialize after htmx:afterSwap
+  document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'dynamic-content') {
+      window.renderVentilationSystems();
+    }
+  });
+
+  // Initialize immediately for dynamically loaded content
+  if (document.getElementById('ventilation-systems-list')) {
+    window.renderVentilationSystems();
+  }
+</script>

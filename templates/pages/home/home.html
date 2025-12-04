@@ -722,6 +722,8 @@
     const accountSuccessModal = document.getElementById(
       "account_success_modal"
     );
+
+    /// TODO: Show modal based on condition from backend (e.g. new account)]
     // accountSuccessModal.showModal();
 
     function closeAccountSuccessModal() {
@@ -729,8 +731,7 @@
     }
 
     function goToBuildingDetails() {
-      window.location.href =
-        "/src/pages/dashboard/building-details/building-details.html";
+      window.location.href = "{% url 'building_details' building_id=1 %}";
     }
-  </script>
+</script>
     {% endblock %}

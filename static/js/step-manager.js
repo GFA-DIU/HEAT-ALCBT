@@ -1,4 +1,6 @@
+// @ts-check
 class StepManager {
+   
   constructor() {
     this.currentStep = 1;
     this.currentSubStep = 1;
@@ -49,6 +51,7 @@ class StepManager {
             title: "Cooling System",
             description:
               "Enter details of the building's cooling system, including type and capacity.",
+              withoutForm: true,
           },
           {
             id: "ventilation-system",
@@ -325,6 +328,20 @@ class StepManager {
       if (typeof htmx !== 'undefined') {
         htmx.process(contentArea);
       }
+
+      // Execute any inline scripts in the loaded content
+      const scripts = contentArea.querySelectorAll('script');
+      scripts.forEach(script => {
+        const newScript = document.createElement('script');
+        if (script.src) {
+          newScript.src = script.src;
+        } else {
+          newScript.textContent = script.textContent;
+        }
+        document.body.appendChild(newScript);
+        // Remove the new script after execution to avoid duplicates
+        setTimeout(() => newScript.remove(), 100);
+      });
     } catch (error) {
       console.error("Failed to load step component:", error);
       contentArea.innerHTML = `
@@ -435,19 +452,23 @@ class StepManager {
 
   saveFormData() {
     const stepKey = this.getCurrentStepKey();
+    const step = this.getCurrentStepInfo();
     const formElements = document.querySelectorAll("input, select, textarea");
 
     this.formData[stepKey] = {};
 
-    formElements.forEach((element) => {
-      if (element.name || element.dataset.field) {
-        const key = element.name || element.dataset.field;
-        const value =
-          element.type === "checkbox" ? element.checked : element.value;
-        this.formData[stepKey][key] = value;
-      }
-    });
-
+    if(step.withoutForm){
+      this.formData = window.buildingData || {};
+    } else {
+      formElements.forEach((element) => {
+        if (element.name || element.dataset.field) {
+          const key = element.name || element.dataset.field;
+          const value =
+            element.type === "checkbox" ? element.checked : element.value;
+          this.formData[stepKey][key] = value;
+        }
+      });
+    }
     // Save to localStorage for persistence
     localStorage.setItem("building-form-data", JSON.stringify(this.formData));
 
@@ -812,6 +833,7 @@ class StepManager {
         stepKey: stepKey,
       },
     });
+    this.formData[stepKey] = data;
     document.dispatchEvent(event);
   }
 }

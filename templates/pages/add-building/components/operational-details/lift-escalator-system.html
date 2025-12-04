@@ -2,7 +2,7 @@
   <div class="w-full flex flex-col">
     <button
       class="btn btn-outline w-fit"
-      onclick="lift_escalator_system_modal.showModal()"
+      onclick="openLiftEscalatorSystemModal()"
     >
       <span
         data-icon="add-large-fill"
@@ -14,42 +14,7 @@
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
     ></div>
-    <ul class="grid grid-cols-1">
-      <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="stairs-line"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-          class="shrink-0 self-start"
-        ></span>
-        <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">Lift & Escalator 01</p>
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span>Lift Regenerative Features</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="lift_escalator_system_modal_delete.showModal()"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
+    <ul id="lift-escalator-systems-list" class="grid grid-cols-1">
     </ul>
   </div>
 </div>
@@ -70,7 +35,7 @@
       </div>
       <button
         type="button"
-        onclick="lift_escalator_system_modal.close()"
+        onclick="closeLiftEscalatorSystemModal()"
         class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
       >
         <span
@@ -80,7 +45,7 @@
         ></span>
       </button>
     </div>
-    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+    <form id="lift-escalator-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
@@ -89,7 +54,7 @@
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 5" />
+            <input type="number" placeholder="eg. 5" name="number_of_lifts" />
           </label>
           <p class="validator-hint">This field is required</p>
         </fieldset>
@@ -100,7 +65,7 @@
               >*</span
             >
           </legend>
-          <select class="select w-full">
+          <select class="select w-full" name="lift_regenerative_features">
             <option disabled selected value="">Select an option</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -113,7 +78,7 @@
               >*</span
             >
           </legend>
-          <select class="select w-full">
+          <select class="select w-full" name="vvvf_sleep_mode">
             <option disabled selected value="">Select an option</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -127,7 +92,7 @@
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 343" />
+            <input type="number" placeholder="eg. 343" name="annual_energy_consumption" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >kWh/year</span
             >
@@ -141,11 +106,11 @@
       <button
         type="button"
         class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
-        onclick="lift_escalator_system_modal.close()"
+        onclick="closeLiftEscalatorSystemModal()"
       >
         Cancel
       </button>
-      <button type="submit" class="btn flex-1 btn-sm btn-primary">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLiftEscalatorSystem()">Save</button>
     </div>
   </div>
 </dialog>
@@ -177,7 +142,7 @@
       >
         Cancel
       </button>
-      <button class="btn btn-sm btn-error flex-1">Remove</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteLiftEscalatorSystem()">Remove</button>
     </div>
   </div>
 </dialog>
@@ -255,3 +220,212 @@
     </button>
   </div>
 </template>
+
+<script>
+  // Store lift & escalator systems data on window to make it globally accessible
+  if (!window.liftEscalatorSystems) {
+    window.liftEscalatorSystems = [];
+  }
+  if (!window.editingLiftEscalatorSystemIndex) {
+    window.editingLiftEscalatorSystemIndex = null;
+  }
+
+  // Open modal for adding new system
+  window.openLiftEscalatorSystemModal = function() {
+    window.editingLiftEscalatorSystemIndex = null;
+    document.getElementById('lift-escalator-system-form').reset();
+    lift_escalator_system_modal.showModal();
+  }
+
+  // Close modal
+  window.closeLiftEscalatorSystemModal = function() {
+    lift_escalator_system_modal.close();
+    window.editingLiftEscalatorSystemIndex = null;
+  }
+
+  // Save lift & escalator system
+  window.saveLiftEscalatorSystem = function() {
+    const form = document.getElementById('lift-escalator-system-form');
+
+    // Collect all form data
+    const systemData = {
+      data: {}
+    };
+
+    // Get all inputs, selects, and textareas from the form
+    const formElements = form.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+      if (element.name) {
+        if (element.type === 'radio') {
+          if (element.checked) {
+            systemData.data[element.name] = element.value;
+          }
+        } else if (element.type === 'checkbox') {
+          systemData.data[element.name] = element.checked;
+        } else {
+          systemData.data[element.name] = element.value;
+        }
+      }
+    });
+
+    // Add or update system
+    if (window.editingLiftEscalatorSystemIndex !== null) {
+      window.liftEscalatorSystems[window.editingLiftEscalatorSystemIndex] = systemData;
+    } else {
+      window.liftEscalatorSystems.push(systemData);
+    }
+
+    // Update the list display
+    window.renderLiftEscalatorSystems();
+
+    // Close modal
+    window.closeLiftEscalatorSystemModal();
+
+    // Emit form status for step validation
+    if (typeof StepManager !== 'undefined') {
+      StepManager.emitFormStatus(window.liftEscalatorSystems.length > 0, {
+        lift_escalator_systems: window.liftEscalatorSystems
+      });
+    }
+  }
+
+  // Render lift & escalator systems list
+  window.renderLiftEscalatorSystems = function() {
+    const listContainer = document.getElementById('lift-escalator-systems-list');
+    
+    if (window.liftEscalatorSystems.length === 0) {
+      listContainer.innerHTML = `
+        <li class="flex flex-col items-center justify-center py-8 text-center">
+          <span data-icon="stairs-line" data-size="48" data-color="var(--icon--soft-400)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No lift & escalator systems added yet</p>
+        </li>
+      `;
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
+      return;
+    }
+
+    listContainer.innerHTML = window.liftEscalatorSystems.map((system, index) => {
+      // Extract key details for display
+      const numberOfLifts = system.data['number_of_lifts'] || 'N/A';
+      const regenerativeFeatures = system.data['lift_regenerative_features'] || 'N/A';
+      
+      return `
+        <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
+          <span
+            data-icon="stairs-line"
+            data-size="20"
+            data-color="var(--icon--strong-950)"
+            class="shrink-0 self-start"
+          ></span>
+          <div class="flex flex-col flex-1">
+            <p class="text-sm/5 font-medium">Lift & Escalator System ${index + 1}</p>
+            <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+              <span class="border-r border-[var(--text--sub-600)] pr-1">Number of lifts: ${numberOfLifts}</span>
+              <span>Regenerative features: ${regenerativeFeatures}</span>
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="btn size-5 btn-ghost p-0" onclick="editLiftEscalatorSystem(${index})">
+              <span
+                data-icon="edit-line"
+                data-size="16"
+                data-color="var(--icon--strong-950)"
+              ></span>
+            </button>
+            <button
+              class="btn size-5 btn-ghost p-0"
+              onclick="confirmDeleteLiftEscalatorSystem(${index})"
+            >
+              <span
+                data-icon="delete-bin-5-line"
+                data-size="16"
+                data-color="var(--icon--strong-950)"
+              ></span>
+            </button>
+          </div>
+        </li>
+      `;
+    }).join('');
+
+    // Reinitialize icons
+    if (window.IconComponent) {
+      window.IconComponent.initialize();
+    }
+  }
+
+  // Edit lift & escalator system
+  window.editLiftEscalatorSystem = function(index) {
+    window.editingLiftEscalatorSystemIndex = index;
+    const system = window.liftEscalatorSystems[index];
+
+    // Reset form
+    document.getElementById('lift-escalator-system-form').reset();
+
+    // Populate all form fields
+    setTimeout(() => {
+      const form = document.getElementById('lift-escalator-system-form');
+      
+      Object.keys(system.data).forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (field) {
+          if (field.type === 'radio') {
+            const radioButton = form.querySelector(`[name="${fieldName}"][value="${system.data[fieldName]}"]`);
+            if (radioButton) radioButton.checked = true;
+          } else if (field.type === 'checkbox') {
+            field.checked = system.data[fieldName];
+          } else {
+            field.value = system.data[fieldName];
+          }
+        }
+      });
+    }, 100);
+
+    lift_escalator_system_modal.showModal();
+  }
+
+  // Confirm delete
+  if (!window.deleteLiftEscalatorSystemIndex) {
+    window.deleteLiftEscalatorSystemIndex = null;
+  }
+  
+  window.confirmDeleteLiftEscalatorSystem = function(index) {
+    window.deleteLiftEscalatorSystemIndex = index;
+    lift_escalator_system_modal_delete.showModal();
+  }
+
+  // Delete lift & escalator system
+  window.deleteLiftEscalatorSystem = function() {
+    if (window.deleteLiftEscalatorSystemIndex !== null) {
+      window.liftEscalatorSystems.splice(window.deleteLiftEscalatorSystemIndex, 1);
+      window.renderLiftEscalatorSystems();
+      window.deleteLiftEscalatorSystemIndex = null;
+      lift_escalator_system_modal_delete.close();
+
+      // Emit form status for step validation
+      if (typeof StepManager !== 'undefined') {
+        StepManager.emitFormStatus(window.liftEscalatorSystems.length > 0, {
+          lift_escalator_systems: window.liftEscalatorSystems
+        });
+      }
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    window.renderLiftEscalatorSystems();
+  });
+
+  // If HTMX is processing this content dynamically, also initialize after htmx:afterSwap
+  document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'dynamic-content') {
+      window.renderLiftEscalatorSystems();
+    }
+  });
+
+  // Initialize immediately for dynamically loaded content
+  if (document.getElementById('lift-escalator-systems-list')) {
+    window.renderLiftEscalatorSystems();
+  }
+</script>

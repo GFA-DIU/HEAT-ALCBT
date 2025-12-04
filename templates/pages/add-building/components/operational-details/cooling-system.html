@@ -1,8 +1,9 @@
+{% load static %}
 <div id="cooling-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button
       class="btn btn-outline w-fit"
-      onclick="cooling_system_modal.showModal()"
+      onclick="openCoolingSystemModal()"
     >
       <span
         data-icon="add-large-fill"
@@ -14,47 +15,8 @@
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
     ></div>
-    <ul class="grid grid-cols-1">
-      <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="snowflake-fill"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-          class="shrink-0 self-start"
-        ></span>
-        <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">
-            Chiller system - Water cooled chiller
-          </p>
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Type: R-290 Propane</span
-            >
-            <span>Refrigerant quantity: 23 kg</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="cooling_system_modal_delete.showModal()"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
+    <ul class="grid grid-cols-1 gap-2" id="cooling-systems-list">
+      <!-- Cooling systems will be added here dynamically -->
     </ul>
   </div>
 </div>
@@ -83,18 +45,19 @@
         ></span>
       </button>
     </div>
-    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+    <form id="cooling-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-4">
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Type of cooling system</legend>
           <select
             class="select w-full"
             id="cooling-system-type"
-            name="cooling-system-type"
+            name="cooling_system_type"
             hx-get="/select_lists/?cooling_types=1"
             hx-trigger="load"
             hx-target="this"
             hx-swap="innerHTML"
+            onchange="handleCoolingSystemTypeChange(this.value)"
           >
             <option value="">Select a cooling system</option>
           </select>
@@ -109,10 +72,17 @@
       <button
         type="button"
         class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
+        onclick="closeCoolingSystemModal()"
       >
         Cancel
       </button>
-      <button type="submit" class="btn flex-1 btn-sm btn-primary">Save</button>
+      <button 
+        type="button" 
+        class="btn flex-1 btn-sm btn-primary"
+        onclick="saveCoolingSystem()"
+      >
+        Save
+      </button>
     </div>
   </div>
 </dialog>
@@ -144,7 +114,7 @@
       >
         Cancel
       </button>
-      <button class="btn btn-sm btn-error flex-1">Remove</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteCoolingSystem()">Remove</button>
     </div>
   </div>
 </dialog>
@@ -212,7 +182,7 @@
 
 <template id="no-cooling-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
-    <img src="/src/assets/cooling-system.png" alt="Cooling System Image" />
+    <img src="{% static 'assets/cooling-system.png' %}" alt="Cooling System Image" />
     <p class="text-sm/5 font-medium">
       Click button below to add a cooling system
     </p>
@@ -233,7 +203,7 @@
       <legend class="fieldset-legend">
         Chiller system<span class="text-[var(--state--error--base)]">*</span>
       </legend>
-      <select class="select w-full">
+      <select class="select w-full" name="chiller_system">
         <option disabled selected value="">Select an option</option>
         <option value="water-cooled">Water cooled chiller</option>
         <option value="air-cooled">Air cooled chiller</option>
@@ -246,7 +216,7 @@
         >
       </legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="eg. 2012" />
+        <input type="text" placeholder="eg. 2012" name="year_of_installation" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -256,16 +226,16 @@
           >*</span
         >
       </legend>
-      <select class="select w-full">
+      <select class="select w-full" name="type_of_refrigerants">
         <option disabled selected value="">Select an option</option>
-        <option value="R1234ze">R-134A</option>
-        <option value="R1234ze">R-32</option>
-        <option value="R1234ze">R-410A</option>
-        <option value="R1234ze">R-290 (Propane)</option>
-        <option value="R1234ze">R-600a (Isobutane)</option>
-        <option value="R1234ze">R-717 (Ammonia)</option>
-        <option value="R1234ze">R-744 (C02)</option>
-        <option value="R1234ze">R-404A</option>
+        <option value="R-134A">R-134A</option>
+        <option value="R-32">R-32</option>
+        <option value="R-410A">R-410A</option>
+        <option value="R-290 (Propane)">R-290 (Propane)</option>
+        <option value="R-600a (Isobutane)">R-600a (Isobutane)</option>
+        <option value="R-717 (Ammonia)">R-717 (Ammonia)</option>
+        <option value="R-744 (C02)">R-744 (C02)</option>
+        <option value="R-404A">R-404A</option>
       </select>
     </fieldset>
     <fieldset class="fieldset">
@@ -275,7 +245,7 @@
         ><span class="text-[var(--text--sub-600)]">(kg)</span>
       </legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg.  134" />
+        <input type="number" placeholder="eg.  134" name="refrigerant_quantity" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >kg</span
         >
@@ -297,7 +267,7 @@
         <label class="flex items-center gap-2">
           <input
             type="radio"
-            name="installation-of-variable-speed-drives"
+            name="installation_of_variable_speed_drives"
             class="radio radio-xs"
           />
           Yes
@@ -305,7 +275,7 @@
         <label class="flex items-center gap-2">
           <input
             type="radio"
-            name="installation-of-variable-speed-drives"
+            name="installation_of_variable_speed_drives"
             class="radio radio-xs"
           />
           No
@@ -327,7 +297,7 @@
         <label class="flex items-center gap-2">
           <input
             type="radio"
-            name="installation-of-heat-recovery-systems"
+            name="installation_of_heat_recovery_systems"
             class="radio radio-xs"
           />
           Yes
@@ -335,7 +305,7 @@
         <label class="flex items-center gap-2">
           <input
             type="radio"
-            name="installation-of-heat-recovery-systems"
+            name="installation_of_heat_recovery_systems"
             class="radio radio-xs"
           />
           No
@@ -350,14 +320,14 @@
         >
       </legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="eg. 342" />
+        <input type="text" placeholder="eg. 342" name="total_chiller_system" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline leakage factor</legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg. 2" />
+        <input type="number" placeholder="eg. 2" name="baseline_leakage_factor" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >%</span
         >
@@ -375,7 +345,7 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" required />
+            <input type="number" placeholder="eg. 1" name="annual_operating_hours_per_day" required />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Hours / day</span
             >
@@ -383,7 +353,7 @@
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" required />
+            <input type="number" placeholder="eg. 1" name="annual_operating_days_per_week" required />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >days / week</span
             >
@@ -391,7 +361,7 @@
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" required />
+            <input type="number" placeholder="eg. 1" name="annual_operating_weeks_per_year" required />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >weeks / year</span
             >
@@ -404,7 +374,7 @@
         Baseline Air Cooled/Water Cooled Chiller Cooling Efficiency
       </legend>
       <label class="input w-full">
-        <input type="number" placeholder="eg. 2" />
+        <input type="number" placeholder="eg. 2" name="baseline_cooling_efficiency" />
       </label>
     </fieldset>
     <div class="col-span-2 mt-3">
@@ -430,7 +400,7 @@
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" />
+                <input type="number" placeholder="eg. 2" name="number_of_chillers" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
@@ -441,7 +411,7 @@
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2000" />
+                <input type="number" placeholder="eg. 2000" name="total_chiller_system_power_input" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >kWH</span
                 >
@@ -455,7 +425,7 @@
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 45" />
+                <input type="number" placeholder="eg. 45" name="water_cooled_chiller_cooling_load_factor" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >%</span
                 >
@@ -464,18 +434,18 @@
             <fieldset class="fieldset">
               <legend class="fieldset-legend">COP</legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" />
+                <input type="number" placeholder="eg. 2" name="cop" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">IPVL</legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" />
+                <input type="number" placeholder="eg. 2" name="ipvl" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Energy efficiency label</legend>
-              <select class="select w-full">
+              <select class="select w-full" name="energy_efficiency_label">
                 <option disabled selected value="">Select an option</option>
                 <option value="A">A</option>
                 <option value="B">B</option>
@@ -488,7 +458,7 @@
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Number of stars</legend>
-              <select class="select w-full">
+              <select class="select w-full" name="number_of_stars">
                 <option disabled selected value="">Select an option</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -502,7 +472,7 @@
                 Total energy consumption of chiller system anually (kwh/year)
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 200" />
+                <input type="number" placeholder="eg. 200" name="total_energy_consumption_of_chiller_system_annually" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >kWh/year</span
                 >
@@ -528,7 +498,7 @@
           >*</span
         >
       </legend>
-      <select class="select w-full">
+      <select class="select w-full" name="type_of_air_condition">
         <option disabled selected value="">Select an option</option>
         <option value="split">Split air condition</option>
         <option value="VRV">
@@ -543,7 +513,7 @@
         >
       </legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="eg. 2012" />
+        <input type="text" placeholder="eg. 2012" name="year_of_installation" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -553,16 +523,16 @@
           >*</span
         >
       </legend>
-      <select class="select w-full">
+      <select class="select w-full" name="type_of_refrigerants">
         <option disabled selected value="">Select an option</option>
-        <option value="R1234ze">R-134A</option>
-        <option value="R1234ze">R-32</option>
-        <option value="R1234ze">R-410A</option>
-        <option value="R1234ze">R-290 (Propane)</option>
-        <option value="R1234ze">R-600a (Isobutane)</option>
-        <option value="R1234ze">R-717 (Ammonia)</option>
-        <option value="R1234ze">R-744 (C02)</option>
-        <option value="R1234ze">R-404A</option>
+        <option value="R-134A">R-134A</option>
+        <option value="R-32">R-32</option>
+        <option value="R-410A">R-410A</option>
+        <option value="R-290 (Propane)">R-290 (Propane)</option>
+        <option value="R-600a (Isobutane)">R-600a (Isobutane)</option>
+        <option value="R-717 (Ammonia)">R-717 (Ammonia)</option>
+        <option value="R-744 (C02)">R-744 (C02)</option>
+        <option value="R-404A">R-404A</option>
       </select>
     </fieldset>
     <fieldset class="fieldset">
@@ -572,7 +542,7 @@
         ><span class="text-[var(--text--sub-600)]">(kg)</span>
       </legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg.  134" />
+        <input type="number" placeholder="eg.  134" name="refrigerant_quantity" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >kg</span
         >
@@ -587,14 +557,14 @@
         >
       </legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="eg. 342" />
+        <input type="text" placeholder="eg. 342" name="total_cooling_load_for_split_vrv" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline leakage factor</legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg. 2" />
+        <input type="number" placeholder="eg. 2" name="baseline_leakage_factor" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >%</span
         >
@@ -612,7 +582,7 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" required />
+            <input type="number" placeholder="eg. 1" name="hours_per_day" required />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Hours / day</span
             >
@@ -620,7 +590,7 @@
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" required />
+            <input type="number" placeholder="eg. 1" name="days_per_week" required />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >days / week</span
             >
@@ -628,7 +598,7 @@
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" required />
+            <input type="number" placeholder="eg. 1" name="weeks_per_year" required />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >weeks / year</span
             >
@@ -657,7 +627,7 @@
                 Total number of split/VRV units
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" />
+                <input type="number" placeholder="eg. 2" name="total_number_of_split_vrv_units" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
@@ -665,7 +635,7 @@
                 Total split unit//VRV system
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 400" />
+                <input type="number" placeholder="eg. 400" name="total_split_unit_vrv_system" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >kW</span
                 >
@@ -679,7 +649,7 @@
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 200" />
+                <input type="number" placeholder="eg. 200" name="total_chiller_system_annually" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >%</span
                 >
@@ -690,7 +660,7 @@
                 Baseline split unit/VRV system efficiency
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 333" />
+                <input type="number" placeholder="eg. 333" name="baseline_split_unit_vrv_system_efficiency" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >watt</span
                 >
@@ -699,19 +669,19 @@
             <fieldset class="fieldset">
               <legend class="fieldset-legend">ISSER rating</legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 4.5" />
+                <input type="number" placeholder="eg. 4.5" name="isser_rating" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">COP</legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" />
+                <input type="number" placeholder="eg. 2" name="cop" />
               </label>
             </fieldset>
 
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Energy efficiency label</legend>
-              <select class="select w-full">
+              <select class="select w-full" name="energy_efficiency_label">
                 <option disabled selected value="">Select an option</option>
                 <option value="A">A</option>
                 <option value="B">B</option>
@@ -724,7 +694,7 @@
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Number of stars</legend>
-              <select class="select w-full">
+              <select class="select w-full" name="number_of_stars">
                 <option disabled selected value="">Select an option</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -738,7 +708,7 @@
                 Total energy consumption of chiller system anually (kwh/year)
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 200" />
+                <input type="number" placeholder="eg. 200" name="total_chiller_system_annually" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >kWh/year</span
                 >
@@ -750,3 +720,272 @@
     </div>
   </div>
 </template>
+
+<script>
+  // Store cooling systems data on window to make it globally accessible
+  if (!window.coolingSystems) {
+    window.coolingSystems = [];
+  }
+  if (!window.editingSystemIndex) {
+    window.editingSystemIndex = null;
+  }
+
+  // Open modal for adding new system
+  window.openCoolingSystemModal = function() {
+    window.editingSystemIndex = null;
+    document.getElementById('cooling-system-form').reset();
+    document.getElementById('selected-cooling-system').innerHTML = '';
+    cooling_system_modal.showModal();
+  }
+
+  // Close modal
+  window.closeCoolingSystemModal = function() {
+    cooling_system_modal.close();
+    window.editingSystemIndex = null;
+  }
+
+  // Handle cooling system type change
+  window.handleCoolingSystemTypeChange = function(systemType) {
+    const selectedSystemDiv = document.getElementById('selected-cooling-system');
+    
+    if (!systemType) {
+      selectedSystemDiv.innerHTML = '';
+      return;
+    }
+
+    // Get the selected option text
+    const selectElement = document.getElementById('cooling-system-type');
+    const selectedText = selectElement.options[selectElement.selectedIndex].text;
+
+    // Determine which template to load based on system type
+    if (selectedText.toLowerCase().includes('chiller')) {
+      loadTemplate('chiller-system-template', selectedSystemDiv);
+    } else {
+      loadTemplate('air-condition-system-template', selectedSystemDiv);
+    }
+
+    // Reinitialize icons after loading template
+    if (window.IconComponent) {
+      window.IconComponent.initialize();
+    }
+  }
+
+  // Load template content
+  function loadTemplate(templateId, targetElement) {
+    const template = document.getElementById(templateId);
+    if (template) {
+      targetElement.innerHTML = template.innerHTML;
+    }
+  }
+
+  // Save cooling system
+  window.saveCoolingSystem = function() {
+    const form = document.getElementById('cooling-system-form');
+    const formData = new FormData(form);
+    
+    // Get cooling system type
+    const systemTypeSelect = document.getElementById('cooling-system-type');
+    const systemType = systemTypeSelect.value;
+    const systemTypeName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+
+    if (!systemType) {
+      alert('Please select a cooling system type');
+      return;
+    }
+
+    // Collect all form data
+    const systemData = {
+      type: systemType,
+      typeName: systemTypeName,
+      data: {}
+    };
+
+    // Get all inputs, selects, and textareas from the form
+    const formElements = form.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+      if (element.name && element.name !== 'cooling-system-type') {
+        if (element.type === 'radio') {
+          if (element.checked) {
+            systemData.data[element.name] = element.value || 'Yes';
+          }
+        } else if (element.type === 'checkbox') {
+          systemData.data[element.name] = element.checked;
+        } else {
+          systemData.data[element.name] = element.value;
+        }
+      }
+    });
+
+    // Add or update system
+    if (window.editingSystemIndex !== null) {
+      window.coolingSystems[window.editingSystemIndex] = systemData;
+    } else {
+      window.coolingSystems.push(systemData);
+    }
+
+    // Update the list display
+    window.renderCoolingSystems();
+
+    // Close modal
+    window.closeCoolingSystemModal();
+
+    // Emit form status for step validation
+    if (typeof StepManager !== 'undefined') {
+      StepManager.emitFormStatus(window.coolingSystems.length > 0, {
+        cooling_systems: window.coolingSystems
+      }, window.stepManager.getCurrentStepKey() );
+    }
+  }
+
+  // Render cooling systems list
+  window.renderCoolingSystems = function() {
+    const listContainer = document.getElementById('cooling-systems-list');
+    
+    if (window.coolingSystems.length === 0) {
+      listContainer.innerHTML = `
+        <li class="flex flex-col items-center justify-center py-8 text-center">
+          <span data-icon="snowflake-fill" data-size="48" data-color="var(--icon--soft-400)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No cooling systems added yet</p>
+        </li>
+      `;
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
+      return;
+    }
+
+    listContainer.innerHTML = window.coolingSystems.map((system, index) => {
+      // Extract key details for display
+      const refrigerantType = system.data['type_of_refrigerants'] || 'N/A';
+      const refrigerantQty = system.data['refrigerant_quantity'] || 'N/A';
+      const chillerType = system.data['chiller_system'] || system.data['type_of_air_condition'] || '';
+      
+      return `
+        <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
+          <span
+            data-icon="snowflake-fill"
+            data-size="20"
+            data-color="var(--icon--strong-950)"
+            class="shrink-0 self-start"
+          ></span>
+          <div class="flex flex-col flex-1">
+            <p class="text-sm/5 font-medium">
+              ${system.typeName}${chillerType ? ' - ' + chillerType : ''}
+            </p>
+            <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+              <span class="border-r border-[var(--text--sub-600)] pr-1">Type: ${refrigerantType}</span>
+              <span>Refrigerant quantity: ${refrigerantQty} kg</span>
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="btn size-5 btn-ghost p-0" onclick="editCoolingSystem(${index})">
+              <span
+                data-icon="edit-line"
+                data-size="16"
+                data-color="var(--icon--strong-950)"
+              ></span>
+            </button>
+            <button
+              class="btn size-5 btn-ghost p-0"
+              onclick="confirmDeleteCoolingSystem(${index})"
+            >
+              <span
+                data-icon="delete-bin-5-line"
+                data-size="16"
+                data-color="var(--icon--strong-950)"
+              ></span>
+            </button>
+          </div>
+        </li>
+      `;
+    }).join('');
+
+    // Reinitialize icons
+    if (window.IconComponent) {
+      window.IconComponent.initialize();
+    }
+  }
+
+  // Edit cooling system
+  window.editCoolingSystem = function(index) {
+    window.editingSystemIndex = index;
+    const system = window.coolingSystems[index];
+
+    // Reset form
+    document.getElementById('cooling-system-form').reset();
+
+    // Set system type
+    const systemTypeSelect = document.getElementById('cooling-system-type');
+    systemTypeSelect.value = system.type;
+
+    // Trigger change to load the appropriate template
+    window.handleCoolingSystemTypeChange(system.type);
+
+    // Wait a bit for template to load, then populate fields
+    setTimeout(() => {
+      const form = document.getElementById('cooling-system-form');
+      
+      // Populate all form fields
+      Object.keys(system.data).forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (field) {
+          if (field.type === 'radio') {
+            const radioButton = form.querySelector(`[name="${fieldName}"][value="${system.data[fieldName]}"]`);
+            if (radioButton) radioButton.checked = true;
+          } else if (field.type === 'checkbox') {
+            field.checked = system.data[fieldName];
+          } else {
+            field.value = system.data[fieldName];
+          }
+        }
+      });
+    }, 100);
+
+    cooling_system_modal.showModal();
+  }
+
+  // Confirm delete
+  if (!window.deleteSystemIndex) {
+    window.deleteSystemIndex = null;
+  }
+  
+  window.confirmDeleteCoolingSystem = function(index) {
+    window.deleteSystemIndex = index;
+    cooling_system_modal_delete.showModal();
+  }
+
+  // Delete cooling system
+  window.deleteCoolingSystem = function() {
+    if (window.deleteSystemIndex !== null) {
+      window.coolingSystems.splice(window.deleteSystemIndex, 1);
+      window.renderCoolingSystems();
+      window.deleteSystemIndex = null;
+      cooling_system_modal_delete.close();
+
+      // Emit form status for step validation
+      if (typeof StepManager !== 'undefined') {
+        StepManager.emitFormStatus(window.coolingSystems.length > 0, {
+          cooling_systems: window.coolingSystems
+        }, window.stepManager.getCurrentStepKey() );
+      }
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    window.renderCoolingSystems();
+  });
+
+  // If HTMX is processing this content dynamically, also initialize after htmx:afterSwap
+  document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'dynamic-content') {
+      window.renderCoolingSystems();
+    }
+  });
+
+  // Initialize immediately for dynamically loaded content
+  if (document.getElementById('cooling-systems-list')) {
+    window.renderCoolingSystems();
+  }
+</script>
+
