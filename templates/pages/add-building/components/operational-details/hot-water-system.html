@@ -400,6 +400,11 @@
     } else {
       window.hotWaterSystems.push(systemData);
     }
+ 
+        // Save form data to StepManager
+    if (typeof StepManager !== 'undefined') {
+      StepManager.saveStepFormData( window.hotWaterSystems, window.stepManager.getCurrentStepKey() );
+    }
 
     // Update the list display
     window.renderHotWaterSystems();

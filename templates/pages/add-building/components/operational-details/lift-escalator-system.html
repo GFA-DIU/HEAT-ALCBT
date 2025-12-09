@@ -274,7 +274,10 @@
     } else {
       window.liftEscalatorSystems.push(systemData);
     }
-
+        // Save form data to StepManager
+    if (typeof StepManager !== 'undefined') {
+      StepManager.saveStepFormData(window.liftEscalatorSystems, window.stepManager.getCurrentStepKey() );
+    }
     // Update the list display
     window.renderLiftEscalatorSystems();
 

@@ -823,6 +823,11 @@
       window.coolingSystems.push(systemData);
     }
 
+    // Save form data to StepManager
+    if (typeof StepManager !== 'undefined') {
+      StepManager.saveStepFormData( window.coolingSystems, window.stepManager.getCurrentStepKey() );
+    }
+
     // Update the list display
     window.renderCoolingSystems();
 

@@ -417,7 +417,10 @@
     } else {
       window.lightingSystems.push(systemData);
     }
-
+        // Save form data to StepManager
+    if (typeof StepManager !== 'undefined') {
+      StepManager.saveStepFormData(window.lightingSystems, window.stepManager.getCurrentStepKey() );
+    }
     // Update the list display
     window.renderLightingSystems();
 

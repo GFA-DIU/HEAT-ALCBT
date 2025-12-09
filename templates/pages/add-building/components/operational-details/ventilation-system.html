@@ -442,7 +442,10 @@
     } else {
       window.ventilationSystems.push(systemData);
     }
-
+        // Save form data to StepManager
+    if (typeof StepManager !== 'undefined') {
+      StepManager.saveStepFormData(window.ventilationSystems, window.stepManager.getCurrentStepKey() );
+    }
     // Update the list display
     window.renderVentilationSystems();
 

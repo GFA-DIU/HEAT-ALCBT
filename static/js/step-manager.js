@@ -125,6 +125,8 @@ class StepManager {
     };
 
     // Store form data
+     
+    /** @type {Record<string, Record<string, any>>} */
     this.formData = {};
 
     // Store form validation status for each step
@@ -285,7 +287,7 @@ class StepManager {
     const contentArea = document.getElementById("dynamic-content");
 
     if (!contentArea) return;
-
+  
     // Show loading state
     contentArea.innerHTML = `
       <div class="flex items-center justify-center h-64">
@@ -450,32 +452,58 @@ class StepManager {
     });
   }
 
+  /**
+   * @param {string} stepKey
+   * @returns {FormData}
+   */
+  getFormData(stepKey) {
+    const form = document.getElementById("form");
+    if (form) {
+      const formData = new FormData(form);
+      console.log("Extracted FormData from form element:", form);
+      return formData;
+    }else {
+      let formData = new FormData();
+      const object = this.formData[stepKey] || {};
+      Object.keys(object).forEach(key => formData.append(key, object[key]))
+      return formData;
+    }
+  }
+
   saveFormData() {
     const stepKey = this.getCurrentStepKey();
     const step = this.getCurrentStepInfo();
-    const formElements = document.querySelectorAll("input, select, textarea");
+    const stepData = this.getFormData(stepKey);
 
-    this.formData[stepKey] = {};
-
-    if(step.withoutForm){
-      this.formData = window.buildingData || {};
-    } else {
-      formElements.forEach((element) => {
-        if (element.name || element.dataset.field) {
-          const key = element.name || element.dataset.field;
-          const value =
-            element.type === "checkbox" ? element.checked : element.value;
-          this.formData[stepKey][key] = value;
-        }
-      });
-    }
+    console.log("Saving form data for step:", stepData);
+    const formObject = Object.fromEntries(stepData.entries());
     // Save to localStorage for persistence
     localStorage.setItem("building-form-data", JSON.stringify(this.formData));
-
+    if(formObject && Object.keys(formObject).length > 0){
+      alert("No data to save for this step.");
+      return;
+    }
     // Save to server via Django
-    this.saveToServer(stepKey, this.formData[stepKey]);
+    this.saveToServer(stepKey, formObject);
   }
 
+  // Helper function save data from each step when the step does not have a form
+   /**  
+   * @param {Record<string, any>} stepData
+   * @param {string} stepKey 
+   */
+  saveStepFormData(stepData, stepKey) {
+    if(stepData){
+      this.formData[stepKey] = stepData;
+    } else {  
+      alert("No data to save for this step.");
+    }
+  }
+
+  /**
+   * @param {string} stepKey
+   * @param {Record<string, any>} stepData
+   */
   async saveToServer(stepKey, stepData) {
     try {
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
@@ -497,6 +525,7 @@ class StepManager {
       }
     } catch (error) {
       console.error('Error saving to server:', error);
+      throw error;
       // Don't block the UI, just log the error
     }
   }
