@@ -44,6 +44,7 @@
       </button>
     </div>
     <form id="ventilation-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
+        {% csrf_token %}
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
@@ -54,7 +55,7 @@
           <select 
             class="select w-full"
             id="ventilation-type"
-            name="ventilation-type"
+            name="ventilation_type"
             hx-get="/select_lists/?ventilation_types=1"
             hx-trigger="load"
             hx-target="this"
@@ -69,7 +70,7 @@
               >*</span
             >
           </legend>
-          <select class="select w-full" name="ventilation-capacity">
+          <select class="select w-full" name="ventilation_capacity">
             <option disabled selected value="">Select an option</option>
             <option value="m3-hr">m<sup>3</sup>/hr</option>
             <option value="ft3-min">ft<sup>3</sup>/min</option>
@@ -83,7 +84,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="baseline-efficiency" />
+            <input type="number" placeholder="eg. 2" name="baseline_efficiency" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >W/CMH</span
             >
@@ -100,7 +101,7 @@
           <div class="w-full flex gap-1.5 items-center">
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating-hours-per-day" required />
+                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >Hours / day</span
                 >
@@ -108,7 +109,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating-days-per-week" required />
+                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >days / week</span
                 >
@@ -116,7 +117,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating-weeks-per-year" required />
+                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >weeks / year</span
                 >
@@ -132,7 +133,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="power-input" />
+            <input type="number" placeholder="eg. 2" name="power_input" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Watts</span
             >
@@ -143,10 +144,10 @@
             Airflow rate<span class="text-[var(--state--error--base)]">*</span>
           </legend>
           <label class="input w-full pr-0 overflow-hidden">
-            <input type="number" placeholder="eg. 2" name="airflow-rate" />
+            <input type="number" placeholder="eg. 2" name="airflow_rate" />
             <select
               class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25"
-              name="airflow-rate-unit"
+              name="airflow_rate_unit"
             >
               <option value="cmh" selected>CMH</option>
               <option value="cfm">CFM</option>
@@ -168,7 +169,7 @@
             <label class="flex items-center gap-2">
               <input
                 type="radio"
-                name="demand-controlled-ventilation"
+                name="demand_controlled_ventilation"
                 value="yes"
                 class="radio radio-xs"
               />
@@ -177,7 +178,7 @@
             <label class="flex items-center gap-2">
               <input
                 type="radio"
-                name="demand-controlled-ventilation"
+                name="demand_controlled_ventilation"
                 value="no"
                 class="radio radio-xs"
               />
@@ -196,7 +197,7 @@
               data-color="var(--icon--disabled-300)"
             ></span>
           </legend>
-          <select class="select w-full" name="variable-speed-drives">
+          <select class="select w-full" name="variable_speed_drives">
             <option disabled selected value="">Select an option</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -210,7 +211,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="number-of-units" />
+            <input type="number" placeholder="eg. 2" name="number_of_units" />
           </label>
         </fieldset>
         <fieldset class="fieldset col-span-2">
@@ -221,7 +222,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="annual-energy-consumption" />
+            <input type="number" placeholder="eg. 2" name="annual_energy_consumption" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >kWh/year</span
             >
@@ -229,7 +230,7 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Energy efficiency label</legend>
-          <select class="select w-full" name="energy-efficiency-label">
+          <select class="select w-full" name="energy_efficiency_label">
             <option disabled selected value="">Select an option</option>
             <option value="A">A</option>
             <option value="B">B</option>
@@ -242,7 +243,7 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Number of stars</legend>
-          <select class="select w-full" name="number-of-stars">
+          <select class="select w-full" name="number_of_stars">
             <option disabled selected value="">Select an option</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -402,9 +403,9 @@
   // Save ventilation system
   window.saveVentilationSystem = function() {
     const form = document.getElementById('ventilation-system-form');
-    
+    const formData = new FormData(form);
     // Get ventilation system type
-    const systemTypeSelect = form.querySelector('[name="ventilation-type"]');
+    const systemTypeSelect = form.querySelector('[name="ventilation_type"]');
     const systemType = systemTypeSelect.value;
     const systemTypeName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
 
@@ -417,24 +418,8 @@
     const systemData = {
       type: systemType,
       typeName: systemTypeName,
-      data: {}
+      data: Object.fromEntries(formData.entries())
     };
-
-    // Get all inputs, selects, and textareas from the form
-    const formElements = form.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-      if (element.name && element.name !== 'ventilation-type') {
-        if (element.type === 'radio') {
-          if (element.checked) {
-            systemData.data[element.name] = element.value || 'Yes';
-          }
-        } else if (element.type === 'checkbox') {
-          systemData.data[element.name] = element.checked;
-        } else {
-          systemData.data[element.name] = element.value;
-        }
-      }
-    });
 
     // Add or update system
     if (window.editingVentilationSystemIndex !== null) {
@@ -442,9 +427,9 @@
     } else {
       window.ventilationSystems.push(systemData);
     }
-        // Save form data to StepManager
-    if (typeof StepManager !== 'undefined') {
-      StepManager.saveStepFormData(window.ventilationSystems, window.stepManager.getCurrentStepKey() );
+        // Save form data to stepManager
+    if (typeof stepManager !== 'undefined') {
+      stepManager.saveStepFormData(window.ventilationSystems.map(m => m.data), window.stepManager.getCurrentStepKey() );
     }
     // Update the list display
     window.renderVentilationSystems();
@@ -452,12 +437,6 @@
     // Close modal
     window.closeVentilationSystemModal();
 
-    // Emit form status for step validation
-    if (typeof StepManager !== 'undefined') {
-      StepManager.emitFormStatus(window.ventilationSystems.length > 0, {
-        ventilation_systems: window.ventilationSystems
-      });
-    }
   }
 
   // Render ventilation systems list
@@ -536,7 +515,7 @@
     document.getElementById('ventilation-system-form').reset();
 
     // Set system type
-    const systemTypeSelect = document.querySelector('[name="ventilation-type"]');
+    const systemTypeSelect = document.querySelector('[name="ventilation_type"]');
     systemTypeSelect.value = system.type;
 
     // Populate all form fields
@@ -578,13 +557,6 @@
       window.renderVentilationSystems();
       window.deleteVentilationSystemIndex = null;
       ventilation_system_modal_delete.close();
-
-      // Emit form status for step validation
-      if (typeof StepManager !== 'undefined') {
-        StepManager.emitFormStatus(window.ventilationSystems.length > 0, {
-          ventilation_systems: window.ventilationSystems
-        });
-      }
     }
   }
 

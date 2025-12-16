@@ -44,6 +44,7 @@
       </button>
     </div>
     <form id="hot-water-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
+        {% csrf_token %}
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
@@ -360,7 +361,7 @@
   // Save hot water system
   window.saveHotWaterSystem = function() {
     const form = document.getElementById('hot-water-system-form');
-    
+    const formData = new FormData(form);
     // Get hot water system type
     const systemTypeSelect = form.querySelector('[name="type_of_hot_water_system"]');
     const systemType = systemTypeSelect.value;
@@ -375,25 +376,10 @@
     const systemData = {
       type: systemType,
       typeName: systemTypeName,
-      data: {}
+      data: formData.entries ? Object.fromEntries(formData.entries()) : {}
     };
 
-    // Get all inputs, selects, and textareas from the form
-    const formElements = form.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-      if (element.name && element.name !== 'type-of-hot-water-system') {
-        if (element.type === 'radio') {
-          if (element.checked) {
-            systemData.data[element.name] = element.value || 'Yes';
-          }
-        } else if (element.type === 'checkbox') {
-          systemData.data[element.name] = element.checked;
-        } else {
-          systemData.data[element.name] = element.value;
-        }
-      }
-    });
-
+   
     // Add or update system
     if (window.editingHotWaterSystemIndex !== null) {
       window.hotWaterSystems[window.editingHotWaterSystemIndex] = systemData;
@@ -401,9 +387,9 @@
       window.hotWaterSystems.push(systemData);
     }
  
-        // Save form data to StepManager
-    if (typeof StepManager !== 'undefined') {
-      StepManager.saveStepFormData( window.hotWaterSystems, window.stepManager.getCurrentStepKey() );
+        // Save form data to stepManager
+    if (typeof stepManager !== 'undefined') {
+      stepManager.saveStepFormData( window.hotWaterSystems.map(m => m.data), window.stepManager.getCurrentStepKey() );
     }
 
     // Update the list display
@@ -412,12 +398,6 @@
     // Close modal
     window.closeHotWaterSystemModal();
 
-    // Emit form status for step validation
-    if (typeof StepManager !== 'undefined') {
-      StepManager.emitFormStatus(window.hotWaterSystems.length > 0, {
-        hot_water_systems: window.hotWaterSystems
-      });
-    }
   }
 
   // Render hot water systems list
@@ -537,13 +517,6 @@
       window.renderHotWaterSystems();
       window.deleteHotWaterSystemIndex = null;
       hot_water_system_modal_delete.close();
-
-      // Emit form status for step validation
-      if (typeof StepManager !== 'undefined') {
-        StepManager.emitFormStatus(window.hotWaterSystems.length > 0, {
-          hot_water_systems: window.hotWaterSystems
-        });
-      }
     }
   }
 

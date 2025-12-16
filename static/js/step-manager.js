@@ -51,7 +51,6 @@ class StepManager {
             title: "Cooling System",
             description:
               "Enter details of the building's cooling system, including type and capacity.",
-              withoutForm: true,
           },
           {
             id: "ventilation-system",
@@ -454,19 +453,17 @@ class StepManager {
 
   /**
    * @param {string} stepKey
-   * @returns {FormData}
+   * @returns {Record<string, any>}
    */
   getFormData(stepKey) {
     const form = document.getElementById("form");
     if (form) {
+      console.log("Extracting FormData from form element:", form);
       const formData = new FormData(form);
-      console.log("Extracted FormData from form element:", form);
-      return formData;
+      return formData.entries ? Object.fromEntries(formData.entries()) : {};
     }else {
-      let formData = new FormData();
       const object = this.formData[stepKey] || {};
-      Object.keys(object).forEach(key => formData.append(key, object[key]))
-      return formData;
+      return object;
     }
   }
 
@@ -475,16 +472,13 @@ class StepManager {
     const step = this.getCurrentStepInfo();
     const stepData = this.getFormData(stepKey);
 
-    console.log("Saving form data for step:", stepData);
-    const formObject = Object.fromEntries(stepData.entries());
-    // Save to localStorage for persistence
-    localStorage.setItem("building-form-data", JSON.stringify(this.formData));
-    if(formObject && Object.keys(formObject).length > 0){
+    this.saveStepFormData(stepData, stepKey);  
+    if(!stepData && Object.keys(stepData).length === 0){
       alert("No data to save for this step.");
       return;
     }
     // Save to server via Django
-    this.saveToServer(stepKey, formObject);
+    this.saveToServer(stepKey, stepData);
   }
 
   // Helper function save data from each step when the step does not have a form
@@ -494,7 +488,9 @@ class StepManager {
    */
   saveStepFormData(stepData, stepKey) {
     if(stepData){
+      console.log("Saving step data:", stepData);
       this.formData[stepKey] = stepData;
+      localStorage.setItem("building-form-data", JSON.stringify(this.formData));
     } else {  
       alert("No data to save for this step.");
     }
@@ -607,6 +603,7 @@ class StepManager {
     }
   }
 
+  
   goToStep(step) {
     this.currentStep = parseInt(step);
     this.currentSubStep = 1;
@@ -853,18 +850,6 @@ class StepManager {
     };
   }
 
-  // Utility method for components to easily emit form status
-  static emitFormStatus(isValid, data = null, stepKey = null) {
-    const event = new CustomEvent("onFormStatus", {
-      detail: {
-        isValid: isValid,
-        data: data,
-        stepKey: stepKey,
-      },
-    });
-    this.formData[stepKey] = data;
-    document.dispatchEvent(event);
-  }
 }
 
 function goToDashboard() {
