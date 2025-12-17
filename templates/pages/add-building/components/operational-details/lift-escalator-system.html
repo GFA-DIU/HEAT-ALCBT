@@ -46,6 +46,7 @@
       </button>
     </div>
     <form id="lift-escalator-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
+        {% csrf_token %}
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
@@ -246,37 +247,22 @@
   // Save lift & escalator system
   window.saveLiftEscalatorSystem = function() {
     const form = document.getElementById('lift-escalator-system-form');
+    const formData = new FormData(form);
 
     // Collect all form data
     const systemData = {
-      data: {}
+      data: formData.entries ? Object.fromEntries(formData.entries()) : {}
     };
-
-    // Get all inputs, selects, and textareas from the form
-    const formElements = form.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-      if (element.name) {
-        if (element.type === 'radio') {
-          if (element.checked) {
-            systemData.data[element.name] = element.value;
-          }
-        } else if (element.type === 'checkbox') {
-          systemData.data[element.name] = element.checked;
-        } else {
-          systemData.data[element.name] = element.value;
-        }
-      }
-    });
-
+ 
     // Add or update system
     if (window.editingLiftEscalatorSystemIndex !== null) {
       window.liftEscalatorSystems[window.editingLiftEscalatorSystemIndex] = systemData;
     } else {
       window.liftEscalatorSystems.push(systemData);
     }
-        // Save form data to StepManager
-    if (typeof StepManager !== 'undefined') {
-      StepManager.saveStepFormData(window.liftEscalatorSystems, window.stepManager.getCurrentStepKey() );
+        // Save form data to stepManager
+    if (typeof stepManager !== 'undefined') {
+      stepManager.saveStepFormData(window.liftEscalatorSystems.map(m => m.data), window.stepManager.getCurrentStepKey() );
     }
     // Update the list display
     window.renderLiftEscalatorSystems();
@@ -284,12 +270,6 @@
     // Close modal
     window.closeLiftEscalatorSystemModal();
 
-    // Emit form status for step validation
-    if (typeof StepManager !== 'undefined') {
-      StepManager.emitFormStatus(window.liftEscalatorSystems.length > 0, {
-        lift_escalator_systems: window.liftEscalatorSystems
-      });
-    }
   }
 
   // Render lift & escalator systems list
@@ -406,12 +386,6 @@
       window.deleteLiftEscalatorSystemIndex = null;
       lift_escalator_system_modal_delete.close();
 
-      // Emit form status for step validation
-      if (typeof StepManager !== 'undefined') {
-        StepManager.emitFormStatus(window.liftEscalatorSystems.length > 0, {
-          lift_escalator_systems: window.liftEscalatorSystems
-        });
-      }
     }
   }
 

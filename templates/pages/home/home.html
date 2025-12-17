@@ -243,7 +243,7 @@
     </dialog>
 
 
-
+{% comment %} 
     <template id="buildings-template">
       <ul class="grid grid-cols-1 gap-4 mt-6">
         <li
@@ -716,7 +716,7 @@
           </p>
         </li>
       </ul>
-    </template>
+    </template> {% endcomment %}
     
 <script>
     const accountSuccessModal = document.getElementById(
@@ -730,8 +730,8 @@
       accountSuccessModal.close();
     }
 
-    function goToBuildingDetails() {
-      window.location.href = "{% url 'building_details' building_id=1 %}";
-    }
+    {% comment %} function goToBuildingDetails(id) {
+      window.location.href = "{% url 'building' building_id=" + id + " %}";
+    } {% endcomment %}
 </script>
     {% endblock %}

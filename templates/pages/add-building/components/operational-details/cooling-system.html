@@ -46,6 +46,7 @@
       </button>
     </div>
     <form id="cooling-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
+        {% csrf_token %}
       <div class="px-5 py-4">
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Type of cooling system</legend>
@@ -797,25 +798,10 @@
     const systemData = {
       type: systemType,
       typeName: systemTypeName,
-      data: {}
+      data: formData.entries ? Object.fromEntries(formData.entries()) : {}
     };
 
-    // Get all inputs, selects, and textareas from the form
-    const formElements = form.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-      if (element.name && element.name !== 'cooling-system-type') {
-        if (element.type === 'radio') {
-          if (element.checked) {
-            systemData.data[element.name] = element.value || 'Yes';
-          }
-        } else if (element.type === 'checkbox') {
-          systemData.data[element.name] = element.checked;
-        } else {
-          systemData.data[element.name] = element.value;
-        }
-      }
-    });
-
+    console.log('Saving cooling system data:', systemData);
     // Add or update system
     if (window.editingSystemIndex !== null) {
       window.coolingSystems[window.editingSystemIndex] = systemData;
@@ -823,9 +809,10 @@
       window.coolingSystems.push(systemData);
     }
 
-    // Save form data to StepManager
-    if (typeof StepManager !== 'undefined') {
-      StepManager.saveStepFormData( window.coolingSystems, window.stepManager.getCurrentStepKey() );
+    // Save form data to stepManager
+    if (typeof stepManager !== 'undefined') {
+      console.log('Saving cooling systems data to stepManager:', window.coolingSystems);
+      stepManager.saveStepFormData( window.coolingSystems.map(m => m.data), window.stepManager.getCurrentStepKey() );
     }
 
     // Update the list display
@@ -834,12 +821,6 @@
     // Close modal
     window.closeCoolingSystemModal();
 
-    // Emit form status for step validation
-    if (typeof StepManager !== 'undefined') {
-      StepManager.emitFormStatus(window.coolingSystems.length > 0, {
-        cooling_systems: window.coolingSystems
-      }, window.stepManager.getCurrentStepKey() );
-    }
   }
 
   // Render cooling systems list
@@ -966,13 +947,6 @@
       window.renderCoolingSystems();
       window.deleteSystemIndex = null;
       cooling_system_modal_delete.close();
-
-      // Emit form status for step validation
-      if (typeof StepManager !== 'undefined') {
-        StepManager.emitFormStatus(window.coolingSystems.length > 0, {
-          cooling_systems: window.coolingSystems
-        }, window.stepManager.getCurrentStepKey() );
-      }
     }
   }
 

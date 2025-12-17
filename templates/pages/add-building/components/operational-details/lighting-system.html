@@ -44,6 +44,7 @@
       </button>
     </div>
     <form id="lighting-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
+        {% csrf_token %}
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
@@ -371,7 +372,7 @@
   // Save lighting system
   window.saveLightingSystem = function() {
     const form = document.getElementById('lighting-system-form');
-    
+    const formData = new FormData(form);
     // Get room type and lighting type for display
     const roomTypeSelect = form.querySelector('[name="room_type"]');
     const roomType = roomTypeSelect.value;
@@ -392,24 +393,8 @@
       roomTypeName: roomTypeName,
       lightingType: lightingType,
       lightingTypeName: lightingTypeName,
-      data: {}
+      data: formData.entries ? Object.fromEntries(formData.entries()) : {}
     };
-
-    // Get all inputs, selects, and textareas from the form
-    const formElements = form.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-      if (element.name && element.name !== 'room-type' && element.name !== 'lighting-type') {
-        if (element.type === 'radio') {
-          if (element.checked) {
-            systemData.data[element.name] = element.value;
-          }
-        } else if (element.type === 'checkbox') {
-          systemData.data[element.name] = element.checked;
-        } else {
-          systemData.data[element.name] = element.value;
-        }
-      }
-    });
 
     // Add or update system
     if (window.editingLightingSystemIndex !== null) {
@@ -417,9 +402,9 @@
     } else {
       window.lightingSystems.push(systemData);
     }
-        // Save form data to StepManager
-    if (typeof StepManager !== 'undefined') {
-      StepManager.saveStepFormData(window.lightingSystems, window.stepManager.getCurrentStepKey() );
+        // Save form data to stepManager
+    if (typeof stepManager !== 'undefined') {
+      stepManager.saveStepFormData(window.lightingSystems.map(m => m.data), window.stepManager.getCurrentStepKey() );
     }
     // Update the list display
     window.renderLightingSystems();
@@ -427,12 +412,6 @@
     // Close modal
     window.closeLightingSystemModal();
 
-    // Emit form status for step validation
-    if (typeof StepManager !== 'undefined') {
-      StepManager.emitFormStatus(window.lightingSystems.length > 0, {
-        lighting_systems: window.lightingSystems
-      });
-    }
   }
 
   // Render lighting systems list
@@ -556,12 +535,6 @@
       window.deleteLightingSystemIndex = null;
       lighting_system_modal_delete.close();
 
-      // Emit form status for step validation
-      if (typeof StepManager !== 'undefined') {
-        StepManager.emitFormStatus(window.lightingSystems.length > 0, {
-          lighting_systems: window.lightingSystems
-        });
-      }
     }
   }
 
