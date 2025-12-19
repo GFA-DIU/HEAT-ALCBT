@@ -22,6 +22,11 @@ from .views.building.hot_water_system import (
     get_hot_water_systems,
     delete_hot_water_system
 )
+from .views.building.lift_escalator_system import (
+    create_or_update_lift_escalator_system,
+    get_lift_escalator_systems,
+    delete_lift_escalator_system
+)
 from .views.home import buildings_list
 from .views.resources import resources
 
@@ -73,4 +78,8 @@ urlpatterns = [
     path("hot-water-system/", create_or_update_hot_water_system, name="hot_water_system_create_update"),
     path("hot-water-system/<uuid:building_id>/", get_hot_water_systems, name="hot_water_system_list"),
     path("hot-water-system/<int:system_id>/delete/", delete_hot_water_system, name="hot_water_system_delete"),
+    # Lift & Escalator System endpoints
+    path("lift-escalator-system/", create_or_update_lift_escalator_system, name="lift_escalator_system_create_update"),
+    path("lift-escalator-system/<uuid:building_id>/", get_lift_escalator_systems, name="lift_escalator_system_list"),
+    path("lift-escalator-system/<int:system_id>/delete/", delete_lift_escalator_system, name="lift_escalator_system_delete"),
 ]

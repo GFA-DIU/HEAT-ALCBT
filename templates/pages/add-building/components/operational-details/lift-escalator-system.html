@@ -223,17 +223,27 @@
 </template>
 
 <script>
-  // Store lift & escalator systems data on window to make it globally accessible
-  if (!window.liftEscalatorSystems) {
-    window.liftEscalatorSystems = [];
-  }
-  if (!window.editingLiftEscalatorSystemIndex) {
-    window.editingLiftEscalatorSystemIndex = null;
+  // Track editing state
+  if (!window.editingLiftEscalatorSystemId) {
+    window.editingLiftEscalatorSystemId = null;
   }
 
-  // Open modal for adding new system
+  // Helper to get CSRF token
+  function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+  }
+
+  // Helper to get building ID from session/localStorage
+  function getBuildingId() {
+    // Try to get from stepManager or localStorage
+    const buildingData = JSON.parse(localStorage.getItem('building-form-data') || '{}');
+    return buildingData['building-information/building-name-location']?.building_id ||
+           sessionStorage.getItem('building_id');
+  }
+
+  // Open modal
   window.openLiftEscalatorSystemModal = function() {
-    window.editingLiftEscalatorSystemIndex = null;
+    window.editingLiftEscalatorSystemId = null;
     document.getElementById('lift-escalator-system-form').reset();
     lift_escalator_system_modal.showModal();
   }
@@ -241,46 +251,79 @@
   // Close modal
   window.closeLiftEscalatorSystemModal = function() {
     lift_escalator_system_modal.close();
-    window.editingLiftEscalatorSystemIndex = null;
+    window.editingLiftEscalatorSystemId = null;
   }
 
-  // Save lift & escalator system
-  window.saveLiftEscalatorSystem = function() {
+  // Save lift & escalator system - POST to API
+  window.saveLiftEscalatorSystem = async function() {
     const form = document.getElementById('lift-escalator-system-form');
     const formData = new FormData(form);
 
+    // Get number of lifts
+    const numberOfLifts = formData.get('number_of_lifts');
+
+    if (!numberOfLifts) {
+      alert('Please enter the number of lifts');
+      return;
+    }
+
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      alert('Building ID not found. Please save building information first.');
+      return;
+    }
+
     // Collect all form data
-    const systemData = {
-      data: formData.entries ? Object.fromEntries(formData.entries()) : {}
-    };
- 
-    // Add or update system
-    if (window.editingLiftEscalatorSystemIndex !== null) {
-      window.liftEscalatorSystems[window.editingLiftEscalatorSystemIndex] = systemData;
-    } else {
-      window.liftEscalatorSystems.push(systemData);
-    }
-        // Save form data to stepManager
-    if (typeof stepManager !== 'undefined') {
-      stepManager.saveStepFormData(window.liftEscalatorSystems.map(m => m.data), window.stepManager.getCurrentStepKey() );
-    }
-    // Update the list display
-    window.renderLiftEscalatorSystems();
+    const systemData = Object.fromEntries(formData.entries());
+    systemData.building_id = buildingId;
 
-    // Close modal
-    window.closeLiftEscalatorSystemModal();
+    // If editing, include the system ID
+    if (window.editingLiftEscalatorSystemId) {
+      systemData.lift_escalator_system_id = window.editingLiftEscalatorSystemId;
+    }
 
+    try {
+      // Save to database via API
+      const response = await fetch('/lift-escalator-system/', {
+        method: window.editingLiftEscalatorSystemId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify(systemData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Success - reload the list
+        await window.renderLiftEscalatorSystems();
+        window.closeLiftEscalatorSystemModal();
+
+        // Show success message
+        console.log(result.message);
+      } else {
+        // Show validation errors
+        alert('Error saving lift & escalator system:\n' + JSON.stringify(result.errors || result.error));
+      }
+    } catch (error) {
+      console.error('Error saving lift & escalator system:', error);
+      alert('Failed to save lift & escalator system. Please try again.');
+    }
   }
 
-  // Render lift & escalator systems list
-  window.renderLiftEscalatorSystems = function() {
+  // Render lift & escalator systems list - FETCH from database
+  window.renderLiftEscalatorSystems = async function() {
     const listContainer = document.getElementById('lift-escalator-systems-list');
-    
-    if (window.liftEscalatorSystems.length === 0) {
+
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
       listContainer.innerHTML = `
         <li class="flex flex-col items-center justify-center py-8 text-center">
-          <span data-icon="stairs-line" data-size="48" data-color="var(--icon--soft-400)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No lift & escalator systems added yet</p>
+          <span data-icon="alert-fill" data-size="48" data-color="var(--state--warning--base)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Please save building information first</p>
         </li>
       `;
       if (window.IconComponent) {
@@ -289,103 +332,175 @@
       return;
     }
 
-    listContainer.innerHTML = window.liftEscalatorSystems.map((system, index) => {
-      // Extract key details for display
-      const numberOfLifts = system.data['number_of_lifts'] || 'N/A';
-      const regenerativeFeatures = system.data['lift_regenerative_features'] || 'N/A';
-      
-      return `
-        <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
-          <span
-            data-icon="stairs-line"
-            data-size="20"
-            data-color="var(--icon--strong-950)"
-            class="shrink-0 self-start"
-          ></span>
-          <div class="flex flex-col flex-1">
-            <p class="text-sm/5 font-medium">Lift & Escalator System ${index + 1}</p>
-            <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-              <span class="border-r border-[var(--text--sub-600)] pr-1">Number of lifts: ${numberOfLifts}</span>
-              <span>Regenerative features: ${regenerativeFeatures}</span>
-            </p>
-          </div>
-          <div class="flex items-center gap-3">
-            <button class="btn size-5 btn-ghost p-0" onclick="editLiftEscalatorSystem(${index})">
-              <span
-                data-icon="edit-line"
-                data-size="16"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-            <button
-              class="btn size-5 btn-ghost p-0"
-              onclick="confirmDeleteLiftEscalatorSystem(${index})"
-            >
-              <span
-                data-icon="delete-bin-5-line"
-                data-size="16"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-          </div>
+    try {
+      // Fetch from database
+      const response = await fetch(`/lift-escalator-system/${buildingId}/`);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        console.error('Failed to load lift & escalator systems');
+        return;
+      }
+
+      const systems = result.lift_escalator_systems || [];
+
+      if (systems.length === 0) {
+        listContainer.innerHTML = `
+          <li class="flex flex-col items-center justify-center py-8 text-center">
+            <span data-icon="stairs-line" data-size="48" data-color="var(--icon--soft-400)"></span>
+            <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No lift & escalator systems added yet</p>
+          </li>
+        `;
+        if (window.IconComponent) {
+          window.IconComponent.initialize();
+        }
+        return;
+      }
+
+      // Render systems from database
+      listContainer.innerHTML = systems.map((system) => {
+        const numberOfLifts = system.number_of_lifts || 'N/A';
+        const regenerativeFeatures = system.lift_regenerative_features ? 'Yes' : 'No';
+
+        return `
+          <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
+            <span
+              data-icon="stairs-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+              class="shrink-0 self-start"
+            ></span>
+            <div class="flex flex-col flex-1">
+              <p class="text-sm/5 font-medium">Lift & Escalator System ${system.id}</p>
+              <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+                <span class="border-r border-[var(--text--sub-600)] pr-1">Number of lifts: ${numberOfLifts}</span>
+                <span>Regenerative features: ${regenerativeFeatures}</span>
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button class="btn size-5 btn-ghost p-0" onclick="editLiftEscalatorSystem(${system.id})">
+                <span
+                  data-icon="edit-line"
+                  data-size="16"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+              </button>
+              <button
+                class="btn size-5 btn-ghost p-0"
+                onclick="confirmDeleteLiftEscalatorSystem(${system.id})"
+              >
+                <span
+                  data-icon="delete-bin-5-line"
+                  data-size="16"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+              </button>
+            </div>
+          </li>
+        `;
+      }).join('');
+
+      // initialize icons again
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
+    } catch (error) {
+      console.error('Error loading lift & escalator systems:', error);
+      listContainer.innerHTML = `
+        <li class="flex flex-col items-center justify-center py-8 text-center">
+          <span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading lift & escalator systems</p>
         </li>
       `;
-    }).join('');
-
-    // Reinitialize icons
-    if (window.IconComponent) {
-      window.IconComponent.initialize();
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
     }
   }
 
-  // Edit lift & escalator system
-  window.editLiftEscalatorSystem = function(index) {
-    window.editingLiftEscalatorSystemIndex = index;
-    const system = window.liftEscalatorSystems[index];
+  // Edit lift & escalator system - LOAD from database
+  window.editLiftEscalatorSystem = async function(systemId) {
+    window.editingLiftEscalatorSystemId = systemId;
 
-    // Reset form
-    document.getElementById('lift-escalator-system-form').reset();
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      alert('Building ID not found');
+      return;
+    }
 
-    // Populate all form fields
-    setTimeout(() => {
+    try {
+      // Fetch all systems to find the one we're editing
+      const response = await fetch(`/lift-escalator-system/${buildingId}/`);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        alert('Failed to load lift & escalator system');
+        return;
+      }
+
+      const system = result.lift_escalator_systems.find(s => s.id === systemId);
+      if (!system) {
+        alert('Lift & escalator system not found');
+        return;
+      }
+
+      // Reset form
       const form = document.getElementById('lift-escalator-system-form');
-      
-      Object.keys(system.data).forEach(fieldName => {
-        const field = form.querySelector(`[name="${fieldName}"]`);
-        if (field) {
-          if (field.type === 'radio') {
-            const radioButton = form.querySelector(`[name="${fieldName}"][value="${system.data[fieldName]}"]`);
-            if (radioButton) radioButton.checked = true;
-          } else if (field.type === 'checkbox') {
-            field.checked = system.data[fieldName];
-          } else {
-            field.value = system.data[fieldName];
-          }
-        }
-      });
-    }, 100);
+      form.reset();
 
-    lift_escalator_system_modal.showModal();
+      // Populate form fields
+      form.querySelector('[name="number_of_lifts"]').value = system.number_of_lifts;
+      form.querySelector('[name="lift_regenerative_features"]').value = system.lift_regenerative_features ? 'yes' : 'no';
+      form.querySelector('[name="vvvf_sleep_mode"]').value = system.vvvf_sleep_mode ? 'yes' : 'no';
+
+      if (system.annual_energy_consumption_kwh !== null) {
+        form.querySelector('[name="annual_energy_consumption"]').value = system.annual_energy_consumption_kwh;
+      }
+
+      lift_escalator_system_modal.showModal();
+    } catch (error) {
+      console.error('Error loading lift & escalator system for edit:', error);
+      alert('Failed to load lift & escalator system');
+    }
   }
 
   // Confirm delete
-  if (!window.deleteLiftEscalatorSystemIndex) {
-    window.deleteLiftEscalatorSystemIndex = null;
+  if (!window.deleteLiftEscalatorSystemId) {
+    window.deleteLiftEscalatorSystemId = null;
   }
-  
-  window.confirmDeleteLiftEscalatorSystem = function(index) {
-    window.deleteLiftEscalatorSystemIndex = index;
+
+  window.confirmDeleteLiftEscalatorSystem = function(systemId) {
+    window.deleteLiftEscalatorSystemId = systemId;
     lift_escalator_system_modal_delete.showModal();
   }
 
-  // Delete lift & escalator system
-  window.deleteLiftEscalatorSystem = function() {
-    if (window.deleteLiftEscalatorSystemIndex !== null) {
-      window.liftEscalatorSystems.splice(window.deleteLiftEscalatorSystemIndex, 1);
-      window.renderLiftEscalatorSystems();
-      window.deleteLiftEscalatorSystemIndex = null;
-      lift_escalator_system_modal_delete.close();
+  // Delete lift & escalator system - DELETE from database
+  window.deleteLiftEscalatorSystem = async function() {
+    if (window.deleteLiftEscalatorSystemId !== null) {
+      try {
+        const response = await fetch(`/lift-escalator-system/${window.deleteLiftEscalatorSystemId}/delete/`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRFToken': getCSRFToken()
+          }
+        });
 
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          // Success - reload the list
+          await window.renderLiftEscalatorSystems();
+          window.deleteLiftEscalatorSystemId = null;
+          lift_escalator_system_modal_delete.close();
+          console.log('Lift & escalator system deleted successfully');
+        } else {
+          alert('Failed to delete lift & escalator system');
+        }
+      } catch (error) {
+        console.error('Error deleting lift & escalator system:', error);
+        alert('Failed to delete lift & escalator system');
+      }
     }
   }
 
