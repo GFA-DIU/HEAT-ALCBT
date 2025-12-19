@@ -4,6 +4,7 @@ Each step loads a template and provides necessary context data.
 """
 
 import logging
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -12,6 +13,10 @@ from django.views.decorators.http import require_http_methods
 
 from pages.models.base import ALCBTCountryManager
 from pages.models.building import BuildingCategory
+
+from django.db import transaction
+from pages.models import Building, HotWaterSystem
+from pages.forms.hot_water_system_form import HotWaterSystemForm
 
 
 @login_required
@@ -231,10 +236,6 @@ def complete_building_setup(request):
     Complete the building setup and create the building record.
     This combines all step data and creates the final building.
     """
-    import json
-    from django.db import transaction
-    from pages.models import Building, HotWaterSystem
-    from pages.forms.hot_water_system_form import HotWaterSystemForm
 
     try:
         # Get all saved step data from session
