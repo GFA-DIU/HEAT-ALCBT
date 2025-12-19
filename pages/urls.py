@@ -16,6 +16,8 @@ from .views.building.add_building_steps import (building_step_view,
                                                 save_building_step)
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
+from .views.building.building_step_operational import \
+    building_step_operational_products
 from .views.building.components import building_components, new_building
 from .views.home import buildings_list
 from .views.resources import resources
@@ -44,6 +46,7 @@ urlpatterns = [
     path("building/step", building_step_view, name="building_step"),
     path("building/step/save", save_building_step, name="save_building_step"),
     path("building/step/data", get_building_step_data, name="get_building_step_data"),
+    path("building/step/operational", building_step_operational_products, name="building_step_operational"),
     path("building/complete", complete_building_setup, name="complete_building_setup"),
     path("building/<uuid:building_id>/", building, name="building"),
     path(

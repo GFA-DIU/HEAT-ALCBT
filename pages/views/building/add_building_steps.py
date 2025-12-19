@@ -3,6 +3,8 @@ Views for handling the multi-step building creation process.
 Each step loads a template and provides necessary context data.
 """
 
+
+
 import logging
 
 from django.contrib.auth.decorators import login_required
@@ -10,9 +12,12 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
+from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
 from pages.models.building import BuildingCategory
+from pages.models.epd import EPD, MaterialCategory
 
+logger = logging.getLogger(__name__)
 
 @login_required
 @require_http_methods(["GET"])
@@ -148,8 +153,67 @@ def handle_hot_water_step(request):
 
 # Step 3: Operational Data Entry
 def handle_operational_data_step(request):
-    """Handle operational energy carrier data entry step."""
-    context = {}
+
+    # Initialize filter form with pre-filled operational filters
+    epd_filters_form = EPDsFilterForm()
+    
+    # Lock category and subcategory for operational products
+    # Category: "Others" (ID: 9), Subcategory: "Energy carrier - delivery free user" (ID: 9.2)
+    try:
+        category = MaterialCategory.objects.get(category_id="9")
+        subcategory = MaterialCategory.objects.get(category_id="9.2")
+        
+        # Set initial values and disable these fields
+        epd_filters_form.fields['category'].initial = category
+        epd_filters_form.fields['category'].disabled = True
+        epd_filters_form.fields['subcategory'].initial = subcategory
+        epd_filters_form.fields['subcategory'].disabled = True
+        epd_filters_form.fields['subcategory'].queryset = MaterialCategory.objects.filter(
+            level=2, parent=category
+        )
+        epd_filters_form.fields['childcategory'].queryset = MaterialCategory.objects.filter(
+            level=3, parent=subcategory
+        ).order_by("name_en")
+    except MaterialCategory.DoesNotExist:
+        logger.warning("Energy carrier categories not found")
+    
+    # Load previously saved operational products from session
+    selected_products = []
+    building_data = request.session.get("building_form_data", {})
+    operational_data = building_data.get("operational_products", [])
+    
+    for product_data in operational_data:
+        try:
+            epd = EPD.objects.get(id=product_data["id"])
+            
+            # Get available units and ensure it's a list
+            available_units = epd.get_available_units()
+            if available_units is None:
+                available_units = [epd.declared_unit]
+            elif isinstance(available_units, set):
+                available_units = sorted(list(available_units))
+            elif not isinstance(available_units, list):
+                available_units = list(available_units)
+            
+            selected_products.append({
+                "id": str(epd.id),
+                "name": epd.name,
+                "country": epd.country.name if epd.country else "Unknown",
+                "category": epd.category.name_en if epd.category else "Unknown",
+                "description": product_data.get("description", ""),
+                "selection_unit": product_data.get("unit", epd.declared_unit),
+                "selection_quantity": product_data.get("quantity", ""),
+                "timestamp": product_data.get("timestamp", ""),
+                "op_units": available_units,
+            })
+        except EPD.DoesNotExist:
+            logger.warning(f"EPD {product_data['id']} not found")
+    
+    context = {
+        'epd_filters_form': epd_filters_form,
+        'countries': ALCBTCountryManager.get_all_countries(),
+        'selected_products': selected_products,
+    }
     return render(
         request,
         "pages/add-building/components/operational-data-entry/operational-data-entry.html",
@@ -255,4 +319,5 @@ def complete_building_setup(request):
         })
         
     except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
         return JsonResponse({"error": str(e)}, status=500)

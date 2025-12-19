@@ -1,5 +1,9 @@
+{% load crispy_forms_tags %}
+{% load static %}
 <div
   class="flex items-center gap-2 p-2 rounded-lg bg-[var(--state--faded--lighter)]"
+  id="select_epd_text"
+  {% if selected_products %}hidden{% endif %}
 >
   <span
     data-icon="information-2-line"
@@ -14,6 +18,7 @@
     <button
       class="btn btn-outline w-fit"
       onclick="energy_carrier_modal.showModal()"
+      type="button"
     >
       <span
         data-icon="add-large-fill"
@@ -25,63 +30,58 @@
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
     ></div>
-    <ul class="grid grid-cols-1">
-      <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="gas-station-line"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-          class="shrink-0 self-start"
-        ></span>
-        <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">Diesel</p>
-          <div class="flex items-stretch gap-2">
-            <label class="input w-full">
-              <input type="text" placeholder="Add a description" />
-            </label>
-            <label class="input pr-0">
-              <input type="number" placeholder="Quantity" />
-              <select
-                class="select select-ghost w-fit !outline-none !border-none"
-              >
-                <option selected value="kg">kg</option>
-                <option value="liters">liters</option>
-                <option value="kwh">kwh</option>
-                <option value="m³">m³</option>
-              </select>
-            </label>
-          </div>
+    
+    <!-- Selected Products Container -->
+    <form id="operational-products-form"
+          hx-post="{% url 'building_step_operational' %}"
+          hx-vals='{"action": "save_op_products"}'
+          hx-target="#operational-products-form"
+          hx-swap="outerHTML">
 
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0 mt-1">
-            <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Airflow rate: 45CMH</span
-            >
-            <span>Capacity units: m<sup>3</sup>/hr</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="energy_carrier_modal_delete.showModal()"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
-    </ul>
+      <ul class="grid grid-cols-1 gap-2" id="selected_op_products">
+        {% if selected_products %}
+          {% for epd in selected_products %}
+            {% include 'pages/add-building/components/operational-data-entry/_selected_product.html' with epd=epd %}
+            {% empty %}
+            <div id="no-energy-carrier-template">
+              <div class="w-full flex flex-col gap-3 items-center justify-center mt-10">
+                <img src="{% static 'assets/energy-carrier.png' %}" alt="Energy Carrier Image" />
+                <p class="text-sm/5 font-medium">
+                  Click button below to add a energy carrier
+                </p>
+                <button class="btn btn-primary" onclick="energy_carrier_modal.showModal()">
+                  Add an energy carrier
+                </button>
+              </div>
+            </div>
+          {% endfor %}
+          {% else%}
+            <div id="no-energy-carrier-template">
+              <div class="w-full flex flex-col gap-3 items-center justify-center mt-10">
+                <img src="{% static 'assets/energy-carrier.png' %}" alt="Energy Carrier Image" />
+                <p class="text-sm/5 font-medium">
+                  Click button below to add a energy carrier
+                </p>
+                <button class="btn btn-primary" onclick="energy_carrier_modal.showModal()">
+                  Add an energy carrier
+                </button>
+              </div>
+            </div>
+        {% endif %}
+      </ul>
+      
+      <div class="flex items-center gap-2 mt-4" id="save_button_container" {% if not selected_products %}hidden{% endif %}>
+        <button 
+          type="submit" 
+          class="btn btn-sm btn-primary" 
+          id="save_button"
+        >
+          <span data-icon="save-line" data-size="16" data-color="currentColor"></span>
+          Save Energy Carriers
+        </button>
+        <span class="text-xs text-[var(--text--sub-600)]" id="save_status"></span>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -89,7 +89,7 @@
   <div
     class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[44.5rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
   >
-    <div class="flex justify-between p-5 w-full">
+    <div class="flex justify-between p-5 w-full border-b border-[var(--stroke--soft-200)]">
       <h3 class="text-lg/6 font-medium">Energy Carrier Emission Factor</h3>
       <button
         type="button"
@@ -103,11 +103,16 @@
         ></span>
       </button>
     </div>
-    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+    
+    <div class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-2.5 w-full">
-        <div
-          class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
-        >
+        <!-- Filter Form -->
+        <form id="epd-filter-form" 
+              hx-post="{% url 'building_step_operational' %}"
+              hx-vals='{"action": "filter"}'
+              hx-target="#operational-epd-list"
+              hx-swap="innerHTML"
+              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]">
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
               <span
@@ -115,31 +120,25 @@
                 data-size="16"
                 data-color="var(--icon--soft-400)"
               ></span>
-              <input type="text" placeholder="Search..." />
+              <input 
+                type="text" 
+                name="search_query"
+                placeholder="Search energy carriers..." 
+              />
             </label>
-            <select class="select">
-              <option selected value="usa">
-                <span data-country="US" data-width="20"></span>
-                <span data-country="US" data-flag="false"></span>
-              </option>
-              <option value="canada">
-                <span data-country="CA" data-width="20"></span>
-                <span data-country="CA" data-flag="false"></span>
-              </option>
-              <option value="uk">
-                <span data-country="GB" data-width="20"></span>
-                <span data-country="GB" data-flag="false"></span>
-              </option>
-              <option value="australia">
-                <span data-country="AU" data-width="20"></span>
-                <span data-country="AU" data-flag="false"></span>
-              </option>
+            <select name="country" class="select min-w-[120px]">
+              <option value="">All Countries</option>
+              {% for country in countries %}
+              <option value="{{ country.id }}">{{ country.name }}</option>
+              {% endfor %}
             </select>
           </div>
+          
+          <!-- Advanced Search Collapse -->
           <div class="collapse rounded-none">
-            <input type="checkbox" class="peer" />
+            <input type="checkbox" class="peer" id="advanced-search-toggle" />
             <div
-              class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
+              class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)] cursor-pointer"
             >
               <span class="flex items-center gap-2">
                 <span
@@ -149,19 +148,60 @@
                 ></span>
                 Advanced Search
                 <span class="text-xs/5 text-[var(--text--sub-600)]"
-                  >Click here for a more advanced search option</span
+                  >Click here for more advanced filters</span
                 >
               </span>
               <span
                 data-icon="caret-down"
                 data-size="16"
                 data-color="var(--icon--soft-400)"
-                class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"
+                class="transition-transform duration-300 ease-in-out peer-checked:rotate-180"
               ></span>
             </div>
             <div class="collapse-content mt-0 px-0">
               <div class="grid grid-cols-4 gap-2">
-                <label class="relative">
+                <!-- Category - Pre-filled and disabled -->
+                <label class="relative col-span-2">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  {% if epd_filters_form.category.initial %}
+                  <select
+                    name="category"
+                    class="select py-0 pl-8 h-9 text-sm/5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)]"
+                    disabled
+                  >
+                    <option selected>{{ epd_filters_form.category.initial.name_en }}</option>
+                  </select>
+                  <input type="hidden" name="category" value="{{ epd_filters_form.category.initial.id }}" />
+                  {% endif %}
+                </label>
+                
+                <!-- Sub-category - Pre-filled and disabled -->
+                <label class="relative col-span-2">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  {% if epd_filters_form.subcategory.initial %}
+                  <select
+                    name="subcategory"
+                    class="select py-0 pl-8 h-9 text-sm/5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)]"
+                    disabled
+                  >
+                    <option selected>{{ epd_filters_form.subcategory.initial.name_en }}</option>
+                  </select>
+                  <input type="hidden" name="subcategory" value="{{ epd_filters_form.subcategory.initial.id }}" />
+                  {% endif %}
+                </label>
+                
+                <!-- Child-category - User selectable -->
+                <label class="relative col-span-2">
                   <span
                     data-icon="filter-3-line"
                     data-size="20"
@@ -169,15 +209,18 @@
                     class="select-icon w-8"
                   ></span>
                   <select
+                    name="childcategory"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option disabled selected value="">Category</option>
-                    <option value="solid">Solid</option>
-                    <option value="liquid">Liquid</option>
-                    <option value="gas">Gas</option>
+                    <option value="">All Types</option>
+                    {% for child in epd_filters_form.childcategory.field.queryset %}
+                    <option value="{{ child.id }}">{{ child.name_en }}</option>
+                    {% endfor %}
                   </select>
                 </label>
-                <label class="relative">
+                
+                <!-- EPD Type -->
+                <label class="relative col-span-2">
                   <span
                     data-icon="filter-3-line"
                     data-size="20"
@@ -185,289 +228,51 @@
                     class="select-icon w-8"
                   ></span>
                   <select
+                    name="type"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option disabled selected value="">Sub-category</option>
-                    <option value="solid">Solid</option>
-                    <option value="liquid">Liquid</option>
-                    <option value="gas">Gas</option>
-                  </select>
-                </label>
-                <label class="relative">
-                  <span
-                    data-icon="filter-3-line"
-                    data-size="20"
-                    data-color="var(--icon--soft-400)"
-                    class="select-icon w-8"
-                  ></span>
-                  <select
-                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                  >
-                    <option disabled selected value="">Child-category</option>
-                    <option value="natural-gas">Natural gas</option>
-                    <option value="liquid-gas">Liquid gas</option>
-                    <option value="heating-oil">Heating oil</option>
-                    <option value="wood-pellets">Wood pellets</option>
-                    <option value="electricity">Electricity</option>
-                    <option value="district-heat">District heat</option>
-                    <option value="biogas">Biogas</option>
-                    <option value="solid-fuel">Solid fuel</option>
-                  </select>
-                </label>
-                <label class="relative">
-                  <span
-                    data-icon="filter-3-line"
-                    data-size="20"
-                    data-color="var(--icon--soft-400)"
-                    class="select-icon w-8"
-                  ></span>
-                  <select
-                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                  >
-                    <option disabled selected value="">EPD type</option>
-                    <option value="solid">Solid</option>
-                    <option value="liquid">Liquid</option>
-                    <option value="gas">Gas</option>
+                    <option value="">All EPD Types</option>
+                    <option value="generic">Generic</option>
+                    <option value="official">Official</option>
                   </select>
                 </label>
               </div>
             </div>
           </div>
-          <button class="btn btn-outline btn-block" disabled>Search</button>
+          <button class="btn btn-outline btn-block mt-2" type="submit">
+            <span data-icon="search-2-line" data-size="16" data-color="currentColor"></span>
+            Search
+          </button>
+        </form>
+        
+        <!-- EPD List Container -->
+        <div id="operational-epd-list" 
+             class="mt-4"
+             hx-get="{% url 'building_step_operational' %}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+          <!-- Loading state -->
+          <div class="flex justify-center items-center py-8">
+            <span class="loading loading-spinner loading-lg"></span>
+          </div>
         </div>
-        <ul class="grid grid-cols-1">
-          <li
-            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
-          >
-            <div class="flex flex-col gap-2.5">
-              <div class="flex items-center">
-                <span>Fire wood (log wood)</span>
-                <div
-                  class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--weak-50)] gap-1 flex items-center"
-                >
-                  <span
-                    data-icon="pushpin-fill"
-                    data-size="16"
-                    data-color="var(--icon--soft-400)"
-                  ></span>
-                  <span class="text-[var(--text--sub-600)]">Generic</span>
-                </div>
-              </div>
-              <div class="flex items-center gap-1.25">
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Solid fuel</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Unit: kwh</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >0.01 kgC02eq</span
-                >
-              </div>
-            </div>
-            <button
-              class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
-              type="button"
-            >
-              <span
-                data-icon="add-large-fill"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-              Add
-            </button>
-          </li>
-          <li
-            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)] bg-[var(--bg--weak-50)]"
-          >
-            <div class="flex flex-col gap-2.5">
-              <div class="flex items-center">
-                <span>Heavy fuel oil</span>
-                <div
-                  class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--weak-50)] gap-1 flex items-center"
-                >
-                  <span
-                    data-icon="pushpin-fill"
-                    data-size="16"
-                    data-color="var(--icon--soft-400)"
-                  ></span>
-                  <span class="text-[var(--text--sub-600)]">Generic</span>
-                </div>
-              </div>
-              <div class="flex items-center gap-1.25">
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Solid fuel</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Unit: kwh</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >0.01 kgC02eq</span
-                >
-              </div>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <button
-                class="btn btn-sm bg-[var(--primary-green)] p-0 size-8 rounded-full"
-              >
-                <span
-                  data-icon="check-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button
-                class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
-                type="button"
-              >
-                Remove
-              </button>
-            </div>
-          </li>
-          <li
-            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
-          >
-            <div class="flex flex-col gap-2.5">
-              <div class="flex items-center">
-                <span>Fire wood (wood pellets)</span>
-                <div
-                  class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--weak-50)] gap-1 flex items-center"
-                >
-                  <span
-                    data-icon="pushpin-fill"
-                    data-size="16"
-                    data-color="var(--icon--soft-400)"
-                  ></span>
-                  <span class="text-[var(--text--sub-600)]">Generic</span>
-                </div>
-              </div>
-              <div class="flex items-center gap-1.25">
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Solid fuel</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Unit: kwh</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >0.01 kgC02eq</span
-                >
-              </div>
-            </div>
-            <button
-              class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
-              type="button"
-            >
-              <span
-                data-icon="add-large-fill"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-              Add
-            </button>
-          </li>
-          <li
-            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
-          >
-            <div class="flex flex-col gap-2.5">
-              <div class="flex items-center">
-                <span>Light fuel oil</span>
-                <div
-                  class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--weak-50)] gap-1 flex items-center"
-                >
-                  <span
-                    data-icon="pushpin-fill"
-                    data-size="16"
-                    data-color="var(--icon--soft-400)"
-                  ></span>
-                  <span class="text-[var(--text--sub-600)]">Generic</span>
-                </div>
-              </div>
-              <div class="flex items-center gap-1.25">
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Solid fuel</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Unit: kwh</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >0.01 kgC02eq</span
-                >
-              </div>
-            </div>
-            <button
-              class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
-              type="button"
-            >
-              <span
-                data-icon="add-large-fill"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-              Add
-            </button>
-          </li>
-        </ul>
-      </div>
-    </form>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <div class="flex items-center gap-2">
-        <button class="btn btn-ghost py-2 px-3">
-          <span
-            data-icon="arrow-left"
-            data-size="20"
-            data-color="var(--icon--soft-400)"
-          ></span>
-          Previous
-        </button>
-        <ul class="flex items-center gap-2">
-          <li>
-            <button class="btn btn-sm rounded-[var(--radius-8)] btn-neutral">
-              1
-            </button>
-          </li>
-          <li>
-            <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
-              2
-            </button>
-          </li>
-          <li>
-            <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
-              3
-            </button>
-          </li>
-        </ul>
-        <button class="btn btn-ghost py-2 px-3">
-          Next
-          <span
-            data-icon="arrow-right"
-            data-size="20"
-            data-color="var(--icon--strong-950)"
-          ></span>
-        </button>
-      </div>
-      <div class="flex items-center gap-2">
-        <button
-          class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit"
-        >
-          Cancel
-        </button>
-        <button type="submit" class="btn btn-sm btn-primary w-fit">Save</button>
+
       </div>
     </div>
+    
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <div id="pagination">
+
+      </div>
+      <button
+        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit"
+        onclick="energy_carrier_modal.close()"
+        type="button">
+        Close
+      </button>
+    </div>
+
+
   </div>
 </dialog>
 
@@ -485,8 +290,7 @@
       </div>
       <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        You are about to remove or delete added energy carrier. This will action
-        will permanently remove it.
+        You are about to remove this energy carrier. This action cannot be undone.
       </p>
     </div>
     <div
@@ -495,93 +299,101 @@
       <button
         class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
         onclick="energy_carrier_modal_delete.close()"
+        type="button"
       >
         Cancel
       </button>
-      <button class="btn btn-sm btn-error flex-1">Remove</button>
+      <button 
+        class="btn btn-sm btn-error flex-1" 
+        id="confirm-delete-btn"
+        type="button"
+      >
+        Remove
+      </button>
     </div>
   </div>
 </dialog>
 
-<template id="energy-carrier-template">
-  <div class="w-full flex flex-col">
-    <button
-      class="btn btn-outline w-fit"
-      onclick="energy_carrier_modal.showModal()"
-    >
-      Add energy carrier
-    </button>
-    <div
-      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
-    ></div>
-    <ul class="grid grid-cols-1">
-      <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="gas-station-line"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-          class="shrink-0 self-start"
-        ></span>
-        <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">Diesel</p>
-          <div class="flex items-stretch gap-2">
-            <label class="input w-full">
-              <input type="text" placeholder="Add a description" />
-            </label>
-            <label class="input pr-0">
-              <input type="number" placeholder="Quantity" />
-              <select
-                class="select select-ghost w-fit !outline-none !border-none"
-              >
-                <option selected value="kg">kg</option>
-                <option value="liters">liters</option>
-                <option value="kwh">kwh</option>
-                <option value="m³">m³</option>
-              </select>
-            </label>
-          </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
 
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Airflow rate: 45CMH</span
-            >
-            <span>Capacity units: m<sup>3</sup>/hr</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="energy_carrier_modal_delete.showModal()"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
-    </ul>
-  </div>
-</template>
+    if (window.IconComponent) {
+      window.IconComponent.initialize();
+    }
+  const selectedOpProducts = document.getElementById('selected_op_products');
+  const selectEpdText = document.getElementById('select_epd_text');
+  const saveButtonContainer = document.getElementById('save_button_container');
+  const deleteModal = document.getElementById('energy_carrier_modal_delete');
+  const mainModal = document.getElementById('energy_carrier_modal');
+  let epdToDelete = null;
+  
+  // Update UI based on selected products count
+  function updateUI() {
+    const hasProducts = selectedOpProducts && selectedOpProducts.children.length > 0;
+    if (selectEpdText) selectEpdText.hidden = hasProducts;
+    if (saveButtonContainer) saveButtonContainer.hidden = !hasProducts;
+  }
+  
+  // Handle successful EPD addition
+  document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'selected_op_products') {
+      updateUI();
+      // Close modal after adding
+      if (mainModal) mainModal.close();
+    }
+  });
+  
+  // Handle Remove EPD button clicks
+  if (selectedOpProducts) {
+    selectedOpProducts.addEventListener('click', function(event) {
+      const removeBtn = event.target.closest('.remove-epd');
+      if (removeBtn) {
+        epdToDelete = {
+          id: removeBtn.dataset.epdId,
+          timestamp: removeBtn.dataset.timestamp,
+          elementId: removeBtn.dataset.elementId
+        };
+        deleteModal.showModal();
+      }
+    });
+  }
+  
+  // Handle delete confirmation
+  const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', function() {
+      energy_carrier_modal_delete.open();
+      if (epdToDelete) {
+        const epdElement = document.getElementById(epdToDelete.elementId);
+        if (epdElement) {
+          epdElement.remove();
+          updateUI();
+        }
+        epdToDelete = null;
+      }
+      deleteModal.close();
+    });
+  }
+  
+  // Handle successful save
+  document.body.addEventListener('htmx:afterRequest', function(event) {
+    if (event.detail.target.id === 'operational-products-form' && event.detail.successful) {
+      const saveStatus = document.getElementById('save_status');
+      if (saveStatus) {
+        saveStatus.textContent = 'Saved successfully!';
+        saveStatus.classList.add('text-success');
+        setTimeout(() => {
+          saveStatus.textContent = '';
+          saveStatus.classList.remove('text-success');
+        }, 3000);
+      }
+    }
+  });
+  
+  // Initialize UI on load
+  updateUI();
+});
+</script>
 
-<template id="no-energy-carrier-template">
-  <div class="w-full flex flex-col gap-3 items-center justify-center mt-10">
-    <img src="/src/assets/energy-carrier.png" alt="Energy Carrier Image" />
-    <p class="text-sm/5 font-medium">
-      Click button below to add a energy carrier
-    </p>
-    <button class="btn btn-primary" onclick="energy_carrier_modal.showModal()">
-      Add an energy carrier
-    </button>
-  </div>
-</template>
+<!-- Remove old templates as they're not needed with Django rendering -->
+
