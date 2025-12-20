@@ -32,6 +32,11 @@ from .views.building.lighting_system import (
     get_lighting_systems,
     delete_lighting_system
 )
+from .views.building.ventilation_system import (
+    create_or_update_ventilation_system,
+    get_ventilation_systems,
+    delete_ventilation_system
+)
 from .views.home import buildings_list
 from .views.resources import resources
 
@@ -91,4 +96,8 @@ urlpatterns = [
     path("lighting-system/", create_or_update_lighting_system, name="lighting_system_create_update"),
     path("lighting-system/<uuid:building_id>/", get_lighting_systems, name="lighting_system_list"),
     path("lighting-system/<int:system_id>/delete/", delete_lighting_system, name="lighting_system_delete"),
+    # Ventilation System endpoints
+    path("ventilation-system/", create_or_update_ventilation_system, name="ventilation_system_create_update"),
+    path("ventilation-system/<uuid:building_id>/", get_ventilation_systems, name="ventilation_system_list"),
+    path("ventilation-system/<int:system_id>/delete/", delete_ventilation_system, name="ventilation_system_delete"),
 ]
