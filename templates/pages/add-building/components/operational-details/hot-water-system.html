@@ -1,3 +1,4 @@
+{% load static %}
 <div id="hot-water-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button
@@ -323,7 +324,7 @@
 
 <template id="no-hot-water-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
-    <img src="/src/assets/hot-water-system.png" alt="hot-water System Image" />
+    <img src="{% static 'assets/hot-water-system.png' %}" alt="hot-water System Image" />
     <p class="text-sm/5 font-medium">
       Click button below to add a hot water system
     </p>
@@ -403,14 +404,10 @@
   // Render hot water systems list
   window.renderHotWaterSystems = function() {
     const listContainer = document.getElementById('hot-water-systems-list');
-    
+    const noSystemsContainer = document.getElementById('no-hot-water-system-template');
     if (window.hotWaterSystems.length === 0) {
-      listContainer.innerHTML = `
-        <li class="flex flex-col items-center justify-center py-8 text-center">
-          <span data-icon="temp-cold-line" data-size="48" data-color="var(--icon--soft-400)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No hot water systems added yet</p>
-        </li>
-      `;
+      listContainer.innerHTML = noSystemsContainer.innerHTML;
+
       if (window.IconComponent) {
         window.IconComponent.initialize();
       }

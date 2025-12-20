@@ -363,7 +363,7 @@
 <template id="no-ventilation-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
     <img
-      src="/src/assets/ventilation-system.png"
+      src="{% static '/assets/ventilation-system.png' %}"
       alt="Ventilation System Image"
     />
     <p class="text-sm/5 font-medium">
@@ -442,14 +442,10 @@
   // Render ventilation systems list
   window.renderVentilationSystems = function() {
     const listContainer = document.getElementById('ventilation-systems-list');
-    
+    const noSystemsContainer = document.getElementById('no-ventilation-system-template');
+     // If no systems, show no systems template
     if (window.ventilationSystems.length === 0) {
-      listContainer.innerHTML = `
-        <li class="flex flex-col items-center justify-center py-8 text-center">
-          <span data-icon="windy-fill" data-size="48" data-color="var(--icon--soft-400)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No ventilation systems added yet</p>
-        </li>
-      `;
+      listContainer.innerHTML = noSystemsContainer.innerHTML;
       if (window.IconComponent) {
         window.IconComponent.initialize();
       }
