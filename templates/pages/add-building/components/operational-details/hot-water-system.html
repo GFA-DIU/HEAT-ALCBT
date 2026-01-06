@@ -337,17 +337,27 @@
 </template>
 
 <script>
-  // make water systems globally accessible
-  if (!window.hotWaterSystems) {
-    window.hotWaterSystems = [];
-  }
-  if (!window.editingHotWaterSystemIndex) {
-    window.editingHotWaterSystemIndex = null;
+  // Track editing state
+  if (!window.editingHotWaterSystemId) {
+    window.editingHotWaterSystemId = null;
   }
 
-  // Open modal 
+  // Helper to get CSRF token
+  function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+  }
+
+  // Helper to get building ID from session/localStorage
+  function getBuildingId() {
+    // Try to get from stepManager or localStorage
+    const buildingData = JSON.parse(localStorage.getItem('building-form-data') || '{}');
+    return buildingData['building-information/building-name-location']?.building_id ||
+           sessionStorage.getItem('building_id');
+  }
+
+  // Open modal
   window.openHotWaterSystemModal = function() {
-    window.editingHotWaterSystemIndex = null;
+    window.editingHotWaterSystemId = null;
     document.getElementById('hot-water-system-form').reset();
     hot_water_system_modal.showModal();
   }
@@ -355,60 +365,80 @@
   // Close modal
   window.closeHotWaterSystemModal = function() {
     hot_water_system_modal.close();
-    window.editingHotWaterSystemIndex = null;
+    window.editingHotWaterSystemId = null;
   }
 
-  // Save hot water system
-  window.saveHotWaterSystem = function() {
+  // Save hot water system - POST to API
+  window.saveHotWaterSystem = async function() {
     const form = document.getElementById('hot-water-system-form');
     const formData = new FormData(form);
+
     // Get hot water system type
     const systemTypeSelect = form.querySelector('[name="type_of_hot_water_system"]');
     const systemType = systemTypeSelect.value;
-    const systemTypeName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
 
     if (!systemType) {
       alert('Please select a hot water system type');
       return;
     }
 
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      alert('Building ID not found. Please save building information first.');
+      return;
+    }
+
     // Collect all form data
-    const systemData = {
-      type: systemType,
-      typeName: systemTypeName,
-      data: formData.entries ? Object.fromEntries(formData.entries()) : {}
-    };
+    const systemData = Object.fromEntries(formData.entries());
+    systemData.building_id = buildingId;
 
-   
-    // Add or update system
-    if (window.editingHotWaterSystemIndex !== null) {
-      window.hotWaterSystems[window.editingHotWaterSystemIndex] = systemData;
-    } else {
-      window.hotWaterSystems.push(systemData);
-    }
- 
-        // Save form data to stepManager
-    if (typeof stepManager !== 'undefined') {
-      stepManager.saveStepFormData( window.hotWaterSystems.map(m => m.data), window.stepManager.getCurrentStepKey() );
+    // If editing, include the system ID
+    if (window.editingHotWaterSystemId) {
+      systemData.hot_water_system_id = window.editingHotWaterSystemId;
     }
 
-    // Update the list display
-    window.renderHotWaterSystems();
+    try {
+      // Save to database via API
+      const response = await fetch('/hot-water-system/', {
+        method: window.editingHotWaterSystemId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify(systemData)
+      });
 
-    // Close modal
-    window.closeHotWaterSystemModal();
+      const result = await response.json();
 
+      if (response.ok && result.success) {
+        // Success - reload the list
+        await window.renderHotWaterSystems();
+        window.closeHotWaterSystemModal();
+
+        // Show success message
+        console.log(result.message);
+      } else {
+        // Show validation errors
+        alert('Error saving hot water system:\n' + JSON.stringify(result.errors || result.error));
+      }
+    } catch (error) {
+      console.error('Error saving hot water system:', error);
+      alert('Failed to save hot water system. Please try again.');
+    }
   }
 
-  // Render hot water systems list
-  window.renderHotWaterSystems = function() {
+  // Render hot water systems list - FETCH from database
+  window.renderHotWaterSystems = async function() {
     const listContainer = document.getElementById('hot-water-systems-list');
-    
-    if (window.hotWaterSystems.length === 0) {
+
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
       listContainer.innerHTML = `
         <li class="flex flex-col items-center justify-center py-8 text-center">
-          <span data-icon="temp-cold-line" data-size="48" data-color="var(--icon--soft-400)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No hot water systems added yet</p>
+          <span data-icon="alert-fill" data-size="48" data-color="var(--state--warning--base)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Please save building information first</p>
         </li>
       `;
       if (window.IconComponent) {
@@ -417,106 +447,182 @@
       return;
     }
 
-    listContainer.innerHTML = window.hotWaterSystems.map((system, index) => {
-      // Extract key details for display
-      const fuelType = system.data['fuel_type'] || 'N/A';
-      const powerInput = system.data['power_input'] || 'N/A';
-      
-      return `
-        <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
-          <span
-            data-icon="temp-cold-line"
-            data-size="20"
-            data-color="var(--icon--strong-950)"
-            class="shrink-0 self-start"
-          ></span>
-          <div class="flex flex-col flex-1">
-            <p class="text-sm/5 font-medium">${system.typeName}</p>
-            <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-              <span class="border-r border-[var(--text--sub-600)] pr-1">Fuel type: ${fuelType}</span>
-              <span>Power input: ${powerInput} Kw</span>
-            </p>
-          </div>
-          <div class="flex items-center gap-3">
-            <button class="btn size-5 btn-ghost p-0" onclick="editHotWaterSystem(${index})">
-              <span
-                data-icon="edit-line"
-                data-size="16"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-            <button
-              class="btn size-5 btn-ghost p-0"
-              onclick="confirmDeleteHotWaterSystem(${index})"
-            >
-              <span
-                data-icon="delete-bin-5-line"
-                data-size="16"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-          </div>
+    try {
+      // Fetch from database
+      const response = await fetch(`/hot-water-system/${buildingId}/`);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        console.error('Failed to load hot water systems');
+        return;
+      }
+
+      const systems = result.hot_water_systems || [];
+
+      if (systems.length === 0) {
+        listContainer.innerHTML = `
+          <li class="flex flex-col items-center justify-center py-8 text-center">
+            <span data-icon="temp-cold-line" data-size="48" data-color="var(--icon--soft-400)"></span>
+            <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No hot water systems added yet</p>
+          </li>
+        `;
+        if (window.IconComponent) {
+          window.IconComponent.initialize();
+        }
+        return;
+      }
+
+      // Render systems from database
+      listContainer.innerHTML = systems.map((system) => {
+        const fuelType = system.fuel_type_display || 'N/A';
+        const powerInput = system.power_input || 'N/A';
+
+        return `
+          <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
+            <span
+              data-icon="temp-cold-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+              class="shrink-0 self-start"
+            ></span>
+            <div class="flex flex-col flex-1">
+              <p class="text-sm/5 font-medium">${system.type_of_hot_water_system_display}</p>
+              <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+                <span class="border-r border-[var(--text--sub-600)] pr-1">Fuel type: ${fuelType}</span>
+                <span>Power input: ${powerInput} Kw</span>
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button class="btn size-5 btn-ghost p-0" onclick="editHotWaterSystem(${system.id})">
+                <span
+                  data-icon="edit-line"
+                  data-size="16"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+              </button>
+              <button
+                class="btn size-5 btn-ghost p-0"
+                onclick="confirmDeleteHotWaterSystem(${system.id})"
+              >
+                <span
+                  data-icon="delete-bin-5-line"
+                  data-size="16"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+              </button>
+            </div>
+          </li>
+        `;
+      }).join('');
+
+      // initialize icons again
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
+    } catch (error) {
+      console.error('Error loading hot water systems:', error);
+      listContainer.innerHTML = `
+        <li class="flex flex-col items-center justify-center py-8 text-center">
+          <span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading hot water systems</p>
         </li>
       `;
-    }).join('');
-
-    // initialize icons again
-    if (window.IconComponent) {
-      window.IconComponent.initialize();
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
     }
   }
 
-  // Edit hot water system
-  window.editHotWaterSystem = function(index) {
-    window.editingHotWaterSystemIndex = index;
-    const system = window.hotWaterSystems[index];
+  // Edit hot water system - LOAD from database
+  window.editHotWaterSystem = async function(systemId) {
+    window.editingHotWaterSystemId = systemId;
 
-    // Reset form
-    document.getElementById('hot-water-system-form').reset();
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      alert('Building ID not found');
+      return;
+    }
 
-    // Set system type
-    const systemTypeSelect = document.querySelector('[name="type_of_hot_water_system"]');
-    systemTypeSelect.value = system.type;
+    try {
+      // Fetch all systems to find the one we're editing
+      const response = await fetch(`/hot-water-system/${buildingId}/`);
+      const result = await response.json();
 
-    // Populate all form fields
-    setTimeout(() => {
+      if (!response.ok || !result.success) {
+        alert('Failed to load hot water system');
+        return;
+      }
+
+      const system = result.hot_water_systems.find(s => s.id === systemId);
+      if (!system) {
+        alert('Hot water system not found');
+        return;
+      }
+
+      // Reset form
       const form = document.getElementById('hot-water-system-form');
-      
-      Object.keys(system.data).forEach(fieldName => {
+      form.reset();
+
+      // Populate form fields
+      Object.keys(system).forEach(fieldName => {
         const field = form.querySelector(`[name="${fieldName}"]`);
         if (field) {
-          if (field.type === 'radio') {
-            const radioButton = form.querySelector(`[name="${fieldName}"][value="${system.data[fieldName]}"]`);
-            if (radioButton) radioButton.checked = true;
-          } else if (field.type === 'checkbox') {
-            field.checked = system.data[fieldName];
+          if (field.type === 'select-one') {
+            field.value = system[fieldName];
+          } else if (field.type === 'number') {
+            field.value = system[fieldName];
+          } else if (field.type === 'text') {
+            field.value = system[fieldName];
           } else {
-            field.value = system.data[fieldName];
+            field.value = system[fieldName];
           }
         }
       });
-    }, 100);
 
-    hot_water_system_modal.showModal();
+      hot_water_system_modal.showModal();
+    } catch (error) {
+      console.error('Error loading hot water system for edit:', error);
+      alert('Failed to load hot water system');
+    }
   }
 
   // Confirm delete
-  if (!window.deleteHotWaterSystemIndex) {
-    window.deleteHotWaterSystemIndex = null;
+  if (!window.deleteHotWaterSystemId) {
+    window.deleteHotWaterSystemId = null;
   }
-  
-  window.confirmDeleteHotWaterSystem = function(index) {
-    window.deleteHotWaterSystemIndex = index;
+
+  window.confirmDeleteHotWaterSystem = function(systemId) {
+    window.deleteHotWaterSystemId = systemId;
     hot_water_system_modal_delete.showModal();
   }
 
-  // Delete hot water system
-  window.deleteHotWaterSystem = function() {
-    if (window.deleteHotWaterSystemIndex !== null) {
-      window.hotWaterSystems.splice(window.deleteHotWaterSystemIndex, 1);
-      window.renderHotWaterSystems();
-      window.deleteHotWaterSystemIndex = null;
-      hot_water_system_modal_delete.close();
+  // Delete hot water system - DELETE from database
+  window.deleteHotWaterSystem = async function() {
+    if (window.deleteHotWaterSystemId !== null) {
+      try {
+        const response = await fetch(`/hot-water-system/${window.deleteHotWaterSystemId}/delete/`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRFToken': getCSRFToken()
+          }
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          // Success - reload the list
+          await window.renderHotWaterSystems();
+          window.deleteHotWaterSystemId = null;
+          hot_water_system_modal_delete.close();
+          console.log('Hot water system deleted successfully');
+        } else {
+          alert('Failed to delete hot water system');
+        }
+      } catch (error) {
+        console.error('Error deleting hot water system:', error);
+        alert('Failed to delete hot water system');
+      }
     }
   }
 

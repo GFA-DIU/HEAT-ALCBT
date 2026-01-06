@@ -17,6 +17,11 @@ from .views.building.add_building_steps import (building_step_view,
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
 from .views.building.components import building_components, new_building
+from .views.building.hot_water_system import (
+    create_or_update_hot_water_system,
+    get_hot_water_systems,
+    delete_hot_water_system
+)
 from .views.home import buildings_list
 from .views.resources import resources
 
@@ -64,4 +69,8 @@ urlpatterns = [
         name="boq_edit",
     ),
     path("cookie_groups/", get_cookie_groups, name="cookie_groups"),
+    # Hot Water System endpoints
+    path("hot-water-system/", create_or_update_hot_water_system, name="hot_water_system_create_update"),
+    path("hot-water-system/<uuid:building_id>/", get_hot_water_systems, name="hot_water_system_list"),
+    path("hot-water-system/<int:system_id>/delete/", delete_hot_water_system, name="hot_water_system_delete"),
 ]
