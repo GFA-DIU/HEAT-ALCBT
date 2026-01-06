@@ -27,6 +27,11 @@ from .views.building.lift_escalator_system import (
     get_lift_escalator_systems,
     delete_lift_escalator_system
 )
+from .views.building.lighting_system import (
+    create_or_update_lighting_system,
+    get_lighting_systems,
+    delete_lighting_system
+)
 from .views.home import buildings_list
 from .views.resources import resources
 
@@ -82,4 +87,8 @@ urlpatterns = [
     path("lift-escalator-system/", create_or_update_lift_escalator_system, name="lift_escalator_system_create_update"),
     path("lift-escalator-system/<uuid:building_id>/", get_lift_escalator_systems, name="lift_escalator_system_list"),
     path("lift-escalator-system/<int:system_id>/delete/", delete_lift_escalator_system, name="lift_escalator_system_delete"),
+    # Lighting System endpoints
+    path("lighting-system/", create_or_update_lighting_system, name="lighting_system_create_update"),
+    path("lighting-system/<uuid:building_id>/", get_lighting_systems, name="lighting_system_list"),
+    path("lighting-system/<int:system_id>/delete/", delete_lighting_system, name="lighting_system_delete"),
 ]

@@ -348,17 +348,27 @@
 </template>
 
 <script>
-  // Store lighting systems data on window to make it globally accessible
-  if (!window.lightingSystems) {
-    window.lightingSystems = [];
-  }
-  if (!window.editingLightingSystemIndex) {
-    window.editingLightingSystemIndex = null;
+  // Track editing state
+  if (!window.editingLightingSystemId) {
+    window.editingLightingSystemId = null;
   }
 
-  // Open modal for adding new system
+  // Helper to get CSRF token
+  function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+  }
+
+  // Helper to get building ID from session/localStorage
+  function getBuildingId() {
+    // Try to get from stepManager or localStorage
+    const buildingData = JSON.parse(localStorage.getItem('building-form-data') || '{}');
+    return buildingData['building-information/building-name-location']?.building_id ||
+           sessionStorage.getItem('building_id');
+  }
+
+  // Open modal
   window.openLightingSystemModal = function() {
-    window.editingLightingSystemIndex = null;
+    window.editingLightingSystemId = null;
     document.getElementById('lighting-system-form').reset();
     lighting_system_modal.showModal();
   }
@@ -366,63 +376,79 @@
   // Close modal
   window.closeLightingSystemModal = function() {
     lighting_system_modal.close();
-    window.editingLightingSystemIndex = null;
+    window.editingLightingSystemId = null;
   }
 
-  // Save lighting system
-  window.saveLightingSystem = function() {
+  // Save lighting system - POST to API
+  window.saveLightingSystem = async function() {
     const form = document.getElementById('lighting-system-form');
     const formData = new FormData(form);
-    // Get room type and lighting type for display
-    const roomTypeSelect = form.querySelector('[name="room_type"]');
-    const roomType = roomTypeSelect.value;
-    const roomTypeName = roomTypeSelect.options[roomTypeSelect.selectedIndex].text;
-    
-    const lightingTypeSelect = form.querySelector('[name="lighting_type"]');
-    const lightingType = lightingTypeSelect.value;
-    const lightingTypeName = lightingTypeSelect.options[lightingTypeSelect.selectedIndex].text;
+
+    // Get room type
+    const roomType = formData.get('room_type');
 
     if (!roomType) {
       alert('Please select a room type');
       return;
     }
 
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      alert('Building ID not found. Please save building information first.');
+      return;
+    }
+
     // Collect all form data
-    const systemData = {
-      roomType: roomType,
-      roomTypeName: roomTypeName,
-      lightingType: lightingType,
-      lightingTypeName: lightingTypeName,
-      data: formData.entries ? Object.fromEntries(formData.entries()) : {}
-    };
+    const systemData = Object.fromEntries(formData.entries());
+    systemData.building_id = buildingId;
 
-    // Add or update system
-    if (window.editingLightingSystemIndex !== null) {
-      window.lightingSystems[window.editingLightingSystemIndex] = systemData;
-    } else {
-      window.lightingSystems.push(systemData);
+    // If editing, include the system ID
+    if (window.editingLightingSystemId) {
+      systemData.lighting_system_id = window.editingLightingSystemId;
     }
-        // Save form data to stepManager
-    if (typeof stepManager !== 'undefined') {
-      stepManager.saveStepFormData(window.lightingSystems.map(m => m.data), window.stepManager.getCurrentStepKey() );
+
+    try {
+      // Save to database via API
+      const response = await fetch('/lighting-system/', {
+        method: window.editingLightingSystemId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify(systemData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Success - reload the list
+        await window.renderLightingSystems();
+        window.closeLightingSystemModal();
+
+        // Show success message
+        console.log(result.message);
+      } else {
+        // Show validation errors
+        alert('Error saving lighting system:\n' + JSON.stringify(result.errors || result.error));
+      }
+    } catch (error) {
+      console.error('Error saving lighting system:', error);
+      alert('Failed to save lighting system. Please try again.');
     }
-    // Update the list display
-    window.renderLightingSystems();
-
-    // Close modal
-    window.closeLightingSystemModal();
-
   }
 
-  // Render lighting systems list
-  window.renderLightingSystems = function() {
+  // Render lighting systems list - FETCH from database
+  window.renderLightingSystems = async function() {
     const listContainer = document.getElementById('lighting-systems-list');
-    
-    if (window.lightingSystems.length === 0) {
+
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
       listContainer.innerHTML = `
         <li class="flex flex-col items-center justify-center py-8 text-center">
-          <span data-icon="lightbulb-line" data-size="48" data-color="var(--icon--soft-400)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No lighting systems added yet</p>
+          <span data-icon="alert-fill" data-size="48" data-color="var(--state--warning--base)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Please save building information first</p>
         </li>
       `;
       if (window.IconComponent) {
@@ -431,110 +457,189 @@
       return;
     }
 
-    listContainer.innerHTML = window.lightingSystems.map((system, index) => {
-      // Extract key details for display
-      const areaOfRoom = system.data['area_of_room'] || 'N/A';
-      const bulbType = system.lightingTypeName || 'N/A';
-      
-      return `
-        <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
-          <span
-            data-icon="lightbulb-line"
-            data-size="20"
-            data-color="var(--icon--strong-950)"
-            class="shrink-0 self-start"
-          ></span>
-          <div class="flex flex-col flex-1">
-            <p class="text-sm/5 font-medium">${system.roomTypeName}</p>
-            <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-              <span class="border-r border-[var(--text--sub-600)] pr-1">Area of room: ${areaOfRoom}m²</span>
-              <span>Bulb type: ${bulbType}</span>
-            </p>
-          </div>
-          <div class="flex items-center gap-3">
-            <button class="btn size-5 btn-ghost p-0" onclick="editLightingSystem(${index})">
-              <span
-                data-icon="edit-line"
-                data-size="16"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-            <button
-              class="btn size-5 btn-ghost p-0"
-              onclick="confirmDeleteLightingSystem(${index})"
-            >
-              <span
-                data-icon="delete-bin-5-line"
-                data-size="16"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-          </div>
+    try {
+      // Fetch from database
+      const response = await fetch(`/lighting-system/${buildingId}/`);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        console.error('Failed to load lighting systems');
+        return;
+      }
+
+      const systems = result.lighting_systems || [];
+
+      if (systems.length === 0) {
+        listContainer.innerHTML = `
+          <li class="flex flex-col items-center justify-center py-8 text-center">
+            <span data-icon="lightbulb-line" data-size="48" data-color="var(--icon--soft-400)"></span>
+            <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No lighting systems added yet</p>
+          </li>
+        `;
+        if (window.IconComponent) {
+          window.IconComponent.initialize();
+        }
+        return;
+      }
+
+      // Render systems from database
+      listContainer.innerHTML = systems.map((system) => {
+        const areaOfRoom = system.area_of_room || 'N/A';
+        const bulbType = system.lighting_bulb_type_display || 'N/A';
+
+        return `
+          <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
+            <span
+              data-icon="lightbulb-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+              class="shrink-0 self-start"
+            ></span>
+            <div class="flex flex-col flex-1">
+              <p class="text-sm/5 font-medium">${system.room_type_display}</p>
+              <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+                <span class="border-r border-[var(--text--sub-600)] pr-1">Area of room: ${areaOfRoom}m²</span>
+                <span>Bulb type: ${bulbType}</span>
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button class="btn size-5 btn-ghost p-0" onclick="editLightingSystem(${system.id})">
+                <span
+                  data-icon="edit-line"
+                  data-size="16"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+              </button>
+              <button
+                class="btn size-5 btn-ghost p-0"
+                onclick="confirmDeleteLightingSystem(${system.id})"
+              >
+                <span
+                  data-icon="delete-bin-5-line"
+                  data-size="16"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+              </button>
+            </div>
+          </li>
+        `;
+      }).join('');
+
+      // initialize icons again
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
+    } catch (error) {
+      console.error('Error loading lighting systems:', error);
+      listContainer.innerHTML = `
+        <li class="flex flex-col items-center justify-center py-8 text-center">
+          <span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading lighting systems</p>
         </li>
       `;
-    }).join('');
-
-    // Reinitialize icons
-    if (window.IconComponent) {
-      window.IconComponent.initialize();
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
     }
   }
 
-  // Edit lighting system
-  window.editLightingSystem = function(index) {
-    window.editingLightingSystemIndex = index;
-    const system = window.lightingSystems[index];
+  // Edit lighting system - LOAD from database
+  window.editLightingSystem = async function(systemId) {
+    window.editingLightingSystemId = systemId;
 
-    // Reset form
-    document.getElementById('lighting-system-form').reset();
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      alert('Building ID not found');
+      return;
+    }
 
-    // Set room type and lighting type
-    const roomTypeSelect = document.querySelector('[name="room_type"]');
-    roomTypeSelect.value = system.roomType;
-    
-    const lightingTypeSelect = document.querySelector('[name="lighting_type"]');
-    lightingTypeSelect.value = system.lightingType;
+    try {
+      // Fetch all systems to find the one we're editing
+      const response = await fetch(`/lighting-system/${buildingId}/`);
+      const result = await response.json();
 
-    // Populate all form fields
-    setTimeout(() => {
+      if (!response.ok || !result.success) {
+        alert('Failed to load lighting system');
+        return;
+      }
+
+      const system = result.lighting_systems.find(s => s.id === systemId);
+      if (!system) {
+        alert('Lighting system not found');
+        return;
+      }
+
+      // Reset form
       const form = document.getElementById('lighting-system-form');
-      
-      Object.keys(system.data).forEach(fieldName => {
-        const field = form.querySelector(`[name="${fieldName}"]`);
-        if (field) {
-          if (field.type === 'radio') {
-            const radioButton = form.querySelector(`[name="${fieldName}"][value="${system.data[fieldName]}"]`);
-            if (radioButton) radioButton.checked = true;
-          } else if (field.type === 'checkbox') {
-            field.checked = system.data[fieldName];
-          } else {
-            field.value = system.data[fieldName];
-          }
-        }
-      });
-    }, 100);
+      form.reset();
 
-    lighting_system_modal.showModal();
+      // Populate form fields (map backend field names to frontend)
+      form.querySelector('[name="room_type"]').value = system.room_type;
+      form.querySelector('[name="area_of_room"]').value = system.area_of_room;
+      form.querySelector('[name="lighting_type"]').value = system.lighting_bulb_type;
+      form.querySelector('[name="number_of_bulbs"]').value = system.number_of_bulbs;
+      form.querySelector('[name="operating_hours_per_day"]').value = system.operation_hours_per_workday;
+      form.querySelector('[name="operating_days_per_week"]').value = system.workdays_per_week;
+      form.querySelector('[name="operating_weeks_per_year"]').value = system.workweeks_per_year;
+      form.querySelector('[name="bulb_power_rating"]').value = system.light_bulb_power_rating_w;
+      form.querySelector('[name="installation_of_sensors"]').value = system.sensors_installed ? 'yes' : 'no';
+
+      if (system.baseline_lighting_power_density !== null) {
+        form.querySelector('[name="baseline_lpd"]').value = system.baseline_lighting_power_density;
+      }
+
+      if (system.total_energy_consumption_kwh_per_year !== null) {
+        form.querySelector('[name="annual_energy_consumption"]').value = system.total_energy_consumption_kwh_per_year;
+      }
+
+      if (system.energy_efficiency_label !== null) {
+        form.querySelector('[name="number_of_stars"]').value = system.energy_efficiency_label;
+      }
+
+      lighting_system_modal.showModal();
+    } catch (error) {
+      console.error('Error loading lighting system for edit:', error);
+      alert('Failed to load lighting system');
+    }
   }
 
   // Confirm delete
-  if (!window.deleteLightingSystemIndex) {
-    window.deleteLightingSystemIndex = null;
+  if (!window.deleteLightingSystemId) {
+    window.deleteLightingSystemId = null;
   }
-  
-  window.confirmDeleteLightingSystem = function(index) {
-    window.deleteLightingSystemIndex = index;
+
+  window.confirmDeleteLightingSystem = function(systemId) {
+    window.deleteLightingSystemId = systemId;
     lighting_system_modal_delete.showModal();
   }
 
-  // Delete lighting system
-  window.deleteLightingSystem = function() {
-    if (window.deleteLightingSystemIndex !== null) {
-      window.lightingSystems.splice(window.deleteLightingSystemIndex, 1);
-      window.renderLightingSystems();
-      window.deleteLightingSystemIndex = null;
-      lighting_system_modal_delete.close();
+  // Delete lighting system - DELETE from database
+  window.deleteLightingSystem = async function() {
+    if (window.deleteLightingSystemId !== null) {
+      try {
+        const response = await fetch(`/lighting-system/${window.deleteLightingSystemId}/delete/`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRFToken': getCSRFToken()
+          }
+        });
 
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          // Success - reload the list
+          await window.renderLightingSystems();
+          window.deleteLightingSystemId = null;
+          lighting_system_modal_delete.close();
+          console.log('Lighting system deleted successfully');
+        } else {
+          alert('Failed to delete lighting system');
+        }
+      } catch (error) {
+        console.error('Error deleting lighting system:', error);
+        alert('Failed to delete lighting system');
+      }
     }
   }
 
