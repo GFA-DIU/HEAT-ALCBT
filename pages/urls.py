@@ -17,6 +17,31 @@ from .views.building.add_building_steps import (building_step_view,
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
 from .views.building.components import building_components, new_building
+from .views.building.hot_water_system import (
+    create_or_update_hot_water_system,
+    get_hot_water_systems,
+    delete_hot_water_system
+)
+from .views.building.lift_escalator_system import (
+    create_or_update_lift_escalator_system,
+    get_lift_escalator_systems,
+    delete_lift_escalator_system
+)
+from .views.building.lighting_system import (
+    create_or_update_lighting_system,
+    get_lighting_systems,
+    delete_lighting_system
+)
+from .views.building.ventilation_system import (
+    create_or_update_ventilation_system,
+    get_ventilation_systems,
+    delete_ventilation_system
+)
+from .views.building.cooling_system import (
+    create_or_update_cooling_system,
+    get_cooling_systems,
+    delete_cooling_system
+)
 from .views.home import buildings_list
 from .views.resources import resources
 
@@ -64,4 +89,24 @@ urlpatterns = [
         name="boq_edit",
     ),
     path("cookie_groups/", get_cookie_groups, name="cookie_groups"),
+    # Hot Water System endpoints
+    path("hot-water-system/", create_or_update_hot_water_system, name="hot_water_system_create_update"),
+    path("hot-water-system/<uuid:building_id>/", get_hot_water_systems, name="hot_water_system_list"),
+    path("hot-water-system/<int:system_id>/delete/", delete_hot_water_system, name="hot_water_system_delete"),
+    # Lift & Escalator System endpoints
+    path("lift-escalator-system/", create_or_update_lift_escalator_system, name="lift_escalator_system_create_update"),
+    path("lift-escalator-system/<uuid:building_id>/", get_lift_escalator_systems, name="lift_escalator_system_list"),
+    path("lift-escalator-system/<int:system_id>/delete/", delete_lift_escalator_system, name="lift_escalator_system_delete"),
+    # Lighting System endpoints
+    path("lighting-system/", create_or_update_lighting_system, name="lighting_system_create_update"),
+    path("lighting-system/<uuid:building_id>/", get_lighting_systems, name="lighting_system_list"),
+    path("lighting-system/<int:system_id>/delete/", delete_lighting_system, name="lighting_system_delete"),
+    # Ventilation System endpoints
+    path("ventilation-system/", create_or_update_ventilation_system, name="ventilation_system_create_update"),
+    path("ventilation-system/<uuid:building_id>/", get_ventilation_systems, name="ventilation_system_list"),
+    path("ventilation-system/<int:system_id>/delete/", delete_ventilation_system, name="ventilation_system_delete"),
+    # Cooling System endpoints
+    path("cooling-system/", create_or_update_cooling_system, name="cooling_system_create_update"),
+    path("cooling-system/<uuid:building_id>/", get_cooling_systems, name="cooling_system_list"),
+    path("cooling-system/<int:system_id>/delete/", delete_cooling_system, name="cooling_system_delete"),
 ]
