@@ -6,6 +6,7 @@ from pages.views.boq.boq import boq_edit
 from pages.views.building.dashboards import dashboard_view
 from pages.views.datasets import datasets
 from pages.views.map import map_view
+from pages.views.profile import view_profile
 from pages.views.select_lists import select_lists
 from pages.views.templates import templates
 
@@ -27,6 +28,7 @@ urlpatterns = [
     path("resource/", resources, name="resources"),
     path("templates/", templates, name="templates"),
     path("datasets/", datasets, name="datasets"),
+    path("profile/", view_profile, name="profile"),
     path(
         "privacy_policy/",
         TemplateView.as_view(template_name="compliance/privacy_policy.html"),

@@ -1,5 +1,7 @@
 {% load custom_filters %}
 
+<form>
+  {% csrf_token %}
   <li
         class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
       id="epd-{{ epd.id }}-{{ epd.timestamp }}"
@@ -19,18 +21,20 @@
         <span class="badge badge-outline badge-primary badge-sm">
             {{ epd.category }}
         </span> {% endcomment %}
+          <input type="text" name='id' value='{{ epd.id }}' hidden/>
+
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
               <input  
-              name="material_{{ epd.id }}_description_{{ epd.timestamp }}" 
+              name="description" 
               value="{% if epd.description %}{{ epd.description }}{% endif %}"
               type="text" placeholder="Add a description" />
             </label>
             <label class="input pr-0">
-              <input type="number" placeholder="Quantity" />
+              <input type="number" name='quantity' placeholder="Quantity" />
               <select
                 class="select select-ghost w-fit !outline-none !border-none"
-                name="material_{{ epd.id }}_unit_{{ epd.timestamp }}"
+                name="unit"
                 required
               >
                 {% for unit in epd.op_units %}
@@ -75,9 +79,11 @@
           </button>
         </div>
       </li>
+</form>
 
 
-{% comment %} <li class="card bg-base-100 border border-[var(--stroke--soft-200)] shadow-sm"
+
+      {% comment %} <li class="card bg-base-100 border border-[var(--stroke--soft-200)] shadow-sm"
     id="epd-{{ epd.id }}-{{ epd.timestamp }}"
     data-epd-id="{{ epd.id }}"
     data-timestamp="{{ epd.timestamp }}">
@@ -158,4 +164,5 @@
             </button>
         </div>
     </div>
-</li> {% endcomment %}
+
+    </li> {% endcomment %}

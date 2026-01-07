@@ -39,8 +39,8 @@
 </head>
 
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="{% block body_class %}{% endblock %}">
-  {% block nav %} 
-  {% if user.is_authenticated %}
+  {% block nav %}
+  {% if user.is_authenticated and 'accounts' not in request.path %}
       <nav class="h-20 px-4 w-full flex items-stretch">
       <div
         class="relative flex items-center lg:justify-center justify-between w-full max-w-[78.563rem] mx-auto"
@@ -126,7 +126,8 @@
           <button class="btn btn-ghost size-6 p-0 max-md:hidden">
             <span data-icon="settings-5-line" data-size="24"></span>
           </button>
-          <button class="btn btn-ghost flex items-center gap-1 max-md:hidden">
+
+          <button popovertarget="popover-1" style="anchor-name:--anchor-1" class="btn btn-ghost flex items-center gap-1 max-md:hidden">
             <div class="avatar avatar-placeholder">
               <div class="bg-primary text-primary-content w-6 rounded-full">
                 <span class="text-xs">{{ user.username|slice:":1" }}</span>
@@ -135,9 +136,16 @@
             <span class="text-sm">{{ user.username}}</span>
             <span data-icon="caret-down" data-size="16"></span>
           </button>
+
+          <ul class="dropdown menu w-52 rounded-box bg-base-100 shadow-sm "
+            popover id="popover-1" style="position-anchor:--anchor-1">
+            <li class='w-full'><a class='w-full' href="{% url 'profile' %}">Profile</a></li>
+            <li class='w-full'><button onclick="logout_modal.showModal()" class='w-full'>Logout</button></li>
+          </ul>
           <button
             class="btn btn-ghost btn-sm flex items-center gap-1 md:hidden"
           ></button>
+
         </div>
       </div>
     </nav>
@@ -185,57 +193,106 @@
 {% endblock nav %} 
 
   {% if messages %}
-  <div class="container mt-3">
+  <div id="toast-messages" class="toast toast-top toast-center z-50">
     {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible d-flex align-items-center justify-content-between" role="alert">
+      <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% elif message.tags == 'debug' %}info{% else %}info{% endif %}">
         <span>{{ message }}</span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     {% endfor %}
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toastContainer = document.getElementById('toast-messages');
+      if (toastContainer) {
+        setTimeout(function() {
+          toastContainer.style.transition = 'opacity 0.5s ease-out';
+          toastContainer.style.opacity = '0';
+          setTimeout(function() {
+            toastContainer.remove();
+          }, 500);
+        }, 3000); // Display for 3 seconds
+      }
+    });
+  </script>
+
   {% endif %}
 
       {% block content %}
-      <p>Default content...</p>
+      <span class="loading loading-spinner loading-lg"></span>
       {% endblock content %}
  
 
  {% block footer %}
-   {% if user.is_authenticated %}
+   {% if user.is_authenticated and 'accounts' not in request.path %}
   {% include 'footer.html' %}
   {% endif %}
  {% endblock footer %}
 
   <!-- Cookie Consent Banner -->
   {% if not request|all_cookies_accepted and not request.COOKIES.banner_shown %}
-  <div id="cookieBanner" class="cookie-banner">
-    <div class="container-fluid">
-      <div class="cookie-content">
+  <div id="cookieBanner" class=" z-100 fixed bottom-0 left-0 right-0 bg-base-100 border-t border-[var(--stroke--soft-200)] shadow-lg cookie-consent-banner">
+    <div class="cookie-banner-content container mx-auto flex flex-col md:flex-row items-center justify-between p-4 gap-4">
+      <div>
         <div class="cookie-text">
-          <h5><i class="bi bi-shield-check"></i> We Value Your Privacy</h5>
-          <p>We use cookies to enhance your experience, provide analytics, and enable embedded content. You can manage your preferences at any time.</p>
+          <h3 class='text-lg font-bold'><i class="bi bi-shield-check"></i> We Value Your Privacy</h3>
+          <p >We use cookies to enhance your experience, provide analytics, and enable embedded content. You can manage your preferences at any time.</p>
         </div>
-        <div class="card bg-base-100 shadow-xl">
-    <div class="card-body">
-        <h2 class="card-title">Building Data</h2>
-        <p>Content here</p>
-    </div>
-</div>
-        <div class="cookie-actions">
-          <button type="button" class="cookie-btn cookie-btn-accept" onclick="acceptAllCookies()">
+
+        <div class="card border-t border-[var(--stroke--soft-200)] rounded-none mt-2">
+          <div class="p-2">
+            <h4 class="card-title">Building Data</h4>
+            <p>Content here</p>
+          </div>
+        </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mt-3">
+          <button type="button" class="btn btn-primary" onclick="acceptAllCookies()">
             Accept All
           </button>
-          <button type="button" class="cookie-btn cookie-btn-decline" onclick="declineOptionalCookies()">
+          <button type="button" class="btn btn-error" onclick="declineOptionalCookies()">
             Decline Optional
           </button>
-          <button type="button" class="cookie-btn cookie-btn-settings" onclick="showCookieSettings()">
+          <button type="button" class="btn btn-outline col-span-2" onclick="showCookieSettings()">
             Manage Preferences
           </button>
         </div>
-      </div>
     </div>
   </div>
   {% endif %}
+
+<dialog id="logout_modal" class="modal modal-middle">
+  <div class="modal-box w-full max-w-[26.375rem] p-0">
+    <div class="flex flex-col items-center p-5">
+      <div
+        class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]"
+      >
+        <span
+          data-icon="alert-fill"
+          data-size="24"
+          data-color="var(--state--warning--base)"
+        ></span>
+      </div>
+      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
+        You are about to log out of your account.
+      </p>
+    </div>
+    <form  action="{% url 'account_logout' %}" method="post" class="w-full">
+      {% csrf_token %}
+      <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full" >
+      <button type="button"
+        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
+        onclick="logout_modal.close()"
+      >
+        Cancel
+      </button>
+      <button class="btn btn-sm btn-error flex-1" type='submit'>Logout</button>
+    </div>
+    </form>
+  </div>
+</dialog>
 
   <!-- Cookie Settings Modal -->
   <div class="modal fade cookie-settings-modal" id="cookieSettingsModal" tabindex="-1" data-bs-backdrop="static">
@@ -433,17 +490,6 @@
   {% block javascript %}
   <script type="module" src="{% static 'js/countries-registry.js' %}"></script>
 
-  <script>
-    const accountSuccessModal = document.getElementById(
-      "account_success_modal"
-    );
-    // accountSuccessModal.showModal();
-
-    function closeAccountSuccessModal() {
-      accountSuccessModal.close();
-    }
-
-  </script>
   <!-- Bootstrap JavaScript -->
   <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
@@ -452,6 +498,30 @@
 
   <!-- icons JS -->
   <script type="module" src="{% static 'js/icons.js' %}"></script>
+
+  <!-- HTMX event listeners for reinitializing components -->
+  <script type="module">
+    import { initCountryFlags } from "{% static 'js/countries-registry.js' %}";
+
+    // Reinitialize icons and country flags after HTMX swaps content
+    document.body.addEventListener('htmx:afterSwap', function(event) {
+      console.log('HTMX content swapped, reinitializing components...');
+
+      // Reinitialize icons in the swapped content
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
+
+      // Reinitialize country flags in the swapped content
+      initCountryFlags();
+    });
+
+    // Alternative: Use htmx:afterSettle for after animations complete
+    document.body.addEventListener('htmx:afterSettle', function(event) {
+      // This runs after transitions/animations are done
+      // Only use if you need to wait for animations
+    });
+  </script>
 
   <!-- HTMX -->
   {% comment %} <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script> {% endcomment %}

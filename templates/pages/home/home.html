@@ -4,14 +4,20 @@
 {% load crispy_forms_tags %}
 
 {% block title %}List view{% endblock title %}
+
+{% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
 {% block content %}
 <!-- Header + subtitle -->
-{% block body_class %} min-h-screen bg-[var(--bg--base-500)] flex flex-col {% endblock body_class %}
 
 <section
       class="flex-1 card bg-white rounded-none rounded-t-[var(--radius-24)] border border-[var(--stroke--soft-200)] pb-6"
     >
-  <div class="max-w-[68.75rem] mx-auto w-full px-4">
+    <div class="max-w-[68.75rem] mx-auto w-full px-4">
         <div class="flex flex-col gap-6 w-full mt-7">
           <div
             class="flex flex-col text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]"
@@ -26,16 +32,12 @@
           </div>
         </div>
       </div>
-  <div
-        class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem]"
-      ></div>
+  
+      <div class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem]"></div>
 
-          <div
-        class="card-body p-0 px-4 max-w-[68.75rem] mx-auto w-full text-[var(--text--strong-950)]"
-      >
-        <div
-          class="flex p-[0.875rem] gap-3 bg-[var(--state--information--lighter)] rounded-[var(--radius-12)] w-full text-[var(--text--strong-950)]"
-        >
+      <div class="card-body p-0 px-4 max-w-[68.75rem] mx-auto w-full text-[var(--text--strong-950)]">
+        {% if not email_verified %}
+        <div id="email-confirmation-banner" class="flex p-[0.875rem] gap-3 bg-[var(--state--information--lighter)] rounded-[var(--radius-12)] w-full text-[var(--text--strong-950)]">
           <span
             data-icon="mail-fill"
             data-color="var(--state--information--base)"
@@ -43,17 +45,19 @@
           <div class="flex flex-col flex-1">
             <span class="text-sm/5 font-medium">Confirm your email</span>
             <p class="text-sm/5 font-normal">
-              We’ve sent a confirmation email to you. Please confirm your
+              We've sent a confirmation email to you. Please confirm your
               account
             </p>
           </div>
-          <button class="btn btn-ghost size-6 p-0">
+          <button class="btn btn-ghost size-6 p-0" onclick="dismissEmailBanner()">
             <span
               data-icon="close-line"
               data-color="var(--icon--strong-950)"
             ></span>
           </button>
         </div>
+        {% endif %}
+        
         <div class="flex items-center justify-between mt-6">
           <div class="flex flex-col">
             <span class="text-xl font-bold">Your buildings</span>
@@ -68,9 +72,18 @@
                 data-size="20"
                 data-color="var(--icon--soft-400)"
               ></span>
-              <input type="text" placeholder="Search..." />
+              <input
+                type="text"
+                name="search"
+                placeholder="Search buildings..."
+                value="{{ search_query|default:'' }}"
+                hx-get="{% url 'home' %}"
+                hx-trigger="keyup changed delay:500ms"
+                hx-target="#buildings-container"
+                hx-swap="innerHTML"
+              />
             </label>
-            <ul class="filter-radio-group flex">
+            {% comment %} <ul class="filter-radio-group flex">
               <li>
                 <input
                   type="radio"
@@ -88,7 +101,7 @@
                   <span data-icon="road-map-line"></span>
                 </label>
               </li>
-            </ul>
+            </ul> {% endcomment %}
             <a href="{% url 'new_building' %}">
               <button class="btn btn-primary rounded-lg w-max">
                 <span data-icon="add-large-fill"></span>
@@ -101,6 +114,7 @@
           {% include "pages/home/buildings_list.html" %} 
         </div>
       </div>
+
 
 
 {% comment %}
@@ -134,14 +148,22 @@
       <div
         class="modal-box w-full max-w-[30rem] !max-h-[97vh] hide-scrollbar overflow-x-hidden overflow-y-auto flex flex-col items-center px-10"
       >
-        <img src="/src/assets/confetti.png" alt="confetti icon" />
-        <h3 class="text-lg font-extrabold">
+        <img src="{% static '/assets/confetti.png' %}" alt="confetti icon" />
+        <h3 class="text-lg font-extrabold text-center">
           Well done your account has been created.
         </h3>
-        <p class="text-sm text-[var(--text--sub-600)]">
+        <p class="text-sm text-[var(--text--sub-600)] text-center">
           Please fill the fields below to finish setting your profile
         </p>
-        <form class="flex flex-col w-full mt-7">
+
+        <div id="profile-form-messages" class="w-full mt-4">
+          <div class="alert alert-error hidden" id="error-message"></div>
+          <div class="alert alert-success hidden" id="success-message"></div>
+        </div>
+
+        <form id="modal-profile-form" class="flex flex-col w-full mt-7 space-y-2" method="POST" action="{% url 'profile' %}">
+          {% csrf_token %}
+
           <fieldset class="fieldset">
             <legend class="fieldset-legend">
               Username<span class="text-error">*</span>
@@ -151,21 +173,29 @@
                 data-icon="user-6-line"
                 data-color="var(--icon--soft-400)"
               ></span>
-              <input
-                type="text"
-                placeholder="Username"
-                required
-                maxlength="150"
-              />
+              {{ user_form.username }}
             </label>
-            <div class="label">
+            {% if user_form.username.errors %}
+              <div class="text-error text-xs mt-1">{{ user_form.username.errors.0 }}</div>
+            {% endif %}
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend">
+              Email<span class="text-error">*</span>
+            </legend>
+            <label class="input w-full">
               <span
-                data-icon="information-fill"
+                data-icon="mail-line"
                 data-color="var(--icon--soft-400)"
               ></span>
-              <span class="text-[var(--text--sub-600)]">0 / 150</span>
-            </div>
+              {{ user_form.email }}
+            </label>
+            {% if user_form.email.errors %}
+              <div class="text-error text-xs mt-1">{{ user_form.email.errors.0 }}</div>
+            {% endif %}
           </fieldset>
+
           <fieldset class="fieldset">
             <legend class="fieldset-legend">
               Country<span class="text-error">*</span>
@@ -177,17 +207,16 @@
                   data-color="var(--icon--soft-400)"
                 ></span>
               </div>
-              <select class="select select-with-icon w-full">
-                <option disabled selected>Pick a country</option>
-                <option>Ghana</option>
-                <option>Nigeria</option>
-                <option>Kenya</option>
-              </select>
+              {{ profile_form.country }}
             </label>
+            {% if profile_form.country.errors %}
+              <div class="text-error text-xs mt-1">{{ profile_form.country.errors.0 }}</div>
+            {% endif %}
           </fieldset>
+
           <fieldset class="fieldset">
             <legend class="fieldset-legend">
-              Region or State<span class="text-error">*</span>
+              Region or State
             </legend>
             <label class="w-full flex relative">
               <div class="select-icon">
@@ -196,39 +225,40 @@
                   data-color="var(--icon--soft-400)"
                 ></span>
               </div>
-              <select class="select select-with-icon w-full" disabled>
-                <option disabled selected>Pick a region or state</option>
-                <option>Greater Accra</option>
-                <option>Ashanti</option>
-                <option>Eastern</option>
-              </select>
+              {{ profile_form.region }}
             </label>
+            {% if profile_form.region.errors %}
+              <div class="text-error text-xs mt-1">{{ profile_form.region.errors.0 }}</div>
+            {% endif %}
           </fieldset>
+
           <fieldset class="fieldset">
             <legend class="fieldset-legend">
-              City<span class="text-error">*</span>
+              City
             </legend>
             <label class="w-full flex relative">
-              <label class="input w-full">
+              <div class="select-icon">
                 <span
                   data-icon="building-line"
                   data-color="var(--icon--soft-400)"
                 ></span>
-                <input type="text" placeholder="eg. Accra" disabled required />
-              </label>
+              </div>
+              {{ profile_form.city }}
             </label>
+            {% if profile_form.city.errors %}
+              <div class="text-error text-xs mt-1">{{ profile_form.city.errors.0 }}</div>
+            {% endif %}
           </fieldset>
+
           <label
             class="label mt-4 mb-6 text-[var(--text--strong-950)] text-sm/5 font-medium"
           >
-            <input
-              type="checkbox"
-              class="checkbox checkbox-xs rounded-[var(--radius-4)]"
-            />
-            Share my info with BEAT tool maintainers
+            {{ profile_form.consent_flag }}
+            <span class="ml-2">Share my info with BEAT tool maintainers</span>
           </label>
 
-          <button type="submit" class="btn btn-primary btn-block">
+          <div class="w-full space-y-1">
+            <button type="submit" class="btn btn-primary btn-block">
             Save & Continue
           </button>
           <button
@@ -238,496 +268,83 @@
           >
             I'll do this later
           </button>
+          </div>
         </form>
       </div>
     </dialog>
 
-
-{% comment %} 
-    <template id="buildings-template">
-      <ul class="grid grid-cols-1 gap-4 mt-6">
-        <li
-          class="bg-[var(--bg--base-600)] rounded-2xl p-1.5 flex flex-col justify-between gap-2 cursor-pointer hover:shadow-[var(--regular-shadow-x-small)]"
-          onclick="goToBuildingDetails()"
-        >
-          <div
-            class="flex justify-between gap-2 bg-[var(--bg--white-0)] border-dashed border border-[var(--stroke--sub-300)] rounded-xl px-2.5 py-4"
-          >
-            <div class="flex flex-col gap-4 flex-1">
-              <div class="flex items-center gap-2.5">
-                <div
-                  class="grid place-items-center bg-[var(--bg--weak-50)] rounded-lg size-13"
-                >
-                  <span
-                    data-icon="building-fill"
-                    data-size="20"
-                    data-color="var(--icon--sub-600)"
-                  ></span>
-                </div>
-                <div class="flex flex-col w-full gap-1.5">
-                  <h6 class="text-base/6 font-bold">Becken Apartments</h6>
-                  <ul class="flex gap-2">
-                    <li
-                      class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
-                    >
-                      <span data-country="KH" data-width="16"></span>
-                      <span
-                        data-country="KH"
-                        data-flag="false"
-                        data-class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      ></span>
-                      <span
-                        class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                        >- Battambang</span
-                      >
-                    </li>
-                    <li
-                      class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
-                    >
-                      <span data-icon="building-2-fill" data-size="16"></span>
-                      <span
-                        class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                        >Building type: Education - Other Educational
-                        Facility</span
-                      >
-                    </li>
-                    <li
-                      class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
-                    >
-                      <span data-icon="calendar-view" data-size="16"></span>
-                      <span
-                        class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                        >Created on: 16th September, 2025</span
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="flex items-center">
-                <div
-                  class="bg-[var(--color-primary)] size-10 grid place-items-center rounded-full"
-                >
-                  <span
-                    data-icon="leaf-line"
-                    data-size="24"
-                    data-color="var(--bg--strong-950)"
-                  ></span>
-                </div>
-                <ul class="flex gap-2.5">
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Total carbon footprint</span
-                    >
-                    <span class="text-base/6 font-medium"
-                      >212.5 kgCO2e eq/m2</span
-                    >
-                  </li>
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Total floor area</span
-                    >
-                    <span
-                      class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                      >230 m<sup>3</sup></span
-                    >
-                  </li>
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Total embodied carbon</span
-                    >
-                    <span
-                      class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                      >354.3 kgCO2e eq/m2</span
-                    >
-                  </li>
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Carbon Savings</span
-                    >
-                    <span
-                      class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                      >15.5%</span
-                    >
-                  </li>
-                </ul>
-                <div class="flex flex-col gap-1.5 pl-2 pr-4">
-                  <span
-                    class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                    >Progress of completion</span
-                  >
-                  <div class="flex items-center gap-2">
-                    <progress
-                      class="progress progress-primary"
-                      value="80"
-                      max="100"
-                    ></progress>
-                    <span class="text-xs/4 text-[var(--text--sub-600)]"
-                      >80%</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="flex gap-2 pt-2.5">
-              <button class="btn size-6 btn-ghost p-0">
-                <span
-                  data-icon="edit-fill"
-                  data-size="20"
-                  data-color="var(--icon--sub-600)"
-                ></span>
-              </button>
-              <button class="btn size-6 btn-ghost p-0">
-                <span
-                  data-icon="delete-bin-5-line"
-                  data-size="20"
-                  data-color="var(--icon--sub-600)"
-                ></span>
-              </button>
-            </div>
-          </div>
-          <p
-            class="text-xs/4 font-medium text-[var(--text--sub-600)] w-full text-center"
-          >
-            Last Edited: 12/09/2025 - 4:15 PM
-          </p>
-        </li>
-        <li
-          class="bg-[var(--bg--base-600)] rounded-2xl p-1.5 flex flex-col justify-between gap-2 cursor-pointer hover:shadow-[var(--regular-shadow-x-small)]"
-          onclick="goToBuildingDetails()"
-        >
-          <div
-            class="flex justify-between gap-2 bg-[var(--bg--white-0)] border-dashed border border-[var(--stroke--sub-300)] rounded-xl px-2.5 py-4"
-          >
-            <div class="flex flex-col gap-4 flex-1">
-              <div class="flex items-center gap-2.5">
-                <div
-                  class="grid place-items-center bg-[var(--bg--weak-50)] rounded-lg size-13"
-                >
-                  <span
-                    data-icon="building-fill"
-                    data-size="20"
-                    data-color="var(--icon--sub-600)"
-                  ></span>
-                </div>
-                <div class="flex flex-col w-full gap-1.5">
-                  <h6 class="text-base/6 font-bold">Green Office Complex</h6>
-                  <ul class="flex gap-2">
-                    <li
-                      class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
-                    >
-                      <span data-country="DE" data-width="16"></span>
-                      <span
-                        data-country="DE"
-                        data-flag="false"
-                        data-class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      ></span>
-                      <span
-                        class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                        >- Baden-Baden</span
-                      >
-                    </li>
-                    <li
-                      class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
-                    >
-                      <span data-icon="building-2-fill" data-size="16"></span>
-                      <span
-                        class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                        >Building type: Homes-Middle Income</span
-                      >
-                    </li>
-                    <li
-                      class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
-                    >
-                      <span data-icon="calendar-view" data-size="16"></span>
-                      <span
-                        class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                        >Created on: 10th September, 2025</span
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="flex items-center">
-                <div
-                  class="bg-[var(--color-primary)] size-10 grid place-items-center rounded-full"
-                >
-                  <span
-                    data-icon="leaf-line"
-                    data-size="24"
-                    data-color="var(--bg--strong-950)"
-                  ></span>
-                </div>
-                <ul class="flex gap-2.5">
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Total carbon footprint</span
-                    >
-                    <span class="text-base/6 font-medium"
-                      >0.0 kgCO2e eq/m2</span
-                    >
-                  </li>
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Total floor area</span
-                    >
-                    <span
-                      class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                      >453 m<sup>3</sup></span
-                    >
-                  </li>
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Total embodied carbon</span
-                    >
-                    <span
-                      class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                      >0.0 kgCO2e eq/m2</span
-                    >
-                  </li>
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Carbon Savings</span
-                    >
-                    <span
-                      class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                      >0%</span
-                    >
-                  </li>
-                </ul>
-                <div class="flex flex-col gap-1.5 pl-2 pr-4">
-                  <span
-                    class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                    >Progress of completion</span
-                  >
-                  <div class="flex items-center gap-2">
-                    <progress
-                      class="progress progress-primary"
-                      value="10"
-                      max="100"
-                    ></progress>
-                    <span class="text-xs/4 text-[var(--text--sub-600)]"
-                      >10%</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="flex gap-2 pt-2.5">
-              <button class="btn size-6 btn-ghost p-0">
-                <span
-                  data-icon="edit-fill"
-                  data-size="20"
-                  data-color="var(--icon--sub-600)"
-                ></span>
-              </button>
-              <button class="btn size-6 btn-ghost p-0">
-                <span
-                  data-icon="delete-bin-5-line"
-                  data-size="20"
-                  data-color="var(--icon--sub-600)"
-                ></span>
-              </button>
-            </div>
-          </div>
-          <p
-            class="text-xs/4 font-medium text-[var(--text--sub-600)] w-full text-center"
-          >
-            Last Edited: 12/09/2025 - 4:15 PM
-          </p>
-        </li>
-        <li
-          class="bg-[var(--bg--base-600)] rounded-2xl p-1.5 flex flex-col justify-between gap-2 cursor-pointer hover:shadow-[var(--regular-shadow-x-small)]"
-          onclick="goToBuildingDetails()"
-        >
-          <div
-            class="flex justify-between gap-2 bg-[var(--bg--white-0)] border-dashed border border-[var(--stroke--sub-300)] rounded-xl px-2.5 py-4"
-          >
-            <div class="flex flex-col gap-4 flex-1">
-              <div class="flex items-center gap-2.5">
-                <div
-                  class="grid place-items-center bg-[var(--bg--weak-50)] rounded-lg size-13"
-                >
-                  <span
-                    data-icon="building-fill"
-                    data-size="20"
-                    data-color="var(--icon--sub-600)"
-                  ></span>
-                </div>
-                <div class="flex flex-col w-full gap-1.5">
-                  <h6 class="text-base/6 font-bold">St. James Plaza</h6>
-                  <ul class="flex gap-2">
-                    <li
-                      class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
-                    >
-                      <span data-country="IN" data-width="16"></span>
-                      <span
-                        data-country="IN"
-                        data-flag="false"
-                        data-class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      ></span>
-                      <span
-                        class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                        >- Part Blair</span
-                      >
-                    </li>
-                    <li
-                      class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
-                    >
-                      <span data-icon="building-2-fill" data-size="16"></span>
-                      <span
-                        class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                        >Retail: Shopping Mall</span
-                      >
-                    </li>
-                    <li
-                      class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
-                    >
-                      <span data-icon="calendar-view" data-size="16"></span>
-                      <span
-                        class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                        >Created on: 10th September, 2025</span
-                      >
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="flex items-center">
-                <div
-                  class="bg-[var(--color-primary)] size-10 grid place-items-center rounded-full"
-                >
-                  <span
-                    data-icon="leaf-line"
-                    data-size="24"
-                    data-color="var(--bg--strong-950)"
-                  ></span>
-                </div>
-                <ul class="flex gap-2.5">
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Total carbon footprint</span
-                    >
-                    <span class="text-base/6 font-medium"
-                      >2,3433.0 kgCO2e eq/m2</span
-                    >
-                  </li>
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Total floor area</span
-                    >
-                    <span
-                      class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                      >999 m<sup>3</sup></span
-                    >
-                  </li>
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Total embodied carbon</span
-                    >
-                    <span
-                      class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                      >1,232.44 kgCO2e eq/m2</span
-                    >
-                  </li>
-                  <li
-                    class="flex flex-col gap-1.5 pl-2 pr-4 border-r border-[var(--stroke--soft-200)]"
-                  >
-                    <span
-                      class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                      >Carbon Savings</span
-                    >
-                    <span
-                      class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                      >45.23%</span
-                    >
-                  </li>
-                </ul>
-                <div class="flex flex-col gap-1.5 pl-2 pr-4">
-                  <span
-                    class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                    >Progress of completion</span
-                  >
-                  <div class="flex items-center gap-2">
-                    <progress
-                      class="progress progress-primary"
-                      value="100"
-                      max="100"
-                    ></progress>
-                    <span class="text-xs/4 text-[var(--text--sub-600)]"
-                      >100%</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="flex gap-2 pt-2.5">
-              <button class="btn size-6 btn-ghost p-0">
-                <span
-                  data-icon="edit-fill"
-                  data-size="20"
-                  data-color="var(--icon--sub-600)"
-                ></span>
-              </button>
-              <button class="btn size-6 btn-ghost p-0">
-                <span
-                  data-icon="delete-bin-5-line"
-                  data-size="20"
-                  data-color="var(--icon--sub-600)"
-                ></span>
-              </button>
-            </div>
-          </div>
-          <p
-            class="text-xs/4 font-medium text-[var(--text--sub-600)] w-full text-center"
-          >
-            Last Edited: 12/09/2025 - 4:15 PM
-          </p>
-        </li>
-      </ul>
-    </template> {% endcomment %}
-    
-<script>
+    <script>
     const accountSuccessModal = document.getElementById(
       "account_success_modal"
     );
 
-    /// TODO: Show modal based on condition from backend (e.g. new account)]
-    // accountSuccessModal.showModal();
+    // Show modal only for first-time account creation
+    {% if show_account_success_modal %}
+    accountSuccessModal.showModal();
+    {% endif %}
 
     function closeAccountSuccessModal() {
       accountSuccessModal.close();
+    }
+
+    function dismissEmailBanner() {
+      const banner = document.getElementById("email-confirmation-banner");
+      if (banner) {
+        banner.style.display = "none";
+      }
+    }
+
+    // Handle profile form submission in modal via AJAX
+    const modalProfileForm = document.getElementById("modal-profile-form");
+    if (modalProfileForm) {
+      modalProfileForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(modalProfileForm); 
+        const errorDiv = document.getElementById("error-message");
+        const successDiv = document.getElementById("success-message");
+
+        try {
+          const response = await fetch("{% url 'profile' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+            },
+          });
+
+          const data = await response.json();
+        
+          if (data.success) {
+            // Show success message
+            successDiv.textContent = data.message;
+            successDiv.classList.remove("hidden");
+            errorDiv.classList.add("hidden");
+
+            // Close modal after 1.5 seconds
+            setTimeout(() => {
+              closeAccountSuccessModal();
+              // Optionally reload the page to reflect changes
+              window.location.reload();
+            }, 1500);
+          } else {
+            // Show error messages
+            let errorText = "Please correct the following errors:\n";
+            for (const [field, errors] of Object.entries(data.errors)) {
+              errorText += `${field}: ${errors.join(", ")} <br/> `;
+            }
+            
+            errorDiv.innerHTML = errorText;
+            errorDiv.classList.remove("hidden");
+            successDiv.classList.add("hidden");
+          }
+        } catch (error) {
+          console.error("Error updating profile:", error);
+          errorDiv.textContent = "An error occurred while updating your profile. Please try again.";
+          errorDiv.parentElement.classList.remove("hidden");
+          successDiv.parentElement.classList.add("hidden");
+        }
+      });
     }
 
     {% comment %} function goToBuildingDetails(id) {

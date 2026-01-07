@@ -1,0 +1,146 @@
+<!-- Example: Building Name & Location Form with Validation -->
+<form id="form" class="grid grid-cols-2 gap-x-2 gap-y-1">
+  {% csrf_token %}
+
+  <fieldset class="fieldset col-span-2">
+    <legend class="fieldset-legend">
+      Building name or Code<span class="text-[var(--state--error--base)]">*</span>
+    </legend>
+    <label class="input validator w-full">
+      <input
+        name="building_name"
+        type="text"
+        placeholder="eg. JP Plaza"
+        required
+        minlength="2"
+        maxlength="200"
+      />
+    </label>
+    <p class="validator-hint" style="display: none;">This field is required</p>
+  </fieldset>
+
+  <fieldset class="fieldset col-span-2">
+    <legend class="fieldset-legend w-full">
+      Address (Zip, Street)<span class="text-[var(--state--error--base)]">*</span>
+      <span class="flex-1 flex justify-end text-[var(--text--sub-600)]">
+        <a class="underline cursor-pointer" onclick="openGeoLocationModal()">Find location on map</a>
+      </span>
+    </legend>
+    <label class="input validator w-full">
+      <input
+        name="address"
+        type="text"
+        placeholder="eg. 1885 L Street Northwest"
+        required
+        minlength="5"
+      />
+    </label>
+    <p class="validator-hint" style="display: none;">This field is required</p>
+  </fieldset>
+
+  <fieldset class="fieldset col-span-2">
+    <legend class="fieldset-legend">
+      Country<span class="text-[var(--state--error--base)]">*</span>
+    </legend>
+    <label class="w-full flex relative">
+      <div class="select-icon" id="country-select-icon">
+        <span
+          data-icon="global-line"
+          data-size="20"
+          data-color="var(--icon--soft-400)"
+        ></span>
+      </div>
+      <select
+        id="country-select"
+        name="country"
+        class="select select-with-icon w-full"
+        required
+        hx-get="/select_lists/"
+        hx-target="#region-select"
+        hx-trigger="change[this.value != '']"
+        hx-swap="innerHTML"
+        hx-vals='js:{"country": this.value}'
+        onchange="if(!this.value) { document.getElementById('region-select').innerHTML = '<option value=\"\">Select a region or state</option>'; document.getElementById('city-select').innerHTML = '<option value=\"\">Select a city</option>'; }"
+      >
+        <option value="">Select a country</option>
+        {% for country in countries %}
+          <option value="{{ country.id }}">
+            <span data-country="{{ country.name }}" data-width="20"></span>
+            <span data-country="{{ country.name }}" data-flag="false"></span>
+        </option>
+        {% endfor %}
+      </select>
+    </label>
+    <p class="validator-hint" style="display: none;">This field is required</p>
+  </fieldset>
+
+  <!-- Add similar validation attributes to other fields... -->
+
+</form>
+
+<script>
+// Initialize form validation when the component loads
+(function() {
+  const form = document.getElementById('form');
+
+  if (form && window.FormValidator) {
+    // Create validator with custom rules
+    const validator = new window.FormValidator(form, {
+      validateOnInput: true,
+      customValidators: {
+        // Custom validation for building name
+        building_name: (value) => {
+          if (value && value.length < 2) {
+            return 'Building name must be at least 2 characters';
+          }
+          // Check for special characters if needed
+          if (value && /[<>]/.test(value)) {
+            return 'Building name cannot contain < or > characters';
+          }
+          return null; // No error
+        },
+
+        // Custom validation for country - ensure it's selected
+        country: (value) => {
+          if (!value || value === '') {
+            return 'Please select a country';
+          }
+          return null;
+        },
+
+        // Custom validation for longitude
+        longitude: (value) => {
+          if (value && (isNaN(value) || value < -180 || value > 180)) {
+            return 'Longitude must be between -180 and 180';
+          }
+          return null;
+        },
+
+        // Custom validation for latitude
+        latitude: (value) => {
+          if (value && (isNaN(value) || value < -90 || value > 90)) {
+            return 'Latitude must be between -90 and 90';
+          }
+          return null;
+        }
+      },
+
+      // Callback when validation status changes
+      onStatusChange: (isValid, data, errors) => {
+        console.log('Form validation status:', isValid);
+        console.log('Form data:', data);
+        if (!isValid) {
+          console.log('Validation errors:', errors);
+        }
+      }
+    });
+
+    // Store validator instance globally for debugging
+    window.currentFormValidator = validator;
+
+    console.log('Form validation initialized for building-name-location');
+  } else {
+    console.error('Form or FormValidator not found');
+  }
+})();
+</script>

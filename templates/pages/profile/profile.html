@@ -1,0 +1,249 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Profile - BEAT{% endblock title %}
+
+{% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock %}
+
+{% block content %}
+<section class="flex-1 card bg-white rounded-none rounded-t-[var(--radius-24)] border border-[var(--stroke--soft-200)] pb-6">
+  <div class="max-w-[68.75rem] mx-auto w-full px-4">
+    <!-- Header -->
+    <div class="flex flex-col gap-6 w-full mt-7">
+      <div class="flex flex-col text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]">
+        Profile Settings
+        <p class="text-sm font-normal text-[var(--text--sub-600)]">
+          Manage your account information and preferences
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem]"></div>
+
+  <div class="card-body p-0 px-4 max-w-[68.75rem] mx-auto w-full text-[var(--text--strong-950)]">
+    <!-- Profile Information Card -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- User Info Card -->
+      <div class="lg:col-span-1">
+        <div class="card bg-[var(--bg--base-600)] border border-[var(--stroke--soft-200)] shadow-sm">
+          <div class="card-body p-6">
+            <div class="flex flex-col items-center gap-4">
+              <div class="avatar avatar-placeholder">
+                <div class="bg-primary text-primary-content w-24 rounded-full">
+                  <span class="text-4xl">{{ user.username|slice:":1"|upper }}</span>
+                </div>
+              </div>
+              <div class="text-center">
+                <h3 class="text-xl font-bold">{{ user.username }}</h3>
+                <p class="text-sm text-[var(--text--sub-600)]">{{ user.email }}</p>
+              </div>
+              <div class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem] my-2"></div>
+              <div class="w-full space-y-2">
+                <div class="flex items-center gap-2 text-sm">
+                  <span data-icon="calendar-view" data-size="20" data-color="var(--icon--sub-600)"></span>
+                  <div class="flex flex-col">
+                    <span class="text-xs text-[var(--text--sub-600)]">Joined</span>
+                    <span class="font-medium">{{ user.date_joined|date:"M d, Y" }}</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <span data-icon="time-line" data-size="20" data-color="var(--icon--sub-600)"></span>
+                  <div class="flex flex-col">
+                    <span class="text-xs text-[var(--text--sub-600)]">Last login</span>
+                    <span class="font-medium">{{ user.last_login|date:"M d, Y H:i" }}</span>
+                  </div>
+                </div>
+                {% if profile.country %}
+                <div class="flex items-center gap-2 text-sm">
+                  <span data-icon="global-line" data-size="20" data-color="var(--icon--sub-600)"></span>
+                  <div class="flex flex-col">
+                    <span class="text-xs text-[var(--text--sub-600)]">Location</span>
+                    <span class="font-medium">
+                      {% if profile.city %}{{ profile.city }}, {% endif %}
+                      {% if profile.region %}{{ profile.region }}, {% endif %}
+                      {{ profile.country }}
+                    </span>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card bg-[var(--bg--base-600)] border border-[var(--stroke--soft-200)] shadow-sm mt-4">
+          <div class="card-body p-4">
+            <h4 class="text-sm font-bold mb-3">Quick Actions</h4>
+            <div class="space-y-2">
+              <a href="{% url 'account_change_password' %}" class="btn btn-ghost btn-sm w-full justify-start">
+                <span data-icon="lock-password-line" data-size="20"></span>
+                <span>Change Password</span>
+              </a>
+              <button onclick="showCookieSettings()" class="btn btn-ghost btn-sm w-full justify-start">
+                <span data-icon="settings-5-line" data-size="20"></span>
+                <span>Cookie Settings</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Profile Form -->
+      <div class="lg:col-span-2">
+        <div class="card bg-[var(--bg--base-600)] border border-[var(--stroke--soft-200)] shadow-sm">
+          <div class="card-body p-6">
+            <h3 class="text-xl font-bold mb-6">Edit Profile</h3>
+
+            <form method="post" class="space-y-6">
+              {% csrf_token %}
+
+              <!-- Account Information Section -->
+              <div class="space-y-4">
+                <h4 class="text-base font-bold text-[var(--text--strong-950)] flex items-center gap-2">
+                  <span data-icon="user-6-line" data-size="20"></span>
+                  Account Information
+                </h4>
+
+                <!-- Username Field -->
+                <fieldset class="fieldset">
+                  <legend class="fieldset-legend">
+                    Username<span class="text-error">*</span>
+                  </legend>
+                  <label class="input w-full">
+                    <span data-icon="user-6-line" data-color="var(--icon--soft-400)"></span>
+                    {{ user_form.username }}
+                  </label>
+                  {% if user_form.username.errors %}
+                    <div class="label text-error text-xs">
+                      {{ user_form.username.errors.0 }}
+                    </div>
+                  {% endif %}
+                </fieldset>
+
+                <!-- Email Field -->
+                <fieldset class="fieldset">
+                  <legend class="fieldset-legend">
+                    Email<span class="text-error">*</span>
+                  </legend>
+                  <label class="input w-full">
+                    <span data-icon="mail-fill" data-color="var(--icon--soft-400)"></span>
+                    {{ user_form.email }}
+                  </label>
+                  {% if user_form.email.errors %}
+                    <div class="label text-error text-xs">
+                      {{ user_form.email.errors.0 }}
+                    </div>
+                  {% endif %}
+                </fieldset>
+              </div>
+
+              <div class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem]"></div>
+
+              <!-- Location Information Section -->
+              <div class="space-y-4">
+                <h4 class="text-base font-bold text-[var(--text--strong-950)] flex items-center gap-2">
+                  <span data-icon="global-line" data-size="20"></span>
+                  Location Information
+                </h4>
+
+                <!-- Country Field -->
+                <fieldset class="fieldset">
+                  <legend class="fieldset-legend">Country</legend>
+                  <label class="w-full flex relative">
+                    <div class="select-icon">
+                      <span data-icon="global-line" data-color="var(--icon--soft-400)"></span>
+                    </div>
+                    {{ profile_form.country }}
+                  </label>
+                  {% if profile_form.country.errors %}
+                    <div class="label text-error text-xs">
+                      {{ profile_form.country.errors.0 }}
+                    </div>
+                  {% endif %}
+                </fieldset>
+
+                <!-- Region Field -->
+                <fieldset class="fieldset">
+                  <legend class="fieldset-legend">Region or State</legend>
+                  <label class="w-full flex relative">
+                    <div class="select-icon">
+                      <span data-icon="flashlight-line" data-color="var(--icon--soft-400)"></span>
+                    </div>
+                    {{ profile_form.region }}
+                  </label>
+                  {% if profile_form.region.errors %}
+                    <div class="label text-error text-xs">
+                      {{ profile_form.region.errors.0 }}
+                    </div>
+                  {% endif %}
+                </fieldset>
+
+                <!-- City Field -->
+                <fieldset class="fieldset">
+                  <legend class="fieldset-legend">City</legend>
+                  <label class="w-full flex relative">
+                    <div class="select-icon">
+                      <span data-icon="building-line" data-color="var(--icon--soft-400)"></span>
+                    </div>
+                    {{ profile_form.city }}
+                  </label>
+                  {% if profile_form.city.errors %}
+                    <div class="label text-error text-xs">
+                      {{ profile_form.city.errors.0 }}
+                    </div>
+                  {% endif %}
+                </fieldset>
+              </div>
+
+              <div class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem]"></div>
+
+              <!-- Privacy Settings Section -->
+              <div class="space-y-4">
+                <h4 class="text-base font-bold text-[var(--text--strong-950)] flex items-center gap-2">
+                  <span data-icon="shield-check-line" data-size="20"></span>
+                  Privacy Settings
+                </h4>
+
+                <!-- Consent Flag -->
+                <label class="label text-[var(--text--strong-950)] text-sm/5 font-medium cursor-pointer">
+                  {{ profile_form.consent_flag }}
+                  <span class="ml-2">Share my info with BEAT tool maintainers</span>
+                </label>
+                {% if profile_form.consent_flag.errors %}
+                  <div class="label text-error text-xs">
+                    {{ profile_form.consent_flag.errors.0 }}
+                  </div>
+                {% endif %}
+                <p class="text-xs text-[var(--text--sub-600)] mt-1">
+                  By enabling this option, you allow the BEAT tool maintainers to access your profile information for support and improvement purposes.
+                </p>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="flex gap-3 justify-end pt-4">
+                <a href="{% url 'home' %}" class="btn btn-ghost">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                  <span data-icon="save-line" data-size="20"></span>
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Reinitialize icons after HTMX swaps (for dynamic region/city dropdowns)
+  document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (window.IconComponent) {
+      window.IconComponent.initialize();
+    }
+  });
+</script>
+{% endblock %}
