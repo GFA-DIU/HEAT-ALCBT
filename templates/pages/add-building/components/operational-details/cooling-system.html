@@ -865,10 +865,14 @@
   // Render cooling systems list
   window.renderCoolingSystems = async function() {
     const listContainer = document.getElementById('cooling-systems-list');
-    const buildingId = getBuildingId();
+    const noSystemsContainer = document.getElementById('no-cooling-system-template');
 
-    if (!buildingId) {
-      console.error('Building ID not found');
+     // If no systems, show no systems template
+    if (window.coolingSystems.length === 0) {
+      listContainer.innerHTML = noSystemsContainer.innerHTML;
+      if (window.IconComponent) {
+        window.IconComponent.initialize();
+      }
       return;
     }
 

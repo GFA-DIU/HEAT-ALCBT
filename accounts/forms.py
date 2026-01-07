@@ -1,11 +1,11 @@
-from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import CustomRegion, CustomUser, UserProfile
-
 from cities_light.models import Country
+from django import forms
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 
 from accounts.models import CustomCity
 from pages.models.base import ALCBTCountryManager
+
+from .models import CustomRegion, CustomUser, UserProfile
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -34,8 +34,20 @@ class CustomUserUpdateForm(forms.ModelForm):
         fields = [
             'email',
             'username',
-        ] 
-
+        ]
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'w-full validator',
+                'placeholder': 'Username',
+                'maxlength': '150',
+                'required': True,
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'w-full validator',
+                'placeholder': 'Email',
+                'required': True,
+            }),
+        } 
 class UserProfileUpdateForm(forms.ModelForm):
     country = forms.ModelChoiceField(
         queryset=ALCBTCountryManager.get_all_countries(),
@@ -43,7 +55,8 @@ class UserProfileUpdateForm(forms.ModelForm):
             'hx-get': '/select_lists/',               # HTMX request to the root URL
             'hx-trigger': 'change',      # Trigger HTMX on change event
             'hx-target': '#region-dropdown', # Update the Region dropdown
-            'class': 'select form-select',
+            'class': 'select select-with-icon w-full validator',
+            'required': True,
         }),
         label="Country"
     )
@@ -55,7 +68,8 @@ class UserProfileUpdateForm(forms.ModelForm):
                 "hx-get": "/select_lists/",  # HTMX request to the root URL
                 "hx-trigger": "change",  # Trigger HTMX on change event
                 "hx-target": "#city-dropdown",  # Update the City dropdown
-                "class": "select form-select",
+                "class": "select select-with-icon w-full validator",
+                "required": True,
             }
         ),
         label="Region",
@@ -63,7 +77,11 @@ class UserProfileUpdateForm(forms.ModelForm):
     )
     city = forms.ModelChoiceField(
         queryset=CustomCity.objects.none(),  # Start with an empty queryset
-        widget=forms.Select(attrs={'id': 'city-dropdown', 'class': 'select form-select',}),
+        widget=forms.Select(attrs={
+            'id': 'city-dropdown',
+            'class': 'select select-with-icon w-full validator',
+            'required': True,
+        }),
         label="City",
         help_text="Select a country first",
         required=False
@@ -72,6 +90,11 @@ class UserProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['country', 'region', 'city', "consent_flag"]
+        widgets = {
+            'consent_flag': forms.CheckboxInput(attrs={
+                'class': 'checkbox checkbox-xs rounded-[var(--radius-4)]',
+            }),
+        }
         
         
     def __init__(self, *args, **kwargs):
