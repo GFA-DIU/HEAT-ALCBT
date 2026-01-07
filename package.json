@@ -4,9 +4,7 @@
   "description": "---",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:css": "postcss app.scss -o static/css/output.css",
-    "watch:css": "postcss app.scss -o static/css/output.css --watch",
+    "build:css": "npx @tailwindcss/cli -i ./app.scss -o ./static/css/output.css",
     "watch:tailwind": "npx @tailwindcss/cli -i ./app.scss -o ./static/css/output.css --watch",
     "build:icons": "node build-icons.mjs"
   },
