@@ -15,7 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
 
-  {% if request|cookie_group_accepted:"analytics" %}
+  {% if request and request|cookie_group_accepted:"analytics" %}
     {% newrelic_browser_timing_header %}
   {% endif %}
 
@@ -481,7 +481,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      {% if not request|all_cookies_accepted and not request.COOKIES.banner_shown %}
+      {% if request and not request|all_cookies_accepted and not request.COOKIES.banner_shown %}
         showCookieBanner();
       {% endif %}
     });
@@ -527,7 +527,7 @@
   {% comment %} <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script> {% endcomment %}
   {% endblock javascript %}
   
-  {% if request|cookie_group_accepted:"analytics" %}
+  {% if request and request|cookie_group_accepted:"analytics" %}
     {% newrelic_browser_timing_footer %}
   {% endif %}
 

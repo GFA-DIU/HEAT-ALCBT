@@ -6,6 +6,7 @@ Each step loads a template and provides necessary context data.
 
 
 import logging
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -18,6 +19,10 @@ from pages.models.building import BuildingCategory
 from pages.models.epd import EPD, MaterialCategory
 
 logger = logging.getLogger(__name__)
+from django.db import transaction
+from pages.models import Building, HotWaterSystem
+from pages.forms.hot_water_system_form import HotWaterSystemForm
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -295,29 +300,74 @@ def complete_building_setup(request):
     Complete the building setup and create the building record.
     This combines all step data and creates the final building.
     """
-    import json
-    
+
     try:
         # Get all saved step data from session
         building_data = request.session.get("building_form_data", {})
-        
+
         if not building_data:
             return JsonResponse({"error": "No building data found"}, status=400)
-        
-        # TODO: Create the actual building record here
-        # You'll need to process the form data and create Building, 
-        # BuildingOperationalInfo, and related objects
-        
-        # For now, just clear the session data
+
+        # Use transaction to ensure all-or-nothing creation
+        with transaction.atomic():
+            # TODO: Create the actual building record here
+            # For now, we need a building instance to associate HWS with
+            # This assumes you have basic building data in session
+
+            # If you already have a building created (e.g., building_id in session)
+            # you can fetch it. Otherwise, you'd create it here.
+            building_id = request.session.get("building_id")
+            if building_id:
+                try:
+                    building = Building.objects.get(id=building_id, created_by=request.user)
+                except Building.DoesNotExist:
+                    return JsonResponse({"error": "Building not found"}, status=404)
+            else:
+                # If no building exists yet, return error - building should be created first
+                return JsonResponse({
+                    "success": False,
+                    "error": "Building must be created before completing setup"
+                }, status=400)
+
+            # Process Hot Water System data
+            hws_data = building_data.get("operational-details/hot-water-system", [])
+
+            if hws_data and isinstance(hws_data, list):
+                # Clear existing hot water systems for this building
+                HotWaterSystem.objects.filter(building=building).delete()
+
+                # Validate and create each hot water system
+                validation_errors = {}
+                for idx, system_data in enumerate(hws_data):
+                    form = HotWaterSystemForm(data=system_data)
+
+                    if form.is_valid():
+                        hws = form.save(commit=False)
+                        hws.building = building
+                        hws.save()
+                    else:
+                        validation_errors[f"system_{idx}"] = form.errors
+
+                # If there were validation errors, rollback and return errors
+                if validation_errors:
+                    transaction.set_rollback(True)
+                    return JsonResponse({
+                        "success": False,
+                        "error": "Validation errors in hot water systems",
+                        "errors": validation_errors
+                    }, status=400)
+
+        # Clear the session data after successful creation
         if "building_form_data" in request.session:
             del request.session["building_form_data"]
-        
+
         return JsonResponse({
             "success": True,
             "message": "Building created successfully",
             "redirect_url": "/dashboard/"
         })
-        
+
     except Exception as e:
+        logging.error(f"Error completing building setup: {str(e)}")
         return JsonResponse({"error": str(e)}, status=500)
         return JsonResponse({"error": str(e)}, status=500)
