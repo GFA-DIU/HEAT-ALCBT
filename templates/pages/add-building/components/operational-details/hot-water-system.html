@@ -1,3 +1,4 @@
+{% load static %}
 <div id="hot-water-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button
@@ -323,7 +324,7 @@
 
 <template id="no-hot-water-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
-    <img src="/src/assets/hot-water-system.png" alt="hot-water System Image" />
+    <img src="{% static 'assets/hot-water-system.png' %}" alt="hot-water System Image" />
     <p class="text-sm/5 font-medium">
       Click button below to add a hot water system
     </p>
@@ -431,16 +432,10 @@
   // Render hot water systems list - FETCH from database
   window.renderHotWaterSystems = async function() {
     const listContainer = document.getElementById('hot-water-systems-list');
+    const noSystemsContainer = document.getElementById('no-hot-water-system-template');
+    if (window.hotWaterSystems.length === 0) {
+      listContainer.innerHTML = noSystemsContainer.innerHTML;
 
-    // Get building ID
-    const buildingId = getBuildingId();
-    if (!buildingId) {
-      listContainer.innerHTML = `
-        <li class="flex flex-col items-center justify-center py-8 text-center">
-          <span data-icon="alert-fill" data-size="48" data-color="var(--state--warning--base)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Please save building information first</p>
-        </li>
-      `;
       if (window.IconComponent) {
         window.IconComponent.initialize();
       }

@@ -1,3 +1,4 @@
+{% load static %}
 <div id="lighting-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button
@@ -337,7 +338,7 @@
 
 <template id="no-lighting-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
-    <img src="/src/assets/lighting-system.png" alt="Lighting System Image" />
+    <img src="{% static '/assets/lighting-system.png' %}" alt="Lighting System Image" />
     <p class="text-sm/5 font-medium">
       Click button below to add a lighting system
     </p>
@@ -441,16 +442,11 @@
   // Render lighting systems list - FETCH from database
   window.renderLightingSystems = async function() {
     const listContainer = document.getElementById('lighting-systems-list');
+    const noSystemsContainer = document.getElementById('no-lighting-system-template');
 
-    // Get building ID
-    const buildingId = getBuildingId();
-    if (!buildingId) {
-      listContainer.innerHTML = `
-        <li class="flex flex-col items-center justify-center py-8 text-center">
-          <span data-icon="alert-fill" data-size="48" data-color="var(--state--warning--base)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Please save building information first</p>
-        </li>
-      `;
+     // If no systems, show no systems template
+    if (window.lightingSystems.length === 0) {
+      listContainer.innerHTML = noSystemsContainer.innerHTML;
       if (window.IconComponent) {
         window.IconComponent.initialize();
       }
