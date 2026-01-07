@@ -135,7 +135,7 @@ body {
   display: none;
 }
 
-.navbar-radio-group label {
+.navbar-radio-group {
   display: flex;
   align-items: center;
   height: 100%;
@@ -156,7 +156,7 @@ body {
 }
 
 @media (max-width: 768px) {
-  .navbar-radio-group label {
+  .navbar-radio-group  {
     a {
       flex-direction: column;
       gap: 0;
@@ -164,7 +164,7 @@ body {
   }
 }
 
-.navbar-radio-group input:checked + label {
+.navbar-radio-group input:checked + a {
   border-bottom: 2px solid var(--color-primary);
   a {
     font-weight: 600;

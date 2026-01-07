@@ -7,7 +7,7 @@
       >
     </legend>
     <label class="input validator w-full">
-      <input name="building_name" type="text" placeholder="eg. JP Plaza" required />
+      <input minlength='3' name="building_name" type="text" placeholder="eg. JP Plaza" required class="validator" />
     </label>
     <p class="validator-hint">This field is required</p>
   </fieldset>
@@ -65,7 +65,7 @@
       Region or State<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full flex relative">
-      <div class="select-icon">
+      <div class="select-icon"> 
         <span
           data-icon="flashlight-line"
           data-size="20"
@@ -141,6 +141,95 @@
     </label>
   </fieldset>
 </form>
+
+<script>
+  // Initialize cascading dropdowns when form is loaded with pre-filled data
+  (function initializeCascadingDropdowns() {
+    const countrySelect = document.getElementById('country-select');
+    const regionSelect = document.getElementById('region-select');
+    const citySelect = document.getElementById('city-select');
+
+    if (!countrySelect || !regionSelect || !citySelect) return;
+
+    // Get saved form data from localStorage
+    const getSavedFormData = () => {
+      const stepKey = 'building-information/building-name-location';
+      const savedDataStr = localStorage.getItem('building-form-data');
+      if (savedDataStr) {
+        try {
+          const allFormData = JSON.parse(savedDataStr);
+          return allFormData[stepKey] || {};
+        } catch (e) {
+          console.error('Error parsing saved form data:', e);
+          return {};
+        }
+      }
+      return {};
+    };
+
+    // Function to trigger HTMX requests for dependent dropdowns
+    const loadDependentDropdowns = (savedData) => {
+      const savedCountry = savedData.country;
+      const savedRegion = savedData.region;
+      const savedCity = savedData.city;
+
+      // If country has a value, trigger HTMX request for regions
+      if (savedCountry && typeof htmx !== 'undefined') {
+        // Trigger the HTMX request on country select
+        htmx.trigger(countrySelect, 'change');
+
+        // Wait for HTMX to populate regions, then restore region value
+        if (savedRegion) {
+          // Listen for when HTMX finishes updating the region select
+          const regionLoadHandler = (event) => {
+            if (event.detail.target === regionSelect) {
+              regionSelect.value = savedRegion;
+
+              // If region has a value, trigger HTMX request for cities
+              if (savedRegion) {
+                htmx.trigger(regionSelect, 'change');
+
+                // Wait for HTMX to populate cities, then restore city value
+                if (savedCity) {
+                  const cityLoadHandler = (event) => {
+                    if (event.detail.target === citySelect) {
+                      citySelect.value = savedCity;
+                      document.body.removeEventListener('htmx:afterSwap', cityLoadHandler);
+                    }
+                  };
+                  document.body.addEventListener('htmx:afterSwap', cityLoadHandler);
+                }
+              }
+
+              document.body.removeEventListener('htmx:afterSwap', regionLoadHandler);
+            }
+          };
+          document.body.addEventListener('htmx:afterSwap', regionLoadHandler);
+        }
+      }
+    };
+
+    // Check multiple times to catch when StepManager restores the data
+    let attempts = 0;
+    const maxAttempts = 5;
+    const checkInterval = 200; // Check every 200ms
+
+    const checkAndLoad = () => {
+      if (countrySelect.value) {
+        // Country value is present, get saved data and trigger HTMX requests
+        const savedData = getSavedFormData();
+        loadDependentDropdowns(savedData);
+      } else if (attempts < maxAttempts) {
+        // Not yet loaded, try again
+        attempts++;
+        setTimeout(checkAndLoad, checkInterval);
+      }
+    };
+
+    // Start checking
+    checkAndLoad();
+  })();
+</script>
 
 <dialog
   id="geo_location_modal"

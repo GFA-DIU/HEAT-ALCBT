@@ -6,6 +6,7 @@ from pages.views.boq.boq import boq_edit
 from pages.views.building.dashboards import dashboard_view
 from pages.views.datasets import datasets
 from pages.views.map import map_view
+from pages.views.profile import view_profile
 from pages.views.select_lists import select_lists
 from pages.views.templates import templates
 
@@ -16,6 +17,8 @@ from .views.building.add_building_steps import (building_step_view,
                                                 save_building_step)
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
+from .views.building.building_step_operational import \
+    building_step_operational_products
 from .views.building.components import building_components, new_building
 from .views.building.hot_water_system import (
     create_or_update_hot_water_system,
@@ -50,6 +53,7 @@ urlpatterns = [
     path("resource/", resources, name="resources"),
     path("templates/", templates, name="templates"),
     path("datasets/", datasets, name="datasets"),
+    path("profile/", view_profile, name="profile"),
     path(
         "privacy_policy/",
         TemplateView.as_view(template_name="compliance/privacy_policy.html"),
@@ -69,6 +73,7 @@ urlpatterns = [
     path("building/step", building_step_view, name="building_step"),
     path("building/step/save", save_building_step, name="save_building_step"),
     path("building/step/data", get_building_step_data, name="get_building_step_data"),
+    path("building/step/operational", building_step_operational_products, name="building_step_operational"),
     path("building/complete", complete_building_setup, name="complete_building_setup"),
     path("building/<uuid:building_id>/", building, name="building"),
     path(
