@@ -723,17 +723,29 @@
 </template>
 
 <script>
-  // Store cooling systems data on window to make it globally accessible
-  if (!window.coolingSystems) {
-    window.coolingSystems = [];
+  // Store editing system ID and type on window
+  if (!window.editingCoolingSystemId) {
+    window.editingCoolingSystemId = null;
   }
-  if (!window.editingSystemIndex) {
-    window.editingSystemIndex = null;
+  if (!window.editingCoolingSystemType) {
+    window.editingCoolingSystemType = null;
+  }
+
+  // Get CSRF token
+  function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+  }
+
+  // Get building ID from the page context
+  function getBuildingId() {
+    const buildingIdElement = document.querySelector('[data-building-id]');
+    return buildingIdElement ? buildingIdElement.dataset.buildingId : null;
   }
 
   // Open modal for adding new system
   window.openCoolingSystemModal = function() {
-    window.editingSystemIndex = null;
+    window.editingCoolingSystemId = null;
+    window.editingCoolingSystemType = null;
     document.getElementById('cooling-system-form').reset();
     document.getElementById('selected-cooling-system').innerHTML = '';
     cooling_system_modal.showModal();
@@ -742,13 +754,14 @@
   // Close modal
   window.closeCoolingSystemModal = function() {
     cooling_system_modal.close();
-    window.editingSystemIndex = null;
+    window.editingCoolingSystemId = null;
+    window.editingCoolingSystemType = null;
   }
 
   // Handle cooling system type change
   window.handleCoolingSystemTypeChange = function(systemType) {
     const selectedSystemDiv = document.getElementById('selected-cooling-system');
-    
+
     if (!systemType) {
       selectedSystemDiv.innerHTML = '';
       return;
@@ -780,10 +793,16 @@
   }
 
   // Save cooling system
-  window.saveCoolingSystem = function() {
+  window.saveCoolingSystem = async function() {
     const form = document.getElementById('cooling-system-form');
     const formData = new FormData(form);
-    
+    const buildingId = getBuildingId();
+
+    if (!buildingId) {
+      alert('Building ID not found');
+      return;
+    }
+
     // Get cooling system type
     const systemTypeSelect = document.getElementById('cooling-system-type');
     const systemType = systemTypeSelect.value;
@@ -794,37 +813,57 @@
       return;
     }
 
+    // Determine if this is chiller or air conditioner
+    const isChiller = systemTypeName.toLowerCase().includes('chiller');
+    const cooling_system_type = isChiller ? 'chiller' : 'air_conditioner';
+
     // Collect all form data
     const systemData = {
-      type: systemType,
-      typeName: systemTypeName,
-      data: formData.entries ? Object.fromEntries(formData.entries()) : {}
+      building_id: buildingId,
+      cooling_system_type: cooling_system_type,
     };
 
-    console.log('Saving cooling system data:', systemData);
-    // Add or update system
-    if (window.editingSystemIndex !== null) {
-      window.coolingSystems[window.editingSystemIndex] = systemData;
-    } else {
-      window.coolingSystems.push(systemData);
+    // Add system ID if editing
+    if (window.editingCoolingSystemId) {
+      systemData.cooling_system_id = window.editingCoolingSystemId;
     }
 
-    // Save form data to stepManager
-    if (typeof stepManager !== 'undefined') {
-      console.log('Saving cooling systems data to stepManager:', window.coolingSystems);
-      stepManager.saveStepFormData( window.coolingSystems.map(m => m.data), window.stepManager.getCurrentStepKey() );
+    // Add all form fields
+    for (const [key, value] of formData.entries()) {
+      if (key !== 'csrfmiddlewaretoken') {
+        systemData[key] = value;
+      }
     }
 
-    // Update the list display
-    window.renderCoolingSystems();
+    try {
+      const method = window.editingCoolingSystemId ? 'PUT' : 'POST';
+      const response = await fetch('/cooling-system/', {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken(),
+        },
+        body: JSON.stringify(systemData),
+      });
 
-    // Close modal
-    window.closeCoolingSystemModal();
+      const result = await response.json();
 
+      if (result.success) {
+        // Refresh the list
+        await window.renderCoolingSystems();
+        // Close modal
+        window.closeCoolingSystemModal();
+      } else {
+        alert('Error saving cooling system: ' + JSON.stringify(result.errors));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred while saving the cooling system');
+    }
   }
 
   // Render cooling systems list
-  window.renderCoolingSystems = function() {
+  window.renderCoolingSystems = async function() {
     const listContainer = document.getElementById('cooling-systems-list');
     const noSystemsContainer = document.getElementById('no-cooling-system-template');
 
@@ -837,119 +876,343 @@
       return;
     }
 
-    listContainer.innerHTML = window.coolingSystems.map((system, index) => {
-      // Extract key details for display
-      const refrigerantType = system.data['type_of_refrigerants'] || 'N/A';
-      const refrigerantQty = system.data['refrigerant_quantity'] || 'N/A';
-      const chillerType = system.data['chiller_system'] || system.data['type_of_air_condition'] || '';
-      
-      return `
-        <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
-          <span
-            data-icon="snowflake-fill"
-            data-size="20"
-            data-color="var(--icon--strong-950)"
-            class="shrink-0 self-start"
-          ></span>
-          <div class="flex flex-col flex-1">
-            <p class="text-sm/5 font-medium">
-              ${system.typeName}${chillerType ? ' - ' + chillerType : ''}
-            </p>
-            <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-              <span class="border-r border-[var(--text--sub-600)] pr-1">Type: ${refrigerantType}</span>
-              <span>Refrigerant quantity: ${refrigerantQty} kg</span>
-            </p>
-          </div>
-          <div class="flex items-center gap-3">
-            <button class="btn size-5 btn-ghost p-0" onclick="editCoolingSystem(${index})">
-              <span
-                data-icon="edit-line"
-                data-size="16"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-            <button
-              class="btn size-5 btn-ghost p-0"
-              onclick="confirmDeleteCoolingSystem(${index})"
-            >
-              <span
-                data-icon="delete-bin-5-line"
-                data-size="16"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-          </div>
-        </li>
-      `;
-    }).join('');
+    try {
+      const response = await fetch(`/cooling-system/${buildingId}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    // Reinitialize icons
-    if (window.IconComponent) {
-      window.IconComponent.initialize();
+      const result = await response.json();
+
+      if (result.success && result.cooling_systems) {
+        const systems = result.cooling_systems;
+
+        if (systems.length === 0) {
+          listContainer.innerHTML = `
+            <li class="flex flex-col items-center justify-center py-8 text-center">
+              <span data-icon="snowflake-fill" data-size="48" data-color="var(--icon--soft-400)"></span>
+              <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No cooling systems added yet</p>
+            </li>
+          `;
+          if (window.IconComponent) {
+            window.IconComponent.initialize();
+          }
+          return;
+        }
+
+        listContainer.innerHTML = systems.map((system) => {
+          const refrigerantType = system.refrigerant_type || 'N/A';
+          const refrigerantQty = system.refrigerant_quantity_kg || 'N/A';
+
+          let systemTypeName = '';
+          let chillerType = '';
+
+          if (system.cooling_system_type === 'chiller') {
+            systemTypeName = 'Chiller System';
+            chillerType = system.chiller_type_display || '';
+          } else {
+            systemTypeName = 'Air Conditioner';
+            chillerType = system.ac_type_display || '';
+          }
+
+          return `
+            <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)] mb-2">
+              <span
+                data-icon="snowflake-fill"
+                data-size="20"
+                data-color="var(--icon--strong-950)"
+                class="shrink-0 self-start"
+              ></span>
+              <div class="flex flex-col flex-1">
+                <p class="text-sm/5 font-medium">
+                  ${systemTypeName}${chillerType ? ' - ' + chillerType : ''}
+                </p>
+                <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+                  <span class="border-r border-[var(--text--sub-600)] pr-1">Type: ${refrigerantType}</span>
+                  <span>Refrigerant quantity: ${refrigerantQty} kg</span>
+                </p>
+              </div>
+              <div class="flex items-center gap-3">
+                <button class="btn size-5 btn-ghost p-0" onclick="editCoolingSystem(${system.id}, '${system.cooling_system_type}')">
+                  <span
+                    data-icon="edit-line"
+                    data-size="16"
+                    data-color="var(--icon--strong-950)"
+                  ></span>
+                </button>
+                <button
+                  class="btn size-5 btn-ghost p-0"
+                  onclick="confirmDeleteCoolingSystem(${system.id}, '${system.cooling_system_type}')"
+                >
+                  <span
+                    data-icon="delete-bin-5-line"
+                    data-size="16"
+                    data-color="var(--icon--strong-950)"
+                  ></span>
+                </button>
+              </div>
+            </li>
+          `;
+        }).join('');
+
+        // Reinitialize icons
+        if (window.IconComponent) {
+          window.IconComponent.initialize();
+        }
+      } else {
+        console.error('Error fetching cooling systems:', result.errors);
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   }
 
   // Edit cooling system
-  window.editCoolingSystem = function(index) {
-    window.editingSystemIndex = index;
-    const system = window.coolingSystems[index];
+  window.editCoolingSystem = async function(systemId, coolingSystemType) {
+    const buildingId = getBuildingId();
 
-    // Reset form
-    document.getElementById('cooling-system-form').reset();
+    if (!buildingId) {
+      alert('Building ID not found');
+      return;
+    }
 
-    // Set system type
-    const systemTypeSelect = document.getElementById('cooling-system-type');
-    systemTypeSelect.value = system.type;
-
-    // Trigger change to load the appropriate template
-    window.handleCoolingSystemTypeChange(system.type);
-
-    // Wait a bit for template to load, then populate fields
-    setTimeout(() => {
-      const form = document.getElementById('cooling-system-form');
-      
-      // Populate all form fields
-      Object.keys(system.data).forEach(fieldName => {
-        const field = form.querySelector(`[name="${fieldName}"]`);
-        if (field) {
-          if (field.type === 'radio') {
-            const radioButton = form.querySelector(`[name="${fieldName}"][value="${system.data[fieldName]}"]`);
-            if (radioButton) radioButton.checked = true;
-          } else if (field.type === 'checkbox') {
-            field.checked = system.data[fieldName];
-          } else {
-            field.value = system.data[fieldName];
-          }
-        }
+    try {
+      const response = await fetch(`/cooling-system/${buildingId}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-    }, 100);
 
-    cooling_system_modal.showModal();
+      const result = await response.json();
+
+      if (result.success && result.cooling_systems) {
+        const system = result.cooling_systems.find(s => s.id === systemId && s.cooling_system_type === coolingSystemType);
+
+        if (system) {
+          window.editingCoolingSystemId = systemId;
+          window.editingCoolingSystemType = coolingSystemType;
+
+          // Reset form
+          document.getElementById('cooling-system-form').reset();
+
+          // Set system type in dropdown and trigger template load
+          const systemTypeSelect = document.getElementById('cooling-system-type');
+          // We need to find the option that corresponds to this system type
+          // For now, trigger the change after setting a placeholder value
+          if (system.cooling_system_type === 'chiller') {
+            // Find chiller option
+            for (let option of systemTypeSelect.options) {
+              if (option.text.toLowerCase().includes('chiller')) {
+                systemTypeSelect.value = option.value;
+                break;
+              }
+            }
+          } else {
+            // Find air conditioner option
+            for (let option of systemTypeSelect.options) {
+              if (option.text.toLowerCase().includes('air') || option.text.toLowerCase().includes('vr')) {
+                systemTypeSelect.value = option.value;
+                break;
+              }
+            }
+          }
+
+          // Trigger template load
+          window.handleCoolingSystemTypeChange(systemTypeSelect.value);
+
+          // Wait for template to load, then populate fields
+          setTimeout(() => {
+            const form = document.getElementById('cooling-system-form');
+
+            if (system.cooling_system_type === 'chiller') {
+              // Populate chiller fields
+              const chillerTypeMapping = {
+                'water_cooled': 'water-cooled',
+                'air_cooled': 'air-cooled',
+              };
+              if (form.querySelector('[name="chiller_system"]')) {
+                form.querySelector('[name="chiller_system"]').value = chillerTypeMapping[system.chiller_type] || system.chiller_type;
+              }
+              if (form.querySelector('[name="year_of_installation"]')) {
+                form.querySelector('[name="year_of_installation"]').value = system.year_of_installation;
+              }
+              if (form.querySelector('[name="type_of_refrigerants"]')) {
+                form.querySelector('[name="type_of_refrigerants"]').value = system.refrigerant_type;
+              }
+              if (form.querySelector('[name="refrigerant_quantity"]')) {
+                form.querySelector('[name="refrigerant_quantity"]').value = system.refrigerant_quantity_kg;
+              }
+
+              // Set radio buttons for boolean fields
+              if (system.variable_speed_drives !== null) {
+                const vsdValue = system.variable_speed_drives ? 'yes' : 'no';
+                const vsdRadio = form.querySelector(`[name="installation_of_variable_speed_drives"][value="${vsdValue}"]`);
+                if (vsdRadio) vsdRadio.checked = true;
+              }
+              if (system.heat_recovery_system !== null) {
+                const hrsValue = system.heat_recovery_system ? 'yes' : 'no';
+                const hrsRadio = form.querySelector(`[name="installation_of_heat_recovery_systems"][value="${hrsValue}"]`);
+                if (hrsRadio) hrsRadio.checked = true;
+              }
+
+              if (form.querySelector('[name="total_chiller_system"]')) {
+                form.querySelector('[name="total_chiller_system"]').value = system.total_cooling_load_rt;
+              }
+              if (form.querySelector('[name="baseline_leakage_factor"]')) {
+                form.querySelector('[name="baseline_leakage_factor"]').value = system.baseline_leakage_factor_percent;
+              }
+              if (form.querySelector('[name="annual_operating_hours_per_day"]')) {
+                form.querySelector('[name="annual_operating_hours_per_day"]').value = system.operation_hours_per_workday;
+              }
+              if (form.querySelector('[name="annual_operating_days_per_week"]')) {
+                form.querySelector('[name="annual_operating_days_per_week"]').value = system.workdays_per_week;
+              }
+              if (form.querySelector('[name="annual_operating_weeks_per_year"]')) {
+                form.querySelector('[name="annual_operating_weeks_per_year"]').value = system.workweeks_per_year;
+              }
+              if (form.querySelector('[name="baseline_cooling_efficiency"]') && system.baseline_cooling_efficiency_kw_h) {
+                form.querySelector('[name="baseline_cooling_efficiency"]').value = system.baseline_cooling_efficiency_kw_h;
+              }
+              if (form.querySelector('[name="number_of_chillers"]') && system.number_of_chillers) {
+                form.querySelector('[name="number_of_chillers"]').value = system.number_of_chillers;
+              }
+              if (form.querySelector('[name="total_chiller_system_power_input"]') && system.total_chiller_system_power_input_kw) {
+                form.querySelector('[name="total_chiller_system_power_input"]').value = system.total_chiller_system_power_input_kw;
+              }
+              if (form.querySelector('[name="water_cooled_chiller_cooling_load_factor"]') && system.water_cooled_chiller_cooling_load_factor_percent) {
+                form.querySelector('[name="water_cooled_chiller_cooling_load_factor"]').value = system.water_cooled_chiller_cooling_load_factor_percent;
+              }
+              if (form.querySelector('[name="cop"]') && system.cop) {
+                form.querySelector('[name="cop"]').value = system.cop;
+              }
+              if (form.querySelector('[name="ipvl"]') && system.ip_lv) {
+                form.querySelector('[name="ipvl"]').value = system.ip_lv;
+              }
+              if (form.querySelector('[name="energy_efficiency_label"]') && system.energy_efficiency_label) {
+                form.querySelector('[name="energy_efficiency_label"]').value = system.energy_efficiency_label;
+              }
+              if (form.querySelector('[name="number_of_stars"]') && system.energy_efficiency_label) {
+                form.querySelector('[name="number_of_stars"]').value = system.energy_efficiency_label;
+              }
+              if (form.querySelector('[name="total_energy_consumption_of_chiller_system_annually"]') && system.total_energy_consumption_kwh_per_year) {
+                form.querySelector('[name="total_energy_consumption_of_chiller_system_annually"]').value = system.total_energy_consumption_kwh_per_year;
+              }
+            } else {
+              // Populate air conditioner fields
+              if (form.querySelector('[name="type_of_air_condition"]')) {
+                form.querySelector('[name="type_of_air_condition"]').value = system.ac_type;
+              }
+              if (form.querySelector('[name="year_of_installation"]')) {
+                form.querySelector('[name="year_of_installation"]').value = system.year_of_installation;
+              }
+              if (form.querySelector('[name="type_of_refrigerants"]')) {
+                form.querySelector('[name="type_of_refrigerants"]').value = system.refrigerant_type;
+              }
+              if (form.querySelector('[name="refrigerant_quantity"]')) {
+                form.querySelector('[name="refrigerant_quantity"]').value = system.refrigerant_quantity_kg;
+              }
+              if (form.querySelector('[name="total_cooling_load_for_split_vrv"]')) {
+                form.querySelector('[name="total_cooling_load_for_split_vrv"]').value = system.total_cooling_load_rt;
+              }
+              if (form.querySelector('[name="baseline_leakage_factor"]')) {
+                form.querySelector('[name="baseline_leakage_factor"]').value = system.baseline_leakage_factor_percent;
+              }
+              if (form.querySelector('[name="hours_per_day"]')) {
+                form.querySelector('[name="hours_per_day"]').value = system.operation_hours_per_workday;
+              }
+              if (form.querySelector('[name="days_per_week"]')) {
+                form.querySelector('[name="days_per_week"]').value = system.workdays_per_week;
+              }
+              if (form.querySelector('[name="weeks_per_year"]')) {
+                form.querySelector('[name="weeks_per_year"]').value = system.workweeks_per_year;
+              }
+              if (form.querySelector('[name="total_number_of_split_vrv_units"]') && system.number_of_units) {
+                form.querySelector('[name="total_number_of_split_vrv_units"]').value = system.number_of_units;
+              }
+              if (form.querySelector('[name="total_split_unit_vrv_system"]') && system.total_system_power_kw) {
+                form.querySelector('[name="total_split_unit_vrv_system"]').value = system.total_system_power_kw;
+              }
+              if (form.querySelector('[name="baseline_split_unit_vrv_system_efficiency"]') && system.baseline_efficiency_kw_per_rt) {
+                form.querySelector('[name="baseline_split_unit_vrv_system_efficiency"]').value = system.baseline_efficiency_kw_per_rt;
+              }
+              if (form.querySelector('[name="isser_rating"]') && system.iseer_rating) {
+                form.querySelector('[name="isser_rating"]').value = system.iseer_rating;
+              }
+              if (form.querySelector('[name="cop"]') && system.cop) {
+                form.querySelector('[name="cop"]').value = system.cop;
+              }
+              if (form.querySelector('[name="energy_efficiency_label"]') && system.energy_efficiency_label) {
+                form.querySelector('[name="energy_efficiency_label"]').value = system.energy_efficiency_label;
+              }
+              if (form.querySelector('[name="number_of_stars"]') && system.energy_efficiency_label) {
+                form.querySelector('[name="number_of_stars"]').value = system.energy_efficiency_label;
+              }
+              if (form.querySelector('[name="total_chiller_system_annually"]') && system.total_energy_consumption_kwh_per_year) {
+                form.querySelector('[name="total_chiller_system_annually"]').value = system.total_energy_consumption_kwh_per_year;
+              }
+            }
+          }, 200);
+
+          cooling_system_modal.showModal();
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred while loading the cooling system');
+    }
   }
 
   // Confirm delete
-  if (!window.deleteSystemIndex) {
-    window.deleteSystemIndex = null;
+  if (!window.deleteCoolingSystemId) {
+    window.deleteCoolingSystemId = null;
   }
-  
-  window.confirmDeleteCoolingSystem = function(index) {
-    window.deleteSystemIndex = index;
+  if (!window.deleteCoolingSystemType) {
+    window.deleteCoolingSystemType = null;
+  }
+
+  window.confirmDeleteCoolingSystem = function(systemId, coolingSystemType) {
+    window.deleteCoolingSystemId = systemId;
+    window.deleteCoolingSystemType = coolingSystemType;
     cooling_system_modal_delete.showModal();
   }
 
   // Delete cooling system
-  window.deleteCoolingSystem = function() {
-    if (window.deleteSystemIndex !== null) {
-      window.coolingSystems.splice(window.deleteSystemIndex, 1);
-      window.renderCoolingSystems();
-      window.deleteSystemIndex = null;
-      cooling_system_modal_delete.close();
+  window.deleteCoolingSystem = async function() {
+    if (window.deleteCoolingSystemId !== null && window.deleteCoolingSystemType !== null) {
+      try {
+        const response = await fetch(`/cooling-system/${window.deleteCoolingSystemId}/delete/?cooling_system_type=${window.deleteCoolingSystemType}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(),
+          },
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          await window.renderCoolingSystems();
+          window.deleteCoolingSystemId = null;
+          window.deleteCoolingSystemType = null;
+          cooling_system_modal_delete.close();
+        } else {
+          alert('Error deleting cooling system: ' + JSON.stringify(result.errors));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the cooling system');
+      }
     }
   }
 
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', function() {
-    window.renderCoolingSystems();
+    if (document.getElementById('cooling-systems-list')) {
+      window.renderCoolingSystems();
+    }
   });
 
   // If HTMX is processing this content dynamically, also initialize after htmx:afterSwap
