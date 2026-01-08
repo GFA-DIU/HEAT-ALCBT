@@ -2593,9 +2593,6 @@
       --toast-x: -50%;
     }
   }
-  .start-0 {
-    inset-inline-start: calc(var(--spacing) * 0);
-  }
   .dropdown-center {
     @layer daisyui.modifier {
       --anchor-h: center;
@@ -2625,9 +2622,6 @@
         }
       }
     }
-  }
-  .end-0 {
-    inset-inline-end: calc(var(--spacing) * 0);
   }
   .toast-top {
     @layer daisyui.modifier {
@@ -3017,9 +3011,6 @@
       }
     }
   }
-  .mx-0 {
-    margin-inline: calc(var(--spacing) * 0);
-  }
   .mx-auto {
     margin-inline: auto;
   }
@@ -3214,6 +3205,9 @@
   }
   .ml-4 {
     margin-left: calc(var(--spacing) * 4);
+  }
+  .ml-auto {
+    margin-left: auto;
   }
   .carousel-item {
     @layer daisyui.component {
@@ -4624,10 +4618,6 @@
     --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
-  .shadow-xl {
-    --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 8px 10px -6px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
   .btn-ghost {
     @layer daisyui.modifier {
       &:not(.btn-active, :hover, :active:focus, :focus-visible) {
@@ -4933,11 +4923,6 @@
   .md\:min-w-\[24rem\] {
     @media (width >= 48rem) {
       min-width: 24rem;
-    }
-  }
-  .md\:grid-cols-3 {
-    @media (width >= 48rem) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   .md\:flex-row {

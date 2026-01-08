@@ -54,7 +54,7 @@
               >*</span
             >
           </legend>
-          <select class="select w-full" name="type_of_hot_water_system">
+          <select class="select w-full" name="type_of_hot_water_system" required>
             <option disabled selected value="">Select an option</option>
             <option value="heat-pump">Heat pump water heater</option>
             <option value="boiler">Boiler</option>
@@ -66,7 +66,7 @@
           <legend class="fieldset-legend">
             Fuel type<span class="text-[var(--state--error--base)]">*</span>
           </legend>
-          <select class="select w-full" name="fuel_type">
+          <select class="select w-full" name="fuel_type" required>
             <option disabled selected value="">Select an option</option>
             <option value="electricity">Electricity</option>
             <option value="light-fuel-oil">Light fuel oil</option>
@@ -89,7 +89,7 @@
           <div class="w-full flex gap-1.5 items-center">
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required />
+                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required  />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >Hours / day</span
                 >
@@ -120,7 +120,7 @@
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 343" name="fuel_consumption" />
+            <input type="number" placeholder="eg. 343" name="fuel_consumption" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Litres/m³</span
             >
@@ -135,7 +135,7 @@
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 343" name="power_input" />
+            <input type="number" placeholder="eg. 343" name="power_input" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Kw</span
             >
@@ -150,7 +150,7 @@
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 343" name="baseline_efficiency" />
+            <input type="number" placeholder="eg. 343" name="baseline_efficiency" required min="0" />
           </label>
           <p class="validator-hint">This field is required</p>
         </fieldset>
@@ -176,7 +176,7 @@
               >*</span
             >
           </legend>
-          <select class="select w-full" name="heat_recovery_system">
+          <select class="select w-full" name="heat_recovery_system" required>
             <option disabled selected value="">Select an option</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -191,13 +191,13 @@
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 5" name="number_of_equipment" />
+            <input type="number" placeholder="eg. 5" name="number_of_equipment" required min="0" />
           </label>
           <p class="validator-hint">This field is required</p>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Energy efficiency label</legend>
-          <select class="select w-full" name="energy_efficiency_label">
+          <select class="select w-full" name="energy_efficiency_label" required>
             <option disabled selected value="">Select an option</option>
             <option value="bee">BEE Star Rating</option>
             <option value="egat">EGAT</option>
@@ -205,7 +205,7 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Number of stars</legend>
-          <select class="select w-full" name="number_of_stars">
+          <select class="select w-full" name="number_of_stars" required>
             <option disabled selected value="">Select an option</option>
             <option value="1">1</option>
             <option value="2">2</option>
@@ -387,6 +387,12 @@
     const buildingId = getBuildingId();
     if (!buildingId) {
       alert('Building ID not found. Please save building information first.');
+      return;
+    }
+
+    const validator = new window.FormValidator(form);
+    if (!validator.validate()) {
+      console.error('Form validation failed', validator.errors);
       return;
     }
 
