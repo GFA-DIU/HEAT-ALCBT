@@ -38,8 +38,8 @@
           data-color="var(--icon--soft-400)"
         ></span>
       </div>
-      <select 
-        id="country-select" 
+      <select
+        id="country-select"
         name="country"
         class="select select-with-icon w-full"
         hx-get="/select_lists/"
@@ -47,9 +47,8 @@
         hx-trigger="change[this.value != '']"
         hx-swap="innerHTML"
         hx-vals='js:{"country": this.value}'
-        onchange="if(!this.value) { document.getElementById('region-select').innerHTML = '<option value=\"\">Select a region or state</option>'; document.getElementById('city-select').innerHTML = '<option value=\"\">Select a city</option>'; }"
       >
-        <option disabled>Select a country</option>
+        <option value="" disabled selected>Select a country</option>
         {% for country in countries %}
           <option value="{{ country.id }}" >
             <span data-country="{{ country.name }}" data-width="20"></span>
@@ -72,7 +71,7 @@
           data-color="var(--icon--soft-400)"
         ></span>
       </div>
-      <select 
+      <select
         id="region-select"
         name="region"
         class="select select-with-icon w-full"
@@ -81,7 +80,6 @@
         hx-target="#city-select"
         hx-swap="innerHTML"
         hx-vals='js:{"region": this.value}'
-        onchange="if(!this.value) { document.getElementById('city-select').innerHTML = '<option value=\"\">Select a city</option>'; }"
       >
         <option value="">Select a region or state</option>
       </select>
@@ -151,27 +149,26 @@
 
     if (!countrySelect || !regionSelect || !citySelect) return;
 
-    // Get saved form data from localStorage
-    const getSavedFormData = () => {
-      const stepKey = 'building-information/building-name-location';
-      const savedDataStr = localStorage.getItem('building-form-data');
-      if (savedDataStr) {
-        try {
-          const allFormData = JSON.parse(savedDataStr);
-          return allFormData[stepKey] || {};
-        } catch (e) {
-          console.error('Error parsing saved form data:', e);
-          return {};
-        }
+    // Add event listener to reset dependent dropdowns when country is cleared
+    countrySelect.addEventListener('change', function() {
+      if (!this.value) {
+        regionSelect.innerHTML = '<option value="">Select a region or state</option>';
+        citySelect.innerHTML = '<option value="">Select a city</option>';
       }
-      return {};
-    };
+    });
+
+    // Add event listener to reset city dropdown when region is cleared
+    regionSelect.addEventListener('change', function() {
+      if (!this.value) {
+        citySelect.innerHTML = '<option value="">Select a city</option>';
+      }
+    });
 
     // Function to trigger HTMX requests for dependent dropdowns
-    const loadDependentDropdowns = (savedData) => {
-      const savedCountry = savedData.country;
-      const savedRegion = savedData.region;
-      const savedCity = savedData.city;
+    const loadDependentDropdowns = () => {
+      const savedCountry = countrySelect.value;
+      const savedRegion = regionSelect.value;
+      const savedCity = citySelect.value;
 
       // If country has a value, trigger HTMX request for regions
       if (savedCountry && typeof htmx !== 'undefined') {
@@ -216,9 +213,8 @@
 
     const checkAndLoad = () => {
       if (countrySelect.value) {
-        // Country value is present, get saved data and trigger HTMX requests
-        const savedData = getSavedFormData();
-        loadDependentDropdowns(savedData);
+        // Country value is present, trigger HTMX requests
+        loadDependentDropdowns();
       } else if (attempts < maxAttempts) {
         // Not yet loaded, try again
         attempts++;

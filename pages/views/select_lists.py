@@ -52,12 +52,13 @@ from accounts.models import CustomCity, CustomRegion
 from pages.models.assembly import AssemblyTechnique
 from pages.models.building import (BuildingCategory, CategorySubcategory,
                                    ClimateZone, CoolingType, HeatingType,
-                                   LightingType, VentilationType)
+                                   LightingType)
 from pages.models.epd import MaterialCategory, Unit
 from pages.models.building_operation.hot_water import (HotWaterSystemType, FuelType,
                                                        EnergyEfficiencyLabelType)
 from pages.models.building_operation.lighting import RoomType, LightingBulbType
 from pages.models.building_operation.chilling import RefrigerantType
+from pages.models.building_operation.ventilation import VentilationType, VentilationCapacity
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +67,22 @@ logger = logging.getLogger(__name__)
 @require_http_methods(["GET"])
 def select_lists(request):
     if m := request.GET.get("country"):
-        country_id = int(m)
+        # Handle empty or invalid country values
+        if not m or m in ['', '""', '\\"\\"']:
+            return render(
+                request,
+                "pages/utils/select_list.html",
+                {"items": [], "default_text": "Select a region"},
+            )
+        try:
+            country_id = int(m)
+        except ValueError:
+            logger.error(f"Invalid country ID: {m}")
+            return render(
+                request,
+                "pages/utils/select_list.html",
+                {"items": [], "default_text": "Select a region"},
+            )
         regions = CustomRegion.objects.filter(country=country_id).order_by("name")
         return render(
             request,
@@ -74,7 +90,21 @@ def select_lists(request):
             {"items": regions, "default_text": "Select a region"},
         )
     elif m := request.GET.get("region"):
-        region_id = int(m)
+        if not m or m in ['', '""', '\\"\\"']:
+            return render(
+                request,
+                "pages/utils/select_list.html",
+                {"items": [], "default_text": "Select a city"},
+            )
+        try:
+            region_id = int(m)
+        except ValueError:
+            logger.error(f"Invalid region ID: {m}")
+            return render(
+                request,
+                "pages/utils/select_list.html",
+                {"items": [], "default_text": "Select a city"},
+            )
         cities = CustomCity.objects.filter(region=region_id).order_by("name")
         return render(
             request,
@@ -169,6 +199,14 @@ def select_lists(request):
             request,
             "pages/utils/select_list.html",
             {"items": items, "default_text": "Select ventilation type"},
+        )
+
+    elif request.GET.get("ventilation_capacity_types"):
+        items = [{"id": choice[0], "name": choice[1]} for choice in VentilationCapacity.choices]
+        return render(
+            request,
+            "pages/utils/select_list.html",
+            {"items": items, "default_text": "Select capacity unit"},
         )
     
     elif request.GET.get("lighting_types"):

@@ -236,10 +236,9 @@
 
   // Helper to get building ID from session/localStorage
   function getBuildingId() {
-    // Try to get from stepManager or localStorage
-    const buildingData = JSON.parse(localStorage.getItem('building-form-data') || '{}');
-    return buildingData['building-information/building-name-location']?.building_id ||
-           sessionStorage.getItem('building_id');
+    // Get building UUID from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('building_uuid');
   }
 
   // Open modal
@@ -277,7 +276,7 @@
 
     // Collect all form data
     const systemData = Object.fromEntries(formData.entries());
-    systemData.building_id = buildingId;
+    systemData.building_uuid = buildingId;
 
     // If editing, include the system ID
     if (window.editingLiftEscalatorSystemId) {
@@ -318,11 +317,11 @@
   window.renderLiftEscalatorSystems = async function() {
     const listContainer = document.getElementById('lift-escalator-systems-list');
     const noSystemsContainer = document.getElementById('no-lift-escalator-system-template');
-    if (window.liftEscalatorSystems.length === 0) {
-      listContainer.innerHTML = noSystemsContainer.innerHTML;
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
+
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      console.error('Building ID not found');
       return;
     }
 

@@ -734,10 +734,10 @@
     return document.querySelector('[name=csrfmiddlewaretoken]').value;
   }
 
-  // Get building ID from the page context
+  // Get building UUID from URL parameters
   function getBuildingId() {
-    const buildingIdElement = document.querySelector('[data-building-id]');
-    return buildingIdElement ? buildingIdElement.dataset.buildingId : null;
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('building_uuid');
   }
 
   // Open modal for adding new system
@@ -862,17 +862,13 @@
 
   // Render cooling systems list
   window.renderCoolingSystems = async function() {
-    const listContainer = document.getElementById('cooling-systems-list');
-    const noSystemsContainer = document.getElementById('no-cooling-system-template');
-
-     // If no systems, show no systems template
-    if (window.coolingSystems.length === 0) {
-      listContainer.innerHTML = noSystemsContainer.innerHTML;
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      console.error('Building ID not found');
       return;
     }
+
+    const listContainer = document.getElementById('cooling-systems-list');
 
     try {
       const response = await fetch(`/cooling-system/${buildingId}/`, {

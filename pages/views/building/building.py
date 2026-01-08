@@ -238,10 +238,6 @@ def handle_information_submit(request, building_id, form):
             building.created_by = request.user
             building.save()
 
-            # Store building UUID in session for operational details
-            request.session['building_uuid'] = str(building.uuid)
-            request.session.modified = True
-
             logger.info(
                 "User %s successfully saved building %s (UUID: %s)", request.user, building, building.uuid
             )
