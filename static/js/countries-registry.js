@@ -150,6 +150,10 @@ export async function initCountryFlags() {
   elements.forEach((element) => {
     const countryCode = element.getAttribute("data-country");
 
+    if(element.getAttribute('data-no-country-replace') === 'true'){
+      return;
+    }
+
     if (!countryCode) {
       console.warn("Element has data-country attribute but no value:", element);
       return;

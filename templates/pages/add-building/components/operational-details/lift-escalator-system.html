@@ -56,7 +56,7 @@
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 5" name="number_of_lifts" />
+            <input type="number" placeholder="eg. 5" name="number_of_lifts" required min="0" />
           </label>
           <p class="validator-hint">This field is required</p>
         </fieldset>
@@ -67,7 +67,7 @@
               >*</span
             >
           </legend>
-          <select class="select w-full" name="lift_regenerative_features">
+          <select class="select w-full" name="lift_regenerative_features" required>
             <option disabled selected value="">Select an option</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -80,7 +80,7 @@
               >*</span
             >
           </legend>
-          <select class="select w-full" name="vvvf_sleep_mode">
+          <select class="select w-full" name="vvvf_sleep_mode" required>
             <option disabled selected value="">Select an option</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -94,7 +94,7 @@
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 343" name="annual_energy_consumption" />
+            <input type="number" placeholder="eg. 343" name="annual_energy_consumption" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >kWh/year</span
             >
@@ -263,8 +263,9 @@
     // Get number of lifts
     const numberOfLifts = formData.get('number_of_lifts');
 
-    if (!numberOfLifts) {
-      alert('Please enter the number of lifts');
+    const validator = new window.FormValidator(form);
+    if (!validator.validate()) {
+      console.error('Form validation failed', validator.errors);
       return;
     }
 

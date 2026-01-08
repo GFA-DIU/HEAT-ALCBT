@@ -51,7 +51,7 @@
           <legend class="fieldset-legend">
             Room type<span class="text-[var(--state--error--base)]">*</span>
           </legend>
-          <select class="select w-full" name="room_type">
+          <select class="select w-full" name="room_type" required>
             <option disabled selected value="">Select an option</option>
             <option value="office">
               Office:
@@ -78,7 +78,7 @@
             Area of room<span class="text-[var(--state--error--base)]">*</span>
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="area_of_room" />
+            <input type="number" placeholder="eg. 2" name="area_of_room" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >m²</span
             >
@@ -91,6 +91,7 @@
             >
           </legend>
           <select 
+            required
             class="select w-full"
             id="lighting-type"
             name="lighting_type"
@@ -110,7 +111,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="number_of_bulbs" />
+            <input type="number" placeholder="eg. 2" name="number_of_bulbs" required min="0" />
           </label>
         </fieldset>
         <fieldset class="fieldset">
@@ -173,7 +174,7 @@
               data-color="var(--icon--disabled-300)"
             ></span>
           </legend>
-          <select class="select w-full" name="installation_of_sensors">
+          <select class="select w-full" name="installation_of_sensors" required>
             <option disabled selected value="">Select an option</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -187,7 +188,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="baseline_lpd" />
+            <input type="number" placeholder="eg. 2" name="baseline_lpd" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >W/m²</span
             >
@@ -201,7 +202,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="annual_energy_consumption" />
+            <input type="number" placeholder="eg. 2" name="annual_energy_consumption" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >kWh/year</span
             >
@@ -397,6 +398,12 @@
     const buildingId = getBuildingId();
     if (!buildingId) {
       alert('Building ID not found. Please save building information first.');
+      return;
+    }
+
+    const validator = new window.FormValidator(form);
+    if (!validator.validate()) {
+      console.error('Form validation failed', validator.errors);
       return;
     }
 
