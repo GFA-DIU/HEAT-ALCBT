@@ -179,6 +179,7 @@
               </label>
               <p class="validator-hint">Required (2-200 characters)</p>
             </fieldset>
+
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Country<span class="text-[var(--state--error--base)]">*</span></legend>
               <select id="template-country" name="country_id" class="select" required>
@@ -188,6 +189,7 @@
                 {% endfor %}
               </select>
             </fieldset>
+
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Building component</legend>
               <select id="template-category" name="category_id" class="select" disabled>
@@ -197,6 +199,7 @@
                 {% endfor %}
               </select>
             </fieldset>
+
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Construction technique</legend>
               <select id="template-technique" name="technique_id" class="select" disabled>
@@ -206,10 +209,12 @@
                 {% endfor %}
               </select>
             </fieldset>
+
             <fieldset class="fieldset col-span-3">
               <legend class="fieldset-legend">Comment</legend>
               <textarea id="template-comment" name="comment" class="textarea w-full" rows="3" placeholder="Add a comment"></textarea>
             </fieldset>
+
           </div>
           <h2 class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4">
             MATERIALS (<span id="modal-materials-count">0</span>)
@@ -220,147 +225,16 @@
                 <h4 class="text-base/5 font-extrabold mb-1">Added Materials</h4>
                 <p class="text-sm/5 text-[var(--text--sub-600)]">Materials from EPD libraries</p>
               </div>
-              <button type="button" class="btn btn-sm btn-outline" onclick="alert('EPD modal integration - Coming soon')">
+              <button type="button" class="btn btn-sm btn-outline" onclick="structural_component_epd_modal.showModal()">
                 <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
                 Add from EPD library
               </button>
             </div>
             <ul id="modal-materials-list" class="grid grid-cols-1 gap-2.5 mt-4">
-              <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2 w-full">
-                  <span class="text-sm/5 font-medium"
-                    >Ready-Mix Concrete C25/30</span
-                  >
-                  <a>
-                    <span
-                      data-icon="external-link-line"
-                      data-size="20"
-                      data-color="var(--icon--sub-600)"
-                    ></span>
-                  </a>
-                </div>
-                <div
-                  class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
-                >
-                  <div
-                    class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
-                  >
-                    <span data-country="KH" data-width="20"></span>
-                  </div>
-                  <label class="input flex-[2.5]">
-                    <input type="text" placeholder="Add description" />
-                  </label>
-                  <label class="input flex-1">
-                    <input type="number" value="1" />
-                    <span class="text-xs/5 text-[var(--text--sub-600)]">%</span>
-                  </label>
-                  <div class="flex items-center py-2 mr-1.5">
-                    <div
-                      class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"
-                    ></div>
-                  </div>
-                  <button
-                    class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0"
-                  >
-                    <span
-                      data-icon="delete-bin-5-line"
-                      data-size="20"
-                      data-color="var(--icon--strong-950)"
-                    ></span>
-                  </button>
-                </div>
-              </li>
-              <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2 w-full">
-                  <span class="text-sm/5 font-medium">Sand-lime brick</span>
-                  <a>
-                    <span
-                      data-icon="external-link-line"
-                      data-size="20"
-                      data-color="var(--icon--sub-600)"
-                    ></span>
-                  </a>
-                </div>
-                <div
-                  class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
-                >
-                  <div
-                    class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
-                  >
-                    <span data-country="KH" data-width="20"></span>
-                  </div>
-                  <label class="input flex-[2.5]">
-                    <input type="text" placeholder="Add description" />
-                  </label>
-                  <label class="input flex-1">
-                    <input type="number" value="1" />
-                    <span class="text-xs/5 text-[var(--text--sub-600)]">%</span>
-                  </label>
-                  <div class="flex items-center py-2 mr-1.5">
-                    <div
-                      class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"
-                    ></div>
-                  </div>
-                  <button
-                    class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0"
-                  >
-                    <span
-                      data-icon="delete-bin-5-line"
-                      data-size="20"
-                      data-color="var(--icon--strong-950)"
-                    ></span>
-                  </button>
-                </div>
-              </li>
-              <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2 w-full">
-                  <span class="text-sm/5 font-medium"
-                    >Ready-Mix Concrete C25/30</span
-                  >
-                  <a>
-                    <span
-                      data-icon="external-link-line"
-                      data-size="20"
-                      data-color="var(--icon--sub-600)"
-                    ></span>
-                  </a>
-                </div>
-                <div
-                  class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
-                >
-                  <div
-                    class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
-                  >
-                    <span data-country="DE" data-width="20"></span>
-                  </div>
-                  <label class="input flex-[5]">
-                    <input type="text" placeholder="Add description" />
-                  </label>
-                  <label class="input flex-1">
-                    <input type="number" placeholder="eg.150" />
-                    <span class="text-xs/5 text-[var(--text--sub-600)]"
-                      >pcs</span
-                    >
-                  </label>
-                  <div class="flex items-center py-2 mr-1.5">
-                    <div
-                      class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"
-                    ></div>
-                  </div>
-                  <button
-                    class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0"
-                  >
-                    <span
-                      data-icon="delete-bin-5-line"
-                      data-size="20"
-                      data-color="var(--icon--strong-950)"
-                    ></span>
-                  </button>
-                </div>
-              </li>
+              
             </ul>
           </div>
-          <div class="p-5 w-full border-t border-[var(--stroke--soft-200)] flex items-center justify-between">
+          <div class="p-5 w-full border-t border-[var(--stroke--soft-200)] flex items-center justify-between absolute bottom-0 bg-white">
             <button type="button" class="btn btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit" onclick="template_detail_modal.close()">
               Cancel
             </button>
@@ -377,10 +251,7 @@
       </div>
     </dialog>
 
-    <dialog
-      id="structural_component_epd_modal"
-      class="modal modal-bottom sm:modal-end"
-    >
+    <dialog id="structural_component_epd_modal"class="modal modal-bottom sm:modal-end">
       <div
         class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
       >
@@ -841,7 +712,7 @@
         document.getElementById('modal-materials-list').innerHTML = '<li class="text-center py-4">Loading...</li>';
         deletedMaterialIds = [];
       
-  
+        template_detail_modal.showModal();
         // Fetch data
         fetch(`/templates/${assemblyId}/`)
           .then(response => response.ok ? response.json() : Promise.reject('Failed to load'))
