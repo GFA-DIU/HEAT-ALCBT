@@ -12,6 +12,6 @@
       <p
         class="text-center text-xs/xs text-[0.688rem] font-medium uppercase text-[var(--bg--black-0)]"
       >
-        Copyright © {{ current_year }} • Terms of Use & Privacy Policy
+        Copyright © {{ current_year }} • <a class='link-secondary' href="{% url 'terms_of_use' %}">Terms of Use</a> & <a class='link-secondary' href="{% url 'privacy_policy' %}">Privacy Policy</a>
       </p>
     </footer>

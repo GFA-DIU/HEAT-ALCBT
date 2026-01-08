@@ -11,11 +11,11 @@
 
   <div class="flex items-stretch w-full p-2.5 gap-4">
       <div class="w-full flex flex-col max-w-[37.875rem] mx-auto">
-        <div class="flex items-center justify-between max-md:mb-10">
+        <div class="flex items-center justify-between max-md:mb-10 mt-4 md:mt-8">
           <img
             src="{% static 'assets/logo.svg' %}"
             alt="logo"
-            class="w-[45px] h-[18px]"
+            class="w-[4.688rem]"
           />
           {% block action_content %} {% endblock action_content %}
         </div>
@@ -29,12 +29,12 @@
           <p
             class="text-sm text-center max-md:mt-6 text-(--text--strong-950)"
           >
-            <a href="{% url 'terms_of_use' %}">Terms of use</a>&nbsp;and&nbsp;<a href="{% url 'privacy_policy' %}">Privacy policy</a>
+            <a class="link-secondary" href="{% url 'terms_of_use' %}">Terms of use</a>&nbsp;and&nbsp;<a class="link-secondary" href="{% url 'privacy_policy' %}">Privacy policy</a>
           </p>
         </div>
       </div>
       <div
-        class="flex w-full rounded-3xl overflow-hidden relative max-lg:hidden max-w-[578px]"
+        class="flex w-full rounded-3xl overflow-hidden relative max-lg:hidden  max-w-[40%]"
       >
         <img
           src="{% static 'assets/onboarding.png' %}"

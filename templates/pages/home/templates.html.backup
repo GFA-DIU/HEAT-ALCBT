@@ -37,10 +37,10 @@
               <input type="text" name="search_query" placeholder="Search templates..." value="{{ search_query }}" />
             </label>
             <select class="select" name="country">
-              <option value="" >All Countries </option>
+              <option value="">All Countries</option>
               {% for country in countries %}
-                <option  value="{{ country.id }}" {% if selected_country == country.id|stringformat:"s" %}selected{% endif %}>
-                 <span data-country="{{country.code2}}"></span>  {{ country.name }}
+                <option value="{{ country.id }}" {% if selected_country == country.id|stringformat:"s" %}selected{% endif %}>
+                  {{ country.name }}
                 </option>
               {% endfor %}
             </select>
@@ -184,7 +184,7 @@
               <select id="template-country" name="country_id" class="select" required>
                 <option value="">Select country</option>
                 {% for country in countries %}
-                  <option value="{{ country.id }}"> <span data-country="{{ country.code2 }}"></span> {{ country.name }}</option>
+                  <option value="{{ country.id }}">{{ country.name }}</option>
                 {% endfor %}
               </select>
             </fieldset>
@@ -830,278 +830,192 @@
     </dialog>
 
     <script>
-      // Global vars for tracking
-      let deletedMaterialIds = [];
-      let currentTemplateData = null;
-      
-      // View template details and populate form
+      // View template details
       function viewTemplate(assemblyId) {
-        // Show loading
+        // Show loading state
         document.getElementById('modal-template-name').textContent = 'Loading...';
+        document.getElementById('modal-template-title').textContent = '';
         document.getElementById('modal-materials-list').innerHTML = '<li class="text-center py-4">Loading...</li>';
-        deletedMaterialIds = [];
-      
-  
-        // Fetch data
+
+        // Open the modal
+        template_detail_modal.showModal();
+
+        // Fetch template details
         fetch(`/templates/${assemblyId}/`)
-          .then(response => response.ok ? response.json() : Promise.reject('Failed to load'))
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to load template');
+            }
+            return response.json();
+          })
           .then(data => {
-            currentTemplateData = data;
-      
-            // Populate form
-            document.getElementById('template-id').value = data.id;
-            document.getElementById('can-edit').value = data.can_edit;
+            // Update modal header
             document.getElementById('modal-template-name').textContent = data.name;
-            document.getElementById('template-name').value = data.name;
-            document.getElementById('template-country').value = data.country_id || '';
-            document.getElementById('template-category').value = data.category_id || '';
-            document.getElementById('template-technique').value = data.technique_id || '';
-            document.getElementById('template-comment').value = data.comment || '';
-      
-            // Show/hide controls based on permissions
-            const canEdit = data.can_edit;
-            document.getElementById('modal-delete-btn').style.display = canEdit ? 'flex' : 'none';
-            document.getElementById('modal-update-btn').style.display = canEdit ? 'block' : 'none';
-      
+            document.getElementById('modal-template-title').textContent = data.name;
+
+            // Update country
+            const countryEl = document.getElementById('modal-template-country');
+            if (data.country_code && data.country_name) {
+              countryEl.innerHTML = `
+                <span data-country="${data.country_code}" data-width="20"></span>
+                <span>${data.country_name}</span>
+              `;
+            } else {
+              countryEl.textContent = 'N/A';
+            }
+
+            // Update dimension
+            document.getElementById('modal-template-dimension').textContent = data.dimension_display || 'N/A';
+
+            // Update mode
+            document.getElementById('modal-template-mode').textContent = data.mode_display || 'N/A';
+
+            // Update classification
+            const classEl = document.getElementById('modal-template-classification');
+            if (data.classification) {
+              classEl.textContent = data.classification.category +
+                (data.classification.technique ? ` - ${data.classification.technique}` : '');
+            } else {
+              classEl.textContent = 'N/A';
+            }
+
+            // Update GWP
+            document.getElementById('modal-template-gwp').textContent =
+              `${data.total_gwp} kg CO2e eq/${data.dimension_display}`;
+
+            // Update comment
+            const commentFieldset = document.getElementById('modal-template-comment-fieldset');
+            const commentEl = document.getElementById('modal-template-comment');
+            if (data.comment) {
+              commentFieldset.style.display = 'block';
+              commentEl.textContent = data.comment;
+            } else {
+              commentFieldset.style.display = 'none';
+            }
+
             // Update materials count
             document.getElementById('modal-materials-count').textContent = data.materials.length;
-      
-            // Render materials
-            renderMaterials(data.materials, canEdit);
-      
-            // Initialize icons/flags
-            if (typeof initializeIcons === 'function') initializeIcons();
-            if (typeof initializeCountryFlags === 'function') initializeCountryFlags();
+
+            // Update materials list
+            const materialsList = document.getElementById('modal-materials-list');
+            if (data.materials.length === 0) {
+              materialsList.innerHTML = '<li class="text-center py-4 text-[var(--text--sub-600)]">No materials added</li>';
+            } else {
+              materialsList.innerHTML = data.materials.map(material => `
+                <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
+                  <div class="flex items-center justify-between mb-2 w-full">
+                    <span class="text-sm/5 font-medium">${material.name}</span>
+                    ${material.epd_link ? `
+                      <a href="${material.epd_link}" target="_blank" title="View EPD details">
+                        <span
+                          data-icon="external-link-line"
+                          data-size="20"
+                          data-color="var(--icon--sub-600)"
+                        ></span>
+                      </a>
+                    ` : ''}
+                  </div>
+                  <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
+                    ${material.country_code ? `
+                      <div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]">
+                        <span data-country="${material.country_code}" data-width="20"></span>
+                      </div>
+                    ` : ''}
+                    <div class="flex-[2.5] text-sm/5 p-2">
+                      ${material.description || 'No description'}
+                    </div>
+                    <div class="flex-1 text-sm/5 p-2 text-right font-medium">
+                      ${material.quantity} ${material.unit}
+                    </div>
+                    <div class="flex-1 text-sm/5 p-2 text-right font-semibold text-green-600">
+                      ${material.gwp} kg CO2e
+                    </div>
+                  </div>
+                </li>
+              `).join('');
+            }
+
+            // Reinitialize icons and country flags after updating content
+            if (typeof initializeIcons === 'function') {
+              initializeIcons();
+            }
+            if (typeof initializeCountryFlags === 'function') {
+              initializeCountryFlags();
+            }
           })
           .catch(error => {
-            console.error('Error:', error);
+            console.error('Error loading template:', error);
             document.getElementById('modal-template-name').textContent = 'Error';
             document.getElementById('modal-materials-list').innerHTML =
-              '<li class="text-center py-4 text-red-600">Failed to load template</li>';
+              '<li class="text-center py-4 text-red-600">Failed to load template details</li>';
           });
       }
-      
-      // Render materials list
-      function renderMaterials(materials, canEdit) {
-        const list = document.getElementById('modal-materials-list');
-      
-        if (materials.length === 0) {
-          list.innerHTML = '<li class="text-center py-4 text-[var(--text--sub-600)]">No materials added</li>';
-          return;
-        }
-      
-        list.innerHTML = materials.map(m => `
-          <li class="bg-[var(--bg--weak-50)] rounded-xl p-4" data-material-id="${m.id}">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm/5 font-medium">${m.name}</span>
-              ${m.epd_link ? `<a href="${m.epd_link}" target="_blank"><span data-icon="external-link-line" data-size="20" data-color="var(--icon--sub-600)"></span></a>` : ''}
-            </div>
-            <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
-              ${m.country_code ? `<div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"><span data-country="${m.country_code}" data-width="20"></span></div>` : ''}
-              <label class="input flex-[2.5]">
-                <input type="text" class="material-description" value="${m.description || ''}" placeholder="Add description" ${!canEdit ? 'readonly' : ''} />
-              </label>
-              <label class="input flex-1">
-                <input type="number" class="material-quantity" value="${m.quantity}" ${!canEdit ? 'readonly' : ''} />
-                <span class="text-xs/5 text-[var(--text--sub-600)]">${m.unit}</span>
-              </label>
-              ${canEdit ? `
-                <div class="flex items-center py-2 mr-1.5"><div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"></div></div>
-                <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0" onclick="deleteMaterial('${m.id}')">
-                  <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
-                </button>
-              ` : ''}
-            </div>
-          </li>
-        `).join('');
-      }
-      
-      // Delete material
-      function deleteMaterial(materialId) {
-        if (!confirm('Remove this material?')) return;
-      
-        deletedMaterialIds.push(materialId);
-        document.querySelector(`[data-material-id="${materialId}"]`)?.remove();
-      
-        const count = document.querySelectorAll('#modal-materials-list > li').length;
-        document.getElementById('modal-materials-count').textContent = count;
-      }
-      
-      // Collect form data
-      function collectFormData() {
-        const materials = [];
-        document.querySelectorAll('#modal-materials-list > li[data-material-id]').forEach(li => {
-          const id = li.getAttribute('data-material-id');
-          materials.push({
-            id,
-            description: li.querySelector('.material-description')?.value || '',
-            quantity: parseFloat(li.querySelector('.material-quantity')?.value) || 0
-          });
-        });
-      
-        return {
-          name: document.getElementById('template-name').value,
-          country_id: document.getElementById('template-country').value,
-          comment: document.getElementById('template-comment').value,
-          materials,
-          deleted_materials: deletedMaterialIds
-        };
-      }
-      
-      // Update template
-      function handleUpdate() {
-        const form = document.getElementById('template-form');
-        if (!form.checkValidity()) {
-          form.reportValidity();
-          return;
-        }
-      
-        const templateId = document.getElementById('template-id').value;
-        const data = collectFormData();
-      
-        fetch(`/templates/${templateId}/update/`, {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': getCsrfToken(),
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(result => {
-          if (result.success) {
-            template_detail_modal.close();
-            htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success('Template updated');
-          } else {
-            alert(result.error || 'Update failed');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('An error occurred');
-        });
-      }
-      
+
       // Duplicate template
-      function handleDuplicate() {
-        const form = document.getElementById('template-form');
-        if (!form.checkValidity()) {
-          form.reportValidity();
+      function duplicateTemplate(assemblyId) {
+        if (!confirm('Do you want to create a copy of this template?')) {
           return;
         }
-      
-        const templateId = document.getElementById('template-id').value;
-        const data = collectFormData();
-      
-        fetch(`/templates/${templateId}/duplicate/`, {
+
+        // TODO: Implement backend endpoint for duplication
+        fetch(`/api/templates/${assemblyId}/duplicate/`, {
           method: 'POST',
           headers: {
             'X-CSRFToken': getCsrfToken(),
             'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
+          }
         })
-        .then(response => response.json())
-        .then(result => {
-          if (result.success) {
-            template_detail_modal.close();
+        .then(response => {
+          if (response.ok) {
+            // Reload the list
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
+            Toast.success('Template duplicated successfully!');
           } else {
-            alert(result.error || 'Duplication failed');
+            alert('Failed to duplicate template');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('An error occurred');
+          alert('An error occurred while duplicating the template');
         });
       }
-      
-      // Delete template from dialog
-      function deleteTemplateFromDialog() {
-        const templateId = document.getElementById('template-id').value;
-        const templateName = document.getElementById('template-name').value;
-      
-        if (!confirm(`Delete "${templateName}"? This cannot be undone.`)) return;
-      
-        fetch(`/templates/${templateId}/delete/`, {
-          method: 'DELETE',
-          headers: { 'X-CSRFToken': getCsrfToken() }
-        })
-        .then(response => response.json())
-        .then(result => {
-          if (result.success) {
-            template_detail_modal.close();
-            htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success('Template deleted');
-          } else {
-            alert(result.error || 'Deletion failed');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('An error occurred');
-        });
-      }
-      
-      // Delete from list (existing function)
+
+      // Delete template
       function deleteTemplate(assemblyId, assemblyName) {
-        if (!confirm(`Delete "${assemblyName}"? This cannot be undone.`)) return;
-      
-        fetch(`/templates/${assemblyId}/delete/`, {
+        if (!confirm(`Are you sure you want to delete "${assemblyName}"? This action cannot be undone.`)) {
+          return;
+        }
+
+        // TODO: Implement backend endpoint for deletion
+        fetch(`/api/templates/${assemblyId}/delete/`, {
           method: 'DELETE',
-          headers: { 'X-CSRFToken': getCsrfToken() }
-        })
-        .then(response => response.json())
-        .then(result => {
-          if (result.success) {
-            htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success('Template deleted');
-          } else {
-            alert(result.error || 'Deletion failed');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          if (typeof Toast !== 'undefined') Toast.error('An error occurred');
-        });
-      }
-      
-      // Duplicate from list (existing function)
-      function duplicateTemplate(assemblyId) {
-        if (!confirm('Create a copy of this template?')) return;
-      
-        // Simple duplication without modifications
-        fetch(`/templates/${assemblyId}/duplicate/`, {
-          method: 'POST',
           headers: {
             'X-CSRFToken': getCsrfToken(),
             'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ materials: [] })
+          }
         })
-        .then(response => response.json())
-        .then(result => {
-          if (result.success) {
+        .then(response => {
+          if (response.ok) {
+            // Reload the list
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
+            Toast.success('Template deleted successfully!');
           } else {
-            alert(result.error || 'Duplication failed');
+            alert('Failed to delete template');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('An error occurred');
+          Toast.error('An error occurred while deleting the template');
         });
       }
-      
-      // Get CSRF token
+
+      // Helper function to get CSRF token
       function getCsrfToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
-          document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+               document.cookie.split('; ')
+                 .find(row => row.startsWith('csrftoken='))
+                 ?.split('=')[1];
       }
-      
     </script>
 
 {% endblock %}
