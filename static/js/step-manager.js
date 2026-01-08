@@ -460,6 +460,13 @@ class StepManager {
     if (form) {
       console.log("Extracting FormData from form element:", form);
       const formData = new FormData(form);
+      let validator = new window.FormValidator(form);
+
+      let isValid = validator.validate();
+      if(!isValid){
+        Toast.error("Please correct the errors in the form before proceeding.");
+        throw new Error("Form validation failed.");
+      }
       return formData.entries ? Object.fromEntries(formData.entries()) : {};
     }else {
       const object = this.formData[stepKey] || {};
@@ -472,7 +479,7 @@ class StepManager {
     const step = this.getCurrentStepInfo();
     const stepData = this.getFormData(stepKey);
 
-    this.saveStepFormData(stepData, stepKey);  
+    this.saveStepFormDataLocally(stepData, stepKey);  
     if(!stepData && Object.keys(stepData).length === 0){
       alert("No data to save for this step.");
       return;
@@ -486,7 +493,7 @@ class StepManager {
    * @param {Record<string, any>} stepData
    * @param {string} stepKey 
    */
-  saveStepFormData(stepData, stepKey) {
+  saveStepFormDataLocally(stepData, stepKey) {
     if(stepData){
       console.log("Saving step data:", stepData);
       this.formData[stepKey] = stepData;
@@ -850,10 +857,6 @@ class StepManager {
     };
   }
 
-}
-
-function goToDashboard() {
-  window.location.href = "/src/pages/dashboard/dashboard.html";
 }
 
 // Initialize the step manager when the page loads

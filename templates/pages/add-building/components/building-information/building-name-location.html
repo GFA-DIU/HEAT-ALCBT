@@ -1,31 +1,48 @@
+<!-- Updated building-name-location.html with validation -->
+<!-- This is a drop-in replacement for your existing file -->
+{% load static %}
 <form id="form" class="grid grid-cols-2 gap-x-2 gap-y-1">
   {% csrf_token %}
+
+  <!-- Building Name Field -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
-      Building name or Code<span class="text-[var(--state--error--base)]"
-        >*</span
-      >
+      Building name or Code<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="input validator w-full">
-      <input minlength='3' name="building_name" type="text" placeholder="eg. JP Plaza" required class="validator" />
+      <input
+        name="building_name"
+        type="text"
+        placeholder="eg. JP Plaza"
+        required
+        minlength="2"
+        maxlength="200"
+      />
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">Building name must be 2-200 characters</p>
   </fieldset>
+
+  <!-- Address Field -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend w-full">
-      Address (Zip, Street)<span class="text-[var(--state--error--base)]"
-        >*</span
-      ><span class="flex-1 flex justify-end text-[var(--text--sub-600)]">
-        <a class="underline cursor-pointer" onclick="openGeoLocationModal()"
-          >Find location on map</a
-        >
+      Address (Zip, Street)<span class="text-[var(--state--error--base)]">*</span>
+      <span class="flex-1 flex justify-end text-[var(--text--sub-600)]">
+        <a class="underline cursor-pointer" onclick="openGeoLocationModal()">Find location on map</a>
       </span>
     </legend>
     <label class="input validator w-full">
-      <input name="address" type="text" placeholder="eg. 1885 L Street Northwest" required />
+      <input
+        name="address"
+        type="text"
+        placeholder="eg. 1885 L Street Northwest"
+        required
+        minlength="5"
+      />
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">Address is required (minimum 5 characters)</p>
   </fieldset>
+
+  <!-- Country Field -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
       Country<span class="text-[var(--state--error--base)]">*</span>
@@ -38,10 +55,11 @@
           data-color="var(--icon--soft-400)"
         ></span>
       </div>
-      <select 
-        id="country-select" 
+      <select
+        id="country-select"
         name="country"
         class="select select-with-icon w-full"
+        required
         hx-get="/select_lists/"
         hx-target="#region-select"
         hx-trigger="change[this.value != '']"
@@ -49,33 +67,36 @@
         hx-vals='js:{"country": this.value}'
         onchange="if(!this.value) { document.getElementById('region-select').innerHTML = '<option value=\"\">Select a region or state</option>'; document.getElementById('city-select').innerHTML = '<option value=\"\">Select a city</option>'; }"
       >
-        <option disabled>Select a country</option>
+        <option value="" disabled selected>Select a country</option>
         {% for country in countries %}
-          <option value="{{ country.id }}" >
+          <option value="{{ country.id }}">
             <span data-country="{{ country.name }}" data-width="20"></span>
             <span data-country="{{ country.name }}" data-flag="false"></span>
-        </option>
+          </option>
         {% endfor %}
       </select>
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">Please select a country</p>
   </fieldset>
+
+  <!-- Region Field -->
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
       Region or State<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full flex relative">
-      <div class="select-icon"> 
+      <div class="select-icon">
         <span
           data-icon="flashlight-line"
           data-size="20"
           data-color="var(--icon--soft-400)"
         ></span>
       </div>
-      <select 
+      <select
         id="region-select"
         name="region"
         class="select select-with-icon w-full"
+        required
         hx-get="/select_lists/"
         hx-trigger="change[this.value != '']"
         hx-target="#city-select"
@@ -86,15 +107,10 @@
         <option value="">Select a region or state</option>
       </select>
     </label>
-    <p class="label">
-      <span
-        data-icon="information-fill"
-        data-size="16"
-        data-color="var(--icon--soft-400)"
-      ></span>
-      Select a country first
-    </p>
+    <p class="validator-hint">Select a country first, then choose region</p>
   </fieldset>
+
+  <!-- City Field -->
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
       City<span class="text-[var(--state--error--base)]">*</span>
@@ -107,130 +123,57 @@
           data-color="var(--icon--soft-400)"
         ></span>
       </div>
-      <select 
+      <select
         id="city-select"
         name="city"
         class="select select-with-icon w-full"
+        required
       >
         <option value="">Select a city</option>
       </select>
     </label>
-    <p class="label">
-      <span
-        data-icon="information-fill"
-        data-size="16"
-        data-color="var(--icon--soft-400)"
-      ></span>
-      Select a region or state first
-    </p>
+    <p class="validator-hint">Select a region first, then choose city</p>
   </fieldset>
+
+  <!-- Longitude Field (Optional) -->
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
       Longitude <span class="text-[var(--text--sub-600)]">(Optional)</span>
     </legend>
     <label class="input validator w-full">
-      <input name="longitude" type="text" placeholder="eg. -7.946232" required />
+      <input
+        name="longitude"
+        type="number"
+        step="any"
+        min="-180"
+        max="180"
+        placeholder="eg. -7.946232"
+      />
     </label>
+    <p class="validator-hint">Must be between -180 and 180</p>
   </fieldset>
+
+  <!-- Latitude Field (Optional) -->
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
       Latitude <span class="text-[var(--text--sub-600)]">(Optional)</span>
     </legend>
     <label class="input validator w-full">
-      <input name="latitude" type="text" placeholder="eg. 5.603722" required />
+      <input
+        name="latitude"
+        type="number"
+        step="any"
+        min="-90"
+        max="90"
+        placeholder="eg. 5.603722"
+      />
     </label>
+    <p class="validator-hint">Must be between -90 and 90</p>
   </fieldset>
+
 </form>
 
-<script>
-  // Initialize cascading dropdowns when form is loaded with pre-filled data
-  (function initializeCascadingDropdowns() {
-    const countrySelect = document.getElementById('country-select');
-    const regionSelect = document.getElementById('region-select');
-    const citySelect = document.getElementById('city-select');
-
-    if (!countrySelect || !regionSelect || !citySelect) return;
-
-    // Get saved form data from localStorage
-    const getSavedFormData = () => {
-      const stepKey = 'building-information/building-name-location';
-      const savedDataStr = localStorage.getItem('building-form-data');
-      if (savedDataStr) {
-        try {
-          const allFormData = JSON.parse(savedDataStr);
-          return allFormData[stepKey] || {};
-        } catch (e) {
-          console.error('Error parsing saved form data:', e);
-          return {};
-        }
-      }
-      return {};
-    };
-
-    // Function to trigger HTMX requests for dependent dropdowns
-    const loadDependentDropdowns = (savedData) => {
-      const savedCountry = savedData.country;
-      const savedRegion = savedData.region;
-      const savedCity = savedData.city;
-
-      // If country has a value, trigger HTMX request for regions
-      if (savedCountry && typeof htmx !== 'undefined') {
-        // Trigger the HTMX request on country select
-        htmx.trigger(countrySelect, 'change');
-
-        // Wait for HTMX to populate regions, then restore region value
-        if (savedRegion) {
-          // Listen for when HTMX finishes updating the region select
-          const regionLoadHandler = (event) => {
-            if (event.detail.target === regionSelect) {
-              regionSelect.value = savedRegion;
-
-              // If region has a value, trigger HTMX request for cities
-              if (savedRegion) {
-                htmx.trigger(regionSelect, 'change');
-
-                // Wait for HTMX to populate cities, then restore city value
-                if (savedCity) {
-                  const cityLoadHandler = (event) => {
-                    if (event.detail.target === citySelect) {
-                      citySelect.value = savedCity;
-                      document.body.removeEventListener('htmx:afterSwap', cityLoadHandler);
-                    }
-                  };
-                  document.body.addEventListener('htmx:afterSwap', cityLoadHandler);
-                }
-              }
-
-              document.body.removeEventListener('htmx:afterSwap', regionLoadHandler);
-            }
-          };
-          document.body.addEventListener('htmx:afterSwap', regionLoadHandler);
-        }
-      }
-    };
-
-    // Check multiple times to catch when StepManager restores the data
-    let attempts = 0;
-    const maxAttempts = 5;
-    const checkInterval = 200; // Check every 200ms
-
-    const checkAndLoad = () => {
-      if (countrySelect.value) {
-        // Country value is present, get saved data and trigger HTMX requests
-        const savedData = getSavedFormData();
-        loadDependentDropdowns(savedData);
-      } else if (attempts < maxAttempts) {
-        // Not yet loaded, try again
-        attempts++;
-        setTimeout(checkAndLoad, checkInterval);
-      }
-    };
-
-    // Start checking
-    checkAndLoad();
-  })();
-</script>
-
+<!-- Geo Location Modal (unchanged) -->
 <dialog
   id="geo_location_modal"
   class="modal modal-middle w-screen overflow-y-auto pt-4 lg:pb-4"
@@ -302,3 +245,145 @@
     </div>
   </div>
 </dialog>
+
+<!-- Validation Script -->
+<script>
+(function() {
+  // Wait for form to be available
+  const form = document.getElementById('form');
+
+  if (!form) {
+    console.error('Form element not found');
+    return;
+  }
+
+  // Check if FormValidator is available
+  if (!window.FormValidator) {
+    console.error('FormValidator not loaded. Please include form-validator.js');
+    return;
+  }
+
+  // Initialize form validator
+  const validator = new window.FormValidator(form, {
+    validateOnInput: true,
+
+    // Custom validation rules
+    customValidators: {
+      // Validate building name
+      building_name: (value) => {
+        if (!value) return null; // Will be caught by required attribute
+
+        if (value.trim().length < 2) {
+          return 'Building name must be at least 2 characters';
+        }
+
+        // Prevent XSS
+        if (/[<>]/.test(value)) {
+          return 'Building name cannot contain < or > characters';
+        }
+
+        return null; // Valid
+      },
+
+      // Validate address
+      address: (value) => {
+        if (!value) return null;
+
+        if (value.trim().length < 5) {
+          return 'Address must be at least 5 characters';
+        }
+
+        return null;
+      },
+
+      // Validate country selection
+      country: (value) => {
+        if (!value || value === '') {
+          return 'Please select a country';
+        }
+        return null;
+      },
+
+      // Validate region (conditional - only required if country selected)
+      region: (value, field, form) => {
+        const countryField = form.querySelector('[name="country"]');
+        if (countryField && countryField.value && (!value || value === '')) {
+          return 'Please select a region';
+        }
+        return null;
+      },
+
+      // Validate city (conditional - only required if region selected)
+      city: (value, field, form) => {
+        const regionField = form.querySelector('[name="region"]');
+        if (regionField && regionField.value && (!value || value === '')) {
+          return 'Please select a city';
+        }
+        return null;
+      },
+
+      // Validate longitude (optional, but if provided must be valid)
+      longitude: (value) => {
+        if (!value || value === '') return null; // Optional field
+
+        const lng = parseFloat(value);
+        if (isNaN(lng)) {
+          return 'Longitude must be a valid number';
+        }
+        if (lng < -180 || lng > 180) {
+          return 'Longitude must be between -180 and 180';
+        }
+
+        return null;
+      },
+
+      // Validate latitude (optional, but if provided must be valid)
+      latitude: (value) => {
+        if (!value || value === '') return null; // Optional field
+
+        const lat = parseFloat(value);
+        if (isNaN(lat)) {
+          return 'Latitude must be a valid number';
+        }
+        if (lat < -90 || lat > 90) {
+          return 'Latitude must be between -90 and 90';
+        }
+
+        return null;
+      }
+    },
+
+    // Callback when validation status changes
+    onStatusChange: (isValid, data, errors) => {
+      console.log('Form validation status:', isValid);
+
+      if (!isValid) {
+        console.log('Validation errors:', errors);
+      }
+
+      // The FormValidator automatically dispatches 'onFormStatus' event
+      // which StepManager listens to for enabling/disabling buttons
+    }
+  });
+
+  // Store validator instance globally for debugging
+  window.currentFormValidator = validator;
+
+  console.log('✓ Form validation initialized for building-name-location');
+
+  // Handle HTMX responses for country/region/city selects
+  // Re-validate dependent fields when selections change
+  document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'region-select' || event.detail.target.id === 'city-select') {
+      // Re-validate the form after dynamic content loads
+      setTimeout(() => {
+        validator.validate();
+        validator.updateFormStatus();
+      }, 100);
+    }
+  });
+
+})();
+</script>
+
+

@@ -15,6 +15,7 @@
   default: true;
   prefersdark: false;
   color-scheme: "light";
+
   --color-base-100: #fff;
   --color-base-200: var(--bg--weak-50);
   --color-base-300: var(--text--disabled-300);
@@ -281,7 +282,7 @@ body {
   .stepper-item-content
   .stepper-sub-item
   .stepper-sub-item-text {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   font-weight: 500;
   line-height: 1rem;
   vertical-align: middle;
