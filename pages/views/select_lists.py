@@ -28,6 +28,18 @@ Units:
 - ?power_units                 - Get power unit options (kW)
 - ?cooling_capacity_units      - Get cooling capacity units (kW, TR)
 - ?airflow_units               - Get airflow units (m³/h, CFM)
+
+Hot Water System Options:
+- ?hot_water_system_types      - Get hot water system type options
+- ?fuel_types                  - Get fuel type options
+- ?energy_efficiency_label_types - Get energy efficiency label options
+
+Cooling System Options:
+- ?refrigerant_types           - Get refrigerant type options
+
+Lighting System Options:
+- ?room_types                  - Get room type options
+- ?lighting_bulb_types         - Get lighting bulb type options
 """
 
 import logging
@@ -42,6 +54,10 @@ from pages.models.building import (BuildingCategory, CategorySubcategory,
                                    ClimateZone, CoolingType, HeatingType,
                                    LightingType, VentilationType)
 from pages.models.epd import MaterialCategory, Unit
+from pages.models.building_operation.hot_water import (HotWaterSystemType, FuelType,
+                                                       EnergyEfficiencyLabelType)
+from pages.models.building_operation.lighting import RoomType, LightingBulbType
+from pages.models.building_operation.chilling import RefrigerantType
 
 logger = logging.getLogger(__name__)
 
@@ -198,6 +214,58 @@ def select_lists(request):
             request,
             "pages/utils/select_list.html",
             {"items": items, "default_text": "Select airflow unit"},
+        )
+
+    # Hot Water System Options
+    elif request.GET.get("hot_water_system_types"):
+        items = [{"id": choice[0], "name": choice[1]} for choice in HotWaterSystemType.choices]
+        return render(
+            request,
+            "pages/utils/select_list.html",
+            {"items": items, "default_text": "Select hot water system type"},
+        )
+
+    elif request.GET.get("fuel_types"):
+        items = [{"id": choice[0], "name": choice[1]} for choice in FuelType.choices]
+        return render(
+            request,
+            "pages/utils/select_list.html",
+            {"items": items, "default_text": "Select fuel type"},
+        )
+
+    elif request.GET.get("energy_efficiency_label_types"):
+        items = [{"id": choice[0], "name": choice[1]} for choice in EnergyEfficiencyLabelType.choices]
+        return render(
+            request,
+            "pages/utils/select_list.html",
+            {"items": items, "default_text": "Select energy efficiency label"},
+        )
+
+    # Refrigerant Types (for cooling systems)
+    elif request.GET.get("refrigerant_types"):
+        items = [{"id": choice[0], "name": choice[1]} for choice in RefrigerantType.choices]
+        return render(
+            request,
+            "pages/utils/select_list.html",
+            {"items": items, "default_text": "Select refrigerant type"},
+        )
+
+    # Room Types (for lighting systems)
+    elif request.GET.get("room_types"):
+        items = [{"id": choice[0], "name": choice[1]} for choice in RoomType.choices]
+        return render(
+            request,
+            "pages/utils/select_list.html",
+            {"items": items, "default_text": "Select room type"},
+        )
+
+    # Lighting Bulb Types
+    elif request.GET.get("lighting_bulb_types"):
+        items = [{"id": choice[0], "name": choice[1]} for choice in LightingBulbType.choices]
+        return render(
+            request,
+            "pages/utils/select_list.html",
+            {"items": items, "default_text": "Select lighting bulb type"},
         )
 
     # Full page load for GET request

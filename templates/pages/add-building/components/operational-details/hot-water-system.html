@@ -54,11 +54,15 @@
               >*</span
             >
           </legend>
-          <select class="select w-full" name="type_of_hot_water_system">
+          <select
+            class="select w-full"
+            name="type_of_hot_water_system"
+            hx-get="/select_lists/?hot_water_system_types=1"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
+          >
             <option disabled selected value="">Select an option</option>
-            <option value="heat-pump">Heat pump water heater</option>
-            <option value="boiler">Boiler</option>
-            <option value="solar">Solar water heaters</option>
           </select>
           <p class="validator-hint">This field is required</p>
         </fieldset>
@@ -66,16 +70,15 @@
           <legend class="fieldset-legend">
             Fuel type<span class="text-[var(--state--error--base)]">*</span>
           </legend>
-          <select class="select w-full" name="fuel_type">
+          <select
+            class="select w-full"
+            name="fuel_type"
+            hx-get="/select_lists/?fuel_types=1"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
+          >
             <option disabled selected value="">Select an option</option>
-            <option value="electricity">Electricity</option>
-            <option value="light-fuel-oil">Light fuel oil</option>
-            <option value="heavy-fuel-oil">Heavy fuel oil</option>
-            <option value="lpg">Liquified petroleum gas (LPG)</option>
-            <option value="natural-gas">Natural gas</option>
-            <option value="coal">Coal</option>
-            <option value="ignite">Ignite</option>
-            <option value="diesel">Diesel</option>
           </select>
         </fieldset>
         <fieldset class="fieldset col-span-2">
@@ -197,10 +200,15 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Energy efficiency label</legend>
-          <select class="select w-full" name="energy_efficiency_label">
+          <select
+            class="select w-full"
+            name="energy_efficiency_label"
+            hx-get="/select_lists/?energy_efficiency_label_types=1"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
+          >
             <option disabled selected value="">Select an option</option>
-            <option value="bee">BEE Star Rating</option>
-            <option value="egat">EGAT</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">

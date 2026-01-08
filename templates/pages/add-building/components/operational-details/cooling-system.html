@@ -227,16 +227,15 @@
           >*</span
         >
       </legend>
-      <select class="select w-full" name="type_of_refrigerants">
+      <select
+        class="select w-full"
+        name="type_of_refrigerants"
+        hx-get="/select_lists/?refrigerant_types=1"
+        hx-trigger="load"
+        hx-target="this"
+        hx-swap="innerHTML"
+      >
         <option disabled selected value="">Select an option</option>
-        <option value="R-134A">R-134A</option>
-        <option value="R-32">R-32</option>
-        <option value="R-410A">R-410A</option>
-        <option value="R-290 (Propane)">R-290 (Propane)</option>
-        <option value="R-600a (Isobutane)">R-600a (Isobutane)</option>
-        <option value="R-717 (Ammonia)">R-717 (Ammonia)</option>
-        <option value="R-744 (C02)">R-744 (C02)</option>
-        <option value="R-404A">R-404A</option>
       </select>
     </fieldset>
     <fieldset class="fieldset">
@@ -524,16 +523,15 @@
           >*</span
         >
       </legend>
-      <select class="select w-full" name="type_of_refrigerants">
+      <select
+        class="select w-full"
+        name="type_of_refrigerants"
+        hx-get="/select_lists/?refrigerant_types=1"
+        hx-trigger="load"
+        hx-target="this"
+        hx-swap="innerHTML"
+      >
         <option disabled selected value="">Select an option</option>
-        <option value="R-134A">R-134A</option>
-        <option value="R-32">R-32</option>
-        <option value="R-410A">R-410A</option>
-        <option value="R-290 (Propane)">R-290 (Propane)</option>
-        <option value="R-600a (Isobutane)">R-600a (Isobutane)</option>
-        <option value="R-717 (Ammonia)">R-717 (Ammonia)</option>
-        <option value="R-744 (C02)">R-744 (C02)</option>
-        <option value="R-404A">R-404A</option>
       </select>
     </fieldset>
     <fieldset class="fieldset">
