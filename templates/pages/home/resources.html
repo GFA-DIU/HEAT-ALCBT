@@ -15,16 +15,144 @@
     >
       <div class="max-w-[68.75rem] mx-auto w-full px-4">
         <div class="flex flex-col gap-6 w-full mt-7">
-          <div
-            class="flex flex-col text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]"
-          >
+          <div class="flex flex-col text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]">
             Resources
             <p class="text-sm font-normal text-[var(--text--sub-600)]">
               Manage your resources to access for low carbon
             </p>
           </div>
         </div>
+
+        <!-- Video and Handbook Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Video -->
+          <div class="flex flex-col p-4">
+            <h4 class="text-center text-lg font-semibold text-[var(--text--strong-950)] mb-2">Introduction video</h4>
+            <p class="text-center text-sm text-[var(--text--sub-600)] mb-4">
+              Watch our short video to get a quick overview of <span class="font-bold" style="color:#F26716">BEAT</span> — what it does, how it works, and how it can support your low-carbon building strategies.
+            </p>
+            <div class="flex justify-center">
+              {% if request|cookie_group_accepted:"media" %}
+              <div class="w-full aspect-video rounded-[var(--radius-10)] overflow-hidden">
+                <iframe
+                  src="https://www.youtube-nocookie.com/embed/4dBHXjpFMwA?si=_gVEw6TvZHadBMrN"
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen
+                  class="w-full h-full"
+                >
+                </iframe>
+              </div>
+              {% else %}
+              <div class="w-full aspect-video rounded-[var(--radius-10)] overflow-hidden border-2 relative" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); border-color: #F26716;">
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="text-center p-4 text-white">
+                    <span data-icon="play-circle-fill" data-size="64" style="color: #F26716;" class="mb-3"></span>
+                    <p class="mb-3 opacity-75 text-sm">This content requires media cookies to be enabled for embedded videos.</p>
+                    <button
+                      class="btn btn-sm px-4 py-2 rounded-full font-medium"
+                      style="background: #F26716; color: white;"
+                      onclick="showCookieSettings()"
+                    >
+                      <span data-icon="settings-3-line" data-size="16" data-color="white" class="mr-1"></span>
+                      Manage Cookie Settings
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- User Handbook -->
+          <div class="flex flex-col p-4">
+            <div class="bg-[var(--bg--weak-50)] rounded-[var(--radius-10)] p-4 h-full border border-[var(--stroke--soft-200)]">
+              <h4 class="text-center text-lg font-semibold text-[var(--text--strong-950)] mb-2">User Handbook</h4>
+              <p class="text-sm text-[var(--text--sub-600)] mb-3">
+                Download the official <span class="font-bold">BEAT</span> Handbook (Part 1) for a detailed, step-by-step guide on using the tool effectively. The handbook covers:
+              </p>
+              <ul class="list-disc list-inside text-sm text-[var(--text--sub-600)] mb-4 space-y-1">
+                <li>Key functionalities and workflow</li>
+                <li>Data input requirements</li>
+                <li>Methodology</li>
+              </ul>
+              <p class="text-sm text-[var(--text--sub-600)]">
+                📄 For guidance, please refer to the BEAT
+                <a href="https://alcbt.gggi.org/beat-handbook-part-1-core-concept-guide/" class="underline text-[var(--text--strong-950)] hover:opacity-80">user documentation</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- BEAT Community Section -->
+        <div class="mt-8 mb-6">
+          <h3 class="text-xl font-bold text-[var(--text--strong-950)] mb-2">
+            The <span style="color:#F26716">BEAT</span> Community
+          </h3>
+          <p class="text-sm text-[var(--text--sub-600)]">
+            Join a growing community of policymakers, planners, and practitioners working to reduce building emissions. Together, we will work on advancing practical, data-driven solutions for a low-carbon future.
+          </p>
+        </div>
+
+        <!-- Host Section -->
+        <h4 class="text-center text-[var(--text--sub-600)] mt-8 mb-4 text-lg">Host</h4>
+        <div class="flex justify-center mb-8">
+          {% with logo_path='images/logos/'|add:'Heat_green.svg' %}
+          <img
+            src="{% static logo_path %}"
+            alt="Host logo"
+            class="h-20 w-auto"
+            loading="lazy"
+          >
+          {% endwith %}
+        </div>
+
+        <!-- Lead Partners Section -->
+        <h4 class="text-center text-[var(--text--sub-600)] mt-8 mb-4 text-lg">Lead partners</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-center justify-items-center mb-8">
+          {% for logo in lead_partner_logos %}
+            {% with logo_path='images/logos/lead_partners/'|add:logo %}
+              <div class="flex justify-center">
+                <img
+                  src="{% static logo_path %}"
+                  alt="Lead partner logo"
+                  class="h-20 w-auto"
+                  loading="lazy"
+                >
+              </div>
+            {% endwith %}
+          {% endfor %}
+        </div>
+
+        <!-- Development Partners Section -->
+        <h4 class="text-center text-[var(--text--sub-600)] mt-8 mb-4 text-lg">Development partners</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-center justify-items-center mb-8">
+          {% for logo in dev_partner_logos %}
+            {% with logo_path='images/logos/development_partners/'|add:logo %}
+              <div class="flex justify-center">
+                <img
+                  src="{% static logo_path %}"
+                  alt="Development partner logo"
+                  class="h-20 w-auto"
+                  loading="lazy"
+                >
+              </div>
+            {% endwith %}
+          {% endfor %}
+        </div>
+
+        <!-- Call to Action Section -->
+        <div class="text-center my-8">
+          <div class="inline-block bg-[var(--bg--weak-50)] rounded-[var(--radius-10)] p-4 border border-[var(--stroke--soft-200)]">
+            <p class="text-sm text-[var(--text--sub-600)]">
+              💡 Interested in contributing or partnering? We'd love to
+              <a href="https://alcbt.gggi.org/contact-us/" class="underline text-[var(--text--strong-950)] hover:opacity-80">hear from you</a>.
+            </p>
+          </div>
+        </div>
       </div>
+      
     </section>
 
 {% endblock content %}

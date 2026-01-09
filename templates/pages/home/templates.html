@@ -7,9 +7,7 @@
 
 {% block content %}
  
-    <section
-      class="flex-1 card bg-white rounded-none rounded-t-[var(--radius-24)] border border-[var(--stroke--soft-200)] pb-6"
-    >
+    <section class="flex-1 card bg-white rounded-none rounded-t-[var(--radius-24)] border border-[var(--stroke--soft-200)] pb-6">
       <div class="max-w-[68.75rem] mx-auto w-full px-4">
         <div class="flex flex-col gap-6 w-full mt-7">
           <div
@@ -21,7 +19,12 @@
             </p>
           </div>
         </div>
-        <div
+        <form
+          id="search-form"
+          hx-get="{% url 'templates' %}"
+          hx-target="#templates-list"
+          hx-swap="outerHTML"
+          hx-trigger="submit, change from:select delay:300ms, keyup changed delay:500ms from:input[name='search_query']"
           class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)] mt-5"
         >
           <div class="flex items-stretch gap-2">
@@ -31,25 +34,15 @@
                 data-size="16"
                 data-color="var(--icon--soft-400)"
               ></span>
-              <input type="text" placeholder="Search..." />
+              <input type="text" name="search_query" placeholder="Search templates..." value="{{ search_query }}" />
             </label>
-            <select class="select">
-              <option selected value="usa">
-                <span data-country="US" data-width="20"></span>
-                <span data-country="US" data-flag="false"></span>
-              </option>
-              <option value="canada">
-                <span data-country="CA" data-width="20"></span>
-                <span data-country="CA" data-flag="false"></span>
-              </option>
-              <option value="uk">
-                <span data-country="GB" data-width="20"></span>
-                <span data-country="GB" data-flag="false"></span>
-              </option>
-              <option value="australia">
-                <span data-country="AU" data-width="20"></span>
-                <span data-country="AU" data-flag="false"></span>
-              </option>
+            <select class="select" name="country">
+              <option value="" >All Countries </option>
+              {% for country in countries %}
+                <option  value="{{ country.id }}" {% if selected_country == country.id|stringformat:"s" %}selected{% endif %}>
+                 <span data-country="{{country.code2}}"></span>  {{ country.name }}
+                </option>
+              {% endfor %}
             </select>
           </div>
           <div class="collapse rounded-none">
@@ -85,28 +78,15 @@
                     class="select-icon w-8"
                   ></span>
                   <select
+                    name="category"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option disabled selected value="">Category</option>
-                    <option value="building-service-engineering">
-                      Building service engineering
-                    </option>
-                    <option value="components-for-windows">
-                      Components for windows & curtain walls
-                    </option>
-                    <option value="composites">Composites</option>
-                    <option value="end-of-life">End of life</option>
-                    <option value="insulation-materials">
-                      Insulation materials
-                    </option>
-                    <option value="metals">Metals</option>
-                    <option value="minerals-building-products">
-                      Minerals building products
-                    </option>
-                    <option value="plastics">Plastics</option>
-                    <option value="wood">Wood</option>
-                    <option value="others">Others</option>
-                    <option value="unkwown">Unkwown</option>
+                    <option value="">Building Component</option>
+                    {% for category in categories %}
+                      <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                      </option>
+                    {% endfor %}
                   </select>
                 </label>
                 <label class="relative">
@@ -117,21 +97,15 @@
                     class="select-icon w-8"
                   ></span>
                   <select
+                    name="technique"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option disabled selected value="">Sub-category</option>
-                    <option value="air-conditioning-and-ventilation">
-                      Air conditioning and ventilation
-                    </option>
-                    <option value="conveyance">Conveyance</option>
-                    <option value="electrical">Electrical</option>
-                    <option value="end-of-life-processes">
-                      End of life processes
-                    </option>
-                    <option value="fire-protection">Fire protection</option>
-                    <option value="heating">Heating</option>
-                    <option value="sanitary">Sanitary</option>
-                    <option value="use">Use</option>
+                    <option value="">Construction Technique</option>
+                    {% for technique in techniques %}
+                      <option value="{{ technique.id }}" {% if selected_technique == technique.id|stringformat:"s" %}selected{% endif %}>
+                        {{ technique.name }}
+                      </option>
+                    {% endfor %}
                   </select>
                 </label>
                 <label class="relative">
@@ -142,21 +116,12 @@
                     class="select-icon w-8"
                   ></span>
                   <select
+                    name="mode"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option disabled selected value="">Child-category</option>
-                    <option value="use-conveyor">Use conveyor</option>
-                    <option value="use-heat-generator">
-                      Use heat generator
-                    </option>
-                    <option value="use-heat-generator-enev">
-                      Use heat generator (EnEv)
-                    </option>
-                    <option value="using-lighting">Using lighting</option>
-                    <option value="using-mountings">Using mountings</option>
-                    <option value="use-ventilations-and-air-conditioning">
-                      Use ventilations and air conditioning
-                    </option>
+                    <option value="">All Types</option>
+                    <option value="system" {% if selected_mode == 'system' %}selected{% endif %}>System Component</option>
+                    <option value="custom" {% if selected_mode == 'custom' %}selected{% endif %}>My Component</option>
                   </select>
                 </label>
                 <label class="relative">
@@ -167,688 +132,126 @@
                     class="select-icon w-8"
                   ></span>
                   <select
+                    name="sort_by"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option disabled selected value="">EPD type</option>
-                    <option value="official">Official</option>
-                    <option value="custom">Custom</option>
-                    <option value="generic">Generic</option>
-                  </select>
-                </label>
-                <label class="relative">
-                  <span
-                    data-icon="filter-3-line"
-                    data-size="20"
-                    data-color="var(--icon--soft-400)"
-                    class="select-icon w-8"
-                  ></span>
-                  <select
-                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                  >
-                    <option disabled selected value="">Sort by</option>
+                    <option value="name" {% if selected_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                    <option value="-name" {% if selected_sort == '-name' %}selected{% endif %}>Name (Z-A)</option>
+                    <option value="-created_at" {% if selected_sort == '-created_at' %}selected{% endif %}>Newest First</option>
+                    <option value="created_at" {% if selected_sort == 'created_at' %}selected{% endif %}>Oldest First</option>
                   </select>
                 </label>
               </div>
             </div>
           </div>
-          <button class="btn btn-outline btn-block" disabled>Search</button>
-        </div>
-        <ul class="grid grid-cols-1 gap-2.75 mt-6">
-          <li
-            class="bg-[var(--bg--weak-50)] rounded-lg px-2.5 py-4 flex justify-between gap-2"
-          >
-            <div class="flex flex-col items-center h-full justify-between">
-              <span
-                data-icon="building-3-line"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-              <div
-                class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center"
-              >
-                <span
-                  data-icon="leaf-line"
-                  data-size="14"
-                  data-color="var(--bg--strong-950)"
-                ></span>
-              </div>
-            </div>
-            <div class="flex-1 flex flex-col gap-2.5">
-              <h6 class="text-sm/5 font-bold">Steel I-Beam</h6>
+          <button type="submit" class="btn btn-outline btn-block">Search</button>
+        </form>
 
-              <div class="flex items-center">
-                <div class="text-sm/5 font-medium pl-2 pr-1">
-                  24.97kg CO2e eq/m2
-                </div>
-                <p class="text-sm/5 text-[var(--text--sub-600)] pr-1">
-                  Horizontal Structural Elements - Beams, Slabs
-                </p>
-                <span data-country="KH" data-width="20"></span>
-              </div>
-            </div>
-            <div class="flex gap-2">
-              <span class="badge gap-0 text-xs/4 py-1 px-2 font-medium"
-                >Quantity: 23m<sup>3</sup></span
-              >
-              <span
-                class="badge bg-[var(--state--information--light)] text-xs/4 py-1 px-2 font-medium gap-1"
-                ><span
-                  data-icon="settings-4-line"
-                  data-size="16"
-                  data-color="var(--icon--soft-400)"
-                ></span
-                >System component</span
-              >
-              <button
-                class="btn size-5 btn-ghost p-0"
-                onclick="template_detail_modal.showModal()"
-              >
-                <span
-                  data-icon="edit-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="file-copy-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="delete-bin-5-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-            </div>
-          </li>
-          <li
-            class="bg-[var(--bg--weak-50)] rounded-lg px-2.5 py-4 flex justify-between gap-2"
-          >
-            <div class="flex flex-col items-center h-full justify-between">
-              <span
-                data-icon="building-3-line"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-              <div
-                class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center"
-              >
-                <span
-                  data-icon="leaf-line"
-                  data-size="14"
-                  data-color="var(--bg--strong-950)"
-                ></span>
-              </div>
-            </div>
-            <div class="flex-1 flex flex-col gap-2.5">
-              <h6 class="text-sm/5 font-bold">Concrete Foundation</h6>
+        {% include "pages/home/partials/templates_list.html" %}
 
-              <div class="flex items-center">
-                <div class="text-sm/5 font-medium pl-2 pr-1">
-                  24.97kg CO2e eq/m2
-                </div>
-                <p class="text-sm/5 text-[var(--text--sub-600)] pr-1">
-                  Foundation & Slab Elements
-                </p>
-                <span data-country="KH" data-width="20"></span>
-              </div>
-            </div>
-            <div class="flex gap-2">
-              <span class="badge gap-0 text-xs/4 py-1 px-2 font-medium"
-                >Quantity: 41m<sup>3</sup></span
-              >
-              <span
-                class="badge bg-[var(--state--information--light)] text-xs/4 py-1 px-2 font-medium gap-1"
-                ><span
-                  data-icon="settings-4-line"
-                  data-size="16"
-                  data-color="var(--icon--soft-400)"
-                ></span
-                >System component</span
-              >
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="edit-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="file-copy-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="delete-bin-5-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-            </div>
-          </li>
-          <li
-            class="bg-[var(--bg--weak-50)] rounded-lg px-2.5 py-4 flex justify-between gap-2"
-          >
-            <div class="flex flex-col items-center h-full justify-between">
-              <span
-                data-icon="building-3-line"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-              <div
-                class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center"
-              >
-                <span
-                  data-icon="leaf-line"
-                  data-size="14"
-                  data-color="var(--bg--strong-950)"
-                ></span>
-              </div>
-            </div>
-            <div class="flex-1 flex flex-col gap-2.5">
-              <h6 class="text-sm/5 font-bold">Insulated Wall Panel</h6>
-
-              <div class="flex items-center">
-                <div class="text-sm/5 font-medium pl-2 pr-1">
-                  24.97kg CO2e eq/m2
-                </div>
-                <p class="text-sm/5 text-[var(--text--sub-600)] pr-1">
-                  Facade & Exterior Elements
-                </p>
-                <span data-country="CW" data-width="20"></span>
-              </div>
-            </div>
-            <div class="flex gap-2">
-              <span class="badge gap-0 text-xs/4 py-1 px-2 font-medium"
-                >Quantity: 18m<sup>3</sup></span
-              >
-              <span class="badge text-xs/4 py-1 px-2 font-medium gap-1"
-                ><span
-                  data-icon="save-line"
-                  data-size="16"
-                  data-color="var(--icon--soft-400)"
-                ></span
-                >My component</span
-              >
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="edit-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="file-copy-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="delete-bin-5-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-            </div>
-          </li>
-          <li
-            class="bg-[var(--bg--weak-50)] rounded-lg px-2.5 py-4 flex justify-between gap-2"
-          >
-            <div class="flex flex-col items-center h-full justify-between">
-              <span
-                data-icon="building-3-line"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-              <div
-                class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center"
-              >
-                <span
-                  data-icon="leaf-line"
-                  data-size="14"
-                  data-color="var(--bg--strong-950)"
-                ></span>
-              </div>
-            </div>
-            <div class="flex-1 flex flex-col gap-2.5">
-              <h6 class="text-sm/5 font-bold">Aluminum Window Frame</h6>
-
-              <div class="flex items-center">
-                <div class="text-sm/5 font-medium pl-2 pr-1">
-                  24.97kg CO2e eq/m2
-                </div>
-                <p class="text-sm/5 text-[var(--text--sub-600)] pr-1">
-                  Roofing & Weatherproofing
-                </p>
-                <span data-country="CY" data-width="20"></span>
-              </div>
-            </div>
-            <div class="flex gap-2">
-              <span class="badge gap-0 text-xs/4 py-1 px-2 font-medium"
-                >Quantity: 92m<sup>3</sup></span
-              >
-              <span class="badge text-xs/4 py-1 px-2 font-medium gap-1"
-                ><span
-                  data-icon="save-line"
-                  data-size="16"
-                  data-color="var(--icon--soft-400)"
-                ></span
-                >My component</span
-              >
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="edit-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="file-copy-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="delete-bin-5-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-            </div>
-          </li>
-          <li
-            class="bg-[var(--bg--weak-50)] rounded-lg px-2.5 py-4 flex justify-between gap-2"
-          >
-            <div class="flex flex-col items-center h-full justify-between">
-              <span
-                data-icon="building-3-line"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-              <div
-                class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center"
-              >
-                <span
-                  data-icon="leaf-line"
-                  data-size="14"
-                  data-color="var(--bg--strong-950)"
-                ></span>
-              </div>
-            </div>
-            <div class="flex-1 flex flex-col gap-2.5">
-              <h6 class="text-sm/5 font-bold">Asphalt Roofing Shingles</h6>
-
-              <div class="flex items-center">
-                <div class="text-sm/5 font-medium pl-2 pr-1">
-                  24.97kg CO2e eq/m2
-                </div>
-                <p class="text-sm/5 text-[var(--text--sub-600)] pr-1">
-                  Interior Finishes & Fixtures
-                </p>
-                <span data-country="CW" data-width="20"></span>
-              </div>
-            </div>
-            <div class="flex gap-2">
-              <span class="badge gap-0 text-xs/4 py-1 px-2 font-medium"
-                >Quantity: 76m<sup>3</sup></span
-              >
-              <span class="badge text-xs/4 py-1 px-2 font-medium gap-1"
-                ><span
-                  data-icon="save-line"
-                  data-size="16"
-                  data-color="var(--icon--soft-400)"
-                ></span
-                >My component</span
-              >
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="edit-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="file-copy-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button class="btn size-5 btn-ghost p-0">
-                <span
-                  data-icon="delete-bin-5-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-            </div>
-          </li>
-        </ul>
-        <div class="flex items-center justify-center gap-2 mt-7.5">
-          <button class="btn btn-ghost py-2 px-3">
-            <span
-              data-icon="arrow-left"
-              data-size="20"
-              data-color="var(--icon--soft-400)"
-            ></span>
-            Previous
-          </button>
-          <ul class="flex items-center gap-2">
-            <li>
-              <button class="btn btn-sm rounded-[var(--radius-8)] btn-neutral">
-                1
-              </button>
-            </li>
-            <li>
-              <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
-                2
-              </button>
-            </li>
-            <li>
-              <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
-                3
-              </button>
-            </li>
-          </ul>
-          <button class="btn btn-ghost py-2 px-3">
-            Next
-            <span
-              data-icon="arrow-right"
-              data-size="20"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
       </div>
     </section>
 
 
     <dialog id="template_detail_modal" class="modal modal-bottom sm:modal-end">
-      <div
-        class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-[95vw] !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
-      >
+      <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-[95vw] !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
         <div class="flex justify-between p-5 w-full">
-          <h3 class="text-lg/6 font-medium">Steel I-Beam</h3>
+          <h3 id="modal-template-name" class="text-lg/6 font-medium">Loading...</h3>
           <div class="flex items-center">
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="20"
-              data-color="var(--icon--sub-600)"
-            ></span>
-            <span class="var(--text--sub-600) ml-1 mr-3 underline">Delete</span>
-            <button
-              type="button"
-              onclick="template_detail_modal.close()"
-              class="btn btn-sm btn-circle btn-ghost"
-            >
-              <span
-                data-icon="close-line"
-                data-size="16"
-                data-color="var(--icon--sub-600)"
-              ></span>
+            <button id="modal-delete-btn" type="button" class="flex items-center mr-3" style="display:none;" onclick="deleteTemplateFromDialog()">
+              <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--sub-600)"></span>
+              <span class="var(--text--sub-600) ml-1 underline">Delete</span>
+            </button>
+            <button type="button" onclick="template_detail_modal.close()" class="btn btn-sm btn-circle btn-ghost">
+              <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
             </button>
           </div>
         </div>
-        <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+        <form id="template-form" class="flex-1 overflow-y-auto hide-scrollbar">
+          {% csrf_token %}
+          <input type="hidden" id="template-id" name="template_id" />
+          <input type="hidden" id="can-edit" value="false" />
           <div class="px-5 py-4 grid grid-cols-3 gap-4">
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">Title</legend>
-              <label class="input w-full">
-                <input type="text" value="Steel I-Beam" />
+            <fieldset class="fieldset col-span-3">
+              <legend class="fieldset-legend">Title<span class="text-[var(--state--error--base)]">*</span></legend>
+              <label class="input validator w-full">
+                <input id="template-name" name="name" type="text" required minlength="2" maxlength="200" />
               </label>
+              <p class="validator-hint">Required (2-200 characters)</p>
             </fieldset>
+
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">Country</legend>
-              <select class="select">
-                <option value="KH" selected>
-                  <span data-country="KH" data-width="20"></span>
-                  <span data-country="KH" data-flag="false"></span>
-                </option>
+              <legend class="fieldset-legend">Country<span class="text-[var(--state--error--base)]">*</span></legend>
+              <select id="template-country" name="country_id" class="select" required>
+                <option value="">Select country</option>
+                {% for country in countries %}
+                  <option value="{{ country.id }}"> <span data-country="{{ country.code2 }}"></span> {{ country.name }}</option>
+                {% endfor %}
               </select>
             </fieldset>
+
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Building component</legend>
-              <select class="select">
-                <option value="horizontal-structural-elements-beams" selected>
-                  Horizontal Structural Elements - Beams, Slabs
-                </option>
+              <select id="template-category" name="category_id" class="select" disabled>
+                <option value="">Select category</option>
+                {% for category in categories %}
+                  <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
               </select>
             </fieldset>
-            <div class="col-span-3 grid grid-cols-2 gap-4">
-              <fieldset class="fieldset">
-                <legend class="fieldset-legend">Construction technique</legend>
-                <select class="select">
-                  <option value="in-situ" selected>
-                    In-Situ Reinforced Concrete Beams
-                  </option>
-                </select>
-              </fieldset>
-              <fieldset class="fieldset">
-                <legend class="fieldset-legend">Quantity</legend>
-                <label class="input w-full">
-                  <input
-                    type="number"
-                    value="23"
-                    placeholder="Enter quantity"
-                  />
-                  <select
-                    class="select select-ghost w-fit !outline-none !border-none"
-                  >
-                    <option value="m2" selected>m²</option>
-                    <option value="m">m</option>
-                    <option value="kg">kg</option>
-                    <option value="m3">m³</option>
-                  </select>
-                </label>
-              </fieldset>
-            </div>
+
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Construction technique</legend>
+              <select id="template-technique" name="technique_id" class="select" disabled>
+                <option value="">Select technique</option>
+                {% for technique in techniques %}
+                  <option value="{{ technique.id }}">{{ technique.name }}</option>
+                {% endfor %}
+              </select>
+            </fieldset>
+
             <fieldset class="fieldset col-span-3">
               <legend class="fieldset-legend">Comment</legend>
-              <textarea
-                class="textarea w-full"
-                placeholder="Add a comment"
-                rows="3"
-              ></textarea>
+              <textarea id="template-comment" name="comment" class="textarea w-full" rows="3" placeholder="Add a comment"></textarea>
             </fieldset>
+
           </div>
-          <h2
-            class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4"
-          >
-            MATERIALS
+          <h2 class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4">
+            MATERIALS (<span id="modal-materials-count">0</span>)
           </h2>
-          <div class="px-5 pb-4 flex-1 flex flex-col">
-            <div
-              class="flex items-end justify-between border-b border-[var(--stroke--soft-200)] pb-4"
-            >
+          <div class="px-5 pb-4">
+            <div class="flex items-end justify-between border-b border-[var(--stroke--soft-200)] pb-4">
               <div class="flex-1">
                 <h4 class="text-base/5 font-extrabold mb-1">Added Materials</h4>
-                <p class="text-sm/5 text-[var(--text--sub-600)]">
-                  Added from EPD libraries
-                </p>
+                <p class="text-sm/5 text-[var(--text--sub-600)]">Materials from EPD libraries</p>
               </div>
-              <button
-                class="btn btn-sm btn-outline"
-                onclick="structural_component_epd_modal.showModal()"
-              >
-                <span
-                  data-icon="add-large-fill"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
+              <button type="button" class="btn btn-sm btn-outline" onclick="structural_component_epd_modal.showModal()">
+                <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
                 Add from EPD library
               </button>
             </div>
-            <ul class="grid grid-cols-1 gap-2.5 mt-4">
-              <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2 w-full">
-                  <span class="text-sm/5 font-medium"
-                    >Ready-Mix Concrete C25/30</span
-                  >
-                  <a>
-                    <span
-                      data-icon="external-link-line"
-                      data-size="20"
-                      data-color="var(--icon--sub-600)"
-                    ></span>
-                  </a>
-                </div>
-                <div
-                  class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
-                >
-                  <div
-                    class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
-                  >
-                    <span data-country="KH" data-width="20"></span>
-                  </div>
-                  <label class="input flex-[2.5]">
-                    <input type="text" placeholder="Add description" />
-                  </label>
-                  <label class="input flex-1">
-                    <input type="number" value="1" />
-                    <span class="text-xs/5 text-[var(--text--sub-600)]">%</span>
-                  </label>
-                  <div class="flex items-center py-2 mr-1.5">
-                    <div
-                      class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"
-                    ></div>
-                  </div>
-                  <button
-                    class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0"
-                  >
-                    <span
-                      data-icon="delete-bin-5-line"
-                      data-size="20"
-                      data-color="var(--icon--strong-950)"
-                    ></span>
-                  </button>
-                </div>
-              </li>
-              <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2 w-full">
-                  <span class="text-sm/5 font-medium">Sand-lime brick</span>
-                  <a>
-                    <span
-                      data-icon="external-link-line"
-                      data-size="20"
-                      data-color="var(--icon--sub-600)"
-                    ></span>
-                  </a>
-                </div>
-                <div
-                  class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
-                >
-                  <div
-                    class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
-                  >
-                    <span data-country="KH" data-width="20"></span>
-                  </div>
-                  <label class="input flex-[2.5]">
-                    <input type="text" placeholder="Add description" />
-                  </label>
-                  <label class="input flex-1">
-                    <input type="number" value="1" />
-                    <span class="text-xs/5 text-[var(--text--sub-600)]">%</span>
-                  </label>
-                  <div class="flex items-center py-2 mr-1.5">
-                    <div
-                      class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"
-                    ></div>
-                  </div>
-                  <button
-                    class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0"
-                  >
-                    <span
-                      data-icon="delete-bin-5-line"
-                      data-size="20"
-                      data-color="var(--icon--strong-950)"
-                    ></span>
-                  </button>
-                </div>
-              </li>
-              <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
-                <div class="flex items-center justify-between mb-2 w-full">
-                  <span class="text-sm/5 font-medium"
-                    >Ready-Mix Concrete C25/30</span
-                  >
-                  <a>
-                    <span
-                      data-icon="external-link-line"
-                      data-size="20"
-                      data-color="var(--icon--sub-600)"
-                    ></span>
-                  </a>
-                </div>
-                <div
-                  class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
-                >
-                  <div
-                    class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
-                  >
-                    <span data-country="DE" data-width="20"></span>
-                  </div>
-                  <label class="input flex-[5]">
-                    <input type="text" placeholder="Add description" />
-                  </label>
-                  <label class="input flex-1">
-                    <input type="number" placeholder="eg.150" />
-                    <span class="text-xs/5 text-[var(--text--sub-600)]"
-                      >pcs</span
-                    >
-                  </label>
-                  <div class="flex items-center py-2 mr-1.5">
-                    <div
-                      class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"
-                    ></div>
-                  </div>
-                  <button
-                    class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0"
-                  >
-                    <span
-                      data-icon="delete-bin-5-line"
-                      data-size="20"
-                      data-color="var(--icon--strong-950)"
-                    ></span>
-                  </button>
-                </div>
-              </li>
+            <ul id="modal-materials-list" class="grid grid-cols-1 gap-2.5 mt-4">
+              
             </ul>
           </div>
-          <div
-            class="p-5 w-full border-t border-[var(--stroke--soft-200)] flex items-center justify-between"
-          >
-            <button
-              class="btn btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit"
-            >
+          <div class="p-5 w-full border-t border-[var(--stroke--soft-200)] flex items-center justify-between absolute bottom-0 bg-white">
+            <button type="button" class="btn btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit" onclick="template_detail_modal.close()">
               Cancel
             </button>
             <div class="flex items-center gap-2">
-              <button
-                class="btn btn-outline text-[var(--text--strong-950)] border-[var(--stroke--strong-950)] w-fit"
-              >
+              <button type="button" id="modal-duplicate-btn" class="btn btn-outline text-[var(--text--strong-950)] border-[var(--stroke--strong-950)] w-fit" onclick="handleDuplicate()">
                 Save & duplicate
               </button>
-              <button class="btn btn-primary w-fit">Update</button>
+              <button type="button" id="modal-update-btn" class="btn btn-primary w-fit" style="display:none;" onclick="handleUpdate()">
+                Update
+              </button>
             </div>
           </div>
         </form>
       </div>
     </dialog>
 
-    <dialog
-      id="structural_component_epd_modal"
-      class="modal modal-bottom sm:modal-end"
-    >
+    <dialog id="structural_component_epd_modal"class="modal modal-bottom sm:modal-end">
       <div
         class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
       >
@@ -1296,5 +699,280 @@
         </div>
       </div>
     </dialog>
-    
+
+    <script>
+      // Global vars for tracking
+      let deletedMaterialIds = [];
+      let currentTemplateData = null;
+      
+      // View template details and populate form
+      function viewTemplate(assemblyId) {
+        // Show loading
+        document.getElementById('modal-template-name').textContent = 'Loading...';
+        document.getElementById('modal-materials-list').innerHTML = '<li class="text-center py-4">Loading...</li>';
+        deletedMaterialIds = [];
+      
+        template_detail_modal.showModal();
+        // Fetch data
+        fetch(`/templates/${assemblyId}/`)
+          .then(response => response.ok ? response.json() : Promise.reject('Failed to load'))
+          .then(data => {
+            currentTemplateData = data;
+      
+            // Populate form
+            document.getElementById('template-id').value = data.id;
+            document.getElementById('can-edit').value = data.can_edit;
+            document.getElementById('modal-template-name').textContent = data.name;
+            document.getElementById('template-name').value = data.name;
+            document.getElementById('template-country').value = data.country_id || '';
+            document.getElementById('template-category').value = data.category_id || '';
+            document.getElementById('template-technique').value = data.technique_id || '';
+            document.getElementById('template-comment').value = data.comment || '';
+      
+            // Show/hide controls based on permissions
+            const canEdit = data.can_edit;
+            document.getElementById('modal-delete-btn').style.display = canEdit ? 'flex' : 'none';
+            document.getElementById('modal-update-btn').style.display = canEdit ? 'block' : 'none';
+      
+            // Update materials count
+            document.getElementById('modal-materials-count').textContent = data.materials.length;
+      
+            // Render materials
+            renderMaterials(data.materials, canEdit);
+      
+            // Initialize icons/flags
+            if (typeof initializeIcons === 'function') initializeIcons();
+            if (typeof initializeCountryFlags === 'function') initializeCountryFlags();
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('modal-template-name').textContent = 'Error';
+            document.getElementById('modal-materials-list').innerHTML =
+              '<li class="text-center py-4 text-red-600">Failed to load template</li>';
+          });
+      }
+      
+      // Render materials list
+      function renderMaterials(materials, canEdit) {
+        const list = document.getElementById('modal-materials-list');
+      
+        if (materials.length === 0) {
+          list.innerHTML = '<li class="text-center py-4 text-[var(--text--sub-600)]">No materials added</li>';
+          return;
+        }
+      
+        list.innerHTML = materials.map(m => `
+          <li class="bg-[var(--bg--weak-50)] rounded-xl p-4" data-material-id="${m.id}">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm/5 font-medium">${m.name}</span>
+              ${m.epd_link ? `<a href="${m.epd_link}" target="_blank"><span data-icon="external-link-line" data-size="20" data-color="var(--icon--sub-600)"></span></a>` : ''}
+            </div>
+            <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
+              ${m.country_code ? `<div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"><span data-country="${m.country_code}" data-width="20"></span></div>` : ''}
+              <label class="input flex-[2.5]">
+                <input type="text" class="material-description" value="${m.description || ''}" placeholder="Add description" ${!canEdit ? 'readonly' : ''} />
+              </label>
+              <label class="input flex-1">
+                <input type="number" class="material-quantity" value="${m.quantity}" ${!canEdit ? 'readonly' : ''} />
+                <span class="text-xs/5 text-[var(--text--sub-600)]">${m.unit}</span>
+              </label>
+              ${canEdit ? `
+                <div class="flex items-center py-2 mr-1.5"><div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"></div></div>
+                <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0" onclick="deleteMaterial('${m.id}')">
+                  <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+                </button>
+              ` : ''}
+            </div>
+          </li>
+        `).join('');
+      }
+      
+      // Delete material
+      function deleteMaterial(materialId) {
+        if (!confirm('Remove this material?')) return;
+      
+        deletedMaterialIds.push(materialId);
+        document.querySelector(`[data-material-id="${materialId}"]`)?.remove();
+      
+        const count = document.querySelectorAll('#modal-materials-list > li').length;
+        document.getElementById('modal-materials-count').textContent = count;
+      }
+      
+      // Collect form data
+      function collectFormData() {
+        const materials = [];
+        document.querySelectorAll('#modal-materials-list > li[data-material-id]').forEach(li => {
+          const id = li.getAttribute('data-material-id');
+          materials.push({
+            id,
+            description: li.querySelector('.material-description')?.value || '',
+            quantity: parseFloat(li.querySelector('.material-quantity')?.value) || 0
+          });
+        });
+      
+        return {
+          name: document.getElementById('template-name').value,
+          country_id: document.getElementById('template-country').value,
+          comment: document.getElementById('template-comment').value,
+          materials,
+          deleted_materials: deletedMaterialIds
+        };
+      }
+      
+      // Update template
+      function handleUpdate() {
+        const form = document.getElementById('template-form');
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+      
+        const templateId = document.getElementById('template-id').value;
+        const data = collectFormData();
+      
+        fetch(`/templates/${templateId}/update/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            template_detail_modal.close();
+            htmx.trigger('#search-form', 'submit');
+            if (typeof Toast !== 'undefined') Toast.success('Template updated');
+          } else {
+            alert(result.error || 'Update failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred');
+        });
+      }
+      
+      // Duplicate template
+      function handleDuplicate() {
+        const form = document.getElementById('template-form');
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+      
+        const templateId = document.getElementById('template-id').value;
+        const data = collectFormData();
+      
+        fetch(`/templates/${templateId}/duplicate/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            template_detail_modal.close();
+            htmx.trigger('#search-form', 'submit');
+            if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
+          } else {
+            alert(result.error || 'Duplication failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred');
+        });
+      }
+      
+      // Delete template from dialog
+      function deleteTemplateFromDialog() {
+        const templateId = document.getElementById('template-id').value;
+        const templateName = document.getElementById('template-name').value;
+      
+        if (!confirm(`Delete "${templateName}"? This cannot be undone.`)) return;
+      
+        fetch(`/templates/${templateId}/delete/`, {
+          method: 'DELETE',
+          headers: { 'X-CSRFToken': getCsrfToken() }
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            template_detail_modal.close();
+            htmx.trigger('#search-form', 'submit');
+            if (typeof Toast !== 'undefined') Toast.success('Template deleted');
+          } else {
+            alert(result.error || 'Deletion failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred');
+        });
+      }
+      
+      // Delete from list (existing function)
+      function deleteTemplate(assemblyId, assemblyName) {
+        if (!confirm(`Delete "${assemblyName}"? This cannot be undone.`)) return;
+      
+        fetch(`/templates/${assemblyId}/delete/`, {
+          method: 'DELETE',
+          headers: { 'X-CSRFToken': getCsrfToken() }
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            htmx.trigger('#search-form', 'submit');
+            if (typeof Toast !== 'undefined') Toast.success('Template deleted');
+          } else {
+            alert(result.error || 'Deletion failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          if (typeof Toast !== 'undefined') Toast.error('An error occurred');
+        });
+      }
+      
+      // Duplicate from list (existing function)
+      function duplicateTemplate(assemblyId) {
+        if (!confirm('Create a copy of this template?')) return;
+      
+        // Simple duplication without modifications
+        fetch(`/templates/${assemblyId}/duplicate/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ materials: [] })
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            htmx.trigger('#search-form', 'submit');
+            if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
+          } else {
+            alert(result.error || 'Duplication failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred');
+        });
+      }
+      
+      // Get CSRF token
+      function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+          document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+      }
+      
+    </script>
+
 {% endblock %}
