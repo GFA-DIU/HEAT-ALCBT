@@ -472,6 +472,13 @@ class StepManager {
     if (form) {
       console.log("Extracting FormData from form element:", form);
       const formData = new FormData(form);
+      let validator = new window.FormValidator(form);
+
+      let isValid = validator.validate();
+      if(!isValid){
+        Toast.error("Please correct the errors in the form before proceeding.");
+        throw new Error("Form validation failed.");
+      }
       return formData.entries ? Object.fromEntries(formData.entries()) : {};
     }else {
       const object = this.formData[stepKey] || {};
@@ -984,10 +991,6 @@ class StepManager {
     };
   }
 
-}
-
-function goToDashboard() {
-  window.location.href = "/src/pages/dashboard/dashboard.html";
 }
 
 // Initialize the step manager when the page loads

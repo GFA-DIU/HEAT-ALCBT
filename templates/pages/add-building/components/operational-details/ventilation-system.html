@@ -61,6 +61,7 @@
             hx-trigger="load"
             hx-target="this"
             hx-swap="innerHTML"
+            required
           >
             <option value="">Select an option</option>
           </select>
@@ -90,7 +91,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="baseline_efficiency" />
+            <input type="number" placeholder="eg. 2" name="baseline_efficiency" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >W/CMH</span
             >
@@ -107,7 +108,7 @@
           <div class="w-full flex gap-1.5 items-center">
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required />
+                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required min="0" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >Hours / day</span
                 >
@@ -115,7 +116,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required />
+                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required min="0" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >days / week</span
                 >
@@ -123,7 +124,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required />
+                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required min="0" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >weeks / year</span
                 >
@@ -139,7 +140,7 @@
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="power_input" />
+            <input type="number" placeholder="eg. 2" name="power_input" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Watts</span
             >
@@ -153,7 +154,7 @@
             <input type="number" placeholder="eg. 2" name="airflow_rate" />
             <select
               class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25"
-              name="airflow_rate_unit"
+              name="airflow_rate_unit" required
             >
               <option value="cmh" selected>CMH</option>
               <option value="cfm">CFM</option>
@@ -426,6 +427,12 @@
       return;
     }
 
+    //validate required fields
+    const validator = new window.FormValidator(form);
+    if (!validator.validate()) {
+      console.error('Form validation failed', validator.errors);
+      return;
+    }
     // Collect all form data
     const systemData = {
       building_uuid: buildingId,
@@ -501,12 +508,7 @@
         const systems = result.ventilation_systems;
 
         if (systems.length === 0) {
-          listContainer.innerHTML = `
-            <li class="flex flex-col items-center justify-center py-8 text-center">
-              <span data-icon="windy-fill" data-size="48" data-color="var(--icon--soft-400)"></span>
-              <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No ventilation systems added yet</p>
-            </li>
-          `;
+          listContainer.innerHTML = noSystemsContainer.innerHTML;
           if (window.IconComponent) {
             window.IconComponent.initialize();
           }

@@ -8,7 +8,13 @@ from pages.views.datasets import datasets
 from pages.views.map import map_view
 from pages.views.profile import view_profile
 from pages.views.select_lists import select_lists
-from pages.views.templates import templates
+from pages.views.templates import (
+    templates,
+    get_template_detail,
+    update_template,
+    duplicate_template,
+    delete_template,
+)
 
 from .views.assembly.assembly import component_edit
 from .views.building.add_building_steps import (building_step_view,
@@ -52,6 +58,10 @@ urlpatterns = [
     path("", buildings_list, name="home"),
     path("resource/", resources, name="resources"),
     path("templates/", templates, name="templates"),
+    path("templates/<uuid:template_id>/", get_template_detail, name="get_template_detail"),
+    path("templates/<uuid:template_id>/update/", update_template, name="update_template"),
+    path("templates/<uuid:template_id>/duplicate/", duplicate_template, name="duplicate_template"),
+    path("templates/<uuid:template_id>/delete/", delete_template, name="delete_template"),
     path("datasets/", datasets, name="datasets"),
     path("profile/", view_profile, name="profile"),
     path(

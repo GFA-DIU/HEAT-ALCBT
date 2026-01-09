@@ -86,9 +86,7 @@
 </div>
 
 <dialog id="energy_carrier_modal" class="modal modal-bottom sm:modal-end">
-  <div
-    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[44.5rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
-  >
+  <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[44.5rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full border-b border-[var(--stroke--soft-200)]">
       <h3 class="text-lg/6 font-medium">Energy Carrier Emission Factor</h3>
       <button
@@ -340,6 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (event.detail.target.id === 'selected_op_products') {
       updateUI();
       // Close modal after adding
+      Toast.info('Energy carrier added successfully');
       if (mainModal) mainModal.close();
     }
   });

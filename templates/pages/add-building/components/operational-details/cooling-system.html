@@ -204,7 +204,7 @@
       <legend class="fieldset-legend">
         Chiller system<span class="text-[var(--state--error--base)]">*</span>
       </legend>
-      <select class="select w-full" name="chiller_system">
+      <select class="select w-full" name="chiller_system" required>
         <option disabled selected value="">Select an option</option>
         <option value="water-cooled">Water cooled chiller</option>
         <option value="air-cooled">Air cooled chiller</option>
@@ -217,7 +217,7 @@
         >
       </legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="eg. 2012" name="year_of_installation" />
+        <input type="text" placeholder="eg. 2012" required min="1900" max="2099" name="year_of_installation" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -245,7 +245,7 @@
         ><span class="text-[var(--text--sub-600)]">(kg)</span>
       </legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg.  134" name="refrigerant_quantity" />
+        <input type="number" placeholder="eg.  134" name="refrigerant_quantity" required min="0" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >kg</span
         >
@@ -320,20 +320,22 @@
         >
       </legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="eg. 342" name="total_chiller_system" />
+        <input type="text" placeholder="eg. 342" name="total_chiller_system"  required min="1" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
+
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline leakage factor</legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg. 2" name="baseline_leakage_factor" />
+        <input type="number" placeholder="eg. 2" name="baseline_leakage_factor" required min="1" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >%</span
         >
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
+
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">
         Annual operating schedule<span
@@ -345,7 +347,7 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="annual_operating_hours_per_day" required />
+            <input type="number" placeholder="eg. 1" name="annual_operating_hours_per_day"  required min="1" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Hours / day</span
             >
@@ -353,7 +355,7 @@
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="annual_operating_days_per_week" required />
+            <input type="number" placeholder="eg. 1" name="annual_operating_days_per_week"  required min="1" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >days / week</span
             >
@@ -361,7 +363,7 @@
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="annual_operating_weeks_per_year" required />
+            <input type="number" placeholder="eg. 1" name="annual_operating_weeks_per_year"  required min="1" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >weeks / year</span
             >
@@ -374,7 +376,7 @@
         Baseline Air Cooled/Water Cooled Chiller Cooling Efficiency
       </legend>
       <label class="input w-full">
-        <input type="number" placeholder="eg. 2" name="baseline_cooling_efficiency" />
+        <input type="number" placeholder="eg. 2" name="baseline_cooling_efficiency"  required min="1" />
       </label>
     </fieldset>
     <div class="col-span-2 mt-3">
@@ -400,7 +402,7 @@
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" name="number_of_chillers" />
+                <input type="number" placeholder="eg. 2" name="number_of_chillers"  required min="0" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
@@ -411,7 +413,7 @@
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2000" name="total_chiller_system_power_input" />
+                <input type="number" placeholder="eg. 2000" name="total_chiller_system_power_input"  required min="0" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >kWH</span
                 >
@@ -425,7 +427,7 @@
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 45" name="water_cooled_chiller_cooling_load_factor" />
+                <input type="number" placeholder="eg. 45" name="water_cooled_chiller_cooling_load_factor"  required min="0"/>
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >%</span
                 >
@@ -434,18 +436,18 @@
             <fieldset class="fieldset">
               <legend class="fieldset-legend">COP</legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" name="cop" />
+                <input type="number" placeholder="eg. 2" name="cop"  required min="0" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">IPVL</legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" name="ipvl" />
+                <input type="number" placeholder="eg. 2" name="ipvl"  required min="0" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Energy efficiency label</legend>
-              <select class="select w-full" name="energy_efficiency_label">
+              <select class="select w-full" name="energy_efficiency_label"  required>
                 <option disabled selected value="">Select an option</option>
                 <option value="A">A</option>
                 <option value="B">B</option>
@@ -458,7 +460,7 @@
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Number of stars</legend>
-              <select class="select w-full" name="number_of_stars">
+              <select class="select w-full" name="number_of_stars" required>
                 <option disabled selected value="">Select an option</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -472,7 +474,7 @@
                 Total energy consumption of chiller system anually (kwh/year)
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 200" name="total_energy_consumption_of_chiller_system_annually" />
+                <input type="number" placeholder="eg. 200" name="total_energy_consumption_of_chiller_system_annually"  required min="0" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >kWh/year</span
                 >
@@ -803,6 +805,13 @@
 
     if (!buildingId) {
       alert('Building ID not found');
+      return;
+    }
+
+    //validate required fields
+    const validator = new window.FormValidator(form);
+    if (!validator.validate()) {
+      console.error('Form validation failed', validator.errors);
       return;
     }
 

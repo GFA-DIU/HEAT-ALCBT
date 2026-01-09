@@ -64,10 +64,10 @@ export function getOfficialName(countryCode) {
 
 export function getCountryCodeByName(countryName) {
   if (!countryName) return null;
-  return Array.from(COUNTRIES_MAP.entries()).find(([cca2, country]) => {
+  const x = Array.from(COUNTRIES_MAP.entries()).find(([cca2, country]) => {
     return (country.name.common.toLowerCase() === countryName.toLowerCase() || country.name.official.toLowerCase() === countryName.toLowerCase());
-  }
-  )[0];
+  });
+  return x && x[0] ? x[0] : 'zz';
 }
 /**
  * Check if a country code exists
@@ -150,6 +150,10 @@ export async function initCountryFlags() {
   elements.forEach((element) => {
     const countryCode = element.getAttribute("data-country");
 
+    if(element.getAttribute('data-no-country-replace') === 'true'){
+      return;
+    }
+
     if (!countryCode) {
       console.warn("Element has data-country attribute but no value:", element);
       return;
@@ -177,7 +181,7 @@ export async function initCountryFlags() {
 
     if (showFlag) {
       // Create flag image
-      const flagUrl = `https://cdn.jsdelivr.net/gh/HatScripts/circle-flags/flags/${lowerCode}.svg`;
+      const flagUrl = `https://cdn.jsdelivr.net/gh/HatScripts/circle-flags/flags/${lowerCode == 'zz' ? 'other/earth' : lowerCode}.svg`;
       const img = document.createElement("img");
       img.src = flagUrl;
       img.alt = `${countryName} Flag icon`;

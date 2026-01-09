@@ -36,7 +36,7 @@ class FormValidator {
     }
 
     // Initial validation
-    this.validate();
+    this.validate(false);
   }
 
   /**
@@ -87,20 +87,20 @@ class FormValidator {
     }
 
     if (field.type === 'number' || field.inputMode === 'numeric') {
-      if (field.min && parseFloat(value) < parseFloat(field.min)) {
+      if (+field.min && parseFloat(value) < parseFloat(field.min)) {
         errors.push(`Value must be at least ${field.min}`);
       }
-      if (field.max && parseFloat(value) > parseFloat(field.max)) {
+      if (+field.max && parseFloat(value) > parseFloat(field.max)) {
         errors.push(`Value must be at most ${field.max}`);
       }
     }
 
-    if (field.minLength && value.length < field.minLength) {
-      errors.push(`Minimum length is ${field.minLength} characters`);
+    if (+field.minlength && value.length < field.minlength) {
+      errors.push(`Minimum length is ${field.minlength} characters`);
     }
 
-    if (field.maxLength && value.length > field.maxLength) {
-      errors.push(`Maximum length is ${field.maxLength} characters`);
+    if (+field.maxlength && value.length > field.maxlength) {
+      errors.push(`Maximum length is ${field.maxlength} characters`);
     }
 
     if (field.pattern && value) {
@@ -117,7 +117,7 @@ class FormValidator {
         errors.push(customError);
       }
     }
-
+    console.log(`Validation for field "${fieldName}":`, errors);
     // Update errors object
     if (errors.length > 0) {
       this.errors[fieldName] = errors;
@@ -131,14 +131,15 @@ class FormValidator {
   /**
    * Validate entire form
    * @returns {boolean} Whether the form is valid
+   * @param {boolean} showErrors - Whether to display errors immediately
    */
-  validate() {
+  validate(showErrors = true) {
     this.errors = {};
     let isValid = true;
 
     // Get all form fields
     const fields = this.form.querySelectorAll('input, select, textarea');
-
+    console.log("Validating fields:", fields);
     fields.forEach(field => {
       if (field.name && !field.disabled) {
         const fieldValid = this.validateField(field);
@@ -148,6 +149,10 @@ class FormValidator {
       }
     });
 
+    if (showErrors) {
+      this.displayErrors();
+    }
+
     return isValid;
   }
 
@@ -156,6 +161,7 @@ class FormValidator {
    * @param {HTMLElement} field
    */
   displayFieldError(field) {
+    console.log("Displaying error for field:", field);
     const fieldName = field.name;
     const errors = this.errors[fieldName];
 
