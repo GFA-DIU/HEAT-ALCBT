@@ -47,7 +47,14 @@ class CustomUserUpdateForm(forms.ModelForm):
                 'placeholder': 'Email',
                 'required': True,
             }),
-        } 
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ensure the email field shows the decrypted value
+        if self.instance and self.instance.pk:
+            # Access the email property which should return the decrypted value
+            self.initial['email'] = str(self.instance.email) 
 class UserProfileUpdateForm(forms.ModelForm):
     country = forms.ModelChoiceField(
         queryset=ALCBTCountryManager.get_all_countries(),

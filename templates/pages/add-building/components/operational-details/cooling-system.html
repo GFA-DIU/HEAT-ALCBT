@@ -787,6 +787,11 @@
     const template = document.getElementById(templateId);
     if (template) {
       targetElement.innerHTML = template.innerHTML;
+
+      // Process HTMX attributes in the newly loaded template
+      if (typeof htmx !== 'undefined') {
+        htmx.process(targetElement);
+      }
     }
   }
 
@@ -817,7 +822,7 @@
 
     // Collect all form data
     const systemData = {
-      building_id: buildingId,
+      building_uuid: buildingId,
       cooling_system_type: cooling_system_type,
     };
 
@@ -826,9 +831,9 @@
       systemData.cooling_system_id = window.editingCoolingSystemId;
     }
 
-    // Add all form fields
+    // Add all form fields (skip csrftoken and cooling_system_type as we already set it)
     for (const [key, value] of formData.entries()) {
-      if (key !== 'csrfmiddlewaretoken') {
+      if (key !== 'csrfmiddlewaretoken' && key !== 'cooling_system_type') {
         systemData[key] = value;
       }
     }

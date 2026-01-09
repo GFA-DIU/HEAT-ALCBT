@@ -657,29 +657,35 @@ class StepManager {
                     if (event.detail.target === buildingTypeSelect) {
                       setTimeout(() => {
                         buildingTypeSelect.value = result.data.building_type;
+                        console.log('Building type set to:', result.data.building_type);
 
                         // Trigger apartment type loading
                         if (apartmentTypeSelect && result.data.apartment_type) {
-                          htmx.trigger(buildingTypeSelect, 'change');
+                          console.log('Triggering apartment type load for:', result.data.apartment_type);
 
                           const apartmentLoadHandler = (event) => {
                             if (event.detail.target === apartmentTypeSelect) {
+                              console.log('Apartment type dropdown loaded, setting value');
                               setTimeout(() => {
                                 apartmentTypeSelect.value = result.data.apartment_type;
-                              }, 50);
+                                console.log('Apartment type set to:', result.data.apartment_type);
+                              }, 100);
                               document.body.removeEventListener('htmx:afterSwap', apartmentLoadHandler);
                             }
                           };
                           document.body.addEventListener('htmx:afterSwap', apartmentLoadHandler);
+
+                          // Trigger the change event to load apartment types
+                          htmx.trigger(buildingTypeSelect, 'change');
                         }
-                      }, 50);
+                      }, 100);
 
                       document.body.removeEventListener('htmx:afterSwap', buildingTypeLoadHandler);
                     }
                   };
                   document.body.addEventListener('htmx:afterSwap', buildingTypeLoadHandler);
                 }
-              }, 200);
+              }, 300);
             }
           }
         }
