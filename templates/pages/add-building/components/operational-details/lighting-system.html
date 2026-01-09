@@ -51,26 +51,15 @@
           <legend class="fieldset-legend">
             Room type<span class="text-[var(--state--error--base)]">*</span>
           </legend>
-          <select class="select w-full" name="room_type" required>
+          <select
+            class="select w-full"
+            name="room_type"
+            hx-get="/select_lists/?room_types=1"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
+          >
             <option disabled selected value="">Select an option</option>
-            <option value="office">
-              Office:
-              <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                >Conference Room, Lobby, Office</span
-              >
-            </option>
-            <option value="hospital">
-              Hospital:
-              <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                >Patient Room, Waiting Room, Surgery Room</span
-              >
-            </option>
-            <option value="residential">
-              Residential:
-              <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                >Kitchen, Dining, Bedroom, Bathroom</span
-              >
-            </option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
@@ -90,12 +79,11 @@
               >*</span
             >
           </legend>
-          <select 
-            required
+          <select
             class="select w-full"
             id="lighting-type"
             name="lighting_type"
-            hx-get="/select_lists/?lighting_types=1"
+            hx-get="/select_lists/?lighting_bulb_types=1"
             hx-trigger="load"
             hx-target="this"
             hx-swap="innerHTML"
@@ -360,12 +348,10 @@
     return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
   }
 
-  // Helper to get building ID from session/localStorage
+  // Get building UUID from URL parameters
   function getBuildingId() {
-    // Try to get from stepManager or localStorage
-    const buildingData = JSON.parse(localStorage.getItem('building-form-data') || '{}');
-    return buildingData['building-information/building-name-location']?.building_id ||
-           sessionStorage.getItem('building_id');
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('building_uuid');
   }
 
   // Open modal
@@ -409,7 +395,7 @@
 
     // Collect all form data
     const systemData = Object.fromEntries(formData.entries());
-    systemData.building_id = buildingId;
+    systemData.building_uuid = buildingId;
 
     // If editing, include the system ID
     if (window.editingLightingSystemId) {
@@ -451,12 +437,10 @@
     const listContainer = document.getElementById('lighting-systems-list');
     const noSystemsContainer = document.getElementById('no-lighting-system-template');
 
-     // If no systems, show no systems template
-    if (window.lightingSystems.length === 0) {
-      listContainer.innerHTML = noSystemsContainer.innerHTML;
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      console.error('Building ID not found');
       return;
     }
 

@@ -7,6 +7,7 @@ Each step loads a template and provides necessary context data.
 
 import logging
 import json
+import uuid as uuid_lib
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -19,9 +20,7 @@ from pages.models.building import BuildingCategory
 from pages.models.epd import EPD, MaterialCategory
 
 logger = logging.getLogger(__name__)
-from django.db import transaction
-from pages.models import Building, HotWaterSystem
-from pages.forms.hot_water_system_form import HotWaterSystemForm
+from pages.models import Building
 
 
 @login_required
@@ -104,7 +103,9 @@ def handle_schedule_temp_step(request):
 # Step 2.2: Cooling System
 def handle_cooling_system_step(request):
     """Handle cooling system configuration step."""
-    context = {}
+    context = {
+        "building_uuid": request.GET.get('building_uuid', '')
+    }
     return render(
         request,
         "pages/add-building/components/operational-details/cooling-system.html",
@@ -115,7 +116,9 @@ def handle_cooling_system_step(request):
 # Step 2.3: Ventilation System
 def handle_ventilation_system_step(request):
     """Handle ventilation system configuration step."""
-    context = {}
+    context = {
+        "building_uuid": request.GET.get('building_uuid', '')
+    }
     return render(
         request,
         "pages/add-building/components/operational-details/ventilation-system.html",
@@ -126,7 +129,9 @@ def handle_ventilation_system_step(request):
 # Step 2.4: Lighting System
 def handle_lighting_system_step(request):
     """Handle lighting system configuration step."""
-    context = {}
+    context = {
+        "building_uuid": request.GET.get('building_uuid', '')
+    }
     return render(
         request,
         "pages/add-building/components/operational-details/lighting-system.html",
@@ -137,7 +142,9 @@ def handle_lighting_system_step(request):
 # Step 2.5: Lift & Escalator System
 def handle_lift_escalator_step(request):
     """Handle lift and escalator system configuration step."""
-    context = {}
+    context = {
+        "building_uuid": request.GET.get('building_uuid', '')
+    }
     return render(
         request,
         "pages/add-building/components/operational-details/lift-escalator-system.html",
@@ -148,7 +155,9 @@ def handle_lift_escalator_step(request):
 # Step 2.6: Hot Water System
 def handle_hot_water_step(request):
     """Handle hot water system configuration step."""
-    context = {}
+    context = {
+        "building_uuid": request.GET.get('building_uuid', '')
+    }
     return render(
         request,
         "pages/add-building/components/operational-details/hot-water-system.html",
@@ -243,131 +252,215 @@ def save_building_step(request):
     """
     Save data from a building creation step.
     Handles AJAX POST requests to save step data.
+
+    Step 1.1 (building-name-location): Creates Building with basic data, returns UUID.
+    Step 1.2 (building-details): Updates the Building with additional details using UUID.
+    Operational steps: Data is saved immediately via dedicated APIs, this just returns success.
     """
-    import json
-    
     try:
         data = json.loads(request.body)
         step_key = data.get("step_key")
         step_data = data.get("data")
-        logging.info(f"Saving step data for {step_key}: {step_data}", step_data)
+        logging.info(f"Saving step data for {step_key}")
 
-        if not step_key or not step_data:
+        if not step_key or step_data is None:
             return JsonResponse({"error": "Missing step_key or data"}, status=400)
-        
-        # Store in session for now (you can modify to save to database)
-        if "building_form_data" not in request.session:
-            request.session["building_form_data"] = {}
-        
-        request.session["building_form_data"][step_key] = step_data
-        request.session.modified = True
-        
+
+        building_uuid = step_data.get('building_uuid', '')
+
+        # Step 1.1: Create the Building with basic info from name & location
+        if step_key == "building-information/building-name-location":
+            if building_uuid:
+                # Update existing building
+                try:
+                    uuid_obj = uuid_lib.UUID(building_uuid)
+                    building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+
+                    # Update name and location fields (handle both 'name' and 'building_name')
+                    if 'building_name' in step_data:
+                        building.name = step_data['building_name']
+                    elif 'name' in step_data:
+                        building.name = step_data['name']
+
+                    if 'address' in step_data:
+                        building.street = step_data['address']  # Using address for street field
+                    if 'country' in step_data and step_data['country']:
+                        building.country_id = step_data['country']
+                    if 'region' in step_data and step_data['region']:
+                        building.region_id = step_data['region']
+                    if 'city' in step_data and step_data['city']:
+                        building.city_id = step_data['city']
+
+                    building.save()
+                    building_uuid = str(building.uuid)
+
+                except (ValueError, Building.DoesNotExist):
+                    return JsonResponse({"error": "Invalid building UUID"}, status=400)
+            else:
+                # Create new building with basic required fields
+                # Handle both 'name' and 'building_name' field names
+                building_name = step_data.get('building_name') or step_data.get('name', 'Untitled Building')
+
+                building = Building.objects.create(
+                    name=building_name,
+                    street=step_data.get('address', ''),  # Using address for street field
+                    country_id=step_data.get('country') if step_data.get('country') else None,
+                    region_id=step_data.get('region') if step_data.get('region') else None,
+                    city_id=step_data.get('city') if step_data.get('city') else None,
+                    created_by=request.user,
+                    # Add minimal defaults for required fields
+                    climate_zone='tropical-wet',  # Default, will be updated in step 1.2
+                    total_floor_area=100,  # Will be updated in step 1.2
+                    reference_period=50,    # Will be updated in step 1.2
+                )
+                building_uuid = str(building.uuid)
+
+        # Step 1.2: Update the Building with detailed information
+        elif step_key == "building-information/building-details":
+            if building_uuid:
+                # Update existing building
+                try:
+                    uuid_obj = uuid_lib.UUID(building_uuid)
+                    building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+
+                    # Map form field names to model field names
+                    field_mapping = {
+                        'building_type': 'category_id',  # FK to CategorySubcategory
+                        'climate_type': 'climate_zone',
+                        'assessment_period': 'reference_period',
+                        'conditioned_floor_area': 'cond_floor_area',
+                        # Direct mappings (same name)
+                        'construction_year': 'construction_year',
+                        'total_floor_area': 'total_floor_area',
+                        'floors_below_ground': 'floors_below_ground',
+                    }
+
+                    # Update building with mapped fields
+                    for form_field, model_field in field_mapping.items():
+                        if form_field in step_data and step_data[form_field]:
+                            setattr(building, model_field, step_data[form_field])
+
+                    building.save()
+                    building_uuid = str(building.uuid)
+
+                except (ValueError, Building.DoesNotExist):
+                    return JsonResponse({"error": "Invalid building UUID"}, status=400)
+            else:
+                return JsonResponse({"error": "Building must be created in step 1.1 first"}, status=400)
+
+        # For all other steps, just acknowledge receipt
+        # Operational systems are saved immediately via their dedicated APIs
+        # Other data is kept client-side until final completion
         return JsonResponse({
             "success": True,
-            "message": "Step data saved successfully"
+            "message": "Step data saved successfully",
+            "building_uuid": building_uuid
         })
-        
+
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON data"}, status=400)
     except Exception as e:
+        logging.error(f"Error saving building step: {str(e)}")
         return JsonResponse({"error": str(e)}, status=500)
 
 
 @login_required
 @require_http_methods(["GET"])
-def get_building_step_data(request):
+def get_building_data(request):
     """
-    Retrieve saved data for a specific building creation step.
+    Get building data by UUID for restoring form fields.
+    Returns building data formatted for form restoration.
     """
-    step_key = request.GET.get("step_key")
-    
-    if not step_key:
-        return JsonResponse({"error": "step_key parameter is required"}, status=400)
-    
-    building_data = request.session.get("building_form_data", {})
-    step_data = building_data.get(step_key, {})
-    
-    return JsonResponse({
-        "success": True,
-        "data": step_data
-    })
+    building_uuid = request.GET.get('building_uuid')
+
+    if not building_uuid:
+        return JsonResponse({"error": "building_uuid parameter is required"}, status=400)
+
+    try:
+        uuid_obj = uuid_lib.UUID(building_uuid)
+        building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+
+        # Return building data with form field names (not model field names)
+        # Get parent category (building_type) and subcategory (apartment_type) if category exists
+        building_type_id = None
+        apartment_type_id = None
+        if building.category:
+            # building.category is a CategorySubcategory object
+            # It has both category (parent) and subcategory (apartment type)
+            building_type_id = building.category.category.id
+            apartment_type_id = building.category.subcategory.id
+
+        data = {
+            # Step 1.1 fields
+            'building_name': building.name,
+            'address': building.street or '',
+            'country': building.country_id,
+            'region': building.region_id,
+            'city': building.city_id,
+
+            # Step 1.2 fields (use form field names)
+            'building_type': building_type_id,
+            'apartment_type': apartment_type_id,
+            'climate_type': building.climate_zone,
+            'assessment_period': building.reference_period,
+            'construction_year': building.construction_year,
+            'total_floor_area': str(building.total_floor_area) if building.total_floor_area else '',
+            'conditioned_floor_area': str(building.cond_floor_area) if building.cond_floor_area else '',
+            'floors_below_ground': building.floors_below_ground,
+        }
+
+        return JsonResponse({
+            "success": True,
+            "data": data
+        })
+
+    except (ValueError, Building.DoesNotExist):
+        return JsonResponse({"error": "Building not found or invalid UUID"}, status=404)
+    except Exception as e:
+        logging.error(f"Error fetching building data: {str(e)}")
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 @login_required
 @require_http_methods(["POST"])
 def complete_building_setup(request):
     """
-    Complete the building setup and create the building record.
-    This combines all step data and creates the final building.
+    Complete the building setup process.
+
+    At this point:
+    - Building already exists (created in step 1.2)
+    - All operational systems already saved to DB (via their dedicated APIs)
+    - This just marks the process as complete and redirects to dashboard
     """
-
     try:
-        # Get all saved step data from session
-        building_data = request.session.get("building_form_data", {})
+        data = json.loads(request.body)
+        building_uuid = data.get("building_uuid")
 
-        if not building_data:
-            return JsonResponse({"error": "No building data found"}, status=400)
+        if not building_uuid:
+            return JsonResponse({
+                "success": False,
+                "error": "Building UUID is required"
+            }, status=400)
 
-        # Use transaction to ensure all-or-nothing creation
-        with transaction.atomic():
-            # TODO: Create the actual building record here
-            # For now, we need a building instance to associate HWS with
-            # This assumes you have basic building data in session
+        # Verify building exists and belongs to user
+        try:
+            uuid_obj = uuid_lib.UUID(building_uuid)
+            building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+        except (ValueError, Building.DoesNotExist):
+            return JsonResponse({
+                "success": False,
+                "error": "Building not found or invalid UUID"
+            }, status=404)
 
-            # If you already have a building created (e.g., building_id in session)
-            # you can fetch it. Otherwise, you'd create it here.
-            building_id = request.session.get("building_id")
-            if building_id:
-                try:
-                    building = Building.objects.get(id=building_id, created_by=request.user)
-                except Building.DoesNotExist:
-                    return JsonResponse({"error": "Building not found"}, status=404)
-            else:
-                # If no building exists yet, return error - building should be created first
-                return JsonResponse({
-                    "success": False,
-                    "error": "Building must be created before completing setup"
-                }, status=400)
-
-            # Process Hot Water System data
-            hws_data = building_data.get("operational-details/hot-water-system", [])
-
-            if hws_data and isinstance(hws_data, list):
-                # Clear existing hot water systems for this building
-                HotWaterSystem.objects.filter(building=building).delete()
-
-                # Validate and create each hot water system
-                validation_errors = {}
-                for idx, system_data in enumerate(hws_data):
-                    form = HotWaterSystemForm(data=system_data)
-
-                    if form.is_valid():
-                        hws = form.save(commit=False)
-                        hws.building = building
-                        hws.save()
-                    else:
-                        validation_errors[f"system_{idx}"] = form.errors
-
-                # If there were validation errors, rollback and return errors
-                if validation_errors:
-                    transaction.set_rollback(True)
-                    return JsonResponse({
-                        "success": False,
-                        "error": "Validation errors in hot water systems",
-                        "errors": validation_errors
-                    }, status=400)
-
-        # Clear the session data after successful creation
-        if "building_form_data" in request.session:
-            del request.session["building_form_data"]
-
+        # Building setup is complete - all data already saved
         return JsonResponse({
             "success": True,
-            "message": "Building created successfully",
-            "redirect_url": "/dashboard/"
+            "message": "Building setup completed successfully",
+            "redirect_url": f"/building/{building.id}/"
         })
 
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON data"}, status=400)
     except Exception as e:
         logging.error(f"Error completing building setup: {str(e)}")
-        return JsonResponse({"error": str(e)}, status=500)
         return JsonResponse({"error": str(e)}, status=500)

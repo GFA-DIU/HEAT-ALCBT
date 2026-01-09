@@ -1,5 +1,4 @@
 <!-- Updated building-name-location.html with validation -->
-<!-- This is a drop-in replacement for your existing file -->
 {% load static %}
 <form id="form" class="grid grid-cols-2 gap-x-2 gap-y-1">
   {% csrf_token %}
@@ -65,7 +64,6 @@
         hx-trigger="change[this.value != '']"
         hx-swap="innerHTML"
         hx-vals='js:{"country": this.value}'
-        onchange="if(!this.value) { document.getElementById('region-select').innerHTML = '<option value=\"\">Select a region or state</option>'; document.getElementById('city-select').innerHTML = '<option value=\"\">Select a city</option>'; }"
       >
         <option value="" disabled selected>Select a country</option>
         {% for country in countries %}
@@ -102,7 +100,6 @@
         hx-target="#city-select"
         hx-swap="innerHTML"
         hx-vals='js:{"region": this.value}'
-        onchange="if(!this.value) { document.getElementById('city-select').innerHTML = '<option value=\"\">Select a city</option>'; }"
       >
         <option value="">Select a region or state</option>
       </select>
@@ -171,7 +168,92 @@
     <p class="validator-hint">Must be between -90 and 90</p>
   </fieldset>
 
-</form>
+<script>
+  // Initialize cascading dropdowns when form is loaded with pre-filled data
+  (function initializeCascadingDropdowns() {
+    const countrySelect = document.getElementById('country-select');
+    const regionSelect = document.getElementById('region-select');
+    const citySelect = document.getElementById('city-select');
+
+    if (!countrySelect || !regionSelect || !citySelect) return;
+
+    // Add event listener to reset dependent dropdowns when country is cleared
+    countrySelect.addEventListener('change', function() {
+      if (!this.value) {
+        regionSelect.innerHTML = '<option value="">Select a region or state</option>';
+        citySelect.innerHTML = '<option value="">Select a city</option>';
+      }
+    });
+
+    // Add event listener to reset city dropdown when region is cleared
+    regionSelect.addEventListener('change', function() {
+      if (!this.value) {
+        citySelect.innerHTML = '<option value="">Select a city</option>';
+      }
+    });
+
+    // Function to trigger HTMX requests for dependent dropdowns
+    const loadDependentDropdowns = () => {
+      const savedCountry = countrySelect.value;
+      const savedRegion = regionSelect.value;
+      const savedCity = citySelect.value;
+
+      // If country has a value, trigger HTMX request for regions
+      if (savedCountry && typeof htmx !== 'undefined') {
+        // Trigger the HTMX request on country select
+        htmx.trigger(countrySelect, 'change');
+
+        // Wait for HTMX to populate regions, then restore region value
+        if (savedRegion) {
+          // Listen for when HTMX finishes updating the region select
+          const regionLoadHandler = (event) => {
+            if (event.detail.target === regionSelect) {
+              regionSelect.value = savedRegion;
+
+              // If region has a value, trigger HTMX request for cities
+              if (savedRegion) {
+                htmx.trigger(regionSelect, 'change');
+
+                // Wait for HTMX to populate cities, then restore city value
+                if (savedCity) {
+                  const cityLoadHandler = (event) => {
+                    if (event.detail.target === citySelect) {
+                      citySelect.value = savedCity;
+                      document.body.removeEventListener('htmx:afterSwap', cityLoadHandler);
+                    }
+                  };
+                  document.body.addEventListener('htmx:afterSwap', cityLoadHandler);
+                }
+              }
+
+              document.body.removeEventListener('htmx:afterSwap', regionLoadHandler);
+            }
+          };
+          document.body.addEventListener('htmx:afterSwap', regionLoadHandler);
+        }
+      }
+    };
+
+    // Check multiple times to catch when StepManager restores the data
+    let attempts = 0;
+    const maxAttempts = 5;
+    const checkInterval = 200; // Check every 200ms
+
+    const checkAndLoad = () => {
+      if (countrySelect.value) {
+        // Country value is present, trigger HTMX requests
+        loadDependentDropdowns();
+      } else if (attempts < maxAttempts) {
+        // Not yet loaded, try again
+        attempts++;
+        setTimeout(checkAndLoad, checkInterval);
+      }
+    };
+
+    // Start checking
+    checkAndLoad();
+  })();
+</script>
 
 <!-- Geo Location Modal (unchanged) -->
 <dialog

@@ -1,4 +1,5 @@
 import json
+import uuid as uuid_lib
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
@@ -8,6 +9,28 @@ from django.db import transaction
 from pages.models.building import Building
 from pages.models.building_operation import HotWaterSystem
 from pages.forms.hot_water_system_form import HotWaterSystemForm
+
+
+def get_building_by_uuid(building_uuid, user):
+    """
+    Helper function to get building by UUID.
+
+    Args:
+        building_uuid: str (UUID)
+        user: Django user object
+
+    Returns:
+        Building object
+
+    Raises:
+        Building.DoesNotExist if building not found
+        ValueError if UUID is invalid
+    """
+    try:
+        uuid_obj = uuid_lib.UUID(str(building_uuid))
+        return Building.objects.get(uuid=uuid_obj, created_by=user)
+    except (ValueError, AttributeError) as e:
+        raise ValueError(f"Invalid UUID format: {building_uuid}")
 
 
 @login_required
@@ -21,7 +44,7 @@ def create_or_update_hot_water_system(request):
 
     Expected payload:
     {
-        "building_id": int,
+        "building_uuid": str (UUID),
         "hot_water_system_id": int (optional, for updates),
         "type_of_hot_water_system": str,
         "fuel_type": str,
@@ -34,8 +57,7 @@ def create_or_update_hot_water_system(request):
         "equipment_efficiency_level": float,
         "heat_recovery_system": str or bool ("yes"/"no" or true/false),
         "number_of_equipment": int,
-        "energy_efficiency_label": str (optional),
-        "number_of_stars": int (optional)
+        "energy_efficiency_label": str (optional)
     }
 
     Returns:
@@ -47,19 +69,24 @@ def create_or_update_hot_water_system(request):
         data = json.loads(request.body)
 
         # Get building
-        building_id = data.get('building_id')
-        if not building_id:
+        building_uuid = data.get('building_uuid')
+        if not building_uuid:
             return JsonResponse({
                 'success': False,
-                'errors': {'building_id': ['Building ID is required.']}
+                'errors': {'building_uuid': ['Building UUID is required.']}
             }, status=400)
 
         try:
-            building = Building.objects.get(id=building_id, created_by=request.user)
+            building = get_building_by_uuid(building_uuid, request.user)
+        except ValueError as e:
+            return JsonResponse({
+                'success': False,
+                'errors': {'building_uuid': [str(e)]}
+            }, status=400)
         except Building.DoesNotExist:
             return JsonResponse({
                 'success': False,
-                'errors': {'building_id': ['Building not found or you do not have permission to access it.']}
+                'errors': {'building_uuid': ['Building not found or you do not have permission to access it.']}
             }, status=404)
 
         # Check if this is an update or create
@@ -111,8 +138,6 @@ def create_or_update_hot_water_system(request):
                     'heat_recovery_system': hot_water_system.heat_recovery_system,
                     'number_of_equipment': hot_water_system.number_of_equipment,
                     'energy_efficiency_label': hot_water_system.energy_efficiency_label,
-                    'energy_efficiency_label_display': hot_water_system.get_energy_efficiency_label_display() if hot_water_system.energy_efficiency_label else None,
-                    'number_of_stars': hot_water_system.number_of_stars,
                 }
             }
 
@@ -139,9 +164,12 @@ def create_or_update_hot_water_system(request):
 
 @login_required
 @require_http_methods(["GET"])
-def get_hot_water_systems(request, building_id):
+def get_hot_water_systems(request, building_uuid):
     """
     Get all hot water systems for a specific building.
+
+    Args:
+        building_uuid: UUID of the building
 
     Returns:
     - Success: {"success": true, "hot_water_systems": list} (200)
@@ -150,11 +178,16 @@ def get_hot_water_systems(request, building_id):
     try:
         # Get building and check permissions
         try:
-            building = Building.objects.get(id=building_id, created_by=request.user)
+            building = get_building_by_uuid(building_uuid, request.user)
+        except ValueError as e:
+            return JsonResponse({
+                'success': False,
+                'errors': {'building_uuid': [str(e)]}
+            }, status=400)
         except Building.DoesNotExist:
             return JsonResponse({
                 'success': False,
-                'errors': {'building_id': ['Building not found or you do not have permission to access it.']}
+                'errors': {'building_uuid': ['Building not found or you do not have permission to access it.']}
             }, status=404)
 
         # Get all hot water systems for this building
@@ -179,8 +212,6 @@ def get_hot_water_systems(request, building_id):
                 'heat_recovery_system': system.heat_recovery_system,
                 'number_of_equipment': system.number_of_equipment,
                 'energy_efficiency_label': system.energy_efficiency_label,
-                'energy_efficiency_label_display': system.get_energy_efficiency_label_display() if system.energy_efficiency_label else None,
-                'number_of_stars': system.number_of_stars,
             })
 
         return JsonResponse({

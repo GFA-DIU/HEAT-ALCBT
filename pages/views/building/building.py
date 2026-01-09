@@ -237,8 +237,9 @@ def handle_information_submit(request, building_id, form):
             building = form.save(commit=False)
             building.created_by = request.user
             building.save()
+
             logger.info(
-                "User %s successfully saved building %s", request.user, building
+                "User %s successfully saved building %s (UUID: %s)", request.user, building, building.uuid
             )
             return redirect("building", building_id=building.id)
         else:

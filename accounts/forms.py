@@ -47,44 +47,52 @@ class CustomUserUpdateForm(forms.ModelForm):
                 'placeholder': 'Email',
                 'required': True,
             }),
-        } 
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ensure the email field shows the decrypted value
+        if self.instance and self.instance.pk:
+            # Access the email property which should return the decrypted value
+            self.initial['email'] = str(self.instance.email) 
 class UserProfileUpdateForm(forms.ModelForm):
     country = forms.ModelChoiceField(
         queryset=ALCBTCountryManager.get_all_countries(),
         widget=forms.Select(attrs={
-            'hx-get': '/select_lists/',               # HTMX request to the root URL
-            'hx-trigger': 'change',      # Trigger HTMX on change event
-            'hx-target': '#region-dropdown', # Update the Region dropdown
-            'class': 'select select-with-icon w-full validator',
-            'required': True,
+            'class': 'w-full',
         }),
-        label="Country"
+        label="Country",
+        required=False
     )
     region = forms.ModelChoiceField(
         queryset=CustomRegion.objects.all(),
-        widget=forms.Select(
-            attrs={
-                "id": "region-dropdown",
-                "hx-get": "/select_lists/",  # HTMX request to the root URL
-                "hx-trigger": "change",  # Trigger HTMX on change event
-                "hx-target": "#city-dropdown",  # Update the City dropdown
-                "class": "select select-with-icon w-full validator",
-                "required": True,
-            }
-        ),
+        widget=forms.Select(attrs={
+            'class': 'w-full',
+        }),
         label="Region",
         required=False,
     )
     city = forms.ModelChoiceField(
         queryset=CustomCity.objects.none(),  # Start with an empty queryset
         widget=forms.Select(attrs={
-            'id': 'city-dropdown',
-            'class': 'select select-with-icon w-full validator',
-            'required': True,
+            'class': 'w-full',
         }),
         label="City",
-        help_text="Select a country first",
         required=False
+    )
+
+    # Text fields for Global country (not saved to model, just for UI)
+    region_text = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full',
+        })
+    )
+    city_text = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full',
+        })
     )
     
     class Meta:
