@@ -9,7 +9,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
   <title class="title">{% block title %}BEAT{% endblock title %}</title>
-  <meta name="description" content="A framework for launching new Django projects quickly.">
+  <meta name="description" content="Begin assessing your building’s whole life cycle emissions – from embodied to operational">
   <meta name="author" content="">
   <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -46,7 +46,7 @@
         class="relative flex items-center lg:justify-center justify-between w-full max-w-[78.563rem] mx-auto"
       >
         <div class="lg:absolute left-0 lg:top-1/2 lg:-translate-y-1/2">
-          <a href="{% url 'home' %}"><img src="{% static 'assets/logo.svg' %}" alt="logo" class="w-[3.688rem]" /></a>
+          <a href="{% url 'home' %}"><img src="{% static 'assets/logo.svg' %}" alt="logo" class="w-[4.688rem]" /></a>
         </div>
         <div
           class="navbar-radio-group flex h-full w-fit relative gap-6"
@@ -117,15 +117,15 @@
         <div
           class="lg:absolute right-0 lg:top-1/2 lg:-translate-y-1/2 flex items-center gap-4"
         >
-          <button class="btn btn-ghost size-6 p-0 max-md:hidden">
+          <a href="https://alcbt.gggi.org/beat-handbook-part-1-core-concept-guide/" target="_blank" class="btn btn-ghost size-6 p-0 max-md:hidden">
             <span data-icon="question-line" data-size="24"></span>
-          </button>
-          <button class="btn btn-ghost size-6 p-0 max-md:hidden">
+          </a>
+          {% comment %} <button class="btn btn-ghost size-6 p-0 max-md:hidden">
             <span data-icon="bell-simple" data-size="24"></span>
-          </button>
-          <button class="btn btn-ghost size-6 p-0 max-md:hidden">
+          </button> {% endcomment %}
+          <a href="{% url 'profile' %}" class="btn btn-ghost size-6 p-0 max-md:hidden">
             <span data-icon="settings-5-line" data-size="24"></span>
-          </button>
+          </a>
 
           <button popovertarget="popover-1" style="anchor-name:--anchor-1" class="btn btn-ghost flex items-center gap-1 max-md:hidden">
             <div class="avatar avatar-placeholder">
@@ -140,6 +140,7 @@
           <ul class="dropdown menu w-52 rounded-box bg-base-100 shadow-sm "
             popover id="popover-1" style="position-anchor:--anchor-1">
             <li class='w-full'><a class='w-full' href="{% url 'profile' %}">Profile</a></li>
+            <li class='w-full'><button class='w-full' onclick="showCookieSettings()">Cookie Settings</button></li>
             <li class='w-full'><button onclick="logout_modal.showModal()" class='w-full'>Logout</button></li>
           </ul>
           <button
@@ -502,18 +503,15 @@
   <script type="module" src="{% static 'js/icons.js' %}"></script>
 
   <!-- HTMX event listeners for reinitializing components -->
-  <script type="module">
+  <script type="module" defer>
     import { initCountryFlags } from "{% static 'js/countries-registry.js' %}";
 
     // Reinitialize icons and country flags after HTMX swaps content
     document.body.addEventListener('htmx:afterSwap', function(event) {
-      console.log('HTMX content swapped, reinitializing components...');
-
       // Reinitialize icons in the swapped content
       if (window.IconComponent) {
         window.IconComponent.initialize();
       }
-
       // Reinitialize country flags in the swapped content
       initCountryFlags();
     });
@@ -523,6 +521,7 @@
       // This runs after transitions/animations are done
       // Only use if you need to wait for animations
     });
+
   </script>
 
   <!-- HTMX -->
