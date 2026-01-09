@@ -227,16 +227,15 @@
           >*</span
         >
       </legend>
-      <select class="select w-full" name="type_of_refrigerants" required>
+      <select
+        class="select w-full"
+        name="type_of_refrigerants"
+        hx-get="/select_lists/?refrigerant_types=1"
+        hx-trigger="load"
+        hx-target="this"
+        hx-swap="innerHTML"
+      >
         <option disabled selected value="">Select an option</option>
-        <option value="R-134A">R-134A</option>
-        <option value="R-32">R-32</option>
-        <option value="R-410A">R-410A</option>
-        <option value="R-290 (Propane)">R-290 (Propane)</option>
-        <option value="R-600a (Isobutane)">R-600a (Isobutane)</option>
-        <option value="R-717 (Ammonia)">R-717 (Ammonia)</option>
-        <option value="R-744 (C02)">R-744 (C02)</option>
-        <option value="R-404A">R-404A</option>
       </select>
     </fieldset>
     <fieldset class="fieldset">
@@ -526,16 +525,15 @@
           >*</span
         >
       </legend>
-      <select class="select w-full" name="type_of_refrigerants">
+      <select
+        class="select w-full"
+        name="type_of_refrigerants"
+        hx-get="/select_lists/?refrigerant_types=1"
+        hx-trigger="load"
+        hx-target="this"
+        hx-swap="innerHTML"
+      >
         <option disabled selected value="">Select an option</option>
-        <option value="R-134A">R-134A</option>
-        <option value="R-32">R-32</option>
-        <option value="R-410A">R-410A</option>
-        <option value="R-290 (Propane)">R-290 (Propane)</option>
-        <option value="R-600a (Isobutane)">R-600a (Isobutane)</option>
-        <option value="R-717 (Ammonia)">R-717 (Ammonia)</option>
-        <option value="R-744 (C02)">R-744 (C02)</option>
-        <option value="R-404A">R-404A</option>
       </select>
     </fieldset>
     <fieldset class="fieldset">
@@ -738,10 +736,10 @@
     return document.querySelector('[name=csrfmiddlewaretoken]').value;
   }
 
-  // Get building ID from the page context
+  // Get building UUID from URL parameters
   function getBuildingId() {
-    const buildingIdElement = document.querySelector('[data-building-id]');
-    return buildingIdElement ? buildingIdElement.dataset.buildingId : null;
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('building_uuid');
   }
 
   // Open modal for adding new system
@@ -791,6 +789,11 @@
     const template = document.getElementById(templateId);
     if (template) {
       targetElement.innerHTML = template.innerHTML;
+
+      // Process HTMX attributes in the newly loaded template
+      if (typeof htmx !== 'undefined') {
+        htmx.process(targetElement);
+      }
     }
   }
 
@@ -828,7 +831,7 @@
 
     // Collect all form data
     const systemData = {
-      building_id: buildingId,
+      building_uuid: buildingId,
       cooling_system_type: cooling_system_type,
     };
 
@@ -837,9 +840,9 @@
       systemData.cooling_system_id = window.editingCoolingSystemId;
     }
 
-    // Add all form fields
+    // Add all form fields (skip csrftoken and cooling_system_type as we already set it)
     for (const [key, value] of formData.entries()) {
-      if (key !== 'csrfmiddlewaretoken') {
+      if (key !== 'csrfmiddlewaretoken' && key !== 'cooling_system_type') {
         systemData[key] = value;
       }
     }
@@ -873,17 +876,13 @@
 
   // Render cooling systems list
   window.renderCoolingSystems = async function() {
-    const listContainer = document.getElementById('cooling-systems-list');
-    const noSystemsContainer = document.getElementById('no-cooling-system-template');
-
-     // If no systems, show no systems template
-    if (window.coolingSystems.length === 0) {
-      listContainer.innerHTML = noSystemsContainer.innerHTML;
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      console.error('Building ID not found');
       return;
     }
+
+    const listContainer = document.getElementById('cooling-systems-list');
 
     try {
       const response = await fetch(`/cooling-system/${buildingId}/`, {

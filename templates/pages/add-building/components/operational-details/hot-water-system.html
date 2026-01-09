@@ -54,11 +54,15 @@
               >*</span
             >
           </legend>
-          <select class="select w-full" name="type_of_hot_water_system" required>
+          <select
+            class="select w-full"
+            name="type_of_hot_water_system"
+            hx-get="/select_lists/?hot_water_system_types=1"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
+          >
             <option disabled selected value="">Select an option</option>
-            <option value="heat-pump">Heat pump water heater</option>
-            <option value="boiler">Boiler</option>
-            <option value="solar">Solar water heaters</option>
           </select>
           <p class="validator-hint">This field is required</p>
         </fieldset>
@@ -66,16 +70,15 @@
           <legend class="fieldset-legend">
             Fuel type<span class="text-[var(--state--error--base)]">*</span>
           </legend>
-          <select class="select w-full" name="fuel_type" required>
+          <select
+            class="select w-full"
+            name="fuel_type"
+            hx-get="/select_lists/?fuel_types=1"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
+          >
             <option disabled selected value="">Select an option</option>
-            <option value="electricity">Electricity</option>
-            <option value="light-fuel-oil">Light fuel oil</option>
-            <option value="heavy-fuel-oil">Heavy fuel oil</option>
-            <option value="lpg">Liquified petroleum gas (LPG)</option>
-            <option value="natural-gas">Natural gas</option>
-            <option value="coal">Coal</option>
-            <option value="ignite">Ignite</option>
-            <option value="diesel">Diesel</option>
           </select>
         </fieldset>
         <fieldset class="fieldset col-span-2">
@@ -197,7 +200,7 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Energy efficiency label</legend>
-          <select class="select w-full" name="energy_efficiency_label" required>
+          <select class="select w-full" name="energy_efficiency_label_type">
             <option disabled selected value="">Select an option</option>
             <option value="bee">BEE Star Rating</option>
             <option value="egat">EGAT</option>
@@ -348,12 +351,10 @@
     return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
   }
 
-  // Helper to get building ID from session/localStorage
+  // Get building UUID from URL parameters
   function getBuildingId() {
-    // Try to get from stepManager or localStorage
-    const buildingData = JSON.parse(localStorage.getItem('building-form-data') || '{}');
-    return buildingData['building-information/building-name-location']?.building_id ||
-           sessionStorage.getItem('building_id');
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('building_uuid');
   }
 
   // Open modal
@@ -398,7 +399,7 @@
 
     // Collect all form data
     const systemData = Object.fromEntries(formData.entries());
-    systemData.building_id = buildingId;
+    systemData.building_uuid = buildingId;
 
     // If editing, include the system ID
     if (window.editingHotWaterSystemId) {
@@ -439,12 +440,11 @@
   window.renderHotWaterSystems = async function() {
     const listContainer = document.getElementById('hot-water-systems-list');
     const noSystemsContainer = document.getElementById('no-hot-water-system-template');
-    if (window.hotWaterSystems.length === 0) {
-      listContainer.innerHTML = noSystemsContainer.innerHTML;
 
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      console.error('Building ID not found');
       return;
     }
 
@@ -580,6 +580,16 @@
           }
         }
       });
+
+      // Map energy_efficiency_label to number_of_stars field (like lighting system)
+      if (system.energy_efficiency_label !== null) {
+        form.querySelector('[name="number_of_stars"]').value = system.energy_efficiency_label;
+      }
+
+      // Map boolean heat_recovery_system to yes/no dropdown
+      if (system.heat_recovery_system !== undefined) {
+        form.querySelector('[name="heat_recovery_system"]').value = system.heat_recovery_system ? 'yes' : 'no';
+      }
 
       hot_water_system_modal.showModal();
     } catch (error) {

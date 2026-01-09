@@ -1,4 +1,5 @@
 import json
+import uuid as uuid_lib
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
@@ -7,6 +8,28 @@ from django.db import transaction
 from pages.models.building import Building
 from pages.models.building_operation import LiftEscalatorSystem
 from pages.forms.lift_escalator_system_form import LiftEscalatorSystemForm
+
+
+def get_building_by_uuid(building_uuid, user):
+    """
+    Helper function to get building by UUID.
+
+    Args:
+        building_uuid: str (UUID)
+        user: Django user object
+
+    Returns:
+        Building object
+
+    Raises:
+        Building.DoesNotExist if building not found
+        ValueError if UUID is invalid
+    """
+    try:
+        uuid_obj = uuid_lib.UUID(str(building_uuid))
+        return Building.objects.get(uuid=uuid_obj, created_by=user)
+    except (ValueError, AttributeError) as e:
+        raise ValueError(f"Invalid UUID format: {building_uuid}")
 
 
 @login_required
@@ -20,7 +43,7 @@ def create_or_update_lift_escalator_system(request):
 
     Expected payload:
     {
-        "building_id": int,
+        "building_uuid": str (UUID),
         "lift_escalator_system_id": int (optional, for updates),
         "number_of_lifts": int,
         "lift_regenerative_features": str or bool ("yes"/"no" or true/false),
@@ -37,19 +60,24 @@ def create_or_update_lift_escalator_system(request):
         data = json.loads(request.body)
 
         # Get building
-        building_id = data.get('building_id')
-        if not building_id:
+        building_uuid = data.get('building_uuid')
+        if not building_uuid:
             return JsonResponse({
                 'success': False,
-                'errors': {'building_id': ['Building ID is required.']}
+                'errors': {'building_uuid': ['Building UUID is required.']}
             }, status=400)
 
         try:
-            building = Building.objects.get(id=building_id, created_by=request.user)
+            building = get_building_by_uuid(building_uuid, request.user)
+        except ValueError as e:
+            return JsonResponse({
+                'success': False,
+                'errors': {'building_uuid': [str(e)]}
+            }, status=400)
         except Building.DoesNotExist:
             return JsonResponse({
                 'success': False,
-                'errors': {'building_id': ['Building not found or you do not have permission to access it.']}
+                'errors': {'building_uuid': ['Building not found or you do not have permission to access it.']}
             }, status=404)
 
         # Check if this is an update or create
@@ -117,9 +145,12 @@ def create_or_update_lift_escalator_system(request):
 
 @login_required
 @require_http_methods(["GET"])
-def get_lift_escalator_systems(request, building_id):
+def get_lift_escalator_systems(request, building_uuid):
     """
     Get all lift & escalator systems for a specific building.
+
+    Args:
+        building_uuid: UUID of the building
 
     Returns:
     - Success: {"success": true, "lift_escalator_systems": list} (200)
@@ -128,11 +159,16 @@ def get_lift_escalator_systems(request, building_id):
     try:
         # Get building and check permissions
         try:
-            building = Building.objects.get(id=building_id, created_by=request.user)
+            building = get_building_by_uuid(building_uuid, request.user)
+        except ValueError as e:
+            return JsonResponse({
+                'success': False,
+                'errors': {'building_uuid': [str(e)]}
+            }, status=400)
         except Building.DoesNotExist:
             return JsonResponse({
                 'success': False,
-                'errors': {'building_id': ['Building not found or you do not have permission to access it.']}
+                'errors': {'building_uuid': ['Building not found or you do not have permission to access it.']}
             }, status=404)
 
         # Get all lift & escalator systems for this building

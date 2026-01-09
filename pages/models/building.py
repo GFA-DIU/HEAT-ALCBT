@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.utils.translation import gettext as _
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -255,6 +256,13 @@ class BuildingOperationalInfo(models.Model):
 
 
 class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
+    uuid = models.UUIDField(
+        _("Building UUID"),
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        db_index=True,
+    )
     name = models.CharField(_("Building name/code"), max_length=255)
     structural_components = models.ManyToManyField(
         Assembly,
