@@ -779,11 +779,6 @@
     } else {
       loadTemplate('air-condition-system-template', selectedSystemDiv);
     }
-
-    // Reinitialize icons after loading template
-    if (window.IconComponent) {
-      window.IconComponent.initialize();
-    }
   }
 
   // Load template content
@@ -879,9 +874,6 @@
      // If no systems, show no systems template
     if (window.coolingSystems.length === 0) {
       listContainer.innerHTML = noSystemsContainer.innerHTML;
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
       return;
     }
 
@@ -905,9 +897,6 @@
               <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No cooling systems added yet</p>
             </li>
           `;
-          if (window.IconComponent) {
-            window.IconComponent.initialize();
-          }
           return;
         }
 
@@ -965,11 +954,6 @@
             </li>
           `;
         }).join('');
-
-        // Reinitialize icons
-        if (window.IconComponent) {
-          window.IconComponent.initialize();
-        }
       } else {
         console.error('Error fetching cooling systems:', result.errors);
       }
