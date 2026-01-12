@@ -128,23 +128,6 @@ class HotWaterSystemForm(forms.ModelForm):
         }
     )
 
-    energy_efficiency_label = forms.ChoiceField(
-        label=_("Energy Efficiency Label"),
-        choices=[('', '---------')] + list(EnergyEfficiencyLabelType.choices),
-        required=False,
-    )
-
-    number_of_stars = forms.IntegerField(
-        label=_("Number of Stars"),
-        min_value=1,
-        max_value=5,
-        required=False,
-        error_messages={
-            'min_value': _('Number of stars must be between 1 and 5.'),
-            'max_value': _('Number of stars must be between 1 and 5.')
-        }
-    )
-
     class Meta:
         model = HotWaterSystem
         fields = [
@@ -160,8 +143,15 @@ class HotWaterSystemForm(forms.ModelForm):
             'heat_recovery_system',
             'number_of_equipment',
             'energy_efficiency_label',
-            'number_of_stars',
         ]
+
+    def __init__(self, data=None, *args, **kwargs):
+        # Map number_of_stars to energy_efficiency_label (like lighting system)
+        if data is not None:
+            data = data.copy()
+            if 'number_of_stars' in data:
+                data['energy_efficiency_label'] = data.pop('number_of_stars')
+        super().__init__(data=data, *args, **kwargs)
 
     def clean_heat_recovery_system(self):
         """Convert 'yes'/'no' string values to boolean."""
@@ -178,19 +168,3 @@ class HotWaterSystemForm(forms.ModelForm):
                 return False
 
         return False
-
-    def clean(self):
-        """Additional validation logic."""
-        cleaned_data = super().clean()
-
-        # If energy efficiency label is provided, number of stars should also be provided
-        energy_label = cleaned_data.get('energy_efficiency_label')
-        num_stars = cleaned_data.get('number_of_stars')
-
-        if energy_label and not num_stars:
-            self.add_error(
-                'number_of_stars',
-                _('Number of stars is required when energy efficiency label is provided.')
-            )
-
-        return cleaned_data

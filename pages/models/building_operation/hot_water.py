@@ -50,6 +50,7 @@ class HotWaterSystem(models.Model):
         max_length=50,
         choices=HotWaterSystemType.choices,
         verbose_name=_("Type of Hot Water System"),
+        db_column="system_type",
     )
 
     fuel_type = models.CharField(
@@ -63,16 +64,19 @@ class HotWaterSystem(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(0), MaxValueValidator(24)],
         verbose_name=_("Operating Hours per Day"),
+        db_column="operation_hours_per_workday",
     )
 
     operating_days_per_week = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(7)],
         verbose_name=_("Operating Days per Week"),
+        db_column="workdays_per_week",
     )
 
     operating_weeks_per_year = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(52)],
         verbose_name=_("Operating Weeks per Year"),
+        db_column="workweeks_per_year",
     )
 
     fuel_consumption = models.DecimalField(
@@ -87,6 +91,7 @@ class HotWaterSystem(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(0)],
         verbose_name=_("Hot Water System Power Input (kW)"),
+        db_column="power_input_kw",
     )
 
     baseline_efficiency = models.DecimalField(
@@ -94,6 +99,7 @@ class HotWaterSystem(models.Model):
         decimal_places=3,
         validators=[MinValueValidator(0)],
         verbose_name=_("Baseline Hot Water System Efficiency (COP)"),
+        db_column="baseline_efficiency_cop",
     )
 
     equipment_efficiency_level = models.DecimalField(
@@ -101,31 +107,26 @@ class HotWaterSystem(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
         verbose_name=_("Baseline Hot Water System Equipment Efficiency Level (%)"),
+        db_column="baseline_equipment_efficiency_percentage",
     )
 
     heat_recovery_system = models.BooleanField(
         verbose_name=_("Installation of Heat Recovery Systems"),
         default=False,
+        db_column="heat_recovery_installed",
     )
 
     number_of_equipment = models.PositiveIntegerField(
         validators=[MinValueValidator(1)],
         verbose_name=_("Number of Hot Water Equipment Installed"),
+        db_column="number_of_equipments",
     )
 
-    energy_efficiency_label = models.CharField(
-        max_length=20,
-        choices=EnergyEfficiencyLabelType.choices,
-        null=True,
-        blank=True,
-        verbose_name=_("Energy Efficiency Label Type"),
-    )
-
-    number_of_stars = models.PositiveSmallIntegerField(
+    energy_efficiency_label = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
         validators=[MinValueValidator(1), MaxValueValidator(5)],
-        verbose_name=_("Number of Stars"),
+        verbose_name=_("Energy Efficiency Star Rating (1-5)"),
     )
 
     class Meta:

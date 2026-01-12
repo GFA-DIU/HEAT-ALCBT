@@ -198,7 +198,6 @@ class StepManager {
         ...this.formData[stepKey],
         ...statusData.data,
       };
-      localStorage.setItem("building-form-data", JSON.stringify(this.formData));
     }
   }
 
@@ -296,7 +295,20 @@ class StepManager {
 
     try {
       // Use the new Django step view endpoint
-      const response = await fetch(`/building/step?step=${subStep.component}`);
+      // Get building UUID if it exists in form data
+      const buildingUuid = this.formData['building-information/building-name-location']?.building_uuid || '';
+      const url = buildingUuid
+        ? `/building/step?step=${subStep.component}&building_uuid=${buildingUuid}`
+        : `/building/step?step=${subStep.component}`;
+
+      // Update browser URL to include UUID if available
+      if (buildingUuid && !window.location.search.includes('building_uuid')) {
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('building_uuid', buildingUuid);
+        window.history.pushState({}, '', newUrl);
+      }
+
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -464,43 +476,47 @@ class StepManager {
     }
   }
 
-  saveFormData() {
+  /**
+   * Save form data - returns the saved data or null if failed
+   * @returns {Promise<Record<string, any> | null>}
+   */
+  async saveFormData() {
     const stepKey = this.getCurrentStepKey();
-    const step = this.getCurrentStepInfo();
     const stepData = this.getFormData(stepKey);
 
-    this.saveStepFormDataLocally(stepData, stepKey);  
-    if(!stepData && Object.keys(stepData).length === 0){
-      alert("No data to save for this step.");
-      return;
+    if(!stepData || Object.keys(stepData).length === 0){
+      console.warn("No data to save for this step.");
+      return null;
     }
-    // Save to server via Django
-    this.saveToServer(stepKey, stepData);
-  }
 
-  // Helper function save data from each step when the step does not have a form
-   /**  
-   * @param {Record<string, any>} stepData
-   * @param {string} stepKey 
-   */
-  saveStepFormDataLocally(stepData, stepKey) {
-    if(stepData){
-      console.log("Saving step data:", stepData);
-      this.formData[stepKey] = stepData;
-      localStorage.setItem("building-form-data", JSON.stringify(this.formData));
-    } else {  
-      alert("No data to save for this step.");
-    }
+    console.log("Saving step data:", stepData);
+    this.formData[stepKey] = stepData;
+
+    // Save to server via Django
+    return await this.saveToServer(stepKey, stepData);
   }
 
   /**
+   * Save to server and return response with UUID
    * @param {string} stepKey
    * @param {Record<string, any>} stepData
+   * @returns {Promise<{success: boolean, building_uuid?: string, error?: string}>}
    */
   async saveToServer(stepKey, stepData) {
     try {
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-      
+
+      // Get building_uuid from URL params or from formData
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlUuid = urlParams.get('building_uuid');
+      const formUuid = this.formData['building-information/building-name-location']?.building_uuid;
+
+      // Add building_uuid to stepData if it exists
+      const dataWithUuid = {
+        ...stepData,
+        building_uuid: urlUuid || formUuid || stepData.building_uuid || ''
+      };
+
       const response = await fetch('/building/step/save', {
         method: 'POST',
         headers: {
@@ -509,59 +525,170 @@ class StepManager {
         },
         body: JSON.stringify({
           step_key: stepKey,
-          data: stepData
+          data: dataWithUuid
         })
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        console.error('Failed to save step data to server');
+        console.error('Failed to save step data to server:', result);
+        return { success: false, error: result.error || 'Failed to save' };
       }
+
+      // Store building_uuid if returned
+      if (result.building_uuid) {
+        if (!this.formData['building-information/building-name-location']) {
+          this.formData['building-information/building-name-location'] = {};
+        }
+        this.formData['building-information/building-name-location'].building_uuid = result.building_uuid;
+      }
+
+      return { success: true, building_uuid: result.building_uuid };
     } catch (error) {
       console.error('Error saving to server:', error);
-      throw error;
-      // Don't block the UI, just log the error
+      return { success: false, error: error.message };
     }
   }
 
   async restoreFormData() {
     const stepKey = this.getCurrentStepKey();
-    
-    // Try to load from server first
-    try {
-      const response = await fetch(`/building/step/data?step_key=${stepKey}`);
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data && Object.keys(result.data).length > 0) {
-          this.formData[stepKey] = result.data;
-        }
-      }
-    } catch (error) {
-      console.error('Error loading from server:', error);
-    }
 
-    // Fallback to localStorage if available
-    if (!this.formData[stepKey] || Object.keys(this.formData[stepKey]).length === 0) {
-      const savedData = localStorage.getItem("building-form-data");
-      if (savedData) {
-        this.formData = JSON.parse(savedData);
-      }
-    }
+    // Get UUID from URL if available
+    const urlParams = new URLSearchParams(window.location.search);
+    const buildingUuid = urlParams.get('building_uuid');
 
-    const stepData = this.formData[stepKey];
+    // If we have a UUID, fetch data from server
+    if (buildingUuid) {
+      try {
+        const response = await fetch(`/building/step/data?building_uuid=${buildingUuid}`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            // Store in formData for consistency
+            this.formData['building-information/building-name-location'] = result.data;
+            this.formData['building-information/building-name-location'].building_uuid = buildingUuid;
+            this.formData['building-information/building-details'] = result.data;
 
-    if (stepData) {
-      Object.keys(stepData).forEach((key) => {
-        const element = document.querySelector(
-          `[name="${key}"], [data-field="${key}"]`
-        );
-        if (element) {
-          if (element.type === "checkbox") {
-            element.checked = stepData[key];
-          } else {
-            element.value = stepData[key];
+            // Restore form fields
+            Object.keys(result.data).forEach((key) => {
+              const element = document.querySelector(
+                `[name="${key}"], [data-field="${key}"]`
+              );
+              if (element && result.data[key]) {
+                if (element.type === "checkbox") {
+                  element.checked = result.data[key];
+                } else {
+                  element.value = result.data[key];
+                }
+              }
+            });
+
+            // For step 1.1, trigger cascading dropdowns for region and city
+            if (stepKey === 'building-information/building-name-location') {
+              // Wait for HTMX to be ready and trigger cascading
+              setTimeout(() => {
+                const countrySelect = document.getElementById('country-select');
+                const regionSelect = document.getElementById('region-select');
+                const citySelect = document.getElementById('city-select');
+
+                if (countrySelect && result.data.country && typeof htmx !== 'undefined') {
+                  // Listen for when regions are loaded
+                  const regionLoadHandler = (event) => {
+                    if (event.detail.target === regionSelect && result.data.region) {
+                      regionSelect.value = result.data.region;
+
+                      // Now trigger city loading
+                      htmx.trigger(regionSelect, 'change');
+
+                      // Listen for when cities are loaded
+                      const cityLoadHandler = (event) => {
+                        if (event.detail.target === citySelect && result.data.city) {
+                          citySelect.value = result.data.city;
+                          document.body.removeEventListener('htmx:afterSwap', cityLoadHandler);
+                        }
+                      };
+                      document.body.addEventListener('htmx:afterSwap', cityLoadHandler);
+
+                      document.body.removeEventListener('htmx:afterSwap', regionLoadHandler);
+                    }
+                  };
+
+                  document.body.addEventListener('htmx:afterSwap', regionLoadHandler);
+                  htmx.trigger(countrySelect, 'change');
+                }
+              }, 200);
+            }
+
+            // For step 1.2, trigger cascading dropdowns for apartment type and climate type
+            if (stepKey === 'building-information/building-details') {
+              setTimeout(() => {
+                const buildingTypeSelect = document.getElementById('building-type-select');
+                const apartmentTypeSelect = document.getElementById('apartment-type-select');
+                const climateTypeSelect = document.getElementById('climate-type-select');
+
+                // Trigger building type dropdown to load
+                if (buildingTypeSelect && typeof htmx !== 'undefined') {
+                  htmx.trigger(buildingTypeSelect, 'load');
+                }
+
+                // Trigger climate type dropdown to load
+                if (climateTypeSelect && typeof htmx !== 'undefined') {
+                  htmx.trigger(climateTypeSelect, 'load');
+
+                  // Wait for it to load then set value
+                  const climateLoadHandler = (event) => {
+                    if (event.detail.target === climateTypeSelect && result.data.climate_type) {
+                      setTimeout(() => {
+                        climateTypeSelect.value = result.data.climate_type;
+                      }, 50);
+                      document.body.removeEventListener('htmx:afterSwap', climateLoadHandler);
+                    }
+                  };
+                  document.body.addEventListener('htmx:afterSwap', climateLoadHandler);
+                }
+
+                // Handle apartment type after building type loads
+                if (buildingTypeSelect && result.data.building_type) {
+                  const buildingTypeLoadHandler = (event) => {
+                    if (event.detail.target === buildingTypeSelect) {
+                      setTimeout(() => {
+                        buildingTypeSelect.value = result.data.building_type;
+                        console.log('Building type set to:', result.data.building_type);
+
+                        // Trigger apartment type loading
+                        if (apartmentTypeSelect && result.data.apartment_type) {
+                          console.log('Triggering apartment type load for:', result.data.apartment_type);
+
+                          const apartmentLoadHandler = (event) => {
+                            if (event.detail.target === apartmentTypeSelect) {
+                              console.log('Apartment type dropdown loaded, setting value');
+                              setTimeout(() => {
+                                apartmentTypeSelect.value = result.data.apartment_type;
+                                console.log('Apartment type set to:', result.data.apartment_type);
+                              }, 100);
+                              document.body.removeEventListener('htmx:afterSwap', apartmentLoadHandler);
+                            }
+                          };
+                          document.body.addEventListener('htmx:afterSwap', apartmentLoadHandler);
+
+                          // Trigger the change event to load apartment types
+                          htmx.trigger(buildingTypeSelect, 'change');
+                        }
+                      }, 100);
+
+                      document.body.removeEventListener('htmx:afterSwap', buildingTypeLoadHandler);
+                    }
+                  };
+                  document.body.addEventListener('htmx:afterSwap', buildingTypeLoadHandler);
+                }
+              }, 300);
+            }
           }
         }
-      });
+      } catch (error) {
+        console.error('Error fetching building data:', error);
+      }
     }
   }
 
@@ -619,9 +746,16 @@ class StepManager {
     this.updateProgress();
   }
 
-  saveAndContinue() {
-    // Save current form data
-    this.saveFormData();
+  async saveAndContinue() {
+    // Save current form data and wait for completion
+    const saveResult = await this.saveFormData();
+
+    // Check if save failed
+    if (saveResult && !saveResult.success) {
+      // Show error message
+      alert(`Failed to save: ${saveResult.error || 'Unknown error'}`);
+      return; // Don't proceed to next step
+    }
 
     const step = this.stepConfig[this.currentStep];
 
@@ -644,9 +778,9 @@ class StepManager {
     this.updateProgress();
   }
 
-  goBack() {
+  async goBack() {
     // Save current form data before going back
-    this.saveFormData();
+    await this.saveFormData();
 
     if (this.currentSubStep > 1) {
       // Go to previous substep
@@ -666,10 +800,10 @@ class StepManager {
     this.updateProgress();
   }
 
-  skip() {
+  async skip() {
     // Save current form data (even if incomplete)
-    this.saveFormData();
-    this.saveAndContinue();
+    await this.saveFormData();
+    await this.saveAndContinue();
   }
 
   async completeSetup() {
