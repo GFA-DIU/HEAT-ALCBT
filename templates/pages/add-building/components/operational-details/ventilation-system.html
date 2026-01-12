@@ -509,9 +509,6 @@
 
         if (systems.length === 0) {
           listContainer.innerHTML = noSystemsContainer.innerHTML;
-          if (window.IconComponent) {
-            window.IconComponent.initialize();
-          }
           return;
         }
 
@@ -557,10 +554,6 @@
           `;
         }).join('');
 
-        // Reinitialize icons
-        if (window.IconComponent) {
-          window.IconComponent.initialize();
-        }
       } else {
         console.error('Error fetching ventilation systems:', result.errors);
       }

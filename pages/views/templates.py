@@ -1,4 +1,5 @@
 import json
+from multiprocessing import context
 
 from cities_light.models import Country
 from django.core.paginator import Paginator
@@ -10,6 +11,8 @@ from django.views.decorators.http import require_http_methods
 
 from pages.models.assembly import (Assembly, AssemblyCategory, AssemblyMode,
                                    AssemblyTechnique, StructuralProduct)
+from pages.models.epd import EPDType, MaterialCategory
+from pages.views.assembly.epd_filtering import get_filtered_epd_list
 
 
 def templates(request):
@@ -119,12 +122,18 @@ def templates(request):
     categories = AssemblyCategory.objects.all().order_by("name")
     techniques = AssemblyTechnique.objects.all().order_by("name")
 
+    # EPD categories for modal (top-level only)
+    epd_categories = MaterialCategory.objects.filter(parent__isnull=True).order_by("name_en")
+    epd_types = [{"value": t[0], "label": t[1]} for t in EPDType.choices]
+
     context = {
         "assemblies_with_gwp": assemblies_with_gwp,
         "page_obj": page_obj,
         "countries": countries,
         "categories": categories,
         "techniques": techniques,
+        "epd_categories": epd_categories,
+        "epd_types": epd_types,
         "search_query": search_query,
         "selected_country": country_id,
         "selected_category": category_id,
@@ -259,11 +268,14 @@ def update_template(request, template_id):
 
         assembly.save()
 
-        # Update materials (description and quantity only)
+        # Update/create materials
         materials_data = data.get("materials", [])
+        new_materials_data = data.get("new_materials", [])
+
+        # Update existing materials (description and quantity only)
         for material_data in materials_data:
             material_id = material_data.get("id")
-            if material_id:
+            if material_id and not str(material_id).startswith("new_"):
                 try:
                     product = StructuralProduct.objects.get(id=material_id, assembly=assembly)
                     product.description = material_data.get("description", product.description)
@@ -272,10 +284,37 @@ def update_template(request, template_id):
                 except StructuralProduct.DoesNotExist:
                     pass
 
+        # Create new materials from EPD modal
+        for new_material in new_materials_data:
+            epd_id = new_material.get("epd_id")
+            if epd_id:
+                from pages.models.epd import EPD
+                try:
+                    epd = EPD.objects.get(id=epd_id)
+
+                    # Get correct unit based on assembly dimension
+                    dimension = None if assembly.is_boq else assembly.dimension
+                    _, expected_units = epd.get_epd_info(dimension)
+                    # Use first expected unit as default
+                    input_unit = expected_units[0] if expected_units else epd.declared_unit
+
+                    StructuralProduct.objects.create(
+                        assembly=assembly,
+                        epd=epd,
+                        description=new_material.get("description", ""),
+                        quantity=new_material.get("quantity", 0),
+                        input_unit=input_unit,
+                    )
+                except EPD.DoesNotExist:
+                    pass
+
         # Delete materials marked for deletion
         deleted_ids = data.get("deleted_materials", [])
         if deleted_ids:
-            StructuralProduct.objects.filter(id__in=deleted_ids, assembly=assembly).delete()
+            # Filter out temp IDs (new_*)
+            real_ids = [id for id in deleted_ids if not str(id).startswith("new_")]
+            if real_ids:
+                StructuralProduct.objects.filter(id__in=real_ids, assembly=assembly).delete()
 
         return JsonResponse({"success": True, "message": "Template updated successfully"})
 
@@ -311,9 +350,9 @@ def duplicate_template(request, template_id):
             created_by=request.user,
         )
 
-        # Copy materials with updated data
+        # Copy existing materials with updated data
         materials_data = data.get("materials", [])
-        material_map = {m["id"]: m for m in materials_data}
+        material_map = {m["id"]: m for m in materials_data if not str(m["id"]).startswith("new_")}
 
         for original_product in original.structuralproduct_set.all():
             material_data = material_map.get(str(original_product.id), {})
@@ -325,6 +364,31 @@ def duplicate_template(request, template_id):
                 quantity=material_data.get("quantity", original_product.quantity),
                 input_unit=original_product.input_unit,
             )
+
+        # Add new materials from EPD modal
+        new_materials_data = data.get("new_materials", [])
+        for new_material in new_materials_data:
+            epd_id = new_material.get("epd_id")
+            if epd_id:
+                from pages.models.epd import EPD
+                try:
+                    epd = EPD.objects.get(id=epd_id)
+
+                    # Get correct unit based on assembly dimension
+                    dimension = None if copy.is_boq else copy.dimension
+                    _, expected_units = epd.get_epd_info(dimension)
+                    # Use first expected unit as default
+                    input_unit = expected_units[0] if expected_units else epd.declared_unit
+
+                    StructuralProduct.objects.create(
+                        assembly=copy,
+                        epd=epd,
+                        description=new_material.get("description", ""),
+                        quantity=new_material.get("quantity", 0),
+                        input_unit=input_unit,
+                    )
+                except EPD.DoesNotExist:
+                    pass
 
         return JsonResponse({"success": True, "message": "Template duplicated successfully", "id": str(copy.id)})
 
@@ -347,3 +411,56 @@ def delete_template(request, template_id):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
+
+
+def search_epds(request):
+    """Search EPDs for adding to templates. Reuses existing EPD filtering logic."""
+    # Get filtered EPDs using existing logic
+    filtered_epds, _ = get_filtered_epd_list(request, operational=False)
+
+    # Paginate
+    page = request.GET.get("page", 1)
+    paginator = Paginator(filtered_epds, 10)
+    epds = paginator.get_page(page)
+
+    # Build EPD list with GWP calculations and JSON-safe data
+    epd_list = []
+    for epd in epds:
+        gwp = 0
+        try:
+            gwp = epd.get_gwp_impact_sum("a1a3")
+        except Exception:
+            pass
+
+        epd_data = {
+            "id": str(epd.id),
+            "name": epd.name,
+            "country": epd.country.name if epd.country else "Unknown",
+            "country_code": epd.country.code2 if epd.country else None,
+            "category": epd.category.name_en if epd.category else "Unknown",
+            "gwp": round(float(gwp), 2) if gwp else 0,
+            "unit": epd.declared_unit,
+            "type": epd.get_type_display() if epd.type else "Unknown",
+        }
+        epd_list.append({
+            **epd_data,
+            "json": json.dumps(epd_data)  # Pre-encode JSON for template
+        })
+
+    # Get search parameters for pagination
+    search_query = request.GET.get("epd_search_query", "").strip()
+    country = request.GET.get("country", "").strip()
+    category = request.GET.get("category", "").strip()
+    epd_type = request.GET.get("type", "").strip()
+
+    context = {
+        "epds": epd_list,
+        "page_obj": epds,
+        "search_query": search_query,
+        "selected_country": country,
+        "selected_category": category,
+        "selected_type": epd_type,
+    }
+
+    # Return HTML partial for HTMX
+    return render(request, "pages/home/partials/epd_components_list.html", context)

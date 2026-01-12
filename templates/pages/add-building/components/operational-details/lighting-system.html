@@ -463,9 +463,6 @@
             <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No lighting systems added yet</p>
           </li>
         `;
-        if (window.IconComponent) {
-          window.IconComponent.initialize();
-        }
         return;
       }
 
@@ -511,11 +508,6 @@
           </li>
         `;
       }).join('');
-
-      // initialize icons again
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
     } catch (error) {
       console.error('Error loading lighting systems:', error);
       listContainer.innerHTML = `
@@ -524,9 +516,7 @@
           <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading lighting systems</p>
         </li>
       `;
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
+
     }
   }
 

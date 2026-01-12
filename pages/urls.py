@@ -8,13 +8,9 @@ from pages.views.datasets import datasets
 from pages.views.map import map_view
 from pages.views.profile import view_profile
 from pages.views.select_lists import select_lists
-from pages.views.templates import (
-    templates,
-    get_template_detail,
-    update_template,
-    duplicate_template,
-    delete_template,
-)
+from pages.views.templates import (delete_template, duplicate_template,
+                                   get_template_detail, search_epds, templates,
+                                   update_template)
 
 from .views.assembly.assembly import component_edit
 from .views.building.add_building_steps import (building_step_view,
@@ -26,31 +22,21 @@ from .views.building.building_simulation import building_simulation
 from .views.building.building_step_operational import \
     building_step_operational_products
 from .views.building.components import building_components, new_building
+from .views.building.cooling_system import (create_or_update_cooling_system,
+                                            delete_cooling_system,
+                                            get_cooling_systems)
 from .views.building.hot_water_system import (
-    create_or_update_hot_water_system,
-    get_hot_water_systems,
-    delete_hot_water_system
-)
+    create_or_update_hot_water_system, delete_hot_water_system,
+    get_hot_water_systems)
 from .views.building.lift_escalator_system import (
-    create_or_update_lift_escalator_system,
-    get_lift_escalator_systems,
-    delete_lift_escalator_system
-)
-from .views.building.lighting_system import (
-    create_or_update_lighting_system,
-    get_lighting_systems,
-    delete_lighting_system
-)
+    create_or_update_lift_escalator_system, delete_lift_escalator_system,
+    get_lift_escalator_systems)
+from .views.building.lighting_system import (create_or_update_lighting_system,
+                                             delete_lighting_system,
+                                             get_lighting_systems)
 from .views.building.ventilation_system import (
-    create_or_update_ventilation_system,
-    get_ventilation_systems,
-    delete_ventilation_system
-)
-from .views.building.cooling_system import (
-    create_or_update_cooling_system,
-    get_cooling_systems,
-    delete_cooling_system
-)
+    create_or_update_ventilation_system, delete_ventilation_system,
+    get_ventilation_systems)
 from .views.home import buildings_list
 from .views.resources import resources
 
@@ -62,6 +48,7 @@ urlpatterns = [
     path("templates/<uuid:template_id>/update/", update_template, name="update_template"),
     path("templates/<uuid:template_id>/duplicate/", duplicate_template, name="duplicate_template"),
     path("templates/<uuid:template_id>/delete/", delete_template, name="delete_template"),
+    path("search-epds/", search_epds, name="search_epds"),
     path("datasets/", datasets, name="datasets"),
     path("profile/", view_profile, name="profile"),
     path(

@@ -1,0 +1,87 @@
+{% load static %}
+<div id="epd-search-list">
+  <ul class="grid grid-cols-1 gap-2.75 mt-6">
+    {% for item in epds %}
+      <li class="py-2.5 flex items-center justify-between gap-2.5 border-b border-[var(--stroke--soft-200)]" data-epd-id="{{ item.id }}">
+        <div class="flex flex-col gap-2.5 flex-1">
+          <span class="text-sm/5 font-medium">{{ item.name }}</span>
+          <div class="flex items-stretch gap-1.25">
+            <span class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"> <span data-country="{{item.country}}"></span> {{ item.country }}</span>
+            <div class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"></div>
+            <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">{{ item.category }}</span>
+            <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">{{ item.gwp }} kgCO₂e</span>
+          </div>
+        </div>
+        <div class="flex flex-col items-end gap-2.5 w-fit">
+          <a href="/epd/{{ item.id }}/" target="_blank" title="View EPD details">
+            <span data-icon="external-link-line" data-size="20" data-color="var(--icon--sub-600)"></span>
+          </a>
+          <button type="button" class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)] add-epd-btn" data-epd='{{ item.json }}'>
+            <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+            Add
+          </button>
+        </div>
+      </li>
+    {% empty %}
+      <li class="py-8 text-center text-[var(--text--sub-600)]">
+        No EPDs found matching your search criteria
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div id="epd-pagination" hx-swap-oob="true" class="flex items-center gap-2 flex-1">
+    <button
+      type="button"
+      class="btn btn-ghost py-2 px-3"
+      {% if page_obj.has_previous %}
+        hx-get="{% url 'search_epds' %}?page={{ page_obj.previous_page_number }}&epd_search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&type={{ selected_type }}"
+        hx-target="#epd-search-list"
+        hx-swap="outerHTML"
+      {% else %}
+        disabled
+      {% endif %}
+    >
+      <span data-icon="arrow-left" data-size="20" data-color="var(--icon--soft-400)"></span>
+      Previous
+    </button>
+    <ul class="flex items-center gap-2">
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li>
+            <button type="button" class="btn btn-sm rounded-[var(--radius-8)] btn-neutral">
+              {{ num }}
+            </button>
+          </li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li>
+            <button
+              type="button"
+              class="btn btn-sm rounded-[var(--radius-8)] btn-ghost"
+              hx-get="{% url 'search_epds' %}?page={{ num }}&epd_search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&type={{ selected_type }}"
+              hx-target="#epd-search-list"
+              hx-swap="outerHTML"
+            >
+              {{ num }}
+            </button>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+    <button
+      type="button"
+      class="btn btn-ghost py-2 px-3"
+      {% if page_obj.has_next %}
+        hx-get="{% url 'search_epds' %}?page={{ page_obj.next_page_number }}&epd_search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&type={{ selected_type }}"
+        hx-target="#epd-search-list"
+        hx-swap="outerHTML"
+      {% else %}
+        disabled
+      {% endif %}
+    >
+      Next
+      <span data-icon="arrow-right" data-size="20" data-color="var(--icon--strong-950)"></span>
+    </button>
+  </div>
+  {% endif %}
+</div>

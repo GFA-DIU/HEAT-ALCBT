@@ -13,15 +13,31 @@ class IconComponent {
         };
     }
 
-    initialize() {
-        const icons = document.querySelectorAll("[data-icon]");
-        icons.forEach((el) => {
-            const iconName = el.dataset.icon;
-            const size = parseInt(el.dataset.size) || 20;
-            const color = el.dataset.color || "currentColor";
+    /**
+     * Initialize a single icon element
+     */
+    initializeIcon(el) {
+        // Skip if already initialized
+        if (el.dataset.iconInitialized === "true") {
+            return;
+        }
 
-            window.IconComponent.render(iconName, el, { size, color });
-        });
+        const iconName = el.dataset.icon;
+        const size = parseInt(el.dataset.size) || 20;
+        const color = el.dataset.color || "currentColor";
+
+        window.IconComponent.render(iconName, el, { size, color });
+
+        // Mark as initialized to prevent double initialization
+        el.dataset.iconInitialized = "true";
+    }
+
+    /**
+     * Initialize all icons in the document (or a specific container)
+     */
+    initialize(container = document) {
+        const icons = container.querySelectorAll("[data-icon]");
+        icons.forEach((el) => this.initializeIcon(el));
     }
 
     /**
@@ -156,7 +172,35 @@ window.createIcon = (name, options) =>
 window.renderIcon = (name, container, options) =>
     window.IconComponent.render(name, container, options);
 
-// Auto-initialize icons with data attributes
+// Auto-initialize existing icons on DOMContentLoaded
 document.addEventListener("DOMContentLoaded", function () {
     window.IconComponent.initialize();
+});
+
+// Auto-initialize new icons as they're added to the DOM (for HTMX and dynamic content)
+const iconObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+            // Only process element nodes
+            if (node.nodeType === 1) {
+                // Check if the node itself has data-icon
+                if (node.dataset?.icon) {
+                    window.IconComponent.initializeIcon(node);
+                }
+                // Check children for data-icon
+                if (node.querySelectorAll) {
+                    const icons = node.querySelectorAll("[data-icon]");
+                    icons.forEach((el) => window.IconComponent.initializeIcon(el));
+                }
+            }
+        });
+    });
+});
+
+// Start observing once DOM is ready
+document.addEventListener("DOMContentLoaded", function () {
+    iconObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+    });
 });
