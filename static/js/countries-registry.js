@@ -128,6 +128,85 @@ export async function waitForCountries() {
 }
 
 /**
+ * Initialize a single country flag element
+ * @param {HTMLElement} element - Element with data-country attribute
+ */
+async function initializeCountryFlag(element) {
+  // Wait for data to load (or fail)
+  await dataPromise;
+
+  const countryCode = element.getAttribute("data-country");
+
+  if (element.getAttribute('data-no-country-replace') === 'true') {
+    return;
+  }
+
+  if (!countryCode) {
+    console.warn("Element has data-country attribute but no value:", element);
+    return;
+  }
+
+  const lowerCode = countryCode.length > 2 ? getCountryCodeByName(countryCode) : countryCode.toLowerCase();
+
+  // Get attributes
+  const showFlag = element.getAttribute("data-flag") !== "false"; // default true
+  const nameType = element.getAttribute("data-name") || "common"; // 'common' or 'official'
+  const width = parseInt(element.getAttribute("data-width")) || 16; // default 16px
+  const customClasses = element.getAttribute("data-class") || "";
+
+  // Get country name if data is available, otherwise use code
+  let countryName;
+  if (hasCountries()) {
+    if (nameType === "official") {
+      countryName = getOfficialName(lowerCode) || countryCode;
+    } else {
+      countryName = getName(lowerCode) || countryCode;
+    }
+  } else {
+    countryName = countryCode;
+  }
+
+  if (showFlag) {
+    // Create flag image
+    const flagUrl = `https://cdn.jsdelivr.net/gh/HatScripts/circle-flags/flags/${lowerCode == 'zz' ? 'other/earth' : lowerCode}.svg`;
+    const img = document.createElement("img");
+    img.src = flagUrl;
+    img.alt = `${countryName} Flag icon`;
+    img.style.width = `${width}px`;
+    img.className = customClasses;
+
+    // Copy any other attributes except data-* and class
+    Array.from(element.attributes).forEach((attr) => {
+      if (
+        !attr.name.startsWith("data-") &&
+        attr.name !== "class" &&
+        attr.name !== "style"
+      ) {
+        img.setAttribute(attr.name, attr.value);
+      }
+    });
+
+    // Replace the element with the img
+    element.replaceWith(img);
+  } else {
+    // Create text element with country name
+    const p = document.createElement("p");
+    p.textContent = countryName;
+    p.className = customClasses;
+
+    // Copy any other attributes except data-* and class
+    Array.from(element.attributes).forEach((attr) => {
+      if (!attr.name.startsWith("data-") && attr.name !== "class") {
+        p.setAttribute(attr.name, attr.value);
+      }
+    });
+
+    // Replace the element with the p
+    element.replaceWith(p);
+  }
+}
+
+/**
  * Initialize country flags by replacing elements with data-country attribute
  * This function should be called after DOM is loaded
  *
@@ -147,77 +226,10 @@ export async function initCountryFlags() {
   // Find all elements with data-country attribute
   const elements = document.querySelectorAll("[data-country]");
 
-  elements.forEach((element) => {
-    const countryCode = element.getAttribute("data-country");
-
-    if(element.getAttribute('data-no-country-replace') === 'true'){
-      return;
-    }
-
-    if (!countryCode) {
-      console.warn("Element has data-country attribute but no value:", element);
-      return;
-    }
-
-    const lowerCode = countryCode.length > 2 ? getCountryCodeByName(countryCode) : countryCode.toLowerCase();
-
-    // Get attributes
-    const showFlag = element.getAttribute("data-flag") !== "false"; // default true
-    const nameType = element.getAttribute("data-name") || "common"; // 'common' or 'official'
-    const width = parseInt(element.getAttribute("data-width")) || 16; // default 16px
-    const customClasses = element.getAttribute("data-class") || "";
-
-    // Get country name if data is available, otherwise use code
-    let countryName;
-    if (hasCountries()) {
-      if (nameType === "official") {
-        countryName = getOfficialName(lowerCode) || countryCode;
-      } else {
-        countryName = getName(lowerCode) || countryCode;
-      }
-    } else {
-      countryName = countryCode;
-    }
-
-    if (showFlag) {
-      // Create flag image
-      const flagUrl = `https://cdn.jsdelivr.net/gh/HatScripts/circle-flags/flags/${lowerCode == 'zz' ? 'other/earth' : lowerCode}.svg`;
-      const img = document.createElement("img");
-      img.src = flagUrl;
-      img.alt = `${countryName} Flag icon`;
-      img.style.width = `${width}px`;
-      img.className = customClasses;
-
-      // Copy any other attributes except data-* and class
-      Array.from(element.attributes).forEach((attr) => {
-        if (
-          !attr.name.startsWith("data-") &&
-          attr.name !== "class" &&
-          attr.name !== "style"
-        ) {
-          img.setAttribute(attr.name, attr.value);
-        }
-      });
-
-      // Replace the element with the img
-      element.replaceWith(img);
-    } else {
-      // Create text element with country name
-      const p = document.createElement("p");
-      p.textContent = countryName;
-      p.className = customClasses;
-
-      // Copy any other attributes except data-* and class
-      Array.from(element.attributes).forEach((attr) => {
-        if (!attr.name.startsWith("data-") && attr.name !== "class") {
-          p.setAttribute(attr.name, attr.value);
-        }
-      });
-
-      // Replace the element with the p
-      element.replaceWith(p);
-    }
-  });
+  // Initialize each element
+  for (const element of elements) {
+    await initializeCountryFlag(element);
+  }
 
   if (!hasCountries()) {
     console.warn(
@@ -249,5 +261,41 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
   } else {
     // DOM is already loaded
     initCountryFlags();
+  }
+
+  // Auto-initialize new country flags as they're added to the DOM (for HTMX and dynamic content)
+  const countryObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        // Only process element nodes
+        if (node.nodeType === 1) {
+          // Check if the node itself has data-country
+          if (node.dataset?.country) {
+            initializeCountryFlag(node);
+          }
+          // Check children for data-country
+          if (node.querySelectorAll) {
+            const countryElements = node.querySelectorAll("[data-country]");
+            countryElements.forEach((el) => initializeCountryFlag(el));
+          }
+        }
+      });
+    });
+  });
+
+  // Start observing once DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      countryObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    });
+  } else {
+    // DOM is already loaded, start observing immediately
+    countryObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
   }
 }

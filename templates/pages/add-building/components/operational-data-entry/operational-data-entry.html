@@ -328,9 +328,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const hasProducts = selectedOpProducts && selectedOpProducts.children.length > 0;
     if (selectEpdText) selectEpdText.hidden = hasProducts;
     if (saveButtonContainer) saveButtonContainer.hidden = !hasProducts;
-    if (window.IconComponent) {
-      window.IconComponent.initialize();
-    }
   }
   
   // Handle successful EPD addition

@@ -502,27 +502,7 @@
   <!-- icons JS -->
   <script type="module" src="{% static 'js/icons.js' %}"></script>
 
-  <!-- HTMX event listeners for reinitializing components -->
-  <script type="module" defer>
-    import { initCountryFlags } from "{% static 'js/countries-registry.js' %}";
 
-    // Reinitialize icons and country flags after HTMX swaps content
-    document.body.addEventListener('htmx:afterSwap', function(event) {
-      // Reinitialize icons in the swapped content
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
-      // Reinitialize country flags in the swapped content
-      initCountryFlags();
-    });
-
-    // Alternative: Use htmx:afterSettle for after animations complete
-    document.body.addEventListener('htmx:afterSettle', function(event) {
-      // This runs after transitions/animations are done
-      // Only use if you need to wait for animations
-    });
-
-  </script>
 
   <!-- HTMX -->
   {% comment %} <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script> {% endcomment %}

@@ -24,7 +24,7 @@
           hx-get="{% url 'templates' %}"
           hx-target="#templates-list"
           hx-swap="outerHTML"
-          hx-trigger="submit, change from:select delay:300ms, keyup changed delay:500ms from:input[name='search_query']"
+          hx-trigger="submit, change from:#search-form select delay:300ms, keyup changed delay:500ms from:#search-form input[name='search_query']"
           class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)] mt-5"
         >
           <div class="flex items-stretch gap-2">
@@ -230,7 +230,7 @@
                 Add from EPD library
               </button>
             </div>
-            <ul id="modal-materials-list" class="grid grid-cols-1 gap-2.5 mt-4">
+            <ul id="modal-materials-list" class="grid grid-cols-1 gap-2.5 mt-4 mb-[100px]">
               
             </ul>
           </div>
@@ -283,41 +283,32 @@
             ></span>
           </button>
         </div>
-        <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+        <form
+          id='epd-search-form'
+          hx-get="{% url 'search_epds' %}"
+          hx-target="#epd-search-list"
+          hx-swap="outerHTML"
+          hx-trigger="submit, change from:#epd-country-filter delay:300ms, change from:#epd-category-filter delay:300ms, change from:#epd-type-filter delay:300ms, keyup changed delay:500ms from:#epd-search-query"
+          class="flex-1 overflow-y-auto hide-scrollbar"
+          >
           <div class="px-5 py-2.5 w-full">
             <div
               class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
             >
               <div class="flex items-stretch gap-2">
                 <label class="input w-full">
-                  <span
-                    data-icon="search-2-line"
-                    data-size="16"
-                    data-color="var(--icon--soft-400)"
-                  ></span>
-                  <input type="text" placeholder="Search..." />
+                  <span data-icon="search-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
+                  <input name='epd_search_query' id="epd-search-query" type="text" placeholder="Search EPDs..." />
                 </label>
-                <select class="select">
-                  <option selected value="usa">
-                    <span data-country="US" data-width="20"></span>
-                    <span data-country="US" data-flag="false"></span>
-                  </option>
-                  <option value="canada">
-                    <span data-country="CA" data-width="20"></span>
-                    <span data-country="CA" data-flag="false"></span>
-                  </option>
-                  <option value="uk">
-                    <span data-country="GB" data-width="20"></span>
-                    <span data-country="GB" data-flag="false"></span>
-                  </option>
-                  <option value="australia">
-                    <span data-country="AU" data-width="20"></span>
-                    <span data-country="AU" data-flag="false"></span>
-                  </option>
+                <select name="country" id="epd-country-filter" class="select">
+                  <option value="">All Countries</option>
+                  {% for country in countries %}
+                    <option value="{{ country.id }}"> <span data-country="{{country.code2}}"></span> {{ country.name }}</option>
+                  {% endfor %}
                 </select>
               </div>
               <div class="collapse rounded-none">
-                <input type="checkbox" class="peer" />
+                <input name="advanced_search" type="checkbox" class="peer" />
                 <div
                   class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
                 >
@@ -328,9 +319,7 @@
                       data-color="var(--icon--strong-950)"
                     ></span>
                     Advanced Search
-                    <span class="text-xs/5 text-[var(--text--sub-600)]"
-                      >Click here for a more advanced search option</span
-                    >
+                    <span class="text-xs/5 text-[var(--text--sub-600)]" >Click here for a more advanced search option</span>
                   </span>
                   <span
                     data-icon="caret-down"
@@ -340,127 +329,35 @@
                   ></span>
                 </div>
                 <div class="collapse-content mt-0 px-0">
-                  <div class="grid grid-cols-4 gap-2">
+                  <div class="grid grid-cols-2 gap-2">
                     <label class="relative">
-                      <span
-                        data-icon="filter-3-line"
-                        data-size="20"
-                        data-color="var(--icon--soft-400)"
-                        class="select-icon w-8"
-                      ></span>
-                      <select
-                        class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                      >
-                        <option disabled selected value="">Category</option>
-                        <option value="building-service-engineering">
-                          Building service engineering
-                        </option>
-                        <option value="components-for-windows">
-                          Components for windows & curtain walls
-                        </option>
-                        <option value="composites">Composites</option>
-                        <option value="end-of-life">End of life</option>
-                        <option value="insulation-materials">
-                          Insulation materials
-                        </option>
-                        <option value="metals">Metals</option>
-                        <option value="minerals-building-products">
-                          Minerals building products
-                        </option>
-                        <option value="plastics">Plastics</option>
-                        <option value="wood">Wood</option>
-                        <option value="others">Others</option>
-                        <option value="unkwown">Unkwown</option>
+                      <span data-icon="filter-3-line" data-size="20" data-color="var(--icon--soft-400)" class="select-icon w-8"></span>
+                      <select name="category" id="epd-category-filter" class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]">
+                        <option value="">All Categories</option>
+                        {% for category in epd_categories %}
+                          <option value="{{ category.id }}">{{ category.name_en }}</option>
+                        {% endfor %}
                       </select>
                     </label>
                     <label class="relative">
-                      <span
-                        data-icon="filter-3-line"
-                        data-size="20"
-                        data-color="var(--icon--soft-400)"
-                        class="select-icon w-8"
-                      ></span>
-                      <select
-                        class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                      >
-                        <option disabled selected value="">Sub-category</option>
-                        <option value="air-conditioning-and-ventilation">
-                          Air conditioning and ventilation
-                        </option>
-                        <option value="conveyance">Conveyance</option>
-                        <option value="electrical">Electrical</option>
-                        <option value="end-of-life-processes">
-                          End of life processes
-                        </option>
-                        <option value="fire-protection">Fire protection</option>
-                        <option value="heating">Heating</option>
-                        <option value="sanitary">Sanitary</option>
-                        <option value="use">Use</option>
-                      </select>
-                    </label>
-                    <label class="relative">
-                      <span
-                        data-icon="filter-3-line"
-                        data-size="20"
-                        data-color="var(--icon--soft-400)"
-                        class="select-icon w-8"
-                      ></span>
-                      <select
-                        class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                      >
-                        <option disabled selected value="">
-                          Child-category
-                        </option>
-                        <option value="use-conveyor">Use conveyor</option>
-                        <option value="use-heat-generator">
-                          Use heat generator
-                        </option>
-                        <option value="use-heat-generator-enev">
-                          Use heat generator (EnEv)
-                        </option>
-                        <option value="using-lighting">Using lighting</option>
-                        <option value="using-mountings">Using mountings</option>
-                        <option value="use-ventilations-and-air-conditioning">
-                          Use ventilations and air conditioning
-                        </option>
-                      </select>
-                    </label>
-                    <label class="relative">
-                      <span
-                        data-icon="filter-3-line"
-                        data-size="20"
-                        data-color="var(--icon--soft-400)"
-                        class="select-icon w-8"
-                      ></span>
-                      <select
-                        class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                      >
-                        <option disabled selected value="">EPD type</option>
-                        <option value="official">Official</option>
-                        <option value="custom">Custom</option>
-                        <option value="generic">Generic</option>
-                      </select>
-                    </label>
-                    <label class="relative">
-                      <span
-                        data-icon="filter-3-line"
-                        data-size="20"
-                        data-color="var(--icon--soft-400)"
-                        class="select-icon w-8"
-                      ></span>
-                      <select
-                        class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                      >
-                        <option disabled selected value="">Sort by</option>
+                      <span data-icon="filter-3-line" data-size="20" data-color="var(--icon--soft-400)" class="select-icon w-8"></span>
+                      <select name="type" id="epd-type-filter" class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]">
+                        <option value="">All Types</option>
+                        {% for type in epd_types %}
+                          <option value="{{ type.value }}">{{ type.label }}</option>
+                        {% endfor %}
                       </select>
                     </label>
                   </div>
                 </div>
               </div>
-              <button class="btn btn-outline btn-block" disabled>Search</button>
+              <button id="epd-search-btn" type="submit" class="btn btn-outline btn-block">Search</button>
             </div>
-            <ul class="grid grid-cols-1">
-              <li
+            <div id="epd-search-list" class="mt-4">
+              <p class="text-center py-8 text-[var(--text--sub-600)]">Enter search criteria and click Search</p>
+            </div>
+            {% comment %} <ul id="epd-results-list" class="grid grid-cols-1" style="display:none;"> {% endcomment %}
+              {% comment %} <li
                 class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
               >
                 <div class="flex flex-col gap-2.5">
@@ -641,61 +538,16 @@
                     Add
                   </button>
                 </div>
-              </li>
-            </ul>
+              </li> {% endcomment %}
+            {% comment %} </ul> {% endcomment %}
           </div>
         </form>
-        <div
-          class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-        >
-          <div class="flex items-center gap-2">
-            <button class="btn btn-ghost py-2 px-3">
-              <span
-                data-icon="arrow-left"
-                data-size="20"
-                data-color="var(--icon--soft-400)"
-              ></span>
-              Previous
-            </button>
-            <ul class="flex items-center gap-2">
-              <li>
-                <button
-                  class="btn btn-sm rounded-[var(--radius-8)] btn-neutral"
-                >
-                  1
-                </button>
-              </li>
-              <li>
-                <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
-                  2
-                </button>
-              </li>
-              <li>
-                <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
-                  3
-                </button>
-              </li>
-            </ul>
-            <button class="btn btn-ghost py-2 px-3">
-              Next
-              <span
-                data-icon="arrow-right"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-          </div>
-          <div class="flex items-center gap-2">
-            <button
-              class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit"
-              onclick="structural_component_epd_modal.close()"
-            >
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-sm btn-primary w-fit">
-              Save
-            </button>
-          </div>
+        <div id="epd-modal-footer" class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+          <div id="epd-pagination"></div>
+
+          <button type="button" class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit" onclick="structural_component_epd_modal.close()">
+            Close
+          </button>
         </div>
       </div>
     </dialog>
@@ -739,10 +591,6 @@
       
             // Render materials
             renderMaterials(data.materials, canEdit);
-      
-            // Initialize icons/flags
-            if (typeof initializeIcons === 'function') initializeIcons();
-            if (typeof initializeCountryFlags === 'function') initializeCountryFlags();
           })
           .catch(error => {
             console.error('Error:', error);
@@ -801,20 +649,39 @@
       // Collect form data
       function collectFormData() {
         const materials = [];
+        const new_materials = [];
+
         document.querySelectorAll('#modal-materials-list > li[data-material-id]').forEach(li => {
           const id = li.getAttribute('data-material-id');
-          materials.push({
-            id,
-            description: li.querySelector('.material-description')?.value || '',
-            quantity: parseFloat(li.querySelector('.material-quantity')?.value) || 0
-          });
+          const description = li.querySelector('.material-description')?.value || '';
+          const quantity = parseFloat(li.querySelector('.material-quantity')?.value) || 0;
+
+          // Check if this is a new material (from EPD modal)
+          if (id.startsWith('new_')) {
+            const epd_id = li.querySelector('.new-material-epd-id')?.value;
+            if (epd_id) {
+              new_materials.push({
+                epd_id,
+                description,
+                quantity
+              });
+            }
+          } else {
+            // Existing material
+            materials.push({
+              id,
+              description,
+              quantity
+            });
+          }
         });
-      
+
         return {
           name: document.getElementById('template-name').value,
           country_id: document.getElementById('template-country').value,
           comment: document.getElementById('template-comment').value,
           materials,
+          new_materials,
           deleted_materials: deletedMaterialIds
         };
       }
@@ -972,7 +839,90 @@
         return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
           document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
       }
-      
+
+
+      // Trigger default search when modal opens
+      let epdModalOpened = false;
+      const epdModalDialog = document.getElementById('structural_component_epd_modal');
+
+      // Listen for when "Add from EPD library" button is clicked
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('[onclick*="structural_component_epd_modal.showModal"]')) {
+          setTimeout(() => {
+            const searchList = document.getElementById('epd-search-list');
+            const hasResults = searchList && searchList.querySelector('ul');
+
+            // Only trigger default search if modal hasn't been populated yet
+            if (!hasResults) {
+              const searchForm = document.getElementById('epd-search-form');
+              if (searchForm && typeof htmx !== 'undefined') {
+                htmx.trigger(searchForm, 'submit');
+              }
+            }
+          }, 100);
+        }
+      });
+
+
+      //  directly add to template materials
+      document.addEventListener('click', function(e) {
+        const addBtn = e.target.closest('.add-epd-btn');
+        if (addBtn) {
+          e.preventDefault();
+          const epd = JSON.parse(addBtn.dataset.epd);
+
+          // Add EPD directly to template materials list with default quantity = 1
+          addEpdToMaterialsList(epd);
+
+          // Change button to "Added" state
+          addBtn.innerHTML = `
+            <span data-icon="check-line" data-size="20" data-color="var(--icon--disabled-300)"></span>
+            Added
+          `;
+          addBtn.classList.remove('btn-outline');
+          addBtn.classList.add('btn-success');
+          addBtn.disabled = true;
+
+        }
+      });
+
+      // Add EPD to materials list in template detail modal
+      function addEpdToMaterialsList(epd) {
+        const materialsList = document.getElementById('modal-materials-list');
+        const tempId = 'new_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        const materialHtml = `
+          <li class="bg-[var(--bg--weak-50)] rounded-xl p-4" data-material-id="${tempId}" data-is-new="true">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm/5 font-medium">${epd.name}</span>
+              <a href="/epd/${epd.id}/" target="_blank"><span data-icon="external-link-line" data-size="20" data-color="var(--icon--sub-600)"></span></a>
+            </div>
+            <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
+              ${epd.country_code ? `<div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"><span data-country="${epd.country_code}" data-width="20"></span></div>` : ''}
+              <label class="input flex-[2.5]">
+                <input type="text" class="material-description" value="" placeholder="Add description" data-epd-id="${epd.id}" />
+              </label>
+              <label class="input flex-1">
+                <input type="number" class="material-quantity" value="1" data-epd-id="${epd.id}" min="0" step="any" />
+                <span class="text-xs/5 text-[var(--text--sub-600)]">${epd.unit}</span>
+              </label>
+              <div class="flex items-center py-2 mr-1.5"><div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"></div></div>
+              <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0" onclick="deleteMaterial('${tempId}')">
+                <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+              </button>
+            </div>
+            <input type="hidden" class="new-material-epd-id" value="${epd.id}" />
+          </li>
+        `;
+
+        materialsList.insertAdjacentHTML('beforeend', materialHtml);
+
+        // Update count
+        const totalMaterials = materialsList.querySelectorAll('li[data-material-id]').length;
+        document.getElementById('modal-materials-count').textContent = totalMaterials;
+
+      }
+
     </script>
 
 {% endblock %}

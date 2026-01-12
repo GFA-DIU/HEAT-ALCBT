@@ -237,13 +237,4 @@
     </div>
   </div>
 </section>
-
-<script>
-  // Reinitialize icons after HTMX swaps (for dynamic region/city dropdowns)
-  document.body.addEventListener('htmx:afterSwap', function(event) {
-    if (window.IconComponent) {
-      window.IconComponent.initialize();
-    }
-  });
-</script>
 {% endblock %}

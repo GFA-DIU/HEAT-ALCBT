@@ -326,17 +326,7 @@ class StepManager {
 
       // Update button states
       this.updateButtonStates();
-
-      // Initialize icons
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
-
-      // Initialize country flags
-      if (window.CountriesRegistry) {
-        window.CountriesRegistry.initCountryFlags();
-      }
-
+ 
       // Process HTMX for dynamically loaded content
       if (typeof htmx !== 'undefined') {
         htmx.process(contentArea);

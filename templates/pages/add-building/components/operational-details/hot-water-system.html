@@ -467,9 +467,6 @@
             <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No hot water systems added yet</p>
           </li>
         `;
-        if (window.IconComponent) {
-          window.IconComponent.initialize();
-        }
         return;
       }
 
@@ -516,10 +513,6 @@
         `;
       }).join('');
 
-      // initialize icons again
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
     } catch (error) {
       console.error('Error loading hot water systems:', error);
       listContainer.innerHTML = `
@@ -528,9 +521,6 @@
           <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading hot water systems</p>
         </li>
       `;
-      if (window.IconComponent) {
-        window.IconComponent.initialize();
-      }
     }
   }
 
