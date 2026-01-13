@@ -27,7 +27,7 @@ class IconComponent {
         const color = el.dataset.color || "currentColor";
 
         window.IconComponent.render(iconName, el, { size, color });
-
+        console.log(`icon name: ${iconName}`)
         // Mark as initialized to prevent double initialization
         el.dataset.iconInitialized = "true";
     }
