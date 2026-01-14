@@ -7,7 +7,7 @@
     <label class="input validator w-full">
       <input type="number" placeholder="eg. 10" name="number_of_residents" required min="1" />
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">Enter a valid value </p>
   </fieldset>
 
   <fieldset class="fieldset col-span-3">
@@ -22,30 +22,30 @@
     <div class="w-full flex gap-1.5 items-center">
       <div class="flex-1">
         <label class="input validator w-full">
-          <input type="number" placeholder="eg. 1" name="annual_operating_hours_per_day" required min="1" />
+          <input type="number" placeholder="eg. 1" name="annual_operating_hours_per_day" required min="1" max="24" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
             >Hours / day</span
           >
         </label>
-        <p class="validator-hint">This field is required</p>
+        <p class="validator-hint">Enter a valid value</p>
       </div>
       <div class="flex-1">
         <label class="input validator w-full">
-          <input type="number" placeholder="eg. 1" name="annual_operating_days_per_week" required min="1" />
+          <input type="number" placeholder="eg. 1" name="annual_operating_days_per_week" required min="1" max="7" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
             >days / week</span
           >
         </label>
-        <p class="validator-hint">This field is required</p>
+        <p class="validator-hint">Enter a valid value</p>
       </div>
       <div class="flex-1">
         <label class="input validator w-full">
-          <input type="number" placeholder="eg. 1" name="annual_operating_weeks_per_year" required min="1" />
+          <input type="number" placeholder="eg. 1" name="annual_operating_weeks_per_year" required min="1" max="52" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
             >weeks / year</span
           >
         </label>
-        <p class="validator-hint">This field is required</p>
+        <p class="validator-hint">Enter a valid value</p>
       </div>
     </div>
   </fieldset>
@@ -65,7 +65,7 @@
           <option value="fahrenheit">°Fahrenheit</option>
         </select>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">Enter a valid value </p>
     </fieldset>
 
     <fieldset class="fieldset">
@@ -82,7 +82,7 @@
           <option value="fahrenheit">°Fahrenheit</option>
         </select>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">Enter a valid value </p>
     </fieldset>
   </div>
 

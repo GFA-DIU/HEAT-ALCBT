@@ -167,6 +167,12 @@ function selectCurrentLocation() {
   }
 }
 
+// Attach to window for global access (needed for onclick handlers)
+window.GeoLocationPicker = GeoLocationPicker;
+window.openGeoLocationModal = openGeoLocationModal;
+window.closeGeoLocationModal = closeGeoLocationModal;
+window.selectCurrentLocation = selectCurrentLocation;
+
 // Initialize when page loads
 document.addEventListener("DOMContentLoaded", () => {
   window.geoLocationPicker = new GeoLocationPicker();

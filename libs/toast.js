@@ -156,6 +156,7 @@ class ToastNotification {
 
 // Create global Toast instance
 const Toast = new ToastNotification();
+window.Toast = Toast;
 
 // Add animations to the page if they don't exist
 if (!document.getElementById('toast-animations')) {

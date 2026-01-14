@@ -92,7 +92,7 @@
           <div class="w-full flex gap-1.5 items-center">
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required  />
+                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required min="1" max="24" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >Hours / day</span
                 >
@@ -100,7 +100,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required />
+                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required min="1" max="7" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >days / week</span
                 >
@@ -108,7 +108,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required />
+                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required min="1" max="52" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >weeks / year</span
                 >
@@ -380,14 +380,14 @@
     const systemType = systemTypeSelect.value;
 
     if (!systemType) {
-      alert('Please select a hot water system type');
+      Toast.error('Please select a hot water system type');
       return;
     }
 
     // Get building ID
     const buildingId = getBuildingId();
     if (!buildingId) {
-      alert('Building ID not found. Please save building information first.');
+      Toast.error('Building ID not found. Please save building information first.');
       return;
     }
 
@@ -428,11 +428,11 @@
         console.log(result.message);
       } else {
         // Show validation errors
-        alert('Error saving hot water system:\n' + JSON.stringify(result.errors || result.error));
+        Toast.error('Error saving hot water system:\n' + JSON.stringify(result.errors || result.error));
       }
     } catch (error) {
       console.error('Error saving hot water system:', error);
-      alert('Failed to save hot water system. Please try again.');
+      Toast.error('Failed to save hot water system. Please try again.');
     }
   }
 
@@ -531,7 +531,7 @@
     // Get building ID
     const buildingId = getBuildingId();
     if (!buildingId) {
-      alert('Building ID not found');
+      Toast.error('Building ID not found');
       return;
     }
 
@@ -541,13 +541,13 @@
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        alert('Failed to load hot water system');
+        Toast.error('Failed to load hot water system');
         return;
       }
 
       const system = result.hot_water_systems.find(s => s.id === systemId);
       if (!system) {
-        alert('Hot water system not found');
+        Toast.error('Hot water system not found');
         return;
       }
 
@@ -584,7 +584,7 @@
       hot_water_system_modal.showModal();
     } catch (error) {
       console.error('Error loading hot water system for edit:', error);
-      alert('Failed to load hot water system');
+      Toast.error('Failed to load hot water system');
     }
   }
 
@@ -618,11 +618,11 @@
           hot_water_system_modal_delete.close();
           console.log('Hot water system deleted successfully');
         } else {
-          alert('Failed to delete hot water system');
+          Toast.error('Failed to delete hot water system');
         }
       } catch (error) {
         console.error('Error deleting hot water system:', error);
-        alert('Failed to delete hot water system');
+        Toast.error('Failed to delete hot water system');
       }
     }
   }

@@ -1,7 +1,4 @@
-import {
-    EXCLUDED_FROM_CURRENT_COLOR,
-    ICONS_REGISTRY,
-} from "./icons-registry.js";
+import { EXCLUDED_FROM_CURRENT_COLOR, ICONS_REGISTRY } from "./_icons-registry.js";
 
 class IconComponent {
     constructor() {
@@ -27,7 +24,6 @@ class IconComponent {
         const color = el.dataset.color || "currentColor";
 
         window.IconComponent.render(iconName, el, { size, color });
-
         // Mark as initialized to prevent double initialization
         el.dataset.iconInitialized = "true";
     }
