@@ -93,7 +93,7 @@
                           >Total carbon footprint</span
                         >
                         <span class="text-base/6 font-medium"
-                          >212.5 kgCO2e eq/m2</span
+                          >{{ building.stats.total_carbon_footprint|floatformat:"1" }} kgCO2e eq/m<sup>2</sup></span
                         >
                       </li>
                       <li
@@ -117,7 +117,7 @@
                         >
                         <span
                           class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                          >354.3 kgCO2e eq/m2</span
+                          >{{ building.stats.total_embodied_carbon|floatformat:"1" }} kgCO2e eq/m<sup>2</sup></span
                         >
                       </li>
                       <li
@@ -129,7 +129,7 @@
                         >
                         <span
                           class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                          >15.5%</span
+                          >{{ building.stats.carbon_savings_percentage|floatformat:"1" }}%</span
                         >
                       </li>
                     </ul>
@@ -141,11 +141,11 @@
                       <div class="flex items-center gap-2">
                         <progress
                           class="progress progress-primary"
-                          value="80"
+                          value="{{ building.stats.progress_percentage }}"
                           max="100"
                         ></progress>
                         <span class="text-xs/4 text-[var(--text--sub-600)]"
-                          >80%</span
+                          >{{ building.stats.progress_percentage }}%</span
                         >
                       </div>
                     </div>

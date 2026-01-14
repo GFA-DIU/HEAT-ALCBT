@@ -12,6 +12,7 @@ from accounts.forms import CustomUserUpdateForm, UserProfileUpdateForm
 from pages.models.assembly import Assembly, AssemblyMode
 from pages.models.building import (Building, BuildingAssembly,
                                    BuildingAssemblySimulated)
+from pages.views.building.building_list_stats import get_building_statistics
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +48,16 @@ def buildings_list(request):
     user_form = CustomUserUpdateForm(instance=request.user)
     profile_form = UserProfileUpdateForm(instance=request.user.userprofile)
 
+    # Calculate statistics for each building
+    buildings_with_stats = []
+    for building in buildings:
+        stats = get_building_statistics(building)
+        # Attach statistics as attributes to the building object
+        building.stats = stats
+        buildings_with_stats.append(building)
+
     context = {
-        "buildings": buildings,
+        "buildings": buildings_with_stats,
         "search_query": search_query,
         "email_verified": email_verified,
         "show_account_success_modal": show_account_success_modal,
@@ -86,16 +95,23 @@ def buildings_list(request):
 @transaction.atomic
 def handle_delete_building(request):
     building_id = request.GET.get("building_id")
-    
+
     try:
         _delete_building(building_id)
-    
+
     except:
         logger.exception("Error occured when trying to delete building: %s", building_id)
-        
-        
 
-    context = {"buildings": Building.objects.filter(created_by=request.user)}
+
+    # Get remaining buildings and add statistics
+    buildings = Building.objects.filter(created_by=request.user)
+    buildings_with_stats = []
+    for building in buildings:
+        stats = get_building_statistics(building)
+        building.stats = stats
+        buildings_with_stats.append(building)
+
+    context = {"buildings": buildings_with_stats}
     return context
 
 
