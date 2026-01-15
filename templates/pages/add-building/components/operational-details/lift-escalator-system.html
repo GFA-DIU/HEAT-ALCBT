@@ -271,7 +271,7 @@
     // Get building ID
     const buildingId = getBuildingId();
     if (!buildingId) {
-      alert('Building ID not found. Please save building information first.');
+      Toast.error('Building ID not found. Please save building information first.');
       return;
     }
 
@@ -306,11 +306,11 @@
         console.log(result.message);
       } else {
         // Show validation errors
-        alert('Error saving lift & escalator system:\n' + JSON.stringify(result.errors || result.error));
+        Toast.error('Error saving lift & escalator system:\n' + JSON.stringify(result.errors || result.error));
       }
     } catch (error) {
       console.error('Error saving lift & escalator system:', error);
-      alert('Failed to save lift & escalator system. Please try again.');
+      Toast.error('Failed to save lift & escalator system. Please try again.');
     }
   }
 
@@ -408,7 +408,7 @@
     // Get building ID
     const buildingId = getBuildingId();
     if (!buildingId) {
-      alert('Building ID not found');
+      Toast.error('Building ID not found');
       return;
     }
 
@@ -418,13 +418,13 @@
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        alert('Failed to load lift & escalator system');
+        Toast.error('Failed to load lift & escalator system');
         return;
       }
 
       const system = result.lift_escalator_systems.find(s => s.id === systemId);
       if (!system) {
-        alert('Lift & escalator system not found');
+        Toast.error('Lift & escalator system not found');
         return;
       }
 
@@ -444,7 +444,7 @@
       lift_escalator_system_modal.showModal();
     } catch (error) {
       console.error('Error loading lift & escalator system for edit:', error);
-      alert('Failed to load lift & escalator system');
+      Toast.error('Failed to load lift & escalator system');
     }
   }
 
@@ -478,11 +478,11 @@
           lift_escalator_system_modal_delete.close();
           console.log('Lift & escalator system deleted successfully');
         } else {
-          alert('Failed to delete lift & escalator system');
+          Toast.error('Failed to delete lift & escalator system');
         }
       } catch (error) {
         console.error('Error deleting lift & escalator system:', error);
-        alert('Failed to delete lift & escalator system');
+        Toast.error('Failed to delete lift & escalator system');
       }
     }
   }

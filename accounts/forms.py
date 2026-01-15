@@ -59,7 +59,11 @@ class UserProfileUpdateForm(forms.ModelForm):
     country = forms.ModelChoiceField(
         queryset=ALCBTCountryManager.get_all_countries(),
         widget=forms.Select(attrs={
-            'class': 'w-full',
+            'class': 'select select-with-icon w-full validator',
+            'hx-get': '/select_lists/',               # HTMX request to the root URL
+            'hx-trigger': 'change',      # Trigger HTMX on change event
+            'hx-target': '#region-dropdown', # Update the Region dropdown
+            'required': 'true',
         }),
         label="Country",
         required=False
@@ -67,7 +71,12 @@ class UserProfileUpdateForm(forms.ModelForm):
     region = forms.ModelChoiceField(
         queryset=CustomRegion.objects.all(),
         widget=forms.Select(attrs={
-            'class': 'w-full',
+            "id": "region-dropdown",
+            "hx-get": "/select_lists/",  # HTMX request to the root URL
+            "hx-trigger": "change",  # Trigger HTMX on change event
+            "hx-target": "#city-dropdown",  # Update the City dropdown
+            "class": "select select-with-icon w-full validator",
+            "required": True,
         }),
         label="Region",
         required=False,
@@ -75,7 +84,9 @@ class UserProfileUpdateForm(forms.ModelForm):
     city = forms.ModelChoiceField(
         queryset=CustomCity.objects.none(),  # Start with an empty queryset
         widget=forms.Select(attrs={
-            'class': 'w-full',
+            'id': 'city-dropdown',
+            'class': 'select select-with-icon w-full validator',
+            'required': True,
         }),
         label="City",
         required=False
@@ -85,13 +96,13 @@ class UserProfileUpdateForm(forms.ModelForm):
     region_text = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={
-            'class': 'w-full',
+            'class': 'w-full validator',
         })
     )
     city_text = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={
-            'class': 'w-full',
+            'class': 'w-full validator',
         })
     )
     

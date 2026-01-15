@@ -50,13 +50,15 @@
           </ul>
         </div>
         <div class="flex items-center gap-2">
-          <button class="btn btn-outline p-2 border-[var(--stroke--soft-200)]">
+          <button
+            onclick="handleDelete('{{ building.id }}', '{% url 'home' %}')"
+            class="btn btn-outline p-2 border-[var(--stroke--soft-200)]">
             <span data-icon="delete-bin-5-line" data-size="20"></span>
           </button>
-          <button class="btn btn-primary">
+          <a href="{% url 'edit_building' %}?building_uuid={{ building.id }}"  class="btn btn-primary">
             <span data-icon="edit-fill" data-size="20"></span>
             <span>Edit</span>
-          </button>
+          </a>
         </div>
       </div>
 
@@ -279,6 +281,33 @@
 
 
   <script defer>
+    async function handleDelete(buildingId, redirectUrl) {
+      const confirmed = await confirmDialog.delete(
+        'This will permanently delete the building and all associated data.',
+        'Delete Building?'
+      );
+
+      if (confirmed) {
+        try {
+          const response = await fetch(`{% url "home" %}?building_id=${buildingId}`, {
+            method: 'DELETE',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            window.location.href = redirectUrl;
+          } else {
+            console.error('Delete failed');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
       const tabInputs = document.querySelectorAll(
         '#building-tabs input[name="building-tabs"]'

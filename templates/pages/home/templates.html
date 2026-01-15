@@ -712,12 +712,12 @@
             htmx.trigger('#search-form', 'submit');
             if (typeof Toast !== 'undefined') Toast.success('Template updated');
           } else {
-            alert(result.error || 'Update failed');
+            Toast.error(result.error || 'Update failed');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('An error occurred');
+          Toast.error('An error occurred');
         });
       }
       
@@ -747,12 +747,12 @@
             htmx.trigger('#search-form', 'submit');
             if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
           } else {
-            alert(result.error || 'Duplication failed');
+            Toast.error(result.error || 'Duplication failed');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('An error occurred');
+          Toast.error('An error occurred');
         });
       }
       
@@ -774,12 +774,12 @@
             htmx.trigger('#search-form', 'submit');
             if (typeof Toast !== 'undefined') Toast.success('Template deleted');
           } else {
-            alert(result.error || 'Deletion failed');
+            Toast.error(result.error || 'Deletion failed');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('An error occurred');
+          Toast.error('An error occurred');
         });
       }
       
@@ -797,7 +797,7 @@
             htmx.trigger('#search-form', 'submit');
             if (typeof Toast !== 'undefined') Toast.success('Template deleted');
           } else {
-            alert(result.error || 'Deletion failed');
+            Toast.error(result.error || 'Deletion failed');
           }
         })
         .catch(error => {
@@ -825,12 +825,12 @@
             htmx.trigger('#search-form', 'submit');
             if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
           } else {
-            alert(result.error || 'Duplication failed');
+            Toast.error(result.error || 'Duplication failed');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('An error occurred');
+          Toast.error('An error occurred');
         });
       }
       

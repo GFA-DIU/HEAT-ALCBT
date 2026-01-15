@@ -78,8 +78,10 @@ def buildings_list(request):
 
     elif request.method == "DELETE":
         context = handle_delete_building(request)
-        return render(request, "pages/home/buildings_list.html", context)
-
+        if request.headers.get("HX-Request"):
+            return render(request, "pages/home/buildings_list.html", context)
+        return JsonResponse({"status": "success"}, status=200)
+    
     # If HTMX request, return only the buildings list partial
     if request.headers.get("HX-Request"):
         return render(request, "pages/home/buildings_list.html", context)

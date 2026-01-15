@@ -116,8 +116,7 @@ class FormValidator {
       if (customError) {
         errors.push(customError);
       }
-    }
-    console.log(`Validation for field "${fieldName}":`, errors);
+    } 
     // Update errors object
     if (errors.length > 0) {
       this.errors[fieldName] = errors;
@@ -139,7 +138,7 @@ class FormValidator {
 
     // Get all form fields
     const fields = this.form.querySelectorAll('input, select, textarea');
-    console.log("Validating fields:", fields);
+ 
     fields.forEach(field => {
       if (field.name && !field.disabled) {
         const fieldValid = this.validateField(field);
@@ -160,8 +159,7 @@ class FormValidator {
    * Display error for a specific field
    * @param {HTMLElement} field
    */
-  displayFieldError(field) {
-    console.log("Displaying error for field:", field);
+  displayFieldError(field) { 
     const fieldName = field.name;
     const errors = this.errors[fieldName];
 
@@ -175,7 +173,7 @@ class FormValidator {
 
     if (!errorElement) {
       errorElement = document.createElement('p');
-      errorElement.className = 'validator-hint error-message';
+      errorElement.className = 'validator-hint error-message text-error';
 
       // Insert after the input/label
       const inputWrapper = field.closest('label') || field;
@@ -185,9 +183,11 @@ class FormValidator {
         fieldContainer.appendChild(errorElement);
       }
     }
-
+    fieldContainer.classList.add('input-error', 'border-error');
     if (errors && errors.length > 0) {
       // Show error
+      field.setAttribute('aria-invalid', 'true');
+      field.setAttribute('user-invalid', 'true');
       errorElement.textContent = errors[0]; // Show first error
       errorElement.style.display = 'block';
       errorElement.classList.add('text-error');
@@ -202,7 +202,8 @@ class FormValidator {
       // Hide error
       errorElement.style.display = 'none';
       errorElement.classList.remove('text-error');
-
+      field.setAttribute('aria-invalid', 'false');
+      field.setAttribute('user-invalid', 'false');
       // Remove error class from input
       const inputElement = field.closest('label.input') || field.closest('.select');
       if (inputElement) {

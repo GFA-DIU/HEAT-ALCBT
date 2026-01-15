@@ -347,7 +347,7 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="annual_operating_hours_per_day"  required min="1" />
+            <input type="number" placeholder="eg. 1" name="annual_operating_hours_per_day"  required min="1" max="24" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Hours / day</span
             >
@@ -355,7 +355,7 @@
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="annual_operating_days_per_week"  required min="1" />
+            <input type="number" placeholder="eg. 1" name="annual_operating_days_per_week"  required min="1" max="7" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >days / week</span
             >
@@ -363,7 +363,7 @@
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="annual_operating_weeks_per_year"  required min="1" />
+            <input type="number" placeholder="eg. 1" name="annual_operating_weeks_per_year"  required min="1" max="52" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >weeks / year</span
             >
@@ -583,7 +583,7 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="hours_per_day" required />
+            <input type="number" placeholder="eg. 1" name="hours_per_day" required min="1" max="24" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Hours / day</span
             >
@@ -591,7 +591,7 @@
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="days_per_week" required />
+            <input type="number" placeholder="eg. 1" name="days_per_week" required min="1" max="7" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >days / week</span
             >
@@ -599,7 +599,7 @@
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="weeks_per_year" required />
+            <input type="number" placeholder="eg. 1" name="weeks_per_year" required min="1" max="52" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >weeks / year</span
             >
@@ -799,7 +799,7 @@
     const buildingId = getBuildingId();
 
     if (!buildingId) {
-      alert('Building ID not found');
+      Toast.error('Building ID not found');
       return;
     }
 
@@ -816,7 +816,7 @@
     const systemTypeName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
 
     if (!systemType) {
-      alert('Please select a cooling system type');
+      Toast.error('Please select a cooling system type');
       return;
     }
 
@@ -861,11 +861,11 @@
         // Close modal
         window.closeCoolingSystemModal();
       } else {
-        alert('Error saving cooling system: ' + JSON.stringify(result.errors));
+        Toast.error('Error saving cooling system: ' + JSON.stringify(result.errors));
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred while saving the cooling system');
+      Toast.error('An error occurred while saving the cooling system');
     }
   }
 
@@ -969,7 +969,7 @@
     const buildingId = getBuildingId();
 
     if (!buildingId) {
-      alert('Building ID not found');
+      Toast.error('Building ID not found');
       return;
     }
 
@@ -1156,7 +1156,7 @@
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred while loading the cooling system');
+      Toast.error('An error occurred while loading the cooling system');
     }
   }
 
@@ -1194,11 +1194,11 @@
           window.deleteCoolingSystemType = null;
           cooling_system_modal_delete.close();
         } else {
-          alert('Error deleting cooling system: ' + JSON.stringify(result.errors));
+          Toast.error('Error deleting cooling system: ' + JSON.stringify(result.errors));
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred while deleting the cooling system');
+        Toast.error('An error occurred while deleting the cooling system');
       }
     }
   }
