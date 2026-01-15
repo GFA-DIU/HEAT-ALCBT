@@ -7,7 +7,9 @@
     "build:css": "npx @tailwindcss/cli -i ./app.scss -o ./static/css/output.css",
     "watch:tailwind": "npx @tailwindcss/cli -i ./app.scss -o ./static/css/output.css --watch",
     "build:icons": "node build-icons.mjs",
-    "build": "npm run build:css && npm run build:icons"
+    "build:js": "node build-js.mjs",
+    "watch:js": "node build-js.mjs --watch",
+    "build": "npm run build:css && npm run build:icons && npm run build:js"
   },
   "repository": {
     "type": "git",

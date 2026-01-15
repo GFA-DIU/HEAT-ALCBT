@@ -23,17 +23,22 @@
         </span> {% endcomment %}
           <input type="text" name='id' value='{{ epd.id }}' hidden/>
 
-          <div class="flex items-stretch gap-2">
-            <label class="input w-full">
+          <div class="grid grid-cols-2 items-stretch gap-2 mt-1">
+            <fieldset>
+              <label class="input w-full validator">
               <input  
-              name="description" 
-              value="{% if epd.description %}{{ epd.description }}{% endif %}"
-              type="text" placeholder="Add a description" />
-            </label>
-            <label class="input pr-0">
-              <input type="number" name='quantity' placeholder="Quantity" />
+                name="description" 
+                value="{% if epd.description %}{{ epd.description }}{% endif %}"
+                type="text" placeholder="Add a description"  required class="block w-full" />
+              </label>
+              <p class="validator-hint hidden">required</p>
+            </fieldset>
+            
+            <fieldset>
+              <label class="input pr-0 grid grid-cols-2 validator">
+              <input type="number" name='quantity' class='block w-full' placeholder="Quantity" required min="1"  />
               <select
-                class="select select-ghost w-fit !outline-none !border-none"
+                class="select select-ghost w-fit !outline-none !border-none block w-full"
                 name="unit"
                 required
               >
@@ -44,23 +49,17 @@
                 {% endfor %}
               </select>
             </label>
+            <p class="validator-hint hidden">Please enter a valid quantity</p>
+            </fieldset>
+
           </div>
 
           <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Airflow rate: 45CMH</span
-            >
-            <span>Capacity units: {{epd.op_units}} </span>
+            {% comment %} <span class="border-r border-[var(--text--sub-600)] pr-1">Airflow rate: 45CMH</span> {% endcomment %}
+            <span>Capacity units: {{epd.op_units }} </span>
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
           <button
             class="btn size-5 btn-ghost p-0"
             onclick="energy_carrier_modal_delete.showModal()"

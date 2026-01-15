@@ -194,7 +194,7 @@
 {% endblock nav %} 
 
   {% if messages %}
-  <div id="toast-messages" class="toast toast-top toast-center z-50">
+  <div id="toast-messages" class="toast toast-top toast-center z-[100000000]">
     {% for message in messages %}
       <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% elif message.tags == 'debug' %}info{% else %}info{% endif %}">
         <span>{{ message }}</span>
@@ -501,6 +501,8 @@
 
   <!-- icons JS -->
   <script type="module" src="{% static 'js/icons.js' %}"></script>
+
+  <script src="{% static 'js/confirm-dialog.js' %}"></script>
 
 
 

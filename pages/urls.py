@@ -66,6 +66,7 @@ urlpatterns = [
     path("map/", map_view, name="map"),
     path("dashboard/", dashboard_view, name="dashboard"),
     path("building/_new", new_building, name="new_building"),
+    path("building/edit", new_building, name="edit_building"),
     path("building/component", building_components),
     path("building/step", building_step_view, name="building_step"),
     path("building/step/save", save_building_step, name="save_building_step"),

@@ -108,7 +108,7 @@
           <div class="w-full flex gap-1.5 items-center">
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required min="0" />
+                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required min="0" max="24" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >Hours / day</span
                 >
@@ -116,7 +116,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required min="0" />
+                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required min="0" max="7" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >days / week</span
                 >
@@ -124,7 +124,7 @@
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required min="0" />
+                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required min="0" max="52" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >weeks / year</span
                 >
@@ -423,7 +423,7 @@
     const buildingId = getBuildingId();
 
     if (!buildingId) {
-      alert('Building ID not found');
+      Toast.error('Building ID not found');
       return;
     }
 
@@ -476,11 +476,11 @@
         // Close modal
         window.closeVentilationSystemModal();
       } else {
-        alert('Error saving ventilation system: ' + JSON.stringify(result.errors));
+        Toast.error('Error saving ventilation system: ' + JSON.stringify(result.errors));
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred while saving the ventilation system');
+      Toast.error('An error occurred while saving the ventilation system');
     }
   }
 
@@ -567,7 +567,7 @@
     const buildingId = getBuildingId();
 
     if (!buildingId) {
-      alert('Building ID not found');
+      Toast.error('Building ID not found');
       return;
     }
 
@@ -625,7 +625,7 @@
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred while loading the ventilation system');
+      Toast.error('An error occurred while loading the ventilation system');
     }
   }
 
@@ -658,11 +658,11 @@
           window.deleteVentilationSystemId = null;
           ventilation_system_modal_delete.close();
         } else {
-          alert('Error deleting ventilation system: ' + JSON.stringify(result.errors));
+          Toast.error('Error deleting ventilation system: ' + JSON.stringify(result.errors));
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred while deleting the ventilation system');
+        Toast.error('An error occurred while deleting the ventilation system');
       }
     }
   }

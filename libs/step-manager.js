@@ -1,10 +1,14 @@
 // @ts-check
 class StepManager {
    
+  editMode = false;
+
   constructor() {
     this.currentStep = 1;
     this.currentSubStep = 1;
     this.totalSteps = 4;
+    this.editMode = window.location.pathname.includes('/building/edit');
+
     this.stepConfig = {
       1: {
         name: "Building Information",
@@ -369,6 +373,11 @@ class StepManager {
     }
   }
 
+  getBuildingId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('building_uuid');
+  }
+  
   updateProgress() {
     const totalSubSteps = Object.values(this.stepConfig).reduce(
       (total, step) => total + step.subSteps.length,
@@ -458,22 +467,52 @@ class StepManager {
    * @returns {Record<string, any>}
    */
   getFormData(stepKey) {
-    const form = document.getElementById("form");
-    if (form) {
-      console.log("Extracting FormData from form element:", form);
-      const formData = new FormData(form);
-      let validator = new window.FormValidator(form);
-
-      let isValid = validator.validate();
-      if(!isValid){
-        Toast.error("Please correct the errors in the form before proceeding.");
-        throw new Error("Form validation failed.");
+    if (stepKey === 'operational-data-entry/operational-data-entry'){
+      const forms = document.getElementById('selected_op_products')?.querySelectorAll("form");
+      if (!forms || forms.length === 0) {
+        Toast.error("No operational products found. Please add at least one.");
+        throw new Error("No operational products found.");
       }
-      return formData.entries ? Object.fromEntries(formData.entries()) : {};
-    }else {
-      const object = this.formData[stepKey] || {};
-      return object;
+      /**
+       * @type {{ [k: string]: FormDataEntryValue; }[]}
+       */
+      const combinedData = [];
+      
+      forms.forEach((form) => {
+        const formData = new FormData(form);
+        let validator = new window.FormValidator(form);
+        let isValid = validator.validate();
+        if (!isValid) {
+          Toast.error("Please correct the errors in the form before proceeding.");
+          throw new Error("Form validation failed.");
+        }
+        combinedData.push(Object.fromEntries(formData.entries()));
+      });
+      
+      return { 
+        building_uuid: this.getBuildingId(),
+        operation_products: combinedData 
+      };
+
+    } else {
+      const form = document.getElementById("form");
+      if (form) {
+
+        const formData = new FormData(form);
+        let validator = new window.FormValidator(form);
+
+        let isValid = validator.validate();
+        if (!isValid) {
+          Toast.error("Please correct the errors in the form before proceeding.");
+          throw new Error("Form validation failed.");
+        }
+        return formData.entries ? Object.fromEntries(formData.entries()) : {};
+      } else {
+        const object = this.formData[stepKey] || {};
+        return object;
+      }
     }
+    
   }
 
   /**
@@ -518,12 +557,13 @@ class StepManager {
       };
 
       const response = await fetch('/building/step/save', {
-        method: 'POST',
+        method: this.editMode ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken || '',
         },
         body: JSON.stringify({
+          building_uuid: this.getBuildingId(),
           step_key: stepKey,
           data: dataWithUuid
         })
@@ -753,7 +793,7 @@ class StepManager {
     // Check if save failed
     if (saveResult && !saveResult.success) {
       // Show error message
-      alert(`Failed to save: ${saveResult.error || 'Unknown error'}`);
+      Toast.error(`Failed to save: ${saveResult.error || 'Unknown error'}`);
       return; // Don't proceed to next step
     }
 
@@ -982,6 +1022,9 @@ class StepManager {
   }
 
 }
+
+// Attach class to window for global access
+window.StepManager = StepManager;
 
 // Initialize the step manager when the page loads
 document.addEventListener("DOMContentLoaded", () => {
