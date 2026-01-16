@@ -41,6 +41,12 @@ IS_HEROKU_APP = "DYNO" in os.environ and not "CI" in os.environ
 if not IS_HEROKU_APP:
     DEBUG = True
 
+# When True, Django will automatically append a trailing slash to URLs
+# that are requested without one if a matching URL pattern exists with a slash.
+# This prevents 404 errors for users or JS requests that omit the trailing slash.
+# Especially important on Heroku where the server is case-sensitive and strict.
+APPEND_SLASH = True
+
 # From: https://github.com/heroku/python-getting-started/blob/main/gettingstarted/settings.py
 # On Heroku, it's safe to use a wildcard for `ALLOWED_HOSTS``, since the Heroku router performs
 # validation of the Host header in the incoming HTTP request. On other platforms you may need to
