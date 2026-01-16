@@ -500,7 +500,7 @@
           >*</span
         >
       </legend>
-      <select class="select w-full" name="type_of_air_condition">
+      <select class="select w-full" name="type_of_air_condition" required>
         <option disabled selected value="">Select an option</option>
         <option value="split">Split air condition</option>
         <option value="VRV">
@@ -515,7 +515,7 @@
         >
       </legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="eg. 2012" name="year_of_installation" />
+        <input type="number" placeholder="eg. 2012" min="1900" max="{% now "Y" %}" name="year_of_installation" required />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -532,6 +532,7 @@
         hx-trigger="load"
         hx-target="this"
         hx-swap="innerHTML"
+        required
       >
         <option disabled selected value="">Select an option</option>
       </select>
@@ -543,7 +544,7 @@
         ><span class="text-[var(--text--sub-600)]">(kg)</span>
       </legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg.  134" name="refrigerant_quantity" />
+        <input type="number" placeholder="eg.  134" name="refrigerant_quantity" required min="0" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >kg</span
         >
@@ -558,14 +559,14 @@
         >
       </legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="eg. 342" name="total_cooling_load_for_split_vrv" />
+        <input type="number" placeholder="eg. 342" name="total_cooling_load_for_split_vrv" required min="0" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline leakage factor</legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg. 2" name="baseline_leakage_factor" />
+        <input type="number" placeholder="eg. 2" name="baseline_leakage_factor" required min="0" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >%</span
         >

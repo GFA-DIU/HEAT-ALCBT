@@ -725,6 +725,13 @@ class StepManager {
               }, 300);
             }
           }
+        }else {
+          Toast.error("Failed to fetch building data from server.");
+
+          setTimeout(() => {
+            history.back();
+          }, 2000);
+
         }
       } catch (error) {
         console.error('Error fetching building data:', error);
@@ -786,17 +793,19 @@ class StepManager {
     this.updateProgress();
   }
 
-  async saveAndContinue() {
+  async saveAndContinue(skipSave = false) {
     // Save current form data and wait for completion
-    const saveResult = await this.saveFormData();
+    if(!skipSave){
+      const saveResult = await this.saveFormData();
 
-    // Check if save failed
-    if (saveResult && !saveResult.success) {
-      // Show error message
-      Toast.error(`Failed to save: ${saveResult.error || 'Unknown error'}`);
-      return; // Don't proceed to next step
+      // Check if save failed
+      if (saveResult && !saveResult.success) {
+        // Show error message
+        Toast.error(`Failed to save: ${saveResult.error || 'Unknown error'}`);
+        return; // Don't proceed to next step
+      }
+
     }
-
     const step = this.stepConfig[this.currentStep];
 
     if (this.currentSubStep < step.subSteps.length) {
@@ -819,8 +828,10 @@ class StepManager {
   }
 
   async goBack() {
-    // Save current form data before going back
-    await this.saveFormData();
+    const response = await confirmDialog.warning("Are you sure you want to go back? Unsaved changes will be lost.");
+    if (!response) {
+      return;
+    }
 
     if (this.currentSubStep > 1) {
       // Go to previous substep
@@ -842,13 +853,16 @@ class StepManager {
 
   async skip() {
     // Save current form data (even if incomplete)
-    await this.saveFormData();
-    await this.saveAndContinue();
+    const results = await confirmDialog.warning("Are you sure you want to skip this step? Unsaved changes will be lost.");
+    if (!results) {
+      return;
+    }
+    await this.saveAndContinue(true);
   }
 
   async completeSetup() {
     // Save final data
-    this.saveFormData();
+    await this.saveFormData();
 
     // Show loading state
     const contentArea = document.getElementById("dynamic-content");
