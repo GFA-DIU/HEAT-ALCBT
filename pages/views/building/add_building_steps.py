@@ -5,8 +5,8 @@ Each step loads a template and provides necessary context data.
 
 
 
-import logging
 import json
+import logging
 import uuid as uuid_lib
 
 from django.contrib.auth.decorators import login_required
@@ -247,11 +247,11 @@ def handle_structural_components_step(request):
 
 
 @login_required
-@require_http_methods(["POST"])
+@require_http_methods(["POST", "PUT"])
 def save_building_step(request):
     """
     Save data from a building creation step.
-    Handles AJAX POST requests to save step data.
+    Handles AJAX POST/PUT requests to save step data.
 
     Step 1.1 (building-name-location): Creates Building with basic data, returns UUID.
     Step 1.2 (building-details): Updates the Building with additional details using UUID.

@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 @login_required
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET", "POST", "PUT"])
 def building_step_operational_products(request):
     """
     Handle operational products selection for the add-building wizard.
