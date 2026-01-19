@@ -73,7 +73,7 @@
                 >Carbon Footprint</span
               >
               <div class="flex px-2.5 items-end">
-                <span class="text-2xl/8 font-medium">78</span>
+                <span class="text-2xl/8 font-medium">{{ stats.total_carbon_footprint|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
                 >
@@ -85,9 +85,9 @@
                 >Total Floor Area</span
               >
               <div class="flex px-2.5 items-end">
-                <span class="text-2xl/8 font-medium">{{ building.total_floor_area }}</span>
+                <span class="text-2xl/8 font-medium">{{ building.total_floor_area|floatformat:0|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
-                  >m<sup>3</sup></span
+                  >m<sup>2</sup></span
                 >
               </div>
             </li>
@@ -97,7 +97,7 @@
                 >Embodied Carbon</span
               >
               <div class="flex px-2.5 items-end">
-                <span class="text-2xl/8 font-medium">55.2</span>
+                <span class="text-2xl/8 font-medium">{{ stats.total_embodied_carbon|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
                 >
@@ -109,7 +109,7 @@
                 >Operational Carbon</span
               >
               <div class="flex px-2.5 items-end">
-                <span class="text-2xl/8 font-medium">10</span>
+                <span class="text-2xl/8 font-medium">{{ stats.total_operational_carbon|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
                 >
@@ -121,7 +121,7 @@
                 >Carbon Savings</span
               >
               <div class="flex px-2.5 items-end">
-                <span class="text-2xl/8 font-medium">10.5%</span>
+                <span class="text-2xl/8 font-medium">{{ stats.carbon_savings_percentage|floatformat:1|default:"0" }}%</span>
               </div>
             </li>
           </ul>
@@ -281,6 +281,9 @@
 
 
   <script defer>
+    // Dynamic chart data from backend
+    const chartData = {{ chart_data|safe }};
+
     async function handleDelete(buildingId, redirectUrl) {
       const confirmed = await confirmDialog.delete(
         'This will permanently delete the building and all associated data.',
@@ -377,15 +380,17 @@
           const operationalColor = stateFeatureBaseColor;
           const embodiedColor = surface800Color;
 
+          // Use dynamic data for whole life carbon cycle
+          const wholeLifeData = chartData.whole_life_carbon || { labels: [], data: [0, 0] };
+
           new Chart(ctx, {
             type: "doughnut",
             data: {
-              labels: ["Operational carbon", "Embodied carbon"],
+              labels: wholeLifeData.labels,
               datasets: [
                 {
-                  // emboided carbon, operational carbon
-                  data: [1.218, 10],
-                  backgroundColor: [embodiedColor, operationalColor],
+                  data: wholeLifeData.data,
+                  backgroundColor: [operationalColor, embodiedColor],
                   borderWidth: 0,
                   cutout: "50%",
                 },
@@ -409,8 +414,8 @@
                     },
                     label: function (context) {
                       const value = context.parsed;
-                      const formatted = value.toLocaleString("en-US");
-                      return [formatted, "Jan 10 2025"];
+                      const formatted = value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                      return formatted + " kgCO₂eq/m²";
                     },
                   },
                 },
@@ -570,22 +575,19 @@
           ],
         };
 
-        // Initialize the Embodied Carbon bar chart
+        // Initialize the Embodied Carbon by Assembly bar chart
         const embodiedCtx = document.getElementById("emboided-carbon-chart");
 
         if (embodiedCtx) {
+          const assemblyData = chartData.embodied_by_assembly || { labels: [], data: [] };
+
           new Chart(embodiedCtx, {
             ...barChartDefaults,
             data: {
-              labels: [
-                "Interm. Floor",
-                "Bottom Floor",
-                "Window\nFrames",
-                "Miscellaneous",
-              ],
+              labels: assemblyData.labels.length > 0 ? assemblyData.labels : ["No data"],
               datasets: [
                 {
-                  data: [93.4, 33, 0.5, 52],
+                  data: assemblyData.data.length > 0 ? assemblyData.data : [0],
                   backgroundColor: primaryColor,
                   borderRadius: 2,
                   barThickness: 55,
@@ -595,24 +597,21 @@
           });
         }
 
+        // Initialize the Embodied Carbon by Material bar chart
         const embodiedCarbonByMaterialChart = document.getElementById(
           "emboided-carbon-by-material-chart"
         );
 
         if (embodiedCarbonByMaterialChart) {
+          const materialData = chartData.embodied_by_material || { labels: [], data: [] };
+
           new Chart(embodiedCarbonByMaterialChart, {
             ...barChartDefaults,
             data: {
-              labels: [
-                "Others",
-                "Masonry",
-                "Ready mix concrete & cement",
-                "Wood/Timber",
-                "Insulation",
-              ],
+              labels: materialData.labels.length > 0 ? materialData.labels : ["No data"],
               datasets: [
                 {
-                  data: [67.1, 22, 9, 0.8, 0.3],
+                  data: materialData.data.length > 0 ? materialData.data : [0],
                   backgroundColor: stateFeatureBaseColor,
                   borderRadius: 2,
                   barThickness: 55,
@@ -622,25 +621,21 @@
           });
         }
 
+        // Initialize the Operational Carbon by System/Appliances bar chart
         const embodiedCarbonByAppliancesChart = document.getElementById(
           "emboided-carbon-by-appliances-chart"
         );
 
         if (embodiedCarbonByAppliancesChart) {
+          const systemData = chartData.operational_by_system || { labels: [], data: [] };
+
           new Chart(embodiedCarbonByAppliancesChart, {
             ...barChartDefaults,
             data: {
-              labels: [
-                "Cooling systems",
-                "Ventilation systems",
-                "Lighting systems",
-                "Lift & escalator",
-                "Hot Water Systems",
-                "Other Systems",
-              ],
+              labels: systemData.labels.length > 0 ? systemData.labels : ["No data"],
               datasets: [
                 {
-                  data: [27.5, 15.2, 29.6, 5.8, 5.3, 0],
+                  data: systemData.data.length > 0 ? systemData.data : [0],
                   backgroundColor: primaryColor,
                   borderRadius: 2,
                   barThickness: 55,
