@@ -12,7 +12,7 @@ from accounts.forms import CustomUserUpdateForm, UserProfileUpdateForm
 from pages.models.assembly import Assembly, AssemblyMode
 from pages.models.building import (Building, BuildingAssembly,
                                    BuildingAssemblySimulated)
-from pages.views.building.building_list_stats import get_building_statistics
+from pages.views.building.building_stats import get_building_statistics
 
 logger = logging.getLogger(__name__)
 

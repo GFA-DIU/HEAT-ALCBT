@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.contrib.auth.decorators import login_required
@@ -19,6 +20,10 @@ from pages.models.building import (Building, BuildingAssembly,
 from pages.models.epd import EPDImpact, MaterialCategory
 from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.impact_calculation import calculate_impacts
+from pages.views.building.building_stats import (
+    get_building_detail_statistics,
+    get_building_chart_data,
+)
 from pages.views.building.operational_products.operational_products import (
     get_op_product, get_op_product_list, handle_op_products_save,
     serialize_operational_products)
@@ -186,6 +191,11 @@ def handle_building_load(request, building_id, simulation):
     form.fields["childcategory"].queryset = MaterialCategory.objects.filter(
         parent=initial
     )
+
+    # Calculate statistics and chart data for building detail page
+    building_stats = get_building_detail_statistics(building)
+    chart_data = get_building_chart_data(building)
+
     context = {
         "building_id": building.id,
         "building": building,
@@ -197,6 +207,9 @@ def handle_building_load(request, building_id, simulation):
         "epd_filters_form": form,
         "edit_mode": False,
         "simulation": simulation,
+        # Statistics for building detail page
+        "stats": building_stats,
+        "chart_data": json.dumps(chart_data),  # Convert to JSON for JavaScript
     }
 
     form = BuildingGeneralInformation(instance=building)
