@@ -1,28 +1,35 @@
 {% load static %}
+
 <div class="flex gap-2 p-2 rounded-lg bg-[var(--state--faded--lighter)]">
-  <span
-    data-icon="information-2-line"
-    data-size="16"
-    data-color="var(--icon--sub-600)"
-  ></span>
-  If data is available as total quantity per material, select “Add from BoQ”.
-  For quantities per components (foundation, floor, roof, etc.), use “Add
-  component”. Refer to BEAT handbook for details.
+  <span data-icon="information-2-line" data-size="16" data-color="var(--icon--sub-600)"></span>
+  If data is available as total quantity per material, select "Add from BoQ".
+  For quantities per components (foundation, floor, roof, etc.), use "Add component".
 </div>
 
-<div id="structural_component_template_container" class="w-full">
-  <div class="w-full mt-4">
+<div id="structural_component_container" class="w-full">
+  <!-- Empty State -->
+  <div id="empty-state" class="w-full flex flex-col gap-3 items-center justify-center mt-10">
+    <img src="{% static 'assets/structural-component.png' %}" alt="Structural Component" />
+    <p class="text-sm/5 font-medium text-[var(--text--sub-600)]">
+      How would you like to add your building structural components?
+    </p>
     <div class="flex items-center gap-2">
-      <button
-        class="btn btn-outline"
-        onclick="structural_component_boq_modal.showModal()"
-      >
-        Add from Build of Quantity
+      <button type="button" class="btn btn-outline" id="btn-add-boq">
+        Add from Bill of Quantity
       </button>
-      <button
-        class="btn btn-outline"
-        onclick="structural_component_component_type_modal.showModal()"
-      >
+      <button type="button" class="btn btn-outline" id="btn-add-component">
+        Add by Component
+      </button>
+    </div>
+  </div>
+
+  <!-- Items List (hidden when empty) -->
+  <div id="items-container" class="w-full mt-4 hidden">
+    <div class="flex items-center gap-2">
+      <button type="button" class="btn btn-outline" id="btn-add-boq-2">
+        Add from Bill of Quantity
+      </button>
+      <button type="button" class="btn btn-outline" id="btn-add-component-2">
         Add by Component
       </button>
     </div>
@@ -30,1206 +37,714 @@
     <div class="flex items-center justify-between mb-6">
       <div class="flex-1">
         <h5 class="text-sm/5 font-bold">Components / Materials Added</h5>
-        <p class="text-xs/4 text-[var(--text--sub-600)]">
-          Added components or materials will appear below
-        </p>
+        <p class="text-xs/4 text-[var(--text--sub-600)]">Added components or materials will appear below</p>
       </div>
-      <button class="btn btn-outline border-[var(--stroke--soft-200)]">
-        <span
-          data-icon="filter-3-fill"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-        ></span>
-        Filter
-      </button>
     </div>
-    <ul class="grid grid-cols-1 gap-2.5">
-      <li
-        class="bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2"
-      >
-        <span
-          data-icon="building-3-line"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-        ></span>
-        <div class="flex-1 flex flex-col gap-2.5">
-          <h6 class="text-sm/5 font-bold">Joe Mentil’s BOQ</h6>
-          <div class="flex items-center">
-            <div
-              class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center"
-            >
-              <span
-                data-icon="leaf-line"
-                data-size="14"
-                data-color="var(--bg--strong-950)"
-              ></span>
-            </div>
-            <div
-              class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)] mr-3"
-            >
-              0.83kg CO2e eq/m2
-            </div>
-            <p class="text-sm/5 text-[var(--text--sub-600)]">
-              Bill of quantities
-            </p>
-          </div>
-        </div>
-        <div class="flex gap-2">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="20"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="20"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
-    </ul>
+    <ul id="saved-items-list" class="grid grid-cols-1 gap-2.5"></ul>
   </div>
 </div>
 
-<dialog
-  id="structural_component_boq_modal"
-  class="modal modal-bottom sm:modal-end"
->
-  <div
-    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
-  >
-    <div class="flex justify-between p-5 w-full">
-      <h3 class="text-lg/6 font-medium">Build of Quantity (BOQ)</h3>
-      <button
-        type="button"
-        onclick="structural_component_boq_modal.close()"
-        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-      >
-        <span
-          data-icon="close-line"
-          data-size="16"
-          data-color="var(--icon--sub-600)"
-        ></span>
+<!-- BOQ Modal -->
+<dialog id="structural_boq_modal" class="modal modal-bottom sm:modal-end">
+  <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
+    <div class="flex justify-between p-5 w-full border-b border-[var(--stroke--soft-200)]">
+      <h3 class="text-lg/6 font-medium">Bill of Quantity (BOQ)</h3>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick="structuralManager.closeBoqModal()">
+        <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
     </div>
-    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+
+    <div class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-2.5 grid grid-cols-1 gap-5">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            Name
-            <span class="text-[var(--state--error--base)]">*</span>
-          </legend>
+          <legend class="fieldset-legend">Name <span class="text-[var(--state--error--base)]">*</span></legend>
           <label class="input w-full">
-            <input type="text" placeholder="eg. Fence wall" />
+            <input type="text" id="boq_name" placeholder="eg. Main Structure BOQ" required />
           </label>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Comment</legend>
           <label class="input w-full">
-            <input type="text" placeholder="Add a comment" />
+            <input type="text" id="boq_comment" placeholder="Add a comment" />
           </label>
         </fieldset>
       </div>
 
-      <h2
-        class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4"
-      >
+      <h2 class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4">
         MATERIALS
       </h2>
-      <div id="structural_component_materials_container" class="w-full">
-        <div class="flex-1 flex flex-col items-center justify-center px-6 pb-4">
-          <img
-            src="{% static 'assets/structure-materials.png' %}"
-            alt="Materials image"
-            class="w-[12.25rem]"
-          />
-          <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">
-            How would you like to add your building structural conponents.
-          </p>
-          <button
-            class="mt-2.5 btn btn-outline"
-            onclick="structural_component_epd_modal.showModal()"
-          >
+
+      <div id="boq_materials_section" class="w-full px-5">
+        <!-- Empty materials state -->
+        <div id="boq_no_materials" class="flex-1 flex flex-col items-center justify-center pb-4">
+          <img src="{% static 'assets/structure-materials.png' %}" alt="Materials" class="w-[12.25rem]" />
+          <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">Add materials from the EPD library</p>
+          <button type="button" class="mt-2.5 btn btn-outline" onclick="structuralManager.openEpdModal('boq')">
             Add from EPD library
           </button>
         </div>
+
+        <!-- Materials list -->
+        <div id="boq_has_materials" class="hidden">
+          <div class="flex items-end justify-between border-b border-[var(--stroke--soft-200)] pb-4 mb-4">
+            <div class="flex-1">
+              <h4 class="text-base/5 font-extrabold mb-1">Added Materials</h4>
+              <p class="text-sm/5 text-[var(--text--sub-600)]">Added from EPD library</p>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.openEpdModal('boq')">
+              <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+              Add more
+            </button>
+          </div>
+          <ul id="structural_materials_list" class="grid grid-cols-1 gap-2.5"></ul>
+        </div>
       </div>
-    </form>
-    <div
-      class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]"
-    >
-      <button
-        class="btn btn-outline"
-        onclick="structural_component_boq_modal.close()"
-      >
-        Cancel
-      </button>
-      <button class="btn btn-primary">Done</button>
+    </div>
+
+    <div class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]">
+      <button type="button" class="btn btn-outline" onclick="structuralManager.closeBoqModal()">Cancel</button>
+      <button type="button" class="btn btn-primary" id="btn-save-boq" onclick="structuralManager.saveBoq()">Done</button>
     </div>
   </div>
 </dialog>
 
-<dialog
-  id="structural_component_component_type_selected_modal"
-  class="modal modal-bottom sm:modal-end"
->
-  <div
-    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
-  >
-    <div class="flex justify-between p-5 w-full">
+<!-- Component Modal -->
+<dialog id="structural_component_modal" class="modal modal-bottom sm:modal-end">
+  <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
+    <div class="flex justify-between p-5 w-full border-b border-[var(--stroke--soft-200)]">
       <h3 class="text-lg/6 font-medium">Create New Component</h3>
-      <button
-        type="button"
-        onclick="structural_component_component_type_selected_modal.close()"
-        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-      >
-        <span
-          data-icon="close-line"
-          data-size="16"
-          data-color="var(--icon--sub-600)"
-        ></span>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick="structuralManager.closeComponentModal()">
+        <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
     </div>
-    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+
+    <div class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-2.5 grid grid-cols-3 gap-4 pb-8">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            Title
-            <span class="text-[var(--state--error--base)]">*</span>
-          </legend>
+          <legend class="fieldset-legend">Title <span class="text-[var(--state--error--base)]">*</span></legend>
           <label class="input w-full">
-            <input type="text" placeholder="eg. Fence wall" />
+            <input type="text" id="component_title" placeholder="eg. Foundation" required />
           </label>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Country</legend>
-          <select class="select">
-            <option value="" selected disabled>Select Country</option>
-            <option value="KH">
-              <span data-country="KH" data-width="20"></span>
-              <span data-country="KH" data-flag="false"></span>
-            </option>
-            <option value="IN">
-              <span data-country="IN" data-width="20"></span>
-              <span data-country="IN" data-flag="false"></span>
-            </option>
-            <option value="ID">
-              <span data-country="ID" data-width="20"></span>
-              <span data-country="ID" data-flag="false"></span>
-            </option>
-            <option value="TH">
-              <span data-country="TH" data-width="20"></span>
-              <span data-country="TH" data-flag="false"></span>
-            </option>
-            <option value="VN">
-              <span data-country="VN" data-width="20"></span>
-              <span data-country="VN" data-flag="false"></span>
-            </option>
-          </select>
-        </fieldset>
-        <fieldset class="fieldset">
           <legend class="fieldset-legend">Building Component</legend>
-          <select class="select">
-            <option value="" selected disabled>Select an option</option>
-            <option value="ext-staircase">
-              Extension - Staircase and Ramps
-            </option>
-            <option value="ext-finishes">Extension - Finishes</option>
-            <option value="ext-misc">Extension - Miscellaneous</option>
-            <option value="hor-structural-elements-beams">
-              Horizontal Structural Elements - Beams, Slabs
-            </option>
-            <option value="mem01">MEM01 - Bottom floor construction</option>
-            <option value="mem02">
-              MEM02 - Intermediate floor construction
-            </option>
-            <option value="mem04">MEM04 - Roof construction</option>
-            <option value="mem05">MEM05 - External walls</option>
-            <option value="mem06">MEM06 - Interior walls</option>
-            <option value="mem08">MEM08 - Window glazing</option>
-            <option value="mem09">MEM09 - Roof insulation</option>
-            <option value="mem10">MEM10 - Wall insulation</option>
+          <select id="component_category" class="select w-full"
+                  hx-get="{% url 'building_step_structural' %}?action=get_techniques"
+                  hx-target="#component_technique"
+                  hx-trigger="change"
+                  hx-include="[name='category_id']">
+            <option value="" selected disabled>Select component</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Construction technique</legend>
-          <select class="select" disabled>
-            <option value="" selected disabled>Select an option</option>
-            <option value="in-situ">In-Situ Reinforced Concrete Beams</option>
-            <option value="precast">Precast Reinforced Concrete Beams</option>
+          <legend class="fieldset-legend">Construction Technique</legend>
+          <select id="component_technique" class="select w-full">
+            <option value="" selected disabled>Select technique</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Mode</legend>
-          <select class="select">
-            <option value="custom" selected>Custom</option>
-            <option value="selection">Selection</option>
+          <legend class="fieldset-legend">Dimension</legend>
+          <select id="component_dimension" class="select w-full">
+            <option value="area" selected>Area (m²)</option>
+            <option value="volume">Volume (m³)</option>
+            <option value="mass">Mass (kg)</option>
+            <option value="length">Length (m)</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Quantity</legend>
           <label class="input w-full">
-            <input type="number" placeholder="Enter quantity" />
-            <select
-              class="select select-ghost w-fit !outline-none !border-none"
-            >
-              <option value="m2" selected>m²</option>
-              <option value="m">m</option>
-              <option value="kg">kg</option>
-              <option value="m3">m³</option>
-            </select>
+            <input type="number" id="component_quantity" placeholder="Enter quantity" step="0.01" min="0" />
+            <span id="component_unit_display" class="text-xs text-[var(--text--sub-600)]">m²</span>
           </label>
         </fieldset>
-        <fieldset class="fieldset col-span-3">
+        <fieldset class="fieldset">
           <legend class="fieldset-legend">Comment</legend>
-          <textarea
-            class="textarea w-full"
-            placeholder="Add a comment"
-            rows="3"
-          ></textarea>
-        </fieldset>
-        <div class="col-span-3 gap-2 flex items-center">
-          <input type="checkbox" id="make-public" />
-          <label for="make-public" class="flex items-center gap-1">
-            <span class="text-sm/5">Make Public</span>
-            <span class="text-xs/4 text-[var(--text--sub-600)]">
-              (Make this component public)
-            </span>
+          <label class="input w-full">
+            <input type="text" id="component_comment" placeholder="Add a comment" />
           </label>
-        </div>
+        </fieldset>
       </div>
 
-      <h2
-        class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4"
-      >
+      <h2 class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4">
         MATERIALS
       </h2>
-      <div id="structural_component_materials_container" class="w-full">
-        <div class="flex-1 flex flex-col items-center justify-center px-6 pb-4">
-          <img
-            src="{% static 'assets/structure-materials.png' %}"
-            alt="Materials image"
-            class="w-[12.25rem]"
-          />
-          <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">
-            How would you like to add your building structural conponents.
-          </p>
-          <button
-            class="mt-2.5 btn btn-outline"
-            onclick="structural_component_epd_modal.showModal()"
-          >
+
+      <div id="component_materials_section" class="w-full px-5">
+        <div id="component_no_materials" class="flex-1 flex flex-col items-center justify-center pb-4">
+          <img src="{% static 'assets/structure-materials.png' %}" alt="Materials" class="w-[12.25rem]" />
+          <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">Add materials from the EPD library</p>
+          <button type="button" class="mt-2.5 btn btn-outline" onclick="structuralManager.openEpdModal('component')">
             Add from EPD library
           </button>
         </div>
+
+        <div id="component_has_materials" class="hidden">
+          <div class="flex items-end justify-between border-b border-[var(--stroke--soft-200)] pb-4 mb-4">
+            <div class="flex-1">
+              <h4 class="text-base/5 font-extrabold mb-1">Added Materials</h4>
+              <p class="text-sm/5 text-[var(--text--sub-600)]">Added from EPD library</p>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.openEpdModal('component')">
+              <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+              Add more
+            </button>
+          </div>
+          <ul id="component_materials_list" class="grid grid-cols-1 gap-2.5"></ul>
+        </div>
       </div>
-    </form>
-    <div
-      class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]"
-    >
-      <button
-        class="btn btn-outline"
-        onclick="structural_component_component_type_selected_modal.close()"
-      >
-        Cancel
-      </button>
-      <button class="btn btn-primary">Done</button>
+    </div>
+
+    <div class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]">
+      <button type="button" class="btn btn-outline" onclick="structuralManager.closeComponentModal()">Cancel</button>
+      <button type="button" class="btn btn-primary" onclick="structuralManager.saveComponent()">Done</button>
     </div>
   </div>
 </dialog>
 
-<template id="structural_component_no-materials-template">
-  <div class="flex-1 flex flex-col items-center justify-center px-6 pb-4">
-    <img
-      src="{% static 'assets/structure-materials.png' %}"
-      alt="Materials image"
-      class="w-[12.25rem]"
-    />
-    <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">
-      How would you like to add your building structural conponents.
-    </p>
-    <button
-      class="mt-2.5 btn btn-outline"
-      onclick="structural_component_epd_modal.showModal()"
-    >
-      Add from EPD library
-    </button>
-  </div>
-</template>
-
-<template id="structural_component_materials_template">
-  <div class="px-5 pb-4 flex-1 flex flex-col">
-    <div
-      class="flex items-end justify-between border-b border-[var(--stroke--soft-200)] pb-4"
-    >
-      <div class="flex-1">
-        <h4 class="text-base/5 font-extrabold mb-1">Added Materials</h4>
-        <p class="text-sm/5 text-[var(--text--sub-600)]">
-          Added from EPD libraries
-        </p>
-      </div>
-      <button
-        class="btn btn-sm btn-outline"
-        onclick="structural_component_epd_modal.showModal()"
-      >
-        <span
-          data-icon="add-large-fill"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-        ></span>
-        Add from EPD library
-      </button>
-    </div>
-    <ul class="grid grid-cols-1 gap-2.5 mt-4">
-      <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
-        <div class="flex items-center justify-between mb-2 w-full">
-          <span class="text-sm/5 font-medium">Shower Hoses</span>
-          <a>
-            <span
-              data-icon="external-link-line"
-              data-size="20"
-              data-color="var(--icon--sub-600)"
-            ></span>
-          </a>
-        </div>
-        <div
-          class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
-        >
-          <div
-            class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
-          >
-            <span data-country="DE" data-width="20"></span>
-          </div>
-          <label class="input w-full">
-            <input type="text" placeholder="Add description" />
-          </label>
-          <select class="select">
-            <option value="" selected disabled>Category</option>
-            <option value="mem01">MEM01 - Bottom floor construction</option>
-            <option value="mem02">
-              MEM02 - Intermediate floor construction
-            </option>
-            <option value="mem04">MEM04 - Roof construction</option>
-            <option value="mem05">MEM05 - External walls</option>
-            <option value="mem06">MEM06 - Interior walls</option>
-            <option value="mem08">MEM08 - Window glazing</option>
-            <option value="mem09">MEM09 - Roof insulation</option>
-            <option value="mem10">MEM10 - Wall insulation</option>
-          </select>
-          <label class="input w-full">
-            <input type="number" placeholder="999999" />
-            <select
-              class="select select-ghost w-fit !outline-none !border-none"
-            >
-              <option selected value="kg">kg</option>
-              <option value="m3">m³</option>
-            </select>
-          </label>
-          <div
-            class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"
-          ></div>
-          <button
-            class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="20"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
-      <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
-        <div class="flex items-center justify-between mb-2 w-full">
-          <span class="text-sm/5 font-medium">Ready-Mix Concrete C25/30</span>
-          <a>
-            <span
-              data-icon="external-link-line"
-              data-size="20"
-              data-color="var(--icon--sub-600)"
-            ></span>
-          </a>
-        </div>
-        <div
-          class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
-        >
-          <div
-            class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
-          >
-            <span data-country="DE" data-width="20"></span>
-          </div>
-          <label class="input w-full">
-            <input type="text" placeholder="Add description" />
-          </label>
-          <label class="input w-full">
-            <input type="number" placeholder="layer thickness" />
-            <span class="text-xs/5 text-[var(--text--sub-600)]">cm</span>
-          </label>
-          <div
-            class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"
-          ></div>
-          <button
-            class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="20"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
-      <li class="bg-[var(--bg--weak-50)] rounded-xl p-4">
-        <div class="flex items-center justify-between mb-2 w-full">
-          <span class="text-sm/5 font-medium">Ready-Mix Concrete C25/30</span>
-          <a>
-            <span
-              data-icon="external-link-line"
-              data-size="20"
-              data-color="var(--icon--sub-600)"
-            ></span>
-          </a>
-        </div>
-        <div
-          class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5"
-        >
-          <div
-            class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"
-          >
-            <span data-country="DE" data-width="20"></span>
-          </div>
-          <label class="input w-full">
-            <input type="text" placeholder="Add description" />
-          </label>
-          <label class="input w-full">
-            <input type="number" placeholder="150" />
-            <span class="text-xs/5 text-[var(--text--sub-600)]">pcs</span>
-          </label>
-          <div
-            class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"
-          ></div>
-          <button
-            class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="20"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
-    </ul>
-  </div>
-</template>
-
-<dialog
-  id="structural_component_epd_modal"
-  class="modal modal-bottom sm:modal-end"
->
-  <div
-    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[44.5rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
-  >
-    <div class="flex justify-between items-center px-5 w-full">
-      <button
-        type="button"
-        onclick="structural_component_epd_modal.close()"
-        class="btn btn-sm btn-outline"
-      >
-        <span
-          data-icon="arrow-left"
-          data-size="16"
-          data-color="var(--icon--soft-400)"
-        ></span>
+<!-- EPD Library Modal -->
+<dialog id="structural_epd_modal" class="modal modal-bottom sm:modal-end">
+  <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[44.5rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
+    <div class="flex justify-between items-center px-5 w-full border-b border-[var(--stroke--soft-200)]">
+      <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.closeEpdModal()">
+        <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
         Go back
       </button>
-      <h3 class="text-lg/6 font-medium w-full text-left p-5">
-        Add from EPD Library
-      </h3>
-      <button
-        type="button"
-        onclick="structural_component_epd_modal.close()"
-        class="btn btn-sm btn-circle btn-ghost"
-      >
-        <span
-          data-icon="close-line"
-          data-size="16"
-          data-color="var(--icon--sub-600)"
-        ></span>
+      <h3 class="text-lg/6 font-medium w-full text-left p-5">Add from EPD Library</h3>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick="structuralManager.closeEpdModal()">
+        <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
     </div>
-    <form method="dialog" class="flex-1 overflow-y-auto hide-scrollbar">
+
+    <div class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-2.5 w-full">
-        <div
-          class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
-        >
+        <form id="structural_epd_filter_form"
+              hx-post="{% url 'building_step_structural' %}"
+              hx-vals='{"action": "filter"}'
+              hx-target="#structural_epd_list"
+              hx-swap="innerHTML"
+              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]">
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
-              <span
-                data-icon="search-2-line"
-                data-size="16"
-                data-color="var(--icon--soft-400)"
-              ></span>
-              <input type="text" placeholder="Search..." />
+              <span data-icon="search-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
+              <input type="text" name="search_query" placeholder="Search materials..." />
             </label>
-            <select class="select">
-              <option selected value="usa">
-                <span data-country="US" data-width="20"></span>
-                <span data-country="US" data-flag="false"></span>
-              </option>
-              <option value="canada">
-                <span data-country="CA" data-width="20"></span>
-                <span data-country="CA" data-flag="false"></span>
-              </option>
-              <option value="uk">
-                <span data-country="GB" data-width="20"></span>
-                <span data-country="GB" data-flag="false"></span>
-              </option>
-              <option value="australia">
-                <span data-country="AU" data-width="20"></span>
-                <span data-country="AU" data-flag="false"></span>
-              </option>
+            <select name="country" class="select min-w-[120px]">
+              <option value="">All Countries</option>
             </select>
+            <input type="hidden" name="dimension" id="epd_filter_dimension" value="area" />
+            <input type="hidden" name="mode" id="epd_filter_mode" value="boq" />
           </div>
+
           <div class="collapse rounded-none">
             <input type="checkbox" class="peer" />
-            <div
-              class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
-            >
+            <div class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between">
               <span class="flex items-center gap-2">
-                <span
-                  data-icon="menu-search-line"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
+                <span data-icon="menu-search-line" data-size="20" data-color="var(--icon--strong-950)"></span>
                 Advanced Search
-                <span class="text-xs/5 text-[var(--text--sub-600)]"
-                  >Click here for a more advanced search option</span
-                >
+                <span class="text-xs/5 text-[var(--text--sub-600)]">Click for more filters</span>
               </span>
-              <span
-                data-icon="caret-down"
-                data-size="16"
-                data-color="var(--icon--soft-400)"
-                class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"
-              ></span>
+              <span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)"
+                    class="transition-transform duration-300 peer-checked:rotate-180"></span>
             </div>
             <div class="collapse-content mt-0 px-0">
-              <div class="grid grid-cols-4 gap-2">
-                <label class="relative">
-                  <span
-                    data-icon="filter-3-line"
-                    data-size="20"
-                    data-color="var(--icon--soft-400)"
-                    class="select-icon w-8"
-                  ></span>
-                  <select
-                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                  >
-                    <option disabled selected value="">Category</option>
-                    <option value="building-service-engineering">
-                      Building service engineering
-                    </option>
-                    <option value="components-for-windows">
-                      Components for windows & curtain walls
-                    </option>
-                    <option value="composites">Composites</option>
-                    <option value="end-of-life">End of life</option>
-                    <option value="insulation-materials">
-                      Insulation materials
-                    </option>
-                    <option value="metals">Metals</option>
-                    <option value="minerals-building-products">
-                      Minerals building products
-                    </option>
-                    <option value="plastics">Plastics</option>
-                    <option value="wood">Wood</option>
-                    <option value="others">Others</option>
-                    <option value="unkwown">Unkwown</option>
-                  </select>
-                </label>
-                <label class="relative">
-                  <span
-                    data-icon="filter-3-line"
-                    data-size="20"
-                    data-color="var(--icon--soft-400)"
-                    class="select-icon w-8"
-                  ></span>
-                  <select
-                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                  >
-                    <option disabled selected value="">Sub-category</option>
-                    <option value="air-conditioning-and-ventilation">
-                      Air conditioning and ventilation
-                    </option>
-                    <option value="conveyance">Conveyance</option>
-                    <option value="electrical">Electrical</option>
-                    <option value="end-of-life-processes">
-                      End of life processes
-                    </option>
-                    <option value="fire-protection">Fire protection</option>
-                    <option value="heating">Heating</option>
-                    <option value="sanitary">Sanitary</option>
-                    <option value="use">Use</option>
-                  </select>
-                </label>
-                <label class="relative">
-                  <span
-                    data-icon="filter-3-line"
-                    data-size="20"
-                    data-color="var(--icon--soft-400)"
-                    class="select-icon w-8"
-                  ></span>
-                  <select
-                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                  >
-                    <option disabled selected value="">Child-category</option>
-                    <option value="use-conveyor">Use conveyor</option>
-                    <option value="use-heat-generator">
-                      Use heat generator
-                    </option>
-                    <option value="use-heat-generator-enev">
-                      Use heat generator (EnEv)
-                    </option>
-                    <option value="using-lighting">Using lighting</option>
-                    <option value="using-mountings">Using mountings</option>
-                    <option value="use-ventilations-and-air-conditioning">
-                      Use ventilations and air conditioning
-                    </option>
-                  </select>
-                </label>
-                <label class="relative">
-                  <span
-                    data-icon="filter-3-line"
-                    data-size="20"
-                    data-color="var(--icon--soft-400)"
-                    class="select-icon w-8"
-                  ></span>
-                  <select
-                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                  >
-                    <option disabled selected value="">EPD type</option>
-                    <option value="official">Official</option>
-                    <option value="custom">Custom</option>
-                    <option value="generic">Generic</option>
-                  </select>
-                </label>
-                <label class="relative">
-                  <span
-                    data-icon="filter-3-line"
-                    data-size="20"
-                    data-color="var(--icon--soft-400)"
-                    class="select-icon w-8"
-                  ></span>
-                  <select
-                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
-                  >
-                    <option disabled selected value="">Sort by</option>
-                  </select>
-                </label>
+              <div class="grid grid-cols-3 gap-2">
+                <select name="category" class="select h-9 text-sm/5">
+                  <option value="">Category</option>
+                </select>
+                <select name="subcategory" class="select h-9 text-sm/5">
+                  <option value="">Sub-category</option>
+                </select>
+                <select name="type" class="select h-9 text-sm/5">
+                  <option value="">EPD Type</option>
+                  <option value="generic">Generic</option>
+                  <option value="official">Official</option>
+                </select>
               </div>
             </div>
           </div>
-          <button class="btn btn-outline btn-block" disabled>Search</button>
+
+          <button type="submit" class="btn btn-outline btn-block mt-2">
+            <span data-icon="search-2-line" data-size="16" data-color="currentColor"></span>
+            Search
+          </button>
+        </form>
+
+        <div id="structural_epd_list" class="mt-4"
+             hx-get="{% url 'building_step_structural' %}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+          <div class="flex justify-center items-center py-8">
+            <span class="loading loading-spinner loading-lg"></span>
+          </div>
         </div>
-        <ul class="grid grid-cols-1">
-          <li
-            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
-          >
-            <div class="flex flex-col gap-2.5">
-              <div class="flex items-center justify-between">
-                <span
-                  >Structural concrete M6582A09 (C30/37, F4, 16, XC4, XF1, XA1,
-                  XD1, WA, slow)</span
-                >
-              </div>
-              <div class="flex items-stretch gap-1.25">
-                <span
-                  class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
-                  >Germany</span
-                >
-                <div
-                  class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
-                ></div>
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Precast concrete elements and goods</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >169.40 kgCO2e</span
-                >
-              </div>
-            </div>
-            <div class="flex flex-col items-end gap-2.5 w-fit">
-              <span
-                data-icon="external-link-line"
-                data-size="20"
-                data-color="var(--icon--sub-600)"
-              ></span>
-              <button
-                class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
-                type="button"
-              >
-                <span
-                  data-icon="add-large-fill"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-                Add
-              </button>
-            </div>
-          </li>
-          <li
-            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
-          >
-            <div class="flex flex-col gap-2.5">
-              <div class="flex items-center justify-between">
-                <span>Shower Hoses</span>
-              </div>
-              <div class="flex items-stretch gap-1.25">
-                <span
-                  class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
-                  >Germany</span
-                >
-                <div
-                  class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
-                ></div>
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Mounting</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >0.59 kgCO2e</span
-                >
-              </div>
-            </div>
-            <div class="flex flex-col items-end gap-2.5 w-fit">
-              <span
-                data-icon="external-link-line"
-                data-size="20"
-                data-color="var(--icon--sub-600)"
-              ></span>
-              <button
-                class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
-                type="button"
-              >
-                <span
-                  data-icon="add-large-fill"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-                Add
-              </button>
-            </div>
-          </li>
-          <li
-            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
-          >
-            <div class="flex flex-col gap-2.5">
-              <div class="flex items-center justify-between">
-                <span>ACC M35 Ready Mixed Concrete (RMC)</span>
-              </div>
-              <div class="flex items-stretch gap-1.25">
-                <span
-                  class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
-                  >India</span
-                >
-                <div
-                  class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
-                ></div>
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Ready mixed concrete</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >396 kgCO2e</span
-                >
-              </div>
-            </div>
-            <div class="flex flex-col items-end gap-2.5 w-fit">
-              <span
-                data-icon="external-link-line"
-                data-size="20"
-                data-color="var(--icon--sub-600)"
-              ></span>
-              <button
-                class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
-                type="button"
-              >
-                <span
-                  data-icon="add-large-fill"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-                Add
-              </button>
-            </div>
-          </li>
-          <li
-            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
-          >
-            <div class="flex flex-col gap-2.5">
-              <div class="flex items-center justify-between">
-                <span
-                  >semi-finished products - Kunststoffwerke Katzbach GmbH & Co.
-                  KG - EPP mold</span
-                >
-              </div>
-              <div class="flex items-stretch gap-1.25">
-                <span
-                  class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
-                  >Germany</span
-                >
-                <div
-                  class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
-                ></div>
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Ready mixed concrete</span
-                >
-                <span
-                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >396 kgCO2e</span
-                >
-              </div>
-            </div>
-            <div class="flex flex-col items-end gap-2.5 w-fit">
-              <span
-                data-icon="external-link-line"
-                data-size="20"
-                data-color="var(--icon--sub-600)"
-              ></span>
-              <button
-                class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
-                type="button"
-              >
-                <span
-                  data-icon="add-large-fill"
-                  data-size="20"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-                Add
-              </button>
-            </div>
-          </li>
-        </ul>
       </div>
-    </form>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <div class="flex items-center gap-2">
-        <button class="btn btn-ghost py-2 px-3">
-          <span
-            data-icon="arrow-left"
-            data-size="20"
-            data-color="var(--icon--soft-400)"
-          ></span>
-          Previous
-        </button>
-        <ul class="flex items-center gap-2">
-          <li>
-            <button class="btn btn-sm rounded-[var(--radius-8)] btn-neutral">
-              1
-            </button>
-          </li>
-          <li>
-            <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
-              2
-            </button>
-          </li>
-          <li>
-            <button class="btn btn-sm rounded-[var(--radius-8)] btn-ghost">
-              3
-            </button>
-          </li>
-        </ul>
-        <button class="btn btn-ghost py-2 px-3">
-          Next
-          <span
-            data-icon="arrow-right"
-            data-size="20"
-            data-color="var(--icon--strong-950)"
-          ></span>
-        </button>
-      </div>
-      <div class="flex items-center gap-2">
-        <button
-          class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit"
-          onclick="structural_component_epd_modal.close()"
-        >
-          Cancel
-        </button>
-        <button type="submit" class="btn btn-sm btn-primary w-fit">Save</button>
-      </div>
+    </div>
+
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <div id="structural_pagination"></div>
+      <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.closeEpdModal()">Close</button>
     </div>
   </div>
 </dialog>
 
-<dialog id="structural_component_modal_delete" class="modal modal-middle">
+<!-- Delete Confirmation Modal -->
+<dialog id="structural_delete_modal" class="modal modal-middle">
   <div class="modal-box w-full max-w-[26.375rem] p-0">
     <div class="flex flex-col items-center p-5">
-      <div
-        class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]"
-      >
-        <span
-          data-icon="alert-fill"
-          data-size="24"
-          data-color="var(--state--warning--base)"
-        ></span>
+      <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
+        <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)"></span>
       </div>
       <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        You are about to remove or deletedded structural components. This will
-        action will permanently remove it.
+        This action will permanently remove this item.
       </p>
     </div>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <button
-        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
-        onclick="structural_component_modal_delete.close()"
-      >
-        Cancel
-      </button>
-      <button class="btn btn-sm btn-error flex-1">Remove</button>
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <button type="button" class="btn btn-sm btn-outline flex-1" onclick="structural_delete_modal.close()">Cancel</button>
+      <button type="button" class="btn btn-sm btn-error flex-1" id="confirm-delete-btn">Remove</button>
     </div>
   </div>
 </dialog>
 
-<dialog
-  id="structural_component_component_type_modal"
-  class="modal modal-center"
->
-  <div class="modal-box w-full max-w-[42.5rem] p-4.5 pb-9">
-    <div class="flex items-center mb-6">
-      <h2 class="text-base/6 font-bold flex-1 text-center">
-        What type of component would you like to add?
-      </h2>
-      <button
-        class="btn btn-sm btn-circle btn-ghost"
-        onclick="structural_component_component_type_modal.close()"
-      >
-        <span
-          data-icon="close-line"
-          data-size="20"
-          data-color="var(--icon--sub-600)"
-        ></span>
-      </button>
-    </div>
-    <ul class="flex gap-4 items-stretch px-4">
-      <li
-        class="flex-1 flex flex-col items-center py-6 px-3 gap-4 rounded-2xl border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="list-settings-fill"
-          data-size="32"
-          data-color="var(--icon--sub-600)"
-        ></span>
-        <div class="text-center">
-          <h3 class="text-sm/5 font-bold">Select from default</h3>
-          <p class="text-xs/4 text-[var(--text--sub-600)] mt-2">
-            Select an assembly from predefined options for a quick LCA
-            assessment.
-          </p>
-        </div>
-        <button
-          class="btn btn-primary w-full"
-          onclick="structural_component_component_type_selected_modal.showModal()"
-        >
-          Select default
-        </button>
-      </li>
-      <li
-        class="flex-1 flex flex-col items-center py-6 px-3 gap-4 rounded-2xl border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="list-settings-fill"
-          data-size="32"
-          data-color="var(--icon--sub-600)"
-        ></span>
-        <div class="text-center">
-          <h3 class="text-sm/5 font-bold">Create custom</h3>
-          <p class="text-xs/4 text-[var(--text--sub-600)] mt-2">
-            Create a custom component from the materials list for a detailed
-            LCA.
-          </p>
-        </div>
-        <button
-          class="btn btn-primary w-full"
-          onclick="structural_component_component_type_selected_modal.showModal()"
-        >
-          Select default
-        </button>
-      </li>
-    </ul>
-  </div>
-</dialog>
+<script>
+class StructuralComponentManager {
+  constructor() {
+    this.boqItems = [];
+    this.componentItems = [];
+    this.currentMode = null;
+    this.editingIndex = null;
+    this.pendingDelete = null;
+  }
 
-<template id="structural-component-template">
-  <div class="w-full mt-4">
-    <div class="flex items-center gap-2">
-      <button
-        class="btn btn-outline"
-        onclick="structural_component_boq_modal.showModal()"
-      >
-        Add from Build of Quantity
-      </button>
-      <button
-        class="btn btn-outline"
-        onclick="structural_component_component_type_modal.showModal()"
-      >
-        Add by Component
-      </button>
-    </div>
-    <div class="divider"></div>
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex-1">
-        <h5 class="text-sm/5 font-bold">Components / Materials Added</h5>
-        <p class="text-xs/4 text-[var(--text--sub-600)]">
-          Added components or materials will appear below
-        </p>
-      </div>
-      <button class="btn btn-outline border-[var(--stroke--soft-200)]">
-        <span
-          data-icon="filter-3-fill"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-        ></span>
-        Filter
-      </button>
-    </div>
-    <ul class="grid grid-cols-1 gap-2.5">
-      <li
-        class="bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2"
-      >
-        <span
-          data-icon="building-3-line"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-        ></span>
+  init() {
+    this.bindEvents();
+    this.loadCategories();
+    this.updateUI();
+  }
+
+  bindEvents() {
+    document.getElementById('btn-add-boq')?.addEventListener('click', () => this.openBoqModal());
+    document.getElementById('btn-add-boq-2')?.addEventListener('click', () => this.openBoqModal());
+    document.getElementById('btn-add-component')?.addEventListener('click', () => this.openComponentModal());
+    document.getElementById('btn-add-component-2')?.addEventListener('click', () => this.openComponentModal());
+
+    document.getElementById('component_dimension')?.addEventListener('change', (e) => {
+      const units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm' };
+      document.getElementById('component_unit_display').textContent = units[e.target.value] || 'm²';
+      document.getElementById('epd_filter_dimension').value = e.target.value;
+    });
+
+    document.getElementById('saved-items-list')?.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('.edit-item-btn');
+      const deleteBtn = e.target.closest('.delete-item-btn');
+
+      if (editBtn) {
+        const type = editBtn.dataset.itemType;
+        const index = parseInt(editBtn.dataset.itemIndex);
+        this.editItem(type, index);
+      }
+
+      if (deleteBtn) {
+        const type = deleteBtn.dataset.itemType;
+        const index = parseInt(deleteBtn.dataset.itemIndex);
+        this.confirmDelete(type, index);
+      }
+    });
+
+    document.getElementById('confirm-delete-btn')?.addEventListener('click', () => this.executeDelete());
+
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+      if (e.detail.target.id === 'structural_materials_list' || e.detail.target.id === 'component_materials_list') {
+        this.updateMaterialsUI();
+        this.bindMaterialEvents();
+      }
+    });
+  }
+
+  bindMaterialEvents() {
+    document.querySelectorAll('.remove-material-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const elementId = btn.dataset.elementId;
+        document.getElementById(elementId)?.remove();
+        this.updateMaterialsUI();
+      });
+    });
+  }
+
+  loadCategories() {
+    fetch("{% url 'building_step_structural' %}?action=get_categories")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('component_category').innerHTML = html;
+      });
+  }
+
+  openBoqModal(index = null) {
+    this.currentMode = 'boq';
+    this.editingIndex = index;
+    document.getElementById('epd_filter_mode').value = 'boq';
+
+    if (index !== null && this.boqItems[index]) {
+      const item = this.boqItems[index];
+      document.getElementById('boq_name').value = item.name;
+      document.getElementById('boq_comment').value = item.comment || '';
+      this.renderMaterials(item.materials, 'boq');
+    } else {
+      document.getElementById('boq_name').value = '';
+      document.getElementById('boq_comment').value = '';
+      document.getElementById('structural_materials_list').innerHTML = '';
+    }
+
+    this.updateMaterialsUI();
+    structural_boq_modal.showModal();
+  }
+
+  closeBoqModal() {
+    structural_boq_modal.close();
+    this.resetModalState();
+  }
+
+  openComponentModal(index = null) {
+    this.currentMode = 'component';
+    this.editingIndex = index;
+    document.getElementById('epd_filter_mode').value = 'component';
+
+    if (index !== null && this.componentItems[index]) {
+      const item = this.componentItems[index];
+      document.getElementById('component_title').value = item.title;
+      document.getElementById('component_category').value = item.category || '';
+      document.getElementById('component_technique').value = item.technique || '';
+      document.getElementById('component_dimension').value = item.dimension || 'area';
+      document.getElementById('component_quantity').value = item.quantity || '';
+      document.getElementById('component_comment').value = item.comment || '';
+      this.renderMaterials(item.materials, 'component');
+    } else {
+      document.getElementById('component_title').value = '';
+      document.getElementById('component_category').value = '';
+      document.getElementById('component_technique').innerHTML = '<option value="">Select technique</option>';
+      document.getElementById('component_dimension').value = 'area';
+      document.getElementById('component_quantity').value = '';
+      document.getElementById('component_comment').value = '';
+      document.getElementById('component_materials_list').innerHTML = '';
+    }
+
+    this.updateMaterialsUI();
+    structural_component_modal.showModal();
+  }
+
+  closeComponentModal() {
+    structural_component_modal.close();
+    this.resetModalState();
+  }
+
+  openEpdModal(mode) {
+    this.currentMode = mode;
+    document.getElementById('epd_filter_mode').value = mode;
+
+    const dimension = mode === 'component' ? document.getElementById('component_dimension').value : 'area';
+    document.getElementById('epd_filter_dimension').value = dimension;
+
+    structural_epd_modal.showModal();
+    htmx.trigger('#structural_epd_list', 'load');
+  }
+
+  closeEpdModal() {
+    structural_epd_modal.close();
+  }
+
+  resetModalState() {
+    this.editingIndex = null;
+  }
+
+  updateMaterialsUI() {
+    const boqList = document.getElementById('structural_materials_list');
+    const componentList = document.getElementById('component_materials_list');
+
+    if (boqList) {
+      const hasBoqMaterials = boqList.children.length > 0;
+      document.getElementById('boq_no_materials').classList.toggle('hidden', hasBoqMaterials);
+      document.getElementById('boq_has_materials').classList.toggle('hidden', !hasBoqMaterials);
+    }
+
+    if (componentList) {
+      const hasCompMaterials = componentList.children.length > 0;
+      document.getElementById('component_no_materials').classList.toggle('hidden', hasCompMaterials);
+      document.getElementById('component_has_materials').classList.toggle('hidden', !hasCompMaterials);
+    }
+  }
+
+  collectMaterials(listId) {
+    const list = document.getElementById(listId);
+    if (!list) return [];
+
+    return Array.from(list.children).map(li => {
+      const epdId = li.dataset.epdId;
+      const timestamp = li.dataset.timestamp;
+      return {
+        epd_id: epdId,
+        name: li.dataset.name,
+        gwp: parseFloat(li.dataset.gwp) || 0,
+        description: li.querySelector('.material-description')?.value || '',
+        quantity: parseFloat(li.querySelector('.material-quantity')?.value) || 0,
+        unit: li.querySelector('.material-unit')?.value || '',
+        category: li.querySelector('.material-category')?.value || '',
+        timestamp: timestamp
+      };
+    });
+  }
+
+  renderMaterials(materials, mode) {
+    const listId = mode === 'boq' ? 'structural_materials_list' : 'component_materials_list';
+    const list = document.getElementById(listId);
+    if (!list) return;
+
+    list.innerHTML = '';
+    materials.forEach(m => {
+      const li = document.createElement('li');
+      li.className = 'bg-[var(--bg--weak-50)] rounded-xl p-4';
+      li.id = `material-${m.epd_id}-${m.timestamp}`;
+      li.dataset.epdId = m.epd_id;
+      li.dataset.timestamp = m.timestamp;
+      li.dataset.name = m.name;
+      li.dataset.gwp = m.gwp;
+
+      li.innerHTML = `
+        <div class="flex items-center justify-between mb-2 w-full">
+          <span class="text-sm/5 font-medium truncate flex-1">${m.name}</span>
+        </div>
+        <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
+          <label class="input w-full">
+            <input type="text" value="${m.description || ''}" placeholder="Description" class="material-description" />
+          </label>
+          <label class="input w-full max-w-[140px]">
+            <input type="number" value="${m.quantity || ''}" placeholder="Qty" class="material-quantity" step="0.01" min="0" />
+            <select class="select select-ghost w-fit !outline-none !border-none material-unit">
+              <option value="${m.unit}" selected>${m.unit}</option>
+            </select>
+          </label>
+          <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] remove-material-btn"
+                  data-element-id="material-${m.epd_id}-${m.timestamp}">
+            <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
+        </div>
+      `;
+      list.appendChild(li);
+    });
+
+    this.bindMaterialEvents();
+    this.updateMaterialsUI();
+  }
+
+  saveBoq() {
+    const name = document.getElementById('boq_name').value.trim();
+    if (!name) {
+      Toast.error('Please enter a BOQ name');
+      return;
+    }
+
+    const materials = this.collectMaterials('structural_materials_list');
+    if (materials.length === 0) {
+      Toast.error('Please add at least one material');
+      return;
+    }
+
+    const totalGwp = materials.reduce((sum, m) => sum + (m.gwp * m.quantity), 0);
+
+    const item = {
+      name: name,
+      comment: document.getElementById('boq_comment').value,
+      materials: materials,
+      total_gwp: totalGwp
+    };
+
+    if (this.editingIndex !== null) {
+      this.boqItems[this.editingIndex] = item;
+    } else {
+      this.boqItems.push(item);
+    }
+
+    this.closeBoqModal();
+    this.updateUI();
+    this.emitFormStatus();
+    Toast.success('BOQ saved successfully');
+  }
+
+  saveComponent() {
+    const title = document.getElementById('component_title').value.trim();
+    if (!title) {
+      Toast.error('Please enter a component title');
+      return;
+    }
+
+    const materials = this.collectMaterials('component_materials_list');
+    if (materials.length === 0) {
+      Toast.error('Please add at least one material');
+      return;
+    }
+
+    const totalGwp = materials.reduce((sum, m) => sum + (m.gwp * m.quantity), 0);
+    const categorySelect = document.getElementById('component_category');
+
+    const item = {
+      title: title,
+      category: document.getElementById('component_category').value,
+      category_name: categorySelect.options[categorySelect.selectedIndex]?.text || '',
+      technique: document.getElementById('component_technique').value,
+      dimension: document.getElementById('component_dimension').value,
+      quantity: document.getElementById('component_quantity').value,
+      comment: document.getElementById('component_comment').value,
+      materials: materials,
+      total_gwp: totalGwp
+    };
+
+    if (this.editingIndex !== null) {
+      this.componentItems[this.editingIndex] = item;
+    } else {
+      this.componentItems.push(item);
+    }
+
+    this.closeComponentModal();
+    this.updateUI();
+    this.emitFormStatus();
+    Toast.success('Component saved successfully');
+  }
+
+  editItem(type, index) {
+    if (type === 'boq') {
+      this.openBoqModal(index);
+    } else {
+      this.openComponentModal(index);
+    }
+  }
+
+  confirmDelete(type, index) {
+    this.pendingDelete = { type, index };
+    structural_delete_modal.showModal();
+  }
+
+  executeDelete() {
+    if (!this.pendingDelete) return;
+
+    const { type, index } = this.pendingDelete;
+    if (type === 'boq') {
+      this.boqItems.splice(index, 1);
+    } else {
+      this.componentItems.splice(index, 1);
+    }
+
+    this.pendingDelete = null;
+    structural_delete_modal.close();
+    this.updateUI();
+    this.emitFormStatus();
+    Toast.info('Item removed');
+  }
+
+  updateUI() {
+    const hasItems = this.boqItems.length > 0 || this.componentItems.length > 0;
+    document.getElementById('empty-state').classList.toggle('hidden', hasItems);
+    document.getElementById('items-container').classList.toggle('hidden', !hasItems);
+
+    const list = document.getElementById('saved-items-list');
+    list.innerHTML = '';
+
+    this.boqItems.forEach((item, index) => {
+      const li = document.createElement('li');
+      li.className = 'bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2';
+      li.innerHTML = `
+        <span data-icon="building-3-line" data-size="20" data-color="var(--icon--strong-950)"></span>
         <div class="flex-1 flex flex-col gap-2.5">
-          <h6 class="text-sm/5 font-bold">Joe Mentil’s BOQ</h6>
+          <h6 class="text-sm/5 font-bold">${item.name}</h6>
           <div class="flex items-center">
-            <div
-              class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center"
-            >
-              <span
-                data-icon="leaf-line"
-                data-size="14"
-                data-color="var(--bg--strong-950)"
-              ></span>
+            <div class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center">
+              <span data-icon="leaf-line" data-size="14" data-color="var(--bg--strong-950)"></span>
             </div>
-            <div
-              class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)] mr-3"
-            >
-              0.83kg CO2e eq/m2
+            <div class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)] mr-3">
+              ${item.total_gwp.toFixed(2)} kgCO2eq
             </div>
-            <p class="text-sm/5 text-[var(--text--sub-600)]">
-              Bill of quantities
-            </p>
+            <p class="text-sm/5 text-[var(--text--sub-600)]">BOQ (${item.materials.length} materials)</p>
           </div>
         </div>
         <div class="flex gap-2">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="20"
-              data-color="var(--icon--strong-950)"
-            ></span>
+          <button type="button" class="btn size-5 btn-ghost p-0 edit-item-btn" data-item-type="boq" data-item-index="${index}">
+            <span data-icon="edit-line" data-size="20" data-color="var(--icon--strong-950)"></span>
           </button>
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="20"
-              data-color="var(--icon--strong-950)"
-            ></span>
+          <button type="button" class="btn size-5 btn-ghost p-0 delete-item-btn" data-item-type="boq" data-item-index="${index}">
+            <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
           </button>
         </div>
-      </li>
-    </ul>
-  </div>
-</template>
+      `;
+      list.appendChild(li);
+    });
 
-<template id="no-structural-component-template">
-  <div class="w-full flex flex-col gap-3 items-center justify-center mt-10">
-    <img
-      src="{% static 'assets/structural-component.png' %}"
-      alt="Energy Carrier Image"
-    />
-    <p class="text-sm/5 font-medium text-[var(--text--sub-600)]">
-      How would you like to add your building structural conponents.
-    </p>
-    <div class="flex items-center gap-2">
-      <div class="tooltip">
-        <div class="tooltip-content max-w-[17rem]">
-          <div class="flex gap-3 py-2">
-            <span
-              data-icon="information-fill"
-              data-size="20"
-              data-color="var(--icon--soft-400)"
-            ></span>
-            <div class="flex flex-col gap-1 w-full text-left">
-              <h3 class="text-sm/5 font-medium text-[var(--text--white-0)]">
-                Add from Build of Quantity(BoQ)
-              </h3>
-              <p class="text-xs/5 text-[var(--text--soft-400)]">
-                If data is available as total quantity per material, select “Add
-                from building of Quantity (BoQ)”
-              </p>
+    this.componentItems.forEach((item, index) => {
+      const li = document.createElement('li');
+      li.className = 'bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2';
+      li.innerHTML = `
+        <span data-icon="stack-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+        <div class="flex-1 flex flex-col gap-2.5">
+          <h6 class="text-sm/5 font-bold">${item.title}</h6>
+          <div class="flex items-center flex-wrap gap-2">
+            <div class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center">
+              <span data-icon="leaf-line" data-size="14" data-color="var(--bg--strong-950)"></span>
             </div>
+            <div class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)]">
+              ${item.total_gwp.toFixed(2)} kgCO2eq
+            </div>
+            <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
+              ${item.category_name || 'No category'}
+            </span>
+            <p class="text-sm/5 text-[var(--text--sub-600)]">${item.quantity || '-'} ${item.dimension || ''}</p>
           </div>
         </div>
-        <button
-          class="btn btn-outline"
-          onclick="structural_component_boq_modal.showModal()"
-        >
-          Add from Build of Quantity
-          <span
-            data-icon="information-fill"
-            data-size="20"
-            data-color="var(--icon--soft-400)"
-          ></span>
-        </button>
-      </div>
-      <div class="tooltip tooltip-bottom">
-        <div class="tooltip-content max-w-[14.75rem]">
-          <div class="flex gap-3 py-2">
-            <span
-              data-icon="information-fill"
-              data-size="20"
-              data-color="var(--icon--soft-400)"
-            ></span>
-            <div class="flex flex-col gap-1 w-full text-left">
-              <h3 class="text-sm/5 font-medium text-[var(--text--white-0)]">
-                Add by component
-              </h3>
-              <p class="text-xs/5 text-[var(--text--soft-400)]">
-                For quantities per components (foundation, floor, roof, etc.),
-                use “Add component”
-              </p>
-            </div>
-          </div>
+        <div class="flex gap-2">
+          <button type="button" class="btn size-5 btn-ghost p-0 edit-item-btn" data-item-type="component" data-item-index="${index}">
+            <span data-icon="edit-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
+          <button type="button" class="btn size-5 btn-ghost p-0 delete-item-btn" data-item-type="component" data-item-index="${index}">
+            <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
         </div>
-        <button
-          class="btn btn-outline"
-          onclick="structural_component_component_type_modal.showModal()"
-        >
-          Add by component
-          <span
-            data-icon="information-fill"
-            data-size="20"
-            data-color="var(--icon--soft-400)"
-          ></span>
-        </button>
-      </div>
-    </div>
-  </div>
-</template>
+      `;
+      list.appendChild(li);
+    });
+  }
+
+  getFormData() {
+    return {
+      boq_items: this.boqItems,
+      component_items: this.componentItems
+    };
+  }
+
+  validate() {
+    return this.boqItems.length > 0 || this.componentItems.length > 0;
+  }
+
+  emitFormStatus() {
+    const isValid = this.validate();
+    document.dispatchEvent(new CustomEvent('onFormStatus', {
+      detail: {
+        isValid: isValid,
+        data: this.getFormData(),
+        errors: isValid ? {} : { structural: 'Add at least one BOQ or component' }
+      }
+    }));
+  }
+
+  restore(data) {
+    if (data?.boq_items) this.boqItems = data.boq_items;
+    if (data?.component_items) this.componentItems = data.component_items;
+    this.updateUI();
+    this.emitFormStatus();
+  }
+}
+
+const structuralManager = new StructuralComponentManager();
+
+// Initialize immediately since this template is loaded dynamically
+structuralManager.init();
+
+window.getStructuralFormData = () => structuralManager.getFormData();
+window.restoreStructuralData = (data) => structuralManager.restore(data);
+</script>

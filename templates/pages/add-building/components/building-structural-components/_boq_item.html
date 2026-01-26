@@ -1,0 +1,27 @@
+<li class="bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2"
+    data-item-type="boq"
+    data-item-index="{{ index }}">
+  <span data-icon="building-3-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+  <div class="flex-1 flex flex-col gap-2.5">
+    <h6 class="text-sm/5 font-bold">{{ item.name }}</h6>
+    <div class="flex items-center">
+      <div class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center">
+        <span data-icon="leaf-line" data-size="14" data-color="var(--bg--strong-950)"></span>
+      </div>
+      <div class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)] mr-3">
+        {{ item.total_gwp|floatformat:2 }} kgCO2eq
+      </div>
+      <p class="text-sm/5 text-[var(--text--sub-600)]">
+        Bill of Quantities ({{ item.materials|length }} materials)
+      </p>
+    </div>
+  </div>
+  <div class="flex gap-2">
+    <button type="button" class="btn size-5 btn-ghost p-0 edit-item-btn" data-item-type="boq" data-item-index="{{ index }}">
+      <span data-icon="edit-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+    </button>
+    <button type="button" class="btn size-5 btn-ghost p-0 delete-item-btn" data-item-type="boq" data-item-index="{{ index }}">
+      <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+    </button>
+  </div>
+</li>

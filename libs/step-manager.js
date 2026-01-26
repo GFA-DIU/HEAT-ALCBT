@@ -9,6 +9,12 @@ class StepManager {
     this.totalSteps = 4;
     this.editMode = window.location.pathname.includes('/building/edit');
 
+    if(this.editMode){
+      document.getElementById('page-title').textContent = 'Edit Building Information';
+      document.getElementById('page-description').textContent = 'Update the building information as needed.';
+    }
+
+
     this.stepConfig = {
       1: {
         name: "Building Information",
@@ -467,6 +473,22 @@ class StepManager {
    * @returns {Record<string, any>}
    */
   getFormData(stepKey) {
+    // Handle structural components step
+    if (stepKey === 'building-structural-components/building-structural-components') {
+      if (typeof window.getStructuralFormData === 'function') {
+        const structuralData = window.getStructuralFormData();
+        if (!structuralData.boq_items?.length && !structuralData.component_items?.length) {
+          Toast.error("Please add at least one BOQ or component.");
+          throw new Error("No structural components found.");
+        }
+        return {
+          building_uuid: this.getBuildingId(),
+          structural_components: structuralData
+        };
+      }
+      return { building_uuid: this.getBuildingId() };
+    }
+
     if (stepKey === 'operational-data-entry/operational-data-entry'){
       const forms = document.getElementById('selected_op_products')?.querySelectorAll("form");
       if (!forms || forms.length === 0) {
