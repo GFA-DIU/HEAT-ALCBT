@@ -386,6 +386,7 @@
 </template>
 
 <script>
+  const noSystemsContainer = document.getElementById('no-ventilation-system-template');
   // Store editing system ID on window
   if (!window.editingVentilationSystemId) {
     window.editingVentilationSystemId = null;
@@ -555,9 +556,13 @@
         }).join('');
 
       } else {
+        listContainer.innerHTML = noSystemsContainer.innerHTML;
         console.error('Error fetching ventilation systems:', result.errors);
+        Toast.error('Error fetching ventilation systems');
       }
     } catch (error) {
+      listContainer.innerHTML = noSystemsContainer.innerHTML;
+      Toast.error('Error fetching ventilation systems');
       console.error('Error:', error);
     }
   }
