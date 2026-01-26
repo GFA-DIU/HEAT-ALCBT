@@ -339,12 +339,7 @@
       const systems = result.lift_escalator_systems || [];
 
       if (systems.length === 0) {
-        listContainer.innerHTML = `
-          <li class="flex flex-col items-center justify-center py-8 text-center">
-            <span data-icon="stairs-line" data-size="48" data-color="var(--icon--soft-400)"></span>
-            <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">No lift & escalator systems added yet</p>
-          </li>
-        `;
+        listContainer.innerHTML = noSystemsContainer.innerHTML;
         return;
       }
 

@@ -9,7 +9,7 @@
 <div id="structural_component_container" class="w-full">
   <!-- Empty State -->
   <div id="empty-state" class="w-full flex flex-col gap-3 items-center justify-center mt-10">
-    <img src="{% static 'assets/structural-component.png' %}" alt="Structural Component" />
+    <img src="{% static 'assets/structural-component.png' %}" class='h-[117px]' alt="Structural Component" />
     <p class="text-sm/5 font-medium text-[var(--text--sub-600)]">
       How would you like to add your building structural components?
     </p>
@@ -370,6 +370,19 @@ class StructuralComponentManager {
         this.updateMaterialsUI();
       });
     });
+
+    // Clear error state on input
+    document.querySelectorAll('.material-description, .material-quantity').forEach(input => {
+      input.addEventListener('input', (e) => {
+        e.target.classList.remove('input-error');
+      });
+    });
+
+    document.querySelectorAll('.material-category').forEach(select => {
+      select.addEventListener('change', (e) => {
+        e.target.classList.remove('select-error');
+      });
+    });
   }
 
   loadCategories() {
@@ -494,6 +507,59 @@ class StructuralComponentManager {
     });
   }
 
+  validateMaterials(materials, mode) {
+    const errors = [];
+
+    materials.forEach((material, index) => {
+      const materialNum = index + 1;
+      const materialName = material.name ? `"${material.name}"` : `Material ${materialNum}`;
+
+      // Validate description
+      if (!material.description || material.description.trim() === '') {
+        errors.push(`${materialName}: Description is required`);
+      }
+
+      // Validate quantity
+      if (!material.quantity || material.quantity <= 0) {
+        errors.push(`${materialName}: Quantity must be greater than 0`);
+      }
+
+      // Validate category (only for BOQ mode)
+      if (mode === 'boq' && (!material.category || material.category === '')) {
+        errors.push(`${materialName}: Category is required`);
+      }
+    });
+
+    return errors;
+  }
+
+  highlightInvalidFields(listId, mode) {
+    const list = document.getElementById(listId);
+    if (!list) return;
+
+    // Clear previous error states
+    list.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    list.querySelectorAll('.select-error').forEach(el => el.classList.remove('select-error'));
+
+    Array.from(list.children).forEach(li => {
+      const descInput = li.querySelector('.material-description');
+      const qtyInput = li.querySelector('.material-quantity');
+      const categorySelect = li.querySelector('.material-category');
+
+      if (descInput && !descInput.value.trim()) {
+        descInput.classList.add('input-error');
+      }
+
+      if (qtyInput && (!qtyInput.value || parseFloat(qtyInput.value) <= 0)) {
+        qtyInput.classList.add('input-error');
+      }
+
+      if (mode === 'boq' && categorySelect && !categorySelect.value) {
+        categorySelect.classList.add('select-error');
+      }
+    });
+  }
+
   renderMaterials(materials, mode) {
     const listId = mode === 'boq' ? 'structural_materials_list' : 'component_materials_list';
     const list = document.getElementById(listId);
@@ -549,6 +615,14 @@ class StructuralComponentManager {
       return;
     }
 
+    // Validate each material
+    const validationErrors = this.validateMaterials(materials, 'boq');
+    if (validationErrors.length > 0) {
+      this.highlightInvalidFields('structural_materials_list', 'boq');
+      Toast.error(validationErrors[0]); // Show first error
+      return;
+    }
+
     const totalGwp = materials.reduce((sum, m) => sum + (m.gwp * m.quantity), 0);
 
     const item = {
@@ -580,6 +654,14 @@ class StructuralComponentManager {
     const materials = this.collectMaterials('component_materials_list');
     if (materials.length === 0) {
       Toast.error('Please add at least one material');
+      return;
+    }
+
+    // Validate each material (component mode doesn't require category)
+    const validationErrors = this.validateMaterials(materials, 'component');
+    if (validationErrors.length > 0) {
+      this.highlightInvalidFields('component_materials_list', 'component');
+      Toast.error(validationErrors[0]); // Show first error
       return;
     }
 
