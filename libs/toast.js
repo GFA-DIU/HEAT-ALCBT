@@ -22,17 +22,25 @@ class ToastNotification {
 
     /**
      * Initialize the toast container if it doesn't exist
+     * Handles native HTML dialogs by appending inside open dialogs
      */
     initContainer(position) {
         const containerId = `toast-stack-${position}`;
-        let container = document.getElementById(containerId);
+
+        // Check for open native dialog (top layer)
+        const openDialog = document.querySelector('dialog[open]');
+        const parent = openDialog || document.body;
+
+        // Look for existing container in the correct parent
+        let container = parent.querySelector(`#${containerId}`);
 
         if (!container) {
             container = document.createElement('div');
             container.id = containerId;
-            container.className = `toast toast-${position} z-50`;
+            container.className = `toast toast-${position}`;
+            container.style.zIndex = '999999';
             container.style.pointerEvents = 'none'; // Allow clicks through container
-            document.body.appendChild(container);
+            parent.appendChild(container);
         }
 
         return container;
