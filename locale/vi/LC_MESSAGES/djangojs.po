@@ -1,0 +1,163 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-27 21:48+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+#: .\libs\step-manager.js:13
+msgid "Edit Building Information"
+msgstr "Chỉnh sửa Thông tin Tòa nhà"
+
+#: .\libs\step-manager.js:14
+msgid "Update the building information as needed."
+msgstr "Cập nhật thông tin tòa nhà khi cần thiết."
+
+#: .\libs\step-manager.js:20
+msgid "Building Information"
+msgstr "Thông tin Tòa nhà"
+
+#: .\libs\step-manager.js:25 .\libs\step-manager.js:28
+msgid "Building Name & Location"
+msgstr "Tên và Vị trí Tòa nhà"
+
+#: .\libs\step-manager.js:29
+msgid "Add details concerning building name and locations of building."
+msgstr "Thêm chi tiết về tên và vị trí của tòa nhà."
+
+#: .\libs\step-manager.js:33 .\libs\step-manager.js:36
+msgid "Building Details"
+msgstr "Chi tiết Tòa nhà"
+
+#: .\libs\step-manager.js:37
+msgid "Add detailed information about your building."
+msgstr "Thêm thông tin chi tiết về tòa nhà của bạn."
+
+#: .\libs\step-manager.js:42
+msgid "Operational Details"
+msgstr "Chi tiết Hoạt động"
+
+#: .\libs\step-manager.js:47 .\libs\step-manager.js:51
+msgid "Operational Schedule & Temperature"
+msgstr "Lịch trình Hoạt động & Nhiệt độ"
+
+#: .\libs\step-manager.js:52
+msgid "Complete field below to add operations information about your building."
+msgstr "Hoàn thành các trường bên dưới để thêm thông tin hoạt động về tòa nhà của bạn."
+
+#: .\libs\step-manager.js:56 .\libs\step-manager.js:59
+msgid "Cooling System"
+msgstr "Hệ thống Làm mát"
+
+#: .\libs\step-manager.js:60
+msgid ""
+"Enter details of the building's cooling system, including type and capacity."
+msgstr ""
+"Nhập chi tiết hệ thống làm mát của tòa nhà, bao gồm loại và công suất."
+
+#: .\libs\step-manager.js:64 .\libs\step-manager.js:67
+msgid "Ventilation System"
+msgstr "Hệ thống Thông gió"
+
+#: .\libs\step-manager.js:68
+msgid ""
+"Provide details on the building,s ventilation type, capacity, and coverage "
+"to assess airflow and indoor air quality."
+msgstr ""
+"Cung cấp chi tiết về loại thông gió, công suất và phạm vi phủ sóng của tòa nhà "
+"để đánh giá luồng không khí và chất lượng không khí trong nhà."
+
+#: .\libs\step-manager.js:72 .\libs\step-manager.js:75
+msgid "Lighting System"
+msgstr "Hệ thống Chiếu sáng"
+
+#: .\libs\step-manager.js:76
+msgid ""
+"Provide details on lighting types, power use, and controls to assess "
+"efficiency."
+msgstr ""
+"Cung cấp chi tiết về loại chiếu sáng, mức tiêu thụ điện và các điều khiển "
+"để đánh giá hiệu suất."
+
+#: .\libs\step-manager.js:80 .\libs\step-manager.js:83
+msgid "Lift & Escalator System"
+msgstr "Hệ thống Thang máy & Thang cuốn"
+
+#: .\libs\step-manager.js:84
+msgid "Provide details on lift & escalator systems in your building if any."
+msgstr "Cung cấp chi tiết về hệ thống thang máy & thang cuốn trong tòa nhà của bạn nếu có."
+
+#: .\libs\step-manager.js:88 .\libs\step-manager.js:91
+msgid "Hot Water System"
+msgstr "Hệ thống Nước nóng"
+
+#: .\libs\step-manager.js:92
+msgid ""
+"Defines the building's method of producing and distributing hot water, "
+"including equipment type, energy source, and usage patterns."
+msgstr ""
+"Xác định phương pháp sản xuất và phân phối nước nóng của tòa nhà, "
+"bao gồm loại thiết bị, nguồn năng lượng và mô hình sử dụng."
+
+#: .\libs\step-manager.js:97
+msgid "Operational Data Entry"
+msgstr "Nhập Dữ liệu Hoạt động"
+
+#: .\libs\step-manager.js:102
+msgid "Data Entry"
+msgstr "Nhập Dữ liệu"
+
+#: .\libs\step-manager.js:105
+msgid "Operational Energy carrier"
+msgstr "Nguồn năng lượng hoạt động"
+
+#: .\libs\step-manager.js:106
+msgid "Tell us what fuels or energy sources your building runs on."
+msgstr "Cho chúng tôi biết tòa nhà của bạn sử dụng nhiên liệu hoặc nguồn năng lượng nào."
+
+#: .\libs\step-manager.js:111 .\libs\step-manager.js:120
+msgid "Building Structural Components"
+msgstr "Các Thành phần Kết cấu Tòa nhà"
+
+#: .\libs\step-manager.js:116
+msgid "Structural Components"
+msgstr "Các Thành phần Kết cấu"
+
+#: .\libs\step-manager.js:121
+msgid ""
+"Enter information about the building's walls, floors, roofs, and other "
+"structural parts."
+msgstr ""
+"Nhập thông tin về tường, sàn, mái và các bộ phận kết cấu khác "
+"của tòa nhà."
+
+#: .\libs\step-manager.js:397
+#, javascript-format
+msgid "%s%% completed"
+msgstr "%s%% hoàn thành"
+
+#: .\libs\step-manager.js:782
+#, javascript-format
+msgid "%s out of"
+msgstr "%s trên"
+
+#: .\libs\step-manager.js:784
+#, javascript-format
+msgid "%s steps"
+msgstr "%s bước"
+
+#: .\libs\step-manager.js:983
+msgid "100% completed"
+msgstr "100% hoàn thành"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-27 16:54+0200\n"
+"POT-Creation-Date: 2026-01-27 21:48+0200\n"
 "PO-Revision-Date: 2025-07-03 16:28+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Vietnamese <vi@li.org>\n"
@@ -436,6 +436,7 @@ msgstr "Số năm sử dụng tòa nhà"
 #: .\pages\models\building.py:344 .\pages\models\building.py:367
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:155
 #: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:41
+#: .\templates\pages\home\partials\templates_list.html:45
 msgid "Quantity"
 msgstr "Số lượng"
 
@@ -1213,7 +1214,8 @@ msgid ""
 "Percentage of the annual energy consumption of the building produced on site "
 "from renewable sources"
 msgstr ""
-"Tỷ lệ phần trăm tiêu thụ năng lượng hàng năm của tòa nhà được sản xuất tại chỗ từ các nguồn năng lượng tái tạo"
+"Tỷ lệ phần trăm tiêu thụ năng lượng hàng năm của tòa nhà được sản xuất tại "
+"chỗ từ các nguồn năng lượng tái tạo"
 
 #: .\pages\models\building_operation\operational_information.py:36
 msgid "Energy Monitoring and Control Systems"
@@ -1351,6 +1353,7 @@ msgid "Dashboard"
 msgstr "Bảng điều khiển"
 
 #: .\templates\_base.html:88 .\templates\pages\home\resources.html:20
+#: .\templates\pages\resources.html:13 .\templates\pages\resources.html:15
 msgid "Resources"
 msgstr "Tài nguyên"
 
@@ -1376,6 +1379,39 @@ msgstr "Ngôn ngữ"
 #: .\templates\pages\add-building\add-building.html:48
 msgid "Logout"
 msgstr "Đăng xuất"
+
+#: .\templates\account\_auth.html:5 .\templates\account\login.html:75
+#: .\templates\account\signup.html:16
+msgid "Sign up"
+msgstr "Đăng ký"
+
+#: .\templates\account\_auth.html:33
+#, fuzzy
+#| msgid "Terms of Use"
+msgid "Terms of use"
+msgstr "Điều khoản sử dụng"
+
+#: .\templates\account\_auth.html:33
+msgid "and"
+msgstr "và"
+
+#: .\templates\account\_auth.html:33
+#, fuzzy
+#| msgid "Privacy Settings"
+msgid "Privacy policy"
+msgstr "Cài đặt quyền riêng tư"
+
+#: .\templates\account\_auth.html:50
+msgid "Building Emission Assessment Tool"
+msgstr "Công cụ Đánh giá Phát thải Tòa nhà"
+
+#: .\templates\account\_auth.html:53
+msgid ""
+"Accelerating the transition towards zero and low carbon buildings through "
+"data-driven decisions"
+msgstr ""
+"Đẩy nhanh quá trình chuyển đổi sang các tòa nhà không carbon và carbon thấp "
+"thông qua các quyết định dựa trên dữ liệu"
 
 #: .\templates\account\email\password_reset_key_message.txt:2
 #, python-format
@@ -1427,10 +1463,6 @@ msgstr "Đăng ký với Google"
 msgid "Don't have an account."
 msgstr "Chưa có tài khoản."
 
-#: .\templates\account\login.html:75 .\templates\account\signup.html:16
-msgid "Sign up"
-msgstr "Đăng ký"
-
 #: .\templates\account\password_change.html:5
 #: .\templates\account\password_change.html:8
 #: .\templates\account\password_change.html:12
@@ -1438,12 +1470,27 @@ msgstr "Đăng ký"
 msgid "Change Password"
 msgstr "Đổi mật khẩu"
 
+#: .\templates\account\password_reset.html:5
+msgid "Password Reset"
+msgstr "Đặt lại mật khẩu"
+
+#: .\templates\account\password_reset.html:8
+msgid "Forgot your password?"
+msgstr "Quên mật khẩu?"
+
+#: .\templates\account\password_reset.html:12
+#, fuzzy
+#| msgid "Change Password"
+msgid "Reset Password"
+msgstr "Đổi mật khẩu"
+
 #: .\templates\account\signup.html:20
 msgid ""
 "Fill in the details below to create your account and track the carbon "
 "mission from your building project."
 msgstr ""
-"Điền thông tin chi tiết bên dưới để tạo tài khoản của bạn và theo dõi nhiệm vụ carbon từ dự án tòa nhà của bạn."
+"Điền thông tin chi tiết bên dưới để tạo tài khoản của bạn và theo dõi nhiệm "
+"vụ carbon từ dự án tòa nhà của bạn."
 
 #: .\templates\account\signup.html:82
 #, fuzzy
@@ -1459,8 +1506,23 @@ msgstr "Tôi đã có tài khoản."
 msgid "Log me in"
 msgstr "Đăng nhập"
 
+#: .\templates\compliance\privacy_policy.html:4
+#: .\templates\compliance\privacy_policy.html:11 .\templates\footer.html:16
+#, fuzzy
+#| msgid "Privacy Settings"
+msgid "Privacy Policy"
+msgstr "Cài đặt quyền riêng tư"
+
+#: .\templates\compliance\privacy_policy.html:13
+msgid ""
+"Your privacy is important to us. This policy outlines how we collect, use, "
+"and protect your personal information."
+msgstr ""
+"Quyền riêng tư của bạn rất quan trọng đối với chúng tôi. Chính sách này nêu rõ "
+"cách chúng tôi thu thập, sử dụng và bảo vệ thông tin cá nhân của bạn."
+
 #: .\templates\compliance\terms_of_use.html:4
-#: .\templates\compliance\terms_of_use.html:11
+#: .\templates\compliance\terms_of_use.html:11 .\templates\footer.html:16
 msgid "Terms of Use"
 msgstr "Điều khoản sử dụng"
 
@@ -1476,6 +1538,25 @@ msgstr "Mục lục"
 #: .\templates\compliance\terms_of_use.html:118
 msgid "Back to top"
 msgstr "Trở về đầu trang"
+
+#: .\templates\footer.html:16
+msgid "Copyright"
+msgstr "Bản quyền"
+
+#: .\templates\pages\add-building\_base.html:40
+#, fuzzy
+#| msgid "Add Building"
+msgid "Add New Building"
+msgstr "Thêm tòa nhà"
+
+#: .\templates\pages\add-building\_base.html:42
+msgid "Complete the following steps to add a new building"
+msgstr "Hoàn thành các bước sau để thêm tòa nhà mới"
+
+#: .\templates\pages\add-building\_base.html:48
+#, python-format
+msgid "0%% completed"
+msgstr "0%% hoàn thành"
 
 #: .\templates\pages\add-building\add-building.html:5
 msgid "Add Building"
@@ -1757,7 +1838,8 @@ msgid ""
 "An address is good, but a pin is precise—help us capture your project's "
 "exact location."
 msgstr ""
-"Địa chỉ là tốt, nhưng ghim chính xác hơn—hãy giúp chúng tôi ghi lại vị trí chính xác của dự án của bạn."
+"Địa chỉ là tốt, nhưng ghim chính xác hơn—hãy giúp chúng tôi ghi lại vị trí "
+"chính xác của dự án của bạn."
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:253
 msgid "Search location or address here"
@@ -1838,6 +1920,7 @@ msgstr "Không tìm thấy vật liệu phù hợp với tiêu chí của bạn"
 #: .\templates\pages\add-building\components\building-structural-components\_epd_list.html:66
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:103
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:108
+#: .\templates\pages\home\partials\templates_list.html:137
 msgid "Previous"
 msgstr "Trước"
 
@@ -1845,6 +1928,7 @@ msgstr "Trước"
 #: .\templates\pages\add-building\components\building-structural-components\_epd_list.html:95
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:134
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:139
+#: .\templates\pages\home\partials\templates_list.html:171
 msgid "Next"
 msgstr "Tiếp"
 
@@ -1871,7 +1955,9 @@ msgid ""
 "For quantities per components (foundation, floor, roof, etc.), use 'Add "
 "component'."
 msgstr ""
-"Nếu dữ liệu có sẵn dưới dạng tổng số lượng mỗi vật liệu, chọn 'Thêm từ BoQ'. Đối với số lượng mỗi thành phần (móng, sàn, mái, v.v.), sử dụng 'Thêm thành phần'."
+"Nếu dữ liệu có sẵn dưới dạng tổng số lượng mỗi vật liệu, chọn 'Thêm từ BoQ'. "
+"Đối với số lượng mỗi thành phần (móng, sàn, mái, v.v.), sử dụng 'Thêm thành "
+"phần'."
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:12
 msgid "Structural Component"
@@ -2241,8 +2327,7 @@ msgstr "Chính thức"
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:292
 msgid ""
 "You are about to remove this energy carrier. This action cannot be undone."
-msgstr ""
-"Bạn sắp xóa nguồn năng lượng này. Hành động này không thể hoàn tác."
+msgstr "Bạn sắp xóa nguồn năng lượng này. Hành động này không thể hoàn tác."
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:339
 msgid "Energy carrier added successfully"
@@ -2265,7 +2350,8 @@ msgstr "Bình luận"
 msgid ""
 "Enter details of the building's cooling system, including type and capacity"
 msgstr ""
-"Nhập thông tin chi tiết về hệ thống làm lạnh của tòa nhà, bao gồm loại và công suất"
+"Nhập thông tin chi tiết về hệ thống làm lạnh của tòa nhà, bao gồm loại và "
+"công suất"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:52
 msgid "Type of cooling system"
@@ -2288,7 +2374,8 @@ msgid ""
 "You are about to remove or delete added cooling system. This will action "
 "will permanently remove it."
 msgstr ""
-"Bạn sắp xóa hoặc xóa bỏ hệ thống làm lạnh đã thêm. Hành động này sẽ xóa vĩnh viễn nó."
+"Bạn sắp xóa hoặc xóa bỏ hệ thống làm lạnh đã thêm. Hành động này sẽ xóa vĩnh "
+"viễn nó."
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:150
 msgid "Chiller system - Water cooled chiller"
@@ -2560,7 +2647,8 @@ msgstr "Điều hòa tách lẻ"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:506
 msgid "Variable Refrigerant Volume (VRV) / Variable Refrigerant Flow (VRF)"
-msgstr "Lưu lượng môi chất lạnh thay đổi (VRV) / Dòng môi chất lạnh thay đổi (VRF)"
+msgstr "Thể tích chất làm lạnh thay đổi (VRV) / Lưu lượng chất làm lạnh thay đổi (VRF)"
+"Lưu lượng môi chất lạnh thay đổi (VRV) / Dòng môi chất lạnh thay đổi (VRF)"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:555
 msgid "Total cooling load for split/VRV"
@@ -2664,7 +2752,8 @@ msgid ""
 "Provide details on the building's method of producing and distributing hot "
 "water."
 msgstr ""
-"Cung cấp thông tin chi tiết về phương pháp sản xuất và phân phối nước nóng của tòa nhà."
+"Cung cấp thông tin chi tiết về phương pháp sản xuất và phân phối nước nóng "
+"của tòa nhà."
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:52
 msgid "Type of hot water system"
@@ -2723,7 +2812,8 @@ msgid ""
 "You are about to remove or delete added hot water system. This will action "
 "will permanently remove it."
 msgstr ""
-"Bạn sắp xóa hoặc xóa bỏ hệ thống nước nóng đã thêm. Hành động này sẽ xóa vĩnh viễn nó."
+"Bạn sắp xóa hoặc xóa bỏ hệ thống nước nóng đã thêm. Hành động này sẽ xóa "
+"vĩnh viễn nó."
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:295
 msgid "Heat pump water system"
@@ -2819,7 +2909,8 @@ msgid ""
 "You are about to remove or delete added lighting system. This will action "
 "will permanently remove it."
 msgstr ""
-"Bạn sắp xóa hoặc xóa bỏ hệ thống chiếu sáng đã thêm. Hành động này sẽ xóa vĩnh viễn nó."
+"Bạn sắp xóa hoặc xóa bỏ hệ thống chiếu sáng đã thêm. Hành động này sẽ xóa "
+"vĩnh viễn nó."
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:179
 msgid "Lift & Escalator 01"
@@ -2898,7 +2989,8 @@ msgid ""
 "Provide details on lighting types, power use, and controls to assess "
 "efficiency."
 msgstr ""
-"Cung cấp thông tin chi tiết về loại chiếu sáng, sử dụng điện và điều khiển để đánh giá hiệu suất."
+"Cung cấp thông tin chi tiết về loại chiếu sáng, sử dụng điện và điều khiển "
+"để đánh giá hiệu suất."
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:52
 msgid "Room type"
@@ -3052,7 +3144,8 @@ msgid ""
 "Enter details of the building's ventilation system, including type and "
 "capacity"
 msgstr ""
-"Nhập thông tin chi tiết về hệ thống thông gió của tòa nhà, bao gồm loại và công suất"
+"Nhập thông tin chi tiết về hệ thống thông gió của tòa nhà, bao gồm loại và "
+"công suất"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:52
 #, fuzzy
@@ -3111,7 +3204,8 @@ msgid ""
 "You are about to remove or delete added ventilation system. This will action "
 "will permanently remove it."
 msgstr ""
-"Bạn sắp xóa hoặc xóa bỏ hệ thống thông gió đã thêm. Hành động này sẽ xóa vĩnh viễn nó."
+"Bạn sắp xóa hoặc xóa bỏ hệ thống thông gió đã thêm. Hành động này sẽ xóa "
+"vĩnh viễn nó."
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:340
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:530
@@ -3265,7 +3359,8 @@ msgstr "Xác nhận email của bạn"
 
 #: .\templates\pages\home\home.html:48
 msgid "We've sent a confirmation email to you. Please confirm your account"
-msgstr "Chúng tôi đã gửi email xác nhận cho bạn. Vui lòng xác nhận tài khoản của bạn"
+msgstr ""
+"Chúng tôi đã gửi email xác nhận cho bạn. Vui lòng xác nhận tài khoản của bạn"
 
 #: .\templates\pages\home\home.html:62
 msgid "Your buildings"
@@ -3365,7 +3460,19 @@ msgstr "bản đồ"
 msgid "You have no buildings added"
 msgstr "Bạn chưa thêm tòa nhà nào"
 
-#: .\templates\pages\home\resources.html:10
+#: .\templates\pages\home\partials\templates_list.html:58
+#, fuzzy
+#| msgid "System Component"
+msgid "System component"
+msgstr "Thành phần hệ thống"
+
+#: .\templates\pages\home\partials\templates_list.html:67
+#, fuzzy
+#| msgid "My Component"
+msgid "My component"
+msgstr "Thành phần của tôi"
+
+#: .\templates\pages\home\resources.html:10 .\templates\pages\resources.html:10
 msgid "Resource page"
 msgstr "Trang tài nguyên"
 
@@ -3373,11 +3480,11 @@ msgstr "Trang tài nguyên"
 msgid "Manage your resources to access for low carbon"
 msgstr "Quản lý tài nguyên của bạn để truy cập carbon thấp"
 
-#: .\templates\pages\home\resources.html:31
+#: .\templates\pages\home\resources.html:31 .\templates\pages\resources.html:22
 msgid "Introduction video"
 msgstr "Video giới thiệu"
 
-#: .\templates\pages\home\resources.html:33
+#: .\templates\pages\home\resources.html:33 .\templates\pages\resources.html:24
 msgid "Watch our short video to get a quick overview of"
 msgstr "Xem video ngắn của chúng tôi để có cái nhìn tổng quan nhanh về"
 
@@ -3386,74 +3493,80 @@ msgid ""
 "what it does, how it works, and how it can support your low-carbon building "
 "strategies."
 msgstr ""
-"nó làm gì, cách hoạt động và cách nó có thể hỗ trợ chiến lược xây dựng carbon thấp của bạn."
+"nó làm gì, cách hoạt động và cách nó có thể hỗ trợ chiến lược xây dựng "
+"carbon thấp của bạn."
 
 #: .\templates\pages\home\resources.html:40
 msgid "YouTube video player"
 msgstr "Trình phát video YouTube"
 
-#: .\templates\pages\home\resources.html:53
+#: .\templates\pages\home\resources.html:53 .\templates\pages\resources.html:41
 msgid "This content requires media cookies to be enabled for embedded videos."
 msgstr "Nội dung này yêu cầu bật cookie phương tiện cho video nhúng."
 
-#: .\templates\pages\home\resources.html:60
+#: .\templates\pages\home\resources.html:60 .\templates\pages\resources.html:43
 msgid "Manage Cookie Settings"
 msgstr "Quản lý cài đặt Cookie"
 
-#: .\templates\pages\home\resources.html:72
+#: .\templates\pages\home\resources.html:72 .\templates\pages\resources.html:57
 msgid "User Handbook"
 msgstr "Sổ tay người dùng"
 
-#: .\templates\pages\home\resources.html:74
+#: .\templates\pages\home\resources.html:74 .\templates\pages\resources.html:59
 msgid "Download the official"
 msgstr "Tải xuống tài liệu chính thức"
 
-#: .\templates\pages\home\resources.html:74
+#: .\templates\pages\home\resources.html:74 .\templates\pages\resources.html:59
 msgid ""
 "Handbook (Part 1) for a detailed, step-by-step guide on using the tool "
 "effectively. The handbook covers:"
 msgstr ""
-"Sổ tay (Phần 1) để có hướng dẫn chi tiết, từng bước về cách sử dụng công cụ hiệu quả. Sổ tay bao gồm:"
+"Sổ tay (Phần 1) để có hướng dẫn chi tiết, từng bước về cách sử dụng công cụ "
+"hiệu quả. Sổ tay bao gồm:"
 
-#: .\templates\pages\home\resources.html:77
+#: .\templates\pages\home\resources.html:77 .\templates\pages\resources.html:63
 msgid "Key functionalities and workflow"
 msgstr "Chức năng chính và quy trình làm việc"
 
-#: .\templates\pages\home\resources.html:78
+#: .\templates\pages\home\resources.html:78 .\templates\pages\resources.html:64
 msgid "Data input requirements"
 msgstr "Yêu cầu nhập dữ liệu"
 
-#: .\templates\pages\home\resources.html:79
+#: .\templates\pages\home\resources.html:79 .\templates\pages\resources.html:65
 msgid "Methodology"
 msgstr "Phương pháp luận"
 
-#: .\templates\pages\home\resources.html:82
+#: .\templates\pages\home\resources.html:82 .\templates\pages\resources.html:67
 msgid "For guidance, please refer to the BEAT"
 msgstr "Để được hướng dẫn, vui lòng tham khảo BEAT"
 
-#: .\templates\pages\home\resources.html:83
+#: .\templates\pages\home\resources.html:83 .\templates\pages\resources.html:68
 msgid "user documentation"
 msgstr "tài liệu người dùng"
 
-#: .\templates\pages\home\resources.html:92
+#: .\templates\pages\home\resources.html:92 .\templates\pages\resources.html:74
 msgid "The"
 msgstr "Các"
 
-#: .\templates\pages\home\resources.html:92
+#: .\templates\pages\home\resources.html:92 .\templates\pages\resources.html:74
 #, fuzzy
 #| msgid "Comment"
 msgid "Community"
-msgstr "Bình luận"
+msgstr "Cộng đồng"
 
-#: .\templates\pages\home\resources.html:95
+#: .\templates\pages\home\resources.html:95 .\templates\pages\resources.html:76
 msgid ""
 "Join a growing community of policymakers, planners, and practitioners "
 "working to reduce building emissions. Together, we will work on advancing "
 "practical, data-driven solutions for a low-carbon future."
 msgstr ""
-"Tham gia cộng đồng ngày càng phát triển của các nhà hoạch định chính sách, nhà quy hoạch và chuyên gia đang làm việc để giảm phát thải từ tòa nhà. Cùng nhau, chúng tôi sẽ làm việc để thúc đẩy các giải pháp thực tế, dựa trên dữ liệu cho tương lai carbon thấp."
+"Tham gia cộng đồng ngày càng phát triển của các nhà hoạch định chính sách, "
+"nhà quy hoạch và chuyên gia đang làm việc để giảm phát thải từ tòa nhà. Cùng "
+"nhau, chúng tôi sẽ làm việc để thúc đẩy các giải pháp thực tế, dựa trên dữ "
+"liệu cho tương lai carbon thấp."
 
 #: .\templates\pages\home\resources.html:100
+#: .\templates\pages\resources.html:79
 msgid "Host"
 msgstr "Đơn vị chủ trì"
 
@@ -3462,6 +3575,7 @@ msgid "Host logo"
 msgstr "Logo đơn vị chủ trì"
 
 #: .\templates\pages\home\resources.html:113
+#: .\templates\pages\resources.html:92
 msgid "Lead partners"
 msgstr "Đối tác chính"
 
@@ -3470,6 +3584,7 @@ msgid "Lead partner logo"
 msgstr "Logo đối tác chính"
 
 #: .\templates\pages\home\resources.html:130
+#: .\templates\pages\resources.html:109
 msgid "Development partners"
 msgstr "Đối tác phát triển"
 
@@ -3478,10 +3593,12 @@ msgid "Development partner logo"
 msgstr "Logo đối tác phát triển"
 
 #: .\templates\pages\home\resources.html:150
+#: .\templates\pages\resources.html:128
 msgid "Interested in contributing or partnering? We'd love to"
 msgstr "Quan tâm đến việc đóng góp hoặc hợp tác? Chúng tôi rất mong được"
 
 #: .\templates\pages\home\resources.html:151
+#: .\templates\pages\resources.html:129
 msgid "hear from you"
 msgstr "nghe từ bạn"
 
@@ -3692,8 +3809,33 @@ msgid ""
 "By enabling this option, you allow the BEAT tool maintainers to access your "
 "profile information for support and improvement purposes."
 msgstr ""
-"Bằng cách bật tùy chọn này, bạn cho phép người quản lý công cụ BEAT truy cập thông tin hồ sơ của bạn cho mục đích hỗ trợ và cải thiện."
+"Bằng cách bật tùy chọn này, bạn cho phép người quản lý công cụ BEAT truy cập "
+"thông tin hồ sơ của bạn cho mục đích hỗ trợ và cải thiện."
 
 #: .\templates\pages\profile\profile.html:231
 msgid "Save Changes"
 msgstr "Lưu thay đổi"
+
+#: .\templates\pages\resources.html:15
+msgid "Welcome to the"
+msgstr "Chào mừng đến với"
+
+#: .\templates\pages\resources.html:15
+msgid "section of the"
+msgstr "phần của"
+
+#: .\templates\pages\resources.html:15
+msgid ""
+"Here you'll find key materials to help you understand, navigate, and "
+"maximise the use of the Building Emissions Assessment Tool."
+msgstr ""
+"Tại đây bạn sẽ tìm thấy các tài liệu chính để giúp bạn hiểu, điều hướng và "
+"tối đa hóa việc sử dụng Công cụ Đánh giá Phát thải Tòa nhà."
+
+#: .\templates\pages\resources.html:24
+msgid ""
+"— what it does, how it works, and how it can support your low-carbon "
+"building strategies."
+msgstr ""
+"— nó làm gì, cách hoạt động và cách nó có thể hỗ trợ chiến lược xây dựng "
+"carbon thấp của bạn."

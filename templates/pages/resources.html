@@ -19,9 +19,9 @@
   <!-- Video -->
     <div class="col-sm-6 p-4 pt-3 align-items-stretch">
       <div style="padding: 1rem">
-        <h4 class="text-center">Introduction video</h4>
+        <h4 class="text-center">{% translate "Introduction video" %}</h4>
             <span class="text-center text-muted mb-2">
-                Watch our short video to get a quick overview of <span class="fw-bolder" style="color:#F26716">BEAT</span> — what it does, how it works, and how it can support your low-carbon building strategies.
+                {% translate "Watch our short video to get a quick overview of" %} <span class="fw-bolder" style="color:#F26716">BEAT</span> {% translate "— what it does, how it works, and how it can support your low-carbon building strategies." %}
             </span>
             <div class="mt-3 d-flex justify-content-center">
                 {% if request|cookie_group_accepted:"media" %}
@@ -38,9 +38,9 @@
                     <div class="d-flex align-items-center justify-content-center h-100 w-100" style="position: absolute; top: 0; left: 0;">
                         <div class="text-center p-4 text-white">
                             <i class="bi bi-play-circle" style="font-size: 4rem; color: #F26716;" class="mb-3"></i>
-                            <p class="mb-3 opacity-75">This content requires media cookies to be enabled for embedded videos.</p>
+                            <p class="mb-3 opacity-75">{% translate "This content requires media cookies to be enabled for embedded videos." %}</p>
                             <button class="btn btn-sm px-4 py-2" style="background: #F26716; color: white; border-radius: 25px; font-weight: 500;" onclick="showCookieSettings()">
-                                <i class="bi bi-gear me-1"></i>Manage Cookie Settings
+                                <i class="bi bi-gear me-1"></i>{% translate "Manage Cookie Settings" %}
                             </button>
                         </div>
                     </div>
@@ -54,18 +54,18 @@
         <div class="col-sm-6 p-4 pt-3">
            <div class="beat-block card h-100">
              <!-- User manual -->
-             <h4 class="text-center">User Handbook</h4>
+             <h4 class="text-center">{% translate "User Handbook" %}</h4>
              <span class="mb-2">
-                 Download the official <span class="fw-bolder">BEAT</span> Handbook (Part 1) for a detailed, step-by-step guide on using the tool effectively. The handbook covers:
+                 {% translate "Download the official" %} <span class="fw-bolder">BEAT</span> {% translate "Handbook (Part 1) for a detailed, step-by-step guide on using the tool effectively. The handbook covers:" %}
              </span>
              <span>
                  <ul>
-                     <li>Key functionalities and workflow</li>
-                     <li>Data input requirements</li>
-                     <li>Methodology</li>
+                     <li>{% translate "Key functionalities and workflow" %}</li>
+                     <li>{% translate "Data input requirements" %}</li>
+                     <li>{% translate "Methodology" %}</li>
                  </ul>
-                 📄 For guidance, please refer to the BEAT
-                 <a href="https://alcbt.gggi.org/beat-handbook-part-1-core-concept-guide/">user documentation</a>.
+                 📄 {% translate "For guidance, please refer to the BEAT" %}
+                 <a href="https://alcbt.gggi.org/beat-handbook-part-1-core-concept-guide/">{% translate "user documentation" %}</a>.
              </span>
            </div>
         </div>
@@ -76,7 +76,7 @@
     {% translate "Join a growing community of policymakers, planners, and practitioners working to reduce building emissions. Together, we will work on advancing practical, data-driven solutions for a low-carbon future." %}
 </span>
 
-<h4 class="text-center text-muted mt-4 fs-4">Host</h4>
+<h4 class="text-center text-muted mt-4 fs-4">{% translate "Host" %}</h4>
   <div class="col d-flex justify-content-center">
     {% with logo_path='images/logos/'|add:'Heat_green.svg' %}
     <img
@@ -89,7 +89,7 @@
     {% endwith %}
   </div>
 
-<h4 class="text-center text-muted mt-4 fs-4">Lead partners</h4>
+<h4 class="text-center text-muted mt-4 fs-4">{% translate "Lead partners" %}</h4>
 <div class="mb-3 row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 align-items-center justify-content-center">
   {% for logo in lead_partner_logos %}
     {% with logo_path='images/logos/lead_partners/'|add:logo %}
@@ -106,7 +106,7 @@
   {% endfor %}
 </div>
 
-<h4 class="text-center text-muted mt-4 fs-4">Development partners</h4>
+<h4 class="text-center text-muted mt-4 fs-4">{% translate "Development partners" %}</h4>
 <div class="mt-2 mb-3 row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 align-items-center justify-content-center">
   {% for logo in dev_partner_logos %}
     {% with logo_path='images/logos/development_partners/'|add:logo %}
@@ -125,8 +125,8 @@
 
 <div class="text-center m-4 mt-4">
   <div class="beat-block card d-inline-block p-3">
-    💡 Interested in contributing or partnering? We’d love to
-    <a href="https://alcbt.gggi.org/contact-us/">hear from you</a>.
+    💡 {% translate "Interested in contributing or partnering? We'd love to" %}
+    <a href="https://alcbt.gggi.org/contact-us/">{% translate "hear from you" %}</a>.
   </div>
 </div>
 
