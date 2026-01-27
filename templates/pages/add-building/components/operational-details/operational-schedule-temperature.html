@@ -1,0 +1,89 @@
+<form id="form" class="grid grid-cols-3 gap-1">
+    {% csrf_token %}
+  <fieldset class="fieldset col-span-3">
+    <legend class="fieldset-legend">
+      Number of residents (occupants)<span class="text-error">*</span>
+    </legend>
+    <label class="input validator w-full">
+      <input type="number" placeholder="eg. 10" name="number_of_residents" required min="1" />
+    </label>
+    <p class="validator-hint">Enter a valid value </p>
+  </fieldset>
+
+  <fieldset class="fieldset col-span-3">
+    <legend class="fieldset-legend">
+      Annual operating schedule<span class="text-error">*</span
+      ><span
+        data-icon="info-custom-fill"
+        data-size="20"
+        data-color="var(--icon--disabled-300)"
+      ></span>
+    </legend>
+    <div class="w-full flex gap-1.5 items-center">
+      <div class="flex-1">
+        <label class="input validator w-full">
+          <input type="number" placeholder="eg. 1" name="annual_operating_hours_per_day" required min="1" max="24" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+            >Hours / day</span
+          >
+        </label>
+        <p class="validator-hint">Enter a valid value</p>
+      </div>
+      <div class="flex-1">
+        <label class="input validator w-full">
+          <input type="number" placeholder="eg. 1" name="annual_operating_days_per_week" required min="1" max="7" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+            >days / week</span
+          >
+        </label>
+        <p class="validator-hint">Enter a valid value</p>
+      </div>
+      <div class="flex-1">
+        <label class="input validator w-full">
+          <input type="number" placeholder="eg. 1" name="annual_operating_weeks_per_year" required min="1" max="52" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+            >weeks / year</span
+          >
+        </label>
+        <p class="validator-hint">Enter a valid value</p>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="col-span-3 grid grid-cols-2 gap-1">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Room heating temperature<span class="text-error">*</span>
+      </legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" placeholder="eg. 18" name="room_heating_temperature" required  />
+        <select
+          class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[calc(max-content+1rem)]"
+          name="heating_temperature_unit"
+        >
+          <option value="celsius" selected>°Celsius</option>
+          <option value="fahrenheit">°Fahrenheit</option>
+        </select>
+      </label>
+      <p class="validator-hint">Enter a valid value </p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">
+        Room cooling temperature<span class="text-error">*</span>
+      </legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" placeholder="eg. 32" name="room_cooling_temperature" required />
+        <select
+          class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[calc(max-content+1rem)]"
+          name="cooling_temperature_unit"
+        >
+          <option value="celsius" selected>°Celsius</option>
+          <option value="fahrenheit">°Fahrenheit</option>
+        </select>
+      </label>
+      <p class="validator-hint">Enter a valid value </p>
+    </fieldset>
+  </div>
+
+</form>

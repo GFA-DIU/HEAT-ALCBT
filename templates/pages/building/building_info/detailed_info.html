@@ -2,6 +2,6 @@
 <form action="{% url 'building' building_id=building_id %}" method="post">
   <!-- Create an identifier for this post request -->
   <input type="hidden" name="action" value="detailed_information" />
-  {% crispy form_detailed_info %}
+  {% comment %} {% crispy form_detailed_info %} {% endcomment %}
 </form>
 {% endif %}

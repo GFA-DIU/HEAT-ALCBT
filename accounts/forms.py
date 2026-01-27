@@ -1,11 +1,11 @@
-from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import CustomRegion, CustomUser, UserProfile
-
 from cities_light.models import Country
+from django import forms
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 
 from accounts.models import CustomCity
 from pages.models.base import ALCBTCountryManager
+
+from .models import CustomRegion, CustomUser, UserProfile
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -34,44 +34,86 @@ class CustomUserUpdateForm(forms.ModelForm):
         fields = [
             'email',
             'username',
-        ] 
+        ]
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'w-full validator',
+                'placeholder': 'Username',
+                'maxlength': '150',
+                'required': True,
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'w-full validator',
+                'placeholder': 'Email',
+                'required': True,
+            }),
+        }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ensure the email field shows the decrypted value
+        if self.instance and self.instance.pk:
+            # Access the email property which should return the decrypted value
+            self.initial['email'] = str(self.instance.email) 
 class UserProfileUpdateForm(forms.ModelForm):
     country = forms.ModelChoiceField(
         queryset=ALCBTCountryManager.get_all_countries(),
         widget=forms.Select(attrs={
+            'class': 'select select-with-icon w-full validator',
             'hx-get': '/select_lists/',               # HTMX request to the root URL
             'hx-trigger': 'change',      # Trigger HTMX on change event
             'hx-target': '#region-dropdown', # Update the Region dropdown
-            'class': 'select form-select',
+            'required': 'true',
         }),
-        label="Country"
+        label="Country",
+        required=False
     )
     region = forms.ModelChoiceField(
         queryset=CustomRegion.objects.all(),
-        widget=forms.Select(
-            attrs={
-                "id": "region-dropdown",
-                "hx-get": "/select_lists/",  # HTMX request to the root URL
-                "hx-trigger": "change",  # Trigger HTMX on change event
-                "hx-target": "#city-dropdown",  # Update the City dropdown
-                "class": "select form-select",
-            }
-        ),
+        widget=forms.Select(attrs={
+            "id": "region-dropdown",
+            "hx-get": "/select_lists/",  # HTMX request to the root URL
+            "hx-trigger": "change",  # Trigger HTMX on change event
+            "hx-target": "#city-dropdown",  # Update the City dropdown
+            "class": "select select-with-icon w-full validator",
+            "required": True,
+        }),
         label="Region",
         required=False,
     )
     city = forms.ModelChoiceField(
         queryset=CustomCity.objects.none(),  # Start with an empty queryset
-        widget=forms.Select(attrs={'id': 'city-dropdown', 'class': 'select form-select',}),
+        widget=forms.Select(attrs={
+            'id': 'city-dropdown',
+            'class': 'select select-with-icon w-full validator',
+            'required': True,
+        }),
         label="City",
-        help_text="Select a country first",
         required=False
+    )
+
+    # Text fields for Global country (not saved to model, just for UI)
+    region_text = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full validator',
+        })
+    )
+    city_text = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full validator',
+        })
     )
     
     class Meta:
         model = UserProfile
         fields = ['country', 'region', 'city', "consent_flag"]
+        widgets = {
+            'consent_flag': forms.CheckboxInput(attrs={
+                'class': 'checkbox checkbox-xs rounded-[var(--radius-4)]',
+            }),
+        }
         
         
     def __init__(self, *args, **kwargs):

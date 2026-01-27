@@ -10,31 +10,149 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
   <title class="title">{% block title %}BEAT{% endblock title %}</title>
-  <meta name="description" content="A framework for launching new Django projects quickly.">
+  <meta name="description" content="Begin assessing your building’s whole life cycle emissions – from embodied to operational">
   <meta name="author" content="">
-  <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
-  
-  {% if request|cookie_group_accepted:"analytics" %}
+  <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+
+  {% if request and request|cookie_group_accepted:"analytics" %}
     {% newrelic_browser_timing_header %}
   {% endif %}
 
   {% block css %}
   <!-- Bootstrap CSS -->
   {% load static %}
-  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
-  <link rel="stylesheet" href="{% static 'css/home.css' %}">
-  <link rel="stylesheet" href="{% static 'css/base.css' %}">
-  {% endblock css%}
-  
+{% comment %} <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">  {% endcomment %}
+   {% comment %} <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}"> {% endcomment %}
+  {% comment %} <link rel="stylesheet" href="{% static 'css/home.css' %}"> {% endcomment %}
+  {% comment %} <link rel="stylesheet" href="{% static 'css/base.css' %}"> {% endcomment %}
+  {% endblock css %}
+
+  <link rel="stylesheet" href="{% static 'css/output.css' %}"/>
   <!-- Cookie Banner CSS - Always included -->
-  <link rel="stylesheet" href="{% static 'css/cookie-consent.css' %}">
+  <link rel="stylesheet" href="{% static 'css/cookie-consent.css' %}"/>
+  
+  {% block extra_head %}
+
+  {% endblock extra_head %}
 
 </head>
 
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="d-flex flex-column h-100 min-vh-100 {% block body_class %}{% endblock %}">
-  {% if user.is_authenticated %}
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="{% block body_class %}{% endblock %}">
+  {% block nav %}
+  {% if user.is_authenticated and 'accounts' not in request.path %}
+      <nav class="h-20 px-4 w-full flex items-stretch">
+      <div
+        class="relative flex items-center lg:justify-center justify-between w-full max-w-[78.563rem] mx-auto"
+      >
+        <div class="lg:absolute left-0 lg:top-1/2 lg:-translate-y-1/2">
+          <a href="{% url 'home' %}"><img src="{% static 'assets/logo.svg' %}" alt="logo" class="w-[4.688rem]" /></a>
+        </div>
+        <div
+          class="navbar-radio-group flex h-full w-fit relative gap-6"
+          style="--navbar-radio-group-count: 2"
+        >
+          <input
+            type="radio"
+            name="navbar-radio-group"
+            id="dashboard"
+            {% url 'home' as home_url %}
+            {% if request.path == home_url %}checked{% endif %}
+            style="--navbar-radio-group-index: 0"
+          />
+           
+            <a href="{% url 'home' %}" >
+              <div>
+                <span data-icon="dashboard-horizontal-fill"></span>
+              </div>
+              <span>Dashboard</span>
+            </a>
+         
+
+          <input
+            type="radio"
+            name="navbar-radio-group"
+            id="resources"
+            {% url 'resources' as resources_url %}
+            {% if request.path == resources_url %}checked{% endif %}
+            style="--navbar-radio-group-index: 1"
+          />
+          
+            <a href="{% url 'resources' %}" >
+              <span data-icon="book-shelf-fill"></span>
+              <span>Resources</span>
+            </a>
+        
+          <input
+            type="radio"
+            name="navbar-radio-group"
+            id="templates"
+            {% url 'templates' as templates_url %}
+            {% if request.path == templates_url %}checked{% endif %}
+            style="--navbar-radio-group-index: 2"
+          />
+        
+            <a href="{% url 'templates' %}" >
+              <span data-icon="folder-open"></span>
+              <span>Templates</span>
+            </a>
+            {% comment %} Note: not in scope {% endcomment %}
+          {% comment %} 
+           
+          <input
+            type="radio"
+            name="navbar-radio-group"
+            id="dataset"
+            {% url 'datasets' as datasets_url %}
+            {% if request.path == datasets_url %}checked{% endif %}
+            style="--navbar-radio-group-index: 3"
+          />
+      
+            <a href="{% url 'datasets' %}">
+              <span data-icon="database"></span>
+              <span>Dataset</span>
+            </a>
+           {% endcomment %}
+        </div>
+        <div
+          class="lg:absolute right-0 lg:top-1/2 lg:-translate-y-1/2 flex items-center gap-4"
+        >
+          <a href="https://alcbt.gggi.org/beat-handbook-part-1-core-concept-guide/" target="_blank" class="btn btn-ghost size-6 p-0 max-md:hidden">
+            <span data-icon="question-line" data-size="24"></span>
+          </a>
+          {% comment %} <button class="btn btn-ghost size-6 p-0 max-md:hidden">
+            <span data-icon="bell-simple" data-size="24"></span>
+          </button> {% endcomment %}
+          <a href="{% url 'profile' %}" class="btn btn-ghost size-6 p-0 max-md:hidden">
+            <span data-icon="settings-5-line" data-size="24"></span>
+          </a>
+
+          <button popovertarget="popover-1" style="anchor-name:--anchor-1" class="btn btn-ghost flex items-center gap-1 max-md:hidden">
+            <div class="avatar avatar-placeholder">
+              <div class="bg-primary text-primary-content w-6 rounded-full">
+                <span class="text-xs">{{ user.username|slice:":1" }}</span>
+              </div>
+            </div>
+            <span class="text-sm">{{ user.username}}</span>
+            <span data-icon="caret-down" data-size="16"></span>
+          </button>
+
+          <ul class="dropdown menu w-52 rounded-box bg-base-100 shadow-sm "
+            popover id="popover-1" style="position-anchor:--anchor-1">
+            <li class='w-full'><a class='w-full' href="{% url 'profile' %}">Profile</a></li>
+            <li class='w-full'><button class='w-full' onclick="showCookieSettings()">Cookie Settings</button></li>
+            <li class='w-full'><button onclick="logout_modal.showModal()" class='w-full'>Logout</button></li>
+          </ul>
+          <button
+            class="btn btn-ghost btn-sm flex items-center gap-1 md:hidden"
+          ></button>
+
+        </div>
+      </div>
+    </nav>
+
+  {% comment %} <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <a class="navbar-brand title" href="{% url 'home' %}">BEAT</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -90,54 +208,112 @@
         </div>
       </div>
     </div>
-  </nav>
+  </nav> {% endcomment %}
   {% endif %}
+    
+{% endblock nav %} 
 
   {% if messages %}
-  <div class="container mt-3">
+  <div id="toast-messages" class="toast toast-top toast-center z-[100000000]">
     {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible d-flex align-items-center justify-content-between" role="alert">
+      <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% elif message.tags == 'debug' %}info{% else %}info{% endif %}">
         <span>{{ message }}</span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     {% endfor %}
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toastContainer = document.getElementById('toast-messages');
+      if (toastContainer) {
+        setTimeout(function() {
+          toastContainer.style.transition = 'opacity 0.5s ease-out';
+          toastContainer.style.opacity = '0';
+          setTimeout(function() {
+            toastContainer.remove();
+          }, 500);
+        }, 3000); // Display for 3 seconds
+      }
+    });
+  </script>
+
   {% endif %}
 
-  <div class="container pb-2 mt-2 flex-grow-1">
-    {% block content %}
-    <p>Default content...</p>
-    {% endblock content %}
-  </div>
+      {% block content %}
+      <span class="loading loading-spinner loading-lg"></span>
+      {% endblock content %}
+ 
 
-  {% if user.is_authenticated %}
+ {% block footer %}
+   {% if user.is_authenticated and 'accounts' not in request.path %}
   {% include 'footer.html' %}
   {% endif %}
+ {% endblock footer %}
 
   <!-- Cookie Consent Banner -->
   {% if not request|all_cookies_accepted and not request.COOKIES.banner_shown %}
-  <div id="cookieBanner" class="cookie-banner">
-    <div class="container-fluid">
-      <div class="cookie-content">
+  <div id="cookieBanner" class=" z-100 fixed bottom-0 left-0 right-0 bg-base-100 border-t border-[var(--stroke--soft-200)] shadow-lg cookie-consent-banner">
+    <div class="cookie-banner-content container mx-auto flex flex-col md:flex-row items-center justify-between p-4 gap-4">
+      <div>
         <div class="cookie-text">
-          <h5><i class="bi bi-shield-check"></i> We Value Your Privacy</h5>
-          <p>We use cookies to enhance your experience, provide analytics, and enable embedded content. You can manage your preferences at any time.</p>
+          <h3 class='text-lg font-bold'><i class="bi bi-shield-check"></i> We Value Your Privacy</h3>
+          <p >We use cookies to enhance your experience, provide analytics, and enable embedded content. You can manage your preferences at any time.</p>
         </div>
-        <div class="cookie-actions">
-          <button type="button" class="cookie-btn cookie-btn-accept" onclick="acceptAllCookies()">
+
+        <div class="card border-t border-[var(--stroke--soft-200)] rounded-none mt-2">
+          <div class="p-2">
+            <h4 class="card-title">Building Data</h4>
+            <p>Content here</p>
+          </div>
+        </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mt-3">
+          <button type="button" class="btn btn-primary" onclick="acceptAllCookies()">
             Accept All
           </button>
-          <button type="button" class="cookie-btn cookie-btn-decline" onclick="declineOptionalCookies()">
+          <button type="button" class="btn btn-error" onclick="declineOptionalCookies()">
             Decline Optional
           </button>
-          <button type="button" class="cookie-btn cookie-btn-settings" onclick="showCookieSettings()">
+          <button type="button" class="btn btn-outline col-span-2" onclick="showCookieSettings()">
             Manage Preferences
           </button>
         </div>
-      </div>
     </div>
   </div>
   {% endif %}
+
+<dialog id="logout_modal" class="modal modal-middle">
+  <div class="modal-box w-full max-w-[26.375rem] p-0">
+    <div class="flex flex-col items-center p-5">
+      <div
+        class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]"
+      >
+        <span
+          data-icon="alert-fill"
+          data-size="24"
+          data-color="var(--state--warning--base)"
+        ></span>
+      </div>
+      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
+        You are about to log out of your account.
+      </p>
+    </div>
+    <form  action="{% url 'account_logout' %}" method="post" class="w-full">
+      {% csrf_token %}
+      <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full" >
+      <button type="button"
+        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
+        onclick="logout_modal.close()"
+      >
+        Cancel
+      </button>
+      <button class="btn btn-sm btn-error flex-1" type='submit'>Logout</button>
+    </div>
+    </form>
+  </div>
+</dialog>
 
   <!-- Cookie Settings Modal -->
   <div class="modal fade cookie-settings-modal" id="cookieSettingsModal" tabindex="-1" data-bs-backdrop="static">
@@ -326,26 +502,39 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      {% if not request|all_cookies_accepted and not request.COOKIES.banner_shown %}
+      {% if request and not request|all_cookies_accepted and not request.COOKIES.banner_shown %}
         showCookieBanner();
       {% endif %}
     });
   </script>
 
   {% block javascript %}
+  <script src="{% static 'js/toast.js' %}"></script>
+
+  <script type="module" src="{% static 'js/countries-registry.js' %}"></script>
+
   <!-- Bootstrap JavaScript -->
   <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 
   <!-- Project JS -->
   <script src="{% static 'js/base.js' %}"></script>
 
+  <!-- icons JS -->
+  <script type="module" src="{% static 'js/icons.js' %}"></script>
+
+  <script src="{% static 'js/confirm-dialog.js' %}"></script>
+
+
+
   <!-- HTMX -->
-  <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script>
+  {% comment %} <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script> {% endcomment %}
   {% endblock javascript %}
   
-  {% if request|cookie_group_accepted:"analytics" %}
+  {% if request and request|cookie_group_accepted:"analytics" %}
     {% newrelic_browser_timing_footer %}
   {% endif %}
+
+ 
 </body>
 
 </html>

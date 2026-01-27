@@ -1,35 +1,32 @@
+import json
 import logging
 
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseServerError
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
 
 from pages.forms.building_detailed_info import BuildingDetailedInformation
 from pages.forms.building_general_info import BuildingGeneralInformation
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.forms.operational_info_form import OperationalInfoForm
 from pages.models.assembly import DIMENSION_UNIT_MAPPING, StructuralProduct
-from pages.models.building import (
-    Building,
-    BuildingAssembly,
-    BuildingAssemblySimulated,
-    OperationalProduct,
-    SimulatedOperationalProduct,
-)
+from pages.models.building import (Building, BuildingAssembly,
+                                   BuildingAssemblySimulated,
+                                   OperationalProduct,
+                                   SimulatedOperationalProduct)
 from pages.models.epd import EPDImpact, MaterialCategory
 from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.impact_calculation import calculate_impacts
-
-from pages.views.building.operational_products.operational_products import (
-    get_op_product,
-    get_op_product_list,
-    serialize_operational_products,
-    handle_op_products_save,
+from pages.views.building.building_stats import (
+    get_building_detail_statistics,
+    get_building_chart_data,
 )
-
+from pages.views.building.operational_products.operational_products import (
+    get_op_product, get_op_product_list, handle_op_products_save,
+    serialize_operational_products)
 
 logger = logging.getLogger(__name__)
 
@@ -194,6 +191,11 @@ def handle_building_load(request, building_id, simulation):
     form.fields["childcategory"].queryset = MaterialCategory.objects.filter(
         parent=initial
     )
+
+    # Calculate statistics and chart data for building detail page
+    building_stats = get_building_detail_statistics(building)
+    chart_data = get_building_chart_data(building)
+
     context = {
         "building_id": building.id,
         "building": building,
@@ -205,6 +207,9 @@ def handle_building_load(request, building_id, simulation):
         "epd_filters_form": form,
         "edit_mode": False,
         "simulation": simulation,
+        # Statistics for building detail page
+        "stats": building_stats,
+        "chart_data": json.dumps(chart_data),  # Convert to JSON for JavaScript
     }
 
     form = BuildingGeneralInformation(instance=building)
@@ -245,8 +250,9 @@ def handle_information_submit(request, building_id, form):
             building = form.save(commit=False)
             building.created_by = request.user
             building.save()
+
             logger.info(
-                "User %s successfully saved building %s", request.user, building
+                "User %s successfully saved building %s (UUID: %s)", request.user, building, building.uuid
             )
             return redirect("building", building_id=building.id)
         else:

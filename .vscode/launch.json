@@ -9,11 +9,70 @@
       "type": "debugpy",
       "request": "launch",
       "args": [
-        "runserver"
+        "runserver",
+        "0.0.0.0:8000"
       ],
       "django": true,
       "autoStartBrowser": false,
-      "program": "${workspaceFolder}/manage.py"
+      "program": "${workspaceFolder}/manage.py",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "django_project.settings",
+        "DEBUG": "True"
+      },
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false
+    },
+    {
+      "name": "Django: Run Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "args": [
+        "test",
+        "--keepdb",
+        "--debug-mode"
+      ],
+      "django": true,
+      "program": "${workspaceFolder}/manage.py",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "django_project.settings"
+      },
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Django: Management Command",
+      "type": "debugpy",
+      "request": "launch",
+      "args": [
+        "shell"
+      ],
+      "django": true,
+      "program": "${workspaceFolder}/manage.py",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "django_project.settings"
+      },
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Django: Migrate",
+      "type": "debugpy",
+      "request": "launch",
+      "args": [
+        "migrate"
+      ],
+      "django": true,
+      "program": "${workspaceFolder}/manage.py",
+      "console": "integratedTerminal",
+      "justMyCode": false,
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "django_project.settings"
+      },
+      "cwd": "${workspaceFolder}"
     }
   ]
 }

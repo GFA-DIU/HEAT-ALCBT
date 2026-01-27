@@ -2,20 +2,17 @@
     font-size: smaller; /* Adjust the size as needed */
 }
 
-.bg-cover {
+/* .bg-cover {
   background-image: url('../../images/backgrounds/GGGI Cambodia_image.jpg');
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: cover;      /* key: keeps aspect ratio, covers entire area */
-
-  /* the blue tint (adjust the alpha and RGB as you like) */
+  background-size: cover;      
   background-color: #16af9880;
 
-  /* blend them together */
   background-blend-mode: overlay;
 
-  min-height: 100vh;           /* make it at least full viewport height */
-}
+  min-height: 100vh; 
+} */
 
 
 .beat-title h1 {

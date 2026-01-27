@@ -1,9 +1,8 @@
 import os
 from pathlib import Path
 
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-
+from django.shortcuts import render
 
 # List of files to be sorted
 files = [
@@ -24,7 +23,7 @@ def resources(request):
         "lead_partner_logos": lead_partner_logos,
         "dev_partner_logos": dev_partner_logos,
     }
-    return render(request, "pages/resources.html", context)
+    return render(request, "pages/home/resources.html", context)
 
 
 def get_all_files(folder_path: Path):

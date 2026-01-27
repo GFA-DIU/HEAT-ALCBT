@@ -1,0 +1,154 @@
+{% load crispy_forms_tags %}
+
+<ul class="flex flex-col gap-2">
+    {% for epd in epd_list %}
+      <li
+            class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+          >
+            <div class="flex flex-col gap-2.5">
+              <div class="flex items-center gap-2">
+                <span>{{ epd.name|truncatechars:80 }}</span>
+                <div
+                  class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--weak-50)] gap-1 flex items-center"
+                >
+                  <span
+                    data-icon="pushpin-fill"
+                    data-size="16"
+                    data-color="var(--icon--soft-400)"
+                  ></span>
+                  <span class="text-[var(--text--sub-600)]">
+                    {% if epd.type == "official" %}
+                    <a href="{{ epd.source }}" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="btn btn-ghost btn-xs btn-square">
+                        <span data-icon="external-link-line" data-size="16" data-color="var(--icon--sub-600)"></span>
+                    </a>
+                    {% elif epd.type == "generic" %}
+                    Generic
+                    {% endif %}
+                  </span>
+                </div>
+                <span data-country="{{epd.country}}" data-width="16"></span>
+              </div>
+              <div class="flex items-center gap-1.25">
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >{{ epd.category }}</span
+                >
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >Unit: {{ epd.declared_unit }}</span
+                >
+                <span
+                  class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                  >{{ epd.impact_gwp|floatformat:"-2" }}  kgO₂eq</span
+                >
+              </div>
+            </div>
+            <button
+              class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+              data-no-country-replace="true"
+              data-id="{{ epd.id }}"
+              data-name="{{ epd.name }}"
+              data-country="{{ epd.country }}"
+              data-category="{{ epd.category }}"
+              hx-post="{% url 'building_step_operational' %}"
+              hx-vals='{"action": "select_op_product", "epd_id": "{{ epd.id }}" }'
+              hx-target="#selected_op_products"
+              hx-swap="beforeend"
+            >
+              <span
+                data-icon="add-large-fill"
+                data-size="20"
+                data-color="var(--icon--strong-950)"
+              ></span>
+              Add
+            </button>
+          </li>
+    {% empty %}
+    <li class="text-center py-8 text-[var(--text--sub-600)]">
+        <span data-icon="inbox-line" data-size="48" data-color="var(--icon--soft-400)" class="mx-auto block mb-2"></span>
+        <p>No energy carriers found matching your criteria</p>
+    </li>
+    {% endfor %}
+</ul>
+
+{% comment %} pagination {% endcomment %}
+{% if epd_list %}
+    <nav class='block w-fill' hx-swap-oob="true" id='pagination' aria-label="Pagination">
+        <div class="flex items-center gap-2 w-full justify-center">
+            <!-- Jump to First Button -->
+            {% comment %} {% if epd_list.has_previous %}
+            <button class="join-item btn btn-sm"
+                    hx-get="{% url 'building_step_operational' %}?page=1&{{ filters|urlencode }}"
+                    hx-target="#operational-epd-list"
+                    hx-swap="innerHTML">
+                Start
+            </button>
+            {% else %}
+            <button class="join-item btn btn-sm btn-disabled" disabled>Start</button>
+            {% endif %} {% endcomment %}
+
+            <!-- Previous Button -->
+            {% if epd_list.has_previous %}
+            <button class="btn btn-ghost btn-sm"
+                    hx-get="{% url 'building_step_operational' %}?page={{ epd_list.previous_page_number }}&{{ filters|urlencode }}"
+                    hx-target="#operational-epd-list"
+                    hx-swap="innerHTML">
+                <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
+                Previous
+            </button>
+            {% else %}
+            <button class="btn btn-ghost btn-sm btn-disabled" disabled>
+                <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
+                Previous
+            </button>
+            {% endif %} 
+
+            <!-- Page Numbers -->
+            {% for num in epd_list.paginator.page_range %}
+                {% if num >= epd_list.number|add:-2 and num <= epd_list.number|add:2 %}
+                <button class="btn btn-sm rounded-[var(--radius-8)] {% if num == epd_list.number %} btn-neutral {% else %} btn-ghost {% endif %}"
+                        {% if num != epd_list.number %}
+                        hx-get="{% url 'building_step_operational' %}?page={{ num }}&{{ filters|urlencode }}"
+                        hx-target="#operational-epd-list"
+                        hx-swap="innerHTML"
+                        {% else %}
+                        disabled
+                        {% endif %}>
+                    {{ num }}
+                </button>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Next Button -->
+            {% if epd_list.has_next %}
+            <button class="btn btn-ghost btn-sm"
+                    hx-get="{% url 'building_step_operational' %}?page={{ epd_list.next_page_number }}&{{ filters|urlencode }}"
+                    hx-target="#operational-epd-list"
+                    hx-swap="innerHTML">
+                    Next
+                <span data-icon="arrow-right" data-size="20" data-color="var(--icon--strong-950)"></span>
+            </button>
+            {% else %}
+            <button class="btn btn-ghost btn-sm btn-disabled" disabled>
+                Next
+                <span data-icon="arrow-right" data-size="16" data-color="var(--icon--strong-950)"></span>
+            </button>
+            {% endif %}
+
+            <!-- Jump to Last Button -->
+            {% comment %} {% if epd_list.has_next %}
+            <button class="join-item btn btn-sm"
+                    hx-get="{% url 'building_step_operational' %}?page={{ epd_list.paginator.num_pages }}&{{ filters|urlencode }}"
+                    hx-target="#operational-epd-list"
+                    hx-swap="innerHTML">
+                End
+            </button>
+            {% else %}
+            <button class="join-item btn btn-sm btn-disabled" disabled>End</button>
+            {% endif %} {% endcomment %}
+        </div>
+    </nav>
+{% endif %}

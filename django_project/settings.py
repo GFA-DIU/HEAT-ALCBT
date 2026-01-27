@@ -2,8 +2,8 @@ import os
 import secrets
 from pathlib import Path
 
-import environ
 import dj_database_url
+import environ
 from django.utils.log import DEFAULT_LOGGING
 from dotenv import load_dotenv
 
@@ -41,6 +41,12 @@ IS_HEROKU_APP = "DYNO" in os.environ and not "CI" in os.environ
 if not IS_HEROKU_APP:
     DEBUG = True
 
+# When True, Django will automatically append a trailing slash to URLs
+# that are requested without one if a matching URL pattern exists with a slash.
+# This prevents 404 errors for users or JS requests that omit the trailing slash.
+# Especially important on Heroku where the server is case-sensitive and strict.
+APPEND_SLASH = True
+
 # From: https://github.com/heroku/python-getting-started/blob/main/gettingstarted/settings.py
 # On Heroku, it's safe to use a wildcard for `ALLOWED_HOSTS``, since the Heroku router performs
 # validation of the Host header in the incoming HTTP request. On other platforms you may need to
@@ -69,6 +75,7 @@ INSTALLED_APPS = [
     "cities_light",
     "crispy_forms",
     "crispy_bootstrap5",
+    'crispy_daisyui',
     "debug_toolbar",
     "encrypted_json_fields",
     "cookie_consent",
@@ -234,8 +241,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # django-crispy-forms
 # https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "daisyui"
+CRISPY_TEMPLATE_PACK = "daisyui"
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

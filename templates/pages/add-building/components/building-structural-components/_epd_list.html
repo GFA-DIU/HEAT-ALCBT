@@ -1,0 +1,100 @@
+<ul class="flex flex-col gap-2">
+  {% for epd in epd_list %}
+  <li class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]">
+    <div class="flex flex-col gap-2.5 flex-1 min-w-0">
+      <div class="flex items-center gap-2">
+        <span class="truncate">{{ epd.name|truncatechars:75 }}</span>
+        <span data-country="{{ epd.country }}" data-width="16"></span>
+      </div>
+      <div class="flex items-center gap-1.25 flex-wrap">
+        <span class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]">
+          {{ epd.country }}
+        </span>
+        <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
+          {{ epd.category }}
+        </span>
+        <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
+          {{ epd.declared_unit }}
+        </span>
+        <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
+          {{ epd.impact_gwp|floatformat:2 }} kgCO2eq
+        </span>
+      </div>
+    </div>
+    <div class="flex flex-col items-end gap-2.5 shrink-0">
+      {% if epd.source %}
+      <a href="{{ epd.source }}" target="_blank" rel="noopener">
+        <span data-icon="external-link-line" data-size="20" data-color="var(--icon--sub-600)"></span>
+      </a>
+      {% endif %}
+      <button
+        type="button"
+        class="btn btn-sm btn-outline border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+        hx-post="{% url 'building_step_structural' %}"
+        hx-vals='{"action": "select_structural_product", "epd_id": "{{ epd.id }}", "mode": "{{ mode|default:'boq' }}", "dimension": "{{ dimension|default:'area' }}"}'
+        hx-target="#structural_materials_list"
+        hx-swap="beforeend"
+      >
+        <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+        Add
+      </button>
+    </div>
+  </li>
+  {% empty %}
+  <li class="text-center py-8 text-[var(--text--sub-600)]">
+    <span data-icon="inbox-line" data-size="48" data-color="var(--icon--soft-400)" class="mx-auto block mb-2"></span>
+    <p>No materials found matching your criteria</p>
+  </li>
+  {% endfor %}
+</ul>
+
+{% if epd_list %}
+<nav class="block w-full mt-4" hx-swap-oob="true" id="structural_pagination" aria-label="Pagination">
+  <div class="flex items-center gap-2 w-full justify-center">
+    {% if epd_list.has_previous %}
+    <button class="btn btn-ghost btn-sm"
+            hx-get="{% url 'building_step_structural' %}?page={{ epd_list.previous_page_number }}&{{ filters }}"
+            hx-target="#structural_epd_list"
+            hx-swap="innerHTML">
+      <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
+      Previous
+    </button>
+    {% else %}
+    <button class="btn btn-ghost btn-sm" disabled>
+      <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
+      Previous
+    </button>
+    {% endif %}
+
+    {% for num in epd_list.paginator.page_range %}
+      {% if num >= epd_list.number|add:-2 and num <= epd_list.number|add:2 %}
+      <button class="btn btn-sm rounded-[var(--radius-8)] {% if num == epd_list.number %}btn-neutral{% else %}btn-ghost{% endif %}"
+              {% if num != epd_list.number %}
+              hx-get="{% url 'building_step_structural' %}?page={{ num }}&{{ filters }}"
+              hx-target="#structural_epd_list"
+              hx-swap="innerHTML"
+              {% else %}
+              disabled
+              {% endif %}>
+        {{ num }}
+      </button>
+      {% endif %}
+    {% endfor %}
+
+    {% if epd_list.has_next %}
+    <button class="btn btn-ghost btn-sm"
+            hx-get="{% url 'building_step_structural' %}?page={{ epd_list.next_page_number }}&{{ filters }}"
+            hx-target="#structural_epd_list"
+            hx-swap="innerHTML">
+      Next
+      <span data-icon="arrow-right" data-size="20" data-color="var(--icon--strong-950)"></span>
+    </button>
+    {% else %}
+    <button class="btn btn-ghost btn-sm" disabled>
+      Next
+      <span data-icon="arrow-right" data-size="16" data-color="var(--icon--strong-950)"></span>
+    </button>
+    {% endif %}
+  </div>
+</nav>
+{% endif %}

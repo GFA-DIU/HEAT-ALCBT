@@ -1,0 +1,25 @@
+<form id="operational-products-form"
+      hx-post="{% url 'building_step_operational' %}"
+      hx-vals='{"action": "save_op_products"}'
+      hx-target="#operational-products-form"
+      hx-swap="outerHTML">
+  <ul class="grid grid-cols-1 gap-2" id="selected_op_products">
+    {% if selected_products %}
+      {% for epd in selected_products %}
+        {% include 'pages/add-building/components/operational-data-entry/_selected_product.html' with epd=epd %}
+      {% endfor %}
+    {% endif %}
+  </ul>
+  
+  <div class="flex items-center gap-2 mt-4" id="save_button_container" {% if not selected_products %}hidden{% endif %}>
+    <button 
+      type="submit" 
+      class="btn btn-sm btn-primary" 
+      id="save_button"
+    >
+      <span data-icon="save-line" data-size="16" data-color="currentColor"></span>
+      Save Energy Carriers
+    </button>
+    <span class="text-xs text-[var(--text--sub-600)]" id="save_status"></span>
+  </div>
+</form>

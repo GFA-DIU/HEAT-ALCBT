@@ -1,38 +1,354 @@
 {% extends '_base.html' %}
 {% load static %}
-{% load i18n %}
+
 {% load crispy_forms_tags %}
 
 {% block title %}List view{% endblock title %}
+
+{% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
 {% block content %}
 <!-- Header + subtitle -->
-<div class="mb-4">
-  <h1 class="mb-1">
-    {% translate "Welcome to" %} <span style="color:#F26716">BEAT</span>
-  </h1>
-  <p class="lead text-muted">
-    {% translate "Begin assessing your building's whole life cycle emissions – from embodied to operational" %}
-  </p>
-</div>
 
-<h2>{% translate "Buildings overview" %}</h2>
+<section
+      class="flex-1 card bg-white rounded-none rounded-t-[var(--radius-24)] border border-[var(--stroke--soft-200)]"
+    >
+    <div class="max-w-[68.75rem] mx-auto w-full px-4">
+        <div class="flex flex-col gap-6 w-full mt-7">
+          <div
+            class="flex flex-col text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]"
+          >
+            Welcome back, {{ user.username }}!
+            <p class="text-sm font-normal text-[var(--text--sub-600)]">
+              Last seen on:
+              <span class="text-[var(--text--strong-950)]"
+                >{{ user.last_login|date:"jS F, Y (H:i T)" }}</span
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+  
+      <div class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem]"></div>
 
-<div hx-get="{% url 'map' %}?model=building&ids=[]" 
+      <div class="card-body p-0 px-4 max-w-[68.75rem] mx-auto w-full text-[var(--text--strong-950)]">
+        {% if not email_verified %}
+        <div id="email-confirmation-banner" class="flex p-[0.875rem] gap-3 bg-[var(--state--information--lighter)] rounded-[var(--radius-12)] w-full text-[var(--text--strong-950)]">
+          <span
+            data-icon="mail-fill"
+            data-color="var(--state--information--base)"
+          ></span>
+          <div class="flex flex-col flex-1">
+            <span class="text-sm/5 font-medium">Confirm your email</span>
+            <p class="text-sm/5 font-normal">
+              We've sent a confirmation email to you. Please confirm your
+              account
+            </p>
+          </div>
+          <button class="btn btn-ghost size-6 p-0" onclick="dismissEmailBanner()">
+            <span
+              data-icon="close-line"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+        {% endif %}
+        
+        <div class="flex items-center justify-between mt-6">
+          <div class="flex flex-col">
+            <span class="text-xl font-bold">Your buildings</span>
+            <p class="text-sm font-normal text-[var(--text--sub-600)]">
+              Add your buildings to access for low carbon
+            </p>
+          </div>
+          <div class="flex items-center gap-2 flex-1 justify-end">
+            <label class="input w-full max-w-[18.75rem]">
+              <span
+                data-icon="search-2-line"
+                data-size="20"
+                data-color="var(--icon--soft-400)"
+              ></span>
+              <input
+                type="text"
+                name="search"
+                placeholder="Search buildings..."
+                value="{{ search_query|default:'' }}"
+                hx-get="{% url 'home' %}"
+                hx-trigger="keyup changed delay:500ms"
+                hx-target="#buildings-container"
+                hx-swap="innerHTML"
+              />
+            </label>
+            {% comment %} <ul class="filter-radio-group flex">
+              <li>
+                <input
+                  type="radio"
+                  name="filter-radio-group"
+                  id="list"
+                  checked
+                />
+                <label for="list">
+                  <span data-icon="list-indefinite"></span>
+                </label>
+              </li>
+              <li>
+                <input type="radio" name="filter-radio-group" id="map" />
+                <label for="map">
+                  <span data-icon="road-map-line"></span>
+                </label>
+              </li>
+            </ul> {% endcomment %}
+            <a href="{% url 'new_building' %}">
+              <button class="btn btn-primary rounded-lg w-max">
+                <span data-icon="add-large-fill"></span>
+                <span class="shrink-0">Add building</span>
+              </button>
+            </a>
+          </div>
+        </div>
+        <div id="buildings-container" class="w-full">
+          {% include "pages/home/partials/buildings_list.html" %} 
+        </div>
+      </div>
+
+
+
+{% comment %}
+<h2>Buildings overview</h2>
+
+ <div hx-get="{% url 'map' %}?model=building&ids=[]" 
      hx-trigger="load"
      hx-target="#buildings_map"
      hx-swap="innerHTML"
      id="buildings_map"
      >
   <img alt="Result loading..." class="htmx-indicator" width="150" src="https://htmx.org/img/bars.svg"/>
-</div>
-<div class="row my-2">
-  <div class='fs-4 fw-bold col-10'>{% translate "Your buildings" %}</div>
+</div> {% endcomment %}
+{% comment %} <div class="row my-2">
+  <div class='fs-4 fw-bold col-10'>Your buildings</div>
  <!-- Button to trigger modal -->
   <a href="{% url 'new_building' %}"  class="icon-button btn btn-primary fs-6 col">
-    {% translate "Add building" %}
+    Add building
   </a>
 </div>
 <div id="buildings_list">
-{% include "pages/home/buildings_list.html" %} 
-</div>
-{% endblock %}
+
+</div> {% endcomment %}
+
+
+
+    <dialog
+      id="account_success_modal"
+      class="modal modal-bottom sm:modal-middle w-screen"
+    >
+      <div
+        class="modal-box w-full max-w-[30rem] !max-h-[97vh] hide-scrollbar overflow-x-hidden overflow-y-auto flex flex-col items-center px-10"
+      >
+        <img src="{% static 'assets/confetti.png' %}" alt="confetti icon" />
+        <h3 class="text-lg font-extrabold text-center">
+          Well done your account has been created.
+        </h3>
+        <p class="text-sm text-[var(--text--sub-600)] text-center">
+          Please fill the fields below to finish setting your profile
+        </p>
+
+        <div id="profile-form-messages" class="w-full mt-4">
+          <div class="alert alert-error hidden" id="error-message"></div>
+          <div class="alert alert-success hidden" id="success-message"></div>
+        </div>
+
+        <form id="modal-profile-form" class="flex flex-col w-full mt-7 space-y-2" method="POST" action="{% url 'profile' %}">
+          {% csrf_token %}
+
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend">
+              Username<span class="text-error">*</span>
+            </legend>
+            <label class="input w-full">
+              <span
+                data-icon="user-6-line"
+                data-color="var(--icon--soft-400)"
+              ></span>
+              {{ user_form.username }}
+            </label>
+            {% if user_form.username.errors %}
+              <div class="text-error text-xs mt-1">{{ user_form.username.errors.0 }}</div>
+            {% endif %}
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend">
+              Email<span class="text-error">*</span>
+            </legend>
+            <label class="input w-full">
+              <span
+                data-icon="mail-line"
+                data-color="var(--icon--soft-400)"
+              ></span>
+              {{ user_form.email }}
+            </label>
+            {% if user_form.email.errors %}
+              <div class="text-error text-xs mt-1">{{ user_form.email.errors.0 }}</div>
+            {% endif %}
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend">
+              Country<span class="text-error">*</span>
+            </legend>
+            <label class="w-full flex relative">
+              <div class="select-icon">
+                <span
+                  data-icon="global-line"
+                  data-color="var(--icon--soft-400)"
+                ></span>
+              </div>
+              {{ profile_form.country }}
+            </label>
+            {% if profile_form.country.errors %}
+              <div class="text-error text-xs mt-1">{{ profile_form.country.errors.0 }}</div>
+            {% endif %}
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend">
+              Region or State
+            </legend>
+            <label class="w-full flex relative">
+              <div class="select-icon">
+                <span
+                  data-icon="flashlight-line"
+                  data-color="var(--icon--soft-400)"
+                ></span>
+              </div>
+              {{ profile_form.region }}
+            </label>
+            {% if profile_form.region.errors %}
+              <div class="text-error text-xs mt-1">{{ profile_form.region.errors.0 }}</div>
+            {% endif %}
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend">
+              City
+            </legend>
+            <label class="w-full flex relative">
+              <div class="select-icon">
+                <span
+                  data-icon="building-line"
+                  data-color="var(--icon--soft-400)"
+                ></span>
+              </div>
+              {{ profile_form.city }}
+            </label>
+            {% if profile_form.city.errors %}
+              <div class="text-error text-xs mt-1">{{ profile_form.city.errors.0 }}</div>
+            {% endif %}
+          </fieldset>
+
+          <label
+            class="label mt-4 mb-6 text-[var(--text--strong-950)] text-sm/5 font-medium"
+          >
+            {{ profile_form.consent_flag }}
+            <span class="ml-2">Share my info with BEAT tool maintainers</span>
+          </label>
+
+          <div class="w-full space-y-1">
+            <button type="submit" class="btn btn-primary btn-block">
+            Save & Continue
+          </button>
+          <button
+            type="button"
+            class="btn btn-ghost btn-block mt-3"
+            onclick="closeAccountSuccessModal()"
+          >
+            I'll do this later
+          </button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
+    <script>
+    const accountSuccessModal = document.getElementById(
+      "account_success_modal"
+    );
+
+    // Show modal only for first-time account creation
+    {% if show_account_success_modal %}
+    accountSuccessModal.showModal();
+    {% endif %}
+
+    function closeAccountSuccessModal() {
+      accountSuccessModal.close();
+    }
+
+    function dismissEmailBanner() {
+      const banner = document.getElementById("email-confirmation-banner");
+      if (banner) {
+        banner.style.display = "none";
+      }
+    }
+
+    // Handle profile form submission in modal via AJAX
+    const modalProfileForm = document.getElementById("modal-profile-form");
+    if (modalProfileForm) {
+      modalProfileForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(modalProfileForm); 
+        const errorDiv = document.getElementById("error-message");
+        const successDiv = document.getElementById("success-message");
+
+        try {
+          const response = await fetch("{% url 'profile' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+            },
+          });
+
+          const data = await response.json();
+        
+          if (data.success) {
+            // Show success message
+            successDiv.textContent = data.message;
+            successDiv.classList.remove("hidden");
+            errorDiv.classList.add("hidden");
+
+            // Close modal after 1.5 seconds
+            setTimeout(() => {
+              closeAccountSuccessModal();
+              // Optionally reload the page to reflect changes
+              window.location.reload();
+            }, 1500);
+          } else {
+            // Show error messages
+            let errorText = "Please correct the following errors:\n";
+            for (const [field, errors] of Object.entries(data.errors)) {
+              errorText += `${field}: ${errors.join(", ")} <br/> `;
+            }
+            
+            errorDiv.innerHTML = errorText;
+            errorDiv.classList.remove("hidden");
+            successDiv.classList.add("hidden");
+          }
+        } catch (error) {
+          console.error("Error updating profile:", error);
+          errorDiv.textContent = "An error occurred while updating your profile. Please try again.";
+          errorDiv.parentElement.classList.remove("hidden");
+          successDiv.parentElement.classList.add("hidden");
+        }
+      });
+    }
+
+    {% comment %} function goToBuildingDetails(id) {
+      window.location.href = "{% url 'building' building_id=" + id + " %}";
+    } {% endcomment %}
+</script>
+    {% endblock %}

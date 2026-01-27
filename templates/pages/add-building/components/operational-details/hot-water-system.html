@@ -1,0 +1,641 @@
+{% load static %}
+<div id="hot-water-system-container" class="w-full">
+  <div class="w-full flex flex-col">
+    <button
+      class="btn btn-outline w-fit"
+      onclick="openHotWaterSystemModal()"
+    >
+      <span
+        data-icon="add-large-fill"
+        data-size="20"
+        data-color="var(--icon--strong-950)"
+      ></span>
+      Add hot water system
+    </button>
+    <div
+      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
+    ></div>
+    <ul id="hot-water-systems-list" class="grid grid-cols-1">
+    </ul>
+  </div>
+</div>
+
+<dialog id="hot_water_system_modal" class="modal modal-bottom sm:modal-end">
+  <div
+    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
+  >
+    <div class="flex justify-between p-5 w-full">
+      <div class="flex flex-col">
+        <h3 class="text-lg/6 font-medium">Add a hot water system</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">
+          Provide details on the building’s method of producing and distributing
+          hot water.
+        </p>
+      </div>
+      <button
+        type="button"
+        onclick="closeHotWaterSystemModal()"
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+      >
+        <span
+          data-icon="close-line"
+          data-size="16"
+          data-color="var(--icon--sub-600)"
+        ></span>
+      </button>
+    </div>
+    <form id="hot-water-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
+        {% csrf_token %}
+      <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            Type of hot water system<span
+              class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <select
+            class="select w-full"
+            name="type_of_hot_water_system"
+            hx-get="/select_lists/?hot_water_system_types=1"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
+          >
+            <option disabled selected value="">Select an option</option>
+          </select>
+          <p class="validator-hint">This field is required</p>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            Fuel type<span class="text-[var(--state--error--base)]">*</span>
+          </legend>
+          <select
+            class="select w-full"
+            name="fuel_type"
+            hx-get="/select_lists/?fuel_types=1"
+            hx-trigger="load"
+            hx-target="this"
+            hx-swap="innerHTML"
+          >
+            <option disabled selected value="">Select an option</option>
+          </select>
+        </fieldset>
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">
+            System operating schedule<span
+              data-icon="info-custom-fill"
+              data-size="20"
+              data-color="var(--icon--disabled-300)"
+            ></span>
+          </legend>
+          <div class="w-full flex gap-1.5 items-center">
+            <div class="flex-1">
+              <label class="input validator w-full">
+                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required min="1" max="24" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+                  >Hours / day</span
+                >
+              </label>
+            </div>
+            <div class="flex-1">
+              <label class="input validator w-full">
+                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required min="1" max="7" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+                  >days / week</span
+                >
+              </label>
+            </div>
+            <div class="flex-1">
+              <label class="input validator w-full">
+                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required min="1" max="52" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+                  >weeks / year</span
+                >
+              </label>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            Fuel consumption<span class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 343" name="fuel_consumption" required min="0" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+              >Litres/m³</span
+            >
+          </label>
+          <p class="validator-hint">This field is required</p>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            Hot water system power input<span
+              class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 343" name="power_input" required min="0" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+              >Kw</span
+            >
+          </label>
+          <p class="validator-hint">This field is required</p>
+        </fieldset>
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">
+            Baseline hot water system efficiency<span
+              class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 343" name="baseline_efficiency" required min="0" />
+          </label>
+          <p class="validator-hint">This field is required</p>
+        </fieldset>
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">
+            Baseline hot water system equipment efficiency level<span
+              class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 40" name="equipment_efficiency_level" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
+              >%</span
+            >
+          </label>
+          <p class="validator-hint">This field is required</p>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            Installation of heat recovery system<span
+              class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <select class="select w-full" name="heat_recovery_system" required>
+            <option disabled selected value="">Select an option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+          <p class="validator-hint">This field is required</p>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">
+            Number of hot water equipment<span
+              class="text-[var(--state--error--base)]"
+              >*</span
+            >
+          </legend>
+          <label class="input validator w-full">
+            <input type="number" placeholder="eg. 5" name="number_of_equipment" required min="0" />
+          </label>
+          <p class="validator-hint">This field is required</p>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <select class="select w-full" name="energy_efficiency_label_type">
+            <option disabled selected value="">Select an option</option>
+            <option value="bee">BEE Star Rating</option>
+            <option value="egat">EGAT</option>
+          </select>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Number of stars</legend>
+          <select class="select w-full" name="number_of_stars" required>
+            <option disabled selected value="">Select an option</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </fieldset>
+      </div>
+    </form>
+    <div
+      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
+    >
+      <button
+        type="button"
+        class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
+        onclick="closeHotWaterSystemModal()"
+      >
+        Cancel
+      </button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveHotWaterSystem()">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="hot_water_system_modal_delete" class="modal modal-middle">
+  <div class="modal-box w-full max-w-[26.375rem] p-0">
+    <div class="flex flex-col items-center p-5">
+      <div
+        class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]"
+      >
+        <span
+          data-icon="alert-fill"
+          data-size="24"
+          data-color="var(--state--warning--base)"
+        ></span>
+      </div>
+      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
+        You are about to remove or delete added hot water system. This will
+        action will permanently remove it.
+      </p>
+    </div>
+    <div
+      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
+    >
+      <button
+        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
+        onclick="hot_water_system_modal_delete.close()"
+      >
+        Cancel
+      </button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteHotWaterSystem()">Remove</button>
+    </div>
+  </div>
+</dialog>
+
+<template id="hot-water-system-template">
+  <div class="w-full flex flex-col">
+    <button
+      class="btn btn-outline w-fit"
+      onclick="hot_water_system_modal.showModal()"
+    >
+      <span
+        data-icon="add-large-fill"
+        data-size="20"
+        data-color="var(--icon--strong-950)"
+      ></span>
+      Add hot water system
+    </button>
+    <div
+      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
+    ></div>
+    <ul class="grid grid-cols-1">
+      <li
+        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
+      >
+        <span
+          data-icon="temp-cold-line"
+          data-size="20"
+          data-color="var(--icon--strong-950)"
+          class="shrink-0 self-start"
+        ></span>
+        <div class="flex flex-col flex-1">
+          <p class="text-sm/5 font-medium">Heat pump water system</p>
+          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+            <span class="border-r border-[var(--text--sub-600)] pr-1"
+              >Fuel type: Electricity</span
+            >
+            <span>Power input: 400Kw</span>
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="btn size-5 btn-ghost p-0">
+            <span
+              data-icon="edit-line"
+              data-size="16"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+          <button
+            class="btn size-5 btn-ghost p-0"
+            onclick="hot_water_system_modal_delete.showModal()"
+          >
+            <span
+              data-icon="delete-bin-5-line"
+              data-size="16"
+              data-color="var(--icon--strong-950)"
+            ></span>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<template id="no-hot-water-system-template">
+  <div class="w-full flex flex-col gap-3 items-center justify-center">
+    <img src="{% static 'assets/hot-water-system.png' %}" alt="hot-water System Image" />
+    <p class="text-sm/5 font-medium">
+      Click button below to add a hot water system
+    </p>
+    <button
+      class="btn btn-primary"
+      onclick="hot_water_system_modal.showModal()"
+    >
+      Add hot water system
+    </button>
+  </div>
+</template>
+
+<script>
+  // Track editing state
+  if (!window.editingHotWaterSystemId) {
+    window.editingHotWaterSystemId = null;
+  }
+
+  // Helper to get CSRF token
+  function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+  }
+
+  // Get building UUID from URL parameters
+  function getBuildingId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('building_uuid');
+  }
+
+  // Open modal
+  window.openHotWaterSystemModal = function() {
+    window.editingHotWaterSystemId = null;
+    document.getElementById('hot-water-system-form').reset();
+    hot_water_system_modal.showModal();
+  }
+
+  // Close modal
+  window.closeHotWaterSystemModal = function() {
+    hot_water_system_modal.close();
+    window.editingHotWaterSystemId = null;
+  }
+
+  // Save hot water system - POST to API
+  window.saveHotWaterSystem = async function() {
+    const form = document.getElementById('hot-water-system-form');
+    const formData = new FormData(form);
+
+    // Get hot water system type
+    const systemTypeSelect = form.querySelector('[name="type_of_hot_water_system"]');
+    const systemType = systemTypeSelect.value;
+
+    if (!systemType) {
+      Toast.error('Please select a hot water system type');
+      return;
+    }
+
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      Toast.error('Building ID not found. Please save building information first.');
+      return;
+    }
+
+    const validator = new window.FormValidator(form);
+    if (!validator.validate()) {
+      console.error('Form validation failed', validator.errors);
+      return;
+    }
+
+    // Collect all form data
+    const systemData = Object.fromEntries(formData.entries());
+    systemData.building_uuid = buildingId;
+
+    // If editing, include the system ID
+    if (window.editingHotWaterSystemId) {
+      systemData.hot_water_system_id = window.editingHotWaterSystemId;
+    }
+
+    try {
+      // Save to database via API
+      const response = await fetch('/hot-water-system/', {
+        method: window.editingHotWaterSystemId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify(systemData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Success - reload the list
+        await window.renderHotWaterSystems();
+        window.closeHotWaterSystemModal();
+
+        // Show success message
+        console.log(result.message);
+      } else {
+        // Show validation errors
+        Toast.error('Error saving hot water system:\n' + JSON.stringify(result.errors || result.error));
+      }
+    } catch (error) {
+      console.error('Error saving hot water system:', error);
+      Toast.error('Failed to save hot water system. Please try again.');
+    }
+  }
+
+  // Render hot water systems list - FETCH from database
+  window.renderHotWaterSystems = async function() {
+    const listContainer = document.getElementById('hot-water-systems-list');
+    const noSystemsContainer = document.getElementById('no-hot-water-system-template');
+
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      console.error('Building ID not found');
+      return;
+    }
+
+    try {
+      // Fetch from database
+      const response = await fetch(`/hot-water-system/${buildingId}/`);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        console.error('Failed to load hot water systems');
+        return;
+      }
+
+      const systems = result.hot_water_systems || [];
+
+      if (systems.length === 0) {
+        listContainer.innerHTML = noSystemsContainer.innerHTML;
+        return;
+      }
+
+      // Render systems from database
+      listContainer.innerHTML = systems.map((system) => {
+        const fuelType = system.fuel_type_display || 'N/A';
+        const powerInput = system.power_input || 'N/A';
+
+        return `
+          <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
+            <span
+              data-icon="temp-cold-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+              class="shrink-0 self-start"
+            ></span>
+            <div class="flex flex-col flex-1">
+              <p class="text-sm/5 font-medium">${system.type_of_hot_water_system_display}</p>
+              <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
+                <span class="border-r border-[var(--text--sub-600)] pr-1">Fuel type: ${fuelType}</span>
+                <span>Power input: ${powerInput} Kw</span>
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button class="btn size-5 btn-ghost p-0" onclick="editHotWaterSystem(${system.id})">
+                <span
+                  data-icon="edit-line"
+                  data-size="16"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+              </button>
+              <button
+                class="btn size-5 btn-ghost p-0"
+                onclick="confirmDeleteHotWaterSystem(${system.id})"
+              >
+                <span
+                  data-icon="delete-bin-5-line"
+                  data-size="16"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+              </button>
+            </div>
+          </li>
+        `;
+      }).join('');
+
+    } catch (error) {
+      console.error('Error loading hot water systems:', error);
+      listContainer.innerHTML = `
+        <li class="flex flex-col items-center justify-center py-8 text-center">
+          <span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading hot water systems</p>
+        </li>
+      `;
+    }
+  }
+
+  // Edit hot water system - LOAD from database
+  window.editHotWaterSystem = async function(systemId) {
+    window.editingHotWaterSystemId = systemId;
+
+    // Get building ID
+    const buildingId = getBuildingId();
+    if (!buildingId) {
+      Toast.error('Building ID not found');
+      return;
+    }
+
+    try {
+      // Fetch all systems to find the one we're editing
+      const response = await fetch(`/hot-water-system/${buildingId}/`);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        Toast.error('Failed to load hot water system');
+        return;
+      }
+
+      const system = result.hot_water_systems.find(s => s.id === systemId);
+      if (!system) {
+        Toast.error('Hot water system not found');
+        return;
+      }
+
+      // Reset form
+      const form = document.getElementById('hot-water-system-form');
+      form.reset();
+
+      // Populate form fields
+      Object.keys(system).forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (field) {
+          if (field.type === 'select-one') {
+            field.value = system[fieldName];
+          } else if (field.type === 'number') {
+            field.value = system[fieldName];
+          } else if (field.type === 'text') {
+            field.value = system[fieldName];
+          } else {
+            field.value = system[fieldName];
+          }
+        }
+      });
+
+      // Map energy_efficiency_label to number_of_stars field (like lighting system)
+      if (system.energy_efficiency_label !== null) {
+        form.querySelector('[name="number_of_stars"]').value = system.energy_efficiency_label;
+      }
+
+      // Map boolean heat_recovery_system to yes/no dropdown
+      if (system.heat_recovery_system !== undefined) {
+        form.querySelector('[name="heat_recovery_system"]').value = system.heat_recovery_system ? 'yes' : 'no';
+      }
+
+      hot_water_system_modal.showModal();
+    } catch (error) {
+      console.error('Error loading hot water system for edit:', error);
+      Toast.error('Failed to load hot water system');
+    }
+  }
+
+  // Confirm delete
+  if (!window.deleteHotWaterSystemId) {
+    window.deleteHotWaterSystemId = null;
+  }
+
+  window.confirmDeleteHotWaterSystem = function(systemId) {
+    window.deleteHotWaterSystemId = systemId;
+    hot_water_system_modal_delete.showModal();
+  }
+
+  // Delete hot water system - DELETE from database
+  window.deleteHotWaterSystem = async function() {
+    if (window.deleteHotWaterSystemId !== null) {
+      try {
+        const response = await fetch(`/hot-water-system/${window.deleteHotWaterSystemId}/delete/`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRFToken': getCSRFToken()
+          }
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          // Success - reload the list
+          await window.renderHotWaterSystems();
+          window.deleteHotWaterSystemId = null;
+          hot_water_system_modal_delete.close();
+          console.log('Hot water system deleted successfully');
+        } else {
+          Toast.error('Failed to delete hot water system');
+        }
+      } catch (error) {
+        console.error('Error deleting hot water system:', error);
+        Toast.error('Failed to delete hot water system');
+      }
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    window.renderHotWaterSystems();
+  });
+
+  // If HTMX is processing this content dynamically, also initialize after htmx:afterSwap
+  document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'dynamic-content') {
+      window.renderHotWaterSystems();
+    }
+  });
+
+  // Initialize immediately for dynamically loaded content
+  if (document.getElementById('hot-water-systems-list')) {
+    window.renderHotWaterSystems();
+  }
+</script>

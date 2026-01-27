@@ -1,0 +1,928 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block title %}Home - HEAT Building LCA{% endblock %}
+
+{% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock body_class %}
+
+{% block content %}
+ 
+    <section class="flex-1 card bg-white rounded-none rounded-t-[var(--radius-24)] border border-[var(--stroke--soft-200)] pb-6">
+      <div class="max-w-[68.75rem] mx-auto w-full px-4">
+        <div class="flex flex-col gap-6 w-full mt-7">
+          <div
+            class="flex flex-col text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]"
+          >
+            Reusable Templates
+            <p class="text-sm font-normal text-[var(--text--sub-600)]">
+              Add your buildings to access for low carbon
+            </p>
+          </div>
+        </div>
+        <form
+          id="search-form"
+          hx-get="{% url 'templates' %}"
+          hx-target="#templates-list"
+          hx-swap="outerHTML"
+          hx-trigger="submit, change from:#search-form select delay:300ms, keyup changed delay:500ms from:#search-form input[name='search_query']"
+          class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)] mt-5"
+        >
+          <div class="flex items-stretch gap-2">
+            <label class="input w-full">
+              <span
+                data-icon="search-2-line"
+                data-size="16"
+                data-color="var(--icon--soft-400)"
+              ></span>
+              <input type="text" name="search_query" placeholder="Search templates..." value="{{ search_query }}" />
+            </label>
+            <select class="select" name="country">
+              <option value="" >All Countries </option>
+              {% for country in countries %}
+                <option  value="{{ country.id }}" {% if selected_country == country.id|stringformat:"s" %}selected{% endif %}>
+                 <span data-country="{{country.code2}}"></span>  {{ country.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="collapse rounded-none">
+            <input type="checkbox" class="peer" />
+            <div
+              class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
+            >
+              <span class="flex items-center gap-2">
+                <span
+                  data-icon="menu-search-line"
+                  data-size="20"
+                  data-color="var(--icon--strong-950)"
+                ></span>
+                Advanced Search
+                <span class="text-xs/5 text-[var(--text--sub-600)]"
+                  >Click here for a more advanced search option</span
+                >
+              </span>
+              <span
+                data-icon="caret-down"
+                data-size="16"
+                data-color="var(--icon--soft-400)"
+                class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"
+              ></span>
+            </div>
+            <div class="collapse-content mt-0 px-0">
+              <div class="grid grid-cols-4 gap-2">
+                <label class="relative">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  <select
+                    name="category"
+                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
+                  >
+                    <option value="">Building Component</option>
+                    {% for category in categories %}
+                      <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <label class="relative">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  <select
+                    name="technique"
+                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
+                  >
+                    <option value="">Construction Technique</option>
+                    {% for technique in techniques %}
+                      <option value="{{ technique.id }}" {% if selected_technique == technique.id|stringformat:"s" %}selected{% endif %}>
+                        {{ technique.name }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <label class="relative">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  <select
+                    name="mode"
+                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
+                  >
+                    <option value="">All Types</option>
+                    <option value="system" {% if selected_mode == 'system' %}selected{% endif %}>System Component</option>
+                    <option value="custom" {% if selected_mode == 'custom' %}selected{% endif %}>My Component</option>
+                  </select>
+                </label>
+                <label class="relative">
+                  <span
+                    data-icon="filter-3-line"
+                    data-size="20"
+                    data-color="var(--icon--soft-400)"
+                    class="select-icon w-8"
+                  ></span>
+                  <select
+                    name="sort_by"
+                    class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
+                  >
+                    <option value="name" {% if selected_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                    <option value="-name" {% if selected_sort == '-name' %}selected{% endif %}>Name (Z-A)</option>
+                    <option value="-created_at" {% if selected_sort == '-created_at' %}selected{% endif %}>Newest First</option>
+                    <option value="created_at" {% if selected_sort == 'created_at' %}selected{% endif %}>Oldest First</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-outline btn-block">Search</button>
+        </form>
+
+        {% include "pages/home/partials/templates_list.html" %}
+
+      </div>
+    </section>
+
+
+    <dialog id="template_detail_modal" class="modal modal-bottom sm:modal-end">
+      <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-[95vw] !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
+        <div class="flex justify-between p-5 w-full">
+          <h3 id="modal-template-name" class="text-lg/6 font-medium">Loading...</h3>
+          <div class="flex items-center">
+            <button id="modal-delete-btn" type="button" class="flex items-center mr-3" style="display:none;" onclick="deleteTemplateFromDialog()">
+              <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--sub-600)"></span>
+              <span class="var(--text--sub-600) ml-1 underline">Delete</span>
+            </button>
+            <button type="button" onclick="template_detail_modal.close()" class="btn btn-sm btn-circle btn-ghost">
+              <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
+            </button>
+          </div>
+        </div>
+        <form id="template-form" class="flex-1 overflow-y-auto hide-scrollbar">
+          {% csrf_token %}
+          <input type="hidden" id="template-id" name="template_id" />
+          <input type="hidden" id="can-edit" value="false" />
+          <div class="px-5 py-4 grid grid-cols-3 gap-4">
+            <fieldset class="fieldset col-span-3">
+              <legend class="fieldset-legend">Title<span class="text-[var(--state--error--base)]">*</span></legend>
+              <label class="input validator w-full">
+                <input id="template-name" name="name" type="text" required minlength="2" maxlength="200" />
+              </label>
+              <p class="validator-hint">Required (2-200 characters)</p>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Country<span class="text-[var(--state--error--base)]">*</span></legend>
+              <select id="template-country" name="country_id" class="select" required>
+                <option value="">Select country</option>
+                {% for country in countries %}
+                  <option value="{{ country.id }}"> <span data-country="{{ country.code2 }}"></span> {{ country.name }}</option>
+                {% endfor %}
+              </select>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Building component</legend>
+              <select id="template-category" name="category_id" class="select" disabled>
+                <option value="">Select category</option>
+                {% for category in categories %}
+                  <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+              </select>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Construction technique</legend>
+              <select id="template-technique" name="technique_id" class="select" disabled>
+                <option value="">Select technique</option>
+                {% for technique in techniques %}
+                  <option value="{{ technique.id }}">{{ technique.name }}</option>
+                {% endfor %}
+              </select>
+            </fieldset>
+
+            <fieldset class="fieldset col-span-3">
+              <legend class="fieldset-legend">Comment</legend>
+              <textarea id="template-comment" name="comment" class="textarea w-full" rows="3" placeholder="Add a comment"></textarea>
+            </fieldset>
+
+          </div>
+          <h2 class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4">
+            MATERIALS (<span id="modal-materials-count">0</span>)
+          </h2>
+          <div class="px-5 pb-4">
+            <div class="flex items-end justify-between border-b border-[var(--stroke--soft-200)] pb-4">
+              <div class="flex-1">
+                <h4 class="text-base/5 font-extrabold mb-1">Added Materials</h4>
+                <p class="text-sm/5 text-[var(--text--sub-600)]">Materials from EPD libraries</p>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline" onclick="structural_component_epd_modal.showModal()">
+                <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+                Add from EPD library
+              </button>
+            </div>
+            <ul id="modal-materials-list" class="grid grid-cols-1 gap-2.5 mt-4 mb-[100px]">
+              
+            </ul>
+          </div>
+          <div class="p-5 w-full border-t border-[var(--stroke--soft-200)] flex items-center justify-between absolute bottom-0 bg-white">
+            <button type="button" class="btn btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit" onclick="template_detail_modal.close()">
+              Cancel
+            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" id="modal-duplicate-btn" class="btn btn-outline text-[var(--text--strong-950)] border-[var(--stroke--strong-950)] w-fit" onclick="handleDuplicate()">
+                Save & duplicate
+              </button>
+              <button type="button" id="modal-update-btn" class="btn btn-primary w-fit" style="display:none;" onclick="handleUpdate()">
+                Update
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
+    <dialog id="structural_component_epd_modal"class="modal modal-bottom sm:modal-end">
+      <div
+        class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
+      >
+        <div class="flex justify-between items-center px-5 w-full">
+          <button
+            type="button"
+            onclick="structural_component_epd_modal.close()"
+            class="btn btn-sm btn-outline"
+          >
+            <span
+              data-icon="arrow-left"
+              data-size="16"
+              data-color="var(--icon--soft-400)"
+            ></span>
+            Go back
+          </button>
+          <h3 class="text-lg/6 font-medium w-full text-left p-5">
+            Add from EPD Library
+          </h3>
+          <button
+            type="button"
+            onclick="structural_component_epd_modal.close()"
+            class="btn btn-sm btn-circle btn-ghost"
+          >
+            <span
+              data-icon="close-line"
+              data-size="16"
+              data-color="var(--icon--sub-600)"
+            ></span>
+          </button>
+        </div>
+        <form
+          id='epd-search-form'
+          hx-get="{% url 'search_epds' %}"
+          hx-target="#epd-search-list"
+          hx-swap="outerHTML"
+          hx-trigger="submit, change from:#epd-country-filter delay:300ms, change from:#epd-category-filter delay:300ms, change from:#epd-type-filter delay:300ms, keyup changed delay:500ms from:#epd-search-query"
+          class="flex-1 overflow-y-auto hide-scrollbar"
+          >
+          <div class="px-5 py-2.5 w-full">
+            <div
+              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
+            >
+              <div class="flex items-stretch gap-2">
+                <label class="input w-full">
+                  <span data-icon="search-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
+                  <input name='epd_search_query' id="epd-search-query" type="text" placeholder="Search EPDs..." />
+                </label>
+                <select name="country" id="epd-country-filter" class="select">
+                  <option value="">All Countries</option>
+                  {% for country in countries %}
+                    <option value="{{ country.id }}"> <span data-country="{{country.code2}}"></span> {{ country.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="collapse rounded-none">
+                <input name="advanced_search" type="checkbox" class="peer" />
+                <div
+                  class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
+                >
+                  <span class="flex items-center gap-2">
+                    <span
+                      data-icon="menu-search-line"
+                      data-size="20"
+                      data-color="var(--icon--strong-950)"
+                    ></span>
+                    Advanced Search
+                    <span class="text-xs/5 text-[var(--text--sub-600)]" >Click here for a more advanced search option</span>
+                  </span>
+                  <span
+                    data-icon="caret-down"
+                    data-size="16"
+                    data-color="var(--icon--soft-400)"
+                    class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"
+                  ></span>
+                </div>
+                <div class="collapse-content mt-0 px-0">
+                  <div class="grid grid-cols-2 gap-2">
+                    <label class="relative">
+                      <span data-icon="filter-3-line" data-size="20" data-color="var(--icon--soft-400)" class="select-icon w-8"></span>
+                      <select name="category" id="epd-category-filter" class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]">
+                        <option value="">All Categories</option>
+                        {% for category in epd_categories %}
+                          <option value="{{ category.id }}">{{ category.name_en }}</option>
+                        {% endfor %}
+                      </select>
+                    </label>
+                    <label class="relative">
+                      <span data-icon="filter-3-line" data-size="20" data-color="var(--icon--soft-400)" class="select-icon w-8"></span>
+                      <select name="type" id="epd-type-filter" class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]">
+                        <option value="">All Types</option>
+                        {% for type in epd_types %}
+                          <option value="{{ type.value }}">{{ type.label }}</option>
+                        {% endfor %}
+                      </select>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <button id="epd-search-btn" type="submit" class="btn btn-outline btn-block">Search</button>
+            </div>
+            <div id="epd-search-list" class="mt-4">
+              <p class="text-center py-8 text-[var(--text--sub-600)]">Enter search criteria and click Search</p>
+            </div>
+            {% comment %} <ul id="epd-results-list" class="grid grid-cols-1" style="display:none;"> {% endcomment %}
+              {% comment %} <li
+                class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+              >
+                <div class="flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between">
+                    <span
+                      >Structural concrete M6582A09 (C30/37, F4, 16, XC4, XF1,
+                      XA1, XD1, WA, slow)</span
+                    >
+                  </div>
+                  <div class="flex items-stretch gap-1.25">
+                    <span
+                      class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                      >Germany</span
+                    >
+                    <div
+                      class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                    ></div>
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >Precast concrete elements and goods</span
+                    >
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >169.40 kgCO2e</span
+                    >
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2.5 w-fit">
+                  <span
+                    data-icon="external-link-line"
+                    data-size="20"
+                    data-color="var(--icon--sub-600)"
+                  ></span>
+                  <button
+                    class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                    type="button"
+                  >
+                    <span
+                      data-icon="add-large-fill"
+                      data-size="20"
+                      data-color="var(--icon--strong-950)"
+                    ></span>
+                    Add
+                  </button>
+                </div>
+              </li>
+              <li
+                class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+              >
+                <div class="flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between">
+                    <span>Shower Hoses</span>
+                  </div>
+                  <div class="flex items-stretch gap-1.25">
+                    <span
+                      class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                      >Germany</span
+                    >
+                    <div
+                      class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                    ></div>
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >Mounting</span
+                    >
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >0.59 kgCO2e</span
+                    >
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2.5 w-fit">
+                  <span
+                    data-icon="external-link-line"
+                    data-size="20"
+                    data-color="var(--icon--sub-600)"
+                  ></span>
+                  <button
+                    class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                    type="button"
+                  >
+                    <span
+                      data-icon="add-large-fill"
+                      data-size="20"
+                      data-color="var(--icon--strong-950)"
+                    ></span>
+                    Add
+                  </button>
+                </div>
+              </li>
+              <li
+                class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+              >
+                <div class="flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between">
+                    <span>ACC M35 Ready Mixed Concrete (RMC)</span>
+                  </div>
+                  <div class="flex items-stretch gap-1.25">
+                    <span
+                      class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                      >India</span
+                    >
+                    <div
+                      class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                    ></div>
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >Ready mixed concrete</span
+                    >
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >396 kgCO2e</span
+                    >
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2.5 w-fit">
+                  <span
+                    data-icon="external-link-line"
+                    data-size="20"
+                    data-color="var(--icon--sub-600)"
+                  ></span>
+                  <button
+                    class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                    type="button"
+                  >
+                    <span
+                      data-icon="add-large-fill"
+                      data-size="20"
+                      data-color="var(--icon--strong-950)"
+                    ></span>
+                    Add
+                  </button>
+                </div>
+              </li>
+              <li
+                class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+              >
+                <div class="flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between">
+                    <span
+                      >semi-finished products - Kunststoffwerke Katzbach GmbH &
+                      Co. KG - EPP mold</span
+                    >
+                  </div>
+                  <div class="flex items-stretch gap-1.25">
+                    <span
+                      class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                      >Germany</span
+                    >
+                    <div
+                      class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                    ></div>
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >Ready mixed concrete</span
+                    >
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >396 kgCO2e</span
+                    >
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2.5 w-fit">
+                  <span
+                    data-icon="external-link-line"
+                    data-size="20"
+                    data-color="var(--icon--sub-600)"
+                  ></span>
+                  <button
+                    class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                    type="button"
+                  >
+                    <span
+                      data-icon="add-large-fill"
+                      data-size="20"
+                      data-color="var(--icon--strong-950)"
+                    ></span>
+                    Add
+                  </button>
+                </div>
+              </li> {% endcomment %}
+            {% comment %} </ul> {% endcomment %}
+          </div>
+        </form>
+        <div id="epd-modal-footer" class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+          <div id="epd-pagination"></div>
+
+          <button type="button" class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit" onclick="structural_component_epd_modal.close()">
+            Close
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <script>
+      // Global vars for tracking
+      let deletedMaterialIds = [];
+      let currentTemplateData = null;
+      
+      // View template details and populate form
+      function viewTemplate(assemblyId) {
+        // Show loading
+        document.getElementById('modal-template-name').textContent = 'Loading...';
+        document.getElementById('modal-materials-list').innerHTML = '<li class="text-center py-4">Loading...</li>';
+        deletedMaterialIds = [];
+      
+        template_detail_modal.showModal();
+        // Fetch data
+        fetch(`/templates/${assemblyId}/`)
+          .then(response => response.ok ? response.json() : Promise.reject('Failed to load'))
+          .then(data => {
+            currentTemplateData = data;
+      
+            // Populate form
+            document.getElementById('template-id').value = data.id;
+            document.getElementById('can-edit').value = data.can_edit;
+            document.getElementById('modal-template-name').textContent = data.name;
+            document.getElementById('template-name').value = data.name;
+            document.getElementById('template-country').value = data.country_id || '';
+            document.getElementById('template-category').value = data.category_id || '';
+            document.getElementById('template-technique').value = data.technique_id || '';
+            document.getElementById('template-comment').value = data.comment || '';
+      
+            // Show/hide controls based on permissions
+            const canEdit = data.can_edit;
+            document.getElementById('modal-delete-btn').style.display = canEdit ? 'flex' : 'none';
+            document.getElementById('modal-update-btn').style.display = canEdit ? 'block' : 'none';
+      
+            // Update materials count
+            document.getElementById('modal-materials-count').textContent = data.materials.length;
+      
+            // Render materials
+            renderMaterials(data.materials, canEdit);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('modal-template-name').textContent = 'Error';
+            document.getElementById('modal-materials-list').innerHTML =
+              '<li class="text-center py-4 text-red-600">Failed to load template</li>';
+          });
+      }
+      
+      // Render materials list
+      function renderMaterials(materials, canEdit) {
+        const list = document.getElementById('modal-materials-list');
+      
+        if (materials.length === 0) {
+          list.innerHTML = '<li class="text-center py-4 text-[var(--text--sub-600)]">No materials added</li>';
+          return;
+        }
+      
+        list.innerHTML = materials.map(m => `
+          <li class="bg-[var(--bg--weak-50)] rounded-xl p-4" data-material-id="${m.id}">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm/5 font-medium">${m.name}</span>
+              ${m.epd_link ? `<a href="${m.epd_link}" target="_blank"><span data-icon="external-link-line" data-size="20" data-color="var(--icon--sub-600)"></span></a>` : ''}
+            </div>
+            <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
+              ${m.country_code ? `<div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"><span data-country="${m.country_code}" data-width="20"></span></div>` : ''}
+              <label class="input flex-[2.5]">
+                <input type="text" class="material-description" value="${m.description || ''}" placeholder="Add description" ${!canEdit ? 'readonly' : ''} />
+              </label>
+              <label class="input flex-1">
+                <input type="number" class="material-quantity" value="${m.quantity}" ${!canEdit ? 'readonly' : ''} />
+                <span class="text-xs/5 text-[var(--text--sub-600)]">${m.unit}</span>
+              </label>
+              ${canEdit ? `
+                <div class="flex items-center py-2 mr-1.5"><div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"></div></div>
+                <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0" onclick="deleteMaterial('${m.id}')">
+                  <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+                </button>
+              ` : ''}
+            </div>
+          </li>
+        `).join('');
+      }
+      
+      // Delete material
+      function deleteMaterial(materialId) {
+        if (!confirm('Remove this material?')) return;
+      
+        deletedMaterialIds.push(materialId);
+        document.querySelector(`[data-material-id="${materialId}"]`)?.remove();
+      
+        const count = document.querySelectorAll('#modal-materials-list > li').length;
+        document.getElementById('modal-materials-count').textContent = count;
+      }
+      
+      // Collect form data
+      function collectFormData() {
+        const materials = [];
+        const new_materials = [];
+
+        document.querySelectorAll('#modal-materials-list > li[data-material-id]').forEach(li => {
+          const id = li.getAttribute('data-material-id');
+          const description = li.querySelector('.material-description')?.value || '';
+          const quantity = parseFloat(li.querySelector('.material-quantity')?.value) || 0;
+
+          // Check if this is a new material (from EPD modal)
+          if (id.startsWith('new_')) {
+            const epd_id = li.querySelector('.new-material-epd-id')?.value;
+            if (epd_id) {
+              new_materials.push({
+                epd_id,
+                description,
+                quantity
+              });
+            }
+          } else {
+            // Existing material
+            materials.push({
+              id,
+              description,
+              quantity
+            });
+          }
+        });
+
+        return {
+          name: document.getElementById('template-name').value,
+          country_id: document.getElementById('template-country').value,
+          comment: document.getElementById('template-comment').value,
+          materials,
+          new_materials,
+          deleted_materials: deletedMaterialIds
+        };
+      }
+      
+      // Update template
+      function handleUpdate() {
+        const form = document.getElementById('template-form');
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+      
+        const templateId = document.getElementById('template-id').value;
+        const data = collectFormData();
+      
+        fetch(`/templates/${templateId}/update/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            template_detail_modal.close();
+            htmx.trigger('#search-form', 'submit');
+            if (typeof Toast !== 'undefined') Toast.success('Template updated');
+          } else {
+            Toast.error(result.error || 'Update failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Toast.error('An error occurred');
+        });
+      }
+      
+      // Duplicate template
+      function handleDuplicate() {
+        const form = document.getElementById('template-form');
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+      
+        const templateId = document.getElementById('template-id').value;
+        const data = collectFormData();
+      
+        fetch(`/templates/${templateId}/duplicate/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            template_detail_modal.close();
+            htmx.trigger('#search-form', 'submit');
+            if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
+          } else {
+            Toast.error(result.error || 'Duplication failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Toast.error('An error occurred');
+        });
+      }
+      
+      // Delete template from dialog
+      function deleteTemplateFromDialog() {
+        const templateId = document.getElementById('template-id').value;
+        const templateName = document.getElementById('template-name').value;
+      
+        if (!confirm(`Delete "${templateName}"? This cannot be undone.`)) return;
+      
+        fetch(`/templates/${templateId}/delete/`, {
+          method: 'DELETE',
+          headers: { 'X-CSRFToken': getCsrfToken() }
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            template_detail_modal.close();
+            htmx.trigger('#search-form', 'submit');
+            if (typeof Toast !== 'undefined') Toast.success('Template deleted');
+          } else {
+            Toast.error(result.error || 'Deletion failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Toast.error('An error occurred');
+        });
+      }
+      
+      // Delete from list (existing function)
+      function deleteTemplate(assemblyId, assemblyName) {
+        if (!confirm(`Delete "${assemblyName}"? This cannot be undone.`)) return;
+      
+        fetch(`/templates/${assemblyId}/delete/`, {
+          method: 'DELETE',
+          headers: { 'X-CSRFToken': getCsrfToken() }
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            htmx.trigger('#search-form', 'submit');
+            if (typeof Toast !== 'undefined') Toast.success('Template deleted');
+          } else {
+            Toast.error(result.error || 'Deletion failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          if (typeof Toast !== 'undefined') Toast.error('An error occurred');
+        });
+      }
+      
+      // Duplicate from list (existing function)
+      function duplicateTemplate(assemblyId) {
+        if (!confirm('Create a copy of this template?')) return;
+      
+        // Simple duplication without modifications
+        fetch(`/templates/${assemblyId}/duplicate/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ materials: [] })
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            htmx.trigger('#search-form', 'submit');
+            if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
+          } else {
+            Toast.error(result.error || 'Duplication failed');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Toast.error('An error occurred');
+        });
+      }
+      
+      // Get CSRF token
+      function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+          document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+      }
+
+
+      // Trigger default search when modal opens
+      let epdModalOpened = false;
+      const epdModalDialog = document.getElementById('structural_component_epd_modal');
+
+      // Listen for when "Add from EPD library" button is clicked
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('[onclick*="structural_component_epd_modal.showModal"]')) {
+          setTimeout(() => {
+            const searchList = document.getElementById('epd-search-list');
+            const hasResults = searchList && searchList.querySelector('ul');
+
+            // Only trigger default search if modal hasn't been populated yet
+            if (!hasResults) {
+              const searchForm = document.getElementById('epd-search-form');
+              if (searchForm && typeof htmx !== 'undefined') {
+                htmx.trigger(searchForm, 'submit');
+              }
+            }
+          }, 100);
+        }
+      });
+
+
+      //  directly add to template materials
+      document.addEventListener('click', function(e) {
+        const addBtn = e.target.closest('.add-epd-btn');
+        if (addBtn) {
+          e.preventDefault();
+          const epd = JSON.parse(addBtn.dataset.epd);
+
+          // Add EPD directly to template materials list with default quantity = 1
+          addEpdToMaterialsList(epd);
+
+          // Change button to "Added" state
+          addBtn.innerHTML = `
+            <span data-icon="check-line" data-size="20" data-color="var(--icon--disabled-300)"></span>
+            Added
+          `;
+          addBtn.classList.remove('btn-outline');
+          addBtn.classList.add('btn-success');
+          addBtn.disabled = true;
+
+        }
+      });
+
+      // Add EPD to materials list in template detail modal
+      function addEpdToMaterialsList(epd) {
+        const materialsList = document.getElementById('modal-materials-list');
+        const tempId = 'new_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        const materialHtml = `
+          <li class="bg-[var(--bg--weak-50)] rounded-xl p-4" data-material-id="${tempId}" data-is-new="true">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm/5 font-medium">${epd.name}</span>
+              <a href="/epd/${epd.id}/" target="_blank"><span data-icon="external-link-line" data-size="20" data-color="var(--icon--sub-600)"></span></a>
+            </div>
+            <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
+              ${epd.country_code ? `<div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"><span data-country="${epd.country_code}" data-width="20"></span></div>` : ''}
+              <label class="input flex-[2.5]">
+                <input type="text" class="material-description" value="" placeholder="Add description" data-epd-id="${epd.id}" />
+              </label>
+              <label class="input flex-1">
+                <input type="number" class="material-quantity" value="1" data-epd-id="${epd.id}" min="0" step="any" />
+                <span class="text-xs/5 text-[var(--text--sub-600)]">${epd.unit}</span>
+              </label>
+              <div class="flex items-center py-2 mr-1.5"><div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full"></div></div>
+              <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch aspect-square shrink-0" onclick="deleteMaterial('${tempId}')">
+                <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+              </button>
+            </div>
+            <input type="hidden" class="new-material-epd-id" value="${epd.id}" />
+          </li>
+        `;
+
+        materialsList.insertAdjacentHTML('beforeend', materialHtml);
+
+        // Update count
+        const totalMaterials = materialsList.querySelectorAll('li[data-material-id]').length;
+        document.getElementById('modal-materials-count').textContent = totalMaterials;
+
+      }
+
+    </script>
+
+{% endblock %}
