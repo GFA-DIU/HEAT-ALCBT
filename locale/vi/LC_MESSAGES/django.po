@@ -28,40 +28,40 @@ msgstr "Tên của người viết này quá dài."
 #: .\pages\forms\lighting_system_form.py:85
 #: .\pages\forms\ventilation_system_form.py:103
 msgid "Energy efficiency label must be between 1 and 5 stars."
-msgstr ""
+msgstr "Nhãn hiệu suất năng lượng phải từ 1 đến 5 sao."
 
 #: .\pages\forms\cooling_system_form.py:128
 #: .\pages\forms\cooling_system_form.py:201
 #: .\pages\forms\lighting_system_form.py:88
 #: .\pages\forms\ventilation_system_form.py:106
 msgid "Please enter a valid number for energy efficiency label."
-msgstr ""
+msgstr "Vui lòng nhập số hợp lệ cho nhãn hiệu suất năng lượng."
 
 #: .\pages\forms\hot_water_system_form.py:14
 #: .\pages\models\building_operation\hot_water.py:52
 msgid "Type of Hot Water System"
-msgstr ""
+msgstr "Loại hệ thống nước nóng"
 
 #: .\pages\forms\hot_water_system_form.py:18
 msgid "Type of hot water system is required."
-msgstr ""
+msgstr "Loại hệ thống nước nóng là bắt buộc."
 
 #: .\pages\forms\hot_water_system_form.py:19
 msgid "Invalid hot water system type selected."
-msgstr ""
+msgstr "Loại hệ thống nước nóng được chọn không hợp lệ."
 
 #: .\pages\forms\hot_water_system_form.py:24
 #: .\pages\models\building_operation\hot_water.py:59
 msgid "Fuel Type"
-msgstr ""
+msgstr "Loại nhiên liệu"
 
 #: .\pages\forms\hot_water_system_form.py:28
 msgid "Fuel type is required."
-msgstr ""
+msgstr "Loại nhiên liệu là bắt buộc."
 
 #: .\pages\forms\hot_water_system_form.py:29
 msgid "Invalid fuel type selected."
-msgstr ""
+msgstr "Loại nhiên liệu được chọn không hợp lệ."
 
 #: .\pages\forms\hot_water_system_form.py:34
 #: .\pages\models\building_operation\hot_water.py:66
@@ -78,7 +78,7 @@ msgstr "Giờ hoạt động mỗi ngày làm việc"
 
 #: .\pages\forms\hot_water_system_form.py:41
 msgid "Operating hours cannot be negative."
-msgstr ""
+msgstr "Giờ hoạt động không thể âm."
 
 #: .\pages\forms\hot_water_system_form.py:42
 #, fuzzy
@@ -138,59 +138,59 @@ msgstr "Số tuần hoạt động mỗi năm"
 
 #: .\pages\forms\hot_water_system_form.py:71
 msgid "Fuel Consumption"
-msgstr ""
+msgstr "Tiêu thụ nhiên liệu"
 
 #: .\pages\forms\hot_water_system_form.py:76
 msgid "Fuel consumption is required."
-msgstr ""
+msgstr "Tiêu thụ nhiên liệu là bắt buộc."
 
 #: .\pages\forms\hot_water_system_form.py:77
 msgid "Fuel consumption cannot be negative."
-msgstr ""
+msgstr "Tiêu thụ nhiên liệu không thể âm."
 
 #: .\pages\forms\hot_water_system_form.py:82
 msgid "Power Input (kW)"
-msgstr ""
+msgstr "Công suất đầu vào (kW)"
 
 #: .\pages\forms\hot_water_system_form.py:87
 msgid "Power input is required."
-msgstr ""
+msgstr "Công suất đầu vào là bắt buộc."
 
 #: .\pages\forms\hot_water_system_form.py:88
 msgid "Power input cannot be negative."
-msgstr ""
+msgstr "Công suất đầu vào không thể âm."
 
 #: .\pages\forms\hot_water_system_form.py:93
 msgid "Baseline Efficiency"
-msgstr ""
+msgstr "Hiệu suất cơ bản"
 
 #: .\pages\forms\hot_water_system_form.py:98
 msgid "Baseline efficiency is required."
-msgstr ""
+msgstr "Hiệu suất cơ bản là bắt buộc."
 
 #: .\pages\forms\hot_water_system_form.py:99
 msgid "Baseline efficiency cannot be negative."
-msgstr ""
+msgstr "Hiệu suất cơ bản không thể âm."
 
 #: .\pages\forms\hot_water_system_form.py:104
 msgid "Equipment Efficiency Level (%)"
-msgstr ""
+msgstr "Mức hiệu suất thiết bị (%)"
 
 #: .\pages\forms\hot_water_system_form.py:110
 msgid "Equipment efficiency level is required."
-msgstr ""
+msgstr "Mức hiệu suất thiết bị là bắt buộc."
 
 #: .\pages\forms\hot_water_system_form.py:111
 msgid "Equipment efficiency level cannot be negative."
-msgstr ""
+msgstr "Mức hiệu suất thiết bị không thể âm."
 
 #: .\pages\forms\hot_water_system_form.py:112
 msgid "Equipment efficiency level cannot exceed 100%."
-msgstr ""
+msgstr "Mức hiệu suất thiết bị không thể vượt quá 100%."
 
 #: .\pages\forms\hot_water_system_form.py:117
 msgid "Heat Recovery System"
-msgstr ""
+msgstr "Hệ thống thu hồi nhiệt"
 
 #: .\pages\forms\hot_water_system_form.py:122
 #, fuzzy
@@ -206,27 +206,27 @@ msgstr "Số lượng cư dân (ước tính)"
 
 #: .\pages\forms\hot_water_system_form.py:127
 msgid "Number of equipment must be at least 1."
-msgstr ""
+msgstr "Số lượng thiết bị phải ít nhất là 1."
 
 #: .\pages\forms\lift_escalator_system_form.py:84
 msgid "Annual energy consumption cannot be negative."
-msgstr ""
+msgstr "Tiêu thụ năng lượng hàng năm không thể âm."
 
 #: .\pages\forms\lift_escalator_system_form.py:87
 #: .\pages\forms\lighting_system_form.py:103
 #: .\pages\forms\lighting_system_form.py:118
 #: .\pages\forms\ventilation_system_form.py:121
 msgid "Please enter a valid number."
-msgstr ""
+msgstr "Vui lòng nhập số hợp lệ."
 
 #: .\pages\forms\lighting_system_form.py:100
 msgid "Baseline lighting power density cannot be negative."
-msgstr ""
+msgstr "Mật độ công suất chiếu sáng cơ bản không thể âm."
 
 #: .\pages\forms\lighting_system_form.py:115
 #: .\pages\forms\ventilation_system_form.py:118
 msgid "Total energy consumption cannot be negative."
-msgstr ""
+msgstr "Tổng tiêu thụ năng lượng không thể âm."
 
 #: .\pages\models\assembly.py:130
 msgid "Assembly Mode"
@@ -380,84 +380,84 @@ msgstr "Đơn vị chiếu sáng"
 
 #: .\pages\models\building.py:267
 msgid "Building UUID"
-msgstr ""
+msgstr "UUID tòa nhà"
 
 #: .\pages\models\building.py:273
 msgid "Building name/code"
-msgstr ""
+msgstr "Tên/mã tòa nhà"
 
 #: .\pages\models\building.py:290
 msgid "Year of Construction"
-msgstr ""
+msgstr "Năm xây dựng"
 
 #: .\pages\models\building.py:295
 msgid "Climate"
-msgstr ""
+msgstr "Khí hậu"
 
 #: .\pages\models\building.py:298
 #: .\templates\pages\add-building\components\building-information\building-details.html:93
 #: .\templates\pages\home\partials\buildings_list.html:105
 msgid "Total floor area"
-msgstr ""
+msgstr "Tổng diện tích sàn"
 
 #: .\pages\models\building.py:299 .\pages\models\building.py:307
 msgid "Gross floor area [m²]"
-msgstr ""
+msgstr "Tổng diện tích sàn [m²]"
 
 #: .\pages\models\building.py:306
 #: .\templates\pages\add-building\components\building-information\building-details.html:103
 msgid "Conditioned floor area"
-msgstr ""
+msgstr "Diện tích sàn có điều hòa"
 
 #: .\pages\models\building.py:314
 msgid "Floors above ground"
-msgstr ""
+msgstr "Số tầng trên mặt đất"
 
 #: .\pages\models\building.py:315
 msgid "Number of floors above"
-msgstr ""
+msgstr "Số tầng phía trên"
 
 #: .\pages\models\building.py:321
 msgid "Floors below ground"
-msgstr ""
+msgstr "Số tầng dưới mặt đất"
 
 #: .\pages\models\building.py:322
 msgid "Number of floors below"
-msgstr ""
+msgstr "Số tầng phía dưới"
 
 #: .\pages\models\building.py:328
 msgid "Assessment time frame"
-msgstr ""
+msgstr "Khung thời gian đánh giá"
 
 #: .\pages\models\building.py:329
 msgid "Years of building use"
-msgstr ""
+msgstr "Số năm sử dụng tòa nhà"
 
 #: .\pages\models\building.py:344 .\pages\models\building.py:367
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:155
 #: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:41
 msgid "Quantity"
-msgstr ""
+msgstr "Số lượng"
 
 #: .\pages\models\building.py:345
 msgid "How much of this component"
-msgstr ""
+msgstr "Số lượng của thành phần này"
 
 #: .\pages\models\building.py:353 .\pages\models\building.py:378
 msgid "Reporting life-cycle"
-msgstr ""
+msgstr "Chu kỳ sống báo cáo"
 
 #: .\pages\models\building.py:354 .\pages\models\building.py:379
 msgid "Reporting life-cycle for assembly"
-msgstr ""
+msgstr "Chu kỳ sống báo cáo cho cụm lắp ráp"
 
 #: .\pages\models\building.py:368
 msgid "How many of components"
-msgstr ""
+msgstr "Số lượng thành phần"
 
 #: .\pages\models\building.py:375
 msgid "Unit of Quantity"
-msgstr ""
+msgstr "Đơn vị số lượng"
 
 #: .\pages\models\building_operation\air_conditioning.py:13
 #: .\pages\models\building_operation\chilling.py:107
@@ -467,24 +467,24 @@ msgstr ""
 #: .\pages\models\building_operation\operational_information.py:12
 #: .\pages\models\building_operation\ventilation.py:26
 msgid "Building"
-msgstr ""
+msgstr "Tòa nhà"
 
 #: .\pages\models\building_operation\air_conditioning.py:18
 msgid "VRV/VRF (Variable Refrigerant Volume/Flow)"
-msgstr ""
+msgstr "VRV/VRF (Lưu lượng môi chất lạnh thay đổi)"
 
 #: .\pages\models\building_operation\air_conditioning.py:19
 msgid "Split Air Conditioners"
-msgstr ""
+msgstr "Máy điều hòa tách lẻ"
 
 #: .\pages\models\building_operation\air_conditioning.py:21
 msgid "Air Conditioners Type"
-msgstr ""
+msgstr "Loại máy điều hòa"
 
 #: .\pages\models\building_operation\air_conditioning.py:24
 #: .\pages\models\building_operation\chilling.py:118
 msgid "Year of Installation"
-msgstr ""
+msgstr "Năm lắp đặt"
 
 #: .\pages\models\building_operation\air_conditioning.py:27
 #: .\pages\models\building_operation\chilling.py:121
@@ -519,644 +519,644 @@ msgstr "Số tuần hoạt động mỗi năm"
 #: .\pages\models\building_operation\air_conditioning.py:38
 #: .\pages\models\building_operation\chilling.py:132
 msgid "Type of Refrigerants"
-msgstr ""
+msgstr "Loại môi chất lạnh"
 
 #: .\pages\models\building_operation\air_conditioning.py:41
 #: .\pages\models\building_operation\chilling.py:135
 msgid "Refrigerant Quantity (Kg)"
-msgstr ""
+msgstr "Số lượng môi chất lạnh (Kg)"
 
 #: .\pages\models\building_operation\air_conditioning.py:44
 msgid "Total Cooling Load for Split/VRV (RT)"
-msgstr ""
+msgstr "Tổng tải làm lạnh cho Split/VRV (RT)"
 
 #: .\pages\models\building_operation\air_conditioning.py:51
 msgid "Baseline Split Unit/VRV System Efficiency (kW/RT)"
-msgstr ""
+msgstr "Hiệu suất hệ thống Split/VRV cơ bản (kW/RT)"
 
 #: .\pages\models\building_operation\air_conditioning.py:56
 #: .\pages\models\building_operation\chilling.py:152
 msgid "Baseline Refrigerant Emission Factor (GWP)"
-msgstr ""
+msgstr "Hệ số phát thải môi chất lạnh cơ bản (GWP)"
 
 #: .\pages\models\building_operation\air_conditioning.py:59
 #: .\pages\models\building_operation\chilling.py:155
 msgid "Baseline Leakage Factor (%)"
-msgstr ""
+msgstr "Hệ số rò rỉ cơ bản (%)"
 
 #: .\pages\models\building_operation\air_conditioning.py:65
 msgid "Total Energy Consumption of Cooling System Annually (kWh/year)"
-msgstr ""
+msgstr "Tổng tiêu thụ năng lượng của hệ thống làm lạnh hàng năm (kWh/năm)"
 
 #: .\pages\models\building_operation\air_conditioning.py:69
 msgid "Total Number of Split/VRV Units"
-msgstr ""
+msgstr "Tổng số đơn vị Split/VRV"
 
 #: .\pages\models\building_operation\air_conditioning.py:72
 msgid "Total Split Unit/VRV System Power (kW)"
-msgstr ""
+msgstr "Tổng công suất hệ thống Split/VRV (kW)"
 
 #: .\pages\models\building_operation\air_conditioning.py:75
 #: .\pages\models\building_operation\chilling.py:176
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:436
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:677
 msgid "COP"
-msgstr ""
+msgstr "COP"
 
 #: .\pages\models\building_operation\air_conditioning.py:82
 msgid "ISEER Rating"
-msgstr ""
+msgstr "Xếp hạng ISEER"
 
 #: .\pages\models\building_operation\air_conditioning.py:88
 #: .\pages\models\building_operation\chilling.py:185
 #: .\pages\models\building_operation\lighting.py:73
 #: .\pages\models\building_operation\ventilation.py:80
 msgid "Energy Efficiency Label"
-msgstr ""
+msgstr "Nhãn hiệu suất năng lượng"
 
 #: .\pages\models\building_operation\chilling.py:8
 msgid "R-290 (Propane)"
-msgstr ""
+msgstr "R-290 (Propane)"
 
 #: .\pages\models\building_operation\chilling.py:9
 msgid "R-600a (Isobutane)"
-msgstr ""
+msgstr "R-600a (Isobutane)"
 
 #: .\pages\models\building_operation\chilling.py:10
 msgid "R-717 (Ammonia)"
-msgstr ""
+msgstr "R-717 (Ammonia)"
 
 #: .\pages\models\building_operation\chilling.py:11
 msgid "R-744 (CO2)"
-msgstr ""
+msgstr "R-744 (CO2)"
 
 #: .\pages\models\building_operation\chilling.py:12
 msgid "R-12"
-msgstr ""
+msgstr "R-12"
 
 #: .\pages\models\building_operation\chilling.py:13
 msgid "R-13"
-msgstr ""
+msgstr "R-13"
 
 #: .\pages\models\building_operation\chilling.py:14
 msgid "R-22"
-msgstr ""
+msgstr "R-22"
 
 #: .\pages\models\building_operation\chilling.py:15
 msgid "R-23"
-msgstr ""
+msgstr "R-23"
 
 #: .\pages\models\building_operation\chilling.py:16
 msgid "R-32"
-msgstr ""
+msgstr "R-32"
 
 #: .\pages\models\building_operation\chilling.py:17
 msgid "R-41"
-msgstr ""
+msgstr "R-41"
 
 #: .\pages\models\building_operation\chilling.py:18
 msgid "R-125"
-msgstr ""
+msgstr "R-125"
 
 #: .\pages\models\building_operation\chilling.py:19
 msgid "R-134a"
-msgstr ""
+msgstr "R-134a"
 
 #: .\pages\models\building_operation\chilling.py:20
 msgid "R-143a"
-msgstr ""
+msgstr "R-143a"
 
 #: .\pages\models\building_operation\chilling.py:21
 msgid "R-227EA"
-msgstr ""
+msgstr "R-227EA"
 
 #: .\pages\models\building_operation\chilling.py:22
 msgid "R-236CB"
-msgstr ""
+msgstr "R-236CB"
 
 #: .\pages\models\building_operation\chilling.py:23
 msgid "R-236EA"
-msgstr ""
+msgstr "R-236EA"
 
 #: .\pages\models\building_operation\chilling.py:24
 msgid "R-236FA"
-msgstr ""
+msgstr "R-236FA"
 
 #: .\pages\models\building_operation\chilling.py:25
 msgid "R-245CA"
-msgstr ""
+msgstr "R-245CA"
 
 #: .\pages\models\building_operation\chilling.py:26
 msgid "R-245FA"
-msgstr ""
+msgstr "R-245FA"
 
 #: .\pages\models\building_operation\chilling.py:27
 msgid "R-404A"
-msgstr ""
+msgstr "R-404A"
 
 #: .\pages\models\building_operation\chilling.py:28
 msgid "R-407A"
-msgstr ""
+msgstr "R-407A"
 
 #: .\pages\models\building_operation\chilling.py:29
 msgid "R-407B"
-msgstr ""
+msgstr "R-407B"
 
 #: .\pages\models\building_operation\chilling.py:30
 msgid "R-407C"
-msgstr ""
+msgstr "R-407C"
 
 #: .\pages\models\building_operation\chilling.py:31
 msgid "R-407D"
-msgstr ""
+msgstr "R-407D"
 
 #: .\pages\models\building_operation\chilling.py:32
 msgid "R-407E"
-msgstr ""
+msgstr "R-407E"
 
 #: .\pages\models\building_operation\chilling.py:33
 msgid "R-407F"
-msgstr ""
+msgstr "R-407F"
 
 #: .\pages\models\building_operation\chilling.py:34
 msgid "R-407G"
-msgstr ""
+msgstr "R-407G"
 
 #: .\pages\models\building_operation\chilling.py:35
 msgid "R-410A"
-msgstr ""
+msgstr "R-410A"
 
 #: .\pages\models\building_operation\chilling.py:36
 msgid "R-410B"
-msgstr ""
+msgstr "R-410B"
 
 #: .\pages\models\building_operation\chilling.py:37
 msgid "R-413A"
-msgstr ""
+msgstr "R-413A"
 
 #: .\pages\models\building_operation\chilling.py:38
 msgid "R-417A"
-msgstr ""
+msgstr "R-417A"
 
 #: .\pages\models\building_operation\chilling.py:39
 msgid "R-417B"
-msgstr ""
+msgstr "R-417B"
 
 #: .\pages\models\building_operation\chilling.py:40
 msgid "R-417C"
-msgstr ""
+msgstr "R-417C"
 
 #: .\pages\models\building_operation\chilling.py:41
 msgid "R-419A"
-msgstr ""
+msgstr "R-419A"
 
 #: .\pages\models\building_operation\chilling.py:42
 msgid "R-419B"
-msgstr ""
+msgstr "R-419B"
 
 #: .\pages\models\building_operation\chilling.py:43
 msgid "R-421A"
-msgstr ""
+msgstr "R-421A"
 
 #: .\pages\models\building_operation\chilling.py:44
 msgid "R-421B"
-msgstr ""
+msgstr "R-421B"
 
 #: .\pages\models\building_operation\chilling.py:45
 msgid "R-422A"
-msgstr ""
+msgstr "R-422A"
 
 #: .\pages\models\building_operation\chilling.py:46
 msgid "R-422B"
-msgstr ""
+msgstr "R-422B"
 
 #: .\pages\models\building_operation\chilling.py:47
 msgid "R-422C"
-msgstr ""
+msgstr "R-422C"
 
 #: .\pages\models\building_operation\chilling.py:48
 msgid "R-422D"
-msgstr ""
+msgstr "R-422D"
 
 #: .\pages\models\building_operation\chilling.py:49
 msgid "R-423A"
-msgstr ""
+msgstr "R-423A"
 
 #: .\pages\models\building_operation\chilling.py:50
 msgid "R-424A"
-msgstr ""
+msgstr "R-424A"
 
 #: .\pages\models\building_operation\chilling.py:51
 msgid "R-425A"
-msgstr ""
+msgstr "R-425A"
 
 #: .\pages\models\building_operation\chilling.py:52
 msgid "R-426A"
-msgstr ""
+msgstr "R-426A"
 
 #: .\pages\models\building_operation\chilling.py:53
 msgid "R-427A"
-msgstr ""
+msgstr "R-427A"
 
 #: .\pages\models\building_operation\chilling.py:54
 msgid "R-428A"
-msgstr ""
+msgstr "R-428A"
 
 #: .\pages\models\building_operation\chilling.py:55
 msgid "R-429A"
-msgstr ""
+msgstr "R-429A"
 
 #: .\pages\models\building_operation\chilling.py:56
 msgid "R-430A"
-msgstr ""
+msgstr "R-430A"
 
 #: .\pages\models\building_operation\chilling.py:57
 msgid "R-431A"
-msgstr ""
+msgstr "R-431A"
 
 #: .\pages\models\building_operation\chilling.py:58
 msgid "R-434A"
-msgstr ""
+msgstr "R-434A"
 
 #: .\pages\models\building_operation\chilling.py:59
 msgid "R-435A"
-msgstr ""
+msgstr "R-435A"
 
 #: .\pages\models\building_operation\chilling.py:60
 msgid "R-437A"
-msgstr ""
+msgstr "R-437A"
 
 #: .\pages\models\building_operation\chilling.py:61
 msgid "R-438A"
-msgstr ""
+msgstr "R-438A"
 
 #: .\pages\models\building_operation\chilling.py:62
 msgid "R-439A"
-msgstr ""
+msgstr "R-439A"
 
 #: .\pages\models\building_operation\chilling.py:63
 msgid "R-440A"
-msgstr ""
+msgstr "R-440A"
 
 #: .\pages\models\building_operation\chilling.py:64
 msgid "R-442A"
-msgstr ""
+msgstr "R-442A"
 
 #: .\pages\models\building_operation\chilling.py:65
 msgid "R-444A"
-msgstr ""
+msgstr "R-444A"
 
 #: .\pages\models\building_operation\chilling.py:66
 msgid "R-444B"
-msgstr ""
+msgstr "R-444B"
 
 #: .\pages\models\building_operation\chilling.py:67
 msgid "R-445A"
-msgstr ""
+msgstr "R-445A"
 
 #: .\pages\models\building_operation\chilling.py:68
 msgid "R-446A"
-msgstr ""
+msgstr "R-446A"
 
 #: .\pages\models\building_operation\chilling.py:69
 msgid "R-447A"
-msgstr ""
+msgstr "R-447A"
 
 #: .\pages\models\building_operation\chilling.py:70
 msgid "R-447B"
-msgstr ""
+msgstr "R-447B"
 
 #: .\pages\models\building_operation\chilling.py:71
 msgid "R-448A"
-msgstr ""
+msgstr "R-448A"
 
 #: .\pages\models\building_operation\chilling.py:72
 msgid "R-449A"
-msgstr ""
+msgstr "R-449A"
 
 #: .\pages\models\building_operation\chilling.py:73
 msgid "R-449B"
-msgstr ""
+msgstr "R-449B"
 
 #: .\pages\models\building_operation\chilling.py:74
 msgid "R-449C"
-msgstr ""
+msgstr "R-449C"
 
 #: .\pages\models\building_operation\chilling.py:75
 msgid "R-450A"
-msgstr ""
+msgstr "R-450A"
 
 #: .\pages\models\building_operation\chilling.py:76
 msgid "R-451A"
-msgstr ""
+msgstr "R-451A"
 
 #: .\pages\models\building_operation\chilling.py:77
 msgid "R-451B"
-msgstr ""
+msgstr "R-451B"
 
 #: .\pages\models\building_operation\chilling.py:78
 msgid "R-452A"
-msgstr ""
+msgstr "R-452A"
 
 #: .\pages\models\building_operation\chilling.py:79
 msgid "R-452B"
-msgstr ""
+msgstr "R-452B"
 
 #: .\pages\models\building_operation\chilling.py:80
 msgid "R-452C"
-msgstr ""
+msgstr "R-452C"
 
 #: .\pages\models\building_operation\chilling.py:81
 msgid "R-453A"
-msgstr ""
+msgstr "R-453A"
 
 #: .\pages\models\building_operation\chilling.py:82
 msgid "R-454A"
-msgstr ""
+msgstr "R-454A"
 
 #: .\pages\models\building_operation\chilling.py:83
 msgid "R-454B"
-msgstr ""
+msgstr "R-454B"
 
 #: .\pages\models\building_operation\chilling.py:84
 msgid "R-454C"
-msgstr ""
+msgstr "R-454C"
 
 #: .\pages\models\building_operation\chilling.py:85
 msgid "R-455A"
-msgstr ""
+msgstr "R-455A"
 
 #: .\pages\models\building_operation\chilling.py:86
 msgid "R-456A"
-msgstr ""
+msgstr "R-456A"
 
 #: .\pages\models\building_operation\chilling.py:87
 msgid "R-457A"
-msgstr ""
+msgstr "R-457A"
 
 #: .\pages\models\building_operation\chilling.py:88
 msgid "R-458A"
-msgstr ""
+msgstr "R-458A"
 
 #: .\pages\models\building_operation\chilling.py:89
 msgid "R-500"
-msgstr ""
+msgstr "R-500"
 
 #: .\pages\models\building_operation\chilling.py:90
 msgid "R-502"
-msgstr ""
+msgstr "R-502"
 
 #: .\pages\models\building_operation\chilling.py:91
 msgid "R-503"
-msgstr ""
+msgstr "R-503"
 
 #: .\pages\models\building_operation\chilling.py:92
 msgid "R-507A"
-msgstr ""
+msgstr "R-507A"
 
 #: .\pages\models\building_operation\chilling.py:93
 msgid "R-508A"
-msgstr ""
+msgstr "R-508A"
 
 #: .\pages\models\building_operation\chilling.py:94
 msgid "R-508B"
-msgstr ""
+msgstr "R-508B"
 
 #: .\pages\models\building_operation\chilling.py:95
 msgid "R-512A"
-msgstr ""
+msgstr "R-512A"
 
 #: .\pages\models\building_operation\chilling.py:96
 msgid "R-513A"
-msgstr ""
+msgstr "R-513A"
 
 #: .\pages\models\building_operation\chilling.py:97
 msgid "R-513B"
-msgstr ""
+msgstr "R-513B"
 
 #: .\pages\models\building_operation\chilling.py:98
 msgid "R-515A"
-msgstr ""
+msgstr "R-515A"
 
 #: .\pages\models\building_operation\chilling.py:99
 #: .\pages\models\building_operation\hot_water.py:29
 msgid "Other"
-msgstr ""
+msgstr "Khác"
 
 #: .\pages\models\building_operation\chilling.py:112
 msgid "Water Cooled Chillers"
-msgstr ""
+msgstr "Chiller làm lạnh bằng nước"
 
 #: .\pages\models\building_operation\chilling.py:113
 msgid "Air Cooled Chillers"
-msgstr ""
+msgstr "Chiller làm lạnh bằng không khí"
 
 #: .\pages\models\building_operation\chilling.py:115
 msgid "Chiller Type"
-msgstr ""
+msgstr "Loại Chiller"
 
 #: .\pages\models\building_operation\chilling.py:138
 msgid "Total Cooling Load for Chiller System (RT)"
-msgstr ""
+msgstr "Tổng tải làm lạnh cho hệ thống Chiller (RT)"
 
 #: .\pages\models\building_operation\chilling.py:141
 msgid "Baseline Cooling Efficiency (kW/h)"
-msgstr ""
+msgstr "Hiệu suất làm lạnh cơ bản (kW/h)"
 
 #: .\pages\models\building_operation\chilling.py:144
 #: .\pages\models\building_operation\ventilation.py:64
 msgid "Installation of Variable Speed Drives (VSDs)"
-msgstr ""
+msgstr "Lắp đặt hệ thống điều khiển tốc độ thay đổi (VSDs)"
 
 #: .\pages\models\building_operation\chilling.py:147
 #: .\pages\models\building_operation\hot_water.py:114
 msgid "Installation of Heat Recovery Systems"
-msgstr ""
+msgstr "Lắp đặt hệ thống thu hồi nhiệt"
 
 #: .\pages\models\building_operation\chilling.py:161
 msgid "Total Energy Consumption of Chiller System Annually (kWh/year)"
-msgstr ""
+msgstr "Tổng tiêu thụ năng lượng của hệ thống Chiller hàng năm (kWh/năm)"
 
 #: .\pages\models\building_operation\chilling.py:165
 msgid "Number of Chillers"
-msgstr ""
+msgstr "Số lượng Chiller"
 
 #: .\pages\models\building_operation\chilling.py:170
 msgid "Water-Cooled Chiller Cooling Load Factor (%)"
-msgstr ""
+msgstr "Hệ số tải làm lạnh Chiller làm lạnh bằng nước (%)"
 
 #: .\pages\models\building_operation\chilling.py:173
 msgid "Total Chiller System Power Input (kW)"
-msgstr ""
+msgstr "Tổng công suất đầu vào hệ thống Chiller (kW)"
 
 #: .\pages\models\building_operation\chilling.py:179
 msgid "IPLV"
-msgstr ""
+msgstr "IPLV"
 
 #: .\pages\models\building_operation\general_systems.py:15
 msgid "Number of Lifts"
-msgstr ""
+msgstr "Số lượng thang máy"
 
 #: .\pages\models\building_operation\general_systems.py:18
 msgid "Installation of Lift Regenerative Features"
-msgstr ""
+msgstr "Lắp đặt tính năng tái tạo thang máy"
 
 #: .\pages\models\building_operation\general_systems.py:22
 msgid "Installation of VVVF and Sleep Mode"
-msgstr ""
+msgstr "Lắp đặt VVVF và chế độ ngủ"
 
 #: .\pages\models\building_operation\general_systems.py:28
 msgid "Annual Lift System Energy Consumption (kWh/year)"
-msgstr ""
+msgstr "Tiêu thụ năng lượng hệ thống thang máy hàng năm (kWh/năm)"
 
 #: .\pages\models\building_operation\general_systems.py:32
 msgid "Lift and Escalator System"
-msgstr ""
+msgstr "Hệ thống thang máy và thang cuốn"
 
 #: .\pages\models\building_operation\general_systems.py:33
 msgid "Lift and Escalator Systems"
-msgstr ""
+msgstr "Hệ thống thang máy và thang cuốn"
 
 #: .\pages\models\building_operation\hot_water.py:9
 msgid "Heat Pump Water Heater"
-msgstr ""
+msgstr "Máy nước nóng bơm nhiệt"
 
 #: .\pages\models\building_operation\hot_water.py:10
 msgid "Boiler"
-msgstr ""
+msgstr "Lò hơi"
 
 #: .\pages\models\building_operation\hot_water.py:11
 msgid "Solar Water Heaters"
-msgstr ""
+msgstr "Máy nước nóng năng lượng mặt trời"
 
 #: .\pages\models\building_operation\hot_water.py:15
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:298
 msgid "Electricity"
-msgstr ""
+msgstr "Điện"
 
 #: .\pages\models\building_operation\hot_water.py:16
 msgid "Light Fuel Oil"
-msgstr ""
+msgstr "Dầu nhiên liệu nhẹ"
 
 #: .\pages\models\building_operation\hot_water.py:17
 msgid "Heavy Fuel Oil"
-msgstr ""
+msgstr "Dầu nhiên liệu nặng"
 
 #: .\pages\models\building_operation\hot_water.py:18
 msgid "Liquified Petroleum Gas (LPG)"
-msgstr ""
+msgstr "Khí dầu mỏ hóa lỏng (LPG)"
 
 #: .\pages\models\building_operation\hot_water.py:19
 msgid "Natural Gas"
-msgstr ""
+msgstr "Khí đốt tự nhiên"
 
 #: .\pages\models\building_operation\hot_water.py:20
 msgid "Coal"
-msgstr ""
+msgstr "Than đá"
 
 #: .\pages\models\building_operation\hot_water.py:21
 msgid "Lignite"
-msgstr ""
+msgstr "Than non"
 
 #: .\pages\models\building_operation\hot_water.py:22
 msgid "Diesel"
-msgstr ""
+msgstr "Dầu diesel"
 
 #: .\pages\models\building_operation\hot_water.py:23
 msgid "Kerosene"
-msgstr ""
+msgstr "Dầu hỏa"
 
 #: .\pages\models\building_operation\hot_water.py:24
 msgid "Fire Wood (Log Wood)"
-msgstr ""
+msgstr "Gỗ đốt (Gỗ khúc)"
 
 #: .\pages\models\building_operation\hot_water.py:25
 msgid "Fire Wood (Wood Chips)"
-msgstr ""
+msgstr "Gỗ đốt (Mảnh gỗ)"
 
 #: .\pages\models\building_operation\hot_water.py:26
 msgid "Fire Wood (Wood Pellets)"
-msgstr ""
+msgstr "Gỗ đốt (Viên gỗ)"
 
 #: .\pages\models\building_operation\hot_water.py:27
 msgid "Char Coal"
-msgstr ""
+msgstr "Than củi"
 
 #: .\pages\models\building_operation\hot_water.py:28
 msgid "Ignite"
-msgstr ""
+msgstr "Đốt"
 
 #: .\pages\models\building_operation\hot_water.py:33
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:205
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:203
 msgid "BEE Star Rating"
-msgstr ""
+msgstr "Xếp hạng sao BEE"
 
 #: .\pages\models\building_operation\hot_water.py:34
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:206
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:204
 msgid "EGAT"
-msgstr ""
+msgstr "EGAT"
 
 #: .\pages\models\building_operation\hot_water.py:86
 msgid "Fuel Consumption (Liters/m³)"
-msgstr ""
+msgstr "Tiêu thụ nhiên liệu (Lít/m³)"
 
 #: .\pages\models\building_operation\hot_water.py:93
 msgid "Hot Water System Power Input (kW)"
-msgstr ""
+msgstr "Công suất đầu vào hệ thống nước nóng (kW)"
 
 #: .\pages\models\building_operation\hot_water.py:101
 msgid "Baseline Hot Water System Efficiency (COP)"
-msgstr ""
+msgstr "Hiệu suất hệ thống nước nóng cơ bản (COP)"
 
 #: .\pages\models\building_operation\hot_water.py:109
 msgid "Baseline Hot Water System Equipment Efficiency Level (%)"
-msgstr ""
+msgstr "Mức hiệu suất thiết bị hệ thống nước nóng cơ bản (%)"
 
 #: .\pages\models\building_operation\hot_water.py:121
 msgid "Number of Hot Water Equipment Installed"
-msgstr ""
+msgstr "Số lượng thiết bị nước nóng được lắp đặt"
 
 #: .\pages\models\building_operation\hot_water.py:129
 msgid "Energy Efficiency Star Rating (1-5)"
-msgstr ""
+msgstr "Xếp hạng sao hiệu suất năng lượng (1-5)"
 
 #: .\pages\models\building_operation\hot_water.py:133
 msgid "Hot Water System"
-msgstr ""
+msgstr "Hệ thống nước nóng"
 
 #: .\pages\models\building_operation\hot_water.py:134
 msgid "Hot Water Systems"
-msgstr ""
+msgstr "Hệ thống nước nóng"
 
 #: .\pages\models\building_operation\lighting.py:8
 msgid "Office: Conference Room"
-msgstr ""
+msgstr "Văn phòng: Phòng họp"
 
 #: .\pages\models\building_operation\lighting.py:9
 msgid "Hospital: Patient Room"
-msgstr ""
+msgstr "Bệnh viện: Phòng bệnh nhân"
 
 #: .\pages\models\building_operation\lighting.py:10
 msgid "Residential: Kitchen"
-msgstr ""
+msgstr "Nhà ở: Nhà bếp"
 
 #: .\pages\models\building_operation\lighting.py:11
 msgid "Residential: Dining"
-msgstr ""
+msgstr "Nhà ở: Phòng ăn"
 
 #: .\pages\models\building_operation\lighting.py:15
 msgid "CFL (Compact Fluorescent Lamp) Lights"
-msgstr ""
+msgstr "Đèn CFL (Đèn huỳnh quang compact)"
 
 #: .\pages\models\building_operation\lighting.py:16
 msgid "LED (Light Emitting Diode) Lights"
-msgstr ""
+msgstr "Đèn LED (Diode phát sáng)"
 
 #: .\pages\models\building_operation\lighting.py:17
 msgid "T5 and T8 Fluorescent Tube Lights"
-msgstr ""
+msgstr "Đèn ống huỳnh quang T5 và T8"
 
 #: .\pages\models\building_operation\lighting.py:18
 #, fuzzy
@@ -1166,11 +1166,11 @@ msgstr "Loại chiếu sáng"
 
 #: .\pages\models\building_operation\lighting.py:30
 msgid "Room Type"
-msgstr ""
+msgstr "Loại phòng"
 
 #: .\pages\models\building_operation\lighting.py:33
 msgid "Area of Room (m²)"
-msgstr ""
+msgstr "Diện tích phòng (m²)"
 
 #: .\pages\models\building_operation\lighting.py:38
 #, fuzzy
@@ -1180,23 +1180,23 @@ msgstr "Loại chiếu sáng"
 
 #: .\pages\models\building_operation\lighting.py:42
 msgid "Number of Lighting Bulbs"
-msgstr ""
+msgstr "Số lượng bóng đèn"
 
 #: .\pages\models\building_operation\lighting.py:54
 msgid "Light Bulb Power Rating (W)"
-msgstr ""
+msgstr "Công suất định mức bóng đèn (W)"
 
 #: .\pages\models\building_operation\lighting.py:57
 msgid "Baseline Lighting Power Density (W/m²)"
-msgstr ""
+msgstr "Mật độ công suất chiếu sáng cơ bản (W/m²)"
 
 #: .\pages\models\building_operation\lighting.py:60
 msgid "Installation of Sensors"
-msgstr ""
+msgstr "Lắp đặt cảm biến"
 
 #: .\pages\models\building_operation\lighting.py:66
 msgid "Total Energy Consumption of Lighting System Annually (kWh/year)"
-msgstr ""
+msgstr "Tổng tiêu thụ năng lượng của hệ thống chiếu sáng hàng năm (kWh/năm)"
 
 #: .\pages\models\building_operation\operational_information.py:15
 #, fuzzy
@@ -1206,38 +1206,39 @@ msgstr "Số lượng cư dân (ước tính)"
 
 #: .\pages\models\building_operation\operational_information.py:30
 msgid "Renewable Energy (%)"
-msgstr ""
+msgstr "Năng lượng tái tạo (%)"
 
 #: .\pages\models\building_operation\operational_information.py:32
 msgid ""
 "Percentage of the annual energy consumption of the building produced on site "
 "from renewable sources"
 msgstr ""
+"Tỷ lệ phần trăm tiêu thụ năng lượng hàng năm của tòa nhà được sản xuất tại chỗ từ các nguồn năng lượng tái tạo"
 
 #: .\pages\models\building_operation\operational_information.py:36
 msgid "Energy Monitoring and Control Systems"
-msgstr ""
+msgstr "Hệ thống giám sát và kiểm soát năng lượng"
 
 #: .\pages\models\building_operation\ventilation.py:8
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:337
 msgid "Air Handling Units (AHUs)"
-msgstr ""
+msgstr "Đơn vị xử lý không khí (AHUs)"
 
 #: .\pages\models\building_operation\ventilation.py:9
 msgid "Fan Coil Units (FCUs)"
-msgstr ""
+msgstr "Đơn vị quạt cuộn dây (FCUs)"
 
 #: .\pages\models\building_operation\ventilation.py:10
 msgid "Ceiling or Wall Mounted Cassette ACs"
-msgstr ""
+msgstr "Điều hòa dạng âm trần hoặc gắn tường"
 
 #: .\pages\models\building_operation\ventilation.py:11
 msgid "DOAS"
-msgstr ""
+msgstr "DOAS"
 
 #: .\pages\models\building_operation\ventilation.py:12
 msgid "Ceiling/Exhaust/Wall Fan"
-msgstr ""
+msgstr "Quạt trần/thông gió/tường"
 
 #: .\pages\models\building_operation\ventilation.py:13
 #, fuzzy
@@ -1247,134 +1248,134 @@ msgstr "Loại thông gió"
 
 #: .\pages\models\building_operation\ventilation.py:17
 msgid "m³/hr"
-msgstr ""
+msgstr "m³/giờ"
 
 #: .\pages\models\building_operation\ventilation.py:18
 msgid "ft³/min"
-msgstr ""
+msgstr "ft³/phút"
 
 #: .\pages\models\building_operation\ventilation.py:42
 msgid "Baseline Ventilation System Efficiency (W/CMH)"
-msgstr ""
+msgstr "Hiệu suất hệ thống thông gió cơ bản (W/CMH)"
 
 #: .\pages\models\building_operation\ventilation.py:54
 msgid "Total Ventilation System Power Input (W)"
-msgstr ""
+msgstr "Tổng công suất đầu vào hệ thống thông gió (W)"
 
 #: .\pages\models\building_operation\ventilation.py:57
 msgid "Air Flow Rate (CMH/CFM)"
-msgstr ""
+msgstr "Tốc độ luồng khí (CMH/CFM)"
 
 #: .\pages\models\building_operation\ventilation.py:60
 msgid "Installation of Demand Controlled Ventilation (DCV)"
-msgstr ""
+msgstr "Lắp đặt hệ thống thông gió điều khiển theo nhu cầu (DCV)"
 
 #: .\pages\models\building_operation\ventilation.py:67
 msgid "Total Number of Ventilation Type Installed"
-msgstr ""
+msgstr "Tổng số loại thông gió được lắp đặt"
 
 #: .\pages\models\building_operation\ventilation.py:73
 msgid "Total Energy Consumption of Ventilation System Annually (kWh/year)"
-msgstr ""
+msgstr "Tổng tiêu thụ năng lượng của hệ thống thông gió hàng năm (kWh/năm)"
 
 #: .\pages\models\epd.py:167
 msgid "Conversions for units, follwoing EPDx"
-msgstr ""
+msgstr "Chuyển đổi đơn vị, theo EPDx"
 
 #: .\pages\models\epd.py:169
 msgid "Declared Unit"
-msgstr ""
+msgstr "Đơn vị khai báo"
 
 #: .\pages\models\epd.py:171
 msgid "Unique worldwide EPD identifier"
-msgstr ""
+msgstr "Mã định danh EPD toàn cầu duy nhất"
 
 #: .\pages\models\epd.py:172
 msgid "Material name"
-msgstr ""
+msgstr "Tên vật liệu"
 
 #: .\pages\models\epd.py:174
 msgid "Name translations"
-msgstr ""
+msgstr "Bản dịch tên"
 
 #: .\pages\models\epd.py:177
 msgid "EPD Node Version"
-msgstr ""
+msgstr "Phiên bản EPD Node"
 
 #: .\pages\models\epd.py:204
 msgid "Impact Category"
-msgstr ""
+msgstr "Danh mục tác động"
 
 #: .\pages\models\epd.py:207
 msgid "Life Cycle Stage"
-msgstr ""
+msgstr "Giai đoạn chu kỳ sống"
 
 #: .\pages\models\epd.py:252 .\pages\models\epd.py:289
 msgid "Source"
-msgstr ""
+msgstr "Nguồn"
 
 #: .\pages\models\epd.py:254
 msgid "Scale Type"
-msgstr ""
+msgstr "Loại thang đo"
 
 #: .\pages\models\epd.py:255
 msgid "Scale Parameters"
-msgstr ""
+msgstr "Tham số thang đo"
 
 #: .\pages\models\epd.py:255
 msgid "Scale-specific metadata"
-msgstr ""
+msgstr "Siêu dữ liệu theo thang đo"
 
 #: .\pages\models\epd.py:290
 msgid "Type"
-msgstr ""
+msgstr "Loại"
 
 #: .\pages\models\epd.py:292
 msgid "Reference Quantity of EPD"
-msgstr ""
+msgstr "Số lượng tham chiếu của EPD"
 
 #: .\pages\models\epd.py:429
 msgid "Score"
-msgstr ""
+msgstr "Điểm số"
 
 #: .\pages\models\product.py:14
 msgid "Unit for quantity of EPD"
-msgstr ""
+msgstr "Đơn vị cho số lượng EPD"
 
 #: .\pages\models\product.py:20
 msgid "Quantity of EPD"
-msgstr ""
+msgstr "Số lượng EPD"
 
 #: .\templates\_base.html:73
 msgid "Dashboard"
-msgstr ""
+msgstr "Bảng điều khiển"
 
 #: .\templates\_base.html:88 .\templates\pages\home\resources.html:20
 msgid "Resources"
-msgstr ""
+msgstr "Tài nguyên"
 
 #: .\templates\_base.html:102
 msgid "Templates"
-msgstr ""
+msgstr "Mẫu"
 
 #: .\templates\_base.html:150
 #: .\templates\pages\add-building\add-building.html:45
 #: .\templates\pages\profile\profile.html:6
 msgid "Profile"
-msgstr ""
+msgstr "Hồ sơ"
 
 #: .\templates\_base.html:151 .\templates\pages\profile\profile.html:88
 msgid "Cookie Settings"
-msgstr ""
+msgstr "Cài đặt Cookie"
 
 #: .\templates\_base.html:157
 msgid "Language"
-msgstr ""
+msgstr "Ngôn ngữ"
 
 #: .\templates\_base.html:170
 #: .\templates\pages\add-building\add-building.html:48
 msgid "Logout"
-msgstr ""
+msgstr "Đăng xuất"
 
 #: .\templates\account\email\password_reset_key_message.txt:2
 #, python-format
@@ -1407,41 +1408,42 @@ msgstr ""
 
 #: .\templates\account\login.html:7
 msgid "Sign Up"
-msgstr ""
+msgstr "Đăng ký"
 
 #: .\templates\account\login.html:17 .\templates\account\login.html:64
 #: .\templates\account\signup.html:8
 msgid "Login"
-msgstr ""
+msgstr "Đăng nhập"
 
 #: .\templates\account\login.html:67 .\templates\account\signup.html:85
 msgid "OR"
-msgstr ""
+msgstr "HOẶC"
 
 #: .\templates\account\login.html:69 .\templates\account\signup.html:87
 msgid "Sign up with Google"
-msgstr ""
+msgstr "Đăng ký với Google"
 
 #: .\templates\account\login.html:73
 msgid "Don't have an account."
-msgstr ""
+msgstr "Chưa có tài khoản."
 
 #: .\templates\account\login.html:75 .\templates\account\signup.html:16
 msgid "Sign up"
-msgstr ""
+msgstr "Đăng ký"
 
 #: .\templates\account\password_change.html:5
 #: .\templates\account\password_change.html:8
 #: .\templates\account\password_change.html:12
 #: .\templates\pages\profile\profile.html:84
 msgid "Change Password"
-msgstr ""
+msgstr "Đổi mật khẩu"
 
 #: .\templates\account\signup.html:20
 msgid ""
 "Fill in the details below to create your account and track the carbon "
 "mission from your building project."
 msgstr ""
+"Điền thông tin chi tiết bên dưới để tạo tài khoản của bạn và theo dõi nhiệm vụ carbon từ dự án tòa nhà của bạn."
 
 #: .\templates\account\signup.html:82
 #, fuzzy
@@ -1451,67 +1453,67 @@ msgstr "Được tạo vào"
 
 #: .\templates\account\signup.html:91
 msgid "I already have an account."
-msgstr ""
+msgstr "Tôi đã có tài khoản."
 
 #: .\templates\account\signup.html:93
 msgid "Log me in"
-msgstr ""
+msgstr "Đăng nhập"
 
 #: .\templates\compliance\terms_of_use.html:4
 #: .\templates\compliance\terms_of_use.html:11
 msgid "Terms of Use"
-msgstr ""
+msgstr "Điều khoản sử dụng"
 
 #: .\templates\compliance\terms_of_use.html:13
 #: .\templates\pages\building\building.html:48
 msgid "Last updated:"
-msgstr ""
+msgstr "Cập nhật lần cuối:"
 
 #: .\templates\compliance\terms_of_use.html:52
 msgid "Table of Contents"
-msgstr ""
+msgstr "Mục lục"
 
 #: .\templates\compliance\terms_of_use.html:118
 msgid "Back to top"
-msgstr ""
+msgstr "Trở về đầu trang"
 
 #: .\templates\pages\add-building\add-building.html:5
 msgid "Add Building"
-msgstr ""
+msgstr "Thêm tòa nhà"
 
 #: .\templates\pages\add-building\add-building.html:19
 msgid "Exit"
-msgstr ""
+msgstr "Thoát"
 
 #: .\templates\pages\add-building\add-building.html:63
 msgid "out of"
-msgstr ""
+msgstr "trong số"
 
 #: .\templates\pages\add-building\add-building.html:65
 msgid "steps"
-msgstr ""
+msgstr "bước"
 
 #: .\templates\pages\add-building\add-building.html:73
 msgid "Building Name & Location"
-msgstr ""
+msgstr "Tên và vị trí tòa nhà"
 
 #: .\templates\pages\add-building\add-building.html:79
 msgid "Add details concerning building name and locations of building."
-msgstr ""
+msgstr "Thêm thông tin chi tiết về tên tòa nhà và vị trí của tòa nhà."
 
 #: .\templates\pages\add-building\add-building.html:91
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:211
 #: .\templates\pages\home\templates.html:270
 msgid "Go back"
-msgstr ""
+msgstr "Quay lại"
 
 #: .\templates\pages\add-building\add-building.html:98
 msgid "Skip"
-msgstr ""
+msgstr "Bỏ qua"
 
 #: .\templates\pages\add-building\add-building.html:101
 msgid "Save & continue"
-msgstr ""
+msgstr "Lưu & tiếp tục"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:7
 #, fuzzy
@@ -1521,7 +1523,7 @@ msgstr "Loại chiếu sáng"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:20
 msgid "Pick a building type"
-msgstr ""
+msgstr "Chọn loại tòa nhà"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:26
 #: .\templates\pages\add-building\components\building-information\building-details.html:48
@@ -1544,51 +1546,51 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:199
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:62
 msgid "This field is required"
-msgstr ""
+msgstr "Trường này là bắt buộc"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:31
 msgid "Type of apartments"
-msgstr ""
+msgstr "Loại căn hộ"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:45
 msgid "Pick a type of apartments"
-msgstr ""
+msgstr "Chọn loại căn hộ"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:53
 msgid "Area climate type"
-msgstr ""
+msgstr "Loại khí hậu khu vực"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:66
 msgid "Select climate type"
-msgstr ""
+msgstr "Chọn loại khí hậu"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:74
 msgid "Assessment period (years)"
-msgstr ""
+msgstr "Thời gian đánh giá (năm)"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:79
 #: .\templates\pages\add-building\components\building-information\building-details.html:120
 #: .\templates\pages\add-building\components\building-information\building-details.html:137
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:9
 msgid "eg. 10"
-msgstr ""
+msgstr "vd. 10"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:85
 msgid "Construction year"
-msgstr ""
+msgstr "Năm xây dựng"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:87
 msgid "eg. 2020"
-msgstr ""
+msgstr "vd. 2020"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:96
 msgid "eg. 340"
-msgstr ""
+msgstr "vd. 340"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:112
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:639
 msgid "eg. 400"
-msgstr ""
+msgstr "vd. 400"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:118
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:74
@@ -1599,23 +1601,23 @@ msgstr "Đơn vị nhiệt độ làm mát"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:125
 msgid "Number of floors below ground"
-msgstr ""
+msgstr "Số tầng dưới mặt đất"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:127
 msgid "eg. 3"
-msgstr ""
+msgstr "vd. 3"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:133
 msgid "Energy consumption of building"
-msgstr ""
+msgstr "Tiêu thụ năng lượng của tòa nhà"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:143
 msgid "Energy monitoring & control systems"
-msgstr ""
+msgstr "Hệ thống giám sát & kiểm soát năng lượng"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:146
 msgid "eg Yes"
-msgstr ""
+msgstr "vd Có"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:147
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:272
@@ -1628,7 +1630,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:183
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:209
 msgid "Yes"
-msgstr ""
+msgstr "Có"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:148
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:280
@@ -1641,43 +1643,43 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:192
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:210
 msgid "No"
-msgstr ""
+msgstr "Không"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:10
 msgid "Building name or Code"
-msgstr ""
+msgstr "Tên hoặc mã tòa nhà"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:16
 msgid "eg. JP Plaza"
-msgstr ""
+msgstr "vd. JP Plaza"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:23
 msgid "Building name must be 2-200 characters"
-msgstr ""
+msgstr "Tên tòa nhà phải từ 2-200 ký tự"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:29
 msgid "Address (Zip, Street)"
-msgstr ""
+msgstr "Địa chỉ (Mã bưu điện, Đường)"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:31
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:241
 msgid "Find location on map"
-msgstr ""
+msgstr "Tìm vị trí trên bản đồ"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:38
 msgid "eg. 1885 L Street Northwest"
-msgstr ""
+msgstr "vd. 1885 L Street Northwest"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:44
 msgid "Address is required (minimum 5 characters)"
-msgstr ""
+msgstr "Địa chỉ là bắt buộc (tối thiểu 5 ký tự)"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:50
 #: .\templates\pages\home\home.html:203
 #: .\templates\pages\home\templates.html:185
 #: .\templates\pages\profile\profile.html:155
 msgid "Country"
-msgstr ""
+msgstr "Quốc gia"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:71
 #, fuzzy
@@ -1688,39 +1690,39 @@ msgstr "Được tạo vào"
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:80
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:339
 msgid "Please select a country"
-msgstr ""
+msgstr "Vui lòng chọn quốc gia"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:86
 #: .\templates\pages\home\home.html:221
 #: .\templates\pages\profile\profile.html:171
 msgid "Region or State"
-msgstr ""
+msgstr "Vùng hoặc Bang"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:107
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:194
 msgid "Select a region or state"
-msgstr ""
+msgstr "Chọn vùng hoặc bang"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:113
 msgid "Select a country first, then choose region"
-msgstr ""
+msgstr "Chọn quốc gia trước, sau đó chọn vùng"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:119
 #: .\templates\pages\home\home.html:239
 #: .\templates\pages\profile\profile.html:187
 msgid "City"
-msgstr ""
+msgstr "Thành phố"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:135
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:195
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:198
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:205
 msgid "Select a city"
-msgstr ""
+msgstr "Chọn thành phố"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:141
 msgid "Select a region first, then choose city"
-msgstr ""
+msgstr "Chọn vùng trước, sau đó chọn thành phố"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:147
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:166
@@ -1728,37 +1730,38 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:411
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:425
 msgid "Optional"
-msgstr ""
+msgstr "Tùy chọn"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:156
 msgid "eg. -7.946232"
-msgstr ""
+msgstr "vd. -7.946232"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:160
 msgid "Must be between -180 and 180"
-msgstr ""
+msgstr "Phải nằm giữa -180 và 180"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:175
 msgid "eg. 5.603722"
-msgstr ""
+msgstr "vd. 5.603722"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:179
 msgid "Must be between -90 and 90"
-msgstr ""
+msgstr "Phải nằm giữa -90 và 90"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:226
 msgid "Geo Location"
-msgstr ""
+msgstr "Vị trí địa lý"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:228
 msgid ""
 "An address is good, but a pin is precise—help us capture your project's "
 "exact location."
 msgstr ""
+"Địa chỉ là tốt, nhưng ghim chính xác hơn—hãy giúp chúng tôi ghi lại vị trí chính xác của dự án của bạn."
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:253
 msgid "Search location or address here"
-msgstr ""
+msgstr "Tìm kiếm vị trí hoặc địa chỉ tại đây"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:273
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:105
@@ -1778,72 +1781,72 @@ msgstr ""
 #: .\templates\pages\home\templates.html:240
 #: .\templates\pages\profile\profile.html:228
 msgid "Cancel"
-msgstr ""
+msgstr "Hủy"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:280
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:106
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:200
 msgid "Done"
-msgstr ""
+msgstr "Hoàn tất"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:314
 msgid "Building name must be at least 2 characters"
-msgstr ""
+msgstr "Tên tòa nhà phải có ít nhất 2 ký tự"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:319
 msgid "Building name cannot contain < or > characters"
-msgstr ""
+msgstr "Tên tòa nhà không được chứa ký tự < hoặc >"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:330
 msgid "Address must be at least 5 characters"
-msgstr ""
+msgstr "Địa chỉ phải có ít nhất 5 ký tự"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:348
 msgid "Please select a region"
-msgstr ""
+msgstr "Vui lòng chọn vùng"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:357
 msgid "Please select a city"
-msgstr ""
+msgstr "Vui lòng chọn thành phố"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:368
 msgid "Longitude must be a valid number"
-msgstr ""
+msgstr "Kinh độ phải là số hợp lệ"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:371
 msgid "Longitude must be between -180 and 180"
-msgstr ""
+msgstr "Kinh độ phải nằm giữa -180 và 180"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:383
 msgid "Latitude must be a valid number"
-msgstr ""
+msgstr "Vĩ độ phải là số hợp lệ"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:386
 msgid "Latitude must be between -90 and 90"
-msgstr ""
+msgstr "Vĩ độ phải nằm giữa -90 và 90"
 
 #: .\templates\pages\add-building\components\building-structural-components\_epd_list.html:40
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:67
 msgid "Add"
-msgstr ""
+msgstr "Thêm"
 
 #: .\templates\pages\add-building\components\building-structural-components\_epd_list.html:47
 msgid "No materials found matching your criteria"
-msgstr ""
+msgstr "Không tìm thấy vật liệu phù hợp với tiêu chí của bạn"
 
 #: .\templates\pages\add-building\components\building-structural-components\_epd_list.html:61
 #: .\templates\pages\add-building\components\building-structural-components\_epd_list.html:66
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:103
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:108
 msgid "Previous"
-msgstr ""
+msgstr "Trước"
 
 #: .\templates\pages\add-building\components\building-structural-components\_epd_list.html:90
 #: .\templates\pages\add-building\components\building-structural-components\_epd_list.html:95
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:134
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:139
 msgid "Next"
-msgstr ""
+msgstr "Tiếp"
 
 #: .\templates\pages\add-building\components\building-structural-components\_selected_material.html:27
 #: .\templates\pages\home\templates.html:444
@@ -1855,12 +1858,12 @@ msgstr "Mô tả"
 
 #: .\templates\pages\add-building\components\building-structural-components\_selected_material.html:35
 msgid "Category"
-msgstr ""
+msgstr "Danh mục"
 
 #: .\templates\pages\add-building\components\building-structural-components\_selected_material.html:45
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:600
 msgid "Qty"
-msgstr ""
+msgstr "Số lượng"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:6
 msgid ""
@@ -1868,19 +1871,20 @@ msgid ""
 "For quantities per components (foundation, floor, roof, etc.), use 'Add "
 "component'."
 msgstr ""
+"Nếu dữ liệu có sẵn dưới dạng tổng số lượng mỗi vật liệu, chọn 'Thêm từ BoQ'. Đối với số lượng mỗi thành phần (móng, sàn, mái, v.v.), sử dụng 'Thêm thành phần'."
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:12
 msgid "Structural Component"
-msgstr ""
+msgstr "Thành phần kết cấu"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:14
 msgid "How would you like to add your building structural components?"
-msgstr ""
+msgstr "Bạn muốn thêm thành phần kết cấu tòa nhà như thế nào?"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:18
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:30
 msgid "Add from Bill of Quantity"
-msgstr ""
+msgstr "Thêm từ Bảng khối lượng"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:21
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:33
@@ -1891,19 +1895,19 @@ msgstr "Bình luận"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:39
 msgid "Components / Materials Added"
-msgstr ""
+msgstr "Thành phần / Vật liệu đã thêm"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:40
 msgid "Added components or materials will appear below"
-msgstr ""
+msgstr "Thành phần hoặc vật liệu đã thêm sẽ xuất hiện bên dưới"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:51
 msgid "Bill of Quantity (BOQ)"
-msgstr ""
+msgstr "Bảng khối lượng (BOQ)"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:62
 msgid "eg. Main Structure BOQ"
-msgstr ""
+msgstr "vd. BOQ kết cấu chính"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:68
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:164
@@ -1917,154 +1921,154 @@ msgstr "Bình luận"
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:170
 #: .\templates\pages\home\templates.html:221
 msgid "MATERIALS"
-msgstr ""
+msgstr "VẬT LIỆU"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:80
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:175
 #: .\templates\pages\building\building.html:141
 #: .\templates\pages\building\building.html:327
 msgid "Materials"
-msgstr ""
+msgstr "Vật liệu"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:81
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:176
 msgid "Add materials from the EPD library"
-msgstr ""
+msgstr "Thêm vật liệu từ thư viện EPD"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:83
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:178
 #: .\templates\pages\home\templates.html:231
 msgid "Add from EPD library"
-msgstr ""
+msgstr "Thêm từ thư viện EPD"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:91
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:185
 #: .\templates\pages\home\templates.html:226
 msgid "Added Materials"
-msgstr ""
+msgstr "Vật liệu đã thêm"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:92
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:186
 msgid "Added from EPD library"
-msgstr ""
+msgstr "Đã thêm từ thư viện EPD"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:96
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:190
 msgid "Add more"
-msgstr ""
+msgstr "Thêm nữa"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:115
 msgid "Create New Component"
-msgstr ""
+msgstr "Tạo thành phần mới"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:124
 #: .\templates\pages\home\templates.html:177
 msgid "Title"
-msgstr ""
+msgstr "Tiêu đề"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:126
 msgid "eg. Foundation"
-msgstr ""
+msgstr "vd. Móng"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:130
 #: .\templates\pages\home\templates.html:85
 msgid "Building Component"
-msgstr ""
+msgstr "Thành phần tòa nhà"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:136
 msgid "Select component"
-msgstr ""
+msgstr "Chọn thành phần"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:140
 #: .\templates\pages\home\templates.html:104
 msgid "Construction Technique"
-msgstr ""
+msgstr "Kỹ thuật xây dựng"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:142
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:451
 #: .\templates\pages\home\templates.html:207
 msgid "Select technique"
-msgstr ""
+msgstr "Chọn kỹ thuật"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:146
 msgid "Dimension"
-msgstr ""
+msgstr "Kích thước"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:148
 msgid "Area (m²)"
-msgstr ""
+msgstr "Diện tích (m²)"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:149
 msgid "Volume (m³)"
-msgstr ""
+msgstr "Thể tích (m³)"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:150
 msgid "Mass (kg)"
-msgstr ""
+msgstr "Khối lượng (kg)"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:151
 msgid "Length (m)"
-msgstr ""
+msgstr "Chiều dài (m)"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:157
 msgid "Enter quantity"
-msgstr ""
+msgstr "Nhập số lượng"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:213
 #: .\templates\pages\home\templates.html:273
 msgid "Add from EPD Library"
-msgstr ""
+msgstr "Thêm từ thư viện EPD"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:231
 msgid "Search materials..."
-msgstr ""
+msgstr "Tìm kiếm vật liệu..."
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:234
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:129
 #: .\templates\pages\home\templates.html:41
 #: .\templates\pages\home\templates.html:305
 msgid "All Countries"
-msgstr ""
+msgstr "Tất cả quốc gia"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:248
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:148
 #: .\templates\pages\home\templates.html:60
 #: .\templates\pages\home\templates.html:322
 msgid "Advanced Search"
-msgstr ""
+msgstr "Tìm kiếm nâng cao"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:249
 msgid "Click for more filters"
-msgstr ""
+msgstr "Nhấp để có thêm bộ lọc"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:262
 #: .\templates\pages\home\templates.html:337
 msgid "All Categories"
-msgstr ""
+msgstr "Tất cả danh mục"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:268
 msgid "All Sub-categories"
-msgstr ""
+msgstr "Tất cả danh mục con"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:271
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:214
 #: .\templates\pages\home\templates.html:123
 #: .\templates\pages\home\templates.html:346
 msgid "All Types"
-msgstr ""
+msgstr "Tất cả loại"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:282
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:243
 #: .\templates\pages\home\templates.html:148
 #: .\templates\pages\home\templates.html:355
 msgid "Search"
-msgstr ""
+msgstr "Tìm kiếm"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:299
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:270
 #: .\templates\pages\home\templates.html:372
 msgid "Close"
-msgstr ""
+msgstr "Đóng"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:311
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:290
@@ -2074,11 +2078,11 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:247
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:291
 msgid "Are you sure?"
-msgstr ""
+msgstr "Bạn có chắc chắn?"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:313
 msgid "This action will permanently remove this item."
-msgstr ""
+msgstr "Hành động này sẽ xóa vĩnh viễn mục này."
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:318
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:310
@@ -2088,11 +2092,11 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:261
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:305
 msgid "Remove"
-msgstr ""
+msgstr "Xóa"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:528
 msgid "Material"
-msgstr ""
+msgstr "Vật liệu"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:532
 #, fuzzy
@@ -2102,7 +2106,7 @@ msgstr "Mô tả"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:537
 msgid "Quantity must be greater than 0"
-msgstr ""
+msgstr "Số lượng phải lớn hơn 0"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:542
 #, fuzzy
@@ -2112,57 +2116,57 @@ msgstr "Giờ hoạt động mỗi ngày làm việc"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:621
 msgid "Please enter a BOQ name"
-msgstr ""
+msgstr "Vui lòng nhập tên BOQ"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:627
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:669
 msgid "Please add at least one material"
-msgstr ""
+msgstr "Vui lòng thêm ít nhất một vật liệu"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:657
 msgid "BOQ saved successfully"
-msgstr ""
+msgstr "Đã lưu BOQ thành công"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:663
 msgid "Please enter a component title"
-msgstr ""
+msgstr "Vui lòng nhập tiêu đề thành phần"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:705
 msgid "Component saved successfully"
-msgstr ""
+msgstr "Đã lưu thành phần thành công"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:735
 msgid "Item removed"
-msgstr ""
+msgstr "Đã xóa mục"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:760
 msgid "BOQ"
-msgstr ""
+msgstr "BOQ"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:760
 msgid "materials"
-msgstr ""
+msgstr "vật liệu"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:790
 msgid "No category"
-msgstr ""
+msgstr "Không có danh mục"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:825
 msgid "Add at least one BOQ or component"
-msgstr ""
+msgstr "Thêm ít nhất một BOQ hoặc thành phần"
 
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:29
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:234
 msgid "Generic"
-msgstr ""
+msgstr "Chung"
 
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:42
 msgid "Unit:"
-msgstr ""
+msgstr "Đơn vị:"
 
 #: .\templates\pages\add-building\components\operational-data-entry\_epd_list.html:73
 msgid "No energy carriers found matching your criteria"
-msgstr ""
+msgstr "Không tìm thấy nguồn năng lượng phù hợp với tiêu chí của bạn"
 
 #: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:34
 #, fuzzy
@@ -2172,80 +2176,81 @@ msgstr "Mô tả"
 
 #: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:36
 msgid "required"
-msgstr ""
+msgstr "bắt buộc"
 
 #: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:54
 msgid "Please enter a valid quantity"
-msgstr ""
+msgstr "Vui lòng nhập số lượng hợp lệ"
 
 #: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:62
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:342
 msgid "Capacity units:"
-msgstr ""
+msgstr "Đơn vị dung lượng:"
 
 #: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:74
 msgid "Remove energy carrier"
-msgstr ""
+msgstr "Xóa nguồn năng lượng"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:14
 msgid "You need to add at least one energy carrier to continue"
-msgstr ""
+msgstr "Bạn cần thêm ít nhất một nguồn năng lượng để tiếp tục"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:29
 msgid "Add energy carrier"
-msgstr ""
+msgstr "Thêm nguồn năng lượng"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:49
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:62
 msgid "Energy Carrier Image"
-msgstr ""
+msgstr "Hình ảnh nguồn năng lượng"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:51
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:64
 msgid "Click button below to add a energy carrier"
-msgstr ""
+msgstr "Nhấp vào nút bên dưới để thêm nguồn năng lượng"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:54
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:67
 msgid "Add an energy carrier"
-msgstr ""
+msgstr "Thêm nguồn năng lượng"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:81
 msgid "Save Energy Carriers"
-msgstr ""
+msgstr "Lưu nguồn năng lượng"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:92
 msgid "Energy Carrier Emission Factor"
-msgstr ""
+msgstr "Hệ số phát thải nguồn năng lượng"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:125
 msgid "Search energy carriers..."
-msgstr ""
+msgstr "Tìm kiếm nguồn năng lượng..."
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:150
 msgid "Click here for more advanced filters"
-msgstr ""
+msgstr "Nhấp vào đây để có thêm bộ lọc nâng cao"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:233
 msgid "All EPD Types"
-msgstr ""
+msgstr "Tất cả loại EPD"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:235
 msgid "Official"
-msgstr ""
+msgstr "Chính thức"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:292
 msgid ""
 "You are about to remove this energy carrier. This action cannot be undone."
 msgstr ""
+"Bạn sắp xóa nguồn năng lượng này. Hành động này không thể hoàn tác."
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:339
 msgid "Energy carrier added successfully"
-msgstr ""
+msgstr "Đã thêm nguồn năng lượng thành công"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:381
 msgid "Saved successfully!"
-msgstr ""
+msgstr "Đã lưu thành công!"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:14
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:31
@@ -2260,14 +2265,15 @@ msgstr "Bình luận"
 msgid ""
 "Enter details of the building's cooling system, including type and capacity"
 msgstr ""
+"Nhập thông tin chi tiết về hệ thống làm lạnh của tòa nhà, bao gồm loại và công suất"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:52
 msgid "Type of cooling system"
-msgstr ""
+msgstr "Loại hệ thống làm lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:63
 msgid "Select a cooling system"
-msgstr ""
+msgstr "Chọn hệ thống làm lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:85
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:232
@@ -2275,43 +2281,44 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:230
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:274
 msgid "Save"
-msgstr ""
+msgstr "Lưu"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:105
 msgid ""
 "You are about to remove or delete added cooling system. This will action "
 "will permanently remove it."
 msgstr ""
+"Bạn sắp xóa hoặc xóa bỏ hệ thống làm lạnh đã thêm. Hành động này sẽ xóa vĩnh viễn nó."
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:150
 msgid "Chiller system - Water cooled chiller"
-msgstr ""
+msgstr "Hệ thống chiller - Chiller làm lạnh bằng nước"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:154
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:928
 msgid "Type:"
-msgstr ""
+msgstr "Loại:"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:156
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:929
 msgid "Refrigerant quantity:"
-msgstr ""
+msgstr "Số lượng môi chất lạnh:"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:185
 msgid "Cooling System Image"
-msgstr ""
+msgstr "Hình ảnh hệ thống làm lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:187
 msgid "Click button below to add a cooling system"
-msgstr ""
+msgstr "Nhấp vào nút bên dưới để thêm hệ thống làm lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:199
 msgid "CHILLER SYSTEM DATA"
-msgstr ""
+msgstr "DỮ LIỆU HỆ THỐNG CHILLER"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:204
 msgid "Chiller system"
-msgstr ""
+msgstr "Hệ thống chiller"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:207
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:237
@@ -2339,63 +2346,63 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:241
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:254
 msgid "Select an option"
-msgstr ""
+msgstr "Chọn một tùy chọn"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:208
 msgid "Water cooled chiller"
-msgstr ""
+msgstr "Chiller làm lạnh bằng nước"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:209
 msgid "Air cooled chiller"
-msgstr ""
+msgstr "Chiller làm lạnh bằng không khí"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:214
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:512
 msgid "Year of installation"
-msgstr ""
+msgstr "Năm lắp đặt"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:219
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:517
 msgid "eg. 2012"
-msgstr ""
+msgstr "vd. 2012"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:225
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:523
 msgid "Type of refrigerants"
-msgstr ""
+msgstr "Loại môi chất lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:242
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:541
 msgid "Refrigerant quantity"
-msgstr ""
+msgstr "Số lượng môi chất lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:247
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:546
 msgid "eg.  134"
-msgstr ""
+msgstr "vd. 134"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:256
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:198
 msgid "Installation of variable speed drives"
-msgstr ""
+msgstr "Lắp đặt hệ thống điều khiển tốc độ thay đổi"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:286
 msgid "Installation of heat recovery systems"
-msgstr ""
+msgstr "Lắp đặt hệ thống thu hồi nhiệt"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:316
 msgid "Total cooling load for chiller system"
-msgstr ""
+msgstr "Tổng tải làm lạnh cho hệ thống chiller"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:322
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:561
 msgid "eg. 342"
-msgstr ""
+msgstr "vd. 342"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:328
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:566
 msgid "Baseline leakage factor"
-msgstr ""
+msgstr "Hệ số rò rỉ cơ bản"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:330
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:378
@@ -2416,12 +2423,12 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:221
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:232
 msgid "eg. 2"
-msgstr ""
+msgstr "vd. 2"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:340
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:16
 msgid "Annual operating schedule"
-msgstr ""
+msgstr "Lịch hoạt động hàng năm"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:349
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:357
@@ -2442,7 +2449,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:119
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:127
 msgid "eg. 1"
-msgstr ""
+msgstr "vd. 1"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:351
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:588
@@ -2451,7 +2458,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:28
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:113
 msgid "Hours / day"
-msgstr ""
+msgstr "Giờ / ngày"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:359
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:596
@@ -2477,12 +2484,12 @@ msgstr "Số tuần hoạt động mỗi năm"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:375
 msgid "Baseline Air Cooled/Water Cooled Chiller Cooling Efficiency"
-msgstr ""
+msgstr "Hiệu suất làm lạnh Chiller làm lạnh bằng không khí/nước cơ bản"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:387
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:616
 msgid "OTHER DETAILS"
-msgstr ""
+msgstr "CHI TIẾT KHÁC"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:399
 #, fuzzy
@@ -2492,23 +2499,23 @@ msgstr "Số lượng cư dân (ước tính)"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:409
 msgid "Total chiller system power input"
-msgstr ""
+msgstr "Tổng công suất đầu vào hệ thống chiller"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:415
 msgid "eg. 2000"
-msgstr ""
+msgstr "vd. 2000"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:423
 msgid "Water-cooled chiller cooling load factor"
-msgstr ""
+msgstr "Hệ số tải làm lạnh chiller làm lạnh bằng nước"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:429
 msgid "eg. 45"
-msgstr ""
+msgstr "vd. 45"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:442
 msgid "IPVL"
-msgstr ""
+msgstr "IPVL"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:448
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:684
@@ -2516,7 +2523,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:200
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:239
 msgid "Energy efficiency label"
-msgstr ""
+msgstr "Nhãn hiệu suất năng lượng"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:461
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:697
@@ -2531,68 +2538,68 @@ msgstr "Số lượng cư dân (ước tính)"
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:473
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:709
 msgid "Total energy consumption of chiller system anually (kwh/year)"
-msgstr ""
+msgstr "Tổng tiêu thụ năng lượng của hệ thống chiller hàng năm (kWh/năm)"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:476
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:653
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:712
 msgid "eg. 200"
-msgstr ""
+msgstr "vd. 200"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:493
 msgid "AIR CONDITION SYSTEM DATA"
-msgstr ""
+msgstr "DỮ LIỆU HỆ THỐNG ĐIỀU HÒA KHÔNG KHÍ"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:498
 msgid "Type of air condition"
-msgstr ""
+msgstr "Loại điều hòa không khí"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:504
 msgid "Split air condition"
-msgstr ""
+msgstr "Điều hòa tách lẻ"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:506
 msgid "Variable Refrigerant Volume (VRV) / Variable Refrigerant Flow (VRF)"
-msgstr ""
+msgstr "Lưu lượng môi chất lạnh thay đổi (VRV) / Dòng môi chất lạnh thay đổi (VRF)"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:555
 msgid "Total cooling load for split/VRV"
-msgstr ""
+msgstr "Tổng tải làm lạnh cho Split/VRV"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:577
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:86
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:121
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:102
 msgid "System operating schedule"
-msgstr ""
+msgstr "Lịch hoạt động hệ thống"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:628
 msgid "Total number of split/VRV units"
-msgstr ""
+msgstr "Tổng số đơn vị Split/VRV"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:636
 msgid "Total split unit//VRV system"
-msgstr ""
+msgstr "Tổng hệ thống đơn vị Split/VRV"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:647
 msgid "Total energy consumption of chiller system annually"
-msgstr ""
+msgstr "Tổng tiêu thụ năng lượng của hệ thống chiller hàng năm"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:661
 msgid "Baseline split unit/VRV system efficiency"
-msgstr ""
+msgstr "Hiệu suất hệ thống đơn vị Split/VRV cơ bản"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:664
 msgid "eg. 333"
-msgstr ""
+msgstr "vd. 333"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:671
 msgid "ISSER rating"
-msgstr ""
+msgstr "Xếp hạng ISSER"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:673
 msgid "eg. 4.5"
-msgstr ""
+msgstr "vd. 4.5"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:802
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:971
@@ -2603,64 +2610,65 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:491
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:574
 msgid "Building ID not found"
-msgstr ""
+msgstr "Không tìm thấy ID tòa nhà"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:819
 msgid "Please select a cooling system type"
-msgstr ""
+msgstr "Vui lòng chọn loại hệ thống làm lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:864
 msgid "Error saving cooling system:"
-msgstr ""
+msgstr "Lỗi khi lưu hệ thống làm lạnh:"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:868
 msgid "An error occurred while saving the cooling system"
-msgstr ""
+msgstr "Đã xảy ra lỗi khi lưu hệ thống làm lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:908
 msgid "Chiller System"
-msgstr ""
+msgstr "Hệ thống Chiller"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:911
 msgid "Air Conditioner"
-msgstr ""
+msgstr "Điều hòa không khí"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:957
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:961
 msgid "Error fetching cooling systems"
-msgstr ""
+msgstr "Lỗi khi tải hệ thống làm lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:1158
 msgid "An error occurred while loading the cooling system"
-msgstr ""
+msgstr "Đã xảy ra lỗi khi tải hệ thống làm lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:1196
 msgid "Error deleting cooling system:"
-msgstr ""
+msgstr "Lỗi khi xóa hệ thống làm lạnh:"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:1200
 msgid "An error occurred while deleting the cooling system"
-msgstr ""
+msgstr "Đã xảy ra lỗi khi xóa hệ thống làm lạnh"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:14
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:279
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:337
 msgid "Add hot water system"
-msgstr ""
+msgstr "Thêm hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:30
 msgid "Add a hot water system"
-msgstr ""
+msgstr "Thêm hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:32
 msgid ""
 "Provide details on the building's method of producing and distributing hot "
 "water."
 msgstr ""
+"Cung cấp thông tin chi tiết về phương pháp sản xuất và phân phối nước nóng của tòa nhà."
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:52
 msgid "Type of hot water system"
-msgstr ""
+msgstr "Loại hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:71
 #, fuzzy
@@ -2670,34 +2678,34 @@ msgstr "Loại lắp ráp"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:121
 msgid "Fuel consumption"
-msgstr ""
+msgstr "Tiêu thụ nhiên liệu"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:126
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:141
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:156
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:98
 msgid "eg. 343"
-msgstr ""
+msgstr "vd. 343"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:135
 msgid "Hot water system power input"
-msgstr ""
+msgstr "Công suất đầu vào hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:150
 msgid "Baseline hot water system efficiency"
-msgstr ""
+msgstr "Hiệu suất hệ thống nước nóng cơ bản"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:162
 msgid "Baseline hot water system equipment efficiency level"
-msgstr ""
+msgstr "Mức hiệu suất thiết bị hệ thống nước nóng cơ bản"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:168
 msgid "eg. 40"
-msgstr ""
+msgstr "vd. 40"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:177
 msgid "Installation of heat recovery system"
-msgstr ""
+msgstr "Lắp đặt hệ thống thu hồi nhiệt"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:191
 #, fuzzy
@@ -2708,17 +2716,18 @@ msgstr "Số lượng cư dân (ước tính)"
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:197
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:60
 msgid "eg. 5"
-msgstr ""
+msgstr "vd. 5"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:251
 msgid ""
 "You are about to remove or delete added hot water system. This will action "
 "will permanently remove it."
 msgstr ""
+"Bạn sắp xóa hoặc xóa bỏ hệ thống nước nóng đã thêm. Hành động này sẽ xóa vĩnh viễn nó."
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:295
 msgid "Heat pump water system"
-msgstr ""
+msgstr "Hệ thống nước bơm nhiệt"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:298
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:483
@@ -2730,61 +2739,61 @@ msgstr "Loại lắp ráp"
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:300
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:484
 msgid "Power input:"
-msgstr ""
+msgstr "Công suất đầu vào:"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:329
 msgid "hot-water System Image"
-msgstr ""
+msgstr "Hình ảnh hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:331
 msgid "Click button below to add a hot water system"
-msgstr ""
+msgstr "Nhấp vào nút bên dưới để thêm hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:382
 msgid "Please select a hot water system type"
-msgstr ""
+msgstr "Vui lòng chọn loại hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:389
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:274
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:385
 msgid "Building ID not found. Please save building information first."
-msgstr ""
+msgstr "Không tìm thấy ID tòa nhà. Vui lòng lưu thông tin tòa nhà trước."
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:430
 msgid "Error saving hot water system:"
-msgstr ""
+msgstr "Lỗi khi lưu hệ thống nước nóng:"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:434
 msgid "Failed to save hot water system. Please try again."
-msgstr ""
+msgstr "Không thể lưu hệ thống nước nóng. Vui lòng thử lại."
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:515
 msgid "Error loading hot water systems"
-msgstr ""
+msgstr "Lỗi khi tải hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:538
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:581
 msgid "Failed to load hot water system"
-msgstr ""
+msgstr "Không thể tải hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:544
 msgid "Hot water system not found"
-msgstr ""
+msgstr "Không tìm thấy hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:615
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:619
 msgid "Failed to delete hot water system"
-msgstr ""
+msgstr "Không thể xóa hệ thống nước nóng"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:14
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:33
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:163
 msgid "Add a lift & escalator system"
-msgstr ""
+msgstr "Thêm hệ thống thang máy & thang cuốn"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:35
 msgid "Provide details on lift & escalator system."
-msgstr ""
+msgstr "Cung cấp chi tiết về hệ thống thang máy & thang cuốn."
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:55
 #, fuzzy
@@ -2794,15 +2803,15 @@ msgstr "Số lượng cư dân (ước tính)"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:66
 msgid "Installation of Lift regenerative Features"
-msgstr ""
+msgstr "Lắp đặt tính năng tái tạo thang máy"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:79
 msgid "Installation of VVVF and sleep mode"
-msgstr ""
+msgstr "Lắp đặt VVVF và chế độ ngủ"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:92
 msgid "Annual lift system energy consumption"
-msgstr ""
+msgstr "Tiêu thụ năng lượng hệ thống thang máy hàng năm"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:135
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:249
@@ -2810,38 +2819,39 @@ msgid ""
 "You are about to remove or delete added lighting system. This will action "
 "will permanently remove it."
 msgstr ""
+"Bạn sắp xóa hoặc xóa bỏ hệ thống chiếu sáng đã thêm. Hành động này sẽ xóa vĩnh viễn nó."
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:179
 msgid "Lift & Escalator 01"
-msgstr ""
+msgstr "Thang máy & Thang cuốn 01"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:181
 msgid "Lift Regenerative Features"
-msgstr ""
+msgstr "Tính năng tái tạo thang máy"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:212
 msgid "lift-escalator System Image"
-msgstr ""
+msgstr "Hình ảnh hệ thống thang máy-thang cuốn"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:215
 msgid "Click button below to add a lift & escalator system"
-msgstr ""
+msgstr "Nhấp vào nút bên dưới để thêm hệ thống thang máy & thang cuốn"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:221
 msgid "Add lift & escalator system"
-msgstr ""
+msgstr "Thêm hệ thống thang máy & thang cuốn"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:309
 msgid "Error saving lift & escalator system:"
-msgstr ""
+msgstr "Lỗi khi lưu hệ thống thang máy & thang cuốn:"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:313
 msgid "Failed to save lift & escalator system. Please try again."
-msgstr ""
+msgstr "Không thể lưu hệ thống thang máy & thang cuốn. Vui lòng thử lại."
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:360
 msgid "Lift & Escalator System"
-msgstr ""
+msgstr "Hệ thống thang máy & thang cuốn"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:362
 #, fuzzy
@@ -2851,25 +2861,25 @@ msgstr "Số lượng cư dân (ước tính)"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:363
 msgid "Regenerative features:"
-msgstr ""
+msgstr "Tính năng tái tạo:"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:393
 msgid "Error loading lift & escalator systems"
-msgstr ""
+msgstr "Lỗi khi tải hệ thống thang máy & thang cuốn"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:416
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:442
 msgid "Failed to load lift & escalator system"
-msgstr ""
+msgstr "Không thể tải hệ thống thang máy & thang cuốn"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:422
 msgid "Lift & escalator system not found"
-msgstr ""
+msgstr "Không tìm thấy hệ thống thang máy & thang cuốn"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:476
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:480
 msgid "Failed to delete lift & escalator system"
-msgstr ""
+msgstr "Không thể xóa hệ thống thang máy & thang cuốn"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:14
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:277
@@ -2881,21 +2891,22 @@ msgstr "Loại chiếu sáng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:30
 msgid "Add a lighting system"
-msgstr ""
+msgstr "Thêm hệ thống chiếu sáng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:32
 msgid ""
 "Provide details on lighting types, power use, and controls to assess "
 "efficiency."
 msgstr ""
+"Cung cấp thông tin chi tiết về loại chiếu sáng, sử dụng điện và điều khiển để đánh giá hiệu suất."
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:52
 msgid "Room type"
-msgstr ""
+msgstr "Loại phòng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:67
 msgid "Area of room"
-msgstr ""
+msgstr "Diện tích phòng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:78
 #, fuzzy
@@ -2911,33 +2922,33 @@ msgstr "Số lượng cư dân (ước tính)"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:107
 msgid "Light bulb power rating"
-msgstr ""
+msgstr "Công suất định mức bóng đèn"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:156
 msgid "Installation of sensors"
-msgstr ""
+msgstr "Lắp đặt cảm biến"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:173
 msgid "Baseline Lighting Power Density (LPD)"
-msgstr ""
+msgstr "Mật độ công suất chiếu sáng cơ bản (LPD)"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:187
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:226
 msgid "Total energy consumption of ventilation system annually"
-msgstr ""
+msgstr "Tổng tiêu thụ năng lượng của hệ thống thông gió hàng năm"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:294
 msgid "Office: Conference Room,Lobby, office"
-msgstr ""
+msgstr "Văn phòng: Phòng họp, Sảnh, văn phòng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:298
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:479
 msgid "Area of room:"
-msgstr ""
+msgstr "Diện tích phòng:"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:300
 msgid "Bulb type :"
-msgstr ""
+msgstr "Loại bóng đèn:"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:329
 #, fuzzy
@@ -2947,41 +2958,41 @@ msgstr "Loại chiếu sáng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:331
 msgid "Click button below to add a lighting system"
-msgstr ""
+msgstr "Nhấp vào nút bên dưới để thêm hệ thống chiếu sáng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:378
 msgid "Please select a room type"
-msgstr ""
+msgstr "Vui lòng chọn loại phòng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:426
 msgid "Error saving lighting system:"
-msgstr ""
+msgstr "Lỗi khi lưu hệ thống chiếu sáng:"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:430
 msgid "Failed to save lighting system. Please try again."
-msgstr ""
+msgstr "Không thể lưu hệ thống chiếu sáng. Vui lòng thử lại."
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:480
 msgid "Bulb type:"
-msgstr ""
+msgstr "Loại bóng đèn:"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:510
 msgid "Error loading lighting systems"
-msgstr ""
+msgstr "Lỗi khi tải hệ thống chiếu sáng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:534
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:574
 msgid "Failed to load lighting system"
-msgstr ""
+msgstr "Không thể tải hệ thống chiếu sáng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:540
 msgid "Lighting system not found"
-msgstr ""
+msgstr "Không tìm thấy hệ thống chiếu sáng"
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:608
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:612
 msgid "Failed to delete lighting system"
-msgstr ""
+msgstr "Không thể xóa hệ thống chiếu sáng"
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:6
 #, fuzzy
@@ -2996,7 +3007,7 @@ msgstr "Số lượng cư dân (ước tính)"
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:69
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:86
 msgid "Enter a valid value"
-msgstr ""
+msgstr "Nhập giá trị hợp lệ"
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:57
 #, fuzzy
@@ -3006,21 +3017,21 @@ msgstr "Đơn vị nhiệt độ sưởi"
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:60
 msgid "eg. 18"
-msgstr ""
+msgstr "vd. 18"
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:65
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:82
 msgid "°Celsius"
-msgstr ""
+msgstr "°C"
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:66
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:83
 msgid "°Fahrenheit"
-msgstr ""
+msgstr "°F"
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:77
 msgid "eg. 32"
-msgstr ""
+msgstr "vd. 32"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:14
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:321
@@ -3041,6 +3052,7 @@ msgid ""
 "Enter details of the building's ventilation system, including type and "
 "capacity"
 msgstr ""
+"Nhập thông tin chi tiết về hệ thống thông gió của tòa nhà, bao gồm loại và công suất"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:52
 #, fuzzy
@@ -3056,54 +3068,55 @@ msgstr "Công suất thông gió"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:88
 msgid "Baseline verification system efficiency"
-msgstr ""
+msgstr "Hiệu suất hệ thống xác minh cơ bản"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:96
 msgid "W/CMH"
-msgstr ""
+msgstr "W/CMH"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:137
 msgid "Total ventilation system power input"
-msgstr ""
+msgstr "Tổng công suất đầu vào hệ thống thông gió"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:145
 msgid "Watts"
-msgstr ""
+msgstr "Watt"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:151
 msgid "Airflow rate"
-msgstr ""
+msgstr "Tốc độ luồng khí"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:159
 msgid "CMH"
-msgstr ""
+msgstr "CMH"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:160
 msgid "CFM"
-msgstr ""
+msgstr "CFM"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:166
 msgid "Installation of Demand Controlled Ventilation"
-msgstr ""
+msgstr "Lắp đặt hệ thống thông gió điều khiển theo nhu cầu"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:215
 msgid "Total number of ventilation type installed"
-msgstr ""
+msgstr "Tổng số loại thông gió được lắp đặt"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:234
 msgid "kWh/year"
-msgstr ""
+msgstr "kWh/năm"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:293
 msgid ""
 "You are about to remove or delete added ventilation system. This will action "
 "will permanently remove it."
 msgstr ""
+"Bạn sắp xóa hoặc xóa bỏ hệ thống thông gió đã thêm. Hành động này sẽ xóa vĩnh viễn nó."
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:340
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:530
 msgid "Airflow rate:"
-msgstr ""
+msgstr "Tốc độ luồng khí:"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:373
 #, fuzzy
@@ -3113,26 +3126,26 @@ msgstr "Loại thông gió"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:376
 msgid "Click button below to add a ventilation system"
-msgstr ""
+msgstr "Nhấp vào nút bên dưới để thêm hệ thống thông gió"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:433
 msgid "Form validation failed"
-msgstr ""
+msgstr "Xác thực biểu mẫu thất bại"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:479
 msgid "Error saving ventilation system:"
-msgstr ""
+msgstr "Lỗi khi lưu hệ thống thông gió:"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:482
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:565
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:631
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:668
 msgid "Error:"
-msgstr ""
+msgstr "Lỗi:"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:483
 msgid "An error occurred while saving the ventilation system"
-msgstr ""
+msgstr "Đã xảy ra lỗi khi lưu hệ thống thông gió"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:531
 #, fuzzy
@@ -3142,54 +3155,54 @@ msgstr "Công suất sưởi"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:559
 msgid "Error fetching ventilation systems:"
-msgstr ""
+msgstr "Lỗi khi tải hệ thống thông gió:"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:560
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:564
 msgid "Error fetching ventilation systems"
-msgstr ""
+msgstr "Lỗi khi tải hệ thống thông gió"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:632
 msgid "An error occurred while loading the ventilation system"
-msgstr ""
+msgstr "Đã xảy ra lỗi khi tải hệ thống thông gió"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:665
 msgid "Error deleting ventilation system:"
-msgstr ""
+msgstr "Lỗi khi xóa hệ thống thông gió:"
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:669
 msgid "An error occurred while deleting the ventilation system"
-msgstr ""
+msgstr "Đã xảy ra lỗi khi xóa hệ thống thông gió"
 
 #: .\templates\pages\building\building.html:5
 msgid "Building View"
-msgstr ""
+msgstr "Xem tòa nhà"
 
 #: .\templates\pages\building\building.html:61
 msgid "Edit"
-msgstr ""
+msgstr "Chỉnh sửa"
 
 #: .\templates\pages\building\building.html:74
 msgid "Carbon Footprint"
-msgstr ""
+msgstr "Dấu chân carbon"
 
 #: .\templates\pages\building\building.html:86
 msgid "Total Floor Area"
-msgstr ""
+msgstr "Tổng diện tích sàn"
 
 #: .\templates\pages\building\building.html:98
 #: .\templates\pages\building\building.html:233
 msgid "Embodied Carbon"
-msgstr ""
+msgstr "Carbon hóa thân"
 
 #: .\templates\pages\building\building.html:110
 msgid "Operational Carbon"
-msgstr ""
+msgstr "Carbon hoạt động"
 
 #: .\templates\pages\building\building.html:122
 #: .\templates\pages\home\partials\buildings_list.html:129
 msgid "Carbon Savings"
-msgstr ""
+msgstr "Tiết kiệm carbon"
 
 #: .\templates\pages\building\building.html:134
 #: .\templates\pages\building\building.html:326
@@ -3201,126 +3214,126 @@ msgstr "Chế độ lắp ráp"
 #: .\templates\pages\building\building.html:147
 #: .\templates\pages\building\building.html:328
 msgid "Energy"
-msgstr ""
+msgstr "Năng lượng"
 
 #: .\templates\pages\building\building.html:196
 msgid "Whole Life Carbon Cycle"
-msgstr ""
+msgstr "Chu kỳ carbon toàn bộ vòng đời"
 
 #: .\templates\pages\building\building.html:208
 msgid "Operational carbon:"
-msgstr ""
+msgstr "Carbon hoạt động:"
 
 #: .\templates\pages\building\building.html:217
 msgid "Embodied carbon:"
-msgstr ""
+msgstr "Carbon hóa thân:"
 
 #: .\templates\pages\building\building.html:254
 msgid "Embodied Carbon by Material"
-msgstr ""
+msgstr "Carbon hóa thân theo vật liệu"
 
 #: .\templates\pages\building\building.html:276
 msgid "Embodied Carbon by Appliances"
-msgstr ""
+msgstr "Carbon hóa thân theo thiết bị"
 
 #: .\templates\pages\building\building.html:292
 #: .\templates\pages\home\partials\buildings_list.html:257
 msgid "This will permanently delete the building and all associated data."
-msgstr ""
+msgstr "Điều này sẽ xóa vĩnh viễn tòa nhà và tất cả dữ liệu liên quan."
 
 #: .\templates\pages\building\building.html:293
 #: .\templates\pages\home\partials\buildings_list.html:258
 msgid "Delete Building?"
-msgstr ""
+msgstr "Xóa tòa nhà?"
 
 #: .\templates\pages\home\home.html:6
 msgid "List view"
-msgstr ""
+msgstr "Xem danh sách"
 
 #: .\templates\pages\home\home.html:25
 #, python-format
 msgid "Welcome back, %(username)s!"
-msgstr ""
+msgstr "Chào mừng trở lại, %(username)s!"
 
 #: .\templates\pages\home\home.html:27
 msgid "Last seen on:"
-msgstr ""
+msgstr "Lần cuối truy cập:"
 
 #: .\templates\pages\home\home.html:46
 msgid "Confirm your email"
-msgstr ""
+msgstr "Xác nhận email của bạn"
 
 #: .\templates\pages\home\home.html:48
 msgid "We've sent a confirmation email to you. Please confirm your account"
-msgstr ""
+msgstr "Chúng tôi đã gửi email xác nhận cho bạn. Vui lòng xác nhận tài khoản của bạn"
 
 #: .\templates\pages\home\home.html:62
 msgid "Your buildings"
-msgstr ""
+msgstr "Tòa nhà của bạn"
 
 #: .\templates\pages\home\home.html:64 .\templates\pages\home\templates.html:19
 msgid "Add your buildings to access for low carbon"
-msgstr ""
+msgstr "Thêm tòa nhà của bạn để truy cập carbon thấp"
 
 #: .\templates\pages\home\home.html:77
 msgid "Search buildings..."
-msgstr ""
+msgstr "Tìm kiếm tòa nhà..."
 
 #: .\templates\pages\home\home.html:108
 #: .\templates\pages\home\partials\buildings_list.html:190
 msgid "Add building"
-msgstr ""
+msgstr "Thêm tòa nhà"
 
 #: .\templates\pages\home\home.html:153
 msgid "confetti icon"
-msgstr ""
+msgstr "biểu tượng pháo hoa"
 
 #: .\templates\pages\home\home.html:155
 msgid "Well done your account has been created."
-msgstr ""
+msgstr "Làm tốt lắm, tài khoản của bạn đã được tạo."
 
 #: .\templates\pages\home\home.html:158
 msgid "Please fill the fields below to finish setting your profile"
-msgstr ""
+msgstr "Vui lòng điền các trường bên dưới để hoàn tất thiết lập hồ sơ của bạn"
 
 #: .\templates\pages\home\home.html:171
 #: .\templates\pages\profile\profile.html:114
 msgid "Username"
-msgstr ""
+msgstr "Tên người dùng"
 
 #: .\templates\pages\home\home.html:187
 #: .\templates\pages\profile\profile.html:130
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: .\templates\pages\home\home.html:259
 #: .\templates\pages\profile\profile.html:214
 msgid "Share my info with BEAT tool maintainers"
-msgstr ""
+msgstr "Chia sẻ thông tin của tôi với người quản lý công cụ BEAT"
 
 #: .\templates\pages\home\home.html:264
 msgid "Save & Continue"
-msgstr ""
+msgstr "Lưu & Tiếp tục"
 
 #: .\templates\pages\home\home.html:271
 msgid "I'll do this later"
-msgstr ""
+msgstr "Tôi sẽ làm điều này sau"
 
 #: .\templates\pages\home\home.html:334
 msgid "Please correct the following errors:"
-msgstr ""
+msgstr "Vui lòng sửa các lỗi sau:"
 
 #: .\templates\pages\home\home.html:345
 msgid "An error occurred while updating your profile. Please try again."
-msgstr ""
+msgstr "Đã xảy ra lỗi khi cập nhật hồ sơ của bạn. Vui lòng thử lại."
 
 #: .\templates\pages\home\partials\buildings_list.html:9
 msgid "Add your first building!"
-msgstr ""
+msgstr "Thêm tòa nhà đầu tiên của bạn!"
 
 #: .\templates\pages\home\partials\buildings_list.html:63
 msgid "Building type:"
-msgstr ""
+msgstr "Loại tòa nhà:"
 
 #: .\templates\pages\home\partials\buildings_list.html:72
 #, fuzzy
@@ -3330,99 +3343,101 @@ msgstr "Được tạo vào"
 
 #: .\templates\pages\home\partials\buildings_list.html:94
 msgid "Total carbon footprint"
-msgstr ""
+msgstr "Tổng dấu chân carbon"
 
 #: .\templates\pages\home\partials\buildings_list.html:117
 msgid "Total embodied carbon"
-msgstr ""
+msgstr "Tổng carbon hóa thân"
 
 #: .\templates\pages\home\partials\buildings_list.html:140
 msgid "Progress of completion"
-msgstr ""
+msgstr "Tiến độ hoàn thành"
 
 #: .\templates\pages\home\partials\buildings_list.html:177
 msgid "Last Edited:"
-msgstr ""
+msgstr "Chỉnh sửa lần cuối:"
 
 #: .\templates\pages\home\partials\buildings_list.html:185
 msgid "map"
-msgstr ""
+msgstr "bản đồ"
 
 #: .\templates\pages\home\partials\buildings_list.html:186
 msgid "You have no buildings added"
-msgstr ""
+msgstr "Bạn chưa thêm tòa nhà nào"
 
 #: .\templates\pages\home\resources.html:10
 msgid "Resource page"
-msgstr ""
+msgstr "Trang tài nguyên"
 
 #: .\templates\pages\home\resources.html:22
 msgid "Manage your resources to access for low carbon"
-msgstr ""
+msgstr "Quản lý tài nguyên của bạn để truy cập carbon thấp"
 
 #: .\templates\pages\home\resources.html:31
 msgid "Introduction video"
-msgstr ""
+msgstr "Video giới thiệu"
 
 #: .\templates\pages\home\resources.html:33
 msgid "Watch our short video to get a quick overview of"
-msgstr ""
+msgstr "Xem video ngắn của chúng tôi để có cái nhìn tổng quan nhanh về"
 
 #: .\templates\pages\home\resources.html:33
 msgid ""
 "what it does, how it works, and how it can support your low-carbon building "
 "strategies."
 msgstr ""
+"nó làm gì, cách hoạt động và cách nó có thể hỗ trợ chiến lược xây dựng carbon thấp của bạn."
 
 #: .\templates\pages\home\resources.html:40
 msgid "YouTube video player"
-msgstr ""
+msgstr "Trình phát video YouTube"
 
 #: .\templates\pages\home\resources.html:53
 msgid "This content requires media cookies to be enabled for embedded videos."
-msgstr ""
+msgstr "Nội dung này yêu cầu bật cookie phương tiện cho video nhúng."
 
 #: .\templates\pages\home\resources.html:60
 msgid "Manage Cookie Settings"
-msgstr ""
+msgstr "Quản lý cài đặt Cookie"
 
 #: .\templates\pages\home\resources.html:72
 msgid "User Handbook"
-msgstr ""
+msgstr "Sổ tay người dùng"
 
 #: .\templates\pages\home\resources.html:74
 msgid "Download the official"
-msgstr ""
+msgstr "Tải xuống tài liệu chính thức"
 
 #: .\templates\pages\home\resources.html:74
 msgid ""
 "Handbook (Part 1) for a detailed, step-by-step guide on using the tool "
 "effectively. The handbook covers:"
 msgstr ""
+"Sổ tay (Phần 1) để có hướng dẫn chi tiết, từng bước về cách sử dụng công cụ hiệu quả. Sổ tay bao gồm:"
 
 #: .\templates\pages\home\resources.html:77
 msgid "Key functionalities and workflow"
-msgstr ""
+msgstr "Chức năng chính và quy trình làm việc"
 
 #: .\templates\pages\home\resources.html:78
 msgid "Data input requirements"
-msgstr ""
+msgstr "Yêu cầu nhập dữ liệu"
 
 #: .\templates\pages\home\resources.html:79
 msgid "Methodology"
-msgstr ""
+msgstr "Phương pháp luận"
 
 #: .\templates\pages\home\resources.html:82
 msgid "For guidance, please refer to the BEAT"
-msgstr ""
+msgstr "Để được hướng dẫn, vui lòng tham khảo BEAT"
 
 #: .\templates\pages\home\resources.html:83
 msgid "user documentation"
-msgstr ""
+msgstr "tài liệu người dùng"
 
 #: .\templates\pages\home\resources.html:92
 msgid "The"
-msgstr ""
+msgstr "Các"
 
 #: .\templates\pages\home\resources.html:92
 #, fuzzy
@@ -3436,119 +3451,120 @@ msgid ""
 "working to reduce building emissions. Together, we will work on advancing "
 "practical, data-driven solutions for a low-carbon future."
 msgstr ""
+"Tham gia cộng đồng ngày càng phát triển của các nhà hoạch định chính sách, nhà quy hoạch và chuyên gia đang làm việc để giảm phát thải từ tòa nhà. Cùng nhau, chúng tôi sẽ làm việc để thúc đẩy các giải pháp thực tế, dựa trên dữ liệu cho tương lai carbon thấp."
 
 #: .\templates\pages\home\resources.html:100
 msgid "Host"
-msgstr ""
+msgstr "Đơn vị chủ trì"
 
 #: .\templates\pages\home\resources.html:105
 msgid "Host logo"
-msgstr ""
+msgstr "Logo đơn vị chủ trì"
 
 #: .\templates\pages\home\resources.html:113
 msgid "Lead partners"
-msgstr ""
+msgstr "Đối tác chính"
 
 #: .\templates\pages\home\resources.html:120
 msgid "Lead partner logo"
-msgstr ""
+msgstr "Logo đối tác chính"
 
 #: .\templates\pages\home\resources.html:130
 msgid "Development partners"
-msgstr ""
+msgstr "Đối tác phát triển"
 
 #: .\templates\pages\home\resources.html:137
 msgid "Development partner logo"
-msgstr ""
+msgstr "Logo đối tác phát triển"
 
 #: .\templates\pages\home\resources.html:150
 msgid "Interested in contributing or partnering? We'd love to"
-msgstr ""
+msgstr "Quan tâm đến việc đóng góp hoặc hợp tác? Chúng tôi rất mong được"
 
 #: .\templates\pages\home\resources.html:151
 msgid "hear from you"
-msgstr ""
+msgstr "nghe từ bạn"
 
 #: .\templates\pages\home\templates.html:5
 msgid "Home"
-msgstr ""
+msgstr "Trang chủ"
 
 #: .\templates\pages\home\templates.html:17
 msgid "Reusable Templates"
-msgstr ""
+msgstr "Mẫu có thể tái sử dụng"
 
 #: .\templates\pages\home\templates.html:38
 msgid "Search templates..."
-msgstr ""
+msgstr "Tìm kiếm mẫu..."
 
 #: .\templates\pages\home\templates.html:62
 #: .\templates\pages\home\templates.html:323
 msgid "Click here for a more advanced search option"
-msgstr ""
+msgstr "Nhấp vào đây để có tùy chọn tìm kiếm nâng cao"
 
 #: .\templates\pages\home\templates.html:124
 msgid "System Component"
-msgstr ""
+msgstr "Thành phần hệ thống"
 
 #: .\templates\pages\home\templates.html:125
 msgid "My Component"
-msgstr ""
+msgstr "Thành phần của tôi"
 
 #: .\templates\pages\home\templates.html:139
 msgid "Name (A-Z)"
-msgstr ""
+msgstr "Tên (A-Z)"
 
 #: .\templates\pages\home\templates.html:140
 msgid "Name (Z-A)"
-msgstr ""
+msgstr "Tên (Z-A)"
 
 #: .\templates\pages\home\templates.html:141
 msgid "Newest First"
-msgstr ""
+msgstr "Mới nhất trước"
 
 #: .\templates\pages\home\templates.html:142
 msgid "Oldest First"
-msgstr ""
+msgstr "Cũ nhất trước"
 
 #: .\templates\pages\home\templates.html:160
 #: .\templates\pages\home\templates.html:386
 #: .\templates\pages\home\templates.html:387
 msgid "Loading..."
-msgstr ""
+msgstr "Đang tải..."
 
 #: .\templates\pages\home\templates.html:164
 #: .\templates\pages\home\templates.html:587
 #: .\templates\pages\home\templates.html:611
 msgid "Delete"
-msgstr ""
+msgstr "Xóa"
 
 #: .\templates\pages\home\templates.html:181
 msgid "Required (2-200 characters)"
-msgstr ""
+msgstr "Bắt buộc (2-200 ký tự)"
 
 #: .\templates\pages\home\templates.html:187
 msgid "Select country"
-msgstr ""
+msgstr "Chọn quốc gia"
 
 #: .\templates\pages\home\templates.html:195
 msgid "Building component"
-msgstr ""
+msgstr "Thành phần tòa nhà"
 
 #: .\templates\pages\home\templates.html:197
 msgid "Select category"
-msgstr ""
+msgstr "Chọn danh mục"
 
 #: .\templates\pages\home\templates.html:205
 msgid "Construction technique"
-msgstr ""
+msgstr "Kỹ thuật xây dựng"
 
 #: .\templates\pages\home\templates.html:227
 msgid "Materials from EPD libraries"
-msgstr ""
+msgstr "Vật liệu từ thư viện EPD"
 
 #: .\templates\pages\home\templates.html:244
 msgid "Save & duplicate"
-msgstr ""
+msgstr "Lưu & nhân bản"
 
 #: .\templates\pages\home\templates.html:247
 #, fuzzy
@@ -3558,31 +3574,31 @@ msgstr "Cập nhật vào"
 
 #: .\templates\pages\home\templates.html:302
 msgid "Search EPDs..."
-msgstr ""
+msgstr "Tìm kiếm EPD..."
 
 #: .\templates\pages\home\templates.html:358
 msgid "Enter search criteria and click Search"
-msgstr ""
+msgstr "Nhập tiêu chí tìm kiếm và nhấp Tìm kiếm"
 
 #: .\templates\pages\home\templates.html:420
 msgid "Error"
-msgstr ""
+msgstr "Lỗi"
 
 #: .\templates\pages\home\templates.html:422
 msgid "Failed to load template"
-msgstr ""
+msgstr "Không thể tải mẫu"
 
 #: .\templates\pages\home\templates.html:431
 msgid "No materials added"
-msgstr ""
+msgstr "Chưa thêm vật liệu"
 
 #: .\templates\pages\home\templates.html:463
 msgid "Remove this material?"
-msgstr ""
+msgstr "Xóa vật liệu này?"
 
 #: .\templates\pages\home\templates.html:536
 msgid "Template updated"
-msgstr ""
+msgstr "Đã cập nhật mẫu"
 
 #: .\templates\pages\home\templates.html:538
 #, fuzzy
@@ -3596,87 +3612,88 @@ msgstr "Cập nhật vào"
 #: .\templates\pages\home\templates.html:628
 #: .\templates\pages\home\templates.html:656
 msgid "An error occurred"
-msgstr ""
+msgstr "Đã xảy ra lỗi"
 
 #: .\templates\pages\home\templates.html:571
 #: .\templates\pages\home\templates.html:649
 msgid "Template duplicated"
-msgstr ""
+msgstr "Đã nhân bản mẫu"
 
 #: .\templates\pages\home\templates.html:573
 #: .\templates\pages\home\templates.html:651
 msgid "Duplication failed"
-msgstr ""
+msgstr "Nhân bản thất bại"
 
 #: .\templates\pages\home\templates.html:587
 #: .\templates\pages\home\templates.html:611
 msgid "This cannot be undone."
-msgstr ""
+msgstr "Không thể hoàn tác."
 
 #: .\templates\pages\home\templates.html:598
 #: .\templates\pages\home\templates.html:621
 msgid "Template deleted"
-msgstr ""
+msgstr "Đã xóa mẫu"
 
 #: .\templates\pages\home\templates.html:600
 #: .\templates\pages\home\templates.html:623
 msgid "Deletion failed"
-msgstr ""
+msgstr "Xóa thất bại"
 
 #: .\templates\pages\home\templates.html:634
 msgid "Create a copy of this template?"
-msgstr ""
+msgstr "Tạo bản sao của mẫu này?"
 
 #: .\templates\pages\home\templates.html:703
 msgid "Added"
-msgstr ""
+msgstr "Đã thêm"
 
 #: .\templates\pages\profile\profile.html:16
 msgid "Profile Settings"
-msgstr ""
+msgstr "Cài đặt hồ sơ"
 
 #: .\templates\pages\profile\profile.html:18
 msgid "Manage your account information and preferences"
-msgstr ""
+msgstr "Quản lý thông tin tài khoản và tùy chọn của bạn"
 
 #: .\templates\pages\profile\profile.html:48
 msgid "Joined"
-msgstr ""
+msgstr "Tham gia"
 
 #: .\templates\pages\profile\profile.html:55
 msgid "Last login"
-msgstr ""
+msgstr "Đăng nhập lần cuối"
 
 #: .\templates\pages\profile\profile.html:63
 msgid "Location"
-msgstr ""
+msgstr "Vị trí"
 
 #: .\templates\pages\profile\profile.html:80
 msgid "Quick Actions"
-msgstr ""
+msgstr "Hành động nhanh"
 
 #: .\templates\pages\profile\profile.html:99
 msgid "Edit Profile"
-msgstr ""
+msgstr "Chỉnh sửa hồ sơ"
 
 #: .\templates\pages\profile\profile.html:108
 msgid "Account Information"
-msgstr ""
+msgstr "Thông tin tài khoản"
 
 #: .\templates\pages\profile\profile.html:150
 msgid "Location Information"
-msgstr ""
+msgstr "Thông tin vị trí"
 
 #: .\templates\pages\profile\profile.html:208
 msgid "Privacy Settings"
-msgstr ""
+msgstr "Cài đặt quyền riêng tư"
 
 #: .\templates\pages\profile\profile.html:222
 msgid ""
 "By enabling this option, you allow the BEAT tool maintainers to access your "
 "profile information for support and improvement purposes."
 msgstr ""
+"Bằng cách bật tùy chọn này, bạn cho phép người quản lý công cụ BEAT truy cập thông tin hồ sơ của bạn cho mục đích hỗ trợ và cải thiện."
 
 #: .\templates\pages\profile\profile.html:231
 msgid "Save Changes"
-msgstr ""
+msgstr "Lưu thay đổi"

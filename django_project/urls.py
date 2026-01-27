@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic.base import RedirectView
+from django.views.i18n import JavaScriptCatalog
 
 DJANGO_ADMIN_URL = os.environ.get("DJANGO_ADMIN_URL")
 
@@ -13,6 +14,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path('cookies/', include('cookie_consent.urls')),
     path("i18n/", include("django.conf.urls.i18n")),  # Language switching
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),  # JavaScript i18n
     path("", include("pages.urls")),
 
 

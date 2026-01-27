@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 
 <footer
       class="bg-[var(--bg--base-700)] pt-5 pb-8 grid place-items-center gap-5 mt-10"
@@ -12,6 +13,6 @@
       <p
         class="text-center text-xs/xs text-[0.688rem] font-medium uppercase text-[var(--bg--black-0)]"
       >
-        Copyright © {{ current_year }} • <a class='link-secondary' href="{% url 'terms_of_use' %}">Terms of Use</a> & <a class='link-secondary' href="{% url 'privacy_policy' %}">Privacy Policy</a>
+        {% translate "Copyright" %} © {{ current_year }} • <a class='link-secondary' href="{% url 'terms_of_use' %}">{% translate "Terms of Use" %}</a> & <a class='link-secondary' href="{% url 'privacy_policy' %}">{% translate "Privacy Policy" %}</a>
       </p>
     </footer>

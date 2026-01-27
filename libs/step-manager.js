@@ -10,124 +10,115 @@ class StepManager {
     this.editMode = window.location.pathname.includes('/building/edit');
 
     if(this.editMode){
-      document.getElementById('page-title').textContent = 'Edit Building Information';
-      document.getElementById('page-description').textContent = 'Update the building information as needed.';
+      document.getElementById('page-title').textContent = gettext('Edit Building Information');
+      document.getElementById('page-description').textContent = gettext('Update the building information as needed.');
     }
 
 
     this.stepConfig = {
       1: {
-        name: "Building Information",
+        name: gettext("Building Information"),
         id: "building-information",
         subSteps: [
           {
             id: "building-name-location",
-            name: "Building Name & Location",
+            name: gettext("Building Name & Location"),
             component: "building-information/building-name-location.html",
             requiredFields: ["building_name", "address", "country"],
-            title: "Building Name & Location",
-            description:
-              "Add details concerning building name and locations of building.",
+            title: gettext("Building Name & Location"),
+            description: gettext("Add details concerning building name and locations of building."),
           },
           {
             id: "building-details",
-            name: "Building Details",
+            name: gettext("Building Details"),
             component: "building-information/building-details.html",
             requiredFields: ["building_type", "assessment_period", "total_floor_area"],
-            title: "Building Details",
-            description: "Add detailed information about your building.",
+            title: gettext("Building Details"),
+            description: gettext("Add detailed information about your building."),
           },
         ],
       },
       2: {
-        name: "Operational Details",
+        name: gettext("Operational Details"),
         id: "operational-details",
         subSteps: [
           {
             id: "operational-schedule-temperature",
-            name: "Operational Schedule & Temperature",
+            name: gettext("Operational Schedule & Temperature"),
             component:
               "operational-details/operational-schedule-temperature.html",
             requiredFields: ["operating_hours", "default_temperature"],
-            title: "Operational Schedule & Temperature",
-            description:
-              "Complete field below to add operations information about your building.",
+            title: gettext("Operational Schedule & Temperature"),
+            description: gettext("Complete field below to add operations information about your building."),
           },
           {
             id: "cooling-system",
-            name: "Cooling System",
+            name: gettext("Cooling System"),
             component: "operational-details/cooling-system.html",
             requiredFields: ["cooling_system_type"],
-            title: "Cooling System",
-            description:
-              "Enter details of the building's cooling system, including type and capacity.",
+            title: gettext("Cooling System"),
+            description: gettext("Enter details of the building's cooling system, including type and capacity."),
           },
           {
             id: "ventilation-system",
-            name: "Ventilation System",
+            name: gettext("Ventilation System"),
             component: "operational-details/ventilation-system.html",
             requiredFields: ["ventilation_type"],
-            title: "Ventilation System",
-            description:
-              "Provide details on the building,s ventilation type, capacity, and coverage to assess airflow and indoor air quality.",
+            title: gettext("Ventilation System"),
+            description: gettext("Provide details on the building,s ventilation type, capacity, and coverage to assess airflow and indoor air quality."),
           },
           {
             id: "lighting-system",
-            name: "Lighting System",
+            name: gettext("Lighting System"),
             component: "operational-details/lighting-system.html",
             requiredFields: ["lighting_type"],
-            title: "Lighting System",
-            description:
-              "Provide details on lighting types, power use, and controls to assess efficiency.",
+            title: gettext("Lighting System"),
+            description: gettext("Provide details on lighting types, power use, and controls to assess efficiency."),
           },
           {
             id: "lift-escalator-system",
-            name: "Lift & Escalator System",
+            name: gettext("Lift & Escalator System"),
             component: "operational-details/lift-escalator-system.html",
             requiredFields: [],
-            title: "Lift & Escalator System",
-            description:
-              "Provide details on lift & escalator systems in your building if any.",
+            title: gettext("Lift & Escalator System"),
+            description: gettext("Provide details on lift & escalator systems in your building if any."),
           },
           {
             formId: "hot-water-system",
-            name: "Hot Water System",
+            name: gettext("Hot Water System"),
             component: "operational-details/hot-water-system.html",
             requiredFields: ["hot_water_type"],
-            title: "Hot Water System",
-            description:
-              "Defines the building’s method of producing and distributing hot water, including equipment type, energy source, and usage patterns.",
+            title: gettext("Hot Water System"),
+            description: gettext("Defines the building's method of producing and distributing hot water, including equipment type, energy source, and usage patterns."),
           },
         ],
       },
       3: {
-        name: "Operational Data Entry",
+        name: gettext("Operational Data Entry"),
         id: "operational-data-entry",
         subSteps: [
           {
             id: "operational-data-entry",
-            name: "Data Entry",
+            name: gettext("Data Entry"),
             component: "operational-data-entry/operational-data-entry.html",
             requiredFields: ["energy_consumption"],
-            title: "Operational Energy carrier",
-            description:
-              "Tell us what fuels or energy sources your building runs on.",
+            title: gettext("Operational Energy carrier"),
+            description: gettext("Tell us what fuels or energy sources your building runs on."),
           },
         ],
       },
       4: {
-        name: "Building Structural Components",
+        name: gettext("Building Structural Components"),
         id: "building-structural-components",
         subSteps: [
           {
             id: "building-structural-components",
-            name: "Structural Components",
+            name: gettext("Structural Components"),
             component:
               "building-structural-components/building-structural-components.html",
             requiredFields: ["foundation_type", "structure_type"],
-            title: "Building Structural Components",
-            description:
-              "Enter information about the building’s walls, floors, roofs, and other structural parts.",
+            title: gettext("Building Structural Components"),
+            description: gettext("Enter information about the building's walls, floors, roofs, and other structural parts."),
           },
         ],
       },
@@ -403,7 +394,7 @@ class StepManager {
     const progressBar = document.getElementById("progress-bar");
 
     if (progressText) {
-      progressText.textContent = `${percentage}% completed`;
+      progressText.textContent = interpolate(gettext("%s%% completed"), [percentage]);
     }
 
     if (progressBar) {
@@ -788,9 +779,9 @@ class StepManager {
 
       currentStepProgress.innerHTML = `
         <span class="text-[0.813rem]/5 font-semibold align-middle"
-          >${this.currentSubStep} out of
+          >${interpolate(gettext("%s out of"), [this.currentSubStep])}
           <span class="font-normal text-[var(--text--sub-600)]"
-            >${this.stepConfig[this.currentStep].subSteps.length} steps</span
+            >${interpolate(gettext("%s steps"), [this.stepConfig[this.currentStep].subSteps.length])}</span
           ></span
         >
       `;
@@ -989,7 +980,7 @@ class StepManager {
     const progressText = document.getElementById("progress-text");
     const progressBar = document.getElementById("progress-bar");
 
-    if (progressText) progressText.textContent = "100% completed";
+    if (progressText) progressText.textContent = gettext("100% completed");
     if (progressBar) progressBar.value = 100;
   }
 

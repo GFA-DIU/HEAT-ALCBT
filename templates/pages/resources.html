@@ -1,17 +1,18 @@
 {% extends '_base.html' %}
 {% load cookie_consent_tags %}
+{% load i18n %}
 {% block css %}
 {{ block.super }}
 {% load static %}
   <link rel="stylesheet" href="{% static 'css/resources.css' %}">
 {% endblock css %}
 
-{% block title %}Resource page{% endblock %}
+{% block title %}{% translate "Resource page" %}{% endblock %}
 
 {% block content %}
-<h1 class="mb-1">Resources</h1>
+<h1 class="mb-1">{% translate "Resources" %}</h1>
 <span class="text-muted mb-5">
-  Welcome to the <span class="fw-bold">Resources</span> section of the <span class="fw-bolder" style="color:#F26716">BEAT</span>. Here you'll find key materials to help you understand, navigate, and maximise the use of the Building Emissions Assessment Tool.
+  {% translate "Welcome to the" %} <span class="fw-bold">{% translate "Resources" %}</span> {% translate "section of the" %} <span class="fw-bolder" style="color:#F26716">BEAT</span>. {% translate "Here you'll find key materials to help you understand, navigate, and maximise the use of the Building Emissions Assessment Tool." %}
 </span>
 
 <div class="row mb-3">
@@ -70,9 +71,9 @@
         </div>
 </div>
 
-<h3 class="mb-1">The <span style="color:#F26716">BEAT</span> Community</h3>
+<h3 class="mb-1">{% translate "The" %} <span style="color:#F26716">BEAT</span> {% translate "Community" %}</h3>
 <span >
-    Join a growing community of policymakers, planners, and practitioners working to reduce building emissions. Together, we will work on advancing practical, data-driven solutions for a low-carbon future.
+    {% translate "Join a growing community of policymakers, planners, and practitioners working to reduce building emissions. Together, we will work on advancing practical, data-driven solutions for a low-carbon future." %}
 </span>
 
 <h4 class="text-center text-muted mt-4 fs-4">Host</h4>

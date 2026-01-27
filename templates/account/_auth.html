@@ -1,7 +1,8 @@
 {% extends '_base.html' %}
 {% load crispy_forms_tags %}
+{% load i18n %}
 
-{% block title %}Sign up{% endblock %}
+{% block title %}{% translate "Sign up" %}{% endblock %}
  
 {% load static %}
  
@@ -29,7 +30,7 @@
           <p
             class="text-sm text-center max-md:mt-6 text-(--text--strong-950)"
           >
-            <a class="link-secondary" href="{% url 'terms_of_use' %}">Terms of use</a>&nbsp;and&nbsp;<a class="link-secondary" href="{% url 'privacy_policy' %}">Privacy policy</a>
+            <a class="link-secondary" href="{% url 'terms_of_use' %}">{% translate "Terms of use" %}</a>&nbsp;{% translate "and" %}&nbsp;<a class="link-secondary" href="{% url 'privacy_policy' %}">{% translate "Privacy policy" %}</a>
           </p>
         </div>
       </div>
@@ -46,11 +47,10 @@
         >
           <div class="flex flex-col text-white">
             <h1 class="text-[2.5rem]/[103%] font-black">
-              Building Emission Assessment Tool
+              {% translate "Building Emission Assessment Tool" %}
             </h1>
             <p class="text-sm">
-              Accelerating the transition towards zero and low carbon buildings
-              through data-driven decisions
+              {% translate "Accelerating the transition towards zero and low carbon buildings through data-driven decisions" %}
             </p>
           </div>
         </div>
