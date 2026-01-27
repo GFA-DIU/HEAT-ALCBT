@@ -646,40 +646,49 @@ class StepManager {
               }
             });
 
-            // For step 1.1, trigger cascading dropdowns for region and city
+            // For step 1.1, handle cascading dropdowns for region and city
             if (stepKey === 'building-information/building-name-location') {
-              // Wait for HTMX to be ready and trigger cascading
-              setTimeout(() => {
-                const countrySelect = document.getElementById('country-select');
-                const regionSelect = document.getElementById('region-select');
-                const citySelect = document.getElementById('city-select');
+              const regionSelect = document.getElementById('region-select');
+              // Check if regions are already pre-populated by server (edit mode)
+              const hasPrePopulatedRegions = regionSelect && regionSelect.options.length > 1;
 
-                if (countrySelect && result.data.country && typeof htmx !== 'undefined') {
-                  // Listen for when regions are loaded
-                  const regionLoadHandler = (event) => {
-                    if (event.detail.target === regionSelect && result.data.region) {
-                      regionSelect.value = result.data.region;
+              if (hasPrePopulatedRegions) {
+                // Edit mode: server already populated regions/cities with correct selections
+                // No HTMX cascade needed - just trigger form validation
+                // console.log('Edit mode: regions/cities pre-populated by server');
+              } else {
+                // Create mode or fallback: use HTMX cascade logic
+                setTimeout(() => {
+                  const countrySelect = document.getElementById('country-select');
+                  const citySelect = document.getElementById('city-select');
 
-                      // Now trigger city loading
-                      htmx.trigger(regionSelect, 'change');
+                  if (countrySelect && result.data.country && typeof htmx !== 'undefined') {
+                    // Listen for when regions are loaded
+                    const regionLoadHandler = (event) => {
+                      if (event.detail.target === regionSelect && result.data.region) {
+                        regionSelect.value = result.data.region;
 
-                      // Listen for when cities are loaded
-                      const cityLoadHandler = (event) => {
-                        if (event.detail.target === citySelect && result.data.city) {
-                          citySelect.value = result.data.city;
-                          document.body.removeEventListener('htmx:afterSwap', cityLoadHandler);
-                        }
-                      };
-                      document.body.addEventListener('htmx:afterSwap', cityLoadHandler);
+                        // Now trigger city loading
+                        htmx.trigger(regionSelect, 'change');
 
-                      document.body.removeEventListener('htmx:afterSwap', regionLoadHandler);
-                    }
-                  };
+                        // Listen for when cities are loaded
+                        const cityLoadHandler = (event) => {
+                          if (event.detail.target === citySelect && result.data.city) {
+                            citySelect.value = result.data.city;
+                            document.body.removeEventListener('htmx:afterSwap', cityLoadHandler);
+                          }
+                        };
+                        document.body.addEventListener('htmx:afterSwap', cityLoadHandler);
 
-                  document.body.addEventListener('htmx:afterSwap', regionLoadHandler);
-                  htmx.trigger(countrySelect, 'change');
-                }
-              }, 200);
+                        document.body.removeEventListener('htmx:afterSwap', regionLoadHandler);
+                      }
+                    };
+
+                    document.body.addEventListener('htmx:afterSwap', regionLoadHandler);
+                    htmx.trigger(countrySelect, 'change');
+                  }
+                }, 200);
+              }
             }
 
             // For step 1.2, trigger cascading dropdowns for apartment type and climate type

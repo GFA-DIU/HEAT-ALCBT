@@ -25,7 +25,10 @@ logger = logging.getLogger(__name__)
 @require_http_methods(["GET", "POST"])
 def building_step_structural_products(request):
     """Handle structural products selection for the add-building wizard."""
-    action = request.POST.get("action") if request.method == "POST" else "list"
+    if request.method == "POST":
+        action = request.POST.get("action", "list")
+    else:
+        action = request.GET.get("action", "list")
 
     if action == "filter":
         return handle_filter_epds(request)
@@ -35,6 +38,8 @@ def building_step_structural_products(request):
         return handle_get_techniques(request)
     elif action == "get_categories":
         return handle_get_categories(request)
+    elif action == "get_subcategories":
+        return handle_get_subcategories(request)
     else:
         return handle_filter_epds(request)
 
@@ -161,3 +166,25 @@ def handle_get_categories(request):
         options.append(f'<option value="{cat["id"]}">{cat["name"]}</option>')
 
     return HttpResponse(''.join(options))
+
+
+def handle_get_subcategories(request):
+    """Get material subcategories for a parent category (HTMX endpoint)."""
+    category_id = request.POST.get("category") or request.GET.get("category")
+
+    if not category_id:
+        return HttpResponse('<option value="">Select category first</option>')
+
+    try:
+        subcategories = MaterialCategory.objects.filter(
+            parent_id=category_id
+        ).order_by("name_en").values('id', 'name_en')
+
+        options = ['<option value="">All Sub-categories</option>']
+        for subcat in subcategories:
+            options.append(f'<option value="{subcat["id"]}">{subcat["name_en"]}</option>')
+
+        return HttpResponse(''.join(options))
+    except Exception as e:
+        logger.error(f"Error fetching subcategories: {e}")
+        return HttpResponse('<option value="">Error loading subcategories</option>')
