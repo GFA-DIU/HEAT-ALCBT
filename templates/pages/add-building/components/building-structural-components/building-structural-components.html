@@ -223,6 +223,7 @@
               hx-vals='{"action": "filter"}'
               hx-target="#structural_epd_list"
               hx-swap="innerHTML"
+              hx-trigger="submit, change from:select delay:300ms, keyup changed delay:500ms from:input[name='search_query']"
               class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]">
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
@@ -231,6 +232,9 @@
             </label>
             <select name="country" class="select min-w-[120px]">
               <option value="">All Countries</option>
+              {% for country in countries %}
+                <option value="{{ country.id }}">{{ country.name }}</option>
+              {% endfor %}
             </select>
             <input type="hidden" name="dimension" id="epd_filter_dimension" value="area" />
             <input type="hidden" name="mode" id="epd_filter_mode" value="boq" />
@@ -249,16 +253,25 @@
             </div>
             <div class="collapse-content mt-0 px-0">
               <div class="grid grid-cols-3 gap-2">
-                <select name="category" class="select h-9 text-sm/5">
-                  <option value="">Category</option>
+                <select name="category" id="epd_category_filter" class="select h-9 text-sm/5"
+                        hx-get="{% url 'building_step_structural' %}?action=get_subcategories"
+                        hx-target="#epd_subcategory_filter"
+                        hx-trigger="change"
+                        hx-swap="innerHTML"
+                        hx-include="this">
+                  <option value="">All Categories</option>
+                  {% for cat in epd_categories %}
+                    <option value="{{ cat.id }}">{{ cat.name_en }}</option>
+                  {% endfor %}
                 </select>
-                <select name="subcategory" class="select h-9 text-sm/5">
-                  <option value="">Sub-category</option>
+                <select name="subcategory" id="epd_subcategory_filter" class="select h-9 text-sm/5">
+                  <option value="">All Sub-categories</option>
                 </select>
                 <select name="type" class="select h-9 text-sm/5">
-                  <option value="">EPD Type</option>
-                  <option value="generic">Generic</option>
-                  <option value="official">Official</option>
+                  <option value="">All Types</option>
+                  {% for t in epd_types %}
+                    <option value="{{ t.value }}">{{ t.label }}</option>
+                  {% endfor %}
                 </select>
               </div>
             </div>

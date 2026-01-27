@@ -16,6 +16,7 @@
         required
         minlength="2"
         maxlength="200"
+        {% if building_data.building_name %}value="{{ building_data.building_name }}"{% endif %}
       />
     </label>
     <p class="validator-hint">Building name must be 2-200 characters</p>
@@ -36,6 +37,7 @@
         placeholder="eg. 1885 L Street Northwest"
         required
         minlength="5"
+        {% if building_data.address %}value="{{ building_data.address }}"{% endif %}
       />
     </label>
     <p class="validator-hint">Address is required (minimum 5 characters)</p>
@@ -65,9 +67,9 @@
         hx-swap="innerHTML"
         hx-vals='js:{"country": this.value}'
       >
-        <option value="" disabled selected>Select a country</option>
+        <option value="" disabled {% if not selected_country %}selected{% endif %}>Select a country</option>
         {% for country in countries %}
-          <option value="{{ country.id }}">
+          <option value="{{ country.id }}" {% if country.id == selected_country %}selected{% endif %}>
             <span data-country="{{ country.name }}" data-width="20"></span>
             <span data-country="{{ country.name }}" data-flag="false"></span>
           </option>
@@ -102,6 +104,9 @@
         hx-vals='js:{"region": this.value}'
       >
         <option value="">Select a region or state</option>
+        {% for region in regions %}
+          <option value="{{ region.id }}" {% if region.id == selected_region %}selected{% endif %}>{{ region.name }}</option>
+        {% endfor %}
       </select>
     </label>
     <p class="validator-hint">Select a country first, then choose region</p>
@@ -127,6 +132,9 @@
         required
       >
         <option value="">Select a city</option>
+        {% for city in cities %}
+          <option value="{{ city.id }}" {% if city.id == selected_city %}selected{% endif %}>{{ city.name }}</option>
+        {% endfor %}
       </select>
     </label>
     <p class="validator-hint">Select a region first, then choose city</p>
@@ -145,6 +153,7 @@
         min="-180"
         max="180"
         placeholder="eg. -7.946232"
+        {% if building_data.longitude %}value="{{ building_data.longitude }}"{% endif %}
       />
     </label>
     <p class="validator-hint">Must be between -180 and 180</p>
@@ -163,13 +172,14 @@
         min="-90"
         max="90"
         placeholder="eg. 5.603722"
+        {% if building_data.latitude %}value="{{ building_data.latitude }}"{% endif %}
       />
     </label>
     <p class="validator-hint">Must be between -90 and 90</p>
   </fieldset>
 
 <script>
-  // Initialize cascading dropdowns when form is loaded with pre-filled data
+  // Initialize cascading dropdowns - simplified since server handles edit mode pre-population
   (function initializeCascadingDropdowns() {
     const countrySelect = document.getElementById('country-select');
     const regionSelect = document.getElementById('region-select');
@@ -177,81 +187,26 @@
 
     if (!countrySelect || !regionSelect || !citySelect) return;
 
-    // Add event listener to reset dependent dropdowns when country is cleared
+    // Reset dependent dropdowns when country is cleared or changed
     countrySelect.addEventListener('change', function() {
       if (!this.value) {
         regionSelect.innerHTML = '<option value="">Select a region or state</option>';
         citySelect.innerHTML = '<option value="">Select a city</option>';
+      } else {
+        // When country changes, also reset city (region will be loaded by HTMX)
+        citySelect.innerHTML = '<option value="">Select a city</option>';
       }
     });
 
-    // Add event listener to reset city dropdown when region is cleared
+    // Reset city dropdown when region is cleared
     regionSelect.addEventListener('change', function() {
       if (!this.value) {
         citySelect.innerHTML = '<option value="">Select a city</option>';
       }
     });
 
-    // Function to trigger HTMX requests for dependent dropdowns
-    const loadDependentDropdowns = () => {
-      const savedCountry = countrySelect.value;
-      const savedRegion = regionSelect.value;
-      const savedCity = citySelect.value;
-
-      // If country has a value, trigger HTMX request for regions
-      if (savedCountry && typeof htmx !== 'undefined') {
-        // Trigger the HTMX request on country select
-        htmx.trigger(countrySelect, 'change');
-
-        // Wait for HTMX to populate regions, then restore region value
-        if (savedRegion) {
-          // Listen for when HTMX finishes updating the region select
-          const regionLoadHandler = (event) => {
-            if (event.detail.target === regionSelect) {
-              regionSelect.value = savedRegion;
-
-              // If region has a value, trigger HTMX request for cities
-              if (savedRegion) {
-                htmx.trigger(regionSelect, 'change');
-
-                // Wait for HTMX to populate cities, then restore city value
-                if (savedCity) {
-                  const cityLoadHandler = (event) => {
-                    if (event.detail.target === citySelect) {
-                      citySelect.value = savedCity;
-                      document.body.removeEventListener('htmx:afterSwap', cityLoadHandler);
-                    }
-                  };
-                  document.body.addEventListener('htmx:afterSwap', cityLoadHandler);
-                }
-              }
-
-              document.body.removeEventListener('htmx:afterSwap', regionLoadHandler);
-            }
-          };
-          document.body.addEventListener('htmx:afterSwap', regionLoadHandler);
-        }
-      }
-    };
-
-    // Check multiple times to catch when StepManager restores the data
-    let attempts = 0;
-    const maxAttempts = 5;
-    const checkInterval = 200; // Check every 200ms
-
-    const checkAndLoad = () => {
-      if (countrySelect.value) {
-        // Country value is present, trigger HTMX requests
-        loadDependentDropdowns();
-      } else if (attempts < maxAttempts) {
-        // Not yet loaded, try again
-        attempts++;
-        setTimeout(checkAndLoad, checkInterval);
-      }
-    };
-
-    // Start checking
-    checkAndLoad();
+    // No polling needed - server handles edit mode pre-population
+    // HTMX handles dynamic loading on user interaction
   })();
 </script>
 

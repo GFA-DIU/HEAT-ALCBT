@@ -14,10 +14,12 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
+from cities_light.models import Country
+
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
 from pages.models.building import BuildingCategory
-from pages.models.epd import EPD, MaterialCategory
+from pages.models.epd import EPD, EPDType, MaterialCategory
 
 logger = logging.getLogger(__name__)
 from pages.models import Building
@@ -65,10 +67,51 @@ def building_step_view(request):
 
 # Step 1.1: Building Name & Location
 def handle_name_location_step(request):
-    """Provide countries for the building location step."""
+    """Provide countries and optionally pre-populated region/city for edit mode."""
+    from accounts.models import CustomCity, CustomRegion
+
+    building_uuid = request.GET.get('building_uuid')
+
     context = {
-        "countries": ALCBTCountryManager.get_alcbt_countries()
+        "countries": ALCBTCountryManager.get_alcbt_countries(),
+        "regions": [],
+        "cities": [],
+        "selected_country": None,
+        "selected_region": None,
+        "selected_city": None,
+        "building_data": None,
     }
+
+    # Edit mode: pre-populate dependent selects from existing building
+    if building_uuid:
+        try:
+            building = Building.objects.get(uuid=building_uuid, created_by=request.user)
+
+            context["building_data"] = {
+                "building_name": building.name,
+                "address": building.street or "",
+                "longitude": building.longitude,
+                "latitude": building.latitude,
+            }
+
+            if building.country:
+                context["selected_country"] = building.country_id
+                context["regions"] = CustomRegion.objects.filter(
+                    country=building.country
+                ).order_by("name")
+
+            if building.region:
+                context["selected_region"] = building.region_id
+                context["cities"] = CustomCity.objects.filter(
+                    region=building.region
+                ).order_by("name")
+
+            if building.city:
+                context["selected_city"] = building.city_id
+
+        except Building.DoesNotExist:
+            logger.warning(f"Building not found for edit: {building_uuid}")
+
     return render(
         request,
         "pages/add-building/components/building-information/building-name-location.html",
@@ -238,7 +281,16 @@ def handle_operational_data_step(request):
 # Step 4: Building Structural Components
 def handle_structural_components_step(request):
     """Handle building structural components step."""
-    context = {}
+    # Get filter dropdown data for EPD library search
+    countries = Country.objects.all().order_by("name")
+    epd_categories = MaterialCategory.objects.filter(parent__isnull=True).order_by("name_en")
+    epd_types = [{"value": t[0], "label": t[1]} for t in EPDType.choices]
+
+    context = {
+        'countries': countries,
+        'epd_categories': epd_categories,
+        'epd_types': epd_types,
+    }
     return render(
         request,
         "pages/add-building/components/building-structural-components/building-structural-components.html",
