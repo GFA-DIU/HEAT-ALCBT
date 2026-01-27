@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <div id="lighting-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button
@@ -10,7 +11,7 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add lighting system
+      {% translate "Add lighting system" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
@@ -26,10 +27,9 @@
   >
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">Add a lighting system</h3>
+        <h3 class="text-lg/6 font-medium">{% translate "Add a lighting system" %}</h3>
         <p class="text-sm/5 text-[var(--text--sub-600)]">
-          Provide details on lighting types, power use, and controls to assess
-          efficiency.
+          {% translate "Provide details on lighting types, power use, and controls to assess efficiency." %}
         </p>
       </div>
       <button
@@ -49,7 +49,7 @@
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            Room type<span class="text-[var(--state--error--base)]">*</span>
+            {% translate "Room type" %}<span class="text-[var(--state--error--base)]">*</span>
           </legend>
           <select
             class="select w-full"
@@ -59,15 +59,15 @@
             hx-target="this"
             hx-swap="innerHTML"
           >
-            <option disabled selected value="">Select an option</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Area of room<span class="text-[var(--state--error--base)]">*</span>
+            {% translate "Area of room" %}<span class="text-[var(--state--error--base)]">*</span>
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="area_of_room" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 2' %}" name="area_of_room" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >m²</span
             >
@@ -75,7 +75,7 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Light bulb type<span class="text-[var(--state--error--base)]"
+            {% translate "Light bulb type" %}<span class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
@@ -88,29 +88,29 @@
             hx-target="this"
             hx-swap="innerHTML"
           >
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Number of lighting bulbs<span
+            {% translate "Number of lighting bulbs" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="number_of_bulbs" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 2' %}" name="number_of_bulbs" required min="0" />
           </label>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Light bulb power rating<span
+            {% translate "Light bulb power rating" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="bulb_power_rating" />
+            <input type="number" placeholder="{% translate 'eg. 2' %}" name="bulb_power_rating" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >W</span
             >
@@ -118,7 +118,7 @@
         </fieldset>
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            System operating schedule<span
+            {% translate "System operating schedule" %}<span
               data-icon="info-custom-fill"
               data-size="20"
               data-color="var(--icon--disabled-300)"
@@ -127,25 +127,25 @@
           <div class="w-full flex gap-1.5 items-center">
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required min="1" max="24" />
+                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_hours_per_day" required min="1" max="24" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >Hours / day</span
+                  >{% translate "Hours / day" %}</span
                 >
               </label>
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required min="1" max="7" />
+                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_days_per_week" required min="1" max="7" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >days / week</span
+                  >{% translate "days / week" %}</span
                 >
               </label>
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required min="1" max="52" />
+                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_weeks_per_year" required min="1" max="52" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >weeks / year</span
+                  >{% translate "weeks / year" %}</span
                 >
               </label>
             </div>
@@ -153,7 +153,7 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Installation of sensors<span
+            {% translate "Installation of sensors" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             ><span
@@ -163,20 +163,20 @@
             ></span>
           </legend>
           <select class="select w-full" name="installation_of_sensors" required>
-            <option disabled selected value="">Select an option</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
+            <option value="yes">{% translate "Yes" %}</option>
+            <option value="no">{% translate "No" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Baseline Lighting Power Density (LPD)<span
+            {% translate "Baseline Lighting Power Density (LPD)" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="baseline_lpd" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 2' %}" name="baseline_lpd" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >W/m²</span
             >
@@ -184,30 +184,30 @@
         </fieldset>
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            Total energy consumption of ventilation system annually<span
+            {% translate "Total energy consumption of ventilation system annually" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="annual_energy_consumption" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 2' %}" name="annual_energy_consumption" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >kWh/year</span
             >
           </label>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
           <select class="select w-full" name="energy_efficiency_label">
-            <option disabled selected value="">Select an option</option>
-            <option value="bee">BEE Star Rating</option>
-            <option value="egat">EGAT</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
+            <option value="bee">{% translate "BEE Star Rating" %}</option>
+            <option value="egat">{% translate "EGAT" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Number of stars</legend>
+          <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
           <select class="select w-full" name="number_of_stars">
-            <option disabled selected value="">Select an option</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -225,9 +225,9 @@
         class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
         onclick="closeLightingSystemModal()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLightingSystem()">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLightingSystem()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -244,10 +244,9 @@
           data-color="var(--state--warning--base)"
         ></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        You are about to remove or delete added lighting system. This will
-        action will permanently remove it.
+        {% translate "You are about to remove or delete added lighting system. This will action will permanently remove it." %}
       </p>
     </div>
     <div
@@ -257,9 +256,9 @@
         class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
         onclick="lighting_system_modal_delete.close()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteLightingSystem()">Remove</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteLightingSystem()">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -275,7 +274,7 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add lighting system
+      {% translate "Add lighting system" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
@@ -292,13 +291,13 @@
         ></span>
         <div class="flex flex-col flex-1">
           <p class="text-sm/5 font-medium">
-            Office: Conference Room,Lobby, office
+            {% translate "Office: Conference Room,Lobby, office" %}
           </p>
           <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
             <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Area of room: 445m²</span
+              >{% translate "Area of room:" %} 445m²</span
             >
-            <span>Bulb type : LED (Light emitting diode) lights</span>
+            <span>{% translate "Bulb type :" %} LED (Light emitting diode) lights</span>
           </p>
         </div>
         <div class="flex items-center gap-3">
@@ -327,12 +326,12 @@
 
 <template id="no-lighting-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
-    <img src="{% static 'assets/lighting-system.png' %}" alt="Lighting System Image" />
+    <img src="{% static 'assets/lighting-system.png' %}" alt="{% translate 'Lighting System Image' %}" />
     <p class="text-sm/5 font-medium">
-      Click button below to add a lighting system
+      {% translate "Click button below to add a lighting system" %}
     </p>
     <button class="btn btn-primary" onclick="lighting_system_modal.showModal()">
-      Add lighting system
+      {% translate "Add lighting system" %}
     </button>
   </div>
 </template>
@@ -376,14 +375,14 @@
     const roomType = formData.get('room_type');
 
     if (!roomType) {
-      Toast.error('Please select a room type');
+      Toast.error('{% translate "Please select a room type" %}');
       return;
     }
 
     // Get building ID
     const buildingId = getBuildingId();
     if (!buildingId) {
-      Toast.error('Building ID not found. Please save building information first.');
+      Toast.error('{% translate "Building ID not found. Please save building information first." %}');
       return;
     }
 
@@ -424,11 +423,11 @@
         console.log(result.message);
       } else {
         // Show validation errors
-        Toast.error('Error saving lighting system:\n' + JSON.stringify(result.errors || result.error));
+        Toast.error('{% translate "Error saving lighting system:" %}\n' + JSON.stringify(result.errors || result.error));
       }
     } catch (error) {
       console.error('Error saving lighting system:', error);
-      Toast.error('Failed to save lighting system. Please try again.');
+      Toast.error('{% translate "Failed to save lighting system. Please try again." %}');
     }
   }
 
@@ -477,8 +476,8 @@
             <div class="flex flex-col flex-1">
               <p class="text-sm/5 font-medium">${system.room_type_display}</p>
               <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-                <span class="border-r border-[var(--text--sub-600)] pr-1">Area of room: ${areaOfRoom}m²</span>
-                <span>Bulb type: ${bulbType}</span>
+                <span class="border-r border-[var(--text--sub-600)] pr-1">{% translate "Area of room:" %} ${areaOfRoom}m²</span>
+                <span>{% translate "Bulb type:" %} ${bulbType}</span>
               </p>
             </div>
             <div class="flex items-center gap-3">
@@ -508,7 +507,7 @@
       listContainer.innerHTML = `
         <li class="flex flex-col items-center justify-center py-8 text-center">
           <span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading lighting systems</p>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">{% translate "Error loading lighting systems" %}</p>
         </li>
       `;
 
@@ -522,7 +521,7 @@
     // Get building ID
     const buildingId = getBuildingId();
     if (!buildingId) {
-      Toast.error('Building ID not found');
+      Toast.error('{% translate "Building ID not found" %}');
       return;
     }
 
@@ -532,13 +531,13 @@
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        Toast.error('Failed to load lighting system');
+        Toast.error('{% translate "Failed to load lighting system" %}');
         return;
       }
 
       const system = result.lighting_systems.find(s => s.id === systemId);
       if (!system) {
-        Toast.error('Lighting system not found');
+        Toast.error('{% translate "Lighting system not found" %}');
         return;
       }
 
@@ -572,7 +571,7 @@
       lighting_system_modal.showModal();
     } catch (error) {
       console.error('Error loading lighting system for edit:', error);
-      Toast.error('Failed to load lighting system');
+      Toast.error('{% translate "Failed to load lighting system" %}');
     }
   }
 
@@ -606,11 +605,11 @@
           lighting_system_modal_delete.close();
           console.log('Lighting system deleted successfully');
         } else {
-          Toast.error('Failed to delete lighting system');
+          Toast.error('{% translate "Failed to delete lighting system" %}');
         }
       } catch (error) {
         console.error('Error deleting lighting system:', error);
-        Toast.error('Failed to delete lighting system');
+        Toast.error('{% translate "Failed to delete lighting system" %}');
       }
     }
   }

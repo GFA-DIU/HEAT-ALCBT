@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load static %}
 <div id="ventilation-system-container" class="w-full">
   <div class="w-full flex flex-col">
@@ -10,7 +11,7 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add ventilation system
+      {% translate "Add ventilation system" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
@@ -26,10 +27,9 @@
   >
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">Add a ventilation system</h3>
+        <h3 class="text-lg/6 font-medium">{% translate "Add a ventilation system" %}</h3>
         <p class="text-sm/5 text-[var(--text--sub-600)]">
-          Enter details of the building's ventilation system, including type and
-          capacity
+          {% translate "Enter details of the building's ventilation system, including type and capacity" %}
         </p>
       </div>
       <button
@@ -49,11 +49,11 @@
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Ventilation type<span class="text-[var(--state--error--base)]"
+            {% translate "Ventilation type" %}<span class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
-          <select 
+          <select
             class="select w-full"
             id="ventilation-type"
             name="ventilation_type"
@@ -63,12 +63,12 @@
             hx-swap="innerHTML"
             required
           >
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Ventilation capacity<span class="text-[var(--state--error--base)]"
+            {% translate "Ventilation capacity" %}<span class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
@@ -80,26 +80,26 @@
             hx-target="this"
             hx-swap="innerHTML"
           >
-            <option disabled selected value="">Select an option</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            Baseline verification system efficiency<span
+            {% translate "Baseline verification system efficiency" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="baseline_efficiency" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 2' %}" name="baseline_efficiency" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >W/CMH</span
+              >{% translate "W/CMH" %}</span
             >
           </label>
         </fieldset>
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            System operating schedule<span
+            {% translate "System operating schedule" %}<span
               data-icon="info-custom-fill"
               data-size="20"
               data-color="var(--icon--disabled-300)"
@@ -108,25 +108,25 @@
           <div class="w-full flex gap-1.5 items-center">
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required min="0" max="24" />
+                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_hours_per_day" required min="0" max="24" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >Hours / day</span
+                  >{% translate "Hours / day" %}</span
                 >
               </label>
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required min="0" max="7" />
+                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_days_per_week" required min="0" max="7" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >days / week</span
+                  >{% translate "days / week" %}</span
                 >
               </label>
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required min="0" max="52" />
+                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_weeks_per_year" required min="0" max="52" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >weeks / year</span
+                  >{% translate "weeks / year" %}</span
                 >
               </label>
             </div>
@@ -134,36 +134,36 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Total ventilation system power input<span
+            {% translate "Total ventilation system power input" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="power_input" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 2' %}" name="power_input" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >Watts</span
+              >{% translate "Watts" %}</span
             >
           </label>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Airflow rate<span class="text-[var(--state--error--base)]">*</span>
+            {% translate "Airflow rate" %}<span class="text-[var(--state--error--base)]">*</span>
           </legend>
           <label class="input w-full pr-0 overflow-hidden">
-            <input type="number" placeholder="eg. 2" name="airflow_rate" />
+            <input type="number" placeholder="{% translate 'eg. 2' %}" name="airflow_rate" />
             <select
               class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25"
               name="airflow_rate_unit" required
             >
-              <option value="cmh" selected>CMH</option>
-              <option value="cfm">CFM</option>
+              <option value="cmh" selected>{% translate "CMH" %}</option>
+              <option value="cfm">{% translate "CFM" %}</option>
             </select>
           </label>
         </fieldset>
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            Installation of Demand Controlled Ventilation<span
+            {% translate "Installation of Demand Controlled Ventilation" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             ><span
@@ -180,7 +180,7 @@
                 value="yes"
                 class="radio radio-xs"
               />
-              Yes
+              {% translate "Yes" %}
             </label>
             <label class="flex items-center gap-2">
               <input
@@ -189,13 +189,13 @@
                 value="no"
                 class="radio radio-xs"
               />
-              No
+              {% translate "No" %}
             </label>
           </div>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Installation of variable speed drives<span
+            {% translate "Installation of variable speed drives" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             ><span
@@ -205,40 +205,40 @@
             ></span>
           </legend>
           <select class="select w-full" name="variable_speed_drives">
-            <option disabled selected value="">Select an option</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
+            <option value="yes">{% translate "Yes" %}</option>
+            <option value="no">{% translate "No" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Total number of ventilation type installed<span
+            {% translate "Total number of ventilation type installed" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="number_of_units" />
+            <input type="number" placeholder="{% translate 'eg. 2' %}" name="number_of_units" />
           </label>
         </fieldset>
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            Total energy consumption of ventilation system annually<span
+            {% translate "Total energy consumption of ventilation system annually" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input w-full">
-            <input type="number" placeholder="eg. 2" name="annual_energy_consumption" />
+            <input type="number" placeholder="{% translate 'eg. 2' %}" name="annual_energy_consumption" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >kWh/year</span
+              >{% translate "kWh/year" %}</span
             >
           </label>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
           <select class="select w-full" name="energy_efficiency_label">
-            <option disabled selected value="">Select an option</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
             <option value="A">A</option>
             <option value="B">B</option>
             <option value="C">C</option>
@@ -249,9 +249,9 @@
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Number of stars</legend>
+          <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
           <select class="select w-full" name="number_of_stars">
-            <option disabled selected value="">Select an option</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -269,9 +269,9 @@
         class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
         onclick="closeVentilationSystemModal()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveVentilationSystem()">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveVentilationSystem()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -288,10 +288,9 @@
           data-color="var(--state--warning--base)"
         ></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        You are about to remove or delete added ventilation system. This will
-        action will permanently remove it.
+        {% translate "You are about to remove or delete added ventilation system. This will action will permanently remove it." %}
       </p>
     </div>
     <div
@@ -301,9 +300,9 @@
         class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
         onclick="ventilation_system_modal_delete.close()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteVentilationSystem()">Remove</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteVentilationSystem()">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -319,7 +318,7 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add ventilation system
+      {% translate "Add ventilation system" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
@@ -335,12 +334,12 @@
           class="shrink-0 self-start"
         ></span>
         <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">Air Handling Units (AHUs)</p>
+          <p class="text-sm/5 font-medium">{% translate "Air Handling Units (AHUs)" %}</p>
           <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
             <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Airflow rate: 45CMH</span
+              >{% translate "Airflow rate:" %} 45CMH</span
             >
-            <span>Capacity units: m<sup>3</sup>/hr</span>
+            <span>{% translate "Capacity units:" %} m<sup>3</sup>/hr</span>
           </p>
         </div>
         <div class="flex items-center gap-3">
@@ -371,16 +370,16 @@
   <div class="w-full flex flex-col gap-3 items-center justify-center">
     <img
       src="{% static 'assets/ventilation-system.png' %}"
-      alt="Ventilation System Image"
+      alt="{% translate 'Ventilation System Image' %}"
     />
     <p class="text-sm/5 font-medium">
-      Click button below to add a ventilation system
+      {% translate "Click button below to add a ventilation system" %}
     </p>
     <button
       class="btn btn-primary"
       onclick="ventilation_system_modal.showModal()"
     >
-      Add ventilation system
+      {% translate "Add ventilation system" %}
     </button>
   </div>
 </template>
@@ -424,14 +423,14 @@
     const buildingId = getBuildingId();
 
     if (!buildingId) {
-      Toast.error('Building ID not found');
+      Toast.error('{% translate "Building ID not found" %}');
       return;
     }
 
     //validate required fields
     const validator = new window.FormValidator(form);
     if (!validator.validate()) {
-      console.error('Form validation failed', validator.errors);
+      console.error('{% translate "Form validation failed" %}', validator.errors);
       return;
     }
     // Collect all form data
@@ -477,11 +476,11 @@
         // Close modal
         window.closeVentilationSystemModal();
       } else {
-        Toast.error('Error saving ventilation system: ' + JSON.stringify(result.errors));
+        Toast.error('{% translate "Error saving ventilation system:" %} ' + JSON.stringify(result.errors));
       }
     } catch (error) {
-      console.error('Error:', error);
-      Toast.error('An error occurred while saving the ventilation system');
+      console.error('{% translate "Error:" %}', error);
+      Toast.error('{% translate "An error occurred while saving the ventilation system" %}');
     }
   }
 
@@ -489,7 +488,7 @@
   window.renderVentilationSystems = async function() {
     const buildingId = getBuildingId();
     if (!buildingId) {
-      console.error('Building ID not found');
+      console.error('{% translate "Building ID not found" %}');
       return;
     }
 
@@ -528,8 +527,8 @@
               <div class="flex flex-col flex-1">
                 <p class="text-sm/5 font-medium">${system.ventilation_type_display}</p>
                 <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-                  <span class="border-r border-[var(--text--sub-600)] pr-1">Airflow rate: ${airflowRate}</span>
-                  <span>Capacity: ${capacity}</span>
+                  <span class="border-r border-[var(--text--sub-600)] pr-1">{% translate "Airflow rate:" %} ${airflowRate}</span>
+                  <span>{% translate "Capacity:" %} ${capacity}</span>
                 </p>
               </div>
               <div class="flex items-center gap-3">
@@ -557,13 +556,13 @@
 
       } else {
         listContainer.innerHTML = noSystemsContainer.innerHTML;
-        console.error('Error fetching ventilation systems:', result.errors);
-        Toast.error('Error fetching ventilation systems');
+        console.error('{% translate "Error fetching ventilation systems:" %}', result.errors);
+        Toast.error('{% translate "Error fetching ventilation systems" %}');
       }
     } catch (error) {
       listContainer.innerHTML = noSystemsContainer.innerHTML;
-      Toast.error('Error fetching ventilation systems');
-      console.error('Error:', error);
+      Toast.error('{% translate "Error fetching ventilation systems" %}');
+      console.error('{% translate "Error:" %}', error);
     }
   }
 
@@ -572,7 +571,7 @@
     const buildingId = getBuildingId();
 
     if (!buildingId) {
-      Toast.error('Building ID not found');
+      Toast.error('{% translate "Building ID not found" %}');
       return;
     }
 
@@ -629,8 +628,8 @@
         }
       }
     } catch (error) {
-      console.error('Error:', error);
-      Toast.error('An error occurred while loading the ventilation system');
+      console.error('{% translate "Error:" %}', error);
+      Toast.error('{% translate "An error occurred while loading the ventilation system" %}');
     }
   }
 
@@ -663,11 +662,11 @@
           window.deleteVentilationSystemId = null;
           ventilation_system_modal_delete.close();
         } else {
-          Toast.error('Error deleting ventilation system: ' + JSON.stringify(result.errors));
+          Toast.error('{% translate "Error deleting ventilation system:" %} ' + JSON.stringify(result.errors));
         }
       } catch (error) {
-        console.error('Error:', error);
-        Toast.error('An error occurred while deleting the ventilation system');
+        console.error('{% translate "Error:" %}', error);
+        Toast.error('{% translate "An error occurred while deleting the ventilation system" %}');
       }
     }
   }

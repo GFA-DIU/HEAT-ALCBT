@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load custom_filters %}
 
 <form>
@@ -26,17 +27,17 @@
           <div class="grid grid-cols-2 items-stretch gap-2 mt-1">
             <fieldset>
               <label class="input w-full validator">
-              <input  
-                name="description" 
+              <input
+                name="description"
                 value="{% if epd.description %}{{ epd.description }}{% endif %}"
-                type="text" placeholder="Add a description"  required class="block w-full" />
+                type="text" placeholder="{% translate 'Add a description' %}"  required class="block w-full" />
               </label>
-              <p class="validator-hint hidden">required</p>
+              <p class="validator-hint hidden">{% translate "required" %}</p>
             </fieldset>
-            
+
             <fieldset>
               <label class="input pr-0 grid grid-cols-2 validator">
-              <input type="number" name='quantity' class='block w-full' placeholder="Quantity" required min="1"  />
+              <input type="number" name='quantity' class='block w-full' placeholder="{% translate 'Quantity' %}" required min="1"  />
               <select
                 class="select select-ghost w-fit !outline-none !border-none block w-full"
                 name="unit"
@@ -49,14 +50,14 @@
                 {% endfor %}
               </select>
             </label>
-            <p class="validator-hint hidden">Please enter a valid quantity</p>
+            <p class="validator-hint hidden">{% translate "Please enter a valid quantity" %}</p>
             </fieldset>
 
           </div>
 
           <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
             {% comment %} <span class="border-r border-[var(--text--sub-600)] pr-1">Airflow rate: 45CMH</span> {% endcomment %}
-            <span>Capacity units: {{epd.op_units }} </span>
+            <span>{% translate "Capacity units:" %} {{epd.op_units }} </span>
           </p>
         </div>
         <div class="flex items-center gap-3">
@@ -68,7 +69,7 @@
             data-epd-id="{{ epd.id }}"
             data-timestamp="{{ epd.timestamp }}"
             data-element-id="epd-{{ epd.id }}-{{ epd.timestamp }}"
-            title="Remove energy carrier"
+            title="{% translate 'Remove energy carrier' %}"
           >
             <span
               data-icon="delete-bin-5-line"
@@ -101,11 +102,11 @@
                         {{ epd.category }}
                     </span>
                 </div>
-                
+
                 {% if epd.description %}
                 <p class="text-xs text-[var(--text--sub-600)] mb-3">{{ epd.description }}</p>
                 {% endif %}
-                
+
                 <!-- Input Fields -->
                 <div class="grid grid-cols-2 gap-3">
                     <!-- Quantity Input -->
@@ -113,7 +114,7 @@
                         <div class="label py-1">
                             <span class="label-text text-xs">Quantity</span>
                         </div>
-                        <input type="number" 
+                        <input type="number"
                                name="material_{{ epd.id }}_quantity_{{ epd.timestamp }}"
                                value="{% if epd.selection_quantity %}{{ epd.selection_quantity }}{% endif %}"
                                step="0.01"
@@ -122,7 +123,7 @@
                                class="input input-bordered input-sm"
                                required />
                     </label>
-                    
+
                     <!-- Unit Selection -->
                     <label class="form-control">
                         <div class="label py-1">
@@ -139,7 +140,7 @@
                         </select>
                     </label>
                 </div>
-                
+
                 <!-- Description Field -->
                 <label class="form-control mt-3">
                     <div class="label py-1">
@@ -151,7 +152,7 @@
                               class="textarea textarea-bordered textarea-sm text-xs">{% if epd.description %}{{ epd.description }}{% endif %}</textarea>
                 </label>
             </div>
-            
+
             <!-- Delete Button -->
             <button type="button"
                     class="btn btn-ghost btn-sm btn-square remove-epd"

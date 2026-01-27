@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <div id="lift-escalator-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button
@@ -10,7 +11,7 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add a lift & escalator system
+      {% translate "Add a lift & escalator system" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
@@ -29,9 +30,9 @@
   >
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">Add a lift & escalator system</h3>
+        <h3 class="text-lg/6 font-medium">{% translate "Add a lift & escalator system" %}</h3>
         <p class="text-sm/5 text-[var(--text--sub-600)]">
-          Provide details on lift & escalator system.
+          {% translate "Provide details on lift & escalator system." %}
         </p>
       </div>
       <button
@@ -51,50 +52,50 @@
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            Number of lifts<span class="text-[var(--state--error--base)]"
+            {% translate "Number of lifts" %}<span class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 5" name="number_of_lifts" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 5' %}" name="number_of_lifts" required min="0" />
           </label>
-          <p class="validator-hint">This field is required</p>
+          <p class="validator-hint">{% translate "This field is required" %}</p>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Installation of Lift regenerative Features<span
+            {% translate "Installation of Lift regenerative Features" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <select class="select w-full" name="lift_regenerative_features" required>
-            <option disabled selected value="">Select an option</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
+            <option value="yes">{% translate "Yes" %}</option>
+            <option value="no">{% translate "No" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Installation of VVVF and sleep mode<span
+            {% translate "Installation of VVVF and sleep mode" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <select class="select w-full" name="vvvf_sleep_mode" required>
-            <option disabled selected value="">Select an option</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
+            <option value="yes">{% translate "Yes" %}</option>
+            <option value="no">{% translate "No" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            Annual lift system energy consumption<span
+            {% translate "Annual lift system energy consumption" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 343" name="annual_energy_consumption" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 343' %}" name="annual_energy_consumption" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >kWh/year</span
             >
@@ -110,9 +111,9 @@
         class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
         onclick="closeLiftEscalatorSystemModal()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLiftEscalatorSystem()">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLiftEscalatorSystem()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -129,10 +130,9 @@
           data-color="var(--state--warning--base)"
         ></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        You are about to remove or delete added lighting system. This will
-        action will permanently remove it.
+        {% translate "You are about to remove or delete added lighting system. This will action will permanently remove it." %}
       </p>
     </div>
     <div
@@ -142,9 +142,9 @@
         class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
         onclick="lift_escalator_system_modal_delete.close()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteLiftEscalatorSystem()">Remove</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteLiftEscalatorSystem()">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -160,7 +160,7 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add a lift & escalator system
+      {% translate "Add a lift & escalator system" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
@@ -176,9 +176,9 @@
           class="shrink-0 self-start"
         ></span>
         <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">Lift & Escalator 01</p>
+          <p class="text-sm/5 font-medium">{% translate "Lift & Escalator 01" %}</p>
           <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span>Lift Regenerative Features</span>
+            <span>{% translate "Lift Regenerative Features" %}</span>
           </p>
         </div>
         <div class="flex items-center gap-3">
@@ -209,16 +209,16 @@
   <div class="w-full flex flex-col gap-3 items-center justify-center">
     <img
       src="{% static 'assets/lift-escalator-system.png' %}"
-      alt="lift-escalator System Image"
+      alt="{% translate 'lift-escalator System Image' %}"
     />
     <p class="text-sm/5 font-medium">
-      Click button below to add a lift & escalator system
+      {% translate "Click button below to add a lift & escalator system" %}
     </p>
     <button
       class="btn btn-primary"
       onclick="lift_escalator_system_modal.showModal()"
     >
-      Add lift & escalator system
+      {% translate "Add lift & escalator system" %}
     </button>
   </div>
 </template>
@@ -271,7 +271,7 @@
     // Get building ID
     const buildingId = getBuildingId();
     if (!buildingId) {
-      Toast.error('Building ID not found. Please save building information first.');
+      Toast.error('{% translate "Building ID not found. Please save building information first." %}');
       return;
     }
 
@@ -306,11 +306,11 @@
         console.log(result.message);
       } else {
         // Show validation errors
-        Toast.error('Error saving lift & escalator system:\n' + JSON.stringify(result.errors || result.error));
+        Toast.error('{% translate "Error saving lift & escalator system:" %}\n' + JSON.stringify(result.errors || result.error));
       }
     } catch (error) {
       console.error('Error saving lift & escalator system:', error);
-      Toast.error('Failed to save lift & escalator system. Please try again.');
+      Toast.error('{% translate "Failed to save lift & escalator system. Please try again." %}');
     }
   }
 
@@ -346,7 +346,7 @@
       // Render systems from database
       listContainer.innerHTML = systems.map((system) => {
         const numberOfLifts = system.number_of_lifts || 'N/A';
-        const regenerativeFeatures = system.lift_regenerative_features ? 'Yes' : 'No';
+        const regenerativeFeatures = system.lift_regenerative_features ? '{% translate "Yes" %}' : '{% translate "No" %}';
 
         return `
           <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
@@ -357,10 +357,10 @@
               class="shrink-0 self-start"
             ></span>
             <div class="flex flex-col flex-1">
-              <p class="text-sm/5 font-medium">Lift & Escalator System ${system.id}</p>
+              <p class="text-sm/5 font-medium">{% translate "Lift & Escalator System" %} ${system.id}</p>
               <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-                <span class="border-r border-[var(--text--sub-600)] pr-1">Number of lifts: ${numberOfLifts}</span>
-                <span>Regenerative features: ${regenerativeFeatures}</span>
+                <span class="border-r border-[var(--text--sub-600)] pr-1">{% translate "Number of lifts:" %} ${numberOfLifts}</span>
+                <span>{% translate "Regenerative features:" %} ${regenerativeFeatures}</span>
               </p>
             </div>
             <div class="flex items-center gap-3">
@@ -390,7 +390,7 @@
       listContainer.innerHTML = `
         <li class="flex flex-col items-center justify-center py-8 text-center">
           <span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading lift & escalator systems</p>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">{% translate "Error loading lift & escalator systems" %}</p>
         </li>
       `;
     }
@@ -403,7 +403,7 @@
     // Get building ID
     const buildingId = getBuildingId();
     if (!buildingId) {
-      Toast.error('Building ID not found');
+      Toast.error('{% translate "Building ID not found" %}');
       return;
     }
 
@@ -413,13 +413,13 @@
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        Toast.error('Failed to load lift & escalator system');
+        Toast.error('{% translate "Failed to load lift & escalator system" %}');
         return;
       }
 
       const system = result.lift_escalator_systems.find(s => s.id === systemId);
       if (!system) {
-        Toast.error('Lift & escalator system not found');
+        Toast.error('{% translate "Lift & escalator system not found" %}');
         return;
       }
 
@@ -439,7 +439,7 @@
       lift_escalator_system_modal.showModal();
     } catch (error) {
       console.error('Error loading lift & escalator system for edit:', error);
-      Toast.error('Failed to load lift & escalator system');
+      Toast.error('{% translate "Failed to load lift & escalator system" %}');
     }
   }
 
@@ -473,11 +473,11 @@
           lift_escalator_system_modal_delete.close();
           console.log('Lift & escalator system deleted successfully');
         } else {
-          Toast.error('Failed to delete lift & escalator system');
+          Toast.error('{% translate "Failed to delete lift & escalator system" %}');
         }
       } catch (error) {
         console.error('Error deleting lift & escalator system:', error);
-        Toast.error('Failed to delete lift & escalator system');
+        Toast.error('{% translate "Failed to delete lift & escalator system" %}');
       }
     }
   }

@@ -1,3 +1,4 @@
+{% load i18n %}
 <form>
     <li class="bg-[var(--bg--weak-50)] rounded-xl p-4"
         id="material-{{ epd.id }}-{{ epd.timestamp }}"
@@ -23,7 +24,7 @@
         <label class="input w-full">
           <input type="text"
                 name="material_{{ epd.id }}_description_{{ epd.timestamp }}"
-                placeholder="Add description"
+                placeholder="{% translate 'Add description' %}"
                 class="material-description" required />
         </label>
 
@@ -31,7 +32,7 @@
         <select name="material_{{ epd.id }}_category_{{ epd.timestamp }}"
                 class="select material-category"
                 required>
-          <option value="" selected disabled>Category</option>
+          <option value="" selected disabled>{% translate "Category" %}</option>
           {% for cat in categories %}
           <option value="{{ cat.id }}">{{ cat.name }}</option>
           {% endfor %}
@@ -41,7 +42,7 @@
         <label class="input w-full max-w-[140px]">
           <input type="number"
                 name="material_{{ epd.id }}_quantity_{{ epd.timestamp }}"
-                placeholder="Qty"
+                placeholder="{% translate 'Qty' %}"
                 step="0.01"
                 min="0"
                 class="material-quantity"
