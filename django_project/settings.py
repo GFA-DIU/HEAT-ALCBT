@@ -194,7 +194,13 @@ LANGUAGE_CODE = "en-us"
 
 LANGUAGES = [
     ('en', 'English'),
-    ('vi', 'Vietnamese'),
+    ('vi', 'Tiếng Việt'),  # Vietnamese
+    ('th', 'ไทย'),  # Thai
+    ('id', 'Bahasa Indonesia'),  # Indonesian
+    ('fil', 'Filipino'),  # Filipino/Tagalog
+    ('km', 'ខ្មែរ'),  # Khmer/Cambodian
+    ('lo', 'ລາວ'),  # Lao
+    ('my', 'မြန်မာ'),  # Burmese/Myanmar
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#time-zone

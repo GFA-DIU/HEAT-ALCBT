@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <div id="cooling-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button
@@ -10,7 +11,7 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add a cooling system
+      {% translate "Add a cooling system" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
@@ -27,10 +28,9 @@
   >
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">Add a cooling system</h3>
+        <h3 class="text-lg/6 font-medium">{% translate "Add a cooling system" %}</h3>
         <p class="text-sm/5 text-[var(--text--sub-600)]">
-          Enter details of the building’s cooling system, including type and
-          capacity
+          {% translate "Enter details of the building's cooling system, including type and capacity" %}
         </p>
       </div>
       <button
@@ -49,7 +49,7 @@
         {% csrf_token %}
       <div class="px-5 py-4">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Type of cooling system</legend>
+          <legend class="fieldset-legend">{% translate "Type of cooling system" %}</legend>
           <select
             class="select w-full"
             id="cooling-system-type"
@@ -60,7 +60,7 @@
             hx-swap="innerHTML"
             onchange="handleCoolingSystemTypeChange(this.value)"
           >
-            <option value="">Select a cooling system</option>
+            <option value="">{% translate "Select a cooling system" %}</option>
           </select>
         </fieldset>
       </div>
@@ -75,14 +75,14 @@
         class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
         onclick="closeCoolingSystemModal()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button 
-        type="button" 
+      <button
+        type="button"
         class="btn flex-1 btn-sm btn-primary"
         onclick="saveCoolingSystem()"
       >
-        Save
+        {% translate "Save" %}
       </button>
     </div>
   </div>
@@ -100,10 +100,9 @@
           data-color="var(--state--warning--base)"
         ></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        You are about to remove or delete added cooling system. This will action
-        will permanently remove it.
+        {% translate "You are about to remove or delete added cooling system. This will action will permanently remove it." %}
       </p>
     </div>
     <div
@@ -113,9 +112,9 @@
         class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
         onclick="cooling_system_modal_delete.close()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteCoolingSystem()">Remove</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteCoolingSystem()">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -131,7 +130,7 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add a cooling system
+      {% translate "Add a cooling system" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
@@ -148,13 +147,13 @@
         ></span>
         <div class="flex flex-col flex-1">
           <p class="text-sm/5 font-medium">
-            Chiller system - Water cooled chiller
+            {% translate "Chiller system - Water cooled chiller" %}
           </p>
           <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
             <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Type: R-290 Propane</span
+              >{% translate "Type:" %} R-290 Propane</span
             >
-            <span>Refrigerant quantity: 23 kg</span>
+            <span>{% translate "Refrigerant quantity:" %} 23 kg</span>
           </p>
         </div>
         <div class="flex items-center gap-3">
@@ -183,12 +182,12 @@
 
 <template id="no-cooling-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
-    <img src="{% static 'assets/cooling-system.png' %}" alt="Cooling System Image" />
+    <img src="{% static 'assets/cooling-system.png' %}" alt="{% translate 'Cooling System Image' %}" />
     <p class="text-sm/5 font-medium">
-      Click button below to add a cooling system
+      {% translate "Click button below to add a cooling system" %}
     </p>
     <button class="btn btn-primary" onclick="cooling_system_modal.showModal()">
-      Add a cooling system
+      {% translate "Add a cooling system" %}
     </button>
   </div>
 </template>
@@ -197,33 +196,33 @@
   <div
     class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4"
   >
-    CHILLER SYSTEM DATA
+    {% translate "CHILLER SYSTEM DATA" %}
   </div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Chiller system<span class="text-[var(--state--error--base)]">*</span>
+        {% translate "Chiller system" %}<span class="text-[var(--state--error--base)]">*</span>
       </legend>
       <select class="select w-full" name="chiller_system" required>
-        <option disabled selected value="">Select an option</option>
-        <option value="water-cooled">Water cooled chiller</option>
-        <option value="air-cooled">Air cooled chiller</option>
+        <option disabled selected value="">{% translate "Select an option" %}</option>
+        <option value="water-cooled">{% translate "Water cooled chiller" %}</option>
+        <option value="air-cooled">{% translate "Air cooled chiller" %}</option>
       </select>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Year of installation<span class="text-[var(--state--error--base)]"
+        {% translate "Year of installation" %}<span class="text-[var(--state--error--base)]"
           >*</span
         >
       </legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="eg. 2012" required min="1900" max="2099" name="year_of_installation" />
+        <input type="text" placeholder="{% translate 'eg. 2012' %}" required min="1900" max="2099" name="year_of_installation" />
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Type of refrigerants<span class="text-[var(--state--error--base)]"
+        {% translate "Type of refrigerants" %}<span class="text-[var(--state--error--base)]"
           >*</span
         >
       </legend>
@@ -235,26 +234,26 @@
         hx-target="this"
         hx-swap="innerHTML"
       >
-        <option disabled selected value="">Select an option</option>
+        <option disabled selected value="">{% translate "Select an option" %}</option>
       </select>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Refrigerant quantity<span class="text-[var(--state--error--base)]"
+        {% translate "Refrigerant quantity" %}<span class="text-[var(--state--error--base)]"
           >*</span
         ><span class="text-[var(--text--sub-600)]">(kg)</span>
       </legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg.  134" name="refrigerant_quantity" required min="0" />
+        <input type="number" placeholder="{% translate 'eg.  134' %}" name="refrigerant_quantity" required min="0" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >kg</span
         >
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Installation of variable speed drives<span
+        {% translate "Installation of variable speed drives" %}<span
           class="text-[var(--state--error--base)]"
           >*</span
         ><span
@@ -270,7 +269,7 @@
             name="installation_of_variable_speed_drives"
             class="radio radio-xs"
           />
-          Yes
+          {% translate "Yes" %}
         </label>
         <label class="flex items-center gap-2">
           <input
@@ -278,13 +277,13 @@
             name="installation_of_variable_speed_drives"
             class="radio radio-xs"
           />
-          No
+          {% translate "No" %}
         </label>
       </div>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Installation of heat recovery systems<span
+        {% translate "Installation of heat recovery systems" %}<span
           class="text-[var(--state--error--base)]"
           >*</span
         ><span
@@ -300,7 +299,7 @@
             name="installation_of_heat_recovery_systems"
             class="radio radio-xs"
           />
-          Yes
+          {% translate "Yes" %}
         </label>
         <label class="flex items-center gap-2">
           <input
@@ -308,37 +307,37 @@
             name="installation_of_heat_recovery_systems"
             class="radio radio-xs"
           />
-          No
+          {% translate "No" %}
         </label>
       </div>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Total cooling load for chiller system<span
+        {% translate "Total cooling load for chiller system" %}<span
           class="text-[var(--state--error--base)]"
           >*</span
         >
       </legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="eg. 342" name="total_chiller_system"  required min="1" />
+        <input type="text" placeholder="{% translate 'eg. 342' %}" name="total_chiller_system"  required min="1" />
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline leakage factor</legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}</legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg. 2" name="baseline_leakage_factor" required min="1" />
+        <input type="number" placeholder="{% translate 'eg. 2' %}" name="baseline_leakage_factor" required min="1" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >%</span
         >
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">
-        Annual operating schedule<span
+        {% translate "Annual operating schedule" %}<span
           data-icon="info-custom-fill"
           data-size="20"
           data-color="var(--icon--disabled-300)"
@@ -347,25 +346,25 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="annual_operating_hours_per_day"  required min="1" max="24" />
+            <input type="number" placeholder="{% translate 'eg. 1' %}" name="annual_operating_hours_per_day"  required min="1" max="24" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >Hours / day</span
+              >{% translate "Hours / day" %}</span
             >
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="annual_operating_days_per_week"  required min="1" max="7" />
+            <input type="number" placeholder="{% translate 'eg. 1' %}" name="annual_operating_days_per_week"  required min="1" max="7" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >days / week</span
+              >{% translate "days / week" %}</span
             >
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="annual_operating_weeks_per_year"  required min="1" max="52" />
+            <input type="number" placeholder="{% translate 'eg. 1' %}" name="annual_operating_weeks_per_year"  required min="1" max="52" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >weeks / year</span
+              >{% translate "weeks / year" %}</span
             >
           </label>
         </div>
@@ -373,10 +372,10 @@
     </fieldset>
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">
-        Baseline Air Cooled/Water Cooled Chiller Cooling Efficiency
+        {% translate "Baseline Air Cooled/Water Cooled Chiller Cooling Efficiency" %}
       </legend>
       <label class="input w-full">
-        <input type="number" placeholder="eg. 2" name="baseline_cooling_efficiency"  required min="1" />
+        <input type="number" placeholder="{% translate 'eg. 2' %}" name="baseline_cooling_efficiency"  required min="1" />
       </label>
     </fieldset>
     <div class="col-span-2 mt-3">
@@ -385,7 +384,7 @@
         <div
           class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
         >
-          OTHER DETAILS
+          {% translate "OTHER DETAILS" %}
           <span
             data-icon="caret-down"
             data-size="16"
@@ -397,23 +396,23 @@
           <div class="grid grid-cols-2 gap-2">
             <fieldset class="fieldset">
               <legend class="fieldset-legend">
-                Number of chillers<span class="text-[var(--text--sub-600)]"
-                  >(Optional)</span
+                {% translate "Number of chillers" %}<span class="text-[var(--text--sub-600)]"
+                  >({% translate "Optional" %})</span
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" name="number_of_chillers"  required min="0" />
+                <input type="number" placeholder="{% translate 'eg. 2' %}" name="number_of_chillers"  required min="0" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">
-                Total chiller system power input<span
+                {% translate "Total chiller system power input" %}<span
                   class="text-[var(--text--sub-600)]"
-                  >(Optional)</span
+                  >({% translate "Optional" %})</span
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2000" name="total_chiller_system_power_input"  required min="0" />
+                <input type="number" placeholder="{% translate 'eg. 2000' %}" name="total_chiller_system_power_input"  required min="0" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >kWH</span
                 >
@@ -421,34 +420,34 @@
             </fieldset>
             <fieldset class="fieldset col-span-2">
               <legend class="fieldset-legend">
-                Water-cooled chiller cooling load factor<span
+                {% translate "Water-cooled chiller cooling load factor" %}<span
                   class="text-[var(--text--sub-600)]"
-                  >(Optional) %</span
+                  >({% translate "Optional" %}) %</span
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 45" name="water_cooled_chiller_cooling_load_factor"  required min="0"/>
+                <input type="number" placeholder="{% translate 'eg. 45' %}" name="water_cooled_chiller_cooling_load_factor"  required min="0"/>
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >%</span
                 >
               </label>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">COP</legend>
+              <legend class="fieldset-legend">{% translate "COP" %}</legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" name="cop"  required min="0" />
+                <input type="number" placeholder="{% translate 'eg. 2' %}" name="cop"  required min="0" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">IPVL</legend>
+              <legend class="fieldset-legend">{% translate "IPVL" %}</legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" name="ipvl"  required min="0" />
+                <input type="number" placeholder="{% translate 'eg. 2' %}" name="ipvl"  required min="0" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">Energy efficiency label</legend>
+              <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
               <select class="select w-full" name="energy_efficiency_label"  required>
-                <option disabled selected value="">Select an option</option>
+                <option disabled selected value="">{% translate "Select an option" %}</option>
                 <option value="A">A</option>
                 <option value="B">B</option>
                 <option value="C">C</option>
@@ -459,9 +458,9 @@
               </select>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">Number of stars</legend>
+              <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
               <select class="select w-full" name="number_of_stars" required>
-                <option disabled selected value="">Select an option</option>
+                <option disabled selected value="">{% translate "Select an option" %}</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -471,10 +470,10 @@
             </fieldset>
             <fieldset class="fieldset col-span-2">
               <legend class="fieldset-legend">
-                Total energy consumption of chiller system anually (kwh/year)
+                {% translate "Total energy consumption of chiller system anually (kwh/year)" %}
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 200" name="total_energy_consumption_of_chiller_system_annually"  required min="0" />
+                <input type="number" placeholder="{% translate 'eg. 200' %}" name="total_energy_consumption_of_chiller_system_annually"  required min="0" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >kWh/year</span
                 >
@@ -491,37 +490,37 @@
   <div
     class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4"
   >
-    AIR CONDITION SYSTEM DATA
+    {% translate "AIR CONDITION SYSTEM DATA" %}
   </div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Type of air condition<span class="text-[var(--state--error--base)]"
+        {% translate "Type of air condition" %}<span class="text-[var(--state--error--base)]"
           >*</span
         >
       </legend>
       <select class="select w-full" name="type_of_air_condition" required>
-        <option disabled selected value="">Select an option</option>
-        <option value="split">Split air condition</option>
+        <option disabled selected value="">{% translate "Select an option" %}</option>
+        <option value="split">{% translate "Split air condition" %}</option>
         <option value="VRV">
-          Variable Refrigerant Volume (VRV) / Variable Refrigerant Flow (VRF)
+          {% translate "Variable Refrigerant Volume (VRV) / Variable Refrigerant Flow (VRF)" %}
         </option>
       </select>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Year of installation<span class="text-[var(--state--error--base)]"
+        {% translate "Year of installation" %}<span class="text-[var(--state--error--base)]"
           >*</span
         >
       </legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg. 2012" min="1900" max="{% now "Y" %}" name="year_of_installation" required />
+        <input type="number" placeholder="{% translate 'eg. 2012' %}" min="1900" max="{% now "Y" %}" name="year_of_installation" required />
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Type of refrigerants<span class="text-[var(--state--error--base)]"
+        {% translate "Type of refrigerants" %}<span class="text-[var(--state--error--base)]"
           >*</span
         >
       </legend>
@@ -534,48 +533,48 @@
         hx-swap="innerHTML"
         required
       >
-        <option disabled selected value="">Select an option</option>
+        <option disabled selected value="">{% translate "Select an option" %}</option>
       </select>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Refrigerant quantity<span class="text-[var(--state--error--base)]"
+        {% translate "Refrigerant quantity" %}<span class="text-[var(--state--error--base)]"
           >*</span
         ><span class="text-[var(--text--sub-600)]">(kg)</span>
       </legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg.  134" name="refrigerant_quantity" required min="0" />
+        <input type="number" placeholder="{% translate 'eg.  134' %}" name="refrigerant_quantity" required min="0" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >kg</span
         >
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Total cooling load for split/VRV<span
+        {% translate "Total cooling load for split/VRV" %}<span
           class="text-[var(--state--error--base)]"
           >*</span
         >
       </legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg. 342" name="total_cooling_load_for_split_vrv" required min="0" />
+        <input type="number" placeholder="{% translate 'eg. 342' %}" name="total_cooling_load_for_split_vrv" required min="0" />
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline leakage factor</legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}</legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="eg. 2" name="baseline_leakage_factor" required min="0" />
+        <input type="number" placeholder="{% translate 'eg. 2' %}" name="baseline_leakage_factor" required min="0" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
           >%</span
         >
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">
-        System operating schedule<span
+        {% translate "System operating schedule" %}<span
           data-icon="info-custom-fill"
           data-size="20"
           data-color="var(--icon--disabled-300)"
@@ -584,25 +583,25 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="hours_per_day" required min="1" max="24" />
+            <input type="number" placeholder="{% translate 'eg. 1' %}" name="hours_per_day" required min="1" max="24" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >Hours / day</span
+              >{% translate "Hours / day" %}</span
             >
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="days_per_week" required min="1" max="7" />
+            <input type="number" placeholder="{% translate 'eg. 1' %}" name="days_per_week" required min="1" max="7" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >days / week</span
+              >{% translate "days / week" %}</span
             >
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 1" name="weeks_per_year" required min="1" max="52" />
+            <input type="number" placeholder="{% translate 'eg. 1' %}" name="weeks_per_year" required min="1" max="52" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >weeks / year</span
+              >{% translate "weeks / year" %}</span
             >
           </label>
         </div>
@@ -614,7 +613,7 @@
         <div
           class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
         >
-          OTHER DETAILS
+          {% translate "OTHER DETAILS" %}
           <span
             data-icon="caret-down"
             data-size="16"
@@ -626,18 +625,18 @@
           <div class="grid grid-cols-2 gap-2">
             <fieldset class="fieldset">
               <legend class="fieldset-legend">
-                Total number of split/VRV units
+                {% translate "Total number of split/VRV units" %}
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" name="total_number_of_split_vrv_units" />
+                <input type="number" placeholder="{% translate 'eg. 2' %}" name="total_number_of_split_vrv_units" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">
-                Total split unit//VRV system
+                {% translate "Total split unit//VRV system" %}
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 400" name="total_split_unit_vrv_system" />
+                <input type="number" placeholder="{% translate 'eg. 400' %}" name="total_split_unit_vrv_system" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >kW</span
                 >
@@ -645,13 +644,13 @@
             </fieldset>
             <fieldset class="fieldset col-span-2">
               <legend class="fieldset-legend">
-                Total energy consumption of chiller system annually<span
+                {% translate "Total energy consumption of chiller system annually" %}<span
                   class="text-[var(--text--sub-600)]"
                   >(kWh/year)</span
                 >
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 200" name="total_chiller_system_annually" />
+                <input type="number" placeholder="{% translate 'eg. 200' %}" name="total_chiller_system_annually" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >%</span
                 >
@@ -659,32 +658,32 @@
             </fieldset>
             <fieldset class="fieldset col-span-2">
               <legend class="fieldset-legend">
-                Baseline split unit/VRV system efficiency
+                {% translate "Baseline split unit/VRV system efficiency" %}
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 333" name="baseline_split_unit_vrv_system_efficiency" />
+                <input type="number" placeholder="{% translate 'eg. 333' %}" name="baseline_split_unit_vrv_system_efficiency" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >watt</span
                 >
               </label>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">ISSER rating</legend>
+              <legend class="fieldset-legend">{% translate "ISSER rating" %}</legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 4.5" name="isser_rating" />
+                <input type="number" placeholder="{% translate 'eg. 4.5' %}" name="isser_rating" />
               </label>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">COP</legend>
+              <legend class="fieldset-legend">{% translate "COP" %}</legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 2" name="cop" />
+                <input type="number" placeholder="{% translate 'eg. 2' %}" name="cop" />
               </label>
             </fieldset>
 
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">Energy efficiency label</legend>
+              <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
               <select class="select w-full" name="energy_efficiency_label">
-                <option disabled selected value="">Select an option</option>
+                <option disabled selected value="">{% translate "Select an option" %}</option>
                 <option value="A">A</option>
                 <option value="B">B</option>
                 <option value="C">C</option>
@@ -695,9 +694,9 @@
               </select>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">Number of stars</legend>
+              <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
               <select class="select w-full" name="number_of_stars">
-                <option disabled selected value="">Select an option</option>
+                <option disabled selected value="">{% translate "Select an option" %}</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -707,10 +706,10 @@
             </fieldset>
             <fieldset class="fieldset col-span-2">
               <legend class="fieldset-legend">
-                Total energy consumption of chiller system anually (kwh/year)
+                {% translate "Total energy consumption of chiller system anually (kwh/year)" %}
               </legend>
               <label class="input w-full">
-                <input type="number" placeholder="eg. 200" name="total_chiller_system_annually" />
+                <input type="number" placeholder="{% translate 'eg. 200' %}" name="total_chiller_system_annually" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
                   >kWh/year</span
                 >
@@ -800,7 +799,7 @@
     const buildingId = getBuildingId();
 
     if (!buildingId) {
-      Toast.error('Building ID not found');
+      Toast.error('{% translate "Building ID not found" %}');
       return;
     }
 
@@ -817,7 +816,7 @@
     const systemTypeName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
 
     if (!systemType) {
-      Toast.error('Please select a cooling system type');
+      Toast.error('{% translate "Please select a cooling system type" %}');
       return;
     }
 
@@ -862,11 +861,11 @@
         // Close modal
         window.closeCoolingSystemModal();
       } else {
-        Toast.error('Error saving cooling system: ' + JSON.stringify(result.errors));
+        Toast.error('{% translate "Error saving cooling system:" %} ' + JSON.stringify(result.errors));
       }
     } catch (error) {
       console.error('Error:', error);
-      Toast.error('An error occurred while saving the cooling system');
+      Toast.error('{% translate "An error occurred while saving the cooling system" %}');
     }
   }
 
@@ -906,10 +905,10 @@
           let chillerType = '';
 
           if (system.cooling_system_type === 'chiller') {
-            systemTypeName = 'Chiller System';
+            systemTypeName = '{% translate "Chiller System" %}';
             chillerType = system.chiller_type_display || '';
           } else {
-            systemTypeName = 'Air Conditioner';
+            systemTypeName = '{% translate "Air Conditioner" %}';
             chillerType = system.ac_type_display || '';
           }
 
@@ -926,8 +925,8 @@
                   ${systemTypeName}${chillerType ? ' - ' + chillerType : ''}
                 </p>
                 <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-                  <span class="border-r border-[var(--text--sub-600)] pr-1">Type: ${refrigerantType}</span>
-                  <span>Refrigerant quantity: ${refrigerantQty} kg</span>
+                  <span class="border-r border-[var(--text--sub-600)] pr-1">{% translate "Type:" %} ${refrigerantType}</span>
+                  <span>{% translate "Refrigerant quantity:" %} ${refrigerantQty} kg</span>
                 </p>
               </div>
               <div class="flex items-center gap-3">
@@ -955,11 +954,11 @@
       } else {
         listContainer.innerHTML = document.getElementById('no-cooling-system-template').innerHTML;
         console.error('Error fetching cooling systems:', result.errors);
-        Toast.error('Error fetching cooling systems');
+        Toast.error('{% translate "Error fetching cooling systems" %}');
       }
     } catch (error) {
       console.error('Error:', error);
-        Toast.error('Error fetching cooling systems');
+        Toast.error('{% translate "Error fetching cooling systems" %}');
       listContainer.innerHTML = document.getElementById('no-cooling-system-template').innerHTML;
     }
   }
@@ -969,7 +968,7 @@
     const buildingId = getBuildingId();
 
     if (!buildingId) {
-      Toast.error('Building ID not found');
+      Toast.error('{% translate "Building ID not found" %}');
       return;
     }
 
@@ -1156,7 +1155,7 @@
       }
     } catch (error) {
       console.error('Error:', error);
-      Toast.error('An error occurred while loading the cooling system');
+      Toast.error('{% translate "An error occurred while loading the cooling system" %}');
     }
   }
 
@@ -1194,11 +1193,11 @@
           window.deleteCoolingSystemType = null;
           cooling_system_modal_delete.close();
         } else {
-          Toast.error('Error deleting cooling system: ' + JSON.stringify(result.errors));
+          Toast.error('{% translate "Error deleting cooling system:" %} ' + JSON.stringify(result.errors));
         }
       } catch (error) {
         console.error('Error:', error);
-        Toast.error('An error occurred while deleting the cooling system');
+        Toast.error('{% translate "An error occurred while deleting the cooling system" %}');
       }
     }
   }
@@ -1222,4 +1221,3 @@
     window.renderCoolingSystems();
   }
 </script>
-

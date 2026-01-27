@@ -66,7 +66,7 @@
               <div>
                 <span data-icon="dashboard-horizontal-fill"></span>
               </div>
-              <span>Dashboard</span>
+              <span>{% translate "Dashboard" %}</span>
             </a>
          
 
@@ -81,7 +81,7 @@
           
             <a href="{% url 'resources' %}" >
               <span data-icon="book-shelf-fill"></span>
-              <span>Resources</span>
+              <span>{% translate "Resources" %}</span>
             </a>
         
           <input
@@ -95,7 +95,7 @@
         
             <a href="{% url 'templates' %}" >
               <span data-icon="folder-open"></span>
-              <span>Templates</span>
+              <span>{% translate "Templates" %}</span>
             </a>
             {% comment %} Note: not in scope {% endcomment %}
           {% comment %} 
@@ -140,9 +140,27 @@
 
           <ul class="dropdown menu w-52 rounded-box bg-base-100 shadow-sm "
             popover id="popover-1" style="position-anchor:--anchor-1">
-            <li class='w-full'><a class='w-full' href="{% url 'profile' %}">Profile</a></li>
-            <li class='w-full'><button class='w-full' onclick="showCookieSettings()">Cookie Settings</button></li>
-            <li class='w-full'><button onclick="logout_modal.showModal()" class='w-full'>Logout</button></li>
+            <li class='w-full'><a class='w-full' href="{% url 'profile' %}">{% translate "Profile" %}</a></li>
+            <li class='w-full'><button class='w-full' onclick="showCookieSettings()">{% translate "Cookie Settings" %}</button></li>
+            <li class='w-full'>
+              <form action="{% url 'set_language' %}" method="post" class="w-full p-0">
+                {% csrf_token %}
+                <input name="next" type="hidden" value="{{ request.path }}">
+                <label class="w-full flex flex-col gap-1 p-2">
+                  <span class="text-xs font-medium">{% translate "Language" %}</span>
+                  <select name="language" class="select select-sm w-full" onchange="this.form.submit()">
+                    {% get_current_language as CURRENT_LANGUAGE %}
+                    {% get_available_languages as AVAILABLE_LANGUAGES %}
+                    {% for lang_code, lang_name in AVAILABLE_LANGUAGES %}
+                      <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>
+                        {{ lang_name }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </label>
+              </form>
+            </li>
+            <li class='w-full'><button onclick="logout_modal.showModal()" class='w-full'>{% translate "Logout" %}</button></li>
           </ul>
           <button
             class="btn btn-ghost btn-sm flex items-center gap-1 md:hidden"

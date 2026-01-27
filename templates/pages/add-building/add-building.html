@@ -1,8 +1,8 @@
 {% extends "pages/add-building/_base.html" %}
-
+{% load i18n %}
 {% load static  %}
 
-{% block title %}Add Building{% endblock title %}
+{% block title %}{% translate "Add Building" %}{% endblock title %}
 
 
 {% block new-building %}
@@ -16,7 +16,7 @@
         >
           <a class="btn btn-sm" href="{% url 'home' %}">
             <span data-icon="logout-box-line"></span>
-            <span>Exit</span>
+            <span>{% translate "Exit" %}</span>
           </a>
 
           <div class="flex items-center gap-4">
@@ -41,9 +41,9 @@
 
           <ul class="dropdown menu w-52 rounded-box bg-base-100 shadow-sm "
             popover id="popover-1" style="position-anchor:--anchor-1">
-            <li class='w-full'><a class='w-full' href="{% url 'profile' %}">Profile</a></li>
+            <li class='w-full'><a class='w-full' href="{% url 'profile' %}">{% translate "Profile" %}</a></li>
             {% comment %} <li class='w-full'><button class='w-full' onclick="showCookieSettings()">Cookie Settings</button></li> {% endcomment %}
-            <li class='w-full'><button onclick="logout_modal.showModal()" class='w-full'>Logout</button></li>
+            <li class='w-full'><button onclick="logout_modal.showModal()" class='w-full'>{% translate "Logout" %}</button></li>
           </ul>
             <button
               class="btn btn-ghost btn-sm flex items-center gap-1 md:hidden"
@@ -58,9 +58,9 @@
                 id="current-step-progress"
               >
                 <span class="text-[0.813rem]/5 font-semibold align-middle"
-                  >1 out of
+                  >1 {% translate "out of" %}
                   <span class="font-normal text-[var(--text--sub-600)]"
-                    >2 steps</span
+                    >2 {% translate "steps" %}</span
                   ></span
                 >
               </div>
@@ -68,13 +68,13 @@
                 class="text-base/5 font-extrabold mb-1"
                 id="current-step-title"
               >
-                Building Name & Location
+                {% translate "Building Name & Location" %}
               </h2>
               <p
                 class="text-sm/5 text-[var(--text--sub-600)] mb-6"
                 id="current-step-description"
               >
-                Add details concerning building name and locations of building.
+                {% translate "Add details concerning building name and locations of building." %}
               </p>
 
               <div id="dynamic-content"></div>
@@ -86,17 +86,17 @@
         >
           <button class="btn btn-outline" id="go-back">
             <span data-icon="arrow-left-s-line"></span>
-            Go back
+            {% translate "Go back" %}
           </button>
           <div class="flex items-center gap-2">
             <button
               class="btn btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
               id="skip"
             >
-              <span>Skip</span>
+              <span>{% translate "Skip" %}</span>
             </button>
             <button class="btn btn-primary" id="save-and-continue" disabled>
-              <span>Save & continue</span>
+              <span>{% translate "Save & continue" %}</span>
             </button>
           </div>
         </div>

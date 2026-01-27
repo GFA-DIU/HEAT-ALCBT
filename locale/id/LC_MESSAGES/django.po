@@ -9,19 +9,18 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-27 13:37+0200\n"
-"PO-Revision-Date: 2025-07-03 16:28+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: Vietnamese <vi@li.org>\n"
-"Language: vi\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: PO File Editor https://pofile.net/free-po-editor\n"
 
 #: .\pages\forms\building_general_info.py:115
 msgid "This writer's name is too long."
-msgstr "Tên của người viết này quá dài."
+msgstr ""
 
 #: .\pages\forms\cooling_system_form.py:125
 #: .\pages\forms\cooling_system_form.py:198
@@ -65,76 +64,54 @@ msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:34
 #: .\pages\models\building_operation\hot_water.py:66
-#, fuzzy
-#| msgid "Operation hours per workday"
 msgid "Operating Hours per Day"
-msgstr "Giờ hoạt động mỗi ngày làm việc"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:40
-#, fuzzy
-#| msgid "Operation hours per workday"
 msgid "Operating hours per day is required."
-msgstr "Giờ hoạt động mỗi ngày làm việc"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:41
 msgid "Operating hours cannot be negative."
 msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:42
-#, fuzzy
-#| msgid "Operation hours per workday"
 msgid "Operating hours cannot exceed 24 hours per day."
-msgstr "Giờ hoạt động mỗi ngày làm việc"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:47
 #: .\pages\models\building_operation\hot_water.py:72
-#, fuzzy
-#| msgid "Operation days per week"
 msgid "Operating Days per Week"
-msgstr "Số ngày hoạt động mỗi tuần"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:52
-#, fuzzy
-#| msgid "Operation days per week"
 msgid "Operating days per week is required."
-msgstr "Số ngày hoạt động mỗi tuần"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:53
-#, fuzzy
-#| msgid "Operation days per week"
 msgid "Operating days cannot be negative."
-msgstr "Số ngày hoạt động mỗi tuần"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:54
-#, fuzzy
-#| msgid "Operation days per week"
 msgid "Operating days cannot exceed 7 days per week."
-msgstr "Số ngày hoạt động mỗi tuần"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:59
 #: .\pages\models\building_operation\hot_water.py:78
-#, fuzzy
-#| msgid "Operation weeks per year"
 msgid "Operating Weeks per Year"
-msgstr "Số tuần hoạt động mỗi năm"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:64
-#, fuzzy
-#| msgid "Operation weeks per year"
 msgid "Operating weeks per year is required."
-msgstr "Số tuần hoạt động mỗi năm"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:65
-#, fuzzy
-#| msgid "Operation weeks per year"
 msgid "Operating weeks cannot be negative."
-msgstr "Số tuần hoạt động mỗi năm"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:66
-#, fuzzy
-#| msgid "Operation weeks per year"
 msgid "Operating weeks cannot exceed 52 weeks per year."
-msgstr "Số tuần hoạt động mỗi năm"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:71
 msgid "Fuel Consumption"
@@ -193,16 +170,12 @@ msgid "Heat Recovery System"
 msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:122
-#, fuzzy
-#| msgid "Approx. number of residents"
 msgid "Number of Equipment"
-msgstr "Số lượng cư dân (ước tính)"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:126
-#, fuzzy
-#| msgid "Approx. number of residents"
 msgid "Number of equipment is required."
-msgstr "Số lượng cư dân (ước tính)"
+msgstr ""
 
 #: .\pages\forms\hot_water_system_form.py:127
 msgid "Number of equipment must be at least 1."
@@ -230,147 +203,147 @@ msgstr ""
 
 #: .\pages\models\assembly.py:130
 msgid "Assembly Mode"
-msgstr "Chế độ lắp ráp"
+msgstr ""
 
 #: .\pages\models\assembly.py:136
 msgid "Assembly type"
-msgstr "Loại lắp ráp"
+msgstr ""
 
 #: .\pages\models\assembly.py:142 .\pages\models\epd.py:166
 #: .\pages\models\epd.py:253 .\pages\models\epd.py:431
 #: .\templates\pages\home\templates.html:215
 msgid "Comment"
-msgstr "Bình luận"
+msgstr ""
 
 #: .\pages\models\assembly.py:143 .\pages\models\product.py:10
 msgid "Description"
-msgstr "Mô tả"
+msgstr ""
 
 #: .\pages\models\base.py:31
 msgid "Created at"
-msgstr "Được tạo vào"
+msgstr ""
 
 #: .\pages\models\base.py:32
 msgid "Updated at"
-msgstr "Cập nhật vào"
+msgstr ""
 
 #: .\pages\models\base.py:34
 msgid "Public"
-msgstr "Công khai"
+msgstr ""
 
 #: .\pages\models\base.py:34
 msgid "Is it visible to all roles"
-msgstr "Có hiển thị cho tất cả vai trò không"
+msgstr ""
 
 #: .\pages\models\base.py:37
 msgid "Draft"
-msgstr "Bản nháp"
+msgstr ""
 
 #: .\pages\models\base.py:37
 msgid "Is it still a draft"
-msgstr "Vẫn là bản nháp?"
+msgstr ""
 
 #: .\pages\models\base.py:50
 msgid "Street"
-msgstr "Đường"
+msgstr ""
 
 #: .\pages\models\base.py:51
 msgid "Number"
-msgstr "Số"
+msgstr ""
 
 #: .\pages\models\base.py:52
 msgid "ZIP"
-msgstr "Mã bưu điện"
+msgstr ""
 
 #: .\pages\models\base.py:55
 msgid "Longitude"
-msgstr "Kinh độ"
+msgstr ""
 
 #: .\pages\models\base.py:56
 msgid "Latitude"
-msgstr "Vĩ độ"
+msgstr ""
 
 #: .\pages\models\building.py:58 .\pages\models\building.py:69
 msgid "Name"
-msgstr "Tên"
+msgstr ""
 
 #: .\pages\models\building.py:118
 msgid "Approx. number of residents"
-msgstr "Số lượng cư dân (ước tính)"
+msgstr ""
 
 #: .\pages\models\building.py:124
 msgid "Operation hours per workday"
-msgstr "Giờ hoạt động mỗi ngày làm việc"
+msgstr ""
 
 #: .\pages\models\building.py:130
 msgid "Operation days per week"
-msgstr "Số ngày hoạt động mỗi tuần"
+msgstr ""
 
 #: .\pages\models\building.py:136
 msgid "Operation weeks per year"
-msgstr "Số tuần hoạt động mỗi năm"
+msgstr ""
 
 #: .\pages\models\building.py:142
 msgid "Typical Heating Temperature"
-msgstr "Nhiệt độ sưởi ấm điển hình"
+msgstr ""
 
 #: .\pages\models\building.py:150
 msgid "Heating Temperature Unit"
-msgstr "Đơn vị nhiệt độ sưởi"
+msgstr ""
 
 #: .\pages\models\building.py:157
 msgid "Typical Cooling Temperature (Celsius)"
-msgstr "Nhiệt độ làm mát điển hình (°C)"
+msgstr ""
 
 #: .\pages\models\building.py:165
 msgid "Cooling Temperature Unit"
-msgstr "Đơn vị nhiệt độ làm mát"
+msgstr ""
 
 #: .\pages\models\building.py:173
 msgid "Heating Type"
-msgstr "Loại sưởi"
+msgstr ""
 
 #: .\pages\models\building.py:180 .\pages\models\building.py:202
 msgid "Heating Capacity"
-msgstr "Công suất sưởi"
+msgstr ""
 
 #: .\pages\models\building.py:188
 msgid "Heating Unit"
-msgstr "Đơn vị sưởi"
+msgstr ""
 
 #: .\pages\models\building.py:195
 msgid "Coolingting Type"
-msgstr "Loại làm mát"
+msgstr ""
 
 #: .\pages\models\building.py:210
 msgid "Cooling Unit"
-msgstr "Đơn vị làm mát"
+msgstr ""
 
 #: .\pages\models\building.py:217
 #: .\pages\models\building_operation\ventilation.py:32
 msgid "Ventilation Type"
-msgstr "Loại thông gió"
+msgstr ""
 
 #: .\pages\models\building.py:224
 #: .\pages\models\building_operation\ventilation.py:38
 msgid "Ventilation Capacity"
-msgstr "Công suất thông gió"
+msgstr ""
 
 #: .\pages\models\building.py:232
 msgid "Ventilation Unit"
-msgstr "Đơn vị thông gió"
+msgstr ""
 
 #: .\pages\models\building.py:239
 msgid "Lighting Type"
-msgstr "Loại chiếu sáng"
+msgstr ""
 
 #: .\pages\models\building.py:246
 msgid "Lighting Capacity"
-msgstr "Công suất chiếu sáng"
+msgstr ""
 
 #: .\pages\models\building.py:254
 msgid "Lighting Unit"
-msgstr "Đơn vị chiếu sáng"
+msgstr ""
 
 #: .\pages\models\building.py:267
 msgid "Building UUID"
@@ -481,30 +454,24 @@ msgstr ""
 #: .\pages\models\building_operation\lighting.py:45
 #: .\pages\models\building_operation\operational_information.py:19
 #: .\pages\models\building_operation\ventilation.py:45
-#, fuzzy
-#| msgid "Operation hours per workday"
 msgid "Operation Hours per Workday"
-msgstr "Giờ hoạt động mỗi ngày làm việc"
+msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:30
 #: .\pages\models\building_operation\chilling.py:124
 #: .\pages\models\building_operation\lighting.py:48
 #: .\pages\models\building_operation\operational_information.py:23
 #: .\pages\models\building_operation\ventilation.py:48
-#, fuzzy
-#| msgid "Operation days per week"
 msgid "Workdays per Week"
-msgstr "Số ngày hoạt động mỗi tuần"
+msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:33
 #: .\pages\models\building_operation\chilling.py:127
 #: .\pages\models\building_operation\lighting.py:51
 #: .\pages\models\building_operation\operational_information.py:27
 #: .\pages\models\building_operation\ventilation.py:51
-#, fuzzy
-#| msgid "Operation weeks per year"
 msgid "Workweeks per Year"
-msgstr "Số tuần hoạt động mỗi năm"
+msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:38
 #: .\pages\models\building_operation\chilling.py:132
@@ -1142,10 +1109,8 @@ msgid "T5 and T8 Fluorescent Tube Lights"
 msgstr ""
 
 #: .\pages\models\building_operation\lighting.py:18
-#, fuzzy
-#| msgid "Lighting Type"
 msgid "Other Lighting Type"
-msgstr "Loại chiếu sáng"
+msgstr ""
 
 #: .\pages\models\building_operation\lighting.py:30
 msgid "Room Type"
@@ -1156,10 +1121,8 @@ msgid "Area of Room (m²)"
 msgstr ""
 
 #: .\pages\models\building_operation\lighting.py:38
-#, fuzzy
-#| msgid "Lighting Type"
 msgid "Lighting Bulb Type"
-msgstr "Loại chiếu sáng"
+msgstr ""
 
 #: .\pages\models\building_operation\lighting.py:42
 msgid "Number of Lighting Bulbs"
@@ -1182,10 +1145,8 @@ msgid "Total Energy Consumption of Lighting System Annually (kWh/year)"
 msgstr ""
 
 #: .\pages\models\building_operation\operational_information.py:15
-#, fuzzy
-#| msgid "Approx. number of residents"
 msgid "Number of Residents"
-msgstr "Số lượng cư dân (ước tính)"
+msgstr ""
 
 #: .\pages\models\building_operation\operational_information.py:30
 msgid "Renewable Energy (%)"
@@ -1222,10 +1183,8 @@ msgid "Ceiling/Exhaust/Wall Fan"
 msgstr ""
 
 #: .\pages\models\building_operation\ventilation.py:13
-#, fuzzy
-#| msgid "Ventilation Type"
 msgid "Other Ventilation Type"
-msgstr "Loại thông gió"
+msgstr ""
 
 #: .\pages\models\building_operation\ventilation.py:17
 msgid "m³/hr"
@@ -1367,16 +1326,11 @@ msgid ""
 "request, you can safely ignore this email. Otherwise, click the button below "
 "to reset your password."
 msgstr ""
-"Xin chào từ %(site_name)s!\n"
-"\n"
-"Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu của bạn. Nếu bạn không thực "
-"hiện yêu cầu này, bạn có thể bỏ qua email này. Nếu không, hãy nhấn vào nút "
-"dưới đây để đặt lại mật khẩu của bạn."
 
 #: .\templates\account\email\password_reset_key_message.txt:8
-#, fuzzy, python-format
+#, python-format
 msgid "In case you forgot, your username is %(username)s."
-msgstr "Trong trường hợp bạn quên, tên người dùng của bạn là %(username)s."
+msgstr ""
 
 #: .\templates\account\email\password_reset_key_message.txt:10
 #, python-format
@@ -1384,8 +1338,6 @@ msgid ""
 "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
 msgstr ""
-"Cảm ơn bạn đã sử dụng %(site_name)s!\n"
-"%(site_domain)s"
 
 #: .\templates\account\login.html:7
 msgid "Sign Up"
@@ -1426,10 +1378,8 @@ msgid ""
 msgstr ""
 
 #: .\templates\account\signup.html:82
-#, fuzzy
-#| msgid "Created at"
 msgid "Create account"
-msgstr "Được tạo vào"
+msgstr ""
 
 #: .\templates\account\signup.html:91
 msgid "I already have an account."
@@ -1599,10 +1549,8 @@ msgid "Building type:"
 msgstr ""
 
 #: .\templates\pages\home\partials\buildings_list.html:72
-#, fuzzy
-#| msgid "Created at"
 msgid "Created on:"
-msgstr "Được tạo vào"
+msgstr ""
 
 #: .\templates\pages\home\partials\buildings_list.html:94
 msgid "Total carbon footprint"
@@ -1713,10 +1661,8 @@ msgid "The"
 msgstr ""
 
 #: .\templates\pages\home\resources.html:92
-#, fuzzy
-#| msgid "Comment"
 msgid "Community"
-msgstr "Bình luận"
+msgstr ""
 
 #: .\templates\pages\home\resources.html:95
 msgid ""
@@ -1867,10 +1813,8 @@ msgid "Select technique"
 msgstr ""
 
 #: .\templates\pages\home\templates.html:216
-#, fuzzy
-#| msgid "Comment"
 msgid "Add a comment"
-msgstr "Bình luận"
+msgstr ""
 
 #: .\templates\pages\home\templates.html:221
 msgid "MATERIALS"
@@ -1898,10 +1842,8 @@ msgid "Save & duplicate"
 msgstr ""
 
 #: .\templates\pages\home\templates.html:247
-#, fuzzy
-#| msgid "Updated at"
 msgid "Update"
-msgstr "Cập nhật vào"
+msgstr ""
 
 #: .\templates\pages\home\templates.html:273
 msgid "Add from EPD Library"
@@ -1937,10 +1879,8 @@ msgstr ""
 
 #: .\templates\pages\home\templates.html:444
 #: .\templates\pages\home\templates.html:726
-#, fuzzy
-#| msgid "Description"
 msgid "Add description"
-msgstr "Mô tả"
+msgstr ""
 
 #: .\templates\pages\home\templates.html:463
 msgid "Remove this material?"
@@ -1951,10 +1891,8 @@ msgid "Template updated"
 msgstr ""
 
 #: .\templates\pages\home\templates.html:538
-#, fuzzy
-#| msgid "Updated at"
 msgid "Update failed"
-msgstr "Cập nhật vào"
+msgstr ""
 
 #: .\templates\pages\home\templates.html:543
 #: .\templates\pages\home\templates.html:578
@@ -2046,8 +1984,3 @@ msgstr ""
 #: .\templates\pages\profile\profile.html:231
 msgid "Save Changes"
 msgstr ""
-
-#, fuzzy
-#~| msgid "Operation hours per workday"
-#~ msgid "Operation Hours for Hot Water per Workday"
-#~ msgstr "Giờ hoạt động mỗi ngày làm việc"

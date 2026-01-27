@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 08:09+0200\n"
+"POT-Creation-Date: 2026-01-27 13:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,6 +22,185 @@ msgstr ""
 msgid "This writer's name is too long."
 msgstr ""
 
+#: .\pages\forms\cooling_system_form.py:125
+#: .\pages\forms\cooling_system_form.py:198
+#: .\pages\forms\lighting_system_form.py:85
+#: .\pages\forms\ventilation_system_form.py:103
+msgid "Energy efficiency label must be between 1 and 5 stars."
+msgstr ""
+
+#: .\pages\forms\cooling_system_form.py:128
+#: .\pages\forms\cooling_system_form.py:201
+#: .\pages\forms\lighting_system_form.py:88
+#: .\pages\forms\ventilation_system_form.py:106
+msgid "Please enter a valid number for energy efficiency label."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:14
+#: .\pages\models\building_operation\hot_water.py:52
+msgid "Type of Hot Water System"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:18
+msgid "Type of hot water system is required."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:19
+msgid "Invalid hot water system type selected."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:24
+#: .\pages\models\building_operation\hot_water.py:59
+msgid "Fuel Type"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:28
+msgid "Fuel type is required."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:29
+msgid "Invalid fuel type selected."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:34
+#: .\pages\models\building_operation\hot_water.py:66
+msgid "Operating Hours per Day"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:40
+msgid "Operating hours per day is required."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:41
+msgid "Operating hours cannot be negative."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:42
+msgid "Operating hours cannot exceed 24 hours per day."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:47
+#: .\pages\models\building_operation\hot_water.py:72
+msgid "Operating Days per Week"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:52
+msgid "Operating days per week is required."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:53
+msgid "Operating days cannot be negative."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:54
+msgid "Operating days cannot exceed 7 days per week."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:59
+#: .\pages\models\building_operation\hot_water.py:78
+msgid "Operating Weeks per Year"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:64
+msgid "Operating weeks per year is required."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:65
+msgid "Operating weeks cannot be negative."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:66
+msgid "Operating weeks cannot exceed 52 weeks per year."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:71
+msgid "Fuel Consumption"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:76
+msgid "Fuel consumption is required."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:77
+msgid "Fuel consumption cannot be negative."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:82
+msgid "Power Input (kW)"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:87
+msgid "Power input is required."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:88
+msgid "Power input cannot be negative."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:93
+msgid "Baseline Efficiency"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:98
+msgid "Baseline efficiency is required."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:99
+msgid "Baseline efficiency cannot be negative."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:104
+msgid "Equipment Efficiency Level (%)"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:110
+msgid "Equipment efficiency level is required."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:111
+msgid "Equipment efficiency level cannot be negative."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:112
+msgid "Equipment efficiency level cannot exceed 100%."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:117
+msgid "Heat Recovery System"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:122
+msgid "Number of Equipment"
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:126
+msgid "Number of equipment is required."
+msgstr ""
+
+#: .\pages\forms\hot_water_system_form.py:127
+msgid "Number of equipment must be at least 1."
+msgstr ""
+
+#: .\pages\forms\lift_escalator_system_form.py:84
+msgid "Annual energy consumption cannot be negative."
+msgstr ""
+
+#: .\pages\forms\lift_escalator_system_form.py:87
+#: .\pages\forms\lighting_system_form.py:103
+#: .\pages\forms\lighting_system_form.py:118
+#: .\pages\forms\ventilation_system_form.py:121
+msgid "Please enter a valid number."
+msgstr ""
+
+#: .\pages\forms\lighting_system_form.py:100
+msgid "Baseline lighting power density cannot be negative."
+msgstr ""
+
+#: .\pages\forms\lighting_system_form.py:115
+#: .\pages\forms\ventilation_system_form.py:118
+msgid "Total energy consumption cannot be negative."
+msgstr ""
+
 #: .\pages\models\assembly.py:130
 msgid "Assembly Mode"
 msgstr ""
@@ -32,6 +211,7 @@ msgstr ""
 
 #: .\pages\models\assembly.py:142 .\pages\models\epd.py:166
 #: .\pages\models\epd.py:253 .\pages\models\epd.py:431
+#: .\templates\pages\home\templates.html:215
 msgid "Comment"
 msgstr ""
 
@@ -83,164 +263,169 @@ msgstr ""
 msgid "Latitude"
 msgstr ""
 
-#: .\pages\models\building.py:57 .\pages\models\building.py:68
+#: .\pages\models\building.py:58 .\pages\models\building.py:69
 msgid "Name"
 msgstr ""
 
-#: .\pages\models\building.py:117
+#: .\pages\models\building.py:118
 msgid "Approx. number of residents"
 msgstr ""
 
-#: .\pages\models\building.py:123
+#: .\pages\models\building.py:124
 msgid "Operation hours per workday"
 msgstr ""
 
-#: .\pages\models\building.py:129
+#: .\pages\models\building.py:130
 msgid "Operation days per week"
 msgstr ""
 
-#: .\pages\models\building.py:135
+#: .\pages\models\building.py:136
 msgid "Operation weeks per year"
 msgstr ""
 
-#: .\pages\models\building.py:141
+#: .\pages\models\building.py:142
 msgid "Typical Heating Temperature"
 msgstr ""
 
-#: .\pages\models\building.py:149
+#: .\pages\models\building.py:150
 msgid "Heating Temperature Unit"
 msgstr ""
 
-#: .\pages\models\building.py:156
+#: .\pages\models\building.py:157
 msgid "Typical Cooling Temperature (Celsius)"
 msgstr ""
 
-#: .\pages\models\building.py:164
+#: .\pages\models\building.py:165
 msgid "Cooling Temperature Unit"
 msgstr ""
 
-#: .\pages\models\building.py:172
+#: .\pages\models\building.py:173
 msgid "Heating Type"
 msgstr ""
 
-#: .\pages\models\building.py:179 .\pages\models\building.py:201
+#: .\pages\models\building.py:180 .\pages\models\building.py:202
 msgid "Heating Capacity"
 msgstr ""
 
-#: .\pages\models\building.py:187
+#: .\pages\models\building.py:188
 msgid "Heating Unit"
 msgstr ""
 
-#: .\pages\models\building.py:194
+#: .\pages\models\building.py:195
 msgid "Coolingting Type"
 msgstr ""
 
-#: .\pages\models\building.py:209
+#: .\pages\models\building.py:210
 msgid "Cooling Unit"
 msgstr ""
 
-#: .\pages\models\building.py:216
+#: .\pages\models\building.py:217
 #: .\pages\models\building_operation\ventilation.py:32
 msgid "Ventilation Type"
 msgstr ""
 
-#: .\pages\models\building.py:223
+#: .\pages\models\building.py:224
 #: .\pages\models\building_operation\ventilation.py:38
 msgid "Ventilation Capacity"
 msgstr ""
 
-#: .\pages\models\building.py:231
+#: .\pages\models\building.py:232
 msgid "Ventilation Unit"
 msgstr ""
 
-#: .\pages\models\building.py:238
+#: .\pages\models\building.py:239
 msgid "Lighting Type"
 msgstr ""
 
-#: .\pages\models\building.py:245
+#: .\pages\models\building.py:246
 msgid "Lighting Capacity"
 msgstr ""
 
-#: .\pages\models\building.py:253
+#: .\pages\models\building.py:254
 msgid "Lighting Unit"
 msgstr ""
 
-#: .\pages\models\building.py:265
+#: .\pages\models\building.py:267
+msgid "Building UUID"
+msgstr ""
+
+#: .\pages\models\building.py:273
 msgid "Building name/code"
 msgstr ""
 
-#: .\pages\models\building.py:282
+#: .\pages\models\building.py:290
 msgid "Year of Construction"
 msgstr ""
 
-#: .\pages\models\building.py:287
+#: .\pages\models\building.py:295
 msgid "Climate"
 msgstr ""
 
-#: .\pages\models\building.py:290
+#: .\pages\models\building.py:298
+#: .\templates\pages\home\partials\buildings_list.html:105
 msgid "Total floor area"
 msgstr ""
 
-#: .\pages\models\building.py:291 .\pages\models\building.py:299
+#: .\pages\models\building.py:299 .\pages\models\building.py:307
 msgid "Gross floor area [m²]"
 msgstr ""
 
-#: .\pages\models\building.py:298
+#: .\pages\models\building.py:306
 msgid "Conditioned floor area"
 msgstr ""
 
-#: .\pages\models\building.py:306
+#: .\pages\models\building.py:314
 msgid "Floors above ground"
 msgstr ""
 
-#: .\pages\models\building.py:307
+#: .\pages\models\building.py:315
 msgid "Number of floors above"
 msgstr ""
 
-#: .\pages\models\building.py:313
+#: .\pages\models\building.py:321
 msgid "Floors below ground"
 msgstr ""
 
-#: .\pages\models\building.py:314
+#: .\pages\models\building.py:322
 msgid "Number of floors below"
 msgstr ""
 
-#: .\pages\models\building.py:320
+#: .\pages\models\building.py:328
 msgid "Assessment time frame"
 msgstr ""
 
-#: .\pages\models\building.py:321
+#: .\pages\models\building.py:329
 msgid "Years of building use"
 msgstr ""
 
-#: .\pages\models\building.py:336 .\pages\models\building.py:359
+#: .\pages\models\building.py:344 .\pages\models\building.py:367
 msgid "Quantity"
 msgstr ""
 
-#: .\pages\models\building.py:337
+#: .\pages\models\building.py:345
 msgid "How much of this component"
 msgstr ""
 
-#: .\pages\models\building.py:345 .\pages\models\building.py:370
+#: .\pages\models\building.py:353 .\pages\models\building.py:378
 msgid "Reporting life-cycle"
 msgstr ""
 
-#: .\pages\models\building.py:346 .\pages\models\building.py:371
+#: .\pages\models\building.py:354 .\pages\models\building.py:379
 msgid "Reporting life-cycle for assembly"
 msgstr ""
 
-#: .\pages\models\building.py:360
+#: .\pages\models\building.py:368
 msgid "How many of components"
 msgstr ""
 
-#: .\pages\models\building.py:367
+#: .\pages\models\building.py:375
 msgid "Unit of Quantity"
 msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:13
 #: .\pages\models\building_operation\chilling.py:107
 #: .\pages\models\building_operation\general_systems.py:12
-#: .\pages\models\building_operation\hot_water.py:35
+#: .\pages\models\building_operation\hot_water.py:46
 #: .\pages\models\building_operation\lighting.py:26
 #: .\pages\models\building_operation\operational_information.py:12
 #: .\pages\models\building_operation\ventilation.py:26
@@ -274,7 +459,6 @@ msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:30
 #: .\pages\models\building_operation\chilling.py:124
-#: .\pages\models\building_operation\hot_water.py:48
 #: .\pages\models\building_operation\lighting.py:48
 #: .\pages\models\building_operation\operational_information.py:23
 #: .\pages\models\building_operation\ventilation.py:48
@@ -283,7 +467,6 @@ msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:33
 #: .\pages\models\building_operation\chilling.py:127
-#: .\pages\models\building_operation\hot_water.py:51
 #: .\pages\models\building_operation\lighting.py:51
 #: .\pages\models\building_operation\operational_information.py:27
 #: .\pages\models\building_operation\ventilation.py:51
@@ -341,7 +524,6 @@ msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:88
 #: .\pages\models\building_operation\chilling.py:185
-#: .\pages\models\building_operation\hot_water.py:84
 #: .\pages\models\building_operation\lighting.py:73
 #: .\pages\models\building_operation\ventilation.py:80
 msgid "Energy Efficiency Label"
@@ -712,7 +894,7 @@ msgid "R-515A"
 msgstr ""
 
 #: .\pages\models\building_operation\chilling.py:99
-#: .\pages\models\building_operation\hot_water.py:27
+#: .\pages\models\building_operation\hot_water.py:29
 msgid "Other"
 msgstr ""
 
@@ -742,7 +924,7 @@ msgid "Installation of Variable Speed Drives (VSDs)"
 msgstr ""
 
 #: .\pages\models\building_operation\chilling.py:147
-#: .\pages\models\building_operation\hot_water.py:73
+#: .\pages\models\building_operation\hot_water.py:114
 msgid "Installation of Heat Recovery Systems"
 msgstr ""
 
@@ -790,107 +972,111 @@ msgstr ""
 msgid "Lift and Escalator Systems"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:8
+#: .\pages\models\building_operation\hot_water.py:9
 msgid "Heat Pump Water Heater"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:9
+#: .\pages\models\building_operation\hot_water.py:10
 msgid "Boiler"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:10
+#: .\pages\models\building_operation\hot_water.py:11
 msgid "Solar Water Heaters"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:14
+#: .\pages\models\building_operation\hot_water.py:15
 msgid "Electricity"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:15
+#: .\pages\models\building_operation\hot_water.py:16
 msgid "Light Fuel Oil"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:16
+#: .\pages\models\building_operation\hot_water.py:17
 msgid "Heavy Fuel Oil"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:17
-msgid "Liquefied Petroleum Gas (LPG)"
-msgstr ""
-
 #: .\pages\models\building_operation\hot_water.py:18
-msgid "Natural Gas"
+msgid "Liquified Petroleum Gas (LPG)"
 msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:19
-msgid "Coal"
+msgid "Natural Gas"
 msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:20
-msgid "Lignite"
+msgid "Coal"
 msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:21
-msgid "Diesel"
+msgid "Lignite"
 msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:22
-msgid "Kerosene"
+msgid "Diesel"
 msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:23
-msgid "Fire Wood (Log Wood)"
+msgid "Kerosene"
 msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:24
-msgid "Fire Wood (Wood Chips)"
+msgid "Fire Wood (Log Wood)"
 msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:25
-msgid "Fire Wood (Wood Pellets)"
+msgid "Fire Wood (Wood Chips)"
 msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:26
+msgid "Fire Wood (Wood Pellets)"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:27
 msgid "Char Coal"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:41
-msgid "Type of Hot Water System"
+#: .\pages\models\building_operation\hot_water.py:28
+msgid "Ignite"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:45
-msgid "Operation Hours for Hot Water per Workday"
+#: .\pages\models\building_operation\hot_water.py:33
+msgid "BEE Star Rating"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:55
-msgid "Fuel Type"
+#: .\pages\models\building_operation\hot_water.py:34
+msgid "EGAT"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:59
+#: .\pages\models\building_operation\hot_water.py:86
 msgid "Fuel Consumption (Liters/m³)"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:63
+#: .\pages\models\building_operation\hot_water.py:93
 msgid "Hot Water System Power Input (kW)"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:66
+#: .\pages\models\building_operation\hot_water.py:101
 msgid "Baseline Hot Water System Efficiency (COP)"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:69
+#: .\pages\models\building_operation\hot_water.py:109
 msgid "Baseline Hot Water System Equipment Efficiency Level (%)"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:77
+#: .\pages\models\building_operation\hot_water.py:121
 msgid "Number of Hot Water Equipment Installed"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:88
+#: .\pages\models\building_operation\hot_water.py:129
+msgid "Energy Efficiency Star Rating (1-5)"
+msgstr ""
+
+#: .\pages\models\building_operation\hot_water.py:133
 msgid "Hot Water System"
 msgstr ""
 
-#: .\pages\models\building_operation\hot_water.py:89
+#: .\pages\models\building_operation\hot_water.py:134
 msgid "Hot Water Systems"
 msgstr ""
 
@@ -1100,32 +1286,35 @@ msgstr ""
 msgid "Quantity of EPD"
 msgstr ""
 
-#: .\templates\_base.html:47
-msgid "Overview"
+#: .\templates\_base.html:73
+msgid "Dashboard"
 msgstr ""
 
-#: .\templates\_base.html:50
+#: .\templates\_base.html:88 .\templates\pages\home\resources.html:20
 msgid "Resources"
 msgstr ""
 
-#: .\templates\_base.html:58
-msgid "Settings"
+#: .\templates\_base.html:102
+msgid "Templates"
 msgstr ""
 
-#: .\templates\_base.html:65
-msgid "Change password"
+#: .\templates\_base.html:150
+#: .\templates\pages\add-building\add-building.html:45
+#: .\templates\pages\profile\profile.html:6
+msgid "Profile"
 msgstr ""
 
-#: .\templates\_base.html:66
+#: .\templates\_base.html:151 .\templates\pages\profile\profile.html:88
 msgid "Cookie Settings"
 msgstr ""
 
-#: .\templates\_base.html:71
+#: .\templates\_base.html:157
 msgid "Language"
 msgstr ""
 
-#: .\templates\_base.html:86
-msgid "Sign out"
+#: .\templates\_base.html:170
+#: .\templates\pages\add-building\add-building.html:48
+msgid "Logout"
 msgstr ""
 
 #: .\templates\account\email\password_reset_key_message.txt:2
@@ -1150,24 +1339,648 @@ msgid ""
 "%(site_domain)s"
 msgstr ""
 
-#: .\templates\pages\home\home.html:11
-msgid "Welcome to"
+#: .\templates\account\login.html:7
+msgid "Sign Up"
 msgstr ""
 
-#: .\templates\pages\home\home.html:14
+#: .\templates\account\login.html:17 .\templates\account\login.html:64
+#: .\templates\account\signup.html:8
+msgid "Login"
+msgstr ""
+
+#: .\templates\account\login.html:67 .\templates\account\signup.html:85
+msgid "OR"
+msgstr ""
+
+#: .\templates\account\login.html:69 .\templates\account\signup.html:87
+msgid "Sign up with Google"
+msgstr ""
+
+#: .\templates\account\login.html:73
+msgid "Don't have an account."
+msgstr ""
+
+#: .\templates\account\login.html:75 .\templates\account\signup.html:16
+msgid "Sign up"
+msgstr ""
+
+#: .\templates\account\password_change.html:5
+#: .\templates\account\password_change.html:8
+#: .\templates\account\password_change.html:12
+#: .\templates\pages\profile\profile.html:84
+msgid "Change Password"
+msgstr ""
+
+#: .\templates\account\signup.html:20
 msgid ""
-"Begin assessing your building's whole life cycle emissions – from embodied "
-"to operational"
+"Fill in the details below to create your account and track the carbon "
+"mission from your building project."
 msgstr ""
 
-#: .\templates\pages\home\home.html:18
-msgid "Buildings overview"
+#: .\templates\account\signup.html:82
+msgid "Create account"
 msgstr ""
 
-#: .\templates\pages\home\home.html:29
+#: .\templates\account\signup.html:91
+msgid "I already have an account."
+msgstr ""
+
+#: .\templates\account\signup.html:93
+msgid "Log me in"
+msgstr ""
+
+#: .\templates\compliance\terms_of_use.html:4
+#: .\templates\compliance\terms_of_use.html:11
+msgid "Terms of Use"
+msgstr ""
+
+#: .\templates\compliance\terms_of_use.html:13
+msgid "Last updated:"
+msgstr ""
+
+#: .\templates\compliance\terms_of_use.html:52
+msgid "Table of Contents"
+msgstr ""
+
+#: .\templates\compliance\terms_of_use.html:118
+msgid "Back to top"
+msgstr ""
+
+#: .\templates\pages\add-building\add-building.html:5
+msgid "Add Building"
+msgstr ""
+
+#: .\templates\pages\add-building\add-building.html:19
+msgid "Exit"
+msgstr ""
+
+#: .\templates\pages\add-building\add-building.html:63
+msgid "out of"
+msgstr ""
+
+#: .\templates\pages\add-building\add-building.html:65
+msgid "steps"
+msgstr ""
+
+#: .\templates\pages\add-building\add-building.html:73
+msgid "Building Name & Location"
+msgstr ""
+
+#: .\templates\pages\add-building\add-building.html:79
+msgid "Add details concerning building name and locations of building."
+msgstr ""
+
+#: .\templates\pages\add-building\add-building.html:91
+#: .\templates\pages\home\templates.html:270
+msgid "Go back"
+msgstr ""
+
+#: .\templates\pages\add-building\add-building.html:98
+msgid "Skip"
+msgstr ""
+
+#: .\templates\pages\add-building\add-building.html:101
+msgid "Save & continue"
+msgstr ""
+
+#: .\templates\pages\home\home.html:6
+msgid "List view"
+msgstr ""
+
+#: .\templates\pages\home\home.html:25
+#, python-format
+msgid "Welcome back, %(username)s!"
+msgstr ""
+
+#: .\templates\pages\home\home.html:27
+msgid "Last seen on:"
+msgstr ""
+
+#: .\templates\pages\home\home.html:46
+msgid "Confirm your email"
+msgstr ""
+
+#: .\templates\pages\home\home.html:48
+msgid "We've sent a confirmation email to you. Please confirm your account"
+msgstr ""
+
+#: .\templates\pages\home\home.html:62
 msgid "Your buildings"
 msgstr ""
 
-#: .\templates\pages\home\home.html:32
+#: .\templates\pages\home\home.html:64 .\templates\pages\home\templates.html:19
+msgid "Add your buildings to access for low carbon"
+msgstr ""
+
+#: .\templates\pages\home\home.html:77
+msgid "Search buildings..."
+msgstr ""
+
+#: .\templates\pages\home\home.html:108
+#: .\templates\pages\home\partials\buildings_list.html:190
 msgid "Add building"
+msgstr ""
+
+#: .\templates\pages\home\home.html:153
+msgid "confetti icon"
+msgstr ""
+
+#: .\templates\pages\home\home.html:155
+msgid "Well done your account has been created."
+msgstr ""
+
+#: .\templates\pages\home\home.html:158
+msgid "Please fill the fields below to finish setting your profile"
+msgstr ""
+
+#: .\templates\pages\home\home.html:171
+#: .\templates\pages\profile\profile.html:114
+msgid "Username"
+msgstr ""
+
+#: .\templates\pages\home\home.html:187
+#: .\templates\pages\profile\profile.html:130
+msgid "Email"
+msgstr ""
+
+#: .\templates\pages\home\home.html:203
+#: .\templates\pages\home\templates.html:185
+#: .\templates\pages\profile\profile.html:155
+msgid "Country"
+msgstr ""
+
+#: .\templates\pages\home\home.html:221
+#: .\templates\pages\profile\profile.html:171
+msgid "Region or State"
+msgstr ""
+
+#: .\templates\pages\home\home.html:239
+#: .\templates\pages\profile\profile.html:187
+msgid "City"
+msgstr ""
+
+#: .\templates\pages\home\home.html:259
+#: .\templates\pages\profile\profile.html:214
+msgid "Share my info with BEAT tool maintainers"
+msgstr ""
+
+#: .\templates\pages\home\home.html:264
+msgid "Save & Continue"
+msgstr ""
+
+#: .\templates\pages\home\home.html:271
+msgid "I'll do this later"
+msgstr ""
+
+#: .\templates\pages\home\home.html:334
+msgid "Please correct the following errors:"
+msgstr ""
+
+#: .\templates\pages\home\home.html:345
+msgid "An error occurred while updating your profile. Please try again."
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:9
+msgid "Add your first building!"
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:63
+msgid "Building type:"
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:72
+msgid "Created on:"
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:94
+msgid "Total carbon footprint"
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:117
+msgid "Total embodied carbon"
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:129
+msgid "Carbon Savings"
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:140
+msgid "Progress of completion"
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:177
+msgid "Last Edited:"
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:185
+msgid "map"
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:186
+msgid "You have no buildings added"
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:257
+msgid "This will permanently delete the building and all associated data."
+msgstr ""
+
+#: .\templates\pages\home\partials\buildings_list.html:258
+msgid "Delete Building?"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:10
+msgid "Resource page"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:22
+msgid "Manage your resources to access for low carbon"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:31
+msgid "Introduction video"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:33
+msgid "Watch our short video to get a quick overview of"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:33
+msgid ""
+"what it does, how it works, and how it can support your low-carbon building "
+"strategies."
+msgstr ""
+
+#: .\templates\pages\home\resources.html:40
+msgid "YouTube video player"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:53
+msgid "This content requires media cookies to be enabled for embedded videos."
+msgstr ""
+
+#: .\templates\pages\home\resources.html:60
+msgid "Manage Cookie Settings"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:72
+msgid "User Handbook"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:74
+msgid "Download the official"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:74
+msgid ""
+"Handbook (Part 1) for a detailed, step-by-step guide on using the tool "
+"effectively. The handbook covers:"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:77
+msgid "Key functionalities and workflow"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:78
+msgid "Data input requirements"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:79
+msgid "Methodology"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:82
+msgid "For guidance, please refer to the BEAT"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:83
+msgid "user documentation"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:92
+msgid "The"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:92
+msgid "Community"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:95
+msgid ""
+"Join a growing community of policymakers, planners, and practitioners "
+"working to reduce building emissions. Together, we will work on advancing "
+"practical, data-driven solutions for a low-carbon future."
+msgstr ""
+
+#: .\templates\pages\home\resources.html:100
+msgid "Host"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:105
+msgid "Host logo"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:113
+msgid "Lead partners"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:120
+msgid "Lead partner logo"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:130
+msgid "Development partners"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:137
+msgid "Development partner logo"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:150
+msgid "Interested in contributing or partnering? We'd love to"
+msgstr ""
+
+#: .\templates\pages\home\resources.html:151
+msgid "hear from you"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:5
+msgid "Home"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:17
+msgid "Reusable Templates"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:38
+msgid "Search templates..."
+msgstr ""
+
+#: .\templates\pages\home\templates.html:41
+#: .\templates\pages\home\templates.html:305
+msgid "All Countries"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:60
+#: .\templates\pages\home\templates.html:322
+msgid "Advanced Search"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:62
+#: .\templates\pages\home\templates.html:323
+msgid "Click here for a more advanced search option"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:85
+msgid "Building Component"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:104
+msgid "Construction Technique"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:123
+#: .\templates\pages\home\templates.html:346
+msgid "All Types"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:124
+msgid "System Component"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:125
+msgid "My Component"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:139
+msgid "Name (A-Z)"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:140
+msgid "Name (Z-A)"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:141
+msgid "Newest First"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:142
+msgid "Oldest First"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:148
+#: .\templates\pages\home\templates.html:355
+msgid "Search"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:160
+#: .\templates\pages\home\templates.html:386
+#: .\templates\pages\home\templates.html:387
+msgid "Loading..."
+msgstr ""
+
+#: .\templates\pages\home\templates.html:164
+#: .\templates\pages\home\templates.html:587
+#: .\templates\pages\home\templates.html:611
+msgid "Delete"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:177
+msgid "Title"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:181
+msgid "Required (2-200 characters)"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:187
+msgid "Select country"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:195
+msgid "Building component"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:197
+msgid "Select category"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:205
+msgid "Construction technique"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:207
+msgid "Select technique"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:216
+msgid "Add a comment"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:221
+msgid "MATERIALS"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:226
+msgid "Added Materials"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:227
+msgid "Materials from EPD libraries"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:231
+msgid "Add from EPD library"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:240
+#: .\templates\pages\profile\profile.html:228
+msgid "Cancel"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:244
+msgid "Save & duplicate"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:247
+msgid "Update"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:273
+msgid "Add from EPD Library"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:302
+msgid "Search EPDs..."
+msgstr ""
+
+#: .\templates\pages\home\templates.html:337
+msgid "All Categories"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:358
+msgid "Enter search criteria and click Search"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:372
+msgid "Close"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:420
+msgid "Error"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:422
+msgid "Failed to load template"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:431
+msgid "No materials added"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:444
+#: .\templates\pages\home\templates.html:726
+msgid "Add description"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:463
+msgid "Remove this material?"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:536
+msgid "Template updated"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:538
+msgid "Update failed"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:543
+#: .\templates\pages\home\templates.html:578
+#: .\templates\pages\home\templates.html:605
+#: .\templates\pages\home\templates.html:628
+#: .\templates\pages\home\templates.html:656
+msgid "An error occurred"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:571
+#: .\templates\pages\home\templates.html:649
+msgid "Template duplicated"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:573
+#: .\templates\pages\home\templates.html:651
+msgid "Duplication failed"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:587
+#: .\templates\pages\home\templates.html:611
+msgid "This cannot be undone."
+msgstr ""
+
+#: .\templates\pages\home\templates.html:598
+#: .\templates\pages\home\templates.html:621
+msgid "Template deleted"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:600
+#: .\templates\pages\home\templates.html:623
+msgid "Deletion failed"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:634
+msgid "Create a copy of this template?"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:703
+msgid "Added"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:16
+msgid "Profile Settings"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:18
+msgid "Manage your account information and preferences"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:48
+msgid "Joined"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:55
+msgid "Last login"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:63
+msgid "Location"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:80
+msgid "Quick Actions"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:99
+msgid "Edit Profile"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:108
+msgid "Account Information"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:150
+msgid "Location Information"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:208
+msgid "Privacy Settings"
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:222
+msgid ""
+"By enabling this option, you allow the BEAT tool maintainers to access your "
+"profile information for support and improvement purposes."
+msgstr ""
+
+#: .\templates\pages\profile\profile.html:231
+msgid "Save Changes"
 msgstr ""

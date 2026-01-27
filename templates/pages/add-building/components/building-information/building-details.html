@@ -1,12 +1,13 @@
+{% load i18n %}
 <form id="form" class="grid grid-cols-2 gap-x-2 gap-y-1">
   {% csrf_token %}
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Building type<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Building type" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full">
-      <select 
+      <select
         id="building-type-select"
         name="building_type"
         class="select w-full"
@@ -16,21 +17,21 @@
         hx-swap="innerHTML"
         required
       >
-        <option value="">Pick a building type</option>
+        <option value="">{% translate "Pick a building type" %}</option>
         {% for category in building_categories %}
           <option value="{{ category.id }}">{{ category.name }}</option>
         {% endfor %}
       </select>
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Type of apartments<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Type of apartments" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full">
-      <select 
+      <select
         id="apartment-type-select"
         name="apartment_type"
         class="select w-full"
@@ -41,18 +42,18 @@
         hx-vals='js:{"building_category": document.getElementById("building-type-select").value}'
         required
       >
-        <option value="">Pick a type of apartments</option>
+        <option value="">{% translate "Pick a type of apartments" %}</option>
       </select>
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
 
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
-      Area climate type<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Area climate type" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full flex relative">
-      <select 
+      <select
         id="climate-type-select"
         name="climate_type"
         class="select w-full"
@@ -62,44 +63,44 @@
         hx-swap="innerHTML"
         required
       >
-        <option value="">Select climate type</option>
+        <option value="">{% translate "Select climate type" %}</option>
       </select>
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
-  
+
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Assessment period (years)<span class="text-[var(--state--error--base)]"
+      {% translate "Assessment period (years)" %}<span class="text-[var(--state--error--base)]"
         >*</span
       >
     </legend>
     <label class="input validator w-full">
-      <input name="assessment_period" type="number" placeholder="eg. 10" required min="1" />
+      <input name="assessment_period" type="number" placeholder="{% translate 'eg. 10' %}" required min="1" />
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
 
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Construction year</legend>
+    <legend class="fieldset-legend">{% translate "Construction year" %}</legend>
     <label class="input w-full">
-      <input name="construction_year" type="text" placeholder="eg. 2020" required  min="1900" max="2100" />
+      <input name="construction_year" type="text" placeholder="{% translate 'eg. 2020' %}" required  min="1900" max="2100" />
     </label>
   </fieldset>
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Total floor area <span class="text-[var(--text--sub-600)]">(m²)</span>
+      {% translate "Total floor area" %} <span class="text-[var(--text--sub-600)]">(m²)</span>
     </legend>
     <label class="input w-full">
-      <input name="total_floor_area" type="number" required placeholder="eg. 340" min="1" />
+      <input name="total_floor_area" type="number" required placeholder="{% translate 'eg. 340' %}" min="1" />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">m²</span>
     </label>
   </fieldset>
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Conditioned floor area
+      {% translate "Conditioned floor area" %}
       <span class="text-[var(--text--sub-600)]">(m²)</span>
       <span
         data-icon="info-custom-fill"
@@ -108,43 +109,43 @@
       ></span>
     </legend>
     <label class="input w-full">
-      <input name="conditioned_floor_area" type="number" placeholder="eg. 400" required min="1" />
+      <input name="conditioned_floor_area" type="number" placeholder="{% translate 'eg. 400' %}" required min="1" />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">m²</span>
     </label>
   </fieldset>
 
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Room cooling temperature</legend>
+    <legend class="fieldset-legend">{% translate "Room cooling temperature" %}</legend>
     <label class="input w-full">
-      <input name="room_cooling_temperature" type="number" placeholder="eg. 10" required />
+      <input name="room_cooling_temperature" type="number" placeholder="{% translate 'eg. 10' %}" required />
     </label>
   </fieldset>
 
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Number of floors below ground</legend>
+    <legend class="fieldset-legend">{% translate "Number of floors below ground" %}</legend>
     <label class="input w-full">
-      <input name="floors_below_ground" type="number" placeholder="eg. 3" required min="0" />
+      <input name="floors_below_ground" type="number" placeholder="{% translate 'eg. 3' %}" required min="0" />
     </label>
   </fieldset>
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Energy consumption of building
+      {% translate "Energy consumption of building" %}
       <span class="text-[var(--text--sub-600)]">(%)</span>
     </legend>
     <label class="input w-full">
-      <input name="energy_consumption" type="number" placeholder="eg. 10" required min="1" />
+      <input name="energy_consumption" type="number" placeholder="{% translate 'eg. 10' %}" required min="1" />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
     </label>
   </fieldset>
 
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Energy monitoring & control systems</legend>
+    <legend class="fieldset-legend">{% translate "Energy monitoring & control systems" %}</legend>
     <label class="w-full">
       <select name="energy_monitoring_control_systems" class="select w-full" required>
-        <option disabled selected value="">eg Yes</option>
-        <option>Yes</option>
-        <option>No</option>
+        <option disabled selected value="">{% translate "eg Yes" %}</option>
+        <option>{% translate "Yes" %}</option>
+        <option>{% translate "No" %}</option>
       </select>
     </label>
   </fieldset>

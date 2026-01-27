@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <div id="hot-water-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button
@@ -10,7 +11,7 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add hot water system
+      {% translate "Add hot water system" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
@@ -26,10 +27,9 @@
   >
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">Add a hot water system</h3>
+        <h3 class="text-lg/6 font-medium">{% translate "Add a hot water system" %}</h3>
         <p class="text-sm/5 text-[var(--text--sub-600)]">
-          Provide details on the building’s method of producing and distributing
-          hot water.
+          {% translate "Provide details on the building's method of producing and distributing hot water." %}
         </p>
       </div>
       <button
@@ -49,7 +49,7 @@
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Type of hot water system<span
+            {% translate "Type of hot water system" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
@@ -62,13 +62,13 @@
             hx-target="this"
             hx-swap="innerHTML"
           >
-            <option disabled selected value="">Select an option</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
           </select>
-          <p class="validator-hint">This field is required</p>
+          <p class="validator-hint">{% translate "This field is required" %}</p>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Fuel type<span class="text-[var(--state--error--base)]">*</span>
+            {% translate "Fuel type" %}<span class="text-[var(--state--error--base)]">*</span>
           </legend>
           <select
             class="select w-full"
@@ -78,12 +78,12 @@
             hx-target="this"
             hx-swap="innerHTML"
           >
-            <option disabled selected value="">Select an option</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            System operating schedule<span
+            {% translate "System operating schedule" %}<span
               data-icon="info-custom-fill"
               data-size="20"
               data-color="var(--icon--disabled-300)"
@@ -92,25 +92,25 @@
           <div class="w-full flex gap-1.5 items-center">
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_hours_per_day" required min="1" max="24" />
+                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_hours_per_day" required min="1" max="24" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >Hours / day</span
+                  >{% translate "Hours / day" %}</span
                 >
               </label>
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_days_per_week" required min="1" max="7" />
+                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_days_per_week" required min="1" max="7" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >days / week</span
+                  >{% translate "days / week" %}</span
                 >
               </label>
             </div>
             <div class="flex-1">
               <label class="input validator w-full">
-                <input type="number" placeholder="eg. 1" name="operating_weeks_per_year" required min="1" max="52" />
+                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_weeks_per_year" required min="1" max="52" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >weeks / year</span
+                  >{% translate "weeks / year" %}</span
                 >
               </label>
             </div>
@@ -118,98 +118,98 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Fuel consumption<span class="text-[var(--state--error--base)]"
+            {% translate "Fuel consumption" %}<span class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 343" name="fuel_consumption" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 343' %}" name="fuel_consumption" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Litres/m³</span
             >
           </label>
-          <p class="validator-hint">This field is required</p>
+          <p class="validator-hint">{% translate "This field is required" %}</p>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Hot water system power input<span
+            {% translate "Hot water system power input" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 343" name="power_input" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 343' %}" name="power_input" required min="0" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >Kw</span
             >
           </label>
-          <p class="validator-hint">This field is required</p>
+          <p class="validator-hint">{% translate "This field is required" %}</p>
         </fieldset>
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            Baseline hot water system efficiency<span
+            {% translate "Baseline hot water system efficiency" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 343" name="baseline_efficiency" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 343' %}" name="baseline_efficiency" required min="0" />
           </label>
-          <p class="validator-hint">This field is required</p>
+          <p class="validator-hint">{% translate "This field is required" %}</p>
         </fieldset>
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">
-            Baseline hot water system equipment efficiency level<span
+            {% translate "Baseline hot water system equipment efficiency level" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 40" name="equipment_efficiency_level" />
+            <input type="number" placeholder="{% translate 'eg. 40' %}" name="equipment_efficiency_level" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
               >%</span
             >
           </label>
-          <p class="validator-hint">This field is required</p>
+          <p class="validator-hint">{% translate "This field is required" %}</p>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Installation of heat recovery system<span
+            {% translate "Installation of heat recovery system" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <select class="select w-full" name="heat_recovery_system" required>
-            <option disabled selected value="">Select an option</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
+            <option value="yes">{% translate "Yes" %}</option>
+            <option value="no">{% translate "No" %}</option>
           </select>
-          <p class="validator-hint">This field is required</p>
+          <p class="validator-hint">{% translate "This field is required" %}</p>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">
-            Number of hot water equipment<span
+            {% translate "Number of hot water equipment" %}<span
               class="text-[var(--state--error--base)]"
               >*</span
             >
           </legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="eg. 5" name="number_of_equipment" required min="0" />
+            <input type="number" placeholder="{% translate 'eg. 5' %}" name="number_of_equipment" required min="0" />
           </label>
-          <p class="validator-hint">This field is required</p>
+          <p class="validator-hint">{% translate "This field is required" %}</p>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
           <select class="select w-full" name="energy_efficiency_label_type">
-            <option disabled selected value="">Select an option</option>
-            <option value="bee">BEE Star Rating</option>
-            <option value="egat">EGAT</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
+            <option value="bee">{% translate "BEE Star Rating" %}</option>
+            <option value="egat">{% translate "EGAT" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Number of stars</legend>
+          <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
           <select class="select w-full" name="number_of_stars" required>
-            <option disabled selected value="">Select an option</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -227,9 +227,9 @@
         class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
         onclick="closeHotWaterSystemModal()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveHotWaterSystem()">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveHotWaterSystem()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -246,10 +246,9 @@
           data-color="var(--state--warning--base)"
         ></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        You are about to remove or delete added hot water system. This will
-        action will permanently remove it.
+        {% translate "You are about to remove or delete added hot water system. This will action will permanently remove it." %}
       </p>
     </div>
     <div
@@ -259,9 +258,9 @@
         class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
         onclick="hot_water_system_modal_delete.close()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteHotWaterSystem()">Remove</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteHotWaterSystem()">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -277,7 +276,7 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add hot water system
+      {% translate "Add hot water system" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
@@ -293,12 +292,12 @@
           class="shrink-0 self-start"
         ></span>
         <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">Heat pump water system</p>
+          <p class="text-sm/5 font-medium">{% translate "Heat pump water system" %}</p>
           <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
             <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Fuel type: Electricity</span
+              >{% translate "Fuel type:" %} {% translate "Electricity" %}</span
             >
-            <span>Power input: 400Kw</span>
+            <span>{% translate "Power input:" %} 400Kw</span>
           </p>
         </div>
         <div class="flex items-center gap-3">
@@ -327,15 +326,15 @@
 
 <template id="no-hot-water-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
-    <img src="{% static 'assets/hot-water-system.png' %}" alt="hot-water System Image" />
+    <img src="{% static 'assets/hot-water-system.png' %}" alt="{% translate 'hot-water System Image' %}" />
     <p class="text-sm/5 font-medium">
-      Click button below to add a hot water system
+      {% translate "Click button below to add a hot water system" %}
     </p>
     <button
       class="btn btn-primary"
       onclick="hot_water_system_modal.showModal()"
     >
-      Add hot water system
+      {% translate "Add hot water system" %}
     </button>
   </div>
 </template>
@@ -380,14 +379,14 @@
     const systemType = systemTypeSelect.value;
 
     if (!systemType) {
-      Toast.error('Please select a hot water system type');
+      Toast.error('{% translate "Please select a hot water system type" %}');
       return;
     }
 
     // Get building ID
     const buildingId = getBuildingId();
     if (!buildingId) {
-      Toast.error('Building ID not found. Please save building information first.');
+      Toast.error('{% translate "Building ID not found. Please save building information first." %}');
       return;
     }
 
@@ -428,11 +427,11 @@
         console.log(result.message);
       } else {
         // Show validation errors
-        Toast.error('Error saving hot water system:\n' + JSON.stringify(result.errors || result.error));
+        Toast.error('{% translate "Error saving hot water system:" %}\n' + JSON.stringify(result.errors || result.error));
       }
     } catch (error) {
       console.error('Error saving hot water system:', error);
-      Toast.error('Failed to save hot water system. Please try again.');
+      Toast.error('{% translate "Failed to save hot water system. Please try again." %}');
     }
   }
 
@@ -481,8 +480,8 @@
             <div class="flex flex-col flex-1">
               <p class="text-sm/5 font-medium">${system.type_of_hot_water_system_display}</p>
               <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-                <span class="border-r border-[var(--text--sub-600)] pr-1">Fuel type: ${fuelType}</span>
-                <span>Power input: ${powerInput} Kw</span>
+                <span class="border-r border-[var(--text--sub-600)] pr-1">{% translate "Fuel type:" %} ${fuelType}</span>
+                <span>{% translate "Power input:" %} ${powerInput} Kw</span>
               </p>
             </div>
             <div class="flex items-center gap-3">
@@ -513,7 +512,7 @@
       listContainer.innerHTML = `
         <li class="flex flex-col items-center justify-center py-8 text-center">
           <span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading hot water systems</p>
+          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">{% translate "Error loading hot water systems" %}</p>
         </li>
       `;
     }
@@ -526,7 +525,7 @@
     // Get building ID
     const buildingId = getBuildingId();
     if (!buildingId) {
-      Toast.error('Building ID not found');
+      Toast.error('{% translate "Building ID not found" %}');
       return;
     }
 
@@ -536,13 +535,13 @@
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        Toast.error('Failed to load hot water system');
+        Toast.error('{% translate "Failed to load hot water system" %}');
         return;
       }
 
       const system = result.hot_water_systems.find(s => s.id === systemId);
       if (!system) {
-        Toast.error('Hot water system not found');
+        Toast.error('{% translate "Hot water system not found" %}');
         return;
       }
 
@@ -579,7 +578,7 @@
       hot_water_system_modal.showModal();
     } catch (error) {
       console.error('Error loading hot water system for edit:', error);
-      Toast.error('Failed to load hot water system');
+      Toast.error('{% translate "Failed to load hot water system" %}');
     }
   }
 
@@ -613,11 +612,11 @@
           hot_water_system_modal_delete.close();
           console.log('Hot water system deleted successfully');
         } else {
-          Toast.error('Failed to delete hot water system');
+          Toast.error('{% translate "Failed to delete hot water system" %}');
         }
       } catch (error) {
         console.error('Error deleting hot water system:', error);
-        Toast.error('Failed to delete hot water system');
+        Toast.error('{% translate "Failed to delete hot water system" %}');
       }
     }
   }
