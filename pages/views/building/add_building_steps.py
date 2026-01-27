@@ -14,10 +14,12 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
+from cities_light.models import Country
+
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
 from pages.models.building import BuildingCategory
-from pages.models.epd import EPD, MaterialCategory
+from pages.models.epd import EPD, EPDType, MaterialCategory
 
 logger = logging.getLogger(__name__)
 from pages.models import Building
@@ -238,7 +240,16 @@ def handle_operational_data_step(request):
 # Step 4: Building Structural Components
 def handle_structural_components_step(request):
     """Handle building structural components step."""
-    context = {}
+    # Get filter dropdown data for EPD library search
+    countries = Country.objects.all().order_by("name")
+    epd_categories = MaterialCategory.objects.filter(parent__isnull=True).order_by("name_en")
+    epd_types = [{"value": t[0], "label": t[1]} for t in EPDType.choices]
+
+    context = {
+        'countries': countries,
+        'epd_categories': epd_categories,
+        'epd_types': epd_types,
+    }
     return render(
         request,
         "pages/add-building/components/building-structural-components/building-structural-components.html",
