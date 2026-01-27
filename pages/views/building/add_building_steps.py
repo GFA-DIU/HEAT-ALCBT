@@ -67,10 +67,51 @@ def building_step_view(request):
 
 # Step 1.1: Building Name & Location
 def handle_name_location_step(request):
-    """Provide countries for the building location step."""
+    """Provide countries and optionally pre-populated region/city for edit mode."""
+    from accounts.models import CustomCity, CustomRegion
+
+    building_uuid = request.GET.get('building_uuid')
+
     context = {
-        "countries": ALCBTCountryManager.get_alcbt_countries()
+        "countries": ALCBTCountryManager.get_alcbt_countries(),
+        "regions": [],
+        "cities": [],
+        "selected_country": None,
+        "selected_region": None,
+        "selected_city": None,
+        "building_data": None,
     }
+
+    # Edit mode: pre-populate dependent selects from existing building
+    if building_uuid:
+        try:
+            building = Building.objects.get(uuid=building_uuid, created_by=request.user)
+
+            context["building_data"] = {
+                "building_name": building.name,
+                "address": building.street or "",
+                "longitude": building.longitude,
+                "latitude": building.latitude,
+            }
+
+            if building.country:
+                context["selected_country"] = building.country_id
+                context["regions"] = CustomRegion.objects.filter(
+                    country=building.country
+                ).order_by("name")
+
+            if building.region:
+                context["selected_region"] = building.region_id
+                context["cities"] = CustomCity.objects.filter(
+                    region=building.region
+                ).order_by("name")
+
+            if building.city:
+                context["selected_city"] = building.city_id
+
+        except Building.DoesNotExist:
+            logger.warning(f"Building not found for edit: {building_uuid}")
+
     return render(
         request,
         "pages/add-building/components/building-information/building-name-location.html",
