@@ -12,7 +12,7 @@
       <input
         name="building_name"
         type="text"
-        placeholder="eg. JP Plaza"
+        placeholder="e.g. JP Plaza"
         required
         minlength="2"
         maxlength="200"
@@ -34,7 +34,7 @@
       <input
         name="address"
         type="text"
-        placeholder="eg. 1885 L Street Northwest"
+        placeholder="e.g. 1885 L Street Northwest"
         required
         minlength="5"
         {% if building_data.address %}value="{{ building_data.address }}"{% endif %}
@@ -152,7 +152,7 @@
         step="any"
         min="-180"
         max="180"
-        placeholder="eg. -7.946232"
+        placeholder="e.g. -7.946232"
         {% if building_data.longitude %}value="{{ building_data.longitude }}"{% endif %}
       />
     </label>
@@ -171,7 +171,7 @@
         step="any"
         min="-90"
         max="90"
-        placeholder="eg. 5.603722"
+        placeholder="e.g. 5.603722"
         {% if building_data.latitude %}value="{{ building_data.latitude }}"{% endif %}
       />
     </label>
