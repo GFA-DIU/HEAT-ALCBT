@@ -47,7 +47,7 @@
             background-color: #ffffff;
         }
         .header {
-            background: #4cb157;
+            background: #81f28e;
             padding: 40px 30px;
             text-align: center;
         }
@@ -80,7 +80,7 @@
         .button {
             display: inline-block;
             padding: 16px 32px;
-            background: #4cb157;
+            background: #81f28e;
             color: #0e121b !important;
             text-decoration: none;
             border-radius: 8px;
@@ -132,7 +132,7 @@
             color: #718096;
         }
         .footer a {
-            color: #4cb157;
+            color: #81f28e;
             text-decoration: none;
         }
         .divider {
@@ -173,7 +173,7 @@
                 <table role="presentation" class="email-container" style="width: 600px; border-collapse: collapse; border: 0; border-spacing: 0; background-color: #ffffff; border-radius: 12px; overflow: hidden;">
                     <!-- Header -->
                     <tr>
-                        <td class="header" style="#4cb157; padding: 40px 30px; text-align: center;">
+                        <td class="header" style="#81f28e; padding: 40px 30px; text-align: center;">
                             <h1 style="color: #0e121b; font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.5px;">BEAT</h1>
                             <p style="color: #0e121b; margin: 8px 0 0 0; font-size: 14px;">Building Life Cycle Assessment Tool</p>
                         </td>
@@ -194,7 +194,7 @@
                             
                             <!-- Button -->
                             <div class="button-container" style="text-align: center; margin: 35px 0;">
-                                <a href="{{ activate_url }}" class="button" style="display: inline-block; padding: 16px 32px; background: #4cb157; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                                <a href="{{ activate_url }}" class="button" style="display: inline-block; padding: 16px 32px; background: #81f28e; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
                                     Confirm Email Address
                                 </a>
                             </div>
