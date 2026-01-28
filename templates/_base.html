@@ -239,13 +239,6 @@
           <h3 class='text-lg font-bold'><i class="bi bi-shield-check"></i> We Value Your Privacy</h3>
           <p >We use cookies to enhance your experience, provide analytics, and enable embedded content. You can manage your preferences at any time.</p>
         </div>
-
-        <div class="card border-t border-[var(--stroke--soft-200)] rounded-none mt-2">
-          <div class="p-2">
-            <h4 class="card-title">Building Data</h4>
-            <p>Content here</p>
-          </div>
-        </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2 mt-3">
@@ -296,29 +289,48 @@
 </dialog>
 
   <!-- Cookie Settings Modal -->
-  <div class="modal fade cookie-settings-modal" id="cookieSettingsModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title"><i class="bi bi-gear"></i> Cookie Settings</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <p class="text-muted mb-4">
-            Manage your cookie preferences below. Essential cookies are required for the website to function properly.
-          </p>
-
-          <div id="cookieCategories">
+  <dialog id="cookieSettingsModal" class="modal modal-middle">
+    <div class="modal-box w-full max-w-2xl max-h-[80vh] p-0 flex flex-col">
+      <!-- Header (static) -->
+      <div class="flex items-center justify-between p-5 border-b border-[var(--stroke--soft-200)] shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-primary/10">
+            <span data-icon="settings-5-line" data-size="24" data-color="var(--color-primary)"></span>
           </div>
+          <h3 class="text-lg font-semibold">Cookie Settings</h3>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger" onclick="declineOptionalCookies()">Decline Optional</button>
-          <button type="button" class="btn btn-success" onclick="saveCustomSettings()">Save Preferences</button>
+        <button type="button" class="btn btn-ghost btn-sm btn-circle" onclick="cookieSettingsModal.close()">
+          <span data-icon="close-line" data-size="20"></span>
+        </button>
+      </div>
+
+      <!-- Body (scrollable) -->
+      <div class="p-5 overflow-y-auto flex-1 min-h-0">
+        <p class="text-sm text-[var(--text--sub-600)] mb-4">
+          Manage your cookie preferences below. Essential cookies are required for the website to function properly.
+        </p>
+        <div id="cookieCategories" class="flex flex-col gap-4">
+          <!-- Cookie categories loaded dynamically -->
         </div>
       </div>
+
+      <!-- Footer (static) -->
+      <div class="p-5 border-t border-[var(--stroke--soft-200)] flex flex-wrap gap-3 justify-end shrink-0">
+        <button type="button" class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="cookieSettingsModal.close()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-sm btn-error" onclick="declineOptionalCookies()">
+          Decline Optional
+        </button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="saveCustomSettings()">
+          Save Preferences
+        </button>
+      </div>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
 
   <script>
     function showCookieBanner() {
@@ -354,8 +366,7 @@
         if (response.ok) {
           setBannerShownCookie();
           hideCookieBanner();
-          const modal = bootstrap.Modal.getInstance(document.getElementById('cookieSettingsModal'));
-          if (modal) modal.hide();
+          cookieSettingsModal.close();
           setTimeout(() => location.reload(), 300);
         }
       }).catch(error => {
@@ -374,8 +385,7 @@
         if (response.ok) {
           setBannerShownCookie();
           hideCookieBanner();
-          const modal = bootstrap.Modal.getInstance(document.getElementById('cookieSettingsModal'));
-          if (modal) modal.hide();
+          cookieSettingsModal.close();
           setTimeout(() => location.reload(), 300);
         }
       }).catch(error => {
@@ -385,8 +395,7 @@
 
     function showCookieSettings() {
       loadCookieCategories();
-      const modal = new bootstrap.Modal(document.getElementById('cookieSettingsModal'));
-      modal.show();
+      cookieSettingsModal.showModal();
     }
 
     function loadCookieCategories() {
@@ -400,11 +409,11 @@
             let cookiesHtml = '';
             if (group.cookies && group.cookies.length > 0) {
               cookiesHtml = `
-                <div class="cookies-list">
+                <div class="mt-3 flex flex-col gap-2 pl-4 border-l-2 border-[var(--stroke--soft-200)]">
                   ${group.cookies.map(cookie => `
-                    <div class="cookie-item">
-                      <div class="cookie-name">${cookie.name}</div>
-                      ${cookie.description ? `<div class="cookie-description">${cookie.description}</div>` : ''}
+                    <div class="text-sm">
+                      <div class="font-medium text-[var(--text--strong-950)]">${cookie.name}</div>
+                      ${cookie.description ? `<div class="text-[var(--text--sub-600)] text-xs mt-0.5">${cookie.description}</div>` : ''}
                     </div>
                   `).join('')}
                 </div>
@@ -412,20 +421,19 @@
             }
 
             const categoryHtml = `
-              <div class="cookie-category ${group.required ? 'required' : ''}">
-                <div class="d-flex justify-content-between align-items-start">
-                  <div class="flex-grow-1">
-                    <h6>${group.name}</h6>
-                    <p class="description">${group.description}</p>
+              <div class="rounded-lg border border-[var(--stroke--soft-200)] p-4 ${group.required ? 'bg-base-200/50' : ''}">
+                <div class="flex justify-between items-start gap-4">
+                  <div class="flex-1 min-w-0">
+                    <h6 class="font-semibold text-[var(--text--strong-950)]">${group.name}</h6>
+                    <p class="text-sm text-[var(--text--sub-600)] mt-1">${group.description}</p>
                     ${cookiesHtml}
                   </div>
-                  <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="cookie-${group.id}"
-                           ${group.enabled ? 'checked' : ''}
-                           ${group.required ? 'disabled' : ''}>
-                    <label class="form-check-label" for="cookie-${group.id}">
-                      ${group.required ? 'Always Active' : 'Enable'}
-                    </label>
+                  <div class="flex items-center gap-2 shrink-0">
+                    ${group.required
+                      ? `<span class="badge badge-sm badge-neutral">Always Active</span>
+                         <input type="checkbox" class="toggle toggle-sm toggle-primary" id="cookie-${group.id}" checked disabled>`
+                      : `<input type="checkbox" class="toggle toggle-sm toggle-primary" id="cookie-${group.id}" ${group.enabled ? 'checked' : ''}>`
+                    }
                   </div>
                 </div>
               </div>
@@ -443,13 +451,13 @@
         .then(response => response.json())
         .then(data => {
           const promises = [];
-          
+
           data.groups.forEach(group => {
             const checkbox = document.getElementById(`cookie-${group.id}`);
             if (checkbox) {
               const isEnabled = group.required ? true : checkbox.checked;
               const url = isEnabled ? `/cookies/accept/${group.id}/` : `/cookies/decline/${group.id}/`;
-              
+
               promises.push(
                 fetch(url, {
                   method: 'POST',
@@ -469,8 +477,7 @@
           if (allOk) {
             setBannerShownCookie();
             hideCookieBanner();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('cookieSettingsModal'));
-            if (modal) modal.hide();
+            cookieSettingsModal.close();
             setTimeout(() => location.reload(), 300);
           } else {
             console.error('Some cookie settings failed to save');

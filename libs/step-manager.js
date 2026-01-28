@@ -691,69 +691,74 @@ class StepManager {
               }
             }
 
-            // For step 1.2, trigger cascading dropdowns for apartment type and climate type
+            // For step 1.2, handle cascading dropdowns for apartment type and climate type
             if (stepKey === 'building-information/building-details') {
-              setTimeout(() => {
-                const buildingTypeSelect = document.getElementById('building-type-select');
-                const apartmentTypeSelect = document.getElementById('apartment-type-select');
-                const climateTypeSelect = document.getElementById('climate-type-select');
+              const apartmentTypeSelect = document.getElementById('apartment-type-select');
+              // Check if apartment_types are already pre-populated by server (edit mode)
+              const hasPrePopulatedApartments = apartmentTypeSelect && apartmentTypeSelect.options.length > 1;
 
-                // Trigger building type dropdown to load
-                if (buildingTypeSelect && typeof htmx !== 'undefined') {
-                  htmx.trigger(buildingTypeSelect, 'load');
-                }
+              if (hasPrePopulatedApartments) {
+                // Edit mode: server already populated building_type/apartment_type/climate_type
+                // No HTMX cascade needed - just trigger form validation
+                // console.log('Edit mode: building details pre-populated by server');
+              } else {
+                // Create mode: use HTMX cascade logic
+                setTimeout(() => {
+                  const buildingTypeSelect = document.getElementById('building-type-select');
+                  const climateTypeSelect = document.getElementById('climate-type-select');
 
-                // Trigger climate type dropdown to load
-                if (climateTypeSelect && typeof htmx !== 'undefined') {
-                  htmx.trigger(climateTypeSelect, 'load');
+                  // Trigger building type dropdown to load
+                  if (buildingTypeSelect && typeof htmx !== 'undefined') {
+                    htmx.trigger(buildingTypeSelect, 'load');
+                  }
 
-                  // Wait for it to load then set value
-                  const climateLoadHandler = (event) => {
-                    if (event.detail.target === climateTypeSelect && result.data.climate_type) {
-                      setTimeout(() => {
-                        climateTypeSelect.value = result.data.climate_type;
-                      }, 50);
-                      document.body.removeEventListener('htmx:afterSwap', climateLoadHandler);
-                    }
-                  };
-                  document.body.addEventListener('htmx:afterSwap', climateLoadHandler);
-                }
+                  // Trigger climate type dropdown to load
+                  if (climateTypeSelect && typeof htmx !== 'undefined') {
+                    htmx.trigger(climateTypeSelect, 'load');
 
-                // Handle apartment type after building type loads
-                if (buildingTypeSelect && result.data.building_type) {
-                  const buildingTypeLoadHandler = (event) => {
-                    if (event.detail.target === buildingTypeSelect) {
-                      setTimeout(() => {
-                        buildingTypeSelect.value = result.data.building_type;
-                        console.log('Building type set to:', result.data.building_type);
+                    // Wait for it to load then set value
+                    const climateLoadHandler = (event) => {
+                      if (event.detail.target === climateTypeSelect && result.data.climate_type) {
+                        setTimeout(() => {
+                          climateTypeSelect.value = result.data.climate_type;
+                        }, 50);
+                        document.body.removeEventListener('htmx:afterSwap', climateLoadHandler);
+                      }
+                    };
+                    document.body.addEventListener('htmx:afterSwap', climateLoadHandler);
+                  }
 
-                        // Trigger apartment type loading
-                        if (apartmentTypeSelect && result.data.apartment_type) {
-                          console.log('Triggering apartment type load for:', result.data.apartment_type);
+                  // Handle apartment type after building type loads
+                  if (buildingTypeSelect && result.data.building_type) {
+                    const buildingTypeLoadHandler = (event) => {
+                      if (event.detail.target === buildingTypeSelect) {
+                        setTimeout(() => {
+                          buildingTypeSelect.value = result.data.building_type;
 
-                          const apartmentLoadHandler = (event) => {
-                            if (event.detail.target === apartmentTypeSelect) {
-                              console.log('Apartment type dropdown loaded, setting value');
-                              setTimeout(() => {
-                                apartmentTypeSelect.value = result.data.apartment_type;
-                                console.log('Apartment type set to:', result.data.apartment_type);
-                              }, 100);
-                              document.body.removeEventListener('htmx:afterSwap', apartmentLoadHandler);
-                            }
-                          };
-                          document.body.addEventListener('htmx:afterSwap', apartmentLoadHandler);
+                          // Trigger apartment type loading
+                          if (apartmentTypeSelect && result.data.apartment_type) {
+                            const apartmentLoadHandler = (event) => {
+                              if (event.detail.target === apartmentTypeSelect) {
+                                setTimeout(() => {
+                                  apartmentTypeSelect.value = result.data.apartment_type;
+                                }, 100);
+                                document.body.removeEventListener('htmx:afterSwap', apartmentLoadHandler);
+                              }
+                            };
+                            document.body.addEventListener('htmx:afterSwap', apartmentLoadHandler);
 
-                          // Trigger the change event to load apartment types
-                          htmx.trigger(buildingTypeSelect, 'change');
-                        }
-                      }, 100);
+                            // Trigger the change event to load apartment types
+                            htmx.trigger(buildingTypeSelect, 'change');
+                          }
+                        }, 100);
 
-                      document.body.removeEventListener('htmx:afterSwap', buildingTypeLoadHandler);
-                    }
-                  };
-                  document.body.addEventListener('htmx:afterSwap', buildingTypeLoadHandler);
-                }
-              }, 300);
+                        document.body.removeEventListener('htmx:afterSwap', buildingTypeLoadHandler);
+                      }
+                    };
+                    document.body.addEventListener('htmx:afterSwap', buildingTypeLoadHandler);
+                  }
+                }, 300);
+              }
             }
           }
         }else {
