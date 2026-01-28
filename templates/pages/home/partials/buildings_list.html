@@ -1,8 +1,6 @@
 {% load static %} 
 
-{% if not buildings %}
 
-{% endif%}
   <ul class="grid grid-cols-1 gap-2 my-6" id="buildings_list">
     {% for building in buildings %}
     <a  href="/building/{{ building.id }}/"
