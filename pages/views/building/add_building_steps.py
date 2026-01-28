@@ -121,10 +121,54 @@ def handle_name_location_step(request):
 
 # Step 1.2: Building Details
 def handle_details_step(request):
-    """Provide building categories and types."""
+    """Provide building categories and optionally pre-populated apartment types for edit mode."""
+    from pages.models.building import CategorySubcategory, ClimateZone
+
+    building_uuid = request.GET.get('building_uuid')
+
     context = {
-        "building_categories": BuildingCategory.objects.all().order_by("name")
+        "building_categories": BuildingCategory.objects.all().order_by("name"),
+        "apartment_types": [],
+        "climate_zones": [{"id": c[0], "name": c[1]} for c in ClimateZone.choices],
+        "selected_building_type": None,
+        "selected_apartment_type": None,
+        "selected_climate_type": None,
+        "building_data": None,
     }
+
+    # Edit mode: pre-populate dependent selects from existing building
+    if building_uuid:
+        try:
+            building = Building.objects.get(uuid=building_uuid, created_by=request.user)
+
+            # Pre-fill text fields
+            context["building_data"] = {
+                "assessment_period": building.reference_period,
+                "construction_year": building.construction_year,
+                "total_floor_area": building.total_floor_area,
+                "conditioned_floor_area": building.cond_floor_area,
+                "floors_below_ground": building.floors_below_ground,
+            }
+
+            # Pre-populate building_type and apartment_type
+            if building.category:
+                # building.category is a CategorySubcategory object
+                context["selected_building_type"] = building.category.category.id
+                context["selected_apartment_type"] = building.category.subcategory.id
+
+                # Pre-populate apartment_types for the selected building_type
+                subcategories = CategorySubcategory.objects.filter(
+                    category=building.category.category
+                ).select_related('subcategory').order_by('subcategory__name')
+                context["apartment_types"] = [cs.subcategory for cs in subcategories]
+
+            # Pre-populate climate_type
+            if building.climate_zone:
+                context["selected_climate_type"] = building.climate_zone
+
+        except Building.DoesNotExist:
+            logger.warning(f"Building not found for edit: {building_uuid}")
+
     return render(
         request,
         "pages/add-building/components/building-information/building-details.html",

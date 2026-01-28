@@ -11,15 +11,17 @@
         id="building-type-select"
         name="building_type"
         class="select w-full"
+        {% if not selected_building_type %}
         hx-get="/select_lists/?building_categories=1"
         hx-trigger="load"
         hx-target="this"
         hx-swap="innerHTML"
+        {% endif %}
         required
       >
         <option value="">{% translate "Pick a building type" %}</option>
         {% for category in building_categories %}
-          <option value="{{ category.id }}">{{ category.name }}</option>
+          <option value="{{ category.id }}" {% if category.id == selected_building_type %}selected{% endif %}>{{ category.name }}</option>
         {% endfor %}
       </select>
     </label>
@@ -43,6 +45,9 @@
         required
       >
         <option value="">{% translate "Pick a type of apartments" %}</option>
+        {% for apt_type in apartment_types %}
+          <option value="{{ apt_type.id }}" {% if apt_type.id == selected_apartment_type %}selected{% endif %}>{{ apt_type.name }}</option>
+        {% endfor %}
       </select>
     </label>
     <p class="validator-hint">{% translate "This field is required" %}</p>
@@ -57,13 +62,18 @@
         id="climate-type-select"
         name="climate_type"
         class="select w-full"
+        {% if not selected_climate_type %}
         hx-get="/select_lists/?climate_zones=1"
         hx-trigger="load"
         hx-target="this"
         hx-swap="innerHTML"
+        {% endif %}
         required
       >
         <option value="">{% translate "Select climate type" %}</option>
+        {% for zone in climate_zones %}
+          <option value="{{ zone.id }}" {% if zone.id == selected_climate_type %}selected{% endif %}>{{ zone.name }}</option>
+        {% endfor %}
       </select>
     </label>
     <p class="validator-hint">{% translate "This field is required" %}</p>
@@ -76,7 +86,7 @@
       >
     </legend>
     <label class="input validator w-full">
-      <input name="assessment_period" type="number" placeholder="{% translate 'eg. 10' %}" required min="1" />
+      <input name="assessment_period" type="number" placeholder="{% translate 'eg. 10' %}" required min="1" {% if building_data.assessment_period %}value="{{ building_data.assessment_period }}"{% endif %} />
     </label>
     <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
@@ -84,7 +94,7 @@
   <fieldset class="fieldset">
     <legend class="fieldset-legend">{% translate "Construction year" %}</legend>
     <label class="input w-full">
-      <input name="construction_year" type="text" placeholder="{% translate 'eg. 2020' %}" required  min="1900" max="2100" />
+      <input name="construction_year" type="text" placeholder="{% translate 'eg. 2020' %}" required min="1900" max="2100" {% if building_data.construction_year %}value="{{ building_data.construction_year }}"{% endif %} />
     </label>
   </fieldset>
 
@@ -93,7 +103,7 @@
       {% translate "Total floor area" %} <span class="text-[var(--text--sub-600)]">(m²)</span>
     </legend>
     <label class="input w-full">
-      <input name="total_floor_area" type="number" required placeholder="{% translate 'eg. 340' %}" min="1" />
+      <input name="total_floor_area" type="number" required placeholder="{% translate 'eg. 340' %}" min="1" {% if building_data.total_floor_area %}value="{{ building_data.total_floor_area }}"{% endif %} />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">m²</span>
     </label>
   </fieldset>
@@ -109,7 +119,7 @@
       ></span>
     </legend>
     <label class="input w-full">
-      <input name="conditioned_floor_area" type="number" placeholder="{% translate 'eg. 400' %}" required min="1" />
+      <input name="conditioned_floor_area" type="number" placeholder="{% translate 'eg. 400' %}" required min="1" {% if building_data.conditioned_floor_area %}value="{{ building_data.conditioned_floor_area }}"{% endif %} />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">m²</span>
     </label>
   </fieldset>
@@ -124,7 +134,7 @@
   <fieldset class="fieldset">
     <legend class="fieldset-legend">{% translate "Number of floors below ground" %}</legend>
     <label class="input w-full">
-      <input name="floors_below_ground" type="number" placeholder="{% translate 'eg. 3' %}" required min="0" />
+      <input name="floors_below_ground" type="number" placeholder="{% translate 'eg. 3' %}" required min="0" {% if building_data.floors_below_ground %}value="{{ building_data.floors_below_ground }}"{% endif %} />
     </label>
   </fieldset>
 
