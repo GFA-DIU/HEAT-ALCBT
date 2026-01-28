@@ -1307,22 +1307,22 @@ msgstr ""
 
 #: .\templates\_base.html:73
 msgid "Dashboard"
-msgstr ""
+msgstr "แดชบอร์ด"
 
 #: .\templates\_base.html:88 .\templates\pages\home\resources.html:20
 #: .\templates\pages\resources.html:13 .\templates\pages\resources.html:15
 msgid "Resources"
-msgstr ""
+msgstr "ทรัพยากร"
 
 #: .\templates\_base.html:102
 msgid "Templates"
-msgstr ""
+msgstr "เทมเพลต"
 
 #: .\templates\_base.html:150
 #: .\templates\pages\add-building\add-building.html:45
 #: .\templates\pages\profile\profile.html:6
 msgid "Profile"
-msgstr ""
+msgstr "โปรไฟล์"
 
 #: .\templates\_base.html:151 .\templates\pages\profile\profile.html:88
 msgid "Cookie Settings"
@@ -1335,12 +1335,12 @@ msgstr ""
 #: .\templates\_base.html:170
 #: .\templates\pages\add-building\add-building.html:48
 msgid "Logout"
-msgstr ""
+msgstr "ออกจากระบบ"
 
 #: .\templates\account\_auth.html:5 .\templates\account\login.html:75
 #: .\templates\account\signup.html:16
 msgid "Sign up"
-msgstr ""
+msgstr "สมัครสมาชิก"
 
 #: .\templates\account\_auth.html:33
 msgid "Terms of use"
@@ -1348,7 +1348,7 @@ msgstr ""
 
 #: .\templates\account\_auth.html:33
 msgid "and"
-msgstr ""
+msgstr "และ"
 
 #: .\templates\account\_auth.html:33
 msgid "Privacy policy"
@@ -1356,7 +1356,7 @@ msgstr ""
 
 #: .\templates\account\_auth.html:50
 msgid "Building Emission Assessment Tool"
-msgstr ""
+msgstr "เครื่องมือประเมินการปล่อยก๊าซเรือนกระจกของอาคาร"
 
 #: .\templates\account\_auth.html:53
 msgid ""
@@ -1388,53 +1388,55 @@ msgstr ""
 
 #: .\templates\account\login.html:7
 msgid "Sign Up"
-msgstr ""
+msgstr "สมัครสมาชิก"
 
 #: .\templates\account\login.html:17 .\templates\account\login.html:64
 #: .\templates\account\signup.html:8
 msgid "Login"
-msgstr ""
+msgstr "เข้าสู่ระบบ"
 
 #: .\templates\account\login.html:67 .\templates\account\signup.html:85
 msgid "OR"
-msgstr ""
+msgstr "หรือ"
 
 #: .\templates\account\login.html:69 .\templates\account\signup.html:87
 msgid "Sign up with Google"
-msgstr ""
+msgstr "สมัครด้วย Google"
 
 #: .\templates\account\login.html:73
 msgid "Don't have an account."
-msgstr ""
+msgstr "ยังไม่มีบัญชี"
 
 #: .\templates\account\password_change.html:5
 #: .\templates\account\password_change.html:8
 #: .\templates\account\password_change.html:12
 #: .\templates\pages\profile\profile.html:84
 msgid "Change Password"
-msgstr ""
+msgstr "เปลี่ยนรหัสผ่าน"
 
 #: .\templates\account\password_reset.html:5
 msgid "Password Reset"
-msgstr ""
+msgstr "รีเซ็ตรหัสผ่าน"
 
 #: .\templates\account\password_reset.html:8
 msgid "Forgot your password?"
-msgstr ""
+msgstr "ลืมรหัสผ่าน?"
 
 #: .\templates\account\password_reset.html:12
 msgid "Reset Password"
-msgstr ""
+msgstr "รีเซ็ตรหัสผ่าน"
 
 #: .\templates\account\signup.html:20
 msgid ""
 "Fill in the details below to create your account and track the carbon "
 "mission from your building project."
 msgstr ""
+"กรอกรายละเอียดด้านล่างเพื่อสร้างบัญชีของคุณและติดตามภารกิจคาร์บอน "
+"จากโครงการอาคารของคุณ"
 
 #: .\templates\account\signup.html:82
 msgid "Create account"
-msgstr ""
+msgstr "สร้างบัญชี"
 
 #: .\templates\account\signup.html:91
 msgid "I already have an account."
@@ -1475,20 +1477,20 @@ msgstr ""
 
 #: .\templates\footer.html:16
 msgid "Copyright"
-msgstr ""
+msgstr "ลิขสิทธิ์"
 
 #: .\templates\pages\add-building\_base.html:40
 msgid "Add New Building"
-msgstr ""
+msgstr "เพิ่มอาคารใหม่"
 
 #: .\templates\pages\add-building\_base.html:42
 msgid "Complete the following steps to add a new building"
-msgstr ""
+msgstr "ทำตามขั้นตอนต่อไปนี้เพื่อเพิ่มอาคารใหม่"
 
 #: .\templates\pages\add-building\_base.html:48
 #, python-format
 msgid "0%% completed"
-msgstr ""
+msgstr "0%% เสร็จสมบูรณ์"
 
 #: .\templates\pages\add-building\add-building.html:5
 msgid "Add Building"
@@ -2542,7 +2544,7 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:506
 msgid "Variable Refrigerant Volume (VRV) / Variable Refrigerant Flow (VRF)"
-msgstr ""
+msgstr "ปริมาณสารทำความเย็นแบบแปรผัน (VRV) / การไหลของสารทำความเย็นแบบแปรผัน (VRF)"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:555
 msgid "Total cooling load for split/VRV"
@@ -3313,7 +3315,7 @@ msgstr ""
 
 #: .\templates\pages\home\resources.html:10 .\templates\pages\resources.html:10
 msgid "Resource page"
-msgstr ""
+msgstr "หน้าทรัพยากร"
 
 #: .\templates\pages\home\resources.html:22
 msgid "Manage your resources to access for low carbon"
@@ -3321,7 +3323,7 @@ msgstr ""
 
 #: .\templates\pages\home\resources.html:31 .\templates\pages\resources.html:22
 msgid "Introduction video"
-msgstr ""
+msgstr "วิดีโอแนะนำ"
 
 #: .\templates\pages\home\resources.html:33 .\templates\pages\resources.html:24
 msgid "Watch our short video to get a quick overview of"
@@ -3347,11 +3349,11 @@ msgstr ""
 
 #: .\templates\pages\home\resources.html:72 .\templates\pages\resources.html:57
 msgid "User Handbook"
-msgstr ""
+msgstr "คู่มือผู้ใช้"
 
 #: .\templates\pages\home\resources.html:74 .\templates\pages\resources.html:59
 msgid "Download the official"
-msgstr ""
+msgstr "ดาวน์โหลดเอกสารอย่างเป็นทางการ"
 
 #: .\templates\pages\home\resources.html:74 .\templates\pages\resources.html:59
 msgid ""
@@ -3381,11 +3383,11 @@ msgstr ""
 
 #: .\templates\pages\home\resources.html:92 .\templates\pages\resources.html:74
 msgid "The"
-msgstr ""
+msgstr "การ"
 
 #: .\templates\pages\home\resources.html:92 .\templates\pages\resources.html:74
 msgid "Community"
-msgstr ""
+msgstr "ชุมชน"
 
 #: .\templates\pages\home\resources.html:95 .\templates\pages\resources.html:76
 msgid ""
@@ -3397,7 +3399,7 @@ msgstr ""
 #: .\templates\pages\home\resources.html:100
 #: .\templates\pages\resources.html:79
 msgid "Host"
-msgstr ""
+msgstr "เจ้าภาพ"
 
 #: .\templates\pages\home\resources.html:105
 msgid "Host logo"
@@ -3406,7 +3408,7 @@ msgstr ""
 #: .\templates\pages\home\resources.html:113
 #: .\templates\pages\resources.html:92
 msgid "Lead partners"
-msgstr ""
+msgstr "พันธมิตรหลัก"
 
 #: .\templates\pages\home\resources.html:120
 msgid "Lead partner logo"
@@ -3415,7 +3417,7 @@ msgstr ""
 #: .\templates\pages\home\resources.html:130
 #: .\templates\pages\resources.html:109
 msgid "Development partners"
-msgstr ""
+msgstr "พันธมิตรพัฒนา"
 
 #: .\templates\pages\home\resources.html:137
 msgid "Development partner logo"
@@ -3429,11 +3431,11 @@ msgstr ""
 #: .\templates\pages\home\resources.html:151
 #: .\templates\pages\resources.html:129
 msgid "hear from you"
-msgstr ""
+msgstr "ได้ยินจากคุณ"
 
 #: .\templates\pages\home\templates.html:5
 msgid "Home"
-msgstr ""
+msgstr "หน้าแรก"
 
 #: .\templates\pages\home\templates.html:17
 msgid "Reusable Templates"
@@ -3641,7 +3643,7 @@ msgstr ""
 
 #: .\templates\pages\resources.html:15
 msgid "Welcome to the"
-msgstr ""
+msgstr "ยินดีต้อนรับสู่"
 
 #: .\templates\pages\resources.html:15
 msgid "section of the"

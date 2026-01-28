@@ -19,136 +19,145 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 #: .\libs\step-manager.js:13
 msgid "Edit Building Information"
-msgstr ""
+msgstr "แก้ไขข้อมูลอาคาร"
 
 #: .\libs\step-manager.js:14
 msgid "Update the building information as needed."
-msgstr ""
+msgstr "อัปเดตข้อมูลอาคารตามต้องการ"
 
 #: .\libs\step-manager.js:20
 msgid "Building Information"
-msgstr ""
+msgstr "ข้อมูลอาคาร"
 
 #: .\libs\step-manager.js:25 .\libs\step-manager.js:28
 msgid "Building Name & Location"
-msgstr ""
+msgstr "ชื่ออาคารและสถานที่"
 
 #: .\libs\step-manager.js:29
 msgid "Add details concerning building name and locations of building."
-msgstr ""
+msgstr "เพิ่มรายละเอียดเกี่ยวกับชื่ออาคารและสถานที่ตั้งของอาคาร"
 
 #: .\libs\step-manager.js:33 .\libs\step-manager.js:36
 msgid "Building Details"
-msgstr ""
+msgstr "รายละเอียดอาคาร"
 
 #: .\libs\step-manager.js:37
 msgid "Add detailed information about your building."
-msgstr ""
+msgstr "เพิ่มข้อมูลรายละเอียดเกี่ยวกับอาคารของคุณ"
 
 #: .\libs\step-manager.js:42
 msgid "Operational Details"
-msgstr ""
+msgstr "รายละเอียดการดำเนินงาน"
 
 #: .\libs\step-manager.js:47 .\libs\step-manager.js:51
 msgid "Operational Schedule & Temperature"
-msgstr ""
+msgstr "ตารางการดำเนินงานและอุณหภูมิ"
 
 #: .\libs\step-manager.js:52
 msgid "Complete field below to add operations information about your building."
-msgstr ""
+msgstr "กรอกข้อมูลด้านล่างเพื่อเพิ่มข้อมูลการดำเนินงานเกี่ยวกับอาคารของคุณ"
 
 #: .\libs\step-manager.js:56 .\libs\step-manager.js:59
 msgid "Cooling System"
-msgstr ""
+msgstr "ระบบทำความเย็น"
 
 #: .\libs\step-manager.js:60
 msgid ""
 "Enter details of the building's cooling system, including type and capacity."
 msgstr ""
+"ป้อนรายละเอียดระบบทำความเย็นของอาคาร รวมถึงประเภทและความจุ"
 
 #: .\libs\step-manager.js:64 .\libs\step-manager.js:67
 msgid "Ventilation System"
-msgstr ""
+msgstr "ระบบระบายอากาศ"
 
 #: .\libs\step-manager.js:68
 msgid ""
 "Provide details on the building,s ventilation type, capacity, and coverage "
 "to assess airflow and indoor air quality."
 msgstr ""
+"ระบุรายละเอียดเกี่ยวกับประเภทการระบายอากาศ ความจุ และพื้นที่ที่ครอบคลุม "
+"เพื่อประเมินการไหลเวียนของอากาศและคุณภาพอากาศในอาคาร"
 
 #: .\libs\step-manager.js:72 .\libs\step-manager.js:75
 msgid "Lighting System"
-msgstr ""
+msgstr "ระบบแสงสว่าง"
 
 #: .\libs\step-manager.js:76
 msgid ""
 "Provide details on lighting types, power use, and controls to assess "
 "efficiency."
 msgstr ""
+"ระบุรายละเอียดเกี่ยวกับประเภทแสงสว่าง การใช้พลังงาน และการควบคุม "
+"เพื่อประเมินประสิทธิภาพ"
 
 #: .\libs\step-manager.js:80 .\libs\step-manager.js:83
 msgid "Lift & Escalator System"
-msgstr ""
+msgstr "ระบบลิฟต์และบันไดเลื่อน"
 
 #: .\libs\step-manager.js:84
 msgid "Provide details on lift & escalator systems in your building if any."
-msgstr ""
+msgstr "ระบุรายละเอียดเกี่ยวกับระบบลิฟต์และบันไดเลื่อนในอาคารของคุณหากมี"
 
 #: .\libs\step-manager.js:88 .\libs\step-manager.js:91
 msgid "Hot Water System"
-msgstr ""
+msgstr "ระบบน้ำร้อน"
 
 #: .\libs\step-manager.js:92
 msgid ""
 "Defines the building's method of producing and distributing hot water, "
 "including equipment type, energy source, and usage patterns."
 msgstr ""
+"กำหนดวิธีการผลิตและจำหน่ายน้ำร้อนของอาคาร "
+"รวมถึงประเภทอุปกรณ์ แหล่งพลังงาน และรูปแบบการใช้งาน"
 
 #: .\libs\step-manager.js:97
 msgid "Operational Data Entry"
-msgstr ""
+msgstr "การป้อนข้อมูลการดำเนินงาน"
 
 #: .\libs\step-manager.js:102
 msgid "Data Entry"
-msgstr ""
+msgstr "การป้อนข้อมูล"
 
 #: .\libs\step-manager.js:105
 msgid "Operational Energy carrier"
-msgstr ""
+msgstr "แหล่งพลังงานการดำเนินงาน"
 
 #: .\libs\step-manager.js:106
 msgid "Tell us what fuels or energy sources your building runs on."
-msgstr ""
+msgstr "บอกเราว่าอาคารของคุณใช้เชื้อเพลิงหรือแหล่งพลังงานอะไร"
 
 #: .\libs\step-manager.js:111 .\libs\step-manager.js:120
 msgid "Building Structural Components"
-msgstr ""
+msgstr "ส่วนประกอบโครงสร้างอาคาร"
 
 #: .\libs\step-manager.js:116
 msgid "Structural Components"
-msgstr ""
+msgstr "ส่วนประกอบโครงสร้าง"
 
 #: .\libs\step-manager.js:121
 msgid ""
 "Enter information about the building's walls, floors, roofs, and other "
 "structural parts."
 msgstr ""
+"ป้อนข้อมูลเกี่ยวกับผนัง พื้น หลังคา และส่วนประกอบโครงสร้างอื่นๆ "
+"ของอาคาร"
 
 #: .\libs\step-manager.js:397
 #, javascript-format
 msgid "%s%% completed"
-msgstr ""
+msgstr "%s%% เสร็จสมบูรณ์"
 
 #: .\libs\step-manager.js:782
 #, javascript-format
 msgid "%s out of"
-msgstr ""
+msgstr "%s จาก"
 
 #: .\libs\step-manager.js:784
 #, javascript-format
 msgid "%s steps"
-msgstr ""
+msgstr "%s ขั้นตอน"
 
 #: .\libs\step-manager.js:983
 msgid "100% completed"
-msgstr ""
+msgstr "100% เสร็จสมบูรณ์"
