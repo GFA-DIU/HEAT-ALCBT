@@ -636,8 +636,10 @@
       }
       
       // Delete material
-      function deleteMaterial(materialId) {
-        if (!confirm('Remove this material?')) return;
+      async function deleteMaterial(materialId) {
+        
+        const confirmDelete = await confirmDialog.delete('Are you sure you want to remove this material from the template?');
+        if (!confirmDelete) return;
       
         deletedMaterialIds.push(materialId);
         document.querySelector(`[data-material-id="${materialId}"]`)?.remove();
@@ -757,11 +759,13 @@
       }
       
       // Delete template from dialog
-      function deleteTemplateFromDialog() {
+      async function deleteTemplateFromDialog() {
         const templateId = document.getElementById('template-id').value;
         const templateName = document.getElementById('template-name').value;
       
-        if (!confirm(`Delete "${templateName}"? This cannot be undone.`)) return;
+        
+        const confirmDelete = await confirmDialog.delete(`Are you sure you want to remove "${templateName}" from the template?`);
+        if (!confirmDelete) return;
       
         fetch(`/templates/${templateId}/delete/`, {
           method: 'DELETE',
@@ -784,9 +788,11 @@
       }
       
       // Delete from list (existing function)
-      function deleteTemplate(assemblyId, assemblyName) {
-        if (!confirm(`Delete "${assemblyName}"? This cannot be undone.`)) return;
+      async function deleteTemplate(assemblyId, assemblyName) {
       
+        const confirmDelete = await confirmDialog.delete(`Are you sure you want to remove "${assemblyName}" from the template? This action cannot be undone.`);
+        if (!confirmDelete) return;
+
         fetch(`/templates/${assemblyId}/delete/`, {
           method: 'DELETE',
           headers: { 'X-CSRFToken': getCsrfToken() }
@@ -807,9 +813,9 @@
       }
       
       // Duplicate from list (existing function)
-      function duplicateTemplate(assemblyId) {
-        if (!confirm('Create a copy of this template?')) return;
-      
+      async function duplicateTemplate(assemblyId) {
+        const confirmDelete = await confirmDialog.info('Create a copy of this template?');
+        if (!confirmDelete) return;
         // Simple duplication without modifications
         fetch(`/templates/${assemblyId}/duplicate/`, {
           method: 'POST',
