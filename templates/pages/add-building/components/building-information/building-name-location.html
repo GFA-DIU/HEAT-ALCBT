@@ -406,8 +406,6 @@
   // Store validator instance globally for debugging
   window.currentFormValidator = validator;
 
-  console.log('✓ Form validation initialized for building-name-location');
-
   // Handle HTMX responses for country/region/city selects
   // Re-validate dependent fields when selections change
   document.body.addEventListener('htmx:afterSwap', function(event) {

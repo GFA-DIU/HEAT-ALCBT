@@ -1,15 +1,7 @@
 {% load static %} 
 
-{% if not buildings %}
-<div class="text-center">
-  <span
-    class="d-inline-block text-warning card card-body fw-bold"
-    {% if selected_epds %} hidden {% endif %}>
-    Add your first building!
-  </span>
-</div>
-{% endif%}
-  <ul class="grid grid-cols-1 gap-2 mt-3" id="buildings_list">
+
+  <ul class="grid grid-cols-1 gap-2 my-6" id="buildings_list">
     {% for building in buildings %}
     <a  href="/building/{{ building.id }}/"
              class="text-decoration-none text-reset"
