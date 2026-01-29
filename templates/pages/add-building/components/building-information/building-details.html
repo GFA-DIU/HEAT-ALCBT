@@ -80,9 +80,7 @@
   
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Assessment period (years)<span class="text-[var(--state--error--base)]"
-        >*</span
-      >
+      Assessment period (years)<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="input validator w-full">
       <input name="assessment_period" type="number" placeholder="e.g. 10" required min="1" {% if building_data.assessment_period %}value="{{ building_data.assessment_period }}"{% endif %} />
@@ -91,9 +89,9 @@
   </fieldset>
 
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Construction year</legend>
-    <label class="input w-full">
-      <input name="construction_year" type="text" placeholder="e.g. 2020" required min="1900" max="2100" {% if building_data.construction_year %}value="{{ building_data.construction_year }}"{% endif %} />
+    <legend class="fieldset-legend">Construction year<span class="text-[var(--state--error--base)]">*</span></legend>
+    <label class="input w-full validator">
+      <input name="construction_year" type="number" placeholder="e.g. 2020" required min="1900" max="2026" {% if building_data.construction_year %}value="{{ building_data.construction_year }}"{% endif %} />
     </label>
   </fieldset>
 
@@ -152,7 +150,7 @@
     <legend class="fieldset-legend">Energy monitoring & control systems</legend>
     <label class="w-full">
       <select name="energy_monitoring_control_systems" class="select w-full" required>
-        <option disabled selected value="">eg Yes</option>
+        <option disabled selected value="">e.g. Yes</option>
         <option>Yes</option>
         <option>No</option>
       </select>
