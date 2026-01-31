@@ -191,7 +191,7 @@ class TestCreateOrUpdateCoolingSystemView:
         client.force_login(user)
         url = reverse('cooling_system_create_update')
         data = {
-            'building_id': str(building.id),
+            'building_uuid': str(building.uuid),
             'cooling_system_type': 'chiller',
             'chiller_system': 'water-cooled',
             'year_of_installation': 2020,
@@ -219,7 +219,7 @@ class TestCreateOrUpdateCoolingSystemView:
         client.force_login(user)
         url = reverse('cooling_system_create_update')
         data = {
-            'building_id': str(building.id),
+            'building_uuid': str(building.uuid),
             'cooling_system_type': 'air_conditioner',
             'type_of_air_condition': 'vrv',
             'year_of_installation': 2021,
@@ -245,7 +245,7 @@ class TestCreateOrUpdateCoolingSystemView:
         client.force_login(user)
         url = reverse('cooling_system_create_update')
         data = {
-            'building_id': str(chiller_system.building.id),
+            'building_uuid': str(chiller_system.building.uuid),
             'cooling_system_id': chiller_system.id,
             'cooling_system_type': 'chiller',
             'chiller_system': 'air-cooled',
@@ -275,7 +275,7 @@ class TestCreateOrUpdateCoolingSystemView:
         client.force_login(user)
         url = reverse('cooling_system_create_update')
         data = {
-            'building_id': str(building.id),
+            'building_uuid': str(building.uuid),
             'year_of_installation': 2020,
         }
         response = client.post(
@@ -293,7 +293,7 @@ class TestCreateOrUpdateCoolingSystemView:
         client.force_login(user)
         url = reverse('cooling_system_create_update')
         data = {
-            'building_id': str(building.id),
+            'building_uuid': str(building.uuid),
             'cooling_system_type': 'invalid_type',
         }
         response = client.post(
@@ -310,7 +310,7 @@ class TestCreateOrUpdateCoolingSystemView:
         client.force_login(user)
         url = reverse('cooling_system_create_update')
         data = {
-            'building_id': str(other_building.id),
+            'building_uuid': str(other_building.uuid),
             'cooling_system_type': 'chiller',
             'chiller_system': 'water-cooled',
             'year_of_installation': 2020,
@@ -338,7 +338,7 @@ class TestGetCoolingSystemsView:
     def test_get_cooling_systems_success(self, client, user, building, chiller_system, ac_system):
         """Test successfully retrieving both chiller and AC systems."""
         client.force_login(user)
-        url = reverse('cooling_system_list', kwargs={'building_id': building.id})
+        url = reverse('cooling_system_list', kwargs={'building_uuid': str(building.uuid)})
         response = client.get(url)
         assert response.status_code == 200
         response_data = response.json()
@@ -353,7 +353,7 @@ class TestGetCoolingSystemsView:
     def test_get_cooling_systems_empty_list(self, client, user, building):
         """Test retrieving cooling systems when none exist."""
         client.force_login(user)
-        url = reverse('cooling_system_list', kwargs={'building_id': building.id})
+        url = reverse('cooling_system_list', kwargs={'building_uuid': str(building.uuid)})
         response = client.get(url)
         assert response.status_code == 200
         response_data = response.json()
@@ -363,7 +363,7 @@ class TestGetCoolingSystemsView:
     def test_get_cooling_systems_unauthorized_building(self, client, user, other_building):
         """Test that user cannot retrieve cooling systems from another user's building."""
         client.force_login(user)
-        url = reverse('cooling_system_list', kwargs={'building_id': other_building.id})
+        url = reverse('cooling_system_list', kwargs={'building_uuid': str(other_building.uuid)})
         response = client.get(url)
         assert response.status_code == 404
         response_data = response.json()

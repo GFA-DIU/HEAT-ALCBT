@@ -171,11 +171,16 @@ class CoolingSystemAirConditionerForm(forms.ModelForm):
                 'refrigerant_quantity': 'refrigerant_quantity_kg',
                 'total_cooling_load_for_split_vrv': 'total_cooling_load_rt',
                 'baseline_split_unit_system_efficiency': 'baseline_efficiency_kw_per_rt',
+                'baseline_split_unit_vrv_system_efficiency': 'baseline_efficiency_kw_per_rt',
                 'baseline_leakage_factor': 'baseline_leakage_factor_percent',
                 'total_energy_consumption_of_split_vrv_annually': 'total_energy_consumption_kwh_per_year',
+                'total_chiller_system_annually': 'total_energy_consumption_kwh_per_year',
                 'number_of_split_vrv_units': 'number_of_units',
+                'total_number_of_split_vrv_units': 'number_of_units',
                 'total_split_unit_system_power': 'total_system_power_kw',
+                'total_split_unit_vrv_system': 'total_system_power_kw',
                 'iseer': 'iseer_rating',
+                'isser_rating': 'iseer_rating',
                 'number_of_stars': 'energy_efficiency_label',
             }
 
