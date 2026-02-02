@@ -1,7 +1,8 @@
 // @ts-check
 class StepManager {
-   
+
   editMode = false;
+  isPopStateNavigation = false;
 
   constructor() {
     this.currentStep = 1;
@@ -90,6 +91,7 @@ class StepManager {
               "Provide details on lift & escalator systems in your building if any.",
           },
           {
+            id: "hot-water-system",
             formId: "hot-water-system",
             name: "Hot Water System",
             component: "operational-details/hot-water-system.html",
@@ -145,6 +147,7 @@ class StepManager {
   }
 
   init() {
+    this.initUrlNavigation();
     this.renderStepNavigation();
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
@@ -186,6 +189,171 @@ class StepManager {
       this.updateButtonStates();
     });
   }
+
+  // ========== URL Navigation Methods ==========
+
+  /**
+   * Initialize URL-based navigation
+   * Parses URL params and binds popstate handler
+   */
+  initUrlNavigation() {
+    const urlParams = this.parseUrlParams();
+
+    // Restore step from URL if valid
+    if (urlParams.step && urlParams.substep) {
+      const resolved = this.resolveStepFromIds(urlParams.step, urlParams.substep);
+      if (resolved) {
+        // Validate access - can't skip to later steps without building_uuid in create mode
+        if (!this.editMode && !urlParams.building_uuid && resolved.step > 1) {
+          console.warn('Cannot access this step without creating a building first');
+          this.currentStep = 1;
+          this.currentSubStep = 1;
+        } else {
+          this.currentStep = resolved.step;
+          this.currentSubStep = resolved.subStep;
+        }
+      } else {
+        console.warn(`Invalid step params: step=${urlParams.step}, substep=${urlParams.substep}`);
+      }
+    }
+
+    // Bind popstate handler for browser back/forward
+    window.addEventListener('popstate', (event) => this.handlePopState(event));
+
+    // Set initial history state
+    this.updateUrl({ replaceState: true });
+  }
+
+  /**
+   * Parse URL query parameters
+   * @returns {{ step: string|null, substep: string|null, building_uuid: string|null }}
+   */
+  parseUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      step: params.get('step'),
+      substep: params.get('substep'),
+      building_uuid: params.get('building_uuid')
+    };
+  }
+
+  /**
+   * Convert semantic step/substep IDs to numeric values
+   * @param {string} stepId - The step ID (e.g., "building-information")
+   * @param {string} subStepId - The substep ID (e.g., "building-name-location")
+   * @returns {{ step: number, subStep: number }|null}
+   */
+  resolveStepFromIds(stepId, subStepId) {
+    for (const [stepNum, config] of Object.entries(this.stepConfig)) {
+      if (config.id === stepId) {
+        const subStepIndex = config.subSteps.findIndex(s => s.id === subStepId);
+        if (subStepIndex !== -1) {
+          return {
+            step: parseInt(stepNum),
+            subStep: subStepIndex + 1
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Convert numeric step/substep to semantic IDs
+   * @param {number} step - The step number (1-4)
+   * @param {number} subStep - The substep number (1-N)
+   * @returns {{ stepId: string, subStepId: string }|null}
+   */
+  resolveIdsFromStep(step, subStep) {
+    // @ts-ignore - stepConfig uses numeric keys
+    const config = this.stepConfig[step];
+    if (!config) return null;
+
+    const subStepConfig = config.subSteps[subStep - 1];
+    if (!subStepConfig) return null;
+
+    return {
+      stepId: config.id,
+      subStepId: subStepConfig.id
+    };
+  }
+
+  /**
+   * Update browser URL with current step state
+   * @param {{ pushState?: boolean, replaceState?: boolean }} options
+   */
+  updateUrl(options = {}) {
+    const { pushState = false, replaceState = false } = options;
+
+    const ids = this.resolveIdsFromStep(this.currentStep, this.currentSubStep);
+    if (!ids) return;
+
+    const url = new URL(window.location.href);
+
+    // Set step params
+    url.searchParams.set('step', ids.stepId);
+    url.searchParams.set('substep', ids.subStepId);
+
+    // Preserve building_uuid if it exists
+    const buildingUuid = this.getBuildingId() ||
+      this.formData['building-information/building-name-location']?.building_uuid;
+    if (buildingUuid) {
+      url.searchParams.set('building_uuid', buildingUuid);
+    }
+
+    // Store state for popstate handling
+    const state = {
+      step: this.currentStep,
+      subStep: this.currentSubStep,
+      building_uuid: buildingUuid || null
+    };
+
+    if (pushState) {
+      window.history.pushState(state, '', url);
+    } else if (replaceState) {
+      window.history.replaceState(state, '', url);
+    }
+  }
+
+  /**
+   * Handle browser back/forward button navigation
+   * @param {PopStateEvent} event
+   */
+  handlePopState(event) {
+    this.isPopStateNavigation = true;
+
+    if (event.state && typeof event.state.step === 'number' && typeof event.state.subStep === 'number') {
+      // Use state from history entry
+      this.currentStep = event.state.step;
+      this.currentSubStep = event.state.subStep;
+    } else {
+      // Parse from URL (for manual URL changes or missing state)
+      const urlParams = this.parseUrlParams();
+      if (urlParams.step && urlParams.substep) {
+        const resolved = this.resolveStepFromIds(urlParams.step, urlParams.substep);
+        if (resolved) {
+          this.currentStep = resolved.step;
+          this.currentSubStep = resolved.subStep;
+        } else {
+          this.currentStep = 1;
+          this.currentSubStep = 1;
+        }
+      } else {
+        this.currentStep = 1;
+        this.currentSubStep = 1;
+      }
+    }
+
+    // Update UI without pushing new history
+    this.renderStepNavigation();
+    this.updateCurrentStepInfo();
+    this.loadCurrentStep();
+    this.updateProgress();
+
+    this.isPopStateNavigation = false;
+  }
+
+  // ========== End URL Navigation Methods ==========
 
   handleFormStatusChange(statusData) {
     // statusData should contain: { isValid: boolean, stepKey?: string, data?: object }
@@ -311,11 +479,9 @@ class StepManager {
         ? `/building/step?step=${subStep.component}&building_uuid=${buildingUuid}`
         : `/building/step?step=${subStep.component}`;
 
-      // Update browser URL to include UUID if available
-      if (buildingUuid && !window.location.search.includes('building_uuid')) {
-        const newUrl = new URL(window.location);
-        newUrl.searchParams.set('building_uuid', buildingUuid);
-        window.history.pushState({}, '', newUrl);
+      // Update browser URL with current step and building_uuid (uses replaceState to avoid extra history entries)
+      if (buildingUuid) {
+        this.updateUrl({ replaceState: true });
       }
 
       const response = await fetch(url);
@@ -412,7 +578,6 @@ class StepManager {
   }
 
   updateButtonStates() {
-    console.log("Updating button states...");
     const step = this.stepConfig[this.currentStep];
     const subStep = step.subSteps[this.currentSubStep - 1];
     const saveBtn = document.getElementById("save-and-continue");
@@ -549,8 +714,6 @@ class StepManager {
       console.warn("No data to save for this step.");
       return null;
     }
-
-    console.log("Saving step data:", stepData);
     this.formData[stepKey] = stepData;
 
     // Save to server via Django
@@ -818,6 +981,7 @@ class StepManager {
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
     this.updateProgress();
+    this.updateUrl({ pushState: true });
   }
 
   goToSubStep(step, subStep) {
@@ -827,6 +991,7 @@ class StepManager {
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
     this.updateProgress();
+    this.updateUrl({ pushState: true });
   }
 
   async saveAndContinue(skipSave = false) {
@@ -861,12 +1026,16 @@ class StepManager {
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
     this.updateProgress();
+    this.updateUrl({ pushState: true });
   }
 
   async goBack() {
-    const response = await confirmDialog.warning("Are you sure you want to go back? Unsaved changes will be lost.");
-    if (!response) {
-      return;
+    // Skip confirmation dialog if triggered by browser back/forward
+    if (!this.isPopStateNavigation) {
+      const response = await confirmDialog.warning("Are you sure you want to go back? Unsaved changes will be lost.");
+      if (!response) {
+        return;
+      }
     }
 
     if (this.currentSubStep > 1) {
@@ -885,6 +1054,11 @@ class StepManager {
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
     this.updateProgress();
+
+    // Only update URL if not from popstate (popstate already has correct URL)
+    if (!this.isPopStateNavigation) {
+      this.updateUrl({ pushState: true });
+    }
   }
 
   async skip() {
@@ -1026,8 +1200,18 @@ class StepManager {
     this.currentStep = 1;
     this.currentSubStep = 1;
 
-    // Reinitialize
-    this.init();
+    // Clear URL params and reset to base URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('step');
+    url.searchParams.delete('substep');
+    url.searchParams.delete('building_uuid');
+    window.history.replaceState({}, '', url);
+
+    // Reinitialize (skip URL parsing since we just reset)
+    this.renderStepNavigation();
+    this.updateCurrentStepInfo();
+    this.loadCurrentStep();
+    this.updateProgress();
 
     // Show navigation buttons again
     const goBackBtn = document.getElementById("go-back");
@@ -1055,9 +1239,6 @@ class StepManager {
   getCurrentStepInfo() {
     const step = this.stepConfig[this.currentStep];
     const subStep = step.subSteps[this.currentSubStep - 1];
-
-    console.log(subStep.title);
-    console.log(subStep.description);
 
     return {
       step: this.currentStep,
