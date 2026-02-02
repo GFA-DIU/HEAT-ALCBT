@@ -153,7 +153,7 @@
         min="-180"
         max="180"
         placeholder="e.g. -7.946232"
-        {% if building_data.longitude %}value="{{ building_data.longitude }}"{% endif %}
+        {% if building_data.longitude is not None %}value="{{ building_data.longitude }}"{% endif %}
       />
     </label>
     <p class="validator-hint">Must be between -180 and 180</p>
@@ -172,7 +172,7 @@
         min="-90"
         max="90"
         placeholder="e.g. 5.603722"
-        {% if building_data.latitude %}value="{{ building_data.latitude }}"{% endif %}
+        {% if building_data.latitude is not None %}value="{{ building_data.latitude }}"{% endif %}
       />
     </label>
     <p class="validator-hint">Must be between -90 and 90</p>
