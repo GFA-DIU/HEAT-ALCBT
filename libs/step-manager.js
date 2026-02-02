@@ -578,7 +578,6 @@ class StepManager {
   }
 
   updateButtonStates() {
-    console.log("Updating button states...");
     const step = this.stepConfig[this.currentStep];
     const subStep = step.subSteps[this.currentSubStep - 1];
     const saveBtn = document.getElementById("save-and-continue");
@@ -715,8 +714,6 @@ class StepManager {
       console.warn("No data to save for this step.");
       return null;
     }
-
-    console.log("Saving step data:", stepData);
     this.formData[stepKey] = stepData;
 
     // Save to server via Django
@@ -1242,9 +1239,6 @@ class StepManager {
   getCurrentStepInfo() {
     const step = this.stepConfig[this.currentStep];
     const subStep = step.subSteps[this.currentSubStep - 1];
-
-    console.log(subStep.title);
-    console.log(subStep.description);
 
     return {
       step: this.currentStep,

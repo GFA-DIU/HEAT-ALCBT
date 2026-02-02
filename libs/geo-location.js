@@ -166,7 +166,6 @@ function getOptionNameAndValue(option) {
 function selectCurrentLocation() {
   if (window.geoLocationPicker) {
     const location = window.geoLocationPicker.getSelectedLocation();
-    console.log("Selected Location:", location);
     // Fill the form fields
     const addressInput = document.querySelector(
       'input[placeholder*="1885 L Street"]'
@@ -185,7 +184,6 @@ function selectCurrentLocation() {
     }
     if(location.country){
       const countrySelect = document.querySelector('select#country-select');
-      console.log('countrySelect', countrySelect);
       /// get all countries datalist options
       let countryOptions = countrySelect.querySelectorAll('option');
       
