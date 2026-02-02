@@ -69,7 +69,7 @@
       >
         <option value="" disabled {% if not selected_country %}selected{% endif %}>Select a country</option>
         {% for country in countries %}
-          <option value="{{ country.id }}" {% if country.id == selected_country %}selected{% endif %}>
+          <option data-name="{{ country.name }}" value="{{ country.id }}" {% if country.id == selected_country %}selected{% endif %}>
             <span data-country="{{ country.name }}" data-width="20"></span>
             <span data-country="{{ country.name }}" data-flag="false"></span>
           </option>
@@ -105,7 +105,7 @@
       >
         <option value="">Select a region or state</option>
         {% for region in regions %}
-          <option value="{{ region.id }}" {% if region.id == selected_region %}selected{% endif %}>{{ region.name }}</option>
+          <option data-name="{{ region.name }}" value="{{ region.id }}" {% if region.id == selected_region %}selected{% endif %}>{{ region.name }}</option>
         {% endfor %}
       </select>
     </label>

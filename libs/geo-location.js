@@ -4,6 +4,9 @@ class GeoLocationPicker {
     this.marker = null;
     this.currentLocation = { lat: 5.603717, lng: -0.186964 }; // Default: Accra, Ghana
     this.selectedAddress = "";
+    this.country = "";
+    this.city = "";
+    this.state = "";
   }
 
   init() {
@@ -76,9 +79,12 @@ class GeoLocationPicker {
       const results = await response.json();
 
       if (results.length > 0) {
-        const { lat, lon, display_name } = results[0];
+        const { lat, lon, display_name, address } = results[0];
         this.map.setView([parseFloat(lat), parseFloat(lon)], 15);
         this.selectedAddress = display_name;
+        this.city = address.city
+        this.state = address.state || "";
+        this.country = address.country || "";
       }
     } catch (error) {
       console.error("Search failed:", error);
@@ -92,6 +98,9 @@ class GeoLocationPicker {
       );
       const data = await response.json();
       this.selectedAddress = data.display_name || "";
+      this.city = data.address.city
+      this.state = data.address.state || "";
+      this.country = data.address.country || "";
     } catch (error) {
       console.error("Reverse geocoding failed:", error);
     }
@@ -106,7 +115,7 @@ class GeoLocationPicker {
           this.currentLocation = { lat: latitude, lng: longitude };
         },
         (error) => {
-          console.log("Could not get user location:", error);
+          console.error("Could not get user location:", error);
         }
       );
     }
@@ -117,6 +126,9 @@ class GeoLocationPicker {
       latitude: this.currentLocation.lat,
       longitude: this.currentLocation.lng,
       address: this.selectedAddress,
+      country: this.country,
+      city: this.city,
+      state: this.state
     };
   }
 }
@@ -142,10 +154,19 @@ function closeGeoLocationModal() {
   }
 }
 
+
+function getOptionNameAndValue(option) {
+
+  return {
+    name: option.getAttribute('data-name'),
+    value: option.getAttribute('value')
+  };
+}
+
 function selectCurrentLocation() {
   if (window.geoLocationPicker) {
     const location = window.geoLocationPicker.getSelectedLocation();
-
+    console.log("Selected Location:", location);
     // Fill the form fields
     const addressInput = document.querySelector(
       'input[placeholder*="1885 L Street"]'
@@ -162,9 +183,26 @@ function selectCurrentLocation() {
     if (lngInput) {
       lngInput.value = location.longitude.toFixed(6);
     }
+    if(location.country){
+      const countrySelect = document.querySelector('select#country-select');
+      console.log('countrySelect', countrySelect);
+      /// get all countries datalist options
+      let countryOptions = countrySelect.querySelectorAll('option');
+      
+      if (countrySelect) {
+        const opts = Array.from(countryOptions).map(getOptionNameAndValue);
+        const matchedCountry = opts.find(
+          (opt) => opt.name?.toLowerCase() === location.country.toLowerCase()
+        );
+        countrySelect.value = matchedCountry ? matchedCountry.value : "";
+        htmx.trigger(countrySelect, 'change');
+      }
+    }
 
     closeGeoLocationModal();
   }
+
+
 }
 
 // Attach to window for global access (needed for onclick handlers)
