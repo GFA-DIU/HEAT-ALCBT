@@ -88,6 +88,14 @@ def create_or_update_cooling_system(request):
 
         # Check if this is an update or create
         cooling_system_id = data.get('cooling_system_id')
+        if cooling_system_id is not None:
+            try:
+                cooling_system_id = int(cooling_system_id)
+            except (ValueError, TypeError):
+                return JsonResponse({
+                    'success': False,
+                    'errors': {'cooling_system_id': ['Invalid cooling system ID.']}
+                }, status=400)
         is_update = bool(cooling_system_id)
 
         if cooling_system_type == 'chiller':

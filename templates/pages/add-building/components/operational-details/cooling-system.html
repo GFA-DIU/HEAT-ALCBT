@@ -268,6 +268,7 @@
           <input
             type="radio"
             name="installation_of_variable_speed_drives"
+            value="yes"
             class="radio radio-xs"
           />
           Yes
@@ -276,6 +277,7 @@
           <input
             type="radio"
             name="installation_of_variable_speed_drives"
+            value="no"
             class="radio radio-xs"
           />
           No
@@ -298,6 +300,7 @@
           <input
             type="radio"
             name="installation_of_heat_recovery_systems"
+            value="yes"
             class="radio radio-xs"
           />
           Yes
@@ -306,6 +309,7 @@
           <input
             type="radio"
             name="installation_of_heat_recovery_systems"
+            value="no"
             class="radio radio-xs"
           />
           No
@@ -503,7 +507,7 @@
       <select class="select w-full" name="type_of_air_condition" required>
         <option disabled selected value="">Select an option</option>
         <option value="split">Split air condition</option>
-        <option value="VRV">
+        <option value="vrv">
           Variable Refrigerant Volume (VRV) / Variable Refrigerant Flow (VRF)
         </option>
       </select>
@@ -1034,9 +1038,23 @@
               if (form.querySelector('[name="year_of_installation"]')) {
                 form.querySelector('[name="year_of_installation"]').value = system.year_of_installation;
               }
-              if (form.querySelector('[name="type_of_refrigerants"]')) {
-                form.querySelector('[name="type_of_refrigerants"]').value = system.refrigerant_type;
+
+              // Set refrigerant type after HTMX loads options
+              const refrigerantSelect = form.querySelector('[name="type_of_refrigerants"]');
+              if (refrigerantSelect && system.refrigerant_type) {
+
+                const setRefrigerantValue = () => {
+                  refrigerantSelect.value = system.refrigerant_type;
+                  // If value wasn't set (options not loaded yet), try again
+                  if (!refrigerantSelect.value && system.refrigerant_type) {
+                    setTimeout(setRefrigerantValue, 100);
+                  }
+                };
+
+                refrigerantSelect.addEventListener('htmx:afterSwap', setRefrigerantValue, { once: true });
+                setRefrigerantValue();
               }
+
               if (form.querySelector('[name="refrigerant_quantity"]')) {
                 form.querySelector('[name="refrigerant_quantity"]').value = system.refrigerant_quantity_kg;
               }
@@ -1103,9 +1121,23 @@
               if (form.querySelector('[name="year_of_installation"]')) {
                 form.querySelector('[name="year_of_installation"]').value = system.year_of_installation;
               }
-              if (form.querySelector('[name="type_of_refrigerants"]')) {
-                form.querySelector('[name="type_of_refrigerants"]').value = system.refrigerant_type;
+
+              // Set refrigerant type after HTMX loads options
+              const refrigerantSelect = form.querySelector('[name="type_of_refrigerants"]');
+              if (refrigerantSelect && system.refrigerant_type) {
+                const setRefrigerantValue = () => {
+                  refrigerantSelect.value = system.refrigerant_type;
+                  // If value wasn't set (options not loaded yet), try again
+                  if (!refrigerantSelect.value && system.refrigerant_type) {
+                    setTimeout(setRefrigerantValue, 100);
+                  }
+                };
+
+                refrigerantSelect.addEventListener('htmx:afterSwap', setRefrigerantValue, { once: true });
+
+                setRefrigerantValue();
               }
+
               if (form.querySelector('[name="refrigerant_quantity"]')) {
                 form.querySelector('[name="refrigerant_quantity"]').value = system.refrigerant_quantity_kg;
               }
