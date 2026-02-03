@@ -386,6 +386,10 @@ def save_building_step(request):
                         building.region_id = step_data['region']
                     if 'city' in step_data and step_data['city']:
                         building.city_id = step_data['city']
+                    if 'longitude' in step_data:
+                        building.longitude = step_data['longitude'] if step_data['longitude'] else None
+                    if 'latitude' in step_data:
+                        building.latitude = step_data['latitude'] if step_data['latitude'] else None
 
                     building.save()
                     building_uuid = str(building.uuid)
@@ -403,6 +407,8 @@ def save_building_step(request):
                     country_id=step_data.get('country') if step_data.get('country') else None,
                     region_id=step_data.get('region') if step_data.get('region') else None,
                     city_id=step_data.get('city') if step_data.get('city') else None,
+                    longitude=step_data.get('longitude') if step_data.get('longitude') else None,
+                    latitude=step_data.get('latitude') if step_data.get('latitude') else None,
                     created_by=request.user,
                     # Add minimal defaults for required fields
                     climate_zone='tropical-wet',  # Default, will be updated in step 1.2
@@ -493,6 +499,8 @@ def get_building_data(request):
             'country': building.country_id,
             'region': building.region_id,
             'city': building.city_id,
+            'longitude': building.longitude,
+            'latitude': building.latitude,
 
             # Step 1.2 fields (use form field names)
             'building_type': building_type_id,
