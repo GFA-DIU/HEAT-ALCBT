@@ -1,3 +1,4 @@
+
 // @ts-check
 class StepManager {
 
@@ -493,6 +494,10 @@ class StepManager {
       const html = await response.text();
       contentArea.innerHTML = html;
 
+      // Initialize icons for dynamically loaded content before scripts run
+      // @ts-ignore - IconComponent is set globally by icons.js module
+      if (window.IconComponent) { window.IconComponent.initialize(contentArea); }
+
       // Reset validation status for the new step (let the component re-validate)
       const currentStepKey = `step-${this.currentStep}-${this.currentSubStep}`;
       delete this.formValidationStatus[currentStepKey];
@@ -502,7 +507,7 @@ class StepManager {
 
       // Update button states
       this.updateButtonStates();
- 
+
       // Process HTMX for dynamically loaded content
       if (typeof htmx !== 'undefined') {
         htmx.process(contentArea);
@@ -518,8 +523,8 @@ class StepManager {
           newScript.textContent = script.textContent;
         }
         document.body.appendChild(newScript);
-        // Remove the new script after execution to avoid duplicates
-        setTimeout(() => newScript.remove(), 100);
+        // Clean up script element after execution
+        newScript.remove();
       });
     } catch (error) {
       console.error("Failed to load step component:", error);
@@ -1088,13 +1093,14 @@ class StepManager {
     try {
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
       
-      const response = await fetch('/building/complete', {
+      const response = await fetch(`/building/complete?building_uuid=${this.getBuildingId()}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken || '',
         },
         body: JSON.stringify({
+          building_uuid: this.getBuildingId(),
           all_data: this.formData
         })
       });
@@ -1103,55 +1109,21 @@ class StepManager {
 
       if (response.ok && result.success) {
         // Show completion message
-        if (contentArea) {
-          contentArea.innerHTML = `
-            <div class="flex flex-col items-center justify-center h-64 text-center">
-              <div class="alert alert-success max-w-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div>
-                  <h3 class="font-bold">Building Setup Completed!</h3>
-                  <div class="text-xs">${result.message || 'All information has been saved successfully.'}</div>
-                </div>
-              </div>
-              <div class="mt-6 space-x-2">
-                <button class="btn btn-primary" onclick="window.location.href='${result.redirect_url || '/dashboard/'}'">
-                  Go to Dashboard
-                </button>
-                <button class="btn btn-outline" onclick="stepManager.resetForm()">
-                  Add Another Building
-                </button>
-              </div>
-            </div>
-          `;
-        }
+          Toast.success("Building setup completed successfully!");
+          
+          setTimeout(() => {
+            window.location.href = `/building/${result.building_uuid}/dashboard`;
+          }, 1000);
 
         // Clear localStorage
         localStorage.removeItem("building-form-data");
       } else {
+        Toast.error(`Failed to complete setup: ${result.error || 'Unknown error'}`);
         throw new Error(result.error || 'Failed to complete building setup');
       }
     } catch (error) {
       console.error('Error completing setup:', error);
-      if (contentArea) {
-        contentArea.innerHTML = `
-          <div class="flex flex-col items-center justify-center h-64 text-center">
-            <div class="alert alert-error max-w-md">
-              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h3 class="font-bold">Error Completing Setup</h3>
-                <div class="text-xs">${error.message}</div>
-              </div>
-            </div>
-            <button onclick="stepManager.completeSetup()" class="btn btn-primary mt-4">
-              Retry
-            </button>
-          </div>
-        `;
-      }
+      Toast.error(`Error completing setup: ${error.message || 'Unknown error'}`);
       return;
     }
 

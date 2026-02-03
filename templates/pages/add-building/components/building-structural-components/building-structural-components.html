@@ -252,7 +252,7 @@
                     class="transition-transform duration-300 peer-checked:rotate-180"></span>
             </div>
             <div class="collapse-content mt-0 px-0">
-              <div class="grid grid-cols-3 gap-2">
+              <div class="grid grid-cols-2 gap-2">
                 <select name="category" id="epd_category_filter" class="select h-9 text-sm/5"
                         hx-get="{% url 'building_step_structural' %}?action=get_subcategories"
                         hx-target="#epd_subcategory_filter"
@@ -264,9 +264,9 @@
                     <option value="{{ cat.id }}">{{ cat.name_en }}</option>
                   {% endfor %}
                 </select>
-                <select name="subcategory" id="epd_subcategory_filter" class="select h-9 text-sm/5">
+                {% comment %} <select name="subcategory" id="epd_subcategory_filter" class="select h-9 text-sm/5">
                   <option value="">All Sub-categories</option>
-                </select>
+                </select> {% endcomment %}
                 <select name="type" class="select h-9 text-sm/5">
                   <option value="">All Types</option>
                   {% for t in epd_types %}
@@ -321,19 +321,30 @@
 </dialog>
 
 <script>
-class StructuralComponentManager {
+(function() {
+  // Use window assignment to avoid const/class re-declaration errors on dynamic reload
+  window.StructuralComponentManager = class StructuralComponentManager {
   constructor() {
     this.boqItems = [];
     this.componentItems = [];
     this.currentMode = null;
     this.editingIndex = null;
     this.pendingDelete = null;
+    this._htmxHandler = null;
   }
 
   init() {
+    this.cleanup();
     this.bindEvents();
     this.loadCategories();
     this.updateUI();
+  }
+
+  cleanup() {
+    // Remove previous htmx:afterSwap listener to prevent duplicates on re-load
+    if (window._structuralHtmxHandler) {
+      document.body.removeEventListener('htmx:afterSwap', window._structuralHtmxHandler);
+    }
   }
 
   bindEvents() {
@@ -343,36 +354,38 @@ class StructuralComponentManager {
     document.getElementById('btn-add-component-2')?.addEventListener('click', () => this.openComponentModal());
 
     document.getElementById('component_dimension')?.addEventListener('change', (e) => {
-      const units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm' };
+      var units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm' };
       document.getElementById('component_unit_display').textContent = units[e.target.value] || 'm²';
       document.getElementById('epd_filter_dimension').value = e.target.value;
     });
 
     document.getElementById('saved-items-list')?.addEventListener('click', (e) => {
-      const editBtn = e.target.closest('.edit-item-btn');
-      const deleteBtn = e.target.closest('.delete-item-btn');
+      var editBtn = e.target.closest('.edit-item-btn');
+      var deleteBtn = e.target.closest('.delete-item-btn');
 
       if (editBtn) {
-        const type = editBtn.dataset.itemType;
-        const index = parseInt(editBtn.dataset.itemIndex);
+        var type = editBtn.dataset.itemType;
+        var index = parseInt(editBtn.dataset.itemIndex);
         this.editItem(type, index);
       }
 
       if (deleteBtn) {
-        const type = deleteBtn.dataset.itemType;
-        const index = parseInt(deleteBtn.dataset.itemIndex);
+        var type = deleteBtn.dataset.itemType;
+        var index = parseInt(deleteBtn.dataset.itemIndex);
         this.confirmDelete(type, index);
       }
     });
 
     document.getElementById('confirm-delete-btn')?.addEventListener('click', () => this.executeDelete());
 
-    document.body.addEventListener('htmx:afterSwap', (e) => {
+    // Store handler reference for cleanup on re-load
+    window._structuralHtmxHandler = (e) => {
       if (e.detail.target.id === 'structural_materials_list' || e.detail.target.id === 'component_materials_list') {
         this.updateMaterialsUI();
         this.bindMaterialEvents();
       }
-    });
+    };
+    document.body.addEventListener('htmx:afterSwap', window._structuralHtmxHandler);
   }
 
   bindMaterialEvents() {
@@ -833,13 +846,15 @@ class StructuralComponentManager {
     this.updateUI();
     this.emitFormStatus();
   }
-}
 
-const structuralManager = new StructuralComponentManager();
+  }; // end class
 
-// Initialize immediately since this template is loaded dynamically
-structuralManager.init();
+  window.structuralManager = new window.StructuralComponentManager();
 
-window.getStructuralFormData = () => structuralManager.getFormData();
-window.restoreStructuralData = (data) => structuralManager.restore(data);
+  // Initialize immediately since this template is loaded dynamically
+  window.structuralManager.init();
+
+  window.getStructuralFormData = () => window.structuralManager.getFormData();
+  window.restoreStructuralData = (data) => window.structuralManager.restore(data);
+})();
 </script>
