@@ -110,7 +110,8 @@
               hx-vals='{"action": "filter"}'
               hx-target="#operational-epd-list"
               hx-swap="innerHTML"
-              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]">
+              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
+              hx-indicator="#energy-loading-spinner">
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
               <span
@@ -123,6 +124,10 @@
                 name="search_query"
                 placeholder="Search energy carriers..." 
               />
+              <!-- Loading spinner -->
+              <div id="energy-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+              </div>
             </label>
             <select name="country" class="select min-w-[120px]">
               <option value="">All Countries</option>
@@ -135,9 +140,7 @@
           <!-- Advanced Search Collapse -->
           <div class="collapse rounded-none">
             <input type="checkbox" class="peer" id="advanced-search-toggle" />
-            <div
-              class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)] cursor-pointer"
-            >
+            <div class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)] cursor-pointer">
               <span class="flex items-center gap-2">
                 <span
                   data-icon="menu-search-line"
