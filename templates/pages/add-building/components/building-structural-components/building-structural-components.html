@@ -320,6 +320,12 @@
   </div>
 </dialog>
 
+<!-- Saved data from backend -->
+{% if boq_items or component_items %}
+{{ boq_items|json_script:"boq-items-data" }}
+{{ component_items|json_script:"component-items-data" }}
+{% endif %}
+
 <script>
 class StructuralComponentManager {
   constructor() {
@@ -615,7 +621,7 @@ class StructuralComponentManager {
     this.updateMaterialsUI();
   }
 
-  saveBoq() {
+  async saveBoq() {
     const name = document.getElementById('boq_name').value.trim();
     if (!name) {
       Toast.error('Please enter a BOQ name');
@@ -638,26 +644,78 @@ class StructuralComponentManager {
 
     const totalGwp = materials.reduce((sum, m) => sum + (m.gwp * m.quantity), 0);
 
-    const item = {
+    const assemblyData = {
       name: name,
       comment: document.getElementById('boq_comment').value,
-      materials: materials,
-      total_gwp: totalGwp
+      materials: materials
     };
 
-    if (this.editingIndex !== null) {
-      this.boqItems[this.editingIndex] = item;
-    } else {
-      this.boqItems.push(item);
+    // Get building UUID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const buildingUuid = urlParams.get('building_uuid');
+
+    if (!buildingUuid) {
+      Toast.error('Building UUID not found');
+      return;
     }
 
-    this.closeBoqModal();
-    this.updateUI();
-    this.emitFormStatus();
-    Toast.success('BOQ saved successfully');
+    // Prepare data for backend
+    const postData = {
+      building_uuid: buildingUuid,
+      mode: 'boq',
+      assembly_data: assemblyData
+    };
+
+    // If editing, include assembly_id
+    if (this.editingIndex !== null && this.boqItems[this.editingIndex]?.id) {
+      postData.assembly_id = this.boqItems[this.editingIndex].id;
+    }
+
+    try {
+      const response = await fetch("{% url 'building_step_structural' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': this.getCSRFToken()
+        },
+        body: JSON.stringify({
+          action: 'save_assembly',
+          ...postData
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local data with server response
+        const item = {
+          id: result.assembly.id,
+          name: name,
+          comment: assemblyData.comment,
+          materials: materials,
+          total_gwp: totalGwp
+        };
+
+        if (this.editingIndex !== null) {
+          this.boqItems[this.editingIndex] = item;
+        } else {
+          this.boqItems.push(item);
+        }
+
+        this.closeBoqModal();
+        this.updateUI();
+        this.emitFormStatus();
+        Toast.success('BOQ saved successfully');
+      } else {
+        Toast.error(result.error || 'Failed to save BOQ');
+      }
+    } catch (error) {
+      console.error('Error saving BOQ:', error);
+      Toast.error('Failed to save BOQ');
+    }
   }
 
-  saveComponent() {
+  async saveComponent() {
     const title = document.getElementById('component_title').value.trim();
     if (!title) {
       Toast.error('Please enter a component title');
@@ -680,29 +738,89 @@ class StructuralComponentManager {
 
     const totalGwp = materials.reduce((sum, m) => sum + (m.gwp * m.quantity), 0);
     const categorySelect = document.getElementById('component_category');
+    const category = document.getElementById('component_category').value;
+    const technique = document.getElementById('component_technique').value;
+    const dimension = document.getElementById('component_dimension').value;
+    const quantity = document.getElementById('component_quantity').value;
 
-    const item = {
+    const assemblyData = {
       title: title,
-      category: document.getElementById('component_category').value,
-      category_name: categorySelect.options[categorySelect.selectedIndex]?.text || '',
-      technique: document.getElementById('component_technique').value,
-      dimension: document.getElementById('component_dimension').value,
-      quantity: document.getElementById('component_quantity').value,
+      category: category,
+      technique: technique || null,
+      dimension: dimension,
+      quantity: parseFloat(quantity) || 1,
       comment: document.getElementById('component_comment').value,
-      materials: materials,
-      total_gwp: totalGwp
+      materials: materials
     };
 
-    if (this.editingIndex !== null) {
-      this.componentItems[this.editingIndex] = item;
-    } else {
-      this.componentItems.push(item);
+    // Get building UUID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const buildingUuid = urlParams.get('building_uuid');
+
+    if (!buildingUuid) {
+      Toast.error('Building UUID not found');
+      return;
     }
 
-    this.closeComponentModal();
-    this.updateUI();
-    this.emitFormStatus();
-    Toast.success('Component saved successfully');
+    // Prepare data for backend
+    const postData = {
+      building_uuid: buildingUuid,
+      mode: 'component',
+      assembly_data: assemblyData
+    };
+
+    // If editing, include assembly_id
+    if (this.editingIndex !== null && this.componentItems[this.editingIndex]?.id) {
+      postData.assembly_id = this.componentItems[this.editingIndex].id;
+    }
+
+    try {
+      const response = await fetch("{% url 'building_step_structural' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': this.getCSRFToken()
+        },
+        body: JSON.stringify({
+          action: 'save_assembly',
+          ...postData
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Update local data with server response
+        const item = {
+          id: result.assembly.id,
+          title: title,
+          category: category,
+          category_name: categorySelect.options[categorySelect.selectedIndex]?.text || '',
+          technique: technique,
+          dimension: dimension,
+          quantity: quantity,
+          comment: assemblyData.comment,
+          materials: materials,
+          total_gwp: totalGwp
+        };
+
+        if (this.editingIndex !== null) {
+          this.componentItems[this.editingIndex] = item;
+        } else {
+          this.componentItems.push(item);
+        }
+
+        this.closeComponentModal();
+        this.updateUI();
+        this.emitFormStatus();
+        Toast.success('Component saved successfully');
+      } else {
+        Toast.error(result.error || 'Failed to save component');
+      }
+    } catch (error) {
+      console.error('Error saving component:', error);
+      Toast.error('Failed to save component');
+    }
   }
 
   editItem(type, index) {
@@ -718,21 +836,63 @@ class StructuralComponentManager {
     structural_delete_modal.showModal();
   }
 
-  executeDelete() {
+  async executeDelete() {
     if (!this.pendingDelete) return;
 
     const { type, index } = this.pendingDelete;
-    if (type === 'boq') {
-      this.boqItems.splice(index, 1);
-    } else {
-      this.componentItems.splice(index, 1);
+    const items = type === 'boq' ? this.boqItems : this.componentItems;
+    const item = items[index];
+
+    // If item has an ID, delete from backend
+    if (item?.id) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const buildingUuid = urlParams.get('building_uuid');
+
+      if (!buildingUuid) {
+        Toast.error('Building UUID not found');
+        return;
+      }
+
+      try {
+        const response = await fetch("{% url 'building_step_structural' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': this.getCSRFToken()
+          },
+          body: JSON.stringify({
+            action: 'delete_assembly',
+            building_uuid: buildingUuid,
+            assembly_id: item.id
+          })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          Toast.error(result.error || 'Failed to delete item');
+          return;
+        }
+      } catch (error) {
+        console.error('Error deleting item:', error);
+        Toast.error('Failed to delete item');
+        return;
+      }
     }
+
+    // Remove from local array
+    items.splice(index, 1);
 
     this.pendingDelete = null;
     structural_delete_modal.close();
     this.updateUI();
     this.emitFormStatus();
     Toast.info('Item removed');
+  }
+
+  getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+           document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
   }
 
   updateUI() {
@@ -839,6 +999,26 @@ const structuralManager = new StructuralComponentManager();
 
 // Initialize immediately since this template is loaded dynamically
 structuralManager.init();
+
+// Load saved data from backend if available
+{% if boq_items or component_items %}
+try {
+  const boqItemsEl = document.getElementById('boq-items-data');
+  const componentItemsEl = document.getElementById('component-items-data');
+
+  const boqItems = boqItemsEl ? JSON.parse(boqItemsEl.textContent) : [];
+  const componentItems = componentItemsEl ? JSON.parse(componentItemsEl.textContent) : [];
+
+  if (boqItems.length > 0 || componentItems.length > 0) {
+    structuralManager.restore({
+      boq_items: boqItems,
+      component_items: componentItems
+    });
+  }
+} catch (error) {
+  console.error('Error loading saved structural data:', error);
+}
+{% endif %}
 
 window.getStructuralFormData = () => structuralManager.getFormData();
 window.restoreStructuralData = (data) => structuralManager.restore(data);

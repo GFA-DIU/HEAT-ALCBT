@@ -1,6 +1,6 @@
 <form id="operational-products-form"
       hx-post="{% url 'building_step_operational' %}"
-      hx-vals='{"action": "save_op_products"}'
+      hx-vals='js:{"action": "save_op_products", "building_uuid": new URLSearchParams(window.location.search).get("building_uuid")}'
       hx-target="#operational-products-form"
       hx-swap="outerHTML">
   <ul class="grid grid-cols-1 gap-2" id="selected_op_products">
