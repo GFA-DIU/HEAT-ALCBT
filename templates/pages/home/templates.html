@@ -26,6 +26,7 @@
           hx-swap="outerHTML"
           hx-trigger="submit, change from:#search-form select delay:300ms, keyup changed delay:500ms from:#search-form input[name='search_query']"
           class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)] mt-5"
+          hx-indicator="#buildings-loading-spinner"
         >
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
@@ -35,6 +36,9 @@
                 data-color="var(--icon--soft-400)"
               ></span>
               <input type="text" name="search_query" placeholder="Search templates..." value="{{ search_query }}" />
+              <div id="buildings-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
+                <span class="loading loading-spinner loading-sm text-primary"></span>
+              </div>
             </label>
             <select class="select" name="country">
               <option value="" >All Countries </option>
@@ -148,7 +152,8 @@
         </form>
 
         {% include "pages/home/partials/templates_list.html" %}
-
+        
+      
       </div>
     </section>
 
@@ -290,15 +295,17 @@
           hx-swap="outerHTML"
           hx-trigger="submit, change from:#epd-country-filter delay:300ms, change from:#epd-category-filter delay:300ms, change from:#epd-type-filter delay:300ms, keyup changed delay:500ms from:#epd-search-query"
           class="flex-1 overflow-y-auto hide-scrollbar"
+          hx-indicator="#epd-loading-spinner"
           >
           <div class="px-5 py-2.5 w-full">
-            <div
-              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
-            >
+            <div class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]">
               <div class="flex items-stretch gap-2">
                 <label class="input w-full">
                   <span data-icon="search-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
                   <input name='epd_search_query' id="epd-search-query" type="text" placeholder="Search EPDs..." />
+                  <div id="epd-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
+                    <span class="loading loading-spinner loading-sm text-primary"></span>
+                  </div>
                 </label>
                 <select name="country" id="epd-country-filter" class="select">
                   <option value="">All Countries</option>
@@ -543,6 +550,7 @@
           </div>
         </form>
         <div id="epd-modal-footer" class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+          
           <div id="epd-pagination"></div>
 
           <button type="button" class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit" onclick="structural_component_epd_modal.close()">

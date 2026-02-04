@@ -224,11 +224,15 @@
               hx-target="#structural_epd_list"
               hx-swap="innerHTML"
               hx-trigger="submit, change from:select delay:300ms, keyup changed delay:500ms from:input[name='search_query']"
-              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]">
+              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
+              hx-indicator="#epd-loading-spinner">
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
               <span data-icon="search-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
               <input type="text" name="search_query" placeholder="Search materials..." />
+              <div id="epd-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+              </div>
             </label>
             <select name="country" class="select min-w-[120px]">
               <option value="">All Countries</option>
