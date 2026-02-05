@@ -280,11 +280,15 @@
               </div>
             </div>
           </div>
-
-          <button type="submit" class="btn btn-outline btn-block mt-2">
-            <span data-icon="search-2-line" data-size="16" data-color="currentColor"></span>
-            Search
-          </button>
+          <div class='flex gap-2 mt-2'>
+            <button type="submit" class="btn btn-outline flex-1">
+              <span data-icon="search-2-line" data-size="16" data-color="currentColor"></span>
+              Search
+            </button>
+            <button type="button" class="btn btn-ghost" onclick="document.getElementById('structural_epd_filter_form').reset(); htmx.trigger('#structural_epd_filter_form', 'submit');">
+              Reset
+            </button>
+          </div>
         </form>
 
         <div id="structural_epd_list" class="mt-4"
