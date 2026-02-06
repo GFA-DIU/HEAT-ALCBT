@@ -123,16 +123,16 @@
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Title <span class="text-[var(--state--error--base)]">*</span></legend>
           <label class="input w-full">
-            <input type="text" id="component_title" placeholder="e.g. Foundation" required />
+            <input type="text" id="component_title" class='w-full' placeholder="e.g. Foundation" required />
           </label>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Building Component</legend>
-          <select id="component_category" class="select w-full"
+          <select id="component_category" name="category_id" class="select w-full"
                   hx-get="{% url 'building_step_structural' %}?action=get_techniques"
                   hx-target="#component_technique"
                   hx-trigger="change"
-                  hx-include="[name='category_id']">
+                  hx-include="this">
             <option value="" selected disabled>Select component</option>
           </select>
         </fieldset>
@@ -154,14 +154,14 @@
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Quantity</legend>
           <label class="input w-full">
-            <input type="number" id="component_quantity" placeholder="Enter quantity" step="0.01" min="0" />
+            <input type="number" id="component_quantity" class="w-full" placeholder="Enter quantity" step="0.01" min="0" />
             <span id="component_unit_display" class="text-xs text-[var(--text--sub-600)]">m²</span>
           </label>
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Comment</legend>
           <label class="input w-full">
-            <input type="text" id="component_comment" placeholder="Add a comment" />
+            <input type="text" id="component_comment" class="w-full" placeholder="Add a comment" />
           </label>
         </fieldset>
       </div>
@@ -237,7 +237,7 @@
             <select name="country" class="select min-w-[120px]">
               <option value="">All Countries</option>
               {% for country in countries %}
-                <option value="{{ country.id }}">{{ country.name }}</option>
+                <option value="{{ country.id }}"> <span data-country="{{ country.name }}" data-size="16" data-color="var(--icon--soft-400)"></span> {{ country.name }}</option>
               {% endfor %}
             </select>
             <input type="hidden" name="dimension" id="epd_filter_dimension" value="area" />
@@ -293,7 +293,8 @@
 
         <div id="structural_epd_list" class="mt-4"
              hx-get="{% url 'building_step_structural' %}"
-             hx-trigger="load"
+             hx-trigger="refreshEpdList"
+             hx-include="#epd_filter_dimension, #epd_filter_mode"
              hx-swap="innerHTML">
           <div class="flex justify-center items-center py-8">
             <span class="loading loading-spinner loading-lg"></span>
@@ -328,6 +329,157 @@
   </div>
 </dialog>
 
+<dialog id="structural_component_component_type_modal" class="modal modal-center">
+  <div class="modal-box w-full max-w-[42.5rem] p-4.5 pb-9">
+    <div class="flex items-center mb-6">
+      <h2 class="text-base/6 font-bold flex-1 text-center">
+        What type of component would you like to add?
+      </h2>
+      <button class="btn btn-sm btn-circle btn-ghost" onclick="structural_component_component_type_modal.close()">
+        <span data-icon="close-line" data-size="20" data-color="var(--icon--sub-600)"></span>
+      </button>
+    </div>
+    <ul class="flex gap-4 items-stretch px-4">
+      <li class="flex-1 flex flex-col items-center py-6 px-3 gap-4 rounded-2xl border border-[var(--stroke--soft-200)]">
+        <span data-icon="list-settings-fill" data-size="32" data-color="var(--icon--sub-600)"></span>
+        <div class="text-center">
+          <h3 class="text-sm/5 font-bold">Select from default</h3>
+          <p class="text-xs/4 text-[var(--text--sub-600)] mt-2">
+            Select an assembly from predefined options for a quick LCA
+            assessment.
+          </p>
+        </div>
+        <button class="btn btn-primary w-full" onclick="structural_component_component_type_modal.close(); structuralManager.openTemplatesModal()">
+          Select default
+        </button>
+      </li>
+      <li
+        class="flex-1 flex flex-col items-center py-6 px-3 gap-4 rounded-2xl border border-[var(--stroke--soft-200)]"
+      >
+        <span
+          data-icon="list-settings-fill"
+          data-size="32"
+          data-color="var(--icon--sub-600)"
+        ></span>
+        <div class="text-center">
+          <h3 class="text-sm/5 font-bold">Create custom</h3>
+          <p class="text-xs/4 text-[var(--text--sub-600)] mt-2">
+            Create a custom component from the materials list for a detailed
+            LCA.
+          </p>
+        </div>
+        <button
+          class="btn btn-primary w-full"
+          onclick="structural_component_component_type_modal.close(); structuralManager.openComponentModal()"
+        >
+          Create custom
+        </button>
+      </li>
+    </ul>
+  </div>
+</dialog>
+
+<!-- Templates Selection Modal -->
+<dialog id="structural_templates_modal" class="modal modal-bottom sm:modal-end">
+  <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
+    <div class="flex justify-between items-center px-5 w-full border-b border-[var(--stroke--soft-200)]">
+      <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.closeTemplatesModal()">
+        <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
+        Go back
+      </button>
+      <h3 class="text-lg/6 font-medium w-full text-left p-5">Select Template</h3>
+      <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick="structuralManager.closeTemplatesModal()">
+        <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto hide-scrollbar">
+      <div class="px-5 py-2.5 w-full">
+        <form id="structural_templates_filter_form"
+              hx-get="{% url 'building_step_structural' %}"
+              hx-vals='{"action": "search_templates"}'
+              hx-target="#structural_templates_list"
+              hx-swap="outerHTML"
+              hx-trigger="submit, change from:select, input changed delay:500ms from:input[name='search_query']"
+              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
+              hx-indicator="#templates-loading-spinner">
+          <div class="flex items-stretch gap-2">
+            <label class="input w-full">
+              <span data-icon="search-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
+              <input type="text" name="search_query" placeholder="Search templates..." />
+              <div id="templates-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
+                <span class="loading loading-spinner loading-sm text-primary"></span>
+              </div>
+            </label>
+            <select name="country" class="select min-w-[120px]">
+              <option value="">All Countries</option>
+              {% for country in countries %}
+                <option value="{{ country.id }}"> <span data-country="{{ country.name }}" data-size="16" data-color="var(--icon--soft-400)"></span> {{ country.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="collapse rounded-none">
+            <input type="checkbox" class="peer" />
+            <div class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between">
+              <span class="flex items-center gap-2">
+                <span data-icon="menu-search-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+                Advanced Search
+                <span class="text-xs/5 text-[var(--text--sub-600)]">Click for more filters</span>
+              </span>
+              <span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)"
+                    class="transition-transform duration-300 peer-checked:rotate-180"></span>
+            </div>
+            <div class="collapse-content mt-0 px-0">
+              <div class="grid grid-cols-3 gap-2">
+                <select name="category" id="template_category_filter" class="select h-9 text-sm/5"
+                        hx-get="{% url 'building_step_structural' %}?action=get_techniques"
+                        hx-target="#template_technique_filter"
+                        hx-trigger="change"
+                        hx-swap="innerHTML"
+                        hx-vals="js:{category_id: document.getElementById('template_category_filter').value}">
+                  <option value="">All Categories</option>
+                </select>
+                <select name="technique" id="template_technique_filter" class="select h-9 text-sm/5">
+                  <option value="">All Techniques</option>
+                </select>
+                <select name="mode" class="select h-9 text-sm/5">
+                  <option value="">All Types</option>
+                  <option value="system">System Component</option>
+                  <option value="custom">My Component</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class='flex gap-2 mt-2'>
+            <button type="submit" class="btn btn-outline flex-1">
+              <span data-icon="search-2-line" data-size="16" data-color="currentColor"></span>
+              Search
+            </button>
+            <button type="button" class="btn btn-ghost" onclick="document.getElementById('structural_templates_filter_form').reset(); htmx.trigger('#structural_templates_filter_form', 'submit');">
+              Reset
+            </button>
+          </div>
+        </form>
+
+        <div id="structural_templates_list" class="mt-4"
+             hx-get="{% url 'building_step_structural' %}?action=search_templates"
+             hx-trigger="load"
+             hx-swap="outerHTML">
+          <div class="flex justify-center items-center py-8">
+            <span class="loading loading-spinner loading-lg"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <div class="flex-1" id='template-pagination-swap'></div>
+      <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.closeTemplatesModal()">Close</button>
+    </div>
+  </div>
+</dialog>
+
 <script>
 (function() {
   // Use window assignment to avoid const/class re-declaration errors on dynamic reload
@@ -358,8 +510,8 @@
   bindEvents() {
     document.getElementById('btn-add-boq')?.addEventListener('click', () => this.openBoqModal());
     document.getElementById('btn-add-boq-2')?.addEventListener('click', () => this.openBoqModal());
-    document.getElementById('btn-add-component')?.addEventListener('click', () => this.openComponentModal());
-    document.getElementById('btn-add-component-2')?.addEventListener('click', () => this.openComponentModal());
+    document.getElementById('btn-add-component')?.addEventListener('click', () => structural_component_component_type_modal.showModal());
+    document.getElementById('btn-add-component-2')?.addEventListener('click', () => structural_component_component_type_modal.showModal());
 
     document.getElementById('component_dimension')?.addEventListener('change', (e) => {
       var units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm' };
@@ -493,11 +645,163 @@
     document.getElementById('epd_filter_dimension').value = dimension;
 
     structural_epd_modal.showModal();
-    htmx.trigger('#structural_epd_list', 'load');
+    // Use custom event to trigger EPD list refresh with current mode/dimension values
+    htmx.trigger('#structural_epd_list', 'refreshEpdList');
   }
 
   closeEpdModal() {
     structural_epd_modal.close();
+  }
+
+  async openTemplatesModal() {
+    structural_templates_modal.showModal();
+
+    // Load categories if not already loaded
+    const categorySelect = document.querySelector('#structural_templates_filter_form select[name="category"]');
+    if (categorySelect && categorySelect.options.length === 1) {
+      try {
+        const response = await fetch('{% url "building_step_structural" %}?action=get_categories');
+        const html = await response.text();
+        categorySelect.innerHTML = html;
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    }
+
+    // Trigger initial load of templates
+    setTimeout(() => {
+      htmx.trigger('#structural_templates_list', 'load');
+    }, 100);
+  }
+
+  closeTemplatesModal() {
+    structural_templates_modal.close();
+  }
+
+  async selectTemplate(templateId) {
+    try {
+      // Fetch template details
+      const response = await fetch(`/templates/${templateId}/`);
+      if (!response.ok) {
+        Toast.error('Failed to load template');
+        return;
+      }
+
+      const template = await response.json();
+
+      // Close templates modal
+      this.closeTemplatesModal();
+
+      // Pre-fill component modal with template data
+      this.openComponentModalFromTemplate(template);
+    } catch (error) {
+      console.error('Error loading template:', error);
+      Toast.error('Error loading template');
+    }
+  }
+
+  async openComponentModalFromTemplate(template) {
+    this.currentMode = 'component';
+    this.editingIndex = null;
+    document.getElementById('epd_filter_mode').value = 'component';
+
+    // Pre-fill form fields with template data
+    document.getElementById('component_title').value = template.name || '';
+    document.getElementById('component_category').value = template.category_id || '';
+
+    // If category is set, load techniques and then set the technique
+    if (template.category_id && template.technique_id) {
+      try {
+        const response = await fetch(`{% url 'building_step_structural' %}?action=get_techniques&category_id=${template.category_id}`);
+        const html = await response.text();
+        document.getElementById('component_technique').innerHTML = html;
+        document.getElementById('component_technique').value = template.technique_id || '';
+      } catch (error) {
+        console.error('Error loading techniques:', error);
+      }
+    } else {
+      document.getElementById('component_technique').innerHTML = '<option value="">Select technique</option>';
+    }
+
+    document.getElementById('component_dimension').value = template.dimension || 'area';
+    document.getElementById('component_quantity').value = ''; // Empty - user should specify
+    document.getElementById('component_comment').value = template.comment || '';
+
+    // Update unit display
+    const units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm' };
+    document.getElementById('component_unit_display').textContent = units[template.dimension] || 'm²';
+    document.getElementById('epd_filter_dimension').value = template.dimension || 'area';
+
+    // Clear materials list first
+    document.getElementById('component_materials_list').innerHTML = '';
+
+    // Load materials from template using the proper EPD selection flow
+    if (template.materials && template.materials.length > 0) {
+      // Extract EPD IDs from the structural product IDs in the template response
+      // The template API returns materials with IDs in format like "uuid-timestamp" or just "uuid"
+      for (const material of template.materials) {
+        try {
+          // Get the EPD ID from the epd_link (e.g., "/epd/uuid/")
+          let epdId = null;
+          if (material.epd_link) {
+            const match = material.epd_link.match(/\/epd\/([^\/]+)\//);
+            if (match) {
+              epdId = match[1];
+            }
+          }
+
+          if (epdId) {
+            // Use the proper EPD selection endpoint to add the material
+            const formData = new FormData();
+            formData.append('action', 'select_structural_product');
+            formData.append('epd_id', epdId);
+            formData.append('mode', 'component');
+            formData.append('dimension', template.dimension || 'area');
+
+            const response = await fetch('{% url "building_step_structural" %}', {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'X-CSRFToken': this.getCsrfToken()
+              }
+            });
+
+            if (response.ok) {
+              const html = await response.text();
+              const list = document.getElementById('component_materials_list');
+              list.insertAdjacentHTML('beforeend', html);
+
+              // Update the quantity and description from template
+              const addedMaterial = list.lastElementChild;
+              if (addedMaterial) {
+                const descInput = addedMaterial.querySelector('.material-description');
+                const qtyInput = addedMaterial.querySelector('.material-quantity');
+
+                if (descInput && material.description) {
+                  descInput.value = material.description;
+                }
+                if (qtyInput && material.quantity) {
+                  qtyInput.value = material.quantity;
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error loading material from template:', error);
+        }
+      }
+
+      // Bind events and update UI after all materials are loaded
+      this.bindMaterialEvents();
+      this.updateMaterialsUI();
+    }
+
+    structural_component_modal.showModal();
+  }
+
+  getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+      document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
   }
 
   resetModalState() {
@@ -614,11 +918,14 @@
           <span class="text-sm/5 font-medium truncate flex-1">${m.name}</span>
         </div>
         <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
+          <div>
+          <span
+          </div>
           <label class="input w-full">
-            <input type="text" value="${m.description || ''}" placeholder="Description" class="material-description" />
+            <input type="text" value="${m.description || ''}" placeholder="Description" class="material-description w-full" />
           </label>
           <label class="input w-full max-w-[140px]">
-            <input type="number" value="${m.quantity || ''}" placeholder="Qty" class="material-quantity" step="0.01" min="0" />
+            <input type="number" value="${m.quantity || ''}" placeholder="Qty" class="material-quantity w-full" step="0.01" min="0" />
             <select class="select select-ghost w-fit !outline-none !border-none material-unit">
               <option value="${m.unit}" selected>${m.unit}</option>
             </select>
@@ -794,17 +1101,18 @@
     });
 
     this.componentItems.forEach((item, index) => {
+      
       const li = document.createElement('li');
       li.className = 'bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2';
       li.innerHTML = `
-        <span data-icon="stack-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+        <span data-icon="building-3-line" data-size="20" data-color="var(--icon--strong-950)"></span>
         <div class="flex-1 flex flex-col gap-2.5">
           <h6 class="text-sm/5 font-bold">${item.title}</h6>
           <div class="flex items-center flex-wrap gap-2">
             <div class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center">
               <span data-icon="leaf-line" data-size="14" data-color="var(--bg--strong-950)"></span>
             </div>
-            <div class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)]">
+            <div class="text-sm/5 font-medium border-r border-[var(--stroke--soft-200)]">
               ${item.total_gwp.toFixed(2)} kgCO2eq
             </div>
             <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
