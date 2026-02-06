@@ -6,13 +6,17 @@ Provides HTMX endpoints for filtering, selecting, and managing structural EPDs.
 import logging
 from datetime import datetime
 
+from cities_light.models import Country
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Prefetch, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
 from pages.forms.epds_filter_form import EPDsFilterForm
-from pages.models.assembly import AssemblyCategory, AssemblyTechnique, AssemblyCategoryTechnique
+from pages.models.assembly import (Assembly, AssemblyCategory, AssemblyTechnique,
+                                   AssemblyCategoryTechnique, StructuralProduct)
 from pages.models.base import ALCBTCountryManager
 from pages.models.epd import EPD, MaterialCategory
 from pages.views.assembly.epd_filtering import get_filtered_epd_list
@@ -40,6 +44,8 @@ def building_step_structural_products(request):
         return handle_get_categories(request)
     elif action == "get_subcategories":
         return handle_get_subcategories(request)
+    elif action == "search_templates":
+        return handle_search_templates(request)
     else:
         return handle_filter_epds(request)
 
@@ -188,3 +194,123 @@ def handle_get_subcategories(request):
     except Exception as e:
         logger.error(f"Error fetching subcategories: {e}")
         return HttpResponse('<option value="">Error loading subcategories</option>')
+
+
+def handle_search_templates(request):
+    """
+    Search and filter templates (assemblies) for selection in building structural components.
+    Reuses logic from templates view with same filters.
+    """
+    # Start with base queryset - show public assemblies and user's custom assemblies
+    assemblies = Assembly.objects.filter(
+        Q(public=True) | Q(created_by=request.user),
+        draft=False,
+        is_boq=False,  # Exclude Bill of Quantities
+    )
+
+    # Get filter parameters
+    search_query = request.GET.get("search_query", "").strip()
+    country_id = request.GET.get("country", "").strip()
+    category_id = request.GET.get("category", "").strip()
+    technique_id = request.GET.get("technique", "").strip()
+    mode = request.GET.get("mode", "").strip()  # system or custom
+    sort_by = request.GET.get("sort_by", "-created_at")  # Default sort by newest first
+
+    # Apply search filter
+    if search_query:
+        assemblies = assemblies.filter(
+            Q(name__icontains=search_query)
+            | Q(description__icontains=search_query)
+            | Q(comment__icontains=search_query)
+        )
+
+    # Apply country filter
+    if country_id:
+        assemblies = assemblies.filter(country_id=country_id)
+
+    # Apply category filter (via StructuralProduct classification)
+    if category_id:
+        assemblies = assemblies.filter(
+            structuralproduct__classification__category_id=category_id
+        ).distinct()
+
+    # Apply technique filter
+    if technique_id:
+        assemblies = assemblies.filter(
+            structuralproduct__classification__technique_id=technique_id
+        ).distinct()
+
+    # Apply mode filter (System Component vs My Component)
+    if mode:
+        assemblies = assemblies.filter(mode=mode)
+
+    # Optimize queries with prefetch_related and select_related
+    assemblies = assemblies.select_related("country", "city", "created_by").prefetch_related(
+        Prefetch(
+            "structuralproduct_set",
+            queryset=StructuralProduct.objects.select_related(
+                "epd", "classification__category", "classification__technique"
+            ),
+        )
+    )
+
+    # Apply sorting
+    sort_options = {
+        "name": "name",
+        "-name": "-name",
+        "created_at": "created_at",
+        "-created_at": "-created_at",
+    }
+    assemblies = assemblies.order_by(sort_options.get(sort_by, "name"))
+
+    # Pagination
+    paginator = Paginator(assemblies, 10)  # 10 items per page
+    page_number = request.GET.get("page", 1)
+    page_obj = paginator.get_page(page_number)
+
+    # Calculate GWP for each assembly
+    assemblies_with_gwp = []
+    for assembly in page_obj:
+        total_gwp = 0
+        classification = None
+
+        # Get total GWP from structural products
+        for structural_product in assembly.structuralproduct_set.all():
+            if structural_product.epd:
+                # Get the quantity
+                quantity = structural_product.quantity or 0
+
+                # Calculate GWP for A1-A3 stage (production stage)
+                try:
+                    gwp_a1a3 = structural_product.epd.get_gwp_impact_sum("a1a3")
+                    total_gwp += float(quantity) * float(gwp_a1a3)
+                except Exception:
+                    # If there's an error getting GWP, just skip this product
+                    pass
+
+            # Get classification from first product
+            if not classification and structural_product.classification:
+                classification = structural_product.classification
+
+        assemblies_with_gwp.append({
+            "assembly": assembly,
+            "total_gwp": round(total_gwp, 2),
+            "classification": classification,
+        })
+
+    context = {
+        "assemblies_with_gwp": assemblies_with_gwp,
+        "page_obj": page_obj,
+        "search_query": search_query,
+        "selected_country": country_id,
+        "selected_category": category_id,
+        "selected_technique": technique_id,
+        "selected_mode": mode,
+        "selected_sort": sort_by,
+    }
+
+    return render(
+        request,
+        "pages/add-building/components/building-structural-components/partials/templates_selection_list.html",
+        context
+    )
