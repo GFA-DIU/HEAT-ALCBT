@@ -53,6 +53,7 @@ def building_step_structural_products(request):
 def handle_filter_epds(request):
     """Filter and return structural EPD list."""
     dimension = request.POST.get("dimension") or request.GET.get("dimension")
+    mode = request.POST.get("mode") or request.GET.get("mode", "boq")
     epd_list, _ = get_epd_list(request, dimension=dimension, operational=False)
 
     form = EPDsFilterForm(request.POST if request.method == "POST" else request.GET)
@@ -70,6 +71,7 @@ def handle_filter_epds(request):
         "filters": filters_str,
         "epd_filters_form": form,
         "dimension": dimension,
+        "mode": mode,
     }
 
     return render(

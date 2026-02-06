@@ -1,6 +1,6 @@
 {% load static %}
 
-<div id="structural_templates_list ">
+<div id="structural_templates_list">
   <ul class="grid grid-cols-1 gap-2.75 mt-3">
     {% for item in assemblies_with_gwp %}
       {% with assembly=item.assembly total_gwp=item.total_gwp classification=item.classification %}
