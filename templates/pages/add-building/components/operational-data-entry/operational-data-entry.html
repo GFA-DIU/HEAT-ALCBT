@@ -82,7 +82,9 @@
           <span class="loading loading-spinner loading-xs button-loading hidden"></span>
           <span class="button-text">Save Energy Carriers</span>
         </button>
-        <span class="text-xs text-[var(--text--sub-600)]" id="save_status"></span>
+        <span class="text-xs text-[var(--text--sub-600)]" id="save_status">
+          <span class="text-warning font-medium unsaved-indicator">⚠ Unsaved changes</span>
+        </span>
       </div>
     </form>
   </div>
@@ -337,9 +339,26 @@
   
   // Update UI based on selected products count
   function updateUI() {
-    const hasProducts = selectedOpProducts && selectedOpProducts.children.length > 0;
+    // Check for actual EPD items (not just the empty state template)
+    const actualProducts = selectedOpProducts?.querySelectorAll('li[id^="epd-"]');
+    const hasProducts = actualProducts && actualProducts.length > 0;
+
     if (selectEpdText) selectEpdText.hidden = hasProducts;
     if (saveButtonContainer) saveButtonContainer.hidden = !hasProducts;
+
+    // Also hide/show the empty state template
+    const emptyTemplate = document.getElementById('no-energy-carrier-template');
+    if (emptyTemplate) {
+      emptyTemplate.style.display = hasProducts ? 'none' : 'block';
+    }
+
+    // Show unsaved indicator if there are products but not saved
+    const form = document.getElementById('operational-products-form');
+    const isSaved = form && form.dataset.saved === 'true';
+    const unsavedIndicator = document.querySelector('.unsaved-indicator');
+    if (unsavedIndicator) {
+      unsavedIndicator.style.display = (hasProducts && !isSaved) ? 'inline' : 'none';
+    }
   }
   
   // Handle successful EPD addition
@@ -352,7 +371,7 @@
         form.removeAttribute('data-saved');
       }
       // Close modal after adding
-      Toast.info('Energy carrier added successfully. Click "Save Energy Carriers" to apply changes.');
+      Toast.warning('Energy carrier added. Click "Save Energy Carriers" to save changes!');
       if (mainModal) mainModal.close();
     }
   });
@@ -491,13 +510,17 @@
           form.dataset.saved = 'true';
         }
 
+        // Hide unsaved indicator
+        const unsavedIndicator = document.querySelector('.unsaved-indicator');
+        if (unsavedIndicator) {
+          unsavedIndicator.style.display = 'none';
+        }
+
         const saveStatus = document.getElementById('save_status');
         if (saveStatus) {
-          saveStatus.textContent = 'Saved successfully!';
-          saveStatus.classList.add('text-success');
+          saveStatus.innerHTML = '<span class="text-success font-medium">✓ Saved successfully!</span>';
           setTimeout(() => {
-            saveStatus.textContent = '';
-            saveStatus.classList.remove('text-success');
+            saveStatus.innerHTML = '';
           }, 3000);
         }
         Toast.success('Energy carriers saved successfully');
