@@ -32,8 +32,20 @@ logger = logging.getLogger(__name__)
 @require_http_methods(["GET", "POST"])
 def building_step_structural_products(request):
     """Handle structural products selection for the add-building wizard."""
+    # Check if request has JSON body
+    action = None
     if request.method == "POST":
-        action = request.POST.get("action", "list")
+        # Try to parse JSON body first
+        if request.content_type == 'application/json':
+            try:
+                data = json.loads(request.body)
+                action = data.get("action")
+            except json.JSONDecodeError:
+                pass
+
+        # Fall back to form data
+        if not action:
+            action = request.POST.get("action", "list")
     else:
         action = request.GET.get("action", "list")
 
@@ -58,13 +70,14 @@ def building_step_structural_products(request):
 def handle_filter_epds(request):
     """Filter and return structural EPD list."""
     dimension = request.POST.get("dimension") or request.GET.get("dimension")
+    mode = request.POST.get("mode") or request.GET.get("mode") or "boq"
     epd_list, _ = get_epd_list(request, dimension=dimension, operational=False)
 
     form = EPDsFilterForm(request.POST if request.method == "POST" else request.GET)
 
     req = request.POST if request.method == "POST" else request.GET
     filter_params = []
-    for key in ['search_query', 'country', 'category', 'subcategory', 'childcategory', 'type', 'dimension']:
+    for key in ['search_query', 'country', 'category', 'subcategory', 'childcategory', 'type', 'dimension', 'mode']:
         value = req.get(key)
         if value:
             filter_params.append(f"{key}={value}")
@@ -75,6 +88,7 @@ def handle_filter_epds(request):
         "filters": filters_str,
         "epd_filters_form": form,
         "dimension": dimension,
+        "mode": mode,
     }
 
     return render(
@@ -285,19 +299,25 @@ def handle_save_assembly(request):
             assembly = Assembly(created_by=request.user)
 
         # Set assembly fields based on mode
+        is_template = assembly_data.get("is_template", False)
+        logger.info(f"is_template value from assembly_data: {is_template}, type: {type(is_template)}")
+
         if mode == "boq":
             assembly.name = assembly_data.get("name", "Untitled BOQ")
             assembly.comment = assembly_data.get("comment", "")
             assembly.is_boq = True
             assembly.mode = AssemblyMode.CUSTOM
             assembly.dimension = AssemblyDimension.AREA  # Default for BOQ
+            assembly.is_template = is_template
         else:  # component
             assembly.name = assembly_data.get("title", "Untitled Component")
             assembly.comment = assembly_data.get("comment", "")
             assembly.is_boq = False
             assembly.mode = AssemblyMode.CUSTOM
             assembly.dimension = assembly_data.get("dimension", AssemblyDimension.AREA)
+            assembly.is_template = is_template
 
+        logger.info(f"About to save assembly with is_template={assembly.is_template}")
         assembly.save()
 
         # Create StructuralProduct records for each material

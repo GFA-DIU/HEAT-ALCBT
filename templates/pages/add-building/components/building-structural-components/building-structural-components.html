@@ -1,5 +1,9 @@
 {% load static %}
 
+<!-- Hidden data for JavaScript restoration -->
+{{ boq_items|json_script:"boq-items-data" }}
+{{ component_items|json_script:"component-items-data" }}
+
 <div class="flex gap-2 p-2 rounded-lg bg-[var(--state--faded--lighter)]">
   <span data-icon="information-2-line" data-size="16" data-color="var(--icon--sub-600)"></span>
   If data is available as total quantity per material, select "Add from BoQ".
@@ -68,6 +72,13 @@
             <input type="text" id="boq_comment" placeholder="Add a comment" />
           </label>
         </fieldset>
+        <fieldset class="fieldset">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="boq_is_template" class="checkbox checkbox-sm" />
+            <span class="text-sm/5 font-medium">Save as template for future use</span>
+          </label>
+          <p class="text-xs/4 text-[var(--text--sub-600)] mt-1">Templates can be reused across multiple buildings</p>
+        </fieldset>
       </div>
 
       <h2 class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4">
@@ -103,7 +114,7 @@
 
     <div class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]">
       <button type="button" class="btn btn-outline" onclick="structuralManager.closeBoqModal()">Cancel</button>
-      <button type="button" class="btn btn-primary" id="btn-save-boq" onclick="structuralManager.saveBoq()">Done</button>
+      <button type="button" class="btn btn-primary" id="btn-save-boq" onclick="structuralManager.saveBoq()">Save</button>
     </div>
   </div>
 </dialog>
@@ -128,11 +139,11 @@
         </fieldset>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Building Component</legend>
-          <select id="component_category" class="select w-full"
+          <select id="component_category" name="category_id" class="select w-full"
                   hx-get="{% url 'building_step_structural' %}?action=get_techniques"
                   hx-target="#component_technique"
                   hx-trigger="change"
-                  hx-include="[name='category_id']">
+                  hx-vals="js:{category_id: document.getElementById('component_category').value}">
             <option value="" selected disabled>Select component</option>
           </select>
         </fieldset>
@@ -163,6 +174,13 @@
           <label class="input w-full">
             <input type="text" id="component_comment" placeholder="Add a comment" />
           </label>
+        </fieldset>
+        <fieldset class="fieldset col-span-3">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="component_is_template" class="checkbox checkbox-sm" />
+            <span class="text-sm/5 font-medium">Save as template for future use</span>
+          </label>
+          <p class="text-xs/4 text-[var(--text--sub-600)] mt-1">Templates can be reused across multiple buildings</p>
         </fieldset>
       </div>
 
@@ -197,7 +215,7 @@
 
     <div class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]">
       <button type="button" class="btn btn-outline" onclick="structuralManager.closeComponentModal()">Cancel</button>
-      <button type="button" class="btn btn-primary" onclick="structuralManager.saveComponent()">Done</button>
+      <button type="button" class="btn btn-primary" onclick="structuralManager.saveComponent()">Save</button>
     </div>
   </div>
 </dialog>
@@ -220,7 +238,7 @@
       <div class="px-5 py-2.5 w-full">
         <form id="structural_epd_filter_form"
               hx-post="{% url 'building_step_structural' %}"
-              hx-vals='{"action": "filter"}'
+              hx-vals="js:{action: 'filter', mode: document.getElementById('epd_filter_mode').value, dimension: document.getElementById('epd_filter_dimension').value}"
               hx-target="#structural_epd_list"
               hx-swap="innerHTML"
               hx-trigger="submit, change from:select delay:300ms, keyup changed delay:500ms from:input[name='search_query']"
@@ -428,10 +446,12 @@
       const item = this.boqItems[index];
       document.getElementById('boq_name').value = item.name;
       document.getElementById('boq_comment').value = item.comment || '';
+      document.getElementById('boq_is_template').checked = item.is_template || false;
       this.renderMaterials(item.materials, 'boq');
     } else {
       document.getElementById('boq_name').value = '';
       document.getElementById('boq_comment').value = '';
+      document.getElementById('boq_is_template').checked = false;
       document.getElementById('structural_materials_list').innerHTML = '';
     }
 
@@ -457,6 +477,7 @@
       document.getElementById('component_dimension').value = item.dimension || 'area';
       document.getElementById('component_quantity').value = item.quantity || '';
       document.getElementById('component_comment').value = item.comment || '';
+      document.getElementById('component_is_template').checked = item.is_template || false;
       this.renderMaterials(item.materials, 'component');
     } else {
       document.getElementById('component_title').value = '';
@@ -465,6 +486,7 @@
       document.getElementById('component_dimension').value = 'area';
       document.getElementById('component_quantity').value = '';
       document.getElementById('component_comment').value = '';
+      document.getElementById('component_is_template').checked = false;
       document.getElementById('component_materials_list').innerHTML = '';
     }
 
@@ -517,10 +539,10 @@
     const list = document.getElementById(listId);
     if (!list) return [];
 
-    return Array.from(list.children).map(li => {
+    const materials = Array.from(list.children).map(li => {
       const epdId = li.dataset.epdId;
       const timestamp = li.dataset.timestamp;
-      return {
+      const material = {
         epd_id: epdId,
         name: li.dataset.name,
         gwp: parseFloat(li.dataset.gwp) || 0,
@@ -530,7 +552,11 @@
         category: li.querySelector('.material-category')?.value || '',
         timestamp: timestamp
       };
+      console.log(`[collectMaterials] Material collected:`, material);
+      return material;
     });
+    console.log(`[collectMaterials] Total materials from ${listId}:`, materials.length);
+    return materials;
   }
 
   validateMaterials(materials, mode) {
@@ -628,7 +654,7 @@
     this.updateMaterialsUI();
   }
 
-  saveBoq() {
+  async saveBoq() {
     const name = document.getElementById('boq_name').value.trim();
     if (!name) {
       Toast.error('Please enter a BOQ name');
@@ -655,22 +681,66 @@
       name: name,
       comment: document.getElementById('boq_comment').value,
       materials: materials,
-      total_gwp: totalGwp
+      total_gwp: totalGwp,
+      is_template: document.getElementById('boq_is_template').checked
     };
 
-    if (this.editingIndex !== null) {
-      this.boqItems[this.editingIndex] = item;
-    } else {
-      this.boqItems.push(item);
+    // Save to database via API
+    const buildingUuid = new URLSearchParams(window.location.search).get('building_uuid');
+    if (!buildingUuid) {
+      Toast.error('Building UUID not found');
+      return;
     }
 
-    this.closeBoqModal();
-    this.updateUI();
-    this.emitFormStatus();
-    Toast.success('BOQ saved successfully');
+    const saveBtn = document.getElementById('btn-save-boq');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Saving...';
+
+    try {
+      const response = await fetch('{% url "building_step_structural" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+        },
+        body: JSON.stringify({
+          action: 'save_assembly',
+          building_uuid: buildingUuid,
+          mode: 'boq',
+          assembly_data: item
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Store assembly ID for editing
+        item.id = result.assembly.id;
+
+        if (this.editingIndex !== null) {
+          this.boqItems[this.editingIndex] = item;
+        } else {
+          this.boqItems.push(item);
+        }
+
+        this.closeBoqModal();
+        this.updateUI();
+        this.emitFormStatus();
+        Toast.success('BOQ saved to database successfully');
+      } else {
+        Toast.error(result.error || 'Failed to save BOQ');
+      }
+    } catch (error) {
+      console.error('Error saving BOQ:', error);
+      Toast.error('Failed to save BOQ');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = originalText;
+    }
   }
 
-  saveComponent() {
+  async saveComponent() {
     const title = document.getElementById('component_title').value.trim();
     if (!title) {
       Toast.error('Please enter a component title');
@@ -703,19 +773,63 @@
       quantity: document.getElementById('component_quantity').value,
       comment: document.getElementById('component_comment').value,
       materials: materials,
-      total_gwp: totalGwp
+      total_gwp: totalGwp,
+      is_template: document.getElementById('component_is_template').checked
     };
 
-    if (this.editingIndex !== null) {
-      this.componentItems[this.editingIndex] = item;
-    } else {
-      this.componentItems.push(item);
+    // Save to database via API
+    const buildingUuid = new URLSearchParams(window.location.search).get('building_uuid');
+    if (!buildingUuid) {
+      Toast.error('Building UUID not found');
+      return;
     }
 
-    this.closeComponentModal();
-    this.updateUI();
-    this.emitFormStatus();
-    Toast.success('Component saved successfully');
+    const saveBtn = document.querySelector('#structural_component_modal .btn-primary');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Saving...';
+
+    try {
+      const response = await fetch('{% url "building_step_structural" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+        },
+        body: JSON.stringify({
+          action: 'save_assembly',
+          building_uuid: buildingUuid,
+          mode: 'component',
+          assembly_data: item
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Store assembly ID for editing
+        item.id = result.assembly.id;
+
+        if (this.editingIndex !== null) {
+          this.componentItems[this.editingIndex] = item;
+        } else {
+          this.componentItems.push(item);
+        }
+
+        this.closeComponentModal();
+        this.updateUI();
+        this.emitFormStatus();
+        Toast.success('Component saved to database successfully');
+      } else {
+        Toast.error(result.error || 'Failed to save component');
+      }
+    } catch (error) {
+      console.error('Error saving component:', error);
+      Toast.error('Failed to save component');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = originalText;
+    }
   }
 
   editItem(type, index) {
@@ -731,10 +845,49 @@
     structural_delete_modal.showModal();
   }
 
-  executeDelete() {
+  async executeDelete() {
     if (!this.pendingDelete) return;
 
     const { type, index } = this.pendingDelete;
+    const items = type === 'boq' ? this.boqItems : this.componentItems;
+    const item = items[index];
+
+    // If item has an ID, delete from database
+    if (item && item.id) {
+      const buildingUuid = new URLSearchParams(window.location.search).get('building_uuid');
+      if (!buildingUuid) {
+        Toast.error('Building UUID not found');
+        return;
+      }
+
+      try {
+        const response = await fetch('{% url "building_step_structural" %}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+          },
+          body: JSON.stringify({
+            action: 'delete_assembly',
+            building_uuid: buildingUuid,
+            assembly_id: item.id
+          })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          Toast.error(result.error || 'Failed to delete');
+          return;
+        }
+      } catch (error) {
+        console.error('Error deleting assembly:', error);
+        Toast.error('Failed to delete from database');
+        return;
+      }
+    }
+
+    // Remove from local array
     if (type === 'boq') {
       this.boqItems.splice(index, 1);
     } else {
@@ -745,7 +898,7 @@
     structural_delete_modal.close();
     this.updateUI();
     this.emitFormStatus();
-    Toast.info('Item removed');
+    Toast.success('Item deleted successfully');
   }
 
   updateUI() {
@@ -856,5 +1009,23 @@
 
   window.getStructuralFormData = () => window.structuralManager.getFormData();
   window.restoreStructuralData = (data) => window.structuralManager.restore(data);
+
+  // Restore data from server if available (for edit mode)
+  {% if boq_items or component_items %}
+    console.log('[StructuralComponents] Restoring data from server');
+    try {
+      const boqItemsJson = document.getElementById('boq-items-data')?.textContent;
+      const componentItemsJson = document.getElementById('component-items-data')?.textContent;
+
+      const serverData = {
+        boq_items: boqItemsJson ? JSON.parse(boqItemsJson) : [],
+        component_items: componentItemsJson ? JSON.parse(componentItemsJson) : []
+      };
+      console.log('[StructuralComponents] Server data:', serverData);
+      window.structuralManager.restore(serverData);
+    } catch (error) {
+      console.error('[StructuralComponents] Error restoring data:', error);
+    }
+  {% endif %}
 })();
 </script>

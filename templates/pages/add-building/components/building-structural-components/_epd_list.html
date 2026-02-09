@@ -32,7 +32,7 @@
         class="btn btn-sm btn-outline border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
         hx-post="{% url 'building_step_structural' %}"
         hx-vals='{"action": "select_structural_product", "epd_id": "{{ epd.id }}", "mode": "{{ mode|default:'boq' }}", "dimension": "{{ dimension|default:'area' }}"}'
-        hx-target="#structural_materials_list"
+        hx-target="{% if mode == 'component' %}#component_materials_list{% else %}#structural_materials_list{% endif %}"
         hx-swap="beforeend"
       >
         <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>

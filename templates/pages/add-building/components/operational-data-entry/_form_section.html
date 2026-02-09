@@ -2,7 +2,8 @@
       hx-post="{% url 'building_step_operational' %}"
       hx-vals='js:{"action": "save_op_products", "building_uuid": new URLSearchParams(window.location.search).get("building_uuid")}'
       hx-target="#operational-products-form"
-      hx-swap="outerHTML">
+      hx-swap="outerHTML"
+      data-saved="true">
   <ul class="grid grid-cols-1 gap-2" id="selected_op_products">
     {% if selected_products %}
       {% for epd in selected_products %}
@@ -12,13 +13,14 @@
   </ul>
   
   <div class="flex items-center gap-2 mt-4" id="save_button_container" {% if not selected_products %}hidden{% endif %}>
-    <button 
-      type="submit" 
-      class="btn btn-sm btn-primary" 
+    <button
+      type="submit"
+      class="btn btn-sm btn-primary"
       id="save_button"
     >
-      <span data-icon="save-line" data-size="16" data-color="currentColor"></span>
-      Save Energy Carriers
+      <span data-icon="save-line" data-size="16" data-color="currentColor" class="button-icon"></span>
+      <span class="loading loading-spinner loading-xs button-loading hidden"></span>
+      <span class="button-text">Save Energy Carriers</span>
     </button>
     <span class="text-xs text-[var(--text--sub-600)]" id="save_status"></span>
   </div>

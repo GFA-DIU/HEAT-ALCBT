@@ -399,7 +399,8 @@ def handle_structural_components_step(request):
                         'name': assembly.name,
                         'comment': assembly.comment or '',
                         'materials': materials,
-                        'total_gwp': total_gwp
+                        'total_gwp': total_gwp,
+                        'is_template': assembly.is_template
                     })
                 else:
                     # Component item
@@ -414,7 +415,8 @@ def handle_structural_components_step(request):
                         'quantity': float(ba.quantity),
                         'comment': assembly.comment or '',
                         'materials': materials,
-                        'total_gwp': total_gwp
+                        'total_gwp': total_gwp,
+                        'is_template': assembly.is_template
                     })
 
         except (ValueError, Building.DoesNotExist):
@@ -568,28 +570,48 @@ def save_building_step(request):
                     OperationalProduct.objects.filter(building=building).delete()
 
                     # Create new operational products
+                    created_count = 0
                     for product in operation_products:
                         # Extract the actual product data (skip csrf token)
-                        epd_uuid = product.get('id')
-                        if epd_uuid:
+                        epd_id = product.get('id')
+                        if epd_id:
                             try:
-                                # The id is a UUID string, need to get the EPD by UUID
-                                # Note: EPD model uses uppercase 'UUID' field
-                                epd_uuid_obj = uuid_lib.UUID(epd_uuid)
-                                epd = EPD.objects.get(UUID=epd_uuid_obj)
+                                # The id is a UUID string (EPD uses UUID as primary key)
+                                epd_uuid_obj = uuid_lib.UUID(epd_id)
+                                epd = EPD.objects.get(id=epd_uuid_obj)
 
-                                OperationalProduct.objects.create(
-                                    building=building,
-                                    epd=epd,
-                                    quantity=float(product.get('quantity', 0)),
-                                    input_unit=product.get('unit', ''),
-                                    description=product.get('description', '')
-                                )
-                            except (ValueError, EPD.DoesNotExist):
-                                logger.warning(f"EPD not found for UUID: {epd_uuid}")
+                                # Extract quantity and unit from the material_* fields
+                                quantity = None
+                                unit = None
+                                description = None
+
+                                # Find the material fields with this EPD's UUID
+                                for key, value in product.items():
+                                    if key.startswith(f'material_{epd_id}_quantity_'):
+                                        quantity = float(value)
+                                    elif key.startswith(f'material_{epd_id}_unit_'):
+                                        unit = value
+                                    elif key.startswith(f'material_{epd_id}_description_'):
+                                        description = value
+
+                                if quantity is not None and unit:
+                                    OperationalProduct.objects.create(
+                                        building=building,
+                                        epd=epd,
+                                        quantity=quantity,
+                                        input_unit=unit,
+                                        description=description or ''
+                                    )
+                                    created_count += 1
+                                else:
+                                    logger.warning(f"Missing quantity or unit for EPD {epd_id}")
+                            except (ValueError, EPD.DoesNotExist) as e:
+                                logger.warning(f"EPD not found for UUID: {epd_id}, error: {e}")
                                 continue
+                        else:
+                            logger.warning(f"Product missing EPD ID: {product}")
 
-                    logger.info(f"Saved {len(operation_products)} operational products for building {building.id}")
+                    logger.info(f"Saved {created_count} operational products for building {building.id}")
 
             except (ValueError, Building.DoesNotExist):
                 return JsonResponse({"error": "Invalid building UUID or building not found"}, status=400)

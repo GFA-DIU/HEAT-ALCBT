@@ -660,30 +660,32 @@ class StepManager {
     }
 
     if (stepKey === 'operational-data-entry/operational-data-entry'){
-      const forms = document.getElementById('selected_op_products')?.querySelectorAll("form");
-      if (!forms || forms.length === 0) {
-        Toast.error("No operational products found. Please add at least one.");
+      console.log('[StepManager] Checking operational data entry');
+      const productsList = document.getElementById('selected_op_products');
+      const productItems = productsList?.querySelectorAll("li[id^='epd-']");
+      console.log('[StepManager] Found product items:', productItems ? productItems.length : 0);
+
+      if (!productItems || productItems.length === 0) {
+        console.error('[StepManager] No product items found in #selected_op_products');
+        Toast.error("Please add at least one energy carrier.");
         throw new Error("No operational products found.");
       }
-      /**
-       * @type {{ [k: string]: FormDataEntryValue; }[]}
-       */
-      const combinedData = [];
-      
-      forms.forEach((form) => {
-        const formData = new FormData(form);
-        let validator = new window.FormValidator(form);
-        let isValid = validator.validate();
-        if (!isValid) {
-          Toast.error("Please correct the errors in the form before proceeding.");
-          throw new Error("Form validation failed.");
-        }
-        combinedData.push(Object.fromEntries(formData.entries()));
-      });
-      
-      return { 
+
+      // Check if products are saved to database
+      const form = document.getElementById('operational-products-form');
+      const isSaved = form && form.dataset.saved === 'true';
+
+      if (!isSaved) {
+        console.warn('[StepManager] Operational products have unsaved changes');
+        Toast.warning("Please click 'Save Energy Carriers' before continuing.");
+        throw new Error("Please save energy carriers first.");
+      }
+
+      // Products are already saved, just verify and continue
+      console.log('[StepManager] Operational products already saved, continuing...');
+      return {
         building_uuid: this.getBuildingId(),
-        operation_products: combinedData 
+        operational_data_saved: true
       };
 
     } else {
@@ -733,6 +735,9 @@ class StepManager {
    */
   async saveToServer(stepKey, stepData) {
     try {
+      console.log('[StepManager] saveToServer called with stepKey:', stepKey);
+      console.log('[StepManager] saveToServer stepData:', stepData);
+
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
       // Get building_uuid from URL params or from formData
@@ -746,23 +751,28 @@ class StepManager {
         building_uuid: urlUuid || formUuid || stepData.building_uuid || ''
       };
 
+      const payload = {
+        building_uuid: this.getBuildingId(),
+        step_key: stepKey,
+        data: dataWithUuid
+      };
+
+      console.log('[StepManager] Sending payload to /building/step/save:', payload);
+
       const response = await fetch('/building/step/save', {
         method: this.editMode ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken || '',
         },
-        body: JSON.stringify({
-          building_uuid: this.getBuildingId(),
-          step_key: stepKey,
-          data: dataWithUuid
-        })
+        body: JSON.stringify(payload)
       });
 
       const result = await response.json();
+      console.log('[StepManager] Server response:', result);
 
       if (!response.ok) {
-        console.error('Failed to save step data to server:', result);
+        console.error('[StepManager] Failed to save step data to server:', result);
         return { success: false, error: result.error || 'Failed to save' };
       }
 

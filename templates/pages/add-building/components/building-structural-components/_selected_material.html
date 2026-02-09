@@ -1,10 +1,9 @@
-<form>
-    <li class="bg-[var(--bg--weak-50)] rounded-xl p-4"
-        id="material-{{ epd.id }}-{{ epd.timestamp }}"
-        data-epd-id="{{ epd.id }}"
-        data-timestamp="{{ epd.timestamp }}"
-        data-name="{{ epd.name }}"
-        data-gwp="{{ epd.gwp }}">
+<li class="bg-[var(--bg--weak-50)] rounded-xl p-4"
+    id="material-{{ epd.id }}-{{ epd.timestamp }}"
+    data-epd-id="{{ epd.id }}"
+    data-timestamp="{{ epd.timestamp }}"
+    data-name="{{ epd.name }}"
+    data-gwp="{{ epd.gwp }}">
       <div class="flex items-center justify-between mb-2 w-full">
         <span class="text-sm/5 font-medium truncate flex-1">{{ epd.name|truncatechars:50 }}</span>
         <div class="flex items-center gap-2">
@@ -66,4 +65,3 @@
       <input type="hidden" name="material_{{ epd.id }}_id_{{ epd.timestamp }}" value="{{ epd.id }}" />
       <input type="hidden" name="material_{{ epd.id }}_gwp_{{ epd.timestamp }}" value="{{ epd.gwp }}" />
     </li>
-</form>
