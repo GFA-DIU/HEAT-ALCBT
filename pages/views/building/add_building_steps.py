@@ -8,6 +8,7 @@ Each step loads a template and provides necessary context data.
 import json
 import logging
 import uuid as uuid_lib
+from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -18,11 +19,10 @@ from cities_light.models import Country
 
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
-from pages.models.building import BuildingCategory
+from pages.models.building import Building, BuildingCategory, OperationalProduct
 from pages.models.epd import EPD, EPDType, MaterialCategory
 
 logger = logging.getLogger(__name__)
-from pages.models import Building
 
 
 @login_required
@@ -278,37 +278,48 @@ def handle_operational_data_step(request):
     except MaterialCategory.DoesNotExist:
         logger.warning("Energy carrier categories not found")
     
-    # Load previously saved operational products from session
+    # Load previously saved operational products from database (if building exists)
     selected_products = []
-    building_data = request.session.get("building_form_data", {})
-    operational_data = building_data.get("operational_products", [])
-    
-    for product_data in operational_data:
+    building_uuid = request.GET.get('building_uuid')
+
+    logger.info(f"Loading operational data step with building_uuid: {building_uuid}")
+
+    if building_uuid:
         try:
-            epd = EPD.objects.get(id=product_data["id"])
-            
-            # Get available units and ensure it's a list
-            available_units = epd.get_available_units()
-            if available_units is None:
-                available_units = [epd.declared_unit]
-            elif isinstance(available_units, set):
-                available_units = sorted(list(available_units))
-            elif not isinstance(available_units, list):
-                available_units = list(available_units)
-            
-            selected_products.append({
-                "id": str(epd.id),
-                "name": epd.name,
-                "country": epd.country.name if epd.country else "Unknown",
-                "category": epd.category.name_en if epd.category else "Unknown",
-                "description": product_data.get("description", ""),
-                "selection_unit": product_data.get("unit", epd.declared_unit),
-                "selection_quantity": product_data.get("quantity", ""),
-                "timestamp": product_data.get("timestamp", ""),
-                "op_units": available_units,
-            })
-        except EPD.DoesNotExist:
-            logger.warning(f"EPD {product_data['id']} not found")
+            uuid_obj = uuid_lib.UUID(building_uuid)
+            building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+            logger.info(f"Found building: {building.id} - {building.name}")
+
+            # Get saved operational products from database
+            saved_products = OperationalProduct.objects.filter(
+                building=building
+            ).select_related('epd', 'epd__country', 'epd__category')
+
+            logger.info(f"Found {saved_products.count()} saved operational products")
+
+            for op_product in saved_products:
+                # Get available units and ensure it's a list
+                available_units = op_product.epd.get_available_units()
+                if available_units is None:
+                    available_units = [op_product.epd.declared_unit]
+                elif isinstance(available_units, set):
+                    available_units = sorted(list(available_units))
+                elif not isinstance(available_units, list):
+                    available_units = list(available_units)
+
+                selected_products.append({
+                    "id": str(op_product.epd.id),
+                    "name": op_product.epd.name,
+                    "country": op_product.epd.country.name if op_product.epd.country else "Unknown",
+                    "category": op_product.epd.category.name_en if op_product.epd.category else "Unknown",
+                    "description": op_product.description,
+                    "selection_unit": op_product.input_unit,
+                    "selection_quantity": op_product.quantity,
+                    "timestamp": datetime.now().strftime("%Y%m%d%H%M%S%f"),
+                    "op_units": available_units,
+                })
+        except (ValueError, Building.DoesNotExist):
+            logger.warning(f"Building not found for UUID: {building_uuid}")
     
     context = {
         'epd_filters_form': epd_filters_form,
@@ -325,15 +336,102 @@ def handle_operational_data_step(request):
 # Step 4: Building Structural Components
 def handle_structural_components_step(request):
     """Handle building structural components step."""
+    from pages.models.assembly import Assembly, StructuralProduct
+    from pages.models.building import BuildingAssembly
+
     # Get filter dropdown data for EPD library search
     countries = Country.objects.all().order_by("name")
     epd_categories = MaterialCategory.objects.filter(parent__isnull=True).order_by("name_en")
     epd_types = [{"value": t[0], "label": t[1]} for t in EPDType.choices]
 
+    # Load previously saved assemblies from database (if building exists)
+    boq_items = []
+    component_items = []
+    building_uuid = request.GET.get('building_uuid')
+
+    if building_uuid:
+        try:
+            uuid_obj = uuid_lib.UUID(building_uuid)
+            building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+
+            # Get saved assemblies with their structural products
+            building_assemblies = BuildingAssembly.objects.filter(
+                building=building
+            ).select_related(
+                'assembly'
+            ).prefetch_related(
+                'assembly__structuralproduct_set__epd',
+                'assembly__structuralproduct_set__epd__country',
+                'assembly__structuralproduct_set__epd__category',
+                'assembly__structuralproduct_set__classification__category'
+            )
+
+            for ba in building_assemblies:
+                assembly = ba.assembly
+
+                # Get materials for this assembly
+                materials = []
+                for sp in assembly.structuralproduct_set.all():
+                    material = {
+                        'epd_id': sp.epd.id,
+                        'name': sp.epd.name,
+                        'quantity': float(sp.quantity),
+                        'unit': sp.input_unit,
+                        'description': sp.description or '',
+                        'gwp': float(sp.epd.get_gwp_impact_sum("A1-A3") or 0),
+                        'country': sp.epd.country.name if sp.epd.country else 'Unknown',
+                    }
+
+                    # Add category for BOQ items
+                    if assembly.is_boq and sp.classification:
+                        material['category'] = sp.classification.category.id
+                        material['category_name'] = sp.classification.category.name
+
+                    materials.append(material)
+
+                # Calculate total GWP
+                total_gwp = sum(m['gwp'] * m['quantity'] for m in materials)
+
+                if assembly.is_boq:
+                    # BOQ item
+                    boq_items.append({
+                        'id': assembly.id,
+                        'name': assembly.name,
+                        'comment': assembly.comment or '',
+                        'materials': materials,
+                        'total_gwp': total_gwp,
+                        'is_template': assembly.is_template
+                    })
+                else:
+                    # Component item
+                    classification = assembly.classification
+                    component_items.append({
+                        'id': assembly.id,
+                        'title': assembly.name,
+                        'category': classification.category.id if classification else None,
+                        'category_name': classification.category.name if classification else '',
+                        'technique': classification.technique.id if classification and classification.technique else None,
+                        'dimension': assembly.dimension,
+                        'quantity': float(ba.quantity),
+                        'comment': assembly.comment or '',
+                        'materials': materials,
+                        'total_gwp': total_gwp,
+                        'is_template': assembly.is_template
+                    })
+
+        except (ValueError, Building.DoesNotExist):
+            logger.warning(f"Building not found for UUID: {building_uuid}")
+        except Exception as e:
+            logger.exception(f"Error loading structural assemblies: {str(e)}")
+
+    logger.info(f"Loaded {len(boq_items)} BOQ items and {len(component_items)} component items")
+
     context = {
         'countries': countries,
         'epd_categories': epd_categories,
         'epd_types': epd_types,
+        'boq_items': boq_items,
+        'component_items': component_items,
     }
     return render(
         request,
@@ -449,6 +547,77 @@ def save_building_step(request):
                     return JsonResponse({"error": "Invalid building UUID"}, status=400)
             else:
                 return JsonResponse({"error": "Building must be created in step 1.1 first"}, status=400)
+
+        # Step 3: Operational Data Entry - Save operational products
+        elif step_key in ["operational-data-entry/operational-data-entry", "operational-data-entry/operational-data-entry.html"]:
+            logger.info(f"Handling operational data entry step for building_uuid: {building_uuid}")
+            logger.info(f"Step data: {step_data}")
+
+            if not building_uuid:
+                return JsonResponse({"error": "Building UUID is required"}, status=400)
+
+            try:
+                uuid_obj = uuid_lib.UUID(building_uuid)
+                building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+                logger.info(f"Found building: {building.id}")
+
+                # Extract operational products from step_data
+                operation_products = step_data.get('operation_products', [])
+                logger.info(f"Found {len(operation_products)} operational products in step_data")
+
+                if operation_products:
+                    # Delete existing operational products for this building
+                    OperationalProduct.objects.filter(building=building).delete()
+
+                    # Create new operational products
+                    created_count = 0
+                    for product in operation_products:
+                        # Extract the actual product data (skip csrf token)
+                        epd_id = product.get('id')
+                        if epd_id:
+                            try:
+                                # The id is a UUID string (EPD uses UUID as primary key)
+                                epd_uuid_obj = uuid_lib.UUID(epd_id)
+                                epd = EPD.objects.get(id=epd_uuid_obj)
+
+                                # Extract quantity and unit from the material_* fields
+                                quantity = None
+                                unit = None
+                                description = None
+
+                                # Find the material fields with this EPD's UUID
+                                for key, value in product.items():
+                                    if key.startswith(f'material_{epd_id}_quantity_'):
+                                        quantity = float(value)
+                                    elif key.startswith(f'material_{epd_id}_unit_'):
+                                        unit = value
+                                    elif key.startswith(f'material_{epd_id}_description_'):
+                                        description = value
+
+                                if quantity is not None and unit:
+                                    OperationalProduct.objects.create(
+                                        building=building,
+                                        epd=epd,
+                                        quantity=quantity,
+                                        input_unit=unit,
+                                        description=description or ''
+                                    )
+                                    created_count += 1
+                                else:
+                                    logger.warning(f"Missing quantity or unit for EPD {epd_id}")
+                            except (ValueError, EPD.DoesNotExist) as e:
+                                logger.warning(f"EPD not found for UUID: {epd_id}, error: {e}")
+                                continue
+                        else:
+                            logger.warning(f"Product missing EPD ID: {product}")
+
+                    logger.info(f"Saved {created_count} operational products for building {building.id}")
+
+            except (ValueError, Building.DoesNotExist):
+                return JsonResponse({"error": "Invalid building UUID or building not found"}, status=400)
+            except Exception as e:
+                logger.exception(f"Error saving operational products: {str(e)}")
+                return JsonResponse({"error": str(e)}, status=500)
 
         # For all other steps, just acknowledge receipt
         # Operational systems are saved immediately via their dedicated APIs

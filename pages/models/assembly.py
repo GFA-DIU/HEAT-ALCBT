@@ -146,6 +146,13 @@ class Assembly(BaseModel):
         EPD, blank=True, related_name="assemblies", through="StructuralProduct"
     )
     is_boq = models.BooleanField(default=False)
+    is_template = models.BooleanField(default=False, help_text="Whether this assembly can be reused as a template")
+    public = models.BooleanField(default=False, help_text="Whether this template is publicly accessible")
+    draft = models.BooleanField(default=False, help_text="Whether this assembly is in draft state")
+    from_template = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='derived_assemblies', help_text="Original template this was created from"
+    )
 
     def __str__(self):
         return self.name
