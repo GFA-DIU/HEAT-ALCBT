@@ -673,12 +673,22 @@ class StepManager {
 
       // Check if products are saved to database
       const form = document.getElementById('operational-products-form');
+      console.log('[StepManager] Form found?', !!form);
+      console.log('[StepManager] Form dataset.saved value:', form?.dataset?.saved);
       const isSaved = form && form.dataset.saved === 'true';
+      console.log('[StepManager] Is saved?', isSaved);
 
       if (!isSaved) {
-        console.warn('[StepManager] Operational products have unsaved changes');
-        Toast.warning("Please click 'Save Energy Carriers' before continuing.");
-        throw new Error("Please save energy carriers first.");
+        // Products need to be saved - trigger the form submission
+        console.log('[StepManager] Triggering save for operational products...');
+
+        // Return a marker that tells saveToServer to use custom save logic
+        return {
+          _useCustomEndpoint: true,
+          _customEndpoint: 'operational-products',
+          _customFormId: 'operational-products-form',
+          building_uuid: this.getBuildingId()
+        };
       }
 
       // Products are already saved, just verify and continue
@@ -760,14 +770,56 @@ class StepManager {
 
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
-      // Handle custom endpoints (like operational schedule)
+      // Handle custom endpoints (like operational schedule and operational products)
       if (stepData._useCustomEndpoint && stepData._customEndpoint) {
         console.log('[StepManager] Using custom endpoint:', stepData._customEndpoint);
 
+        // Special handling for operational products - trigger the form submission
+        if (stepData._customEndpoint === 'operational-products') {
+          const formId = stepData._customFormId || 'operational-products-form';
+          const form = document.getElementById(formId);
+
+          if (!form) {
+            console.error('[StepManager] Form not found:', formId);
+            return { success: false, error: 'Form not found' };
+          }
+
+          console.log('[StepManager] Triggering form submission for operational products');
+
+          // Use HTMX to submit the form and wait for response
+          return new Promise((resolve) => {
+            // Listen for the custom trigger event from server
+            const handleSaved = () => {
+              console.log('[StepManager] Operational products saved successfully');
+              document.body.removeEventListener('operationalProductsSaved', handleSaved);
+              resolve({ success: true, building_uuid: this.getBuildingId() });
+            };
+
+            document.body.addEventListener('operationalProductsSaved', handleSaved);
+
+            // Trigger the form submission
+            htmx.trigger(form, 'submit');
+
+            // Timeout fallback
+            setTimeout(() => {
+              document.body.removeEventListener('operationalProductsSaved', handleSaved);
+              console.warn('[StepManager] Save timeout, checking form state');
+              const savedForm = document.getElementById(formId);
+              if (savedForm?.dataset?.saved === 'true') {
+                resolve({ success: true, building_uuid: this.getBuildingId() });
+              } else {
+                resolve({ success: false, error: 'Save timeout' });
+              }
+            }, 5000);
+          });
+        }
+
+        // Handle other custom endpoints (like operational schedule)
         // Remove the markers from the data
         const cleanData = { ...stepData };
         delete cleanData._useCustomEndpoint;
         delete cleanData._customEndpoint;
+        delete cleanData._customFormId;
 
         const response = await fetch(`/building/step/${stepData._customEndpoint}`, {
           method: 'POST',

@@ -504,18 +504,8 @@
       }
 
       if (event.detail.successful) {
-        // Mark form as saved
-        const form = document.getElementById('operational-products-form');
-        if (form) {
-          form.dataset.saved = 'true';
-        }
-
-        // Hide unsaved indicator
-        const unsavedIndicator = document.querySelector('.unsaved-indicator');
-        if (unsavedIndicator) {
-          unsavedIndicator.style.display = 'none';
-        }
-
+        // Form already has data-saved="true" from server response
+        // Just show success message
         const saveStatus = document.getElementById('save_status');
         if (saveStatus) {
           saveStatus.innerHTML = '<span class="text-success font-medium">✓ Saved successfully!</span>';
