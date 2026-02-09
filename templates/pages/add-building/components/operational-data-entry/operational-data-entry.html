@@ -34,9 +34,11 @@
     <!-- Selected Products Container -->
     <form id="operational-products-form"
           hx-post="{% url 'building_step_operational' %}"
-          hx-vals='{"action": "save_op_products"}'
+          hx-vals='js:{"action": "save_op_products", "building_uuid": new URLSearchParams(window.location.search).get("building_uuid")}'
           hx-target="#operational-products-form"
-          hx-swap="outerHTML">
+          hx-swap="outerHTML"
+          {% if selected_products %}data-saved="true"{% endif %}>
+      {% csrf_token %}
 
       <ul class="grid grid-cols-1 gap-2" id="selected_op_products">
         {% if selected_products %}
@@ -71,13 +73,14 @@
       </ul>
       
       <div class="flex items-center gap-2 mt-4" id="save_button_container" {% if not selected_products %}hidden{% endif %}>
-        <button 
-          type="submit" 
-          class="btn btn-sm btn-primary" 
+        <button
+          type="submit"
+          class="btn btn-sm btn-primary"
           id="save_button"
         >
-          <span data-icon="save-line" data-size="16" data-color="currentColor"></span>
-          Save Energy Carriers
+          <span data-icon="save-line" data-size="16" data-color="currentColor" class="button-icon"></span>
+          <span class="loading loading-spinner loading-xs button-loading hidden"></span>
+          <span class="button-text">Save Energy Carriers</span>
         </button>
         <span class="text-xs text-[var(--text--sub-600)]" id="save_status"></span>
       </div>
@@ -321,14 +324,15 @@
 </dialog>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-
+(function() {
+  // Use IIFE to avoid polluting global scope but allow re-execution on dynamic load
 
   const selectedOpProducts = document.getElementById('selected_op_products');
   const selectEpdText = document.getElementById('select_epd_text');
   const saveButtonContainer = document.getElementById('save_button_container');
   const deleteModal = document.getElementById('energy_carrier_modal_delete');
   const mainModal = document.getElementById('energy_carrier_modal');
+  const saveButton = document.getElementById('save_button');
   let epdToDelete = null;
   
   // Update UI based on selected products count
@@ -342,8 +346,13 @@ document.addEventListener('DOMContentLoaded', function() {
   document.body.addEventListener('htmx:afterSwap', function(event) {
     if (event.detail.target.id === 'selected_op_products') {
       updateUI();
+      // Mark form as unsaved since a new product was added
+      const form = document.getElementById('operational-products-form');
+      if (form) {
+        form.removeAttribute('data-saved');
+      }
       // Close modal after adding
-      Toast.info('Energy carrier added successfully');
+      Toast.info('Energy carrier added successfully. Click "Save Energy Carriers" to apply changes.');
       if (mainModal) mainModal.close();
     }
   });
@@ -351,53 +360,170 @@ document.addEventListener('DOMContentLoaded', function() {
   // Handle Remove EPD button clicks
   if (selectedOpProducts) {
     selectedOpProducts.addEventListener('click', function(event) {
+      console.log('[Operational] Click event detected', event.target);
       const removeBtn = event.target.closest('.remove-epd');
+      console.log('[Operational] Remove button found:', removeBtn);
       if (removeBtn) {
         epdToDelete = {
           id: removeBtn.dataset.epdId,
           timestamp: removeBtn.dataset.timestamp,
           elementId: removeBtn.dataset.elementId
         };
-        deleteModal.showModal();
+        console.log('[Operational] EPD to delete:', epdToDelete);
+        console.log('[Operational] Delete modal:', deleteModal);
+        if (deleteModal) {
+          deleteModal.showModal();
+        } else {
+          console.error('[Operational] Delete modal not found!');
+        }
       }
     });
+  } else {
+    console.error('[Operational] selectedOpProducts element not found!');
   }
   
   // Handle delete confirmation
   const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
   if (confirmDeleteBtn) {
-    confirmDeleteBtn.addEventListener('click', function() {
-      energy_carrier_modal_delete.open();
+    confirmDeleteBtn.addEventListener('click', async function() {
       if (epdToDelete) {
-        const epdElement = document.getElementById(epdToDelete.elementId);
-        if (epdElement) {
-          epdElement.remove();
-          updateUI();
+        const buildingUuid = new URLSearchParams(window.location.search).get('building_uuid');
+
+        if (!buildingUuid) {
+          Toast.error('Building UUID not found');
+          deleteModal.close();
+          return;
         }
-        epdToDelete = null;
+
+        // Disable button during request
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Removing...';
+
+        try {
+          const response = await fetch('{% url "building_step_operational" %}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                             document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || ''
+            },
+            body: JSON.stringify({
+              action: 'delete_op_product',
+              building_uuid: buildingUuid,
+              epd_id: epdToDelete.id
+            })
+          });
+
+          console.log('[Operational] Response status:', response.status);
+          console.log('[Operational] Response content-type:', response.headers.get('content-type'));
+
+          // Check if response is JSON
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('[Operational] Server returned non-JSON response:', text.substring(0, 500));
+            Toast.error('Server error: Expected JSON response');
+            return;
+          }
+
+          const result = await response.json();
+          console.log('[Operational] Delete result:', result);
+
+          if (result.success) {
+            // Remove element from DOM
+            const epdElement = document.getElementById(epdToDelete.elementId);
+            if (epdElement) {
+              epdElement.remove();
+              updateUI();
+            }
+            Toast.success('Energy carrier removed successfully');
+          } else {
+            Toast.error(result.error || 'Failed to remove energy carrier');
+          }
+        } catch (error) {
+          console.error('Error removing energy carrier:', error);
+          Toast.error('Failed to remove energy carrier: ' + error.message);
+        } finally {
+          // Reset button
+          confirmDeleteBtn.disabled = false;
+          confirmDeleteBtn.innerHTML = 'Remove';
+          epdToDelete = null;
+          deleteModal.close();
+        }
       }
-      deleteModal.close();
     });
   }
   
-  // Handle successful save
-  document.body.addEventListener('htmx:afterRequest', function(event) {
-    if (event.detail.target.id === 'operational-products-form' && event.detail.successful) {
-      const saveStatus = document.getElementById('save_status');
-      if (saveStatus) {
-        saveStatus.textContent = 'Saved successfully!';
-        saveStatus.classList.add('text-success');
-        setTimeout(() => {
-          saveStatus.textContent = '';
-          saveStatus.classList.remove('text-success');
-        }, 3000);
+  // Handle save button loading state
+  document.body.addEventListener('htmx:beforeRequest', function(event) {
+    if (event.detail.target.id === 'operational-products-form') {
+      const btn = document.getElementById('save_button');
+      if (btn) {
+        btn.disabled = true;
+        const icon = btn.querySelector('.button-icon');
+        const loading = btn.querySelector('.button-loading');
+        const text = btn.querySelector('.button-text');
+        if (icon) icon.classList.add('hidden');
+        if (loading) loading.classList.remove('hidden');
+        if (text) text.textContent = 'Saving...';
       }
     }
   });
-  
+
+  // Handle successful save
+  document.body.addEventListener('htmx:afterRequest', function(event) {
+    if (event.detail.target.id === 'operational-products-form') {
+      const btn = document.getElementById('save_button');
+      if (btn) {
+        btn.disabled = false;
+        const icon = btn.querySelector('.button-icon');
+        const loading = btn.querySelector('.button-loading');
+        const text = btn.querySelector('.button-text');
+        if (icon) icon.classList.remove('hidden');
+        if (loading) loading.classList.add('hidden');
+        if (text) text.textContent = 'Save Energy Carriers';
+      }
+
+      if (event.detail.successful) {
+        // Mark form as saved
+        const form = document.getElementById('operational-products-form');
+        if (form) {
+          form.dataset.saved = 'true';
+        }
+
+        const saveStatus = document.getElementById('save_status');
+        if (saveStatus) {
+          saveStatus.textContent = 'Saved successfully!';
+          saveStatus.classList.add('text-success');
+          setTimeout(() => {
+            saveStatus.textContent = '';
+            saveStatus.classList.remove('text-success');
+          }, 3000);
+        }
+        Toast.success('Energy carriers saved successfully');
+      }
+    }
+  });
+
+  // Mark form as unsaved when any field changes
+  if (selectedOpProducts) {
+    selectedOpProducts.addEventListener('input', function(event) {
+      const form = document.getElementById('operational-products-form');
+      if (form && form.dataset.saved === 'true') {
+        form.removeAttribute('data-saved');
+        const saveStatus = document.getElementById('save_status');
+        if (saveStatus) {
+          saveStatus.textContent = 'Unsaved changes';
+          saveStatus.classList.remove('text-success');
+          saveStatus.classList.add('text-warning');
+        }
+      }
+    });
+  }
+
   // Initialize UI on load
   updateUI();
-});
+})();
 </script>
 
 <!-- Remove old templates as they're not needed with Django rendering -->

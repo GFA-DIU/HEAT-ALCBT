@@ -1,11 +1,9 @@
 {% load custom_filters %}
 
-<form>
-  {% csrf_token %}
-  <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      id="epd-{{ epd.id }}-{{ epd.timestamp }}"
-        >
+<li
+      class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
+    id="epd-{{ epd.id }}-{{ epd.timestamp }}"
+      >
         <span
           data-icon="gas-station-line"
           data-size="20"
@@ -26,20 +24,27 @@
           <div class="grid grid-cols-2 items-stretch gap-2 mt-1">
             <fieldset>
               <label class="input w-full validator">
-              <input  
-                name="description" 
+              <input
+                name="material_{{ epd.id }}_description_{{ epd.timestamp }}"
                 value="{% if epd.description %}{{ epd.description }}{% endif %}"
                 type="text" placeholder="Add a description"  required class="block w-full" />
               </label>
               <p class="validator-hint hidden">required</p>
             </fieldset>
-            
+
             <fieldset>
               <label class="input pr-0 grid grid-cols-2 validator">
-              <input type="number" name='quantity' class='block w-full' placeholder="Quantity" required min="1"  />
+              <input type="number"
+                name='material_{{ epd.id }}_quantity_{{ epd.timestamp }}'
+                value="{% if epd.selection_quantity %}{{ epd.selection_quantity }}{% endif %}"
+                class='block w-full'
+                placeholder="Quantity"
+                required
+                min="1"
+                step="0.01" />
               <select
                 class="select select-ghost w-fit !outline-none !border-none block w-full"
-                name="unit"
+                name="material_{{ epd.id }}_unit_{{ epd.timestamp }}"
                 required
               >
                 {% for unit in epd.op_units %}
@@ -61,10 +66,8 @@
         </div>
         <div class="flex items-center gap-3">
           <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="energy_carrier_modal_delete.showModal()"
             type="button"
-            class="btn btn-ghost btn-sm btn-square remove-epd"
+            class="btn size-5 btn-ghost p-0 remove-epd"
             data-epd-id="{{ epd.id }}"
             data-timestamp="{{ epd.timestamp }}"
             data-element-id="epd-{{ epd.id }}-{{ epd.timestamp }}"
@@ -78,7 +81,6 @@
           </button>
         </div>
       </li>
-</form>
 
 
 
