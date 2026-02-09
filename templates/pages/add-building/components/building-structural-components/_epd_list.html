@@ -41,8 +41,8 @@
     </div>
   </li>
   {% empty %}
-  <li class="text-center py-8 text-[var(--text--sub-600)]">
-    <span data-icon="inbox-line" data-size="48" data-color="var(--icon--soft-400)" class="mx-auto block mb-2"></span>
+  <li class="text-center py-8 text-[var(--text--sub-600)] flex justify-center items-center gap-2">
+    {% comment %} <span data-icon="inbox-line" data-size="48" data-color="var(--icon--soft-400)" class="mx-auto block mb-2"></span> {% endcomment %}
     <p>No materials found matching your criteria</p>
   </li>
   {% endfor %}
@@ -53,9 +53,10 @@
   <div class="flex items-center gap-2 w-full justify-center">
     {% if epd_list.has_previous %}
     <button class="btn btn-ghost btn-sm"
-            hx-get="{% url 'building_step_structural' %}?page={{ epd_list.previous_page_number }}&{{ filters }}"
+            hx-get="{% url 'building_step_structural' %}?page={{ epd_list.previous_page_number }}&{{ filters }}&mode={{ mode|default:'boq' }}"
             hx-target="#structural_epd_list"
-            hx-swap="innerHTML">
+            hx-swap="innerHTML"
+            hx-include="#epd_filter_dimension, #epd_filter_mode">
       <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
       Previous
     </button>
@@ -70,9 +71,10 @@
       {% if num >= epd_list.number|add:-2 and num <= epd_list.number|add:2 %}
       <button class="btn btn-sm rounded-[var(--radius-8)] {% if num == epd_list.number %}btn-neutral{% else %}btn-ghost{% endif %}"
               {% if num != epd_list.number %}
-              hx-get="{% url 'building_step_structural' %}?page={{ num }}&{{ filters }}"
+              hx-get="{% url 'building_step_structural' %}?page={{ num }}&{{ filters }}&mode={{ mode|default:'boq' }}"
               hx-target="#structural_epd_list"
               hx-swap="innerHTML"
+              hx-include="#epd_filter_dimension, #epd_filter_mode"
               {% else %}
               disabled
               {% endif %}>
@@ -83,9 +85,10 @@
 
     {% if epd_list.has_next %}
     <button class="btn btn-ghost btn-sm"
-            hx-get="{% url 'building_step_structural' %}?page={{ epd_list.next_page_number }}&{{ filters }}"
+            hx-get="{% url 'building_step_structural' %}?page={{ epd_list.next_page_number }}&{{ filters }}&mode={{ mode|default:'boq' }}"
             hx-target="#structural_epd_list"
-            hx-swap="innerHTML">
+            hx-swap="innerHTML"
+            hx-include="#epd_filter_dimension, #epd_filter_mode">
       Next
       <span data-icon="arrow-right" data-size="20" data-color="var(--icon--strong-950)"></span>
     </button>

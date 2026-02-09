@@ -1,7 +1,7 @@
 {% load static %}
 
-<div id="templates-list">
-  <ul class="grid grid-cols-1 gap-2.75 mt-6">
+<div id="structural_templates_list">
+  <ul class="grid grid-cols-1 gap-2.75 mt-3">
     {% for item in assemblies_with_gwp %}
       {% with assembly=item.assembly total_gwp=item.total_gwp classification=item.classification %}
         <li class="bg-[var(--bg--weak-50)] rounded-lg px-2.5 py-4 flex justify-between gap-2">
@@ -38,7 +38,7 @@
               {% endif %}
             </div>
           </div>
-          <div class="flex gap-2">
+          <div class="flex gap-2 items-center">
             {% with first_product=assembly.structuralproduct_set.first %}
               {% if first_product %}
                 <span class="badge gap-0 text-xs/4 py-1 px-2 font-medium">
@@ -55,7 +55,7 @@
                   data-size="16"
                   data-color="var(--icon--soft-400)"
                 ></span>
-                System component
+                System
               </span>
             {% else %}
               <span class="badge text-xs/4 py-1 px-2 font-medium gap-1">
@@ -68,61 +68,34 @@
               </span>
             {% endif %}
             <button
-              class="btn size-5 btn-ghost p-0"
-              onclick="viewTemplate('{{ assembly.id }}')"
-              title="View details"
+              class="btn btn-sm btn-outline border-[var(--stroke--soft-200)] rounded-[var(--radius-8)] self-end"
+              onclick="structuralManager.selectTemplate('{{ assembly.id }}')"
+              title="Select this template"
             >
-              <span
-                data-icon="eye-line"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-            <button
-              class="btn size-5 btn-ghost p-0"
-              onclick="duplicateTemplate('{{ assembly.id }}')"
-              title="Duplicate template"
-            >
-              <span
-                data-icon="file-copy-line"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
-            </button>
-            <button
-              class="btn size-5 btn-ghost p-0"
-              onclick="deleteTemplate('{{ assembly.id }}', '{{ assembly.name }}')"
-              title="Delete template"
-            >
-              <span
-                data-icon="delete-bin-5-line"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-              ></span>
+              <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+              Add
             </button>
           </div>
         </li>
       {% endwith %}
     {% empty %}
       <section class="flex flex-col flex-1">
-        <div class="flex flex-col flex-1 items-center justify-center gap-4">
-          <img src="{% static 'assets/building.png' %}" alt="map" />
-          <span class="text-sm/5 font-medium text-center">No templates available</span>            
-            {% comment %} <button class="btn btn-outline rounded-lg" onclick="template_detail_modal.showModal()">
-              <span data-icon="add-large-fill"></span>
-              Add Template
-            </button> {% endcomment %}
+        <div class="flex flex-col flex-1 items-center justify-center gap-4 py-8">
+          <img src="{% static 'assets/building.png' %}" alt="No templates" class="w-32" />
+          <span class="text-sm/5 font-medium text-center text-[var(--text--sub-600)]">No templates found</span>
+          <p class="text-xs/4 text-center text-[var(--text--sub-600)]">Try adjusting your search criteria</p>
         </div>
-      </section> 
+      </section>
     {% endfor %}
   </ul>
 
-  <div class="flex items-center justify-center gap-2 mt-7.5">
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div id='template-pagination-swap'  hx-swap-oob="true" class="flex items-center justify-center gap-2 mt-4">
     <button
-      class="btn btn-ghost py-2 px-3"
+      class="btn btn-ghost btn-sm py-2 px-3"
       {% if page_obj.has_previous %}
-        hx-get="?page={{ page_obj.previous_page_number }}&search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&technique={{ selected_technique }}&mode={{ selected_mode }}&sort_by={{ selected_sort }}"
-        hx-target="#templates-list"
+        hx-get="{% url 'building_step_structural' %}?action=search_templates&page={{ page_obj.previous_page_number }}&search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&technique={{ selected_technique }}&mode={{ selected_mode }}&sort_by={{ selected_sort }}"
+        hx-target="#structural_templates_list"
         hx-swap="outerHTML"
       {% else %}
         disabled
@@ -147,8 +120,8 @@
           <li>
             <button
               class="btn btn-sm rounded-[var(--radius-8)] btn-ghost"
-              hx-get="?page={{ num }}&search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&technique={{ selected_technique }}&mode={{ selected_mode }}&sort_by={{ selected_sort }}"
-              hx-target="#templates-list"
+              hx-get="{% url 'building_step_structural' %}?action=search_templates&page={{ num }}&search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&technique={{ selected_technique }}&mode={{ selected_mode }}&sort_by={{ selected_sort }}"
+              hx-target="#structural_templates_list"
               hx-swap="outerHTML"
             >
               {{ num }}
@@ -158,10 +131,10 @@
       {% endfor %}
     </ul>
     <button
-      class="btn btn-ghost py-2 px-3"
+      class="btn btn-ghost btn-sm py-2 px-3"
       {% if page_obj.has_next %}
-        hx-get="?page={{ page_obj.next_page_number }}&search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&technique={{ selected_technique }}&mode={{ selected_mode }}&sort_by={{ selected_sort }}"
-        hx-target="#templates-list"
+        hx-get="{% url 'building_step_structural' %}?action=search_templates&page={{ page_obj.next_page_number }}&search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&technique={{ selected_technique }}&mode={{ selected_mode }}&sort_by={{ selected_sort }}"
+        hx-target="#structural_templates_list"
         hx-swap="outerHTML"
       {% else %}
         disabled
@@ -175,4 +148,5 @@
       ></span>
     </button>
   </div>
+  {% endif %}
 </div>

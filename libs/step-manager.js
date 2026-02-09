@@ -1093,7 +1093,7 @@ class StepManager {
     const contentArea = document.getElementById("dynamic-content");
     if (contentArea) {
       contentArea.innerHTML = `
-        <div class="flex items-center justify-center h-64">
+        <div class="flex items-center justify-center h-64 w-fit mx-auto">
           <div class="loading loading-spinner loading-lg text-primary"></div>
           <p class="ml-4">Completing building setup...</p>
         </div>

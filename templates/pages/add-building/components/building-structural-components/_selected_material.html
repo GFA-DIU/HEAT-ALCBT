@@ -14,46 +14,42 @@
         </div>
       </div>
 
-      <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
-        <div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]">
-          <span data-country="{{ epd.country }}" data-width="20"></span>
-        </div>
+  <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
+    <div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]">
+      <span data-country="{{ epd.country }}" data-width="20"></span>
+    </div>
 
-        <label class="input w-full">
-          <input type="text"
-                name="material_{{ epd.id }}_description_{{ epd.timestamp }}"
-                placeholder="Add description"
-                class="material-description" required />
-        </label>
+    <label class="input w-full">
+      <input type="text"
+            placeholder="Add description"
+            class="material-description" required />
+    </label>
 
-        {% if mode == 'boq' %}
-        <select name="material_{{ epd.id }}_category_{{ epd.timestamp }}"
-                class="select material-category"
-                required>
-          <option value="" selected disabled>Category</option>
-          {% for cat in categories %}
-          <option value="{{ cat.id }}">{{ cat.name }}</option>
-          {% endfor %}
-        </select>
-        {% endif %}
+    {% if mode == 'boq' %}
+    <select class="select material-category" required>
+      <option value="" selected disabled>Category</option>
+      {% for cat in categories %}
+      <option value="{{ cat.id }}">{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+    {% endif %}
 
-        <label class="input w-full max-w-[140px]">
-          <input type="number"
-                name="material_{{ epd.id }}_quantity_{{ epd.timestamp }}"
-                placeholder="Qty"
-                step="0.01"
-                min="0"
-                class="material-quantity"
-                required />
-          <select name="material_{{ epd.id }}_unit_{{ epd.timestamp }}"
-                  class="select select-ghost w-fit !outline-none !border-none material-unit">
-            {% for unit in epd.available_units %}
-            <option value="{{ unit }}" {% if unit == epd.selection_unit %}selected{% endif %}>{{ unit }}</option>
-            {% endfor %}
-          </select>
-        </label>
+    <label class="input w-full max-w-[140px]">
+      <input type="number"
+            placeholder="Qty"
+            step="0.01"
+            min="0"
+            class="material-quantity"
+            required />
+      <select class="select select-ghost w-fit !outline-none !border-none material-unit">
+        {% for unit in epd.available_units %}
+        <option value="{{ unit }}" {% if unit == epd.selection_unit %}selected{% endif %}>{{ unit }}</option>
+        {% endfor %}
+      </select>
+    </label>
 
-        <div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"></div>
+    <div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"></div>
+
 
         <button type="button"
                 class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch remove-material-btn"

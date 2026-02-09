@@ -81,7 +81,12 @@
                 hx-trigger="keyup changed delay:500ms"
                 hx-target="#buildings-container"
                 hx-swap="innerHTML"
+                hx-indicator="#buildings-loading-spinner"
               />
+                <!-- Loading spinner -->
+              <div id="buildings-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+              </div>
             </label>
             {% comment %} <ul class="filter-radio-group flex">
               <li>
@@ -111,8 +116,9 @@
           </div>
         </div>
         <div id="buildings-container" class="w-full">
-          {% include "pages/home/partials/buildings_list.html" %} 
+          {% include "pages/home/partials/buildings_list.html" %}
         </div>
+
       </div>
 
 
