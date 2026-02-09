@@ -324,8 +324,8 @@
 </dialog>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-
+(function() {
+  // Use IIFE to avoid polluting global scope but allow re-execution on dynamic load
 
   const selectedOpProducts = document.getElementById('selected_op_products');
   const selectEpdText = document.getElementById('select_epd_text');
@@ -360,37 +360,97 @@ document.addEventListener('DOMContentLoaded', function() {
   // Handle Remove EPD button clicks
   if (selectedOpProducts) {
     selectedOpProducts.addEventListener('click', function(event) {
+      console.log('[Operational] Click event detected', event.target);
       const removeBtn = event.target.closest('.remove-epd');
+      console.log('[Operational] Remove button found:', removeBtn);
       if (removeBtn) {
         epdToDelete = {
           id: removeBtn.dataset.epdId,
           timestamp: removeBtn.dataset.timestamp,
           elementId: removeBtn.dataset.elementId
         };
-        deleteModal.showModal();
+        console.log('[Operational] EPD to delete:', epdToDelete);
+        console.log('[Operational] Delete modal:', deleteModal);
+        if (deleteModal) {
+          deleteModal.showModal();
+        } else {
+          console.error('[Operational] Delete modal not found!');
+        }
       }
     });
+  } else {
+    console.error('[Operational] selectedOpProducts element not found!');
   }
   
   // Handle delete confirmation
   const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
   if (confirmDeleteBtn) {
-    confirmDeleteBtn.addEventListener('click', function() {
+    confirmDeleteBtn.addEventListener('click', async function() {
       if (epdToDelete) {
-        const epdElement = document.getElementById(epdToDelete.elementId);
-        if (epdElement) {
-          epdElement.remove();
-          updateUI();
-          // Mark form as unsaved since a product was removed
-          const form = document.getElementById('operational-products-form');
-          if (form) {
-            form.removeAttribute('data-saved');
-          }
-          Toast.info('Energy carrier removed. Click "Save Energy Carriers" to apply changes.');
+        const buildingUuid = new URLSearchParams(window.location.search).get('building_uuid');
+
+        if (!buildingUuid) {
+          Toast.error('Building UUID not found');
+          deleteModal.close();
+          return;
         }
-        epdToDelete = null;
+
+        // Disable button during request
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Removing...';
+
+        try {
+          const response = await fetch('{% url "building_step_operational" %}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                             document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || ''
+            },
+            body: JSON.stringify({
+              action: 'delete_op_product',
+              building_uuid: buildingUuid,
+              epd_id: epdToDelete.id
+            })
+          });
+
+          console.log('[Operational] Response status:', response.status);
+          console.log('[Operational] Response content-type:', response.headers.get('content-type'));
+
+          // Check if response is JSON
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('[Operational] Server returned non-JSON response:', text.substring(0, 500));
+            Toast.error('Server error: Expected JSON response');
+            return;
+          }
+
+          const result = await response.json();
+          console.log('[Operational] Delete result:', result);
+
+          if (result.success) {
+            // Remove element from DOM
+            const epdElement = document.getElementById(epdToDelete.elementId);
+            if (epdElement) {
+              epdElement.remove();
+              updateUI();
+            }
+            Toast.success('Energy carrier removed successfully');
+          } else {
+            Toast.error(result.error || 'Failed to remove energy carrier');
+          }
+        } catch (error) {
+          console.error('Error removing energy carrier:', error);
+          Toast.error('Failed to remove energy carrier: ' + error.message);
+        } finally {
+          // Reset button
+          confirmDeleteBtn.disabled = false;
+          confirmDeleteBtn.innerHTML = 'Remove';
+          epdToDelete = null;
+          deleteModal.close();
+        }
       }
-      deleteModal.close();
     });
   }
   
@@ -463,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Initialize UI on load
   updateUI();
-});
+})();
 </script>
 
 <!-- Remove old templates as they're not needed with Django rendering -->

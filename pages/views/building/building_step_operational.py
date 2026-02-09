@@ -24,20 +24,36 @@ logger = logging.getLogger(__name__)
 
 
 @login_required
-@require_http_methods(["GET", "POST", "PUT"])
+@require_http_methods(["GET", "POST", "PUT", "DELETE"])
 def building_step_operational_products(request):
     """
     Handle operational products selection for the add-building wizard.
     Supports GET for listing/filtering EPDs and POST for adding/saving products.
     """
-    action = request.POST.get("action") if request.method == "POST" else "list"
-    
+    import json
+
+    action = "list"
+
+    if request.method == "POST":
+        # Try to get action from JSON body first
+        if request.content_type == 'application/json':
+            try:
+                data = json.loads(request.body)
+                action = data.get("action", "list")
+            except json.JSONDecodeError:
+                action = request.POST.get("action", "list")
+        else:
+            # Fall back to form data
+            action = request.POST.get("action", "list")
+
     if action == "filter":
         return handle_filter_epds(request)
     elif action == "select_op_product":
         return handle_select_product(request)
     elif action == "save_op_products":
         return handle_save_products(request)
+    elif action == "delete_op_product":
+        return handle_delete_product(request)
     else:
         # Default: return EPD list
         return handle_filter_epds(request)
@@ -204,3 +220,49 @@ def handle_save_products(request):
     response['HX-Trigger'] = 'operationalProductsSaved'
 
     return response
+
+
+def handle_delete_product(request):
+    """
+    Delete a specific operational product from the building.
+    """
+    import json
+
+    try:
+        data = json.loads(request.body)
+        building_uuid = data.get("building_uuid")
+        epd_id = data.get("epd_id")
+
+        if not building_uuid or not epd_id:
+            return JsonResponse({"success": False, "error": "Missing required fields"}, status=400)
+
+        # Get the building instance
+        try:
+            uuid_obj = uuid_lib.UUID(building_uuid)
+            building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+        except (ValueError, Building.DoesNotExist):
+            return JsonResponse({"success": False, "error": "Building not found"}, status=404)
+
+        # Delete the operational product
+        deleted_count, _ = OperationalProduct.objects.filter(
+            building=building,
+            epd_id=epd_id
+        ).delete()
+
+        if deleted_count > 0:
+            logger.info(f"Deleted operational product {epd_id} from building {building.id}")
+            return JsonResponse({
+                "success": True,
+                "message": "Energy carrier removed successfully"
+            })
+        else:
+            return JsonResponse({
+                "success": False,
+                "error": "Energy carrier not found"
+            }, status=404)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "Invalid JSON data"}, status=400)
+    except Exception as e:
+        logger.exception(f"Error deleting operational product: {str(e)}")
+        return JsonResponse({"success": False, "error": str(e)}, status=500)

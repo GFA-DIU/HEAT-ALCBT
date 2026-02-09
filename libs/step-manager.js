@@ -688,6 +688,26 @@ class StepManager {
         operational_data_saved: true
       };
 
+    } else if (stepKey === 'operational-details/operational-schedule-temperature') {
+      // For operational schedule, we need to call our custom save function
+      // Return a marker that tells saveToServer to use custom logic
+      const form = document.getElementById("form");
+      if (form) {
+        const formData = new FormData(form);
+        let validator = new window.FormValidator(form);
+        let isValid = validator.validate();
+        if (!isValid) {
+          Toast.error("Please correct the errors in the form before proceeding.");
+          throw new Error("Form validation failed.");
+        }
+        return {
+          building_uuid: this.getBuildingId(),
+          _useCustomEndpoint: true,
+          _customEndpoint: 'operational-schedule',
+          ...Object.fromEntries(formData.entries())
+        };
+      }
+      throw new Error("Form not found.");
     } else {
       const form = document.getElementById("form");
       if (form) {
@@ -739,6 +759,35 @@ class StepManager {
       console.log('[StepManager] saveToServer stepData:', stepData);
 
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+      // Handle custom endpoints (like operational schedule)
+      if (stepData._useCustomEndpoint && stepData._customEndpoint) {
+        console.log('[StepManager] Using custom endpoint:', stepData._customEndpoint);
+
+        // Remove the markers from the data
+        const cleanData = { ...stepData };
+        delete cleanData._useCustomEndpoint;
+        delete cleanData._customEndpoint;
+
+        const response = await fetch(`/building/step/${stepData._customEndpoint}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken || '',
+          },
+          body: JSON.stringify(cleanData)
+        });
+
+        const result = await response.json();
+        console.log('[StepManager] Custom endpoint response:', result);
+
+        if (!response.ok || !result.success) {
+          console.error('[StepManager] Failed to save via custom endpoint:', result);
+          return { success: false, error: result.error || 'Failed to save' };
+        }
+
+        return { success: true, building_uuid: this.getBuildingId() };
+      }
 
       // Get building_uuid from URL params or from formData
       const urlParams = new URLSearchParams(window.location.search);

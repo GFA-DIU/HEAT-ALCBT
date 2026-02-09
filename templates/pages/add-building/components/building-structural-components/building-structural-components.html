@@ -774,11 +774,13 @@
 
           if (epdId) {
             // Use the proper EPD selection endpoint to add the material
+            // Use current dimension from the dropdown, not template dimension
+            const currentDimension = document.getElementById('component_dimension').value;
             const formData = new FormData();
             formData.append('action', 'select_structural_product');
             formData.append('epd_id', epdId);
             formData.append('mode', 'component');
-            formData.append('dimension', template.dimension || 'area');
+            formData.append('dimension', currentDimension);
 
             const response = await fetch('{% url "building_step_structural" %}', {
               method: 'POST',
@@ -860,7 +862,7 @@
         gwp: parseFloat(li.dataset.gwp) || 0,
         description: li.querySelector('.material-description')?.value || '',
         quantity: parseFloat(li.querySelector('.material-quantity')?.value) || 0,
-        unit: li.querySelector('.material-unit')?.value || '',
+        unit: li.querySelector('.material-unit-value')?.value || li.querySelector('.material-unit')?.dataset?.unit || '',
         category: li.querySelector('.material-category')?.value || '',
         timestamp: timestamp
       };
