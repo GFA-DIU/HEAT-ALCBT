@@ -474,8 +474,10 @@ class StepManager {
 
     try {
       // Use the new Django step view endpoint
-      // Get building UUID if it exists in form data
-      const buildingUuid = this.formData['building-information/building-name-location']?.building_uuid || '';
+      // Get building UUID from URL params first (covers refresh/shared links), then fall back to formData
+      const buildingUuid = this.getBuildingId()
+        || this.formData['building-information/building-name-location']?.building_uuid
+        || '';
       const url = buildingUuid
         ? `/building/step?step=${subStep.component}&building_uuid=${buildingUuid}`
         : `/building/step?step=${subStep.component}`;

@@ -189,8 +189,11 @@ def handle_get_techniques(request):
 
 
 def handle_get_categories(request):
-    """Get assembly categories (HTMX endpoint)."""
-    categories = AssemblyCategory.objects.all().values('id', 'name')
+    """Get assembly categories (HTMX endpoint). Returns JSON when format=json."""
+    categories = list(AssemblyCategory.objects.all().values('id', 'name'))
+
+    if request.GET.get('format') == 'json':
+        return JsonResponse({'categories': categories})
 
     options = ['<option value="">Select category</option>']
     for cat in categories:
