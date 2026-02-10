@@ -7,6 +7,7 @@ from .models.epd import MaterialCategory, EPD, Impact, EPDImpact, Label, EPDLabe
 from .models.assembly import Assembly, AssemblyCategory, AssemblyTechnique
 from .models.building import Building, BuildingCategory, BuildingSubcategory
 from .models.base import ALCBTCountryManager
+from .models.building_operation.chilling import RefrigerantGWP
 from .scripts.Excel_export.export_EPDs_to_excel import to_excel_bytes
 
 
@@ -197,3 +198,12 @@ admin.site.register(BuildingCategory, BuildingCategoryAdmin)
 admin.site.register(BuildingSubcategory)
 admin.site.register(Impact)
 admin.site.register(Label, LabelAdmin)
+
+
+class RefrigerantGWPAdmin(admin.ModelAdmin):
+    list_display = ["refrigerant_code", "gwp_value"]
+    search_fields = ["refrigerant_code"]
+    ordering = ["refrigerant_code"]
+
+
+admin.site.register(RefrigerantGWP, RefrigerantGWPAdmin)
