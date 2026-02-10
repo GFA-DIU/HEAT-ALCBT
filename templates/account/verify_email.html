@@ -1,0 +1,54 @@
+{% extends 'account/_auth.html' %}
+{% load static %}
+
+{% block title %}Verify Your Email{% endblock %}
+
+{% block auth_content %}
+  <div class="flex flex-col gap-6 w-full">
+
+    <div class="flex flex-col gap-2 text-center">
+      <span data-icon="mail-fill" data-color="var(--state--information--base)" class="text-4xl mx-auto"></span>
+      <h1 class="text-xl font-bold text-(--text--strong-950)">Confirm your email address</h1>
+      <p class="text-sm text-[var(--text--sub-600)]">
+        We sent a confirmation email to <span class="font-medium text-(--text--strong-950)">{{ email }}</span>.
+        Please check your inbox and click the confirmation link to access the platform.
+      </p>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flex p-[0.875rem] gap-3 rounded-[var(--radius-12)] w-full
+          {% if message.tags == 'success' %}bg-[var(--state--success--lighter)] text-[var(--state--success--base)]
+          {% elif message.tags == 'warning' %}bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]
+          {% else %}bg-[var(--state--information--lighter)] text-[var(--state--information--base)]{% endif %}">
+          <p class="text-sm">{{ message }}</p>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if can_resend %}
+      <div class="flex flex-col gap-3">
+        <p class="text-sm text-center text-[var(--text--sub-600)]">
+          It has been over a week since we sent your confirmation email. You can request a new one below.
+        </p>
+        <form method="post" action="{% url 'resend_confirmation_email' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary w-full">
+            Resend confirmation email
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <p class="text-sm text-center text-[var(--text--sub-600)]">
+        Did not receive it? Check your spam folder or wait a few minutes.
+      </p>
+    {% endif %}
+
+    <div class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem] text-sm text-[var(--text--sub-600)]">or</div>
+
+    <a href="{% url 'account_logout' %}" class="btn btn-outline w-full">
+      Sign out
+    </a>
+
+  </div>
+{% endblock auth_content %}

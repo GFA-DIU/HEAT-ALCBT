@@ -36,27 +36,6 @@
       <div class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem]"></div>
 
       <div class="card-body p-0 px-4 max-w-[68.75rem] mx-auto w-full text-[var(--text--strong-950)]">
-        {% if not email_verified %}
-        <div id="email-confirmation-banner" class="flex p-[0.875rem] gap-3 bg-[var(--state--information--lighter)] rounded-[var(--radius-12)] w-full text-[var(--text--strong-950)]">
-          <span
-            data-icon="mail-fill"
-            data-color="var(--state--information--base)"
-          ></span>
-          <div class="flex flex-col flex-1">
-            <span class="text-sm/5 font-medium">Confirm your email</span>
-            <p class="text-sm/5 font-normal">
-              We've sent a confirmation email to you. Please confirm your
-              account
-            </p>
-          </div>
-          <button class="btn btn-ghost size-6 p-0" onclick="dismissEmailBanner()">
-            <span
-              data-icon="close-line"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-        {% endif %}
         
         <div class="flex items-center justify-between mt-6">
           <div class="flex flex-col">
