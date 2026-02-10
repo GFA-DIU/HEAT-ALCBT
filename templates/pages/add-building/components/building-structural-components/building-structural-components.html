@@ -123,7 +123,7 @@
 <dialog id="structural_component_modal" class="modal modal-bottom sm:modal-end">
   <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full border-b border-[var(--stroke--soft-200)]">
-      <h3 class="text-lg/6 font-medium">Create New Component</h3>
+      <h3 class="text-lg/6 font-medium" id="structural_component_modal_title">Create New Component</h3>
       <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick="structuralManager.closeComponentModal()">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
@@ -509,6 +509,7 @@
     this.editingIndex = null;
     this.pendingDelete = null;
     this._htmxHandler = null;
+    this.categories = [];
   }
 
   init() {
@@ -590,10 +591,14 @@
   }
 
   loadCategories() {
-    fetch("{% url 'building_step_structural' %}?action=get_categories")
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('component_category').innerHTML = html;
+    fetch("{% url 'building_step_structural' %}?action=get_categories&format=json")
+      .then(res => res.json())
+      .then(data => {
+        this.categories = data.categories || [];
+        const options = ['<option value="">Select category</option>',
+          ...this.categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`)
+        ].join('');
+        document.getElementById('component_category').innerHTML = options;
       });
   }
 
@@ -624,22 +629,39 @@
     this.resetModalState();
   }
 
-  openComponentModal(index = null) {
+  async openComponentModal(index = null) {
     this.currentMode = 'component';
     this.editingIndex = index;
     document.getElementById('epd_filter_mode').value = 'component';
 
     if (index !== null && this.componentItems[index]) {
       const item = this.componentItems[index];
+      document.getElementById('structural_component_modal_title').textContent = 'Edit Component';
       document.getElementById('component_title').value = item.title;
       document.getElementById('component_category').value = item.category || '';
-      document.getElementById('component_technique').value = item.technique || '';
       document.getElementById('component_dimension').value = item.dimension || 'area';
       document.getElementById('component_quantity').value = item.quantity || '';
       document.getElementById('component_comment').value = item.comment || '';
       document.getElementById('component_is_template').checked = item.is_template || false;
+
+      // Load techniques for the saved category, then restore saved technique
+      if (item.category) {
+        try {
+          const response = await fetch(`{% url 'building_step_structural' %}?action=get_techniques&category_id=${item.category}`);
+          const html = await response.text();
+          document.getElementById('component_technique').innerHTML = html;
+          document.getElementById('component_technique').value = item.technique || '';
+        } catch (error) {
+          console.error('Error loading techniques:', error);
+          document.getElementById('component_technique').innerHTML = '<option value="">Select technique</option>';
+        }
+      } else {
+        document.getElementById('component_technique').innerHTML = '<option value="">Select technique</option>';
+      }
+
       this.renderMaterials(item.materials, 'component');
     } else {
+      document.getElementById('structural_component_modal_title').textContent = 'Create New Component';
       document.getElementById('component_title').value = '';
       document.getElementById('component_category').value = '';
       document.getElementById('component_technique').innerHTML = '<option value="">Select technique</option>';
@@ -931,6 +953,10 @@
     const list = document.getElementById(listId);
     if (!list) return;
 
+    const categoryOptions = this.categories.map(cat =>
+      `<option value="${cat.id}">${cat.name}</option>`
+    ).join('');
+
     list.innerHTML = '';
     materials.forEach(m => {
       const li = document.createElement('li');
@@ -941,29 +967,41 @@
       li.dataset.name = m.name;
       li.dataset.gwp = m.gwp;
 
+      const categorySelect = mode === 'boq' ? `
+        <select class="select material-category" required>
+          <option value="" disabled>Category</option>
+          ${categoryOptions}
+        </select>` : '';
+
       li.innerHTML = `
         <div class="flex items-center justify-between mb-2 w-full">
           <span class="text-sm/5 font-medium truncate flex-1">${m.name}</span>
         </div>
         <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
-          <div>
-          <span
+          <div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]">
           </div>
           <label class="input w-full">
-            <input type="text" value="${m.description || ''}" placeholder="Description" class="material-description w-full" />
+            <input type="text" value="${m.description || ''}" placeholder="Add description" class="material-description w-full" />
           </label>
+          ${categorySelect}
           <label class="input w-full max-w-[140px]">
             <input type="number" value="${m.quantity || ''}" placeholder="Qty" class="material-quantity w-full" step="0.01" min="0" />
-            <select class="select select-ghost w-fit !outline-none !border-none material-unit">
-              <option value="${m.unit}" selected>${m.unit}</option>
-            </select>
+            <span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="${m.unit}">${m.unit}</span>
+            <input type="hidden" class="material-unit-value" value="${m.unit}" />
           </label>
-          <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] remove-material-btn"
+          <div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"></div>
+          <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch remove-material-btn"
                   data-element-id="material-${m.epd_id}-${m.timestamp}">
             <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
           </button>
         </div>
       `;
+
+      // Set the saved category value after inserting into DOM
+      if (mode === 'boq' && m.category) {
+        li.querySelector('.material-category').value = m.category;
+      }
+
       list.appendChild(li);
     });
 
@@ -993,6 +1031,8 @@
     }
 
     const totalGwp = materials.reduce((sum, m) => sum + (m.gwp * m.quantity), 0);
+
+    const existingItem = this.editingIndex !== null ? this.boqItems[this.editingIndex] : null;
 
     const item = {
       name: name,
@@ -1025,6 +1065,7 @@
           action: 'save_assembly',
           building_uuid: buildingUuid,
           mode: 'boq',
+          assembly_id: existingItem?.id || null,
           assembly_data: item
         })
       });
@@ -1081,6 +1122,8 @@
     const totalGwp = materials.reduce((sum, m) => sum + (m.gwp * m.quantity), 0);
     const categorySelect = document.getElementById('component_category');
 
+    const existingComponentItem = this.editingIndex !== null ? this.componentItems[this.editingIndex] : null;
+
     const item = {
       title: title,
       category: document.getElementById('component_category').value,
@@ -1117,6 +1160,7 @@
           action: 'save_assembly',
           building_uuid: buildingUuid,
           mode: 'component',
+          assembly_id: existingComponentItem?.id || null,
           assembly_data: item
         })
       });
