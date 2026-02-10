@@ -262,6 +262,12 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
 
+# Site domain configuration
+# For local development, use 127.0.0.1:8000
+# For production, use your actual domain (e.g., beat.example.com)
+SITE_DOMAIN = os.environ.get("SITE_DOMAIN", "127.0.0.1:8000")
+SITE_NAME = os.environ.get("SITE_NAME", "BEAT")
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = "home"
 ACCOUNT_SIGNUP_REDIRECT_URL = "home"

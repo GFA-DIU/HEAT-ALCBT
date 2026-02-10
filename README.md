@@ -37,12 +37,28 @@ docker compose up db
 
 Next, start the Django application
 
+**Note:** Create a `.env` file in the root directory with the following environment variables:
+
+```bash
+# Site Configuration (for email confirmation links)
+SITE_DOMAIN="127.0.0.1:8000"  # For production, use actual domain (e.g., "beat.yourdomain.com")
+SITE_NAME="BEAT Local"         # For production, use "BEAT"
+
+# Email Configuration (optional for local development)
+EMAIL_HOST_USER="your-email@example.com"
+EMAIL_HOST_PASSWORD="your-password"
+DEFAULT_FROM_EMAIL="your-email@example.com"
+```
+
+Then install and run:
+
 ```Bash
 $ python -m venv .venv
 $ source .venv/bin/activate
 
 (.venv) $ pip install -r requirements.dev.txt
 (.venv) $ python manage.py migrate
+(.venv) $ python manage.py update_site # Updates site domain from SITE_DOMAIN env var (Needed for email sending)
 (.venv) $ python manage.py createsuperuser
 (.venv) $ python manage.py create_email_address # Creates an email_address for the superuser (Needed for all_auth to work)
 (.venv) $ python manage.py cities_light
