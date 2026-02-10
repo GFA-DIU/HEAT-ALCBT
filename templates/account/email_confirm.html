@@ -1,11 +1,11 @@
-{% extends 'account/_base.html' %}
+{% extends 'account/_auth.html' %}
 {% load crispy_forms_tags %}
 
 {% block title %}Email Confirmation{% endblock %}
 
 {% block auth_content %}
     <h1 class="text-xl font-bold text-center text-(--text--strong-950)">
-        "Confirm Email Address"
+        Confirm Email Address
     </h1>
     {% if confirmation %}
         {% if can_confirm %}
