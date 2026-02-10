@@ -1,11 +1,10 @@
 import logging
-from datetime import timedelta
 
-from allauth.account.models import EmailAddress, EmailConfirmation
 from allauth.account.utils import send_email_confirmation
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib.messages import get_messages
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -46,40 +45,24 @@ def update_profile(request):
 @login_required
 def verify_email(request):
     """Page shown to authenticated users who have not yet verified their email."""
-    email_address = EmailAddress.objects.filter(user=request.user).first()
+    # Consume any queued allauth messages (e.g. "Successfully signed in",
+    # "Confirmation email sent") so they don't appear on this page.
+    list(get_messages(request))
 
-    can_resend = False
-    if email_address and not email_address.verified:
-        last_confirmation = EmailConfirmation.objects.filter(
-            email_address=email_address
-        ).order_by("-sent").first()
-        if last_confirmation is None or last_confirmation.sent < timezone.now() - timedelta(weeks=1):
-            can_resend = True
+    days_since_joined = (timezone.now() - request.user.date_joined).days
+    can_resend = days_since_joined >= 7
 
     return render(request, "account/verify_email.html", {
         "can_resend": can_resend,
-        "email": request.user.email,
     })
 
 
 @login_required
 def resend_confirmation_email(request):
     """Resend email confirmation to the current user."""
-    email_address = EmailAddress.objects.filter(user=request.user, verified=False).first()
-
-    if email_address:
-        last_confirmation = EmailConfirmation.objects.filter(
-            email_address=email_address
-        ).order_by("-sent").first()
-
-        one_week_ago = timezone.now() - timedelta(weeks=1)
-        if last_confirmation is None or last_confirmation.sent < one_week_ago:
-            send_email_confirmation(request, request.user, signup=False)
-            messages.success(request, "Confirmation email sent. Please check your inbox.")
-        else:
-            messages.info(request, "A confirmation email was already sent recently. Please check your inbox.")
-    else:
-        messages.warning(request, "No unverified email address found for your account.")
+    days_since_joined = (timezone.now() - request.user.date_joined).days
+    if days_since_joined >= 7:
+        send_email_confirmation(request, request.user, signup=False)
 
     return redirect("verify_email")
 

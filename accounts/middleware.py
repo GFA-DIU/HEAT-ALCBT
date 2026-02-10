@@ -1,4 +1,5 @@
 from allauth.account.models import EmailAddress
+from django.contrib.messages import get_messages
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -35,6 +36,7 @@ class EmailVerificationMiddleware:
                 ).exists()
 
                 if not email_verified:
+                    list(get_messages(request))
                     return redirect(reverse("verify_email"))
 
         return self.get_response(request)
