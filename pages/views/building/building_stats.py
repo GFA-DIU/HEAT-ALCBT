@@ -16,6 +16,8 @@ from typing import Dict, Any, List
 from django.db.models import Sum, Q
 
 from pages.models.building import Building
+from pages.models.building_operation.chilling import CoolingSystemChiller
+from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
 from pages.views.building.impact_calculation import calculate_impacts, calculate_impact_operational
 
 
@@ -57,25 +59,28 @@ def calculate_progress_percentage(building: Building) -> int:
         progress += 10
 
     # Step 2.2: Cooling System (10%)
-    if building.cooling_type:
+    has_cooling = (
+        CoolingSystemChiller.objects.filter(building=building).exists() or
+        CoolingSystemAirConditioner.objects.filter(building=building).exists()
+    )
+    if has_cooling:
         progress += 10
 
     # Step 2.3: Ventilation System (10%)
-    if building.ventilation_type:
+    if building.ventilation_systems.exists():
         progress += 10
 
     # Step 2.4: Lighting System (10%)
-    if building.lighting_type:
+    if building.lighting_systems.exists():
         progress += 10
 
     # Step 2.5: Lift & Escalator System (10%)
-    # This is optional, so we check if any lift/escalator data exists
-
-    progress += 10
+    if building.lift_escalator_systems.exists():
+        progress += 10
 
     # Step 2.6: Hot Water System (10%)
-    # Check if hot water system data exists
-    progress += 10
+    if building.hot_water_systems.exists():
+        progress += 10
 
     # Step 3: Operational Data Entry (10%)
     # Check if at least one operational product (energy carrier) has been added
