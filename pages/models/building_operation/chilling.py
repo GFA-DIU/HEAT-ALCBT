@@ -4,6 +4,37 @@ from django.utils.translation import gettext_lazy as _
 from pages.models.building import Building
 
 
+class RefrigerantGWP(models.Model):
+    """Stores Global Warming Potential (GWP) values per refrigerant type.
+    Admins can manage these via the admin interface and add new types as needed.
+    """
+
+    refrigerant_code = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name=_("Refrigerant Code"),
+    )
+    gwp_value = models.PositiveIntegerField(
+        verbose_name=_("GWP Value"),
+    )
+
+    class Meta:
+        verbose_name = _("Refrigerant GWP")
+        verbose_name_plural = _("Refrigerant GWP Values")
+        ordering = ["refrigerant_code"]
+
+    def __str__(self):
+        return f"{self.refrigerant_code}: {self.gwp_value}"
+
+    @classmethod
+    def get_gwp(cls, refrigerant_code):
+        """Return GWP value for a given refrigerant code, or None if not found."""
+        try:
+            return cls.objects.get(refrigerant_code=refrigerant_code).gwp_value
+        except cls.DoesNotExist:
+            return None
+
+
 class RefrigerantType(models.TextChoices):
     R290 = "R-290", _("R-290 (Propane)")
     R600A = "R-600a", _("R-600a (Isobutane)")
@@ -184,3 +215,8 @@ class CoolingSystemChiller(models.Model):
         choices=[(i, _(str(i))) for i in range(1, 6)],
         verbose_name=_("Energy Efficiency Label"),
     )
+
+    def save(self, *args, **kwargs):
+        if self.baseline_refrigerant_emission_factor is None and self.refrigerant_type:
+            self.baseline_refrigerant_emission_factor = RefrigerantGWP.get_gwp(self.refrigerant_type)
+        super().save(*args, **kwargs)

@@ -1,6 +1,5 @@
 import logging
 
-from allauth.account.models import EmailAddress
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.db import models, transaction
@@ -35,12 +34,6 @@ def buildings_list(request):
             models.Q(street__icontains=search_query)
         ).distinct()
 
-    # Check if user's email is verified
-    email_verified = EmailAddress.objects.filter(
-        user=request.user,
-        verified=True
-    ).exists()
-
     # Check if this is a new user (first time on home page after signup)
     show_account_success_modal = request.session.pop('show_account_success_modal', False)
 
@@ -59,7 +52,6 @@ def buildings_list(request):
     context = {
         "buildings": buildings_with_stats,
         "search_query": search_query,
-        "email_verified": email_verified,
         "show_account_success_modal": show_account_success_modal,
         "user_form": user_form,
         "profile_form": profile_form,
