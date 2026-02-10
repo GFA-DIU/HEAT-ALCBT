@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from pages.models.building import Building
-from pages.models.building_operation.chilling import RefrigerantType
+from pages.models.building_operation.chilling import RefrigerantGWP, RefrigerantType
 
 
 class CoolingSystemAirConditioner(models.Model):
@@ -87,3 +87,8 @@ class CoolingSystemAirConditioner(models.Model):
         choices=[(i, _(str(i))) for i in range(1, 6)],
         verbose_name=_("Energy Efficiency Label"),
     )
+
+    def save(self, *args, **kwargs):
+        if self.baseline_refrigerant_emission_factor is None and self.refrigerant_type:
+            self.baseline_refrigerant_emission_factor = RefrigerantGWP.get_gwp(self.refrigerant_type)
+        super().save(*args, **kwargs)
