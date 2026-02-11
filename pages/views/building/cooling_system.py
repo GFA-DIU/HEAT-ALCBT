@@ -173,6 +173,7 @@ def _handle_chiller_system(request, building, data, cooling_system_id, is_update
                 'cop': float(chiller_system.cop) if chiller_system.cop else None,
                 'ip_lv': float(chiller_system.ip_lv) if chiller_system.ip_lv else None,
                 'energy_efficiency_label': chiller_system.energy_efficiency_label,
+                'number_of_stars': chiller_system.number_of_stars,
                 'total_energy_consumption_kwh_per_year': chiller_system.total_energy_consumption_kwh_per_year,
                 'baseline_refrigerant_emission_factor': chiller_system.baseline_refrigerant_emission_factor,
             }
@@ -224,6 +225,8 @@ def _handle_air_conditioner_system(request, building, data, cooling_system_id, i
                 'cooling_system_type': 'air_conditioner',
                 'ac_type': ac_system.ac_type,
                 'ac_type_display': ac_system.get_ac_type_display(),
+                'packaged_subtype': ac_system.packaged_subtype,
+                'packaged_subtype_display': ac_system.get_packaged_subtype_display() if ac_system.packaged_subtype else None,
                 'year_of_installation': ac_system.year_of_installation,
                 'operation_hours_per_workday': ac_system.operation_hours_per_workday,
                 'workdays_per_week': ac_system.workdays_per_week,
@@ -240,6 +243,7 @@ def _handle_air_conditioner_system(request, building, data, cooling_system_id, i
                 'cop': float(ac_system.cop) if ac_system.cop else None,
                 'iseer_rating': float(ac_system.iseer_rating) if ac_system.iseer_rating else None,
                 'energy_efficiency_label': ac_system.energy_efficiency_label,
+                'number_of_stars': ac_system.number_of_stars,
             }
         }
 
@@ -314,6 +318,7 @@ def get_cooling_systems(request, building_uuid):
                 'cop': float(system.cop) if system.cop else None,
                 'ip_lv': float(system.ip_lv) if system.ip_lv else None,
                 'energy_efficiency_label': system.energy_efficiency_label,
+                'number_of_stars': system.number_of_stars,
                 'total_energy_consumption_kwh_per_year': system.total_energy_consumption_kwh_per_year,
                 'baseline_refrigerant_emission_factor': system.baseline_refrigerant_emission_factor,
             })
@@ -325,6 +330,8 @@ def get_cooling_systems(request, building_uuid):
                 'cooling_system_type': 'air_conditioner',
                 'ac_type': system.ac_type,
                 'ac_type_display': system.get_ac_type_display(),
+                'packaged_subtype': system.packaged_subtype,
+                'packaged_subtype_display': system.get_packaged_subtype_display() if system.packaged_subtype else None,
                 'year_of_installation': system.year_of_installation,
                 'operation_hours_per_workday': system.operation_hours_per_workday,
                 'workdays_per_week': system.workdays_per_week,
@@ -341,6 +348,7 @@ def get_cooling_systems(request, building_uuid):
                 'cop': float(system.cop) if system.cop else None,
                 'iseer_rating': float(system.iseer_rating) if system.iseer_rating else None,
                 'energy_efficiency_label': system.energy_efficiency_label,
+                'number_of_stars': system.number_of_stars,
             })
 
         return JsonResponse({
