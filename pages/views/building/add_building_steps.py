@@ -214,8 +214,20 @@ def handle_cooling_system_step(request):
 # Step 2.3: Ventilation System
 def handle_ventilation_system_step(request):
     """Handle ventilation system configuration step."""
+    building_uuid = request.GET.get('building_uuid', '')
+    climate_zone = ''
+    if building_uuid:
+        try:
+            from pages.models.building import Building
+            import uuid as uuid_lib
+            building = Building.objects.get(uuid=uuid_lib.UUID(building_uuid), created_by=request.user)
+            if building.climate_zone:
+                climate_zone = building.climate_zone
+        except Exception:
+            pass
     context = {
-        "building_uuid": request.GET.get('building_uuid', '')
+        "building_uuid": building_uuid,
+        "climate_zone": climate_zone,
     }
     return render(
         request,

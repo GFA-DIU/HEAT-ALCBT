@@ -5,12 +5,11 @@ from pages.models.building import Building
 
 
 class VentilationType(models.TextChoices):
-    AHU = "AHU", _("Air Handling Units (AHUs)")
-    FCU = "FCU", _("Fan Coil Units (FCUs)")
-    CASSETTE_AC = "CASSETTE_AC", _("Ceiling or Wall Mounted Cassette ACs")
-    DOAS = "DOAS", _("DOAS")
+    AHU = "AHU", _("Air Handling Unit (AHU)")
+    FCU = "FCU", _("Fan Coil Unit (FCU)")
+    CASSETTE_AC = "CASSETTE_AC", _("Ceiling/Wall Mounted Cassette AC")
+    DOAS = "DOAS", _("Dedicated Outdoor Air System (DOAS)")
     FAN = "FAN", _("Ceiling/Exhaust/Wall Fan")
-    OTHER = "OTHER", _("Other Ventilation Type")
 
 
 class VentilationCapacity(models.TextChoices):
@@ -35,10 +34,14 @@ class VentilationSystem(models.Model):
     ventilation_capacity = models.CharField(
         max_length=50,
         choices=VentilationCapacity.choices,
+        null=True,
+        blank=True,
         verbose_name=_("Ventilation Capacity"),
     )
 
-    baseline_efficiency_w_cmh = models.PositiveIntegerField(
+    baseline_efficiency_w_cmh = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
         verbose_name=_("Baseline Ventilation System Efficiency (W/CMH)")
     )
     operation_hours_per_workday = models.PositiveSmallIntegerField(
@@ -50,10 +53,14 @@ class VentilationSystem(models.Model):
     workweeks_per_year = models.PositiveSmallIntegerField(
         null=True, blank=True, verbose_name=_("Workweeks per Year")
     )
-    total_power_input_w = models.PositiveIntegerField(
-        verbose_name=_("Total Ventilation System Power Input (W)")
+    total_power_input_kw = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name=_("Total Ventilation System Power Input (kW)")
     )
     air_flow_rate = models.PositiveIntegerField(
+        null=True,
+        blank=True,
         verbose_name=_("Air Flow Rate (CMH/CFM)")
     )
     demand_controlled_ventilation = models.BooleanField(
@@ -73,9 +80,14 @@ class VentilationSystem(models.Model):
             "Total Energy Consumption of Ventilation System Annually (kWh/year)"
         ),
     )
-    energy_efficiency_label = models.PositiveSmallIntegerField(
+    fresh_air_ratio_percent = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("Fresh Air Ratio (%)"),
+    )
+    number_of_stars = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
         choices=[(i, _(str(i))) for i in range(1, 6)],
-        verbose_name=_("Energy Efficiency Label"),
+        verbose_name=_("Number of Stars (1–5)"),
     )
