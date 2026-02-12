@@ -33,9 +33,9 @@ class CoolingType(models.TextChoices):
     WINDOW_AC = "window-ac", "Window air conditioners"
     SPLIT_AC = "split-ac", "Split air conditioners"
     VRF_SYSTEM = "vrf-system", "Variable refrigerant flow (VRF) systems"
-    PACKAGED_AC = "packaged-ac", "Packaged air conditioners"
-    CHILLER_SYSTEM = "chiller-system", "Chiller systems"
-    OTHER = "other", "Other cooling type"
+    PACKAGED_AC = "packaged-ac", "Packaged/Ductable air conditioners"
+    CHILLER_WATER = "chiller-water", "Chiller system - Water cooled chiller"
+    CHILLER_AIR = "chiller-air", "Chiller system - Air cooled chiller"
 
 
 class VentilationType(models.TextChoices):

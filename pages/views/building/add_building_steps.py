@@ -190,8 +190,19 @@ def handle_schedule_temp_step(request):
 # Step 2.2: Cooling System
 def handle_cooling_system_step(request):
     """Handle cooling system configuration step."""
+    building_uuid = request.GET.get('building_uuid', '')
+    climate_zone = ''
+    if building_uuid:
+        try:
+            import uuid as uuid_lib
+            from pages.models.building import Building
+            building = Building.objects.get(uuid=uuid_lib.UUID(building_uuid), created_by=request.user)
+            climate_zone = building.climate_zone
+        except Exception:
+            pass
     context = {
-        "building_uuid": request.GET.get('building_uuid', '')
+        "building_uuid": building_uuid,
+        "climate_zone": climate_zone,
     }
     return render(
         request,
