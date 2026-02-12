@@ -165,14 +165,7 @@
           <p class="label-text-alt text-[var(--text--soft-400)]">Typical: 2–15 kW for heat pumps</p>
         </fieldset>
 
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually</legend>
-          <label class="input w-full">
-            <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="e.g. 1092" min="0" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
-          </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">Default: efficiency level × hrs/day × days/week × weeks/year</p>
-        </fieldset>
+        <input type="hidden" name="total_energy_consumption_kwh_per_year" />
 
       </div>
     </div>
@@ -268,14 +261,7 @@
       <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
       <div class="collapse-content px-4 grid grid-cols-1 gap-y-1">
 
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">Total energy consumption annually</legend>
-          <label class="input w-full">
-            <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="e.g. 1092" min="0" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
-          </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">Efficiency level × hrs/day × days/week × weeks/year</p>
-        </fieldset>
+        <input type="hidden" name="total_energy_consumption_kwh_per_year" />
 
       </div>
     </div>
@@ -449,6 +435,22 @@
     if (!validator.validate()) {
       console.error('Form validation failed', validator.errors);
       return;
+    }
+
+    // Compute total energy = equipment_efficiency_level% × hrs/day × days/week × weeks/year
+    var effEl   = form.querySelector('[name="equipment_efficiency_level"]');
+    var hrsEl   = form.querySelector('[name="operating_hours_per_day"]');
+    var daysEl  = form.querySelector('[name="operating_days_per_week"]');
+    var weeksEl = form.querySelector('[name="operating_weeks_per_year"]');
+    var totalEnergyEl = form.querySelector('[name="total_energy_consumption_kwh_per_year"]');
+    if (effEl && hrsEl && daysEl && weeksEl && totalEnergyEl) {
+      var eff   = parseFloat(effEl.value);
+      var hrs   = parseFloat(hrsEl.value);
+      var days  = parseFloat(daysEl.value);
+      var weeks = parseFloat(weeksEl.value);
+      if (!isNaN(eff) && !isNaN(hrs) && !isNaN(days) && !isNaN(weeks)) {
+        totalEnergyEl.value = Math.round((eff / 100) * hrs * days * weeks);
+      }
     }
 
     var formData = new FormData(form);
