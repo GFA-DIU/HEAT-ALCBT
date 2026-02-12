@@ -1,232 +1,86 @@
 {% load static %}
 <div id="lighting-system-container" class="w-full">
   <div class="w-full flex flex-col">
-    <button
-      class="btn btn-outline w-fit"
-      onclick="openLightingSystemModal()"
-    >
-      <span
-        data-icon="add-large-fill"
-        data-size="20"
-        data-color="var(--icon--strong-950)"
-      ></span>
+    <button class="btn btn-outline w-fit" onclick="openLightingSystemModal()">
+      <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
       Add lighting system
     </button>
-    <div
-      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
-    ></div>
-    <ul id="lighting-systems-list" class="grid grid-cols-1">
-    </ul>
+    <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
+    <ul id="lighting-systems-list" class="grid grid-cols-1 gap-2"></ul>
   </div>
 </div>
 
 <dialog id="lighting_system_modal" class="modal modal-bottom sm:modal-end">
-  <div
-    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
-  >
+  <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
         <h3 class="text-lg/6 font-medium">Add a lighting system</h3>
-        <p class="text-sm/5 text-[var(--text--sub-600)]">
-          Provide details on lighting types, power use, and controls to assess
-          efficiency.
-        </p>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">Provide details on lighting types, power use, and controls to assess efficiency.</p>
       </div>
-      <button
-        type="button"
-        onclick="closeLightingSystemModal()"
-        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-      >
-        <span
-          data-icon="close-line"
-          data-size="16"
-          data-color="var(--icon--sub-600)"
-        ></span>
+      <button type="button" onclick="closeLightingSystemModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+        <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
     </div>
     <form id="lighting-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
-        {% csrf_token %}
+      {% csrf_token %}
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">
-            Room type<span class="text-[var(--state--error--base)]">*</span>
-          </legend>
-          <select
-            class="select w-full"
-            name="room_type"
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Room type<span class="text-[var(--state--error--base)]">*</span></legend>
+          <select class="select w-full" name="room_type"
             hx-get="/select_lists/?room_types=1"
             hx-trigger="load"
             hx-target="this"
             hx-swap="innerHTML"
-          >
+            onchange="handleLightingRoomTypeChange(this.value)"
+            required>
             <option disabled selected value="">Select an option</option>
           </select>
         </fieldset>
+
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            Area of room<span class="text-[var(--state--error--base)]">*</span>
-          </legend>
+          <legend class="fieldset-legend">Area of room<span class="text-[var(--state--error--base)]">*</span></legend>
           <label class="input w-full">
-            <input type="number" placeholder="e.g. 2" name="area_of_room" required min="0" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >m²</span
-            >
+            <input type="number" placeholder="e.g. 50" name="area_of_room" required min="0" step="0.01" onchange="recalcLightingLPD()" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">m²</span>
           </label>
         </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            Light bulb type<span class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <select
-            class="select w-full"
-            id="lighting-type"
-            name="lighting_type"
-            hx-get="/select_lists/?lighting_bulb_types=1"
-            hx-trigger="load"
-            hx-target="this"
-            hx-swap="innerHTML"
-          >
-            <option value="">Select an option</option>
-          </select>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            Number of lighting bulbs<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <label class="input w-full">
-            <input type="number" placeholder="e.g. 2" name="number_of_bulbs" required min="0" />
-          </label>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            Light bulb power rating<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <label class="input w-full">
-            <input type="number" placeholder="e.g. 2" name="bulb_power_rating" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >W</span
-            >
-          </label>
-        </fieldset>
+
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">
-            System operating schedule<span
-              data-icon="info-custom-fill"
-              data-size="20"
-              data-color="var(--icon--disabled-300)"
-            ></span>
-          </legend>
-          <div class="w-full flex gap-1.5 items-center">
-            <div class="flex-1">
-              <label class="input validator w-full">
-                <input type="number" placeholder="e.g. 1" name="operating_hours_per_day" required min="1" max="24" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >Hours / day</span
-                >
-              </label>
-            </div>
-            <div class="flex-1">
-              <label class="input validator w-full">
-                <input type="number" placeholder="e.g. 1" name="operating_days_per_week" required min="1" max="7" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >days / week</span
-                >
-              </label>
-            </div>
-            <div class="flex-1">
-              <label class="input validator w-full">
-                <input type="number" placeholder="e.g. 1" name="operating_weeks_per_year" required min="1" max="52" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >weeks / year</span
-                >
-              </label>
-            </div>
-          </div>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            Installation of sensors<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            ><span
-              data-icon="info-custom-fill"
-              data-size="20"
-              data-color="var(--icon--disabled-300)"
-            ></span>
-          </legend>
-          <select class="select w-full" name="installation_of_sensors" required>
-            <option disabled selected value="">Select an option</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
+          <legend class="fieldset-legend">Type of lighting system<span class="text-[var(--state--error--base)]">*</span></legend>
+          <select class="select w-full" id="lighting-type-select" name="lighting_type"
+            onchange="handleLightingTypeChange(this.value)"
+            required>
+            <option value="">Select a lighting system</option>
+            <optgroup label="LED">
+              <option value="LED_PANEL">LED Panel</option>
+              <option value="LED_TUBE">LED Tube</option>
+              <option value="LED_DOWNLIGHT">LED Downlight</option>
+              <option value="LED_BULB">LED Bulb</option>
+              <option value="LED_STRIP">LED Strip</option>
+            </optgroup>
+            <optgroup label="Fluorescent">
+              <option value="FLUORESCENT_T5">Fluorescent T5</option>
+              <option value="FLUORESCENT_T8">Fluorescent T8</option>
+              <option value="FLUORESCENT_T12">Fluorescent T12</option>
+            </optgroup>
+            <option value="CFL">CFL</option>
+            <optgroup label="Incandescent / Halogen">
+              <option value="INCANDESCENT">Incandescent</option>
+              <option value="HALOGEN">Halogen</option>
+            </optgroup>
+            <optgroup label="HID">
+              <option value="METAL_HALIDE">Metal Halide</option>
+              <option value="HIGH_PRESSURE_SODIUM">High-Pressure Sodium</option>
+            </optgroup>
           </select>
         </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            Baseline Lighting Power Density (LPD)<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <label class="input w-full">
-            <input type="number" placeholder="e.g. 2" name="baseline_lpd" required min="0" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >W/m²</span
-            >
-          </label>
-        </fieldset>
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">
-            Total energy consumption of ventilation system annually<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <label class="input w-full">
-            <input type="number" placeholder="e.g. 2" name="annual_energy_consumption" required min="0" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >kWh/year</span
-            >
-          </label>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">Energy efficiency label</legend>
-          <select class="select w-full" name="energy_efficiency_label">
-            <option disabled selected value="">Select an option</option>
-            <option value="bee">BEE Star Rating</option>
-            <option value="egat">EGAT</option>
-          </select>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">Number of stars</legend>
-          <select class="select w-full" name="number_of_stars">
-            <option disabled selected value="">Select an option</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-        </fieldset>
+
       </div>
+      <div id="selected-lighting-system"></div>
     </form>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <button
-        type="button"
-        class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
-        onclick="closeLightingSystemModal()"
-      >
-        Cancel
-      </button>
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeLightingSystemModal()">Cancel</button>
       <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLightingSystem()">Save</button>
     </div>
   </div>
@@ -235,176 +89,787 @@
 <dialog id="lighting_system_modal_delete" class="modal modal-middle">
   <div class="modal-box w-full max-w-[26.375rem] p-0">
     <div class="flex flex-col items-center p-5">
-      <div
-        class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]"
-      >
-        <span
-          data-icon="alert-fill"
-          data-size="24"
-          data-color="var(--state--warning--base)"
-        ></span>
+      <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
+        <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)"></span>
       </div>
       <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
-      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        You are about to remove or delete added lighting system. This will
-        action will permanently remove it.
-      </p>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">You are about to permanently remove this lighting system.</p>
     </div>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <button
-        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
-        onclick="lighting_system_modal_delete.close()"
-      >
-        Cancel
-      </button>
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="lighting_system_modal_delete.close()">Cancel</button>
       <button class="btn btn-sm btn-error flex-1" onclick="deleteLightingSystem()">Remove</button>
     </div>
   </div>
 </dialog>
 
-<template id="lighting-system-template">
-  <div class="w-full flex flex-col">
-    <button
-      class="btn btn-outline w-fit"
-      onclick="lighting_system_modal.showModal()"
-    >
-      <span
-        data-icon="add-large-fill"
-        data-size="20"
-        data-color="var(--icon--strong-950)"
-      ></span>
-      Add lighting system
-    </button>
-    <div
-      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
-    ></div>
-    <ul class="grid grid-cols-1">
-      <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="lightbulb-line"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-          class="shrink-0 self-start"
-        ></span>
-        <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">
-            Office: Conference Room,Lobby, office
-          </p>
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >Area of room: 445m²</span
-            >
-            <span>Bulb type : LED (Light emitting diode) lights</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="lighting_system_modal_delete.showModal()"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
-    </ul>
-  </div>
-</template>
-
 <template id="no-lighting-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
     <img src="{% static 'assets/lighting-system.png' %}" alt="Lighting System Image" />
-    <p class="text-sm/5 font-medium">
-      Click button below to add a lighting system
-    </p>
-    <button class="btn btn-primary" onclick="lighting_system_modal.showModal()">
-      Add lighting system
-    </button>
+    <p class="text-sm/5 font-medium">Click button below to add a lighting system</p>
+    <button class="btn btn-primary" onclick="lighting_system_modal.showModal()">Add lighting system</button>
+  </div>
+</template>
+
+<!-- ============================================================
+     PER-TYPE TEMPLATES
+     ============================================================ -->
+
+<!-- LED Template -->
+<template id="led-lighting-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">LED LIGHTING DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total number of fixtures installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_fixtures" placeholder="e.g. 200" required min="0" onchange="recalcLightingPower()" />
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Wattage per fixture<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="bulb_power_rating" placeholder="e.g. 20" required min="0" step="0.1" onchange="recalcLightingPower()" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input w-full">
+        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" onchange="recalcLightingLPD()" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
+      <label class="input w-full">
+        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5 mt-1">
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" /> No</label>
+      </div>
+    </fieldset>
+
+  </div>
+
+  <div class="px-5 pb-4">
+    <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
+      <input type="checkbox" />
+      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
+      <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">Total energy consumption annually</legend>
+          <label class="input w-full">
+            <input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+          </label>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <select class="select w-full" name="energy_efficiency_label">
+            <option value="">Select an option</option>
+            <option value="BEE">BEE Star Rating</option>
+            <option value="EGAT">EGAT Label No</option>
+            <option value="ESDM">ESDM decree</option>
+            <option value="OTHERS">Others</option>
+          </select>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Number of stars</legend>
+          <select class="select w-full" name="number_of_stars">
+            <option value="">Select an option</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </fieldset>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Fluorescent Template (T5 / T8 / T12) -->
+<template id="fluorescent-lighting-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">FLUORESCENT LIGHTING DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total number of fixtures installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_fixtures" placeholder="e.g. 150" required min="0" onchange="recalcLightingPower()" />
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Number of tubes per fixture<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="tubes_per_fixture" placeholder="e.g. 2" required min="1" onchange="recalcLightingPower()" />
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Wattage per tube<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="bulb_power_rating" placeholder="e.g. 28" required min="0" step="0.1" onchange="recalcLightingPower()" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input w-full">
+        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" onchange="recalcLightingLPD()" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
+      <label class="input w-full">
+        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5 mt-1">
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" /> No</label>
+      </div>
+    </fieldset>
+
+  </div>
+
+  <div class="px-5 pb-4">
+    <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
+      <input type="checkbox" />
+      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
+      <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">Total energy consumption annually</legend>
+          <label class="input w-full">
+            <input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+          </label>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <select class="select w-full" name="energy_efficiency_label">
+            <option value="">Select an option</option>
+            <option value="BEE">BEE Star Rating</option>
+            <option value="EGAT">EGAT Label No</option>
+            <option value="ESDM">ESDM decree</option>
+            <option value="OTHERS">Others</option>
+          </select>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Number of stars</legend>
+          <select class="select w-full" name="number_of_stars">
+            <option value="">Select an option</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </fieldset>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- CFL Template -->
+<template id="cfl-lighting-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">CFL LIGHTING DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total number of fixtures installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_fixtures" placeholder="e.g. 80" required min="0" onchange="recalcLightingPower()" />
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Wattage per lamp<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="bulb_power_rating" placeholder="5–30" required min="0" step="0.1" onchange="recalcLightingPower()" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input w-full">
+        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" onchange="recalcLightingLPD()" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
+      <label class="input w-full">
+        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5 mt-1">
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" /> No</label>
+      </div>
+    </fieldset>
+
+  </div>
+
+  <div class="px-5 pb-4">
+    <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
+      <input type="checkbox" />
+      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
+      <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">Total energy consumption annually</legend>
+          <label class="input w-full">
+            <input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+          </label>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <select class="select w-full" name="energy_efficiency_label">
+            <option value="">Select an option</option>
+            <option value="BEE">BEE Star Rating</option>
+            <option value="EGAT">EGAT Label No</option>
+            <option value="ESDM">ESDM decree</option>
+            <option value="OTHERS">Others</option>
+          </select>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Number of stars</legend>
+          <select class="select w-full" name="number_of_stars">
+            <option value="">Select an option</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </fieldset>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Incandescent / Halogen Template -->
+<template id="incandescent-lighting-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">INCANDESCENT / HALOGEN LIGHTING DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total number of fixtures installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_fixtures" placeholder="e.g. 30" required min="0" onchange="recalcLightingPower()" />
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Wattage per lamp<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="bulb_power_rating" placeholder="25–150" required min="0" step="0.1" onchange="recalcLightingPower()" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input w-full">
+        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" onchange="recalcLightingLPD()" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
+      <label class="input w-full">
+        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5 mt-1">
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" /> No</label>
+      </div>
+    </fieldset>
+
+  </div>
+
+  <div class="px-5 pb-4">
+    <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
+      <input type="checkbox" />
+      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
+      <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">Total energy consumption annually</legend>
+          <label class="input w-full">
+            <input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+          </label>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <select class="select w-full" name="energy_efficiency_label">
+            <option value="">Select an option</option>
+            <option value="BEE">BEE Star Rating</option>
+            <option value="EGAT">EGAT Label No</option>
+            <option value="ESDM">ESDM decree</option>
+            <option value="OTHERS">Others</option>
+          </select>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Number of stars</legend>
+          <select class="select w-full" name="number_of_stars">
+            <option value="">Select an option</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </fieldset>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- HID Template (Metal Halide / High-Pressure Sodium) — no sensors field -->
+<template id="hid-lighting-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">HID LIGHTING DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total number of fixtures installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_fixtures" placeholder="e.g. 20" required min="0" onchange="recalcLightingPower()" />
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Wattage per fixture<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="bulb_power_rating" placeholder="70–1000" required min="0" step="0.1" onchange="recalcLightingPower()" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input w-full">
+        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" onchange="recalcLightingLPD()" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
+      <label class="input w-full">
+        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
+      </label>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <label class="input validator w-full">
+            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+  </div>
+
+  <div class="px-5 pb-4">
+    <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
+      <input type="checkbox" />
+      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
+      <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">Total energy consumption annually</legend>
+          <label class="input w-full">
+            <input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+          </label>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <select class="select w-full" name="energy_efficiency_label">
+            <option value="">Select an option</option>
+            <option value="BEE">BEE Star Rating</option>
+            <option value="EGAT">EGAT Label No</option>
+            <option value="ESDM">ESDM decree</option>
+            <option value="OTHERS">Others</option>
+          </select>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Number of stars</legend>
+          <select class="select w-full" name="number_of_stars">
+            <option value="">Select an option</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </fieldset>
+
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-  // Track editing state
+  // ================================================================
+  // Operating schedule defaults by room type [hrs/day, days/week, weeks/year]
+  // ================================================================
+  var LIGHTING_OPERATING_DEFAULTS = {
+    'OFFICE_CONFERENCE':   [10, 5, 50],
+    'HOSPITAL_PATIENT':    [18, 7, 52],
+    'RESIDENTIAL_KITCHEN': [5,  7, 52],
+    'RESIDENTIAL_DINING':  [4,  7, 52],
+    'COMMERCIAL_GENERAL':  [12, 6, 52],
+    'COMMERCIAL_MALL':     [14, 7, 52],
+  };
+
+  // Map lighting type value to template id
+  var LIGHTING_TYPE_MAP = {
+    'LED_PANEL':            'led-lighting-template',
+    'LED_TUBE':             'led-lighting-template',
+    'LED_DOWNLIGHT':        'led-lighting-template',
+    'LED_BULB':             'led-lighting-template',
+    'LED_STRIP':            'led-lighting-template',
+    'FLUORESCENT_T5':       'fluorescent-lighting-template',
+    'FLUORESCENT_T8':       'fluorescent-lighting-template',
+    'FLUORESCENT_T12':      'fluorescent-lighting-template',
+    'CFL':                  'cfl-lighting-template',
+    'INCANDESCENT':         'incandescent-lighting-template',
+    'HALOGEN':              'incandescent-lighting-template',
+    'METAL_HALIDE':         'hid-lighting-template',
+    'HIGH_PRESSURE_SODIUM': 'hid-lighting-template',
+  };
+
+  // ================================================================
+  // Handle lighting type change — load per-type template
+  // ================================================================
+  window.handleLightingTypeChange = function(typeValue) {
+    var container = document.getElementById('selected-lighting-system');
+    container.innerHTML = '';
+
+    if (!typeValue) return;
+
+    var templateId = LIGHTING_TYPE_MAP[typeValue];
+    if (!templateId) return;
+
+    var tmpl = document.getElementById(templateId);
+    if (!tmpl) return;
+
+    var clone = tmpl.content.cloneNode(true);
+    container.appendChild(clone);
+
+    // Apply room-type defaults if a room type is already selected
+    var roomTypeSelect = document.querySelector('#lighting-system-form [name="room_type"]');
+    if (roomTypeSelect && roomTypeSelect.value) {
+      applyLightingScheduleDefaults(roomTypeSelect.value);
+    }
+  };
+
+  // ================================================================
+  // Handle room type change — apply schedule defaults
+  // ================================================================
+  window.handleLightingRoomTypeChange = function(roomTypeValue) {
+    applyLightingScheduleDefaults(roomTypeValue);
+  };
+
+  function applyLightingScheduleDefaults(roomTypeValue) {
+    var defaults = LIGHTING_OPERATING_DEFAULTS[roomTypeValue];
+    if (!defaults) return;
+
+    var form = document.getElementById('lighting-system-form');
+    var hField = form.querySelector('[name="operating_hours_per_day"]');
+    var dField = form.querySelector('[name="operating_days_per_week"]');
+    var wField = form.querySelector('[name="operating_weeks_per_year"]');
+
+    if (hField && !hField.value) hField.value = defaults[0];
+    if (dField && !dField.value) dField.value = defaults[1];
+    if (wField && !wField.value) wField.value = defaults[2];
+  }
+
+  // ================================================================
+  // Auto-calculate total lighting power
+  // Fluorescent: fixtures × tubes_per_fixture × wattage / 1000
+  // Others: fixtures × wattage / 1000
+  // ================================================================
+  window.recalcLightingPower = function() {
+    var form = document.getElementById('lighting-system-form');
+    if (!form) return;
+
+    var fixturesEl = form.querySelector('[name="number_of_fixtures"]');
+    var wattageEl  = form.querySelector('[name="bulb_power_rating"]');
+    var tubesEl    = form.querySelector('[name="tubes_per_fixture"]');
+    var powerEl    = form.querySelector('[name="total_lighting_power"]');
+
+    if (!fixturesEl || !wattageEl || !powerEl) return;
+
+    var fixtures = parseFloat(fixturesEl.value);
+    var wattage  = parseFloat(wattageEl.value);
+    var tubes    = tubesEl ? (parseFloat(tubesEl.value) || 1) : 1;
+
+    if (!isNaN(fixtures) && !isNaN(wattage)) {
+      var totalKw = (fixtures * tubes * wattage) / 1000;
+      powerEl.value = totalKw.toFixed(4);
+      recalcLightingLPD();
+    }
+  };
+
+  // ================================================================
+  // Auto-calculate LPD = total_power / area
+  // ================================================================
+  window.recalcLightingLPD = function() {
+    var form = document.getElementById('lighting-system-form');
+    if (!form) return;
+
+    var powerEl = form.querySelector('[name="total_lighting_power"]');
+    var areaEl  = form.querySelector('[name="area_of_room"]');
+    var lpdEl   = form.querySelector('[name="baseline_lpd"]');
+
+    if (!powerEl || !areaEl || !lpdEl) return;
+
+    var power = parseFloat(powerEl.value);
+    var area  = parseFloat(areaEl.value);
+
+    if (!isNaN(power) && !isNaN(area) && area > 0) {
+      lpdEl.value = (power / area).toFixed(6);
+    }
+  };
+
+  // ================================================================
+  // Helper: set field value in the form
+  // ================================================================
+  function setLightingField(form, name, value) {
+    var el = form.querySelector('[name="' + name + '"]');
+    if (el && value !== null && value !== undefined) el.value = value;
+  }
+
+  function setLightingRadio(form, name, value) {
+    var radios = form.querySelectorAll('[name="' + name + '"]');
+    radios.forEach(function(r) {
+      r.checked = (r.value === value);
+    });
+  }
+
+  // ================================================================
+  // Modal open / close
+  // ================================================================
   if (!window.editingLightingSystemId) {
     window.editingLightingSystemId = null;
   }
 
-  // Helper to get CSRF token
   function getCSRFToken() {
     return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
   }
 
-  // Get building UUID from URL parameters
   function getBuildingId() {
-    const urlParams = new URLSearchParams(window.location.search);
+    var urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('building_uuid');
   }
 
-  // Open modal
   window.openLightingSystemModal = function() {
     window.editingLightingSystemId = null;
-    document.getElementById('lighting-system-form').reset();
+    var form = document.getElementById('lighting-system-form');
+    form.reset();
+    document.getElementById('selected-lighting-system').innerHTML = '';
+    document.getElementById('lighting-type-select').value = '';
     lighting_system_modal.showModal();
-  }
+  };
 
-  // Close modal
   window.closeLightingSystemModal = function() {
     lighting_system_modal.close();
     window.editingLightingSystemId = null;
-  }
+  };
 
-  // Save lighting system - POST to API
+  // ================================================================
+  // Save
+  // ================================================================
   window.saveLightingSystem = async function() {
-    const form = document.getElementById('lighting-system-form');
-    const formData = new FormData(form);
+    var form = document.getElementById('lighting-system-form');
 
-    // Get room type
-    const roomType = formData.get('room_type');
-
-    if (!roomType) {
-      Toast.error('Please select a room type');
-      return;
-    }
-
-    // Get building ID
-    const buildingId = getBuildingId();
+    var buildingId = getBuildingId();
     if (!buildingId) {
       Toast.error('Building ID not found. Please save building information first.');
       return;
     }
 
-    const validator = new window.FormValidator(form);
+    var validator = new window.FormValidator(form);
     if (!validator.validate()) {
       console.error('Form validation failed', validator.errors);
       return;
     }
 
-    // Collect all form data
-    const systemData = Object.fromEntries(formData.entries());
+    var formData = new FormData(form);
+    var systemData = Object.fromEntries(formData.entries());
     systemData.building_uuid = buildingId;
 
-    // If editing, include the system ID
     if (window.editingLightingSystemId) {
       systemData.lighting_system_id = window.editingLightingSystemId;
     }
 
     try {
-      // Save to database via API
-      const response = await fetch('/lighting-system/', {
+      var response = await fetch('/lighting-system/', {
         method: window.editingLightingSystemId ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -413,170 +878,152 @@
         body: JSON.stringify(systemData)
       });
 
-      const result = await response.json();
+      var result = await response.json();
 
       if (response.ok && result.success) {
-        // Success - reload the list
         await window.renderLightingSystems();
         window.closeLightingSystemModal();
-
-        // Show success message
-        console.log(result.message);
       } else {
-        // Show validation errors
         Toast.error('Error saving lighting system:\n' + JSON.stringify(result.errors || result.error));
       }
     } catch (error) {
       console.error('Error saving lighting system:', error);
       Toast.error('Failed to save lighting system. Please try again.');
     }
-  }
+  };
 
-  // Render lighting systems list - FETCH from database
+  // ================================================================
+  // Render list
+  // ================================================================
   window.renderLightingSystems = async function() {
-    const listContainer = document.getElementById('lighting-systems-list');
-    const noSystemsContainer = document.getElementById('no-lighting-system-template');
+    var listContainer = document.getElementById('lighting-systems-list');
+    var noSystemsTemplate = document.getElementById('no-lighting-system-template');
 
-    // Get building ID
-    const buildingId = getBuildingId();
+    var buildingId = getBuildingId();
     if (!buildingId) {
       console.error('Building ID not found');
       return;
     }
 
     try {
-      // Fetch from database
-      const response = await fetch(`/lighting-system/${buildingId}/`);
-      const result = await response.json();
+      var response = await fetch('/lighting-system/' + buildingId + '/');
+      var result = await response.json();
 
       if (!response.ok || !result.success) {
         console.error('Failed to load lighting systems');
         return;
       }
 
-      const systems = result.lighting_systems || [];
+      var systems = result.lighting_systems || [];
 
       if (systems.length === 0) {
-        listContainer.innerHTML = noSystemsContainer.innerHTML;
+        listContainer.innerHTML = noSystemsTemplate.innerHTML;
         return;
       }
 
-      // Render systems from database
-      listContainer.innerHTML = systems.map((system) => {
-        const areaOfRoom = system.area_of_room || 'N/A';
-        const bulbType = system.lighting_bulb_type_display || 'N/A';
+      listContainer.innerHTML = systems.map(function(system) {
+        var areaOfRoom = system.area_of_room || 'N/A';
+        var bulbType   = system.lighting_bulb_type_display || 'N/A';
+        var roomType   = system.room_type_display || 'N/A';
 
-        return `
-          <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
-            <span
-              data-icon="lightbulb-line"
-              data-size="20"
-              data-color="var(--icon--strong-950)"
-              class="shrink-0 self-start"
-            ></span>
-            <div class="flex flex-col flex-1">
-              <p class="text-sm/5 font-medium">${system.room_type_display}</p>
-              <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-                <span class="border-r border-[var(--text--sub-600)] pr-1">Area of room: ${areaOfRoom}m²</span>
-                <span>Bulb type: ${bulbType}</span>
-              </p>
-            </div>
-            <div class="flex items-center gap-3">
-              <button class="btn size-5 btn-ghost p-0" onclick="editLightingSystem(${system.id})">
-                <span
-                  data-icon="edit-line"
-                  data-size="16"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button
-                class="btn size-5 btn-ghost p-0"
-                onclick="confirmDeleteLightingSystem(${system.id})"
-              >
-                <span
-                  data-icon="delete-bin-5-line"
-                  data-size="16"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-            </div>
-          </li>
-        `;
+        return '<li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">'
+          + '<span data-icon="lightbulb-line" data-size="20" data-color="var(--icon--strong-950)" class="shrink-0 self-start"></span>'
+          + '<div class="flex flex-col flex-1">'
+          + '<p class="text-sm/5 font-medium">' + roomType + '</p>'
+          + '<p class="text-sm/5 text-[var(--text--sub-600)] gap-0">'
+          + '<span class="border-r border-[var(--text--sub-600)] pr-1">Area: ' + areaOfRoom + ' m²</span>'
+          + '<span class="pl-1">' + bulbType + '</span>'
+          + '</p>'
+          + '</div>'
+          + '<div class="flex items-center gap-3">'
+          + '<button class="btn size-5 btn-ghost p-0" onclick="editLightingSystem(' + system.id + ')">'
+          + '<span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>'
+          + '</button>'
+          + '<button class="btn size-5 btn-ghost p-0" onclick="confirmDeleteLightingSystem(' + system.id + ')">'
+          + '<span data-icon="delete-bin-5-line" data-size="16" data-color="var(--icon--strong-950)"></span>'
+          + '</button>'
+          + '</div>'
+          + '</li>';
       }).join('');
+
+      if (window.initIcons) window.initIcons();
     } catch (error) {
       console.error('Error loading lighting systems:', error);
-      listContainer.innerHTML = `
-        <li class="flex flex-col items-center justify-center py-8 text-center">
-          <span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading lighting systems</p>
-        </li>
-      `;
-
+      listContainer.innerHTML = '<li class="flex flex-col items-center justify-center py-8 text-center">'
+        + '<span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>'
+        + '<p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading lighting systems</p>'
+        + '</li>';
     }
-  }
+  };
 
-  // Edit lighting system - LOAD from database
+  // ================================================================
+  // Edit
+  // ================================================================
   window.editLightingSystem = async function(systemId) {
     window.editingLightingSystemId = systemId;
 
-    // Get building ID
-    const buildingId = getBuildingId();
+    var buildingId = getBuildingId();
     if (!buildingId) {
       Toast.error('Building ID not found');
       return;
     }
 
     try {
-      // Fetch all systems to find the one we're editing
-      const response = await fetch(`/lighting-system/${buildingId}/`);
-      const result = await response.json();
+      var response = await fetch('/lighting-system/' + buildingId + '/');
+      var result = await response.json();
 
       if (!response.ok || !result.success) {
         Toast.error('Failed to load lighting system');
         return;
       }
 
-      const system = result.lighting_systems.find(s => s.id === systemId);
+      var system = result.lighting_systems.find(function(s) { return s.id === systemId; });
       if (!system) {
         Toast.error('Lighting system not found');
         return;
       }
 
-      // Reset form
-      const form = document.getElementById('lighting-system-form');
+      var form = document.getElementById('lighting-system-form');
       form.reset();
+      document.getElementById('selected-lighting-system').innerHTML = '';
 
-      // Populate form fields (map backend field names to frontend)
-      form.querySelector('[name="room_type"]').value = system.room_type;
-      form.querySelector('[name="area_of_room"]').value = system.area_of_room;
-      form.querySelector('[name="lighting_type"]').value = system.lighting_bulb_type;
-      form.querySelector('[name="number_of_bulbs"]').value = system.number_of_bulbs;
-      form.querySelector('[name="operating_hours_per_day"]').value = system.operation_hours_per_workday;
-      form.querySelector('[name="operating_days_per_week"]').value = system.workdays_per_week;
-      form.querySelector('[name="operating_weeks_per_year"]').value = system.workweeks_per_year;
-      form.querySelector('[name="bulb_power_rating"]').value = system.light_bulb_power_rating_w;
-      form.querySelector('[name="installation_of_sensors"]').value = system.sensors_installed ? 'yes' : 'no';
+      // Set top-level selects
+      var roomTypeEl = form.querySelector('[name="room_type"]');
+      if (roomTypeEl) roomTypeEl.value = system.room_type;
 
-      if (system.baseline_lighting_power_density !== null) {
-        form.querySelector('[name="baseline_lpd"]').value = system.baseline_lighting_power_density;
+      setLightingField(form, 'area_of_room', system.area_of_room);
+
+      // Set lighting type dropdown and load template
+      var typeSelect = document.getElementById('lighting-type-select');
+      if (typeSelect) {
+        typeSelect.value = system.lighting_bulb_type;
+        handleLightingTypeChange(system.lighting_bulb_type);
       }
 
-      if (system.total_energy_consumption_kwh_per_year !== null) {
-        form.querySelector('[name="annual_energy_consumption"]').value = system.total_energy_consumption_kwh_per_year;
-      }
-
-      if (system.energy_efficiency_label !== null) {
-        form.querySelector('[name="number_of_stars"]').value = system.energy_efficiency_label;
-      }
+      // Populate type-specific fields
+      setLightingField(form, 'number_of_fixtures', system.number_of_bulbs);
+      setLightingField(form, 'tubes_per_fixture', system.tubes_per_fixture);
+      setLightingField(form, 'bulb_power_rating', system.light_bulb_power_rating_w);
+      setLightingField(form, 'total_lighting_power', system.total_lighting_power_kw);
+      setLightingField(form, 'baseline_lpd', system.baseline_lighting_power_density);
+      setLightingField(form, 'operating_hours_per_day', system.operation_hours_per_workday);
+      setLightingField(form, 'operating_days_per_week', system.workdays_per_week);
+      setLightingField(form, 'operating_weeks_per_year', system.workweeks_per_year);
+      setLightingRadio(form, 'installation_of_sensors', system.sensors_installed ? 'yes' : 'no');
+      setLightingField(form, 'annual_energy_consumption', system.total_energy_consumption_kwh_per_year);
+      setLightingField(form, 'energy_efficiency_label', system.energy_efficiency_label);
+      setLightingField(form, 'number_of_stars', system.number_of_stars);
 
       lighting_system_modal.showModal();
     } catch (error) {
       console.error('Error loading lighting system for edit:', error);
       Toast.error('Failed to load lighting system');
     }
-  }
+  };
 
-  // Confirm delete
+  // ================================================================
+  // Delete
+  // ================================================================
   if (!window.deleteLightingSystemId) {
     window.deleteLightingSystemId = null;
   }
@@ -584,27 +1031,22 @@
   window.confirmDeleteLightingSystem = function(systemId) {
     window.deleteLightingSystemId = systemId;
     lighting_system_modal_delete.showModal();
-  }
+  };
 
-  // Delete lighting system - DELETE from database
   window.deleteLightingSystem = async function() {
     if (window.deleteLightingSystemId !== null) {
       try {
-        const response = await fetch(`/lighting-system/${window.deleteLightingSystemId}/delete/`, {
+        var response = await fetch('/lighting-system/' + window.deleteLightingSystemId + '/delete/', {
           method: 'DELETE',
-          headers: {
-            'X-CSRFToken': getCSRFToken()
-          }
+          headers: { 'X-CSRFToken': getCSRFToken() }
         });
 
-        const result = await response.json();
+        var result = await response.json();
 
         if (response.ok && result.success) {
-          // Success - reload the list
           await window.renderLightingSystems();
           window.deleteLightingSystemId = null;
           lighting_system_modal_delete.close();
-          console.log('Lighting system deleted successfully');
         } else {
           Toast.error('Failed to delete lighting system');
         }
@@ -613,21 +1055,21 @@
         Toast.error('Failed to delete lighting system');
       }
     }
-  }
+  };
 
-  // Initialize on page load
+  // ================================================================
+  // Initialize
+  // ================================================================
   document.addEventListener('DOMContentLoaded', function() {
     window.renderLightingSystems();
   });
 
-  // If HTMX is processing this content dynamically, also initialize after htmx:afterSwap
   document.addEventListener('htmx:afterSwap', function(evt) {
     if (evt.detail.target.id === 'dynamic-content') {
       window.renderLightingSystems();
     }
   });
 
-  // Initialize immediately for dynamically loaded content
   if (document.getElementById('lighting-systems-list')) {
     window.renderLightingSystems();
   }
