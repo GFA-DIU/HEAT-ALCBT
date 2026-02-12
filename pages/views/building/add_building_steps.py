@@ -19,8 +19,10 @@ from cities_light.models import Country
 
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
-from pages.models.building import Building, BuildingCategory, OperationalProduct
+from pages.models.building import Building, BuildingAssembly, BuildingCategory, OperationalProduct,CategorySubcategory, ClimateZone
 from pages.models.epd import EPD, EPDType, MaterialCategory
+from accounts.models import CustomCity, CustomRegion
+from pages.models.assembly import Assembly, StructuralProduct
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +70,7 @@ def building_step_view(request):
 # Step 1.1: Building Name & Location
 def handle_name_location_step(request):
     """Provide countries and optionally pre-populated region/city for edit mode."""
-    from accounts.models import CustomCity, CustomRegion
+
 
     building_uuid = request.GET.get('building_uuid')
 
@@ -122,7 +124,7 @@ def handle_name_location_step(request):
 # Step 1.2: Building Details
 def handle_details_step(request):
     """Provide building categories and optionally pre-populated apartment types for edit mode."""
-    from pages.models.building import CategorySubcategory, ClimateZone
+
 
     building_uuid = request.GET.get('building_uuid')
 
@@ -194,8 +196,7 @@ def handle_cooling_system_step(request):
     climate_zone = ''
     if building_uuid:
         try:
-            import uuid as uuid_lib
-            from pages.models.building import Building
+
             building = Building.objects.get(uuid=uuid_lib.UUID(building_uuid), created_by=request.user)
             climate_zone = building.climate_zone
         except Exception:
@@ -214,8 +215,18 @@ def handle_cooling_system_step(request):
 # Step 2.3: Ventilation System
 def handle_ventilation_system_step(request):
     """Handle ventilation system configuration step."""
+    building_uuid = request.GET.get('building_uuid', '')
+    climate_zone = ''
+    if building_uuid:
+        try:
+            building = Building.objects.get(uuid=uuid_lib.UUID(building_uuid), created_by=request.user)
+            if building.climate_zone:
+                climate_zone = building.climate_zone
+        except Exception:
+            pass
     context = {
-        "building_uuid": request.GET.get('building_uuid', '')
+        "building_uuid": building_uuid,
+        "climate_zone": climate_zone,
     }
     return render(
         request,
@@ -347,8 +358,7 @@ def handle_operational_data_step(request):
 # Step 4: Building Structural Components
 def handle_structural_components_step(request):
     """Handle building structural components step."""
-    from pages.models.assembly import Assembly, StructuralProduct
-    from pages.models.building import BuildingAssembly
+
 
     # Get filter dropdown data for EPD library search
     countries = Country.objects.all().order_by("name")
