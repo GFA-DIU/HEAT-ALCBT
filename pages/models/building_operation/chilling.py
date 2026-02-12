@@ -168,8 +168,8 @@ class CoolingSystemChiller(models.Model):
     total_cooling_load_rt = models.PositiveIntegerField(
         verbose_name=_("Total Cooling Load for Chiller System (RT)")
     )
-    baseline_cooling_efficiency_kw_h = models.PositiveIntegerField(
-        null=True, blank=True, verbose_name=_("Baseline Cooling Efficiency (kW/h)")
+    baseline_cooling_efficiency_kw_h = models.DecimalField(
+        max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("Baseline Cooling Efficiency (kW/RT)")
     )
     variable_speed_drives = models.BooleanField(
         verbose_name=_("Installation of Variable Speed Drives (VSDs)"), default=False
@@ -209,11 +209,18 @@ class CoolingSystemChiller(models.Model):
     ip_lv = models.DecimalField(
         max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=_("IPLV")
     )
-    energy_efficiency_label = models.PositiveSmallIntegerField(
+    energy_efficiency_label = models.CharField(
+        max_length=1,
+        null=True,
+        blank=True,
+        choices=[(c, c) for c in ['A', 'B', 'C', 'D', 'E', 'F', 'G']],
+        verbose_name=_("Energy Efficiency Label (A–G)"),
+    )
+    number_of_stars = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
         choices=[(i, _(str(i))) for i in range(1, 6)],
-        verbose_name=_("Energy Efficiency Label"),
+        verbose_name=_("Number of Stars (1–5)"),
     )
 
     def save(self, *args, **kwargs):

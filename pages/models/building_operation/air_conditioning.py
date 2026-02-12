@@ -5,6 +5,13 @@ from pages.models.building import Building
 from pages.models.building_operation.chilling import RefrigerantGWP, RefrigerantType
 
 
+class PackagedACSubType(models.TextChoices):
+    ROOFTOP = "rooftop", _("Rooftop Unit")
+    FLOOR_STANDING = "floor_standing", _("Floor-standing")
+    DUCTABLE = "ductable", _("Ductable")
+    CASSETTE = "cassette", _("Cassette")
+
+
 class CoolingSystemAirConditioner(models.Model):
     building = models.ForeignKey(
         Building,
@@ -15,10 +22,19 @@ class CoolingSystemAirConditioner(models.Model):
     ac_type = models.CharField(
         max_length=50,
         choices=[
-            ("vrv", _("VRV/VRF (Variable Refrigerant Volume/Flow)")),
+            ("window", _("Window Air Conditioners")),
             ("split", _("Split Air Conditioners")),
+            ("vrv", _("VRV/VRF (Variable Refrigerant Volume/Flow)")),
+            ("packaged", _("Packaged/Ductable Air Conditioners")),
         ],
         verbose_name=_("Air Conditioners Type"),
+    )
+    packaged_subtype = models.CharField(
+        max_length=50,
+        choices=PackagedACSubType.choices,
+        null=True,
+        blank=True,
+        verbose_name=_("Packaged AC Sub-type"),
     )
     year_of_installation = models.PositiveIntegerField(
         verbose_name=_("Year of Installation")
@@ -81,11 +97,18 @@ class CoolingSystemAirConditioner(models.Model):
         blank=True,
         verbose_name=_("ISEER Rating"),
     )
-    energy_efficiency_label = models.PositiveSmallIntegerField(
+    energy_efficiency_label = models.CharField(
+        max_length=1,
+        null=True,
+        blank=True,
+        choices=[(c, c) for c in ['A', 'B', 'C', 'D', 'E', 'F', 'G']],
+        verbose_name=_("Energy Efficiency Label (A–G)"),
+    )
+    number_of_stars = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
         choices=[(i, _(str(i))) for i in range(1, 6)],
-        verbose_name=_("Energy Efficiency Label"),
+        verbose_name=_("Number of Stars (1–5)"),
     )
 
     def save(self, *args, **kwargs):
