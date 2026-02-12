@@ -1,0 +1,57 @@
+<div class="size-full space-y-4 flex flex-col">
+  <div class="space-y-1 shrink-0">
+    <h6 class="h6-title text-[var(--text--strong-950)]">Preview & Confirm</h6>
+    <p class="paragraph-small text-[var(--text--sub-600)]">
+      Map your file columns to BEAT data fields
+    </p>
+  </div>
+
+  <div class="w-full flex-1 overflow-auto hide-scrollbar rounded-lg bg-white border border-[var(--stroke--soft-200)]">
+    <table class="table w-full relative border-collapse">
+      <thead class="bg-[var(--bg--weak-50)] sticky top-0 z-10 text-[var(--text--sub-600)] label-small">
+        <tr>
+          <th class="w-[30%] py-3 px-4 text-left font-normal border-b-0">Your file’s imported column</th>
+          <th class="w-[40%] py-3 px-4 text-left font-normal border-b-0">System required headers</th>
+          <th class="py-3 px-4 text-left font-normal border-b-0">Value</th>
+        </tr>
+      </thead>
+      <tbody id="preview-body" class="text-[var(--text--strong-950)] paragraph-small">
+        <!-- Rows injected via JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<template id="template-row-preview">
+  <tr class="border-b border-[var(--stroke--soft-200)] last:border-0 hover:bg-[var(--bg--weak-50)] transition-colors">
+    <td class="px-4 py-3 font-medium col-file"></td>
+    <td class="px-4 py-3 col-header"></td>
+    <td class="px-4 py-3 col-value"></td>
+  </tr>
+</template>
+
+<script>
+  (function () {
+    // Mock Data (consistent with map-fields)
+    const columns = [
+      { id: '1', fileColumn: 'Building ID', requiredHeader: 'building_identifier', sampleValue: 'BLD-1001' },
+      { id: '2', fileColumn: 'Address Line 1', requiredHeader: 'building_address', sampleValue: '123 Innovation Dr' },
+      { id: '3', fileColumn: 'City Name', requiredHeader: 'building_city', sampleValue: 'San Francisco' },
+      { id: '4', fileColumn: 'Country Code', requiredHeader: 'country', sampleValue: 'USA' },
+    ];
+
+    const tbody = document.getElementById('preview-body');
+    const template = document.getElementById('template-row-preview');
+
+    if (tbody && template) {
+      tbody.innerHTML = '';
+      columns.forEach(col => {
+        const clone = template.content.cloneNode(true);
+        clone.querySelector('.col-file').textContent = col.fileColumn;
+        clone.querySelector('.col-header').textContent = col.requiredHeader || '--';
+        clone.querySelector('.col-value').textContent = col.sampleValue || '--';
+        tbody.appendChild(clone);
+      });
+    }
+  })();
+</script>

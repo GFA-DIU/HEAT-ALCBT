@@ -108,6 +108,10 @@
                 <span class="shrink-0">Add building</span>
               </button>
             </a>
+            <button id="import-btn" class="btn btn-outline rounded-lg w-max" onclick="import_dialog_initial.showModal()">
+              <span data-icon="import-line"></span>
+              <span class="shrink-0">Import building</span>
+            </button>
           </div>
         </div>
         <div id="buildings-container" class="w-full">
@@ -273,6 +277,11 @@
       </div>
     </dialog>
 
+    <div hx-get="{% url 'import_dialog_initial' %}" hx-trigger="load" hx-swap="outerHTML">
+    </div>
+    <div hx-get="{% url 'import_dialog' %}" hx-trigger="load" hx-swap="outerHTML">
+    </div>
+
     <script>
     const accountSuccessModal = document.getElementById(
       "account_success_modal"
@@ -350,5 +359,55 @@
     {% comment %} function goToBuildingDetails(id) {
       window.location.href = "{% url 'building' building_id=" + id + " %}";
     } {% endcomment %}
+
+  let initalTab = 'organizations';
+
+  function setInitialTab(tab) {
+    initalTab = tab;
+    const content = document.getElementById('initial-dialog-content');
+    const template = document.getElementById(tab === 'organizations' ? 'organization-content' : 'users-content');
+
+    if (content && template) {
+      content.innerHTML = template.innerHTML;
+
+      // Toggle active classes on buttons
+      const orgBtn = document.getElementById('tab-btn-organizations');
+      const userBtn = document.getElementById('tab-btn-users');
+
+      if (orgBtn && userBtn) {
+        const activeClasses = ['border-primary', 'text-[var(--text--strong-950)]'];
+        const inactiveClasses = ['border-transparent', 'text-[var(--text--sub-600)]'];
+
+        if (tab === 'organizations') {
+          orgBtn.classList.add(...activeClasses);
+          orgBtn.classList.remove(...inactiveClasses);
+          userBtn.classList.add(...inactiveClasses);
+          userBtn.classList.remove(...activeClasses);
+        } else {
+          userBtn.classList.add(...activeClasses);
+          userBtn.classList.remove(...inactiveClasses);
+          orgBtn.classList.add(...inactiveClasses);
+          orgBtn.classList.remove(...activeClasses);
+        }
+      }
+
+      // Re-initialize icons for the new content
+      if (window.IconComponent) window.IconComponent.initialize();
+    }
+  }
+
+  document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+    if (window.IconComponent) {
+      window.IconComponent.initialize();
+    }
+
+    // If the initial dialog was just loaded, set the default tab
+    if (evt.detail.target.id === 'import_dialog_initial' || document.getElementById('initial-dialog-content')) {
+      if (!document.getElementById('initial-dialog-content').innerHTML.trim()) {
+        setInitialTab('organizations');
+      }
+    }
+  });
 </script>
-    {% endblock %}
+    
+{% endblock %}
