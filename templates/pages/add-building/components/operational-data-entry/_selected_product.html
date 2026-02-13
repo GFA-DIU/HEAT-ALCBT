@@ -33,7 +33,7 @@
             </fieldset>
 
             <fieldset>
-              <label class="input pr-0 grid grid-cols-2 validator">
+              <label class="input validator w-full">
               <input type="number"
                 name='material_{{ epd.id }}_quantity_{{ epd.timestamp }}'
                 value="{% if epd.selection_quantity %}{{ epd.selection_quantity }}{% endif %}"
@@ -42,27 +42,14 @@
                 required
                 min="1"
                 step="0.01" />
-              <select
-                class="select select-ghost w-fit !outline-none !border-none block w-full"
-                name="material_{{ epd.id }}_unit_{{ epd.timestamp }}"
-                required
-              >
-                {% for unit in epd.op_units %}
-                    <option value="{{ unit }}" {% if unit == epd.selection_unit %}selected{% endif %}>
-                        {{ unit }}
-                    </option>
-                {% endfor %}
-              </select>
+              <input type="hidden" name="material_{{ epd.id }}_unit_{{ epd.timestamp }}" value="{{ epd.selection_unit }}" />
+              <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{{ epd.selection_unit }}</span>
             </label>
             <p class="validator-hint hidden">Please enter a valid quantity</p>
             </fieldset>
 
           </div>
 
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            {% comment %} <span class="border-r border-[var(--text--sub-600)] pr-1">Airflow rate: 45CMH</span> {% endcomment %}
-            <span>Capacity units: {{epd.op_units }} </span>
-          </p>
         </div>
         <div class="flex items-center gap-3">
           <button
