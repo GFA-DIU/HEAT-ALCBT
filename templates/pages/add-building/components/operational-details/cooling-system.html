@@ -692,14 +692,6 @@
       </div>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">IPLV (Integrated Part Load Value)<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(Critical efficiency metric, 5.0 – 8.0)</span></legend>
-      <label class="input validator w-full">
-        <input type="number" name="ipvl" placeholder="e.g. 6.0" required min="0" step="0.01" />
-      </label>
-      <p class="validator-hint">This field is required</p>
-    </fieldset>
-
     <!-- OTHER DETAILS -->
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
@@ -709,6 +701,9 @@
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">IPLV (Integrated Part Load Value) <span class="text-[var(--text--sub-600)]">(Optional, 5.0 – 8.0)</span></legend>
+              <label class="input w-full"><input type="number" name="ipvl" placeholder="e.g. 6.0" min="0" step="0.01" /></label>
+            </fieldset>
             <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Water-cooled chiller cooling load factor <span class="text-[var(--text--sub-600)]">(Optional, Typical: 10 – 25%)</span></legend>
               <label class="input w-full"><input type="number" name="water_cooled_chiller_cooling_load_factor" placeholder="e.g. 15" min="0" max="100" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span></label>
             </fieldset>
@@ -846,14 +841,6 @@
       </div>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">IPLV (Integrated Part Load Value)<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(Critical efficiency metric, 4.0 – 6.0)</span></legend>
-      <label class="input validator w-full">
-        <input type="number" name="ipvl" placeholder="e.g. 5.0" required min="0" step="0.01" />
-      </label>
-      <p class="validator-hint">This field is required</p>
-    </fieldset>
-
     <!-- OTHER DETAILS -->
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
@@ -863,6 +850,9 @@
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">IPLV (Integrated Part Load Value) <span class="text-[var(--text--sub-600)]">(Optional, 4.0 – 6.0)</span></legend>
+              <label class="input w-full"><input type="number" name="ipvl" placeholder="e.g. 5.0" min="0" step="0.01" /></label>
+            </fieldset>
             <fieldset class="fieldset"><legend class="fieldset-legend">Total system power input <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
               <label class="input w-full"><input type="number" name="total_chiller_system_power_input" placeholder="e.g. 800" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span></label>
             </fieldset>
