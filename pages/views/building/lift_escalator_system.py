@@ -99,6 +99,12 @@ def create_or_update_lift_escalator_system(request):
 
             form = LiftEscalatorSystemForm(data, instance=lift_escalator_system)
         else:
+            # Enforce one lift system per building
+            if LiftEscalatorSystem.objects.filter(building=building).exists():
+                return JsonResponse({
+                    'success': False,
+                    'errors': {'building': ['Only one lift & escalator system is allowed per building.']}
+                }, status=400)
             # Create new lift & escalator system
             form = LiftEscalatorSystemForm(data)
 

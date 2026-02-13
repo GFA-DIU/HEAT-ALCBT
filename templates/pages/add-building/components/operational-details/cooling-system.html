@@ -680,7 +680,7 @@
       <legend class="fieldset-legend">Installation of variable speed drives<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked /> No</label>
       </div>
     </fieldset>
 
@@ -688,7 +688,7 @@
       <legend class="fieldset-legend">Installation of heat recovery systems<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked /> No</label>
       </div>
     </fieldset>
 
@@ -834,7 +834,7 @@
       <legend class="fieldset-legend">Installation of variable speed drives<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked /> No</label>
       </div>
     </fieldset>
 
@@ -842,7 +842,7 @@
       <legend class="fieldset-legend">Installation of heat recovery systems<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked /> No</label>
       </div>
     </fieldset>
 
@@ -915,32 +915,31 @@
   // Hours expressed as total annual hours; we convert to h/day × d/week × w/year
   // The doc gives total annual hours. We break them into sensible defaults:
   //   hours_per_day = total / (days_per_week * weeks_per_year)
-  //   We fix days=5, weeks=52 for residential; days=5, weeks=52 for commercial; days=6, weeks=52 for chiller
   var OPERATING_DEFAULTS = {
     // [hours_per_day, days_per_week, weeks_per_year]
     residential: { // Window AC, Split AC
-      'hot-dry':     [8,  5, 52],
-      'warm-humid':  [7,  5, 52],
-      'composite':   [6,  5, 52],
-      'temperate':   [4,  5, 52],
-      'cold':        [2,  5, 52],
-      'tropical-wet':[8,  5, 52],
+      'tropical-wet': [8,  7, 52],
+      'warm-humid':   [7,  7, 48],
+      'hot-dry':      [8,  7, 44],
+      'composite':    [7,  7, 36],
+      'temperate':    [5,  7, 28],
+      'cold':         [4,  7, 14],
     },
     commercial: { // VRF, Packaged
-      'hot-dry':     [10, 5, 52],
-      'warm-humid':  [9,  5, 52],
-      'composite':   [9,  5, 52],
-      'temperate':   [6,  5, 52],
-      'cold':        [4,  5, 52],
-      'tropical-wet':[12, 5, 52],
+      'tropical-wet': [10, 7, 52],
+      'warm-humid':   [10, 6, 50],
+      'hot-dry':      [10, 6, 46],
+      'composite':    [10, 6, 40],
+      'temperate':    [9,  6, 32],
+      'cold':         [8,  6, 20],
     },
     chiller: { // Water/Air cooled chiller
-      'hot-dry':     [16, 6, 50],
-      'warm-humid':  [18, 6, 52],
-      'composite':   [14, 6, 45],
-      'temperate':   [12, 6, 36],
-      'cold':        [8,  5, 36],
-      'tropical-wet':[20, 6, 52],
+      'tropical-wet': [14, 7, 52],
+      'warm-humid':   [12, 7, 50],
+      'hot-dry':      [12, 6, 46],
+      'composite':    [12, 6, 40],
+      'temperate':    [10, 6, 32],
+      'cold':         [8,  6, 20],
     },
   };
 

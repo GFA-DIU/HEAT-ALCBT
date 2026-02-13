@@ -8,19 +8,20 @@ from pages.models.building import Building
 class HotWaterSystemType(models.TextChoices):
     HEAT_PUMP = "heat-pump", _("Heat Pump Water Heater")
     BOILER = "boiler", _("Boiler")
-    SOLAR = "solar", _("Solar Water Heaters")
+    SOLAR = "solar", _("Water Heaters")
 
 
 class FuelType(models.TextChoices):
     ELECTRICITY = "electricity", _("Electricity")
-    LIGHT_FUEL_OIL = "light-fuel-oil", _("Light Fuel Oil")
-    HEAVY_FUEL_OIL = "heavy-fuel-oil", _("Heavy Fuel Oil")
-    LPG = "lpg", _("LPG")
     NATURAL_GAS = "natural-gas", _("Natural Gas")
-    COAL = "coal", _("Coal")
-    LIGNITE = "lignite", _("Lignite")
+    LPG = "lpg", _("LPG")
     DIESEL = "diesel", _("Diesel")
     KEROSENE = "kerosene", _("Kerosene")
+    COAL = "coal", _("Coal")
+    SOLAR = "solar", _("Solar")
+    LIGHT_FUEL_OIL = "light-fuel-oil", _("Light Fuel Oil")
+    HEAVY_FUEL_OIL = "heavy-fuel-oil", _("Heavy Fuel Oil")
+    LIGNITE = "lignite", _("Lignite")
     FIRE_WOOD_LOG = "fire-wood-log", _("Fire Wood (Log Wood)")
     FIRE_WOOD_CHIPS = "fire-wood-chips", _("Fire Wood (Wood Chips)")
     FIRE_WOOD_PELLETS = "fire-wood-pellets", _("Fire Wood (Wood Pellets)")
@@ -122,6 +123,22 @@ class HotWaterSystem(models.Model):
         null=True,
         blank=True,
         verbose_name=_("Total Energy Consumption Annually (kWh/year)"),
+    )
+
+    total_fuel_consumption = models.DecimalField(
+        max_digits=15,
+        decimal_places=3,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Total Fuel Consumption (Boiler)"),
+    )
+
+    fuel_consumption_unit = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        verbose_name=_("Fuel Consumption Unit"),
     )
 
     class Meta:
