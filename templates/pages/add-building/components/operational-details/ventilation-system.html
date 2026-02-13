@@ -514,7 +514,7 @@
   // Annual hours → [h/day, d/week, w/year]
   // AHU/FCU/DOAS/Cassette use 5d/52wk; Fans use 7d/52wk
   var VENT_OPERATING_DEFAULTS = {
-    // h/d derived from doc total hrs/year ÷ (d/w × 52): AHU/FCU/DOAS/CASSETTE=5d/w, FAN=7d/w
+    // total hrs/year ÷ (d/w × 52): AHU/FCU/DOAS/CASSETTE=5d/w, FAN=7d/w
     'AHU': {
       'hot-dry':     [14, 5, 52], 'warm-humid':  [17, 5, 52], 'composite':   [10, 5, 52],
       'temperate':   [9,  5, 52], 'cold':        [7,  5, 52], 'tropical-wet':[19, 5, 52],
