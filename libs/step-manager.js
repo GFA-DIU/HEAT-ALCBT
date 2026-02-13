@@ -489,6 +489,12 @@ class StepManager {
 
       const response = await fetch(url);
 
+      // If the session expired, the server redirects to login.
+      if (response.url && response.url.indexOf('/accounts/login/') !== -1) {
+        window.location.href = '/accounts/login/?next=' + encodeURIComponent(window.location.pathname + window.location.search);
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

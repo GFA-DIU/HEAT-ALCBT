@@ -101,6 +101,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
+    "accounts.middleware.HtmxLoginRedirectMiddleware",
     "accounts.middleware.EmailVerificationMiddleware",
     # # own
     # "django_project.middleware.LoginRequiredMiddleware",

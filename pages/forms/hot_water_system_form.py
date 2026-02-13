@@ -2,6 +2,7 @@ from django import forms
 from django.utils.translation import gettext as _
 
 from pages.models.building_operation import HotWaterSystem, HotWaterSystemType, FuelType
+from decimal import Decimal
 
 
 class HotWaterSystemForm(forms.ModelForm):
@@ -24,6 +25,8 @@ class HotWaterSystemForm(forms.ModelForm):
             'equipment_efficiency_level',
             'power_input',
             'total_energy_consumption_kwh_per_year',
+            'total_fuel_consumption',
+            'fuel_consumption_unit',
         ]
 
     def __init__(self, data=None, *args, **kwargs):
@@ -49,7 +52,6 @@ class HotWaterSystemForm(forms.ModelForm):
         if value is None or value == '':
             return None
         try:
-            from decimal import Decimal
             value = Decimal(str(value))
             if value < 0:
                 raise forms.ValidationError(_('Power input cannot be negative.'))
@@ -68,3 +70,24 @@ class HotWaterSystemForm(forms.ModelForm):
             return value
         except (ValueError, TypeError):
             raise forms.ValidationError(_('Please enter a valid number.'))
+
+    def clean_total_fuel_consumption(self):
+        value = self.cleaned_data.get('total_fuel_consumption')
+        if value is None or value == '':
+            return None
+        try:
+
+            val = Decimal(str(value))
+            if val < 0:
+                raise forms.ValidationError(_('Total fuel consumption cannot be negative.'))
+            return val
+        except forms.ValidationError:
+            raise
+        except Exception:
+            raise forms.ValidationError(_('Please enter a valid number.'))
+
+    def clean_fuel_consumption_unit(self):
+        value = self.cleaned_data.get('fuel_consumption_unit')
+        if value is None or value == '':
+            return None
+        return str(value).strip()

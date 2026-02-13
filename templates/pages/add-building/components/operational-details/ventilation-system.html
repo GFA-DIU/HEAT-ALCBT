@@ -95,7 +95,7 @@
       <legend class="fieldset-legend">Installation of Variable Speed Drives (VSD)<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
         <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked /> No</label>
       </div>
     </fieldset>
 
@@ -103,7 +103,7 @@
       <legend class="fieldset-legend">Installation of Demand Controlled Ventilation (DCV)<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
         <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked /> No</label>
       </div>
     </fieldset>
 
@@ -263,7 +263,7 @@
       <legend class="fieldset-legend">Installation of Variable Speed Drives (VSD)<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
         <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked /> No</label>
       </div>
     </fieldset>
 
@@ -271,7 +271,7 @@
       <legend class="fieldset-legend">Installation of Demand Controlled Ventilation (DCV)<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
         <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked /> No</label>
       </div>
     </fieldset>
 
@@ -514,17 +514,18 @@
   // Annual hours → [h/day, d/week, w/year]
   // AHU/FCU/DOAS/Cassette use 5d/52wk; Fans use 7d/52wk
   var VENT_OPERATING_DEFAULTS = {
+    // h/d derived from doc total hrs/year ÷ (d/w × 52): AHU/FCU/DOAS/CASSETTE=5d/w, FAN=7d/w
     'AHU': {
       'hot-dry':     [14, 5, 52], 'warm-humid':  [17, 5, 52], 'composite':   [10, 5, 52],
-      'temperate':   [9,  5, 52], 'cold':        [6,  5, 52], 'tropical-wet':[19, 5, 52],
+      'temperate':   [9,  5, 52], 'cold':        [7,  5, 52], 'tropical-wet':[19, 5, 52],
     },
     'FCU': {
       'hot-dry':     [12, 5, 52], 'warm-humid':  [17, 5, 52], 'composite':   [9,  5, 52],
       'temperate':   [7,  5, 52], 'cold':        [5,  5, 52], 'tropical-wet':[20, 5, 52],
     },
     'DOAS': {
-      'hot-dry':     [14, 5, 52], 'warm-humid':  [14, 5, 52], 'composite':   [12, 5, 52],
-      'temperate':   [9,  5, 52], 'cold':        [6,  5, 52], 'tropical-wet':[17, 5, 52],
+      'hot-dry':     [14, 5, 52], 'warm-humid':  [14, 5, 52], 'composite':   [13, 5, 52],
+      'temperate':   [9,  5, 52], 'cold':        [7,  5, 52], 'tropical-wet':[17, 5, 52],
     },
     'CASSETTE_AC': {
       'hot-dry':     [14, 5, 52], 'warm-humid':  [13, 5, 52], 'composite':   [10, 5, 52],

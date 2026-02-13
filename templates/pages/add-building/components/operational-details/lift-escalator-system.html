@@ -1,7 +1,7 @@
 {% load static %}
 <div id="lift-escalator-system-container" class="w-full">
   <div class="w-full flex flex-col">
-    <button class="btn btn-outline w-fit" onclick="openLiftEscalatorSystemModal()">
+    <button id="add-lift-escalator-btn" class="btn btn-outline w-fit" onclick="openLiftEscalatorSystemModal()">
       <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
       Add a lift & escalator system
     </button>
@@ -36,7 +36,7 @@
           <legend class="fieldset-legend">Installation of lift regenerative features<span class="text-[var(--state--error--base)]">*</span></legend>
           <div class="flex items-center gap-2.5 mt-1">
             <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="yes" class="radio radio-xs" /> Yes</label>
-            <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="no" class="radio radio-xs" /> No</label>
+            <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="no" class="radio radio-xs" checked /> No</label>
           </div>
         </fieldset>
 
@@ -44,12 +44,19 @@
           <legend class="fieldset-legend">Installation of VVVF and sleep mode<span class="text-[var(--state--error--base)]">*</span></legend>
           <div class="flex items-center gap-2.5 mt-1">
             <label class="flex items-center gap-2"><input type="radio" name="vvvf_sleep_mode" value="yes" class="radio radio-xs" /> Yes</label>
-            <label class="flex items-center gap-2"><input type="radio" name="vvvf_sleep_mode" value="no" class="radio radio-xs" /> No</label>
+            <label class="flex items-center gap-2"><input type="radio" name="vvvf_sleep_mode" value="no" class="radio radio-xs" checked /> No</label>
           </div>
         </fieldset>
 
-        <!-- Annual energy consumption is computed from total building electricity × 7.5%, sent silently -->
-        <input type="hidden" name="annual_energy_consumption" />
+        <!-- Annual energy consumption = total building operational kWh × 7.5% -->
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">Annual lift system energy consumption</legend>
+          <label class="input w-full bg-[var(--bg--weak-50)]">
+            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+          </label>
+          <p class="label-text-alt text-[var(--text--soft-400)]">Total building operational energy × 7.5%</p>
+        </fieldset>
 
       </div>
     </form>
@@ -98,9 +105,29 @@
     return urlParams.get('building_uuid');
   }
 
+  function computeAndSetLiftEnergy(buildingId) {
+    fetch('/building/' + buildingId + '/total-kwh/')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        console.log('[Lift] total-kwh response:', data);
+        if (data.success) {
+          var form = document.getElementById('lift-escalator-system-form');
+          var energyEl = form ? form.querySelector('[name="annual_energy_consumption"]') : null;
+          console.log('[Lift] energyEl:', energyEl);
+          if (energyEl) {
+            energyEl.value = parseFloat((data.total_kwh * 0.075).toFixed(2));
+            console.log('[Lift] set value to:', energyEl.value);
+          }
+        }
+      })
+      .catch(function(err) { console.error('[Lift] total-kwh fetch error:', err); });
+  }
+
   window.openLiftEscalatorSystemModal = function() {
     window.editingLiftEscalatorSystemId = null;
     document.getElementById('lift-escalator-system-form').reset();
+    var buildingId = getBuildingId();
+    if (buildingId) computeAndSetLiftEnergy(buildingId);
     lift_escalator_system_modal.showModal();
   };
 
@@ -177,6 +204,10 @@
 
       var systems = result.lift_escalator_systems || [];
 
+      // Show/hide Add button — only one lift system allowed
+      var addBtn = document.getElementById('add-lift-escalator-btn');
+      if (addBtn) addBtn.style.display = systems.length > 0 ? 'none' : '';
+
       if (systems.length === 0) {
         listContainer.innerHTML = noSystemsTemplate.innerHTML;
         return;
@@ -252,6 +283,9 @@
       form.querySelectorAll('[name="vvvf_sleep_mode"]').forEach(function(r) {
         r.checked = (r.value === (system.vvvf_sleep_mode ? 'yes' : 'no'));
       });
+
+      // Always recompute energy from current operational data
+      computeAndSetLiftEnergy(buildingId);
 
       lift_escalator_system_modal.showModal();
     } catch (error) {

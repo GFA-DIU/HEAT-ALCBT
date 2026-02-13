@@ -4,6 +4,7 @@ This provides HTMX endpoints for filtering, selecting, and saving operational pr
 """
 
 import logging
+import json
 from datetime import datetime
 import uuid as uuid_lib
 
@@ -12,6 +13,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
+from django.db.models import Sum
 
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
@@ -30,7 +32,6 @@ def building_step_operational_products(request):
     Handle operational products selection for the add-building wizard.
     Supports GET for listing/filtering EPDs and POST for adding/saving products.
     """
-    import json
 
     action = "list"
 
@@ -226,7 +227,6 @@ def handle_delete_product(request):
     """
     Delete a specific operational product from the building.
     """
-    import json
 
     try:
         data = json.loads(request.body)
@@ -266,3 +266,25 @@ def handle_delete_product(request):
     except Exception as e:
         logger.exception(f"Error deleting operational product: {str(e)}")
         return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_building_total_kwh(request, building_uuid):
+    """
+    Return the sum of all operational product quantities with unit 'kwh' for a building.
+    Used to compute the lift & escalator annual energy consumption default (total × 7.5%).
+    """
+    try:
+        uuid_obj = uuid_lib.UUID(str(building_uuid))
+        building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+    except (ValueError, Building.DoesNotExist):
+        return JsonResponse({"success": False, "error": "Building not found"}, status=404)
+
+
+    total = OperationalProduct.objects.filter(
+        building=building,
+        input_unit='kwh'
+    ).aggregate(total=Sum('quantity'))['total'] or 0
+
+    return JsonResponse({"success": True, "total_kwh": float(total)})

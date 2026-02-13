@@ -34,6 +34,8 @@ def _serialize(system):
         'equipment_efficiency_level': str(system.equipment_efficiency_level),
         'power_input': str(system.power_input) if system.power_input is not None else None,
         'total_energy_consumption_kwh_per_year': system.total_energy_consumption_kwh_per_year,
+        'total_fuel_consumption': str(system.total_fuel_consumption) if system.total_fuel_consumption is not None else None,
+        'fuel_consumption_unit': system.fuel_consumption_unit,
     }
 
 

@@ -20,7 +20,7 @@ from .views.building.add_building_steps import (building_step_view,
 from .views.building.building import building
 from .views.building.building_simulation import building_simulation
 from .views.building.building_step_operational import \
-    building_step_operational_products
+    building_step_operational_products, get_building_total_kwh
 from .views.building.building_step_operational_schedule import \
     building_step_operational_schedule
 from .views.building.building_step_structural import \
@@ -77,6 +77,7 @@ urlpatterns = [
     path("building/step/data", get_building_data, name="get_building_data"),
     path("building/step/operational", building_step_operational_products, name="building_step_operational"),
     path("building/step/operational-schedule", building_step_operational_schedule, name="building_step_operational_schedule"),
+    path("building/<uuid:building_uuid>/total-kwh/", get_building_total_kwh, name="building_total_kwh"),
     path("building/step/structural", building_step_structural_products, name="building_step_structural"),
     path("building/complete", complete_building_setup, name="complete_building_setup"),
     path("building/<uuid:building_id>/", building, name="building"),

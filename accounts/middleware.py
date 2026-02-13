@@ -1,5 +1,6 @@
 from allauth.account.models import EmailAddress
 from django.contrib.messages import get_messages
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -13,6 +14,28 @@ ALLOWED_PATHS_WHEN_UNVERIFIED = [
     "/cookies/",
     "/__debug__/",
 ]
+
+
+class HtmxLoginRedirectMiddleware:
+    """
+    When an HTMX request is redirected to the login page (session expired),
+    Django returns a 302 which HTMX would render inline. Instead, return a
+    200 with HX-Redirect so the browser does a full-page redirect to login.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        is_htmx = request.headers.get('HX-Request') == 'true'
+        if response.status_code == 302 and is_htmx:
+            location = response.get('Location') or ''
+            if '/accounts/login/' in location:
+                redirect_response = HttpResponse(status=200)
+                redirect_response['HX-Redirect'] = location
+                return redirect_response
+        return response
 
 
 class EmailVerificationMiddleware:

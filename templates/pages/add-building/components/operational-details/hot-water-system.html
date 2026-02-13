@@ -81,13 +81,9 @@
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Fuel type<span class="text-[var(--state--error--base)]">*</span></legend>
-      <select class="select w-full" name="fuel_type"
-        hx-get="/select_lists/?fuel_types=1"
-        hx-trigger="load"
-        hx-target="this"
-        hx-swap="innerHTML"
-        required>
+      <select class="select w-full" name="fuel_type" required>
         <option value="">Select an option</option>
+        <option value="electricity">Electricity</option>
       </select>
     </fieldset>
 
@@ -123,19 +119,28 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline hot water system efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">Coefficient of Performance (COP)<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_efficiency" placeholder="2.5–4.5" required min="0" step="0.001" />
+        <input type="number" name="baseline_efficiency" placeholder="2.5–4.5" required min="0.01" step="0.001" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">COP</span>
       </label>
       <p class="validator-hint">Typical: 2.5–4.5 for heat pumps</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Hot water system power input<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="power_input" placeholder="2–15" required min="0" step="0.01" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+      <p class="validator-hint">Typical: 2–15 kW for heat pumps</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Installation of heat recovery system<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
         <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" checked /> No</label>
       </div>
     </fieldset>
 
@@ -148,27 +153,15 @@
       <p class="validator-hint">Typical: 75%–95%</p>
     </fieldset>
 
-  </div>
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Total energy consumption annually</legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+      </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Power input × No. of equipment × schedule / COP</p>
+    </fieldset>
 
-  <div class="px-5 pb-4">
-    <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
-      <input type="checkbox" />
-      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
-      <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
-
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Hot water system power input</legend>
-          <label class="input w-full">
-            <input type="number" name="power_input" placeholder="2–15" min="0" step="0.01" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
-          </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">Typical: 2–15 kW for heat pumps</p>
-        </fieldset>
-
-        <input type="hidden" name="total_energy_consumption_kwh_per_year" />
-
-      </div>
-    </div>
   </div>
 </template>
 
@@ -179,13 +172,15 @@
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Fuel type<span class="text-[var(--state--error--base)]">*</span></legend>
-      <select class="select w-full" name="fuel_type"
-        hx-get="/select_lists/?fuel_types=1"
-        hx-trigger="load"
-        hx-target="this"
-        hx-swap="innerHTML"
-        required>
+      <select class="select w-full" name="fuel_type" required onchange="handleBoilerFuelTypeChange(this.value)">
         <option value="">Select an option</option>
+        <option value="electricity">Electricity</option>
+        <option value="natural-gas">Natural Gas</option>
+        <option value="lpg">LPG</option>
+        <option value="diesel">Diesel</option>
+        <option value="kerosene">Kerosene</option>
+        <option value="coal">Coal</option>
+        <option value="other">Other</option>
       </select>
     </fieldset>
 
@@ -230,56 +225,66 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Total fuel consumption<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="total_fuel_consumption" placeholder="e.g. 1000" required min="0" step="0.001" />
+        <span id="boiler-fuel-unit" class="text-sm/5 align-middle text-[var(--text--sub-600)]">—</span>
+        <input type="hidden" name="fuel_consumption_unit" id="boiler-fuel-unit-input" value="" />
+      </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Select fuel type first to see the unit</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Installation of heat recovery system<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
         <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" checked /> No</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline hot water system equipment efficiency level<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="equipment_efficiency_level" placeholder="75–95" required min="0" max="100" step="0.01" />
+        <input type="number" name="equipment_efficiency_level" placeholder="75–95" required min="0.01" max="100" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
       <p class="validator-hint">Typical: 75%–95%</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline hot water system efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
-      <label class="input validator w-full">
-        <input type="number" name="baseline_efficiency" placeholder="e.g. 0.85" required min="0" step="0.001" />
+      <legend class="fieldset-legend">Baseline hot water system efficiency</legend>
+      <label class="input w-full">
+        <input type="number" name="baseline_efficiency" placeholder="e.g. 0.85" min="0" step="0.001" />
       </label>
     </fieldset>
 
-  </div>
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Total energy consumption annually</legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+      </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Power input × No. of equipment × schedule / efficiency level</p>
+    </fieldset>
 
-  <div class="px-5 pb-4">
-    <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
-      <input type="checkbox" />
-      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
-      <div class="collapse-content px-4 grid grid-cols-1 gap-y-1">
-
-        <input type="hidden" name="total_energy_consumption_kwh_per_year" />
-
-      </div>
-    </div>
   </div>
 </template>
 
-<!-- Solar Water Heaters -->
+<!-- Water Heaters (formerly Solar) -->
 <template id="solar-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">SOLAR WATER HEATER DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">WATER HEATER DATA</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Fuel type<span class="text-[var(--state--error--base)]">*</span></legend>
-      <select class="select w-full" name="fuel_type" required>
+      <select class="select w-full" name="fuel_type" required onchange="handleWaterHeaterFuelTypeChange(this.value)">
         <option value="">Select an option</option>
-        <option value="electricity">Electricity (backup heating)</option>
-        <option value="none">None (fully solar)</option>
+        <option value="electricity">Electricity</option>
+        <option value="natural-gas">Natural Gas</option>
+        <option value="lpg">LPG</option>
+        <option value="solar">Solar</option>
       </select>
+      <p id="solar-fuel-tip" class="label-text-alt text-[var(--text--soft-400)] hidden">Solar is zero-carbon. Total energy will be set to 0.</p>
     </fieldset>
 
     <fieldset class="fieldset">
@@ -316,47 +321,45 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Hot water system power input<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="1–5" required min="0" step="0.01" />
+        <input type="number" name="power_input" placeholder="2–5 (electric), 10–40 (gas)" required min="0" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="validator-hint">Typical: 1–5 kW for electric backup (0 if no backup)</p>
+      <p class="validator-hint">Typical: 2–5 kW for electric, 10–40 kW for gas</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Installation of heat recovery system<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5 mt-1">
+        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="yes" class="radio radio-xs" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" checked /> No</label>
+      </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline hot water system equipment efficiency level<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="equipment_efficiency_level" placeholder="75–95" required min="0" max="100" step="0.01" />
+        <input type="number" name="equipment_efficiency_level" placeholder="75–99" required min="0.01" max="100" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">Typical: 75%–95%</p>
+      <p class="validator-hint">Electric: 95–99%. Gas: 75–85%.</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline hot water system efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
-      <label class="input validator w-full">
-        <input type="number" name="baseline_efficiency" placeholder="e.g. 0.85" required min="0" step="0.001" />
+      <legend class="fieldset-legend">Baseline hot water system efficiency</legend>
+      <label class="input w-full">
+        <input type="number" name="baseline_efficiency" placeholder="e.g. 0.85" min="0" step="0.001" />
       </label>
     </fieldset>
 
-  </div>
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Total energy consumption annually</legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+      </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Power input × No. of equipment × schedule / efficiency level (0 if Solar)</p>
+    </fieldset>
 
-  <div class="px-5 pb-4">
-    <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
-      <input type="checkbox" />
-      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
-      <div class="collapse-content px-4 grid grid-cols-1 gap-y-1">
-
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">Total energy consumption annually</legend>
-          <label class="input w-full">
-            <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="e.g. 1092" min="0" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
-          </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">Default: efficiency level × hrs/day × days/week × weeks/year</p>
-        </fieldset>
-
-      </div>
-    </div>
   </div>
 </template>
 
@@ -365,6 +368,42 @@
     'heat-pump': 'heat-pump-template',
     'boiler':    'boiler-template',
     'solar':     'solar-template',
+  };
+
+  // Fuel consumption units per fuel type for boiler
+  var BOILER_FUEL_UNITS = {
+    'electricity': 'kWh/year',
+    'natural-gas': 'm³/year',
+    'lpg':         'kg/year',
+    'diesel':      'Liters/year',
+    'kerosene':    'Liters/year',
+    'coal':        'kg/year',
+    'other':       'units/year',
+  };
+
+  // ================================================================
+  // Boiler fuel type change — update displayed unit
+  // ================================================================
+  window.handleBoilerFuelTypeChange = function(fuelValue) {
+    var form = document.getElementById('hot-water-system-form');
+    if (!form) return;
+    var unitEl = form.querySelector('#boiler-fuel-unit');
+    var unitInput = form.querySelector('#boiler-fuel-unit-input');
+    var unit = BOILER_FUEL_UNITS[fuelValue] || '—';
+    if (unitEl) unitEl.textContent = unit;
+    if (unitInput) unitInput.value = fuelValue ? unit : '';
+    recomputeHWSEnergy();
+  };
+
+  // ================================================================
+  // Water heater fuel type change — zero out if Solar
+  // ================================================================
+  window.handleWaterHeaterFuelTypeChange = function(fuelValue) {
+    var form = document.getElementById('hot-water-system-form');
+    if (!form) return;
+    var tip = form.querySelector('#solar-fuel-tip');
+    if (tip) tip.classList.toggle('hidden', fuelValue !== 'solar');
+    recomputeHWSEnergy();
   };
 
   // ================================================================
@@ -385,9 +424,84 @@
     var clone = tmpl.content.cloneNode(true);
     container.appendChild(clone);
 
-    // HTMX process newly injected content (for fuel_type hx-get)
+    // HTMX process newly injected content (no longer needed for fuel_type but keep for safety)
     if (window.htmx) htmx.process(container);
+
+    // Wire up live computation of total energy field
+    var form = document.getElementById('hot-water-system-form');
+    ['power_input', 'number_of_equipment', 'equipment_efficiency_level',
+     'baseline_efficiency', 'operating_hours_per_day', 'operating_days_per_week',
+     'operating_weeks_per_year'].forEach(function(name) {
+      var el = form.querySelector('[name="' + name + '"]');
+      if (el) el.addEventListener('input', recomputeHWSEnergy);
+    });
+    // Fuel type selects wired via onchange in template
+    recomputeHWSEnergy();
   };
+
+  // ================================================================
+  // Recompute total energy based on system type
+  // ================================================================
+  function recomputeHWSEnergy() {
+    var form = document.getElementById('hot-water-system-form');
+    if (!form) return;
+
+    var typeSelect = document.getElementById('hot-water-type-select');
+    var systemType = typeSelect ? typeSelect.value : '';
+
+    var totalEl = form.querySelector('[name="total_energy_consumption_kwh_per_year"]');
+    if (!totalEl) return;
+
+    var powerEl  = form.querySelector('[name="power_input"]');
+    var numEl    = form.querySelector('[name="number_of_equipment"]');
+    var hrsEl    = form.querySelector('[name="operating_hours_per_day"]');
+    var daysEl   = form.querySelector('[name="operating_days_per_week"]');
+    var weeksEl  = form.querySelector('[name="operating_weeks_per_year"]');
+
+    var power  = parseFloat(powerEl  ? powerEl.value  : '');
+    var num    = parseFloat(numEl    ? numEl.value    : '');
+    var hrs    = parseFloat(hrsEl    ? hrsEl.value    : '');
+    var days   = parseFloat(daysEl   ? daysEl.value   : '');
+    var weeks  = parseFloat(weeksEl  ? weeksEl.value  : '');
+
+    if (systemType === 'heat-pump') {
+      // Formula: power_input × number_of_equipment × schedule / COP
+      var copEl = form.querySelector('[name="baseline_efficiency"]');
+      var cop   = parseFloat(copEl ? copEl.value : '');
+      if (!isNaN(power) && !isNaN(num) && !isNaN(hrs) && !isNaN(days) && !isNaN(weeks) && !isNaN(cop) && cop > 0) {
+        totalEl.value = parseFloat(((power * num * hrs * days * weeks) / cop).toFixed(2));
+      } else {
+        totalEl.value = '';
+      }
+
+    } else if (systemType === 'boiler') {
+      // Formula: power_input × number_of_equipment × schedule / efficiency_level%
+      var effEl = form.querySelector('[name="equipment_efficiency_level"]');
+      var eff   = parseFloat(effEl ? effEl.value : '');
+      if (!isNaN(power) && !isNaN(num) && !isNaN(hrs) && !isNaN(days) && !isNaN(weeks) && !isNaN(eff) && eff > 0) {
+        totalEl.value = parseFloat(((power * num * hrs * days * weeks) / (eff / 100)).toFixed(2));
+      } else {
+        totalEl.value = '';
+      }
+
+    } else if (systemType === 'solar') {
+      // Water Heaters — check if Solar fuel selected
+      var fuelSelect = form.querySelector('[name="fuel_type"]');
+      var fuelValue  = fuelSelect ? fuelSelect.value : '';
+      if (fuelValue === 'solar') {
+        totalEl.value = 0;
+        return;
+      }
+      // Formula: power_input × number_of_equipment × schedule / efficiency_level%
+      var effEl2 = form.querySelector('[name="equipment_efficiency_level"]');
+      var eff2   = parseFloat(effEl2 ? effEl2.value : '');
+      if (!isNaN(power) && !isNaN(num) && !isNaN(hrs) && !isNaN(days) && !isNaN(weeks) && !isNaN(eff2) && eff2 > 0) {
+        totalEl.value = parseFloat(((power * num * hrs * days * weeks) / (eff2 / 100)).toFixed(2));
+      } else {
+        totalEl.value = '';
+      }
+    }
+  }
 
   // ================================================================
   // Modal open / close
@@ -437,21 +551,8 @@
       return;
     }
 
-    // Compute total energy = equipment_efficiency_level% × hrs/day × days/week × weeks/year
-    var effEl   = form.querySelector('[name="equipment_efficiency_level"]');
-    var hrsEl   = form.querySelector('[name="operating_hours_per_day"]');
-    var daysEl  = form.querySelector('[name="operating_days_per_week"]');
-    var weeksEl = form.querySelector('[name="operating_weeks_per_year"]');
-    var totalEnergyEl = form.querySelector('[name="total_energy_consumption_kwh_per_year"]');
-    if (effEl && hrsEl && daysEl && weeksEl && totalEnergyEl) {
-      var eff   = parseFloat(effEl.value);
-      var hrs   = parseFloat(hrsEl.value);
-      var days  = parseFloat(daysEl.value);
-      var weeks = parseFloat(weeksEl.value);
-      if (!isNaN(eff) && !isNaN(hrs) && !isNaN(days) && !isNaN(weeks)) {
-        totalEnergyEl.value = Math.round((eff / 100) * hrs * days * weeks);
-      }
-    }
+    // Recompute total energy before saving
+    recomputeHWSEnergy();
 
     var formData = new FormData(form);
     var systemData = Object.fromEntries(formData.entries());
@@ -606,19 +707,19 @@
         setField('equipment_efficiency_level', system.equipment_efficiency_level);
         setField('power_input', system.power_input);
         setField('total_energy_consumption_kwh_per_year', system.total_energy_consumption_kwh_per_year);
+        setField('total_fuel_consumption', system.total_fuel_consumption);
+        // Update boiler fuel unit display if applicable
+        if (system.type_of_hot_water_system === 'boiler') {
+          handleBoilerFuelTypeChange(system.fuel_type);
+        }
+        // Update water heater solar tip if applicable
+        if (system.type_of_hot_water_system === 'solar') {
+          handleWaterHeaterFuelTypeChange(system.fuel_type);
+        }
       };
 
-      // fuel_type select: if it uses hx-get (heat-pump / boiler), wait for HTMX to finish loading options
-      var fuelSelect = form.querySelector('[name="fuel_type"]');
-      if (fuelSelect && fuelSelect.hasAttribute('hx-get')) {
-        fuelSelect.addEventListener('htmx:afterSwap', function onFuelLoaded() {
-          fuelSelect.removeEventListener('htmx:afterSwap', onFuelLoaded);
-          populateFields();
-        });
-      } else {
-        // Solar or any static select — populate immediately
-        populateFields();
-      }
+      // Static selects — populate immediately after a short delay for DOM settle
+      setTimeout(populateFields, 50);
 
       hot_water_system_modal.showModal();
     } catch (error) {
