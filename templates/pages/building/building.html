@@ -307,6 +307,8 @@
       function loadTabContent(tabLabel) {
         if (tabLabel === "Savings") {
           if (tabContentContainerTop) tabContentContainerTop.classList.remove("hidden");
+          // Show spinner while loading
+          tabContentContainer.innerHTML = '<div class="flex justify-center items-center py-8 w-full"><span class="loading loading-spinner loading-lg"></span></div>';
           // Use HTMX to load content
           htmx.ajax('GET', `{% url "savings_tab" building_id=building.id %}`, {
             target: '#tab-content-container'
