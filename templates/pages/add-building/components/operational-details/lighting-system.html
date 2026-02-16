@@ -136,18 +136,20 @@
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
-      <label class="input w-full">
-        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" onchange="recalcLightingLPD()" />
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Fixtures × Wattage ÷ 1000</p>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
-      <label class="input w-full">
-        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" />
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Total lighting power ÷ Area of room</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -155,19 +157,19 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" />
+            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" />
+            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" />
+            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
           </label>
         </div>
@@ -177,8 +179,8 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> No</label>
       </div>
     </fieldset>
 
@@ -191,11 +193,12 @@
       <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually</legend>
-          <label class="input w-full">
-            <input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" />
+          <legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+          <label class="input w-full bg-[var(--bg--weak-50)]">
+            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
+          <p class="label-text-alt text-[var(--text--soft-400)]">Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor</p>
         </fieldset>
 
         <fieldset class="fieldset">
@@ -255,18 +258,20 @@
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
-      <label class="input w-full">
-        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" onchange="recalcLightingLPD()" />
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Fixtures × Tubes × Wattage ÷ 1000</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
-      <label class="input w-full">
-        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" />
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Total lighting power ÷ Area of room</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -274,19 +279,19 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" />
+            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" />
+            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" />
+            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
           </label>
         </div>
@@ -296,8 +301,8 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> No</label>
       </div>
     </fieldset>
 
@@ -310,11 +315,12 @@
       <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually</legend>
-          <label class="input w-full">
-            <input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" />
+          <legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+          <label class="input w-full bg-[var(--bg--weak-50)]">
+            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
+          <p class="label-text-alt text-[var(--text--soft-400)]">Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor</p>
         </fieldset>
 
         <fieldset class="fieldset">
@@ -367,18 +373,20 @@
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
-      <label class="input w-full">
-        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" onchange="recalcLightingLPD()" />
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Fixtures × Wattage ÷ 1000</p>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
-      <label class="input w-full">
-        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" />
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Total lighting power ÷ Area of room</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -386,19 +394,19 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" />
+            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" />
+            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" />
+            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
           </label>
         </div>
@@ -408,8 +416,8 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> No</label>
       </div>
     </fieldset>
 
@@ -422,11 +430,12 @@
       <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually</legend>
-          <label class="input w-full">
-            <input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" />
+          <legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+          <label class="input w-full bg-[var(--bg--weak-50)]">
+            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
+          <p class="label-text-alt text-[var(--text--soft-400)]">Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor</p>
         </fieldset>
 
         <fieldset class="fieldset">
@@ -479,18 +488,20 @@
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
-      <label class="input w-full">
-        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" onchange="recalcLightingLPD()" />
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Fixtures × Wattage ÷ 1000</p>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
-      <label class="input w-full">
-        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" />
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Total lighting power ÷ Area of room</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -498,19 +509,19 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" />
+            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" />
+            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" />
+            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
           </label>
         </div>
@@ -520,8 +531,8 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> No</label>
       </div>
     </fieldset>
 
@@ -534,11 +545,12 @@
       <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually</legend>
-          <label class="input w-full">
-            <input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" />
+          <legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+          <label class="input w-full bg-[var(--bg--weak-50)]">
+            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
+          <p class="label-text-alt text-[var(--text--soft-400)]">Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor</p>
         </fieldset>
 
         <fieldset class="fieldset">
@@ -591,18 +603,20 @@
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
-      <label class="input w-full">
-        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" onchange="recalcLightingLPD()" />
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Fixtures × Wattage ÷ 1000</p>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
-      <label class="input w-full">
-        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" />
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Total lighting power ÷ Area of room</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -610,19 +624,19 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" />
+            <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" />
+            <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" />
+            <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" oninput="recalcLightingEnergy()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
           </label>
         </div>
@@ -638,11 +652,12 @@
       <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually</legend>
-          <label class="input w-full">
-            <input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" />
+          <legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+          <label class="input w-full bg-[var(--bg--weak-50)]">
+            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
+          <p class="label-text-alt text-[var(--text--soft-400)]">Total power (kW) × hrs/day × days/wk × wks/yr</p>
         </fieldset>
 
         <fieldset class="fieldset">
@@ -726,6 +741,8 @@
     if (roomTypeSelect && roomTypeSelect.value) {
       applyLightingScheduleDefaults(roomTypeSelect.value);
     }
+    // Trigger energy recalc in case values were pre-populated (e.g. edit mode)
+    recalcLightingPower();
   };
 
   // ================================================================
@@ -773,6 +790,7 @@
       var totalKw = (fixtures * tubes * wattage) / 1000;
       powerEl.value = totalKw.toFixed(4);
       recalcLightingLPD();
+      recalcLightingEnergy();
     }
   };
 
@@ -795,6 +813,40 @@
     if (!isNaN(power) && !isNaN(area) && area > 0) {
       lpdEl.value = (power / area).toFixed(6);
     }
+    recalcLightingEnergy();
+  };
+
+  // ================================================================
+  // Auto-calculate annual energy
+  // Formula: Total_Lighting_Power × hrs/day × days/wk × wks/yr × sensor_factor
+  // sensor_factor = 0.80 if sensors = yes, else 1.00
+  // ================================================================
+  window.recalcLightingEnergy = function() {
+    var form = document.getElementById('lighting-system-form');
+    if (!form) return;
+
+    var powerEl  = form.querySelector('[name="total_lighting_power"]');
+    var hrsEl    = form.querySelector('[name="operating_hours_per_day"]');
+    var daysEl   = form.querySelector('[name="operating_days_per_week"]');
+    var weeksEl  = form.querySelector('[name="operating_weeks_per_year"]');
+    var energyEl = form.querySelector('[name="annual_energy_consumption"]');
+
+    if (!powerEl || !energyEl) return;
+
+    var power = parseFloat(powerEl.value);
+    var hrs   = hrsEl   ? parseFloat(hrsEl.value)   : NaN;
+    var days  = daysEl  ? parseFloat(daysEl.value)  : NaN;
+    var weeks = weeksEl ? parseFloat(weeksEl.value) : NaN;
+
+    if (isNaN(power) || isNaN(hrs) || isNaN(days) || isNaN(weeks)) {
+      energyEl.value = '';
+      return;
+    }
+
+    var sensorEl = form.querySelector('[name="installation_of_sensors"]:checked');
+    var sensorFactor = (sensorEl && sensorEl.value === 'yes') ? 0.80 : 1.00;
+
+    energyEl.value = (power * hrs * days * weeks * sensorFactor).toFixed(2);
   };
 
   // ================================================================
@@ -1010,9 +1062,10 @@
       setLightingField(form, 'operating_days_per_week', system.workdays_per_week);
       setLightingField(form, 'operating_weeks_per_year', system.workweeks_per_year);
       setLightingRadio(form, 'installation_of_sensors', system.sensors_installed ? 'yes' : 'no');
-      setLightingField(form, 'annual_energy_consumption', system.total_energy_consumption_kwh_per_year);
       setLightingField(form, 'energy_efficiency_label', system.energy_efficiency_label);
       setLightingField(form, 'number_of_stars', system.number_of_stars);
+      // Recompute auto-calculated fields with the loaded values
+      recalcLightingPower();
 
       lighting_system_modal.showModal();
     } catch (error) {
