@@ -77,7 +77,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="number_of_units" placeholder="e.g. 3" required min="1" />
+        <input type="number" name="number_of_units" placeholder="e.g. 3" required min="1" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
       </label>
       <p class="validator-hint">Must be at least 1</p>
     </fieldset>
@@ -85,7 +85,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
+        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
       </label>
       <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
@@ -94,16 +94,16 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Installation of Variable Speed Drives (VSD)<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> No</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Installation of Demand Controlled Ventilation (DCV)<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> No</label>
       </div>
     </fieldset>
 
@@ -113,27 +113,27 @@
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_hours_per_day" id="ahu-hours" placeholder="e.g. 10" required min="1" max="24" />
+          <input type="number" name="operating_hours_per_day" id="ahu-hours" placeholder="e.g. 10" required min="1" max="24" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_days_per_week" id="ahu-days" placeholder="e.g. 5" required min="1" max="7" />
+          <input type="number" name="operating_days_per_week" id="ahu-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_weeks_per_year" id="ahu-weeks" placeholder="e.g. 52" required min="1" max="52" />
+          <input type="number" name="operating_weeks_per_year" id="ahu-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
         </label></div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
-      <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 15" required min="0" step="0.01" />
+      <legend class="fieldset-legend">Total ventilation system power input</legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="power_input" placeholder="Auto-calculated" min="0" step="0.01" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
@@ -146,14 +146,15 @@
           <div class="grid grid-cols-2 gap-2">
             <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
               <label class="input w-full pr-0 overflow-hidden">
-                <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="0" />
+                <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="0" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
                 <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
                   <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
                 </select>
               </label>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="annual_energy_consumption" placeholder="e.g. 30000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor</p>
             </fieldset>
           </div>
         </div>
@@ -189,15 +190,15 @@
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_hours_per_day" id="fcu-hours" placeholder="e.g. 10" required min="1" max="24" />
+          <input type="number" name="operating_hours_per_day" id="fcu-hours" placeholder="e.g. 10" required min="1" max="24" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_days_per_week" id="fcu-days" placeholder="e.g. 5" required min="1" max="7" />
+          <input type="number" name="operating_days_per_week" id="fcu-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_weeks_per_year" id="fcu-weeks" placeholder="e.g. 52" required min="1" max="52" />
+          <input type="number" name="operating_weeks_per_year" id="fcu-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
         </label></div>
       </div>
@@ -206,7 +207,7 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 8" required min="0" step="0.01" />
+        <input type="number" name="power_input" placeholder="e.g. 8" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -228,8 +229,9 @@
                 </select>
               </label>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="annual_energy_consumption" placeholder="e.g. 15000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr</p>
             </fieldset>
           </div>
         </div>
@@ -245,7 +247,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="number_of_units" placeholder="e.g. 2" required min="1" />
+        <input type="number" name="number_of_units" placeholder="e.g. 2" required min="1" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
       </label>
       <p class="validator-hint">Must be at least 1</p>
     </fieldset>
@@ -253,7 +255,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
+        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
       </label>
       <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
@@ -262,16 +264,16 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Installation of Variable Speed Drives (VSD)<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> No</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Installation of Demand Controlled Ventilation (DCV)<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> No</label>
       </div>
     </fieldset>
 
@@ -281,27 +283,27 @@
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_hours_per_day" id="doas-hours" placeholder="e.g. 12" required min="1" max="24" />
+          <input type="number" name="operating_hours_per_day" id="doas-hours" placeholder="e.g. 12" required min="1" max="24" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_days_per_week" id="doas-days" placeholder="e.g. 5" required min="1" max="7" />
+          <input type="number" name="operating_days_per_week" id="doas-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_weeks_per_year" id="doas-weeks" placeholder="e.g. 52" required min="1" max="52" />
+          <input type="number" name="operating_weeks_per_year" id="doas-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
         </label></div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
-      <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 20" required min="0" step="0.01" />
+      <legend class="fieldset-legend">Total ventilation system power input</legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="power_input" placeholder="Auto-calculated" min="0" step="0.01" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
@@ -314,14 +316,15 @@
           <div class="grid grid-cols-2 gap-2">
             <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
               <label class="input w-full pr-0 overflow-hidden">
-                <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="0" />
+                <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="0" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
                 <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
                   <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
                 </select>
               </label>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="annual_energy_consumption" placeholder="e.g. 40000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor</p>
             </fieldset>
           </div>
         </div>
@@ -366,15 +369,15 @@
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_hours_per_day" id="cassette-hours" placeholder="e.g. 10" required min="1" max="24" />
+          <input type="number" name="operating_hours_per_day" id="cassette-hours" placeholder="e.g. 10" required min="1" max="24" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_days_per_week" id="cassette-days" placeholder="e.g. 5" required min="1" max="7" />
+          <input type="number" name="operating_days_per_week" id="cassette-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_weeks_per_year" id="cassette-weeks" placeholder="e.g. 52" required min="1" max="52" />
+          <input type="number" name="operating_weeks_per_year" id="cassette-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
         </label></div>
       </div>
@@ -383,7 +386,7 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 12" required min="0" step="0.01" />
+        <input type="number" name="power_input" placeholder="e.g. 12" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -405,8 +408,9 @@
                 </select>
               </label>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="annual_energy_consumption" placeholder="e.g. 20000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr</p>
             </fieldset>
           </div>
         </div>
@@ -442,15 +446,15 @@
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_hours_per_day" id="fan-hours" placeholder="e.g. 12" required min="1" max="24" />
+          <input type="number" name="operating_hours_per_day" id="fan-hours" placeholder="e.g. 12" required min="1" max="24" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_days_per_week" id="fan-days" placeholder="e.g. 7" required min="1" max="7" />
+          <input type="number" name="operating_days_per_week" id="fan-days" placeholder="e.g. 7" required min="1" max="7" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="operating_weeks_per_year" id="fan-weeks" placeholder="e.g. 52" required min="1" max="52" />
+          <input type="number" name="operating_weeks_per_year" id="fan-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
         </label></div>
       </div>
@@ -459,7 +463,7 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 2" required min="0" step="0.01" />
+        <input type="number" name="power_input" placeholder="e.g. 2" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -488,8 +492,9 @@
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="annual_energy_consumption" placeholder="e.g. 5000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr</p>
             </fieldset>
           </div>
         </div>
@@ -499,6 +504,75 @@
 </template>
 
 <script>
+  // ================================================================
+  // Auto-calculation helpers for ventilation systems
+  // ================================================================
+
+  // AHU / DOAS: power_input = airflow × baseline_efficiency × units ÷ 1000
+  //             annual_energy = power_input × h × d × w × VSD_factor × DCV_factor
+  window.recalcVentPowerAndEnergy = function(form, ventType) {
+    if (!form) return;
+    var airflowEl   = form.querySelector('[name="airflow_rate"]');
+    var effEl       = form.querySelector('[name="baseline_efficiency"]');
+    var unitsEl     = form.querySelector('[name="number_of_units"]');
+    var powerEl     = form.querySelector('[name="power_input"]');
+    var energyEl    = form.querySelector('[name="annual_energy_consumption"]');
+
+    var airflow  = airflowEl  ? parseFloat(airflowEl.value)  : NaN;
+    var eff      = effEl      ? parseFloat(effEl.value)      : NaN;
+    var units    = unitsEl    ? parseFloat(unitsEl.value)    : NaN;
+
+    // Recalculate power_input from airflow when all three inputs are present
+    if (!isNaN(airflow) && !isNaN(eff) && !isNaN(units) && airflow > 0 && units > 0) {
+      if (powerEl) powerEl.value = ((airflow * eff * units) / 1000).toFixed(4);
+    }
+
+    // Recalculate annual energy
+    if (!energyEl || !powerEl) return;
+    var power = parseFloat(powerEl.value);
+    var hrsEl   = form.querySelector('[name="operating_hours_per_day"]');
+    var daysEl  = form.querySelector('[name="operating_days_per_week"]');
+    var weeksEl = form.querySelector('[name="operating_weeks_per_year"]');
+    var hrs   = hrsEl   ? parseFloat(hrsEl.value)   : NaN;
+    var days  = daysEl  ? parseFloat(daysEl.value)  : NaN;
+    var weeks = weeksEl ? parseFloat(weeksEl.value) : NaN;
+
+    if (isNaN(power) || isNaN(hrs) || isNaN(days) || isNaN(weeks)) {
+      energyEl.value = '';
+      return;
+    }
+
+    // VSD factor (AHU/DOAS only)
+    var vsdEl = form.querySelector('[name="variable_speed_drives"]:checked');
+    var dcvEl = form.querySelector('[name="demand_controlled_ventilation"]:checked');
+    var vsdFactor = (vsdEl && vsdEl.value === 'yes') ? 0.80 : 1.00;
+    var dcvFactor = (dcvEl && dcvEl.value === 'yes') ? 0.70 : 1.00;
+
+    energyEl.value = (power * hrs * days * weeks * vsdFactor * dcvFactor).toFixed(2);
+  };
+
+  // FCU / Cassette / Fan: annual_energy = power_input × h × d × w
+  window.recalcVentSimpleEnergy = function(form) {
+    if (!form) return;
+    var powerEl  = form.querySelector('[name="power_input"]');
+    var energyEl = form.querySelector('[name="annual_energy_consumption"]');
+    if (!powerEl || !energyEl) return;
+
+    var power = parseFloat(powerEl.value);
+    var hrsEl   = form.querySelector('[name="operating_hours_per_day"]');
+    var daysEl  = form.querySelector('[name="operating_days_per_week"]');
+    var weeksEl = form.querySelector('[name="operating_weeks_per_year"]');
+    var hrs   = hrsEl   ? parseFloat(hrsEl.value)   : NaN;
+    var days  = daysEl  ? parseFloat(daysEl.value)  : NaN;
+    var weeks = weeksEl ? parseFloat(weeksEl.value) : NaN;
+
+    if (isNaN(power) || isNaN(hrs) || isNaN(days) || isNaN(weeks)) {
+      energyEl.value = '';
+      return;
+    }
+    energyEl.value = (power * hrs * days * weeks).toFixed(2);
+  };
+
   var VENT_CLIMATE_ZONE = "{{ climate_zone }}";
 
   if (!window.editingVentilationSystemId) window.editingVentilationSystemId = null;
@@ -714,6 +788,13 @@
         sf('number_of_stars', system.number_of_stars);
         sr('variable_speed_drives', system.variable_speed_drives ? 'yes' : 'no');
         sr('demand_controlled_ventilation', system.demand_controlled_ventilation ? 'yes' : 'no');
+
+        // Recompute auto-calculated fields with loaded values
+        if (system.ventilation_type === 'AHU' || system.ventilation_type === 'DOAS') {
+          recalcVentPowerAndEnergy(form, system.ventilation_type.toLowerCase());
+        } else {
+          recalcVentSimpleEnergy(form);
+        }
       }, 200);
 
       ventilation_system_modal.showModal();
