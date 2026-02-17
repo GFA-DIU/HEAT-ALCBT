@@ -86,6 +86,31 @@
     </fieldset>
   </div>
 
+  <fieldset class="fieldset col-span-3">
+    <legend class="fieldset-legend">
+      Renewable energy installation (%)<span class="text-error">*</span>
+    </legend>
+    <label class="input validator w-full">
+      <input type="number" placeholder="e.g. 15" name="renewable_energy_percent" required min="0.01" max="100" step="0.01" />
+      <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
+    </label>
+    <p class="validator-hint">Enter a value greater than 0</p>
+  </fieldset>
+
+  <fieldset class="fieldset col-span-3">
+    <legend class="fieldset-legend">
+      Building smart system installation<span class="text-error">*</span>
+    </legend>
+    <div class="flex items-center gap-2.5">
+      <label class="flex items-center gap-2">
+        <input type="radio" name="building_smart_system" value="yes" class="radio radio-xs" /> Yes
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="radio" name="building_smart_system" value="no" class="radio radio-xs" checked /> No
+      </label>
+    </div>
+  </fieldset>
+
 </form>
 
 <script>
@@ -137,6 +162,14 @@
         }
         if (data.cooling_temperature_unit) {
           form.querySelector('[name="cooling_temperature_unit"]').value = data.cooling_temperature_unit;
+        }
+        if (data.renewable_energy_percent) {
+          form.querySelector('[name="renewable_energy_percent"]').value = data.renewable_energy_percent;
+        }
+        if (data.building_smart_system !== undefined) {
+          const val = data.building_smart_system ? 'yes' : 'no';
+          const radio = form.querySelector(`[name="building_smart_system"][value="${val}"]`);
+          if (radio) radio.checked = true;
         }
 
         console.log('[OperationalSchedule] Data loaded successfully');
