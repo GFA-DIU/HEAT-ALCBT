@@ -104,7 +104,7 @@
       <legend class="fieldset-legend">Total cooling load<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_cooling_load" placeholder="e.g. 10" required min="0" step="0.1"
-          oninput="applyRefrigerantQtyDefault(this.form,'window-ac')" />
+          oninput="applyRefrigerantQtyDefault(this.form,'window-ac'); recalcCoolingSimpleEnergy(this.form,'window-ac')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">RT</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -113,7 +113,8 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="number_of_units" placeholder="e.g. 5" required min="1" />
+        <input type="number" name="number_of_units" placeholder="e.g. 5" required min="1"
+          oninput="recalcCoolingSimpleEnergy(this.form,'window-ac')" />
       </label>
       <p class="validator-hint">Must be at least 1</p>
     </fieldset>
@@ -134,19 +135,22 @@
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" name="hours_per_day" id="window-ac-hours" placeholder="e.g. 8" required min="1" max="24" />
+            <input type="number" name="hours_per_day" id="window-ac-hours" placeholder="e.g. 8" required min="1" max="24"
+              oninput="recalcCoolingSimpleEnergy(this.form,'window-ac')" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" name="days_per_week" id="window-ac-days" placeholder="e.g. 5" required min="1" max="7" />
+            <input type="number" name="days_per_week" id="window-ac-days" placeholder="e.g. 5" required min="1" max="7"
+              oninput="recalcCoolingSimpleEnergy(this.form,'window-ac')" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" name="weeks_per_year" id="window-ac-weeks" placeholder="e.g. 52" required min="1" max="52" />
+            <input type="number" name="weeks_per_year" id="window-ac-weeks" placeholder="e.g. 52" required min="1" max="52"
+              oninput="recalcCoolingSimpleEnergy(this.form,'window-ac')" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
           </label>
         </div>
@@ -156,10 +160,11 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline cooling efficiency<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_cooling_efficiency" placeholder="0.85 – 2.00" required min="0.85" max="2.00" step="0.01" />
+        <input type="number" name="baseline_cooling_efficiency" placeholder="e.g. 1.20" required min="0" step="0.01"
+          oninput="recalcCoolingSimpleEnergy(this.closest('form'),'window-ac')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/RT</span>
       </label>
-      <p class="validator-hint">Acceptable range: 0.85 – 2.00 kW/RT</p>
+      <p class="validator-hint">Value cannot be negative</p>
     </fieldset>
 
     <!-- OTHER DETAILS -->
@@ -192,8 +197,12 @@
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="total_energy_consumption_annually" placeholder="e.g. 20000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually</legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">= Cooling load × Units × Efficiency × h/day × d/week × w/year</p>
             </fieldset>
           </div>
         </div>
@@ -237,7 +246,7 @@
       <legend class="fieldset-legend">Total cooling load<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_cooling_load" placeholder="e.g. 20" required min="0" step="0.1"
-          oninput="applyRefrigerantQtyDefault(this.form,'split-ac')" />
+          oninput="applyRefrigerantQtyDefault(this.form,'split-ac'); recalcCoolingSimpleEnergy(this.form,'split-ac')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">RT</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -246,7 +255,8 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="number_of_units" placeholder="e.g. 25" required min="1" />
+        <input type="number" name="number_of_units" placeholder="e.g. 25" required min="1"
+          oninput="recalcCoolingSimpleEnergy(this.form,'split-ac')" />
       </label>
       <p class="validator-hint">Must be at least 1</p>
     </fieldset>
@@ -266,15 +276,18 @@
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="hours_per_day" id="split-ac-hours" placeholder="e.g. 8" required min="1" max="24" />
+          <input type="number" name="hours_per_day" id="split-ac-hours" placeholder="e.g. 8" required min="1" max="24"
+            oninput="recalcCoolingSimpleEnergy(this.form,'split-ac')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="days_per_week" id="split-ac-days" placeholder="e.g. 5" required min="1" max="7" />
+          <input type="number" name="days_per_week" id="split-ac-days" placeholder="e.g. 5" required min="1" max="7"
+            oninput="recalcCoolingSimpleEnergy(this.form,'split-ac')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="weeks_per_year" id="split-ac-weeks" placeholder="e.g. 52" required min="1" max="52" />
+          <input type="number" name="weeks_per_year" id="split-ac-weeks" placeholder="e.g. 52" required min="1" max="52"
+            oninput="recalcCoolingSimpleEnergy(this.form,'split-ac')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
         </label></div>
       </div>
@@ -283,10 +296,11 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline cooling efficiency<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_cooling_efficiency" placeholder="0.75 – 1.80" required min="0.75" max="1.80" step="0.01" />
+        <input type="number" name="baseline_cooling_efficiency" placeholder="e.g. 1.00" required min="0" step="0.01"
+          oninput="recalcCoolingSimpleEnergy(this.form,'split-ac')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/RT</span>
       </label>
-      <p class="validator-hint">Acceptable range: 0.75 – 1.80 kW/RT</p>
+      <p class="validator-hint">Value cannot be negative</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
@@ -317,8 +331,12 @@
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="total_energy_consumption_annually" placeholder="e.g. 30000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually</legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">= Cooling load × Units × Efficiency × h/day × d/week × w/year</p>
             </fieldset>
           </div>
         </div>
@@ -362,7 +380,7 @@
       <legend class="fieldset-legend">Total cooling load<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_cooling_load" placeholder="Typical: 20 – 500 RT" required min="0" step="0.1"
-          oninput="applyRefrigerantQtyDefault(this.form,'vrf-system')" />
+          oninput="applyRefrigerantQtyDefault(this.form,'vrf-system'); recalcCoolingSimpleEnergy(this.form,'vrf-system')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">RT</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -371,7 +389,8 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Number of outdoor units<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="number_of_units" placeholder="e.g. 3" required min="1" />
+        <input type="number" name="number_of_units" placeholder="e.g. 3" required min="1"
+          oninput="recalcCoolingSimpleEnergy(this.form,'vrf-system')" />
       </label>
       <p class="validator-hint">Must be at least 1</p>
     </fieldset>
@@ -391,15 +410,18 @@
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="hours_per_day" id="vrf-hours" placeholder="10 – 16" required min="1" max="24" />
+          <input type="number" name="hours_per_day" id="vrf-hours" placeholder="10 – 16" required min="1" max="24"
+            oninput="recalcCoolingSimpleEnergy(this.form,'vrf-system')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="days_per_week" id="vrf-days" placeholder="5 – 7" required min="1" max="7" />
+          <input type="number" name="days_per_week" id="vrf-days" placeholder="5 – 7" required min="1" max="7"
+            oninput="recalcCoolingSimpleEnergy(this.form,'vrf-system')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="weeks_per_year" id="vrf-weeks" placeholder="50 – 52" required min="1" max="52" />
+          <input type="number" name="weeks_per_year" id="vrf-weeks" placeholder="50 – 52" required min="1" max="52"
+            oninput="recalcCoolingSimpleEnergy(this.form,'vrf-system')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
         </label></div>
       </div>
@@ -408,10 +430,11 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline cooling efficiency<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_cooling_efficiency" placeholder="0.65 – 1.40" required min="0.65" max="1.40" step="0.01" />
+        <input type="number" name="baseline_cooling_efficiency" placeholder="e.g. 0.90" required min="0" step="0.01"
+          oninput="recalcCoolingSimpleEnergy(this.form,'vrf-system')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/RT</span>
       </label>
-      <p class="validator-hint">Acceptable range: 0.65 – 1.40 kW/RT</p>
+      <p class="validator-hint">Value cannot be negative</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
@@ -442,8 +465,12 @@
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="total_energy_consumption_annually" placeholder="e.g. 80000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually</legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">= Cooling load × Units × Efficiency × h/day × d/week × w/year</p>
             </fieldset>
           </div>
         </div>
@@ -498,7 +525,7 @@
       <legend class="fieldset-legend">Total cooling load<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_cooling_load" placeholder="e.g. 50" required min="0" step="0.1"
-          oninput="applyRefrigerantQtyDefault(this.form,'packaged-ac')" />
+          oninput="applyRefrigerantQtyDefault(this.form,'packaged-ac'); recalcCoolingSimpleEnergy(this.form,'packaged-ac')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">RT</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -507,7 +534,8 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="number_of_units" placeholder="e.g. 4" required min="1" />
+        <input type="number" name="number_of_units" placeholder="e.g. 4" required min="1"
+          oninput="recalcCoolingSimpleEnergy(this.form,'packaged-ac')" />
       </label>
       <p class="validator-hint">Must be at least 1</p>
     </fieldset>
@@ -527,15 +555,18 @@
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="hours_per_day" id="packaged-hours" placeholder="e.g. 10" required min="1" max="24" />
+          <input type="number" name="hours_per_day" id="packaged-hours" placeholder="e.g. 10" required min="1" max="24"
+            oninput="recalcCoolingSimpleEnergy(this.form,'packaged-ac')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="days_per_week" id="packaged-days" placeholder="e.g. 5" required min="1" max="7" />
+          <input type="number" name="days_per_week" id="packaged-days" placeholder="e.g. 5" required min="1" max="7"
+            oninput="recalcCoolingSimpleEnergy(this.form,'packaged-ac')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="weeks_per_year" id="packaged-weeks" placeholder="e.g. 50" required min="1" max="52" />
+          <input type="number" name="weeks_per_year" id="packaged-weeks" placeholder="e.g. 50" required min="1" max="52"
+            oninput="recalcCoolingSimpleEnergy(this.form,'packaged-ac')" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
         </label></div>
       </div>
@@ -544,10 +575,11 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline cooling efficiency<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_cooling_efficiency" placeholder="0.75 – 1.70" required min="0.75" max="1.70" step="0.01" />
+        <input type="number" name="baseline_cooling_efficiency" placeholder="e.g. 1.00" required min="0" step="0.01"
+          oninput="recalcCoolingSimpleEnergy(this.form,'packaged-ac')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/RT</span>
       </label>
-      <p class="validator-hint">Acceptable range: 0.75 – 1.70 kW/RT</p>
+      <p class="validator-hint">Value cannot be negative</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
@@ -578,8 +610,12 @@
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="total_energy_consumption_annually" placeholder="e.g. 50000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually</legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">= Cooling load × Units × Efficiency × h/day × d/week × w/year</p>
             </fieldset>
           </div>
         </div>
@@ -624,7 +660,7 @@
       <legend class="fieldset-legend">Total cooling capacity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_cooling_load" placeholder="e.g. 500" required min="0" step="0.1"
-          oninput="applyRefrigerantQtyDefault(this.form,'water_cooled')" />
+          oninput="applyRefrigerantQtyDefault(this.form,'water_cooled'); recalcChillerEnergy(this.form)" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">RT</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -633,7 +669,8 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="number_of_chillers" placeholder="e.g. 2" required min="1" />
+        <input type="number" name="number_of_chillers" placeholder="e.g. 2" required min="1"
+          oninput="recalcChillerEnergy(this.form)" />
       </label>
       <p class="validator-hint">Must be at least 1</p>
     </fieldset>
@@ -653,15 +690,18 @@
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="annual_operating_hours_per_day" id="water-chiller-hours" placeholder="12 – 24" required min="1" max="24" />
+          <input type="number" name="annual_operating_hours_per_day" id="water-chiller-hours" placeholder="12 – 24" required min="1" max="24"
+            oninput="recalcChillerEnergy(this.form)" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="annual_operating_days_per_week" id="water-chiller-days" placeholder="5 – 7" required min="1" max="7" />
+          <input type="number" name="annual_operating_days_per_week" id="water-chiller-days" placeholder="5 – 7" required min="1" max="7"
+            oninput="recalcChillerEnergy(this.form)" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="annual_operating_weeks_per_year" id="water-chiller-weeks" placeholder="50 – 52" required min="1" max="52" />
+          <input type="number" name="annual_operating_weeks_per_year" id="water-chiller-weeks" placeholder="50 – 52" required min="1" max="52"
+            oninput="recalcChillerEnergy(this.form)" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
         </label></div>
       </div>
@@ -670,25 +710,26 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline cooling efficiency<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_cooling_efficiency" placeholder="0.40 – 1.00" required min="0.40" max="1.00" step="0.01" />
+        <input type="number" name="baseline_cooling_efficiency" placeholder="e.g. 0.70" required min="0" step="0.01"
+          oninput="recalcChillerEnergy(this.form)" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/RT</span>
       </label>
-      <p class="validator-hint">Acceptable range: 0.40 – 1.00 kW/RT</p>
+      <p class="validator-hint">Value cannot be negative</p>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Installation of variable speed drives<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Installation of heat recovery systems<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
       </div>
     </fieldset>
 
@@ -727,8 +768,12 @@
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="total_energy_consumption_of_chiller_system_annually" placeholder="e.g. 200000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually</legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_of_chiller_system_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">= Cooling capacity × Units × Efficiency × h/day × d/week × w/year × VSD factor × HR factor</p>
             </fieldset>
           </div>
         </div>
@@ -773,7 +818,7 @@
       <legend class="fieldset-legend">Total cooling load<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_cooling_load" placeholder="e.g. 200" required min="0" step="0.1"
-          oninput="applyRefrigerantQtyDefault(this.form,'air_cooled')" />
+          oninput="applyRefrigerantQtyDefault(this.form,'air_cooled'); recalcChillerEnergy(this.form)" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">RT</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -782,7 +827,8 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="number_of_chillers" placeholder="e.g. 3" required min="1" />
+        <input type="number" name="number_of_chillers" placeholder="e.g. 3" required min="1"
+          oninput="recalcChillerEnergy(this.form)" />
       </label>
       <p class="validator-hint">Must be at least 1</p>
     </fieldset>
@@ -802,15 +848,18 @@
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="annual_operating_hours_per_day" id="air-chiller-hours" placeholder="10 – 24" required min="1" max="24" />
+          <input type="number" name="annual_operating_hours_per_day" id="air-chiller-hours" placeholder="10 – 24" required min="1" max="24"
+            oninput="recalcChillerEnergy(this.form)" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="annual_operating_days_per_week" id="air-chiller-days" placeholder="5 – 7" required min="1" max="7" />
+          <input type="number" name="annual_operating_days_per_week" id="air-chiller-days" placeholder="5 – 7" required min="1" max="7"
+            oninput="recalcChillerEnergy(this.form)" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
-          <input type="number" name="annual_operating_weeks_per_year" id="air-chiller-weeks" placeholder="50 – 52" required min="1" max="52" />
+          <input type="number" name="annual_operating_weeks_per_year" id="air-chiller-weeks" placeholder="50 – 52" required min="1" max="52"
+            oninput="recalcChillerEnergy(this.form)" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
         </label></div>
       </div>
@@ -819,25 +868,26 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline cooling efficiency<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_cooling_efficiency" placeholder="0.60 – 1.50" required min="0.60" max="1.50" step="0.01" />
+        <input type="number" name="baseline_cooling_efficiency" placeholder="e.g. 1.00" required min="0" step="0.01"
+          oninput="recalcChillerEnergy(this.form)" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/RT</span>
       </label>
-      <p class="validator-hint">Acceptable range: 0.60 – 1.50 kW/RT</p>
+      <p class="validator-hint">Value cannot be negative</p>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Installation of variable speed drives<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Installation of heat recovery systems<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
       </div>
     </fieldset>
 
@@ -873,8 +923,12 @@
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
-              <label class="input w-full"><input type="number" name="total_energy_consumption_of_chiller_system_annually" placeholder="e.g. 150000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually</legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_of_chiller_system_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">= Cooling load × Units × Efficiency × h/day × d/week × w/year × VSD factor × HR factor</p>
             </fieldset>
           </div>
         </div>
@@ -1206,7 +1260,7 @@
           setField(form, 'water_cooled_chiller_cooling_load_factor', system.water_cooled_chiller_cooling_load_factor_percent);
           setField(form, 'energy_efficiency_label', system.energy_efficiency_label);
           setField(form, 'number_of_stars', system.number_of_stars);
-          setField(form, 'total_energy_consumption_of_chiller_system_annually', system.total_energy_consumption_kwh_per_year);
+          recalcChillerEnergy(form);
         }, 200);
       } else {
         const acToTop = { window: 'window-ac', split: 'split-ac', vrv: 'vrf-system', packaged: 'packaged-ac' };
@@ -1230,8 +1284,9 @@
           setField(form, 'total_system_power', system.total_system_power_kw);
           setField(form, 'energy_efficiency_label', system.energy_efficiency_label);
           setField(form, 'number_of_stars', system.number_of_stars);
-          setField(form, 'total_energy_consumption_annually', system.total_energy_consumption_kwh_per_year);
           if (system.packaged_subtype) setField(form, 'packaged_subtype', system.packaged_subtype);
+          const acToTopForRecalc = { window: 'window-ac', split: 'split-ac', vrv: 'vrf-system', packaged: 'packaged-ac' };
+          recalcCoolingSimpleEnergy(form, acToTopForRecalc[system.ac_type] || 'split-ac');
         }, 200);
       }
 
@@ -1294,6 +1349,62 @@
     } catch (e) {
       console.error(e);
       Toast.error('An error occurred while deleting the cooling system');
+    }
+  };
+
+  // ── Auto-calculation: Total Energy Consumption ───────────────────────────
+  //   Annual Energy (kWh/year) = Cooling_Load (RT) × Units × Efficiency (kW/RT) × h × d × w
+  window.recalcCoolingSimpleEnergy = function(form, systemType) {
+    if (!form) return;
+    var loadEl  = form.querySelector('[name="total_cooling_load"]');
+    var unitsEl = form.querySelector('[name="number_of_units"]');
+    var effEl   = form.querySelector('[name="baseline_cooling_efficiency"]');
+    var hrsEl   = form.querySelector('[name="hours_per_day"]');
+    var daysEl  = form.querySelector('[name="days_per_week"]');
+    var weeksEl = form.querySelector('[name="weeks_per_year"]');
+    var energyEl = form.querySelector('[name="total_energy_consumption_annually"]');
+    if (!loadEl || !unitsEl || !effEl || !hrsEl || !daysEl || !weeksEl || !energyEl) return;
+    var load  = parseFloat(loadEl.value)  || 0;
+    var units = parseFloat(unitsEl.value) || 0;
+    var eff   = parseFloat(effEl.value)   || 0;
+    var hrs   = parseFloat(hrsEl.value)   || 0;
+    var days  = parseFloat(daysEl.value)  || 0;
+    var weeks = parseFloat(weeksEl.value) || 0;
+    if (load > 0 && units > 0 && eff > 0 && hrs > 0 && days > 0 && weeks > 0) {
+      energyEl.value = (load * units * eff * hrs * days * weeks).toFixed(2);
+    } else {
+      energyEl.value = '';
+    }
+  };
+
+  // Chiller formula (Water/Air cooled):
+  //   Annual Energy = Cooling_Load × Units × Efficiency × h × d × w × VSD_factor × HR_factor
+  //   VSD_factor = 0.80 if VSD=yes else 1.00
+  //   HR_factor  = 0.70 if HR=yes  else 1.00
+  window.recalcChillerEnergy = function(form) {
+    if (!form) return;
+    var loadEl   = form.querySelector('[name="total_cooling_load"]');
+    var unitsEl  = form.querySelector('[name="number_of_chillers"]');
+    var effEl    = form.querySelector('[name="baseline_cooling_efficiency"]');
+    var hrsEl    = form.querySelector('[name="annual_operating_hours_per_day"]');
+    var daysEl   = form.querySelector('[name="annual_operating_days_per_week"]');
+    var weeksEl  = form.querySelector('[name="annual_operating_weeks_per_year"]');
+    var vsdEl    = form.querySelector('[name="installation_of_variable_speed_drives"]:checked');
+    var hrEl     = form.querySelector('[name="installation_of_heat_recovery_systems"]:checked');
+    var energyEl = form.querySelector('[name="total_energy_consumption_of_chiller_system_annually"]');
+    if (!loadEl || !unitsEl || !effEl || !hrsEl || !daysEl || !weeksEl || !energyEl) return;
+    var load  = parseFloat(loadEl.value)  || 0;
+    var units = parseFloat(unitsEl.value) || 0;
+    var eff   = parseFloat(effEl.value)   || 0;
+    var hrs   = parseFloat(hrsEl.value)   || 0;
+    var days  = parseFloat(daysEl.value)  || 0;
+    var weeks = parseFloat(weeksEl.value) || 0;
+    var vsdFactor = (vsdEl && vsdEl.value === 'yes') ? 0.80 : 1.00;
+    var hrFactor  = (hrEl  && hrEl.value  === 'yes') ? 0.70 : 1.00;
+    if (load > 0 && units > 0 && eff > 0 && hrs > 0 && days > 0 && weeks > 0) {
+      energyEl.value = (load * units * eff * hrs * days * weeks * vsdFactor * hrFactor).toFixed(2);
+    } else {
+      energyEl.value = '';
     }
   };
 

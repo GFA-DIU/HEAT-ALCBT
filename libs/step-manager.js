@@ -706,6 +706,24 @@ class StepManager {
         operational_data_saved: true
       };
 
+    } else if (stepKey === 'building-information/building-details') {
+      const form = document.getElementById("form");
+      if (form) {
+        const formData = new FormData(form);
+        let validator = new window.FormValidator(form);
+        let isValid = validator.validate();
+        if (!isValid) {
+          Toast.error("Please correct the errors in the form before proceeding.");
+          throw new Error("Form validation failed.");
+        }
+        return {
+          building_uuid: this.getBuildingId(),
+          _useCustomEndpoint: true,
+          _customEndpoint: 'building-details-files',
+          ...Object.fromEntries(formData.entries())
+        };
+      }
+      throw new Error("Form not found.");
     } else if (stepKey === 'operational-details/operational-schedule-temperature') {
       // For operational schedule, we need to call our custom save function
       // Return a marker that tells saveToServer to use custom logic
@@ -820,6 +838,61 @@ class StepManager {
               }
             }, 5000);
           });
+        }
+
+        // Handle building-details-files: save text fields via JSON, then upload files
+        if (stepData._customEndpoint === 'building-details-files') {
+          // Validate file uploads before proceeding
+          if (typeof window.validateBuildingFiles === 'function') {
+            if (!window.validateBuildingFiles()) {
+              return { success: false, error: 'File validation failed' };
+            }
+          }
+
+          const buildingUuid = this.getBuildingId();
+          if (!buildingUuid) {
+            return { success: false, error: 'Building UUID not found. Please complete step 1 first.' };
+          }
+
+          // 1. Save the text fields via the existing JSON endpoint
+          const textData = { ...stepData };
+          delete textData._useCustomEndpoint;
+          delete textData._customEndpoint;
+          delete textData._customFormId;
+          // Strip file-only fields that can't be serialized as JSON
+          delete textData.certification_file;
+          delete textData.boq_files;
+          // Strip radio fields handled by file upload endpoint
+          // (has_certification and has_boq are saved by the file upload endpoint)
+          delete textData.has_certification;
+          delete textData.has_boq;
+
+          const jsonPayload = {
+            building_uuid: buildingUuid,
+            step_key: 'building-information/building-details',
+            data: { ...textData, building_uuid: buildingUuid }
+          };
+
+          const jsonResponse = await fetch('/building/step/save', {
+            method: this.editMode ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken || '' },
+            body: JSON.stringify(jsonPayload)
+          });
+          const jsonResult = await jsonResponse.json();
+          if (!jsonResponse.ok || !jsonResult.success) {
+            return { success: false, error: jsonResult.error || 'Failed to save building details' };
+          }
+
+          // 2. Upload files via multipart endpoint
+          if (typeof window.uploadBuildingFiles === 'function') {
+            const uploadOk = await window.uploadBuildingFiles(buildingUuid);
+            if (!uploadOk) {
+              Toast.error('Failed to upload files. Please try again.');
+              return { success: false, error: 'File upload failed' };
+            }
+          }
+
+          return { success: true, building_uuid: buildingUuid };
         }
 
         // Handle other custom endpoints (like operational schedule)

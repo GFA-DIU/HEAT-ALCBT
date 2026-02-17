@@ -3,8 +3,7 @@ Views for handling the multi-step building creation process.
 Each step loads a template and provides necessary context data.
 """
 
-
-
+import os as _os
 import json
 import logging
 import uuid as uuid_lib
@@ -143,6 +142,22 @@ def handle_details_step(request):
         try:
             building = Building.objects.get(uuid=building_uuid, created_by=request.user)
 
+
+            cert_info = None
+            if building.certification_file:
+                cert_info = {
+                    "name": _os.path.basename(building.certification_file.name),
+                    "url": f"/building/files/serve/?building_uuid={building.uuid}&type=certification",
+                }
+            boq_info = [
+                {
+                    "id": bf.id,
+                    "name": bf.original_filename or _os.path.basename(bf.file.name),
+                    "url": f"/building/files/serve/?building_uuid={building.uuid}&type=boq&file_id={bf.id}",
+                }
+                for bf in building.boq_files.all()
+            ]
+
             # Pre-fill text fields
             context["building_data"] = {
                 "assessment_period": building.reference_period,
@@ -150,6 +165,10 @@ def handle_details_step(request):
                 "total_floor_area": building.total_floor_area,
                 "conditioned_floor_area": building.cond_floor_area,
                 "floors_below_ground": building.floors_below_ground,
+                "has_certification": building.has_certification,
+                "certification_file": cert_info,
+                "has_boq": building.has_boq,
+                "boq_files": boq_info,
             }
 
             # Pre-populate building_type and apartment_type
