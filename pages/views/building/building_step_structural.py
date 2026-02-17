@@ -115,7 +115,6 @@ def handle_select_product(request):
 
     try:
         epd = EPD.objects.select_related('country', 'category').get(id=epd_id)
-        epd_info = epd.get_epd_info(dimension)
 
         available_units = epd.get_available_units()
         if available_units is None:
@@ -123,12 +122,16 @@ def handle_select_product(request):
         elif isinstance(available_units, set):
             available_units = sorted(list(available_units))
 
-        # epd_info returns (selection_text, selection_unit) tuple or None
+        # For BoQ mode, always use the EPD's declared unit — the user selects
+        # from available_units via a dropdown so dimension logic doesn't apply.
+        # For component mode, derive the unit from the assembly dimension.
         selection_text = ""
         selection_unit = epd.declared_unit
-        if epd_info and isinstance(epd_info, (list, tuple)) and len(epd_info) >= 2:
-            selection_text = epd_info[0] or ""
-            selection_unit = epd_info[1] or epd.declared_unit
+        if mode != "boq":
+            epd_info = epd.get_epd_info(dimension)
+            if epd_info and isinstance(epd_info, (list, tuple)) and len(epd_info) >= 2:
+                selection_text = epd_info[0] or ""
+                selection_unit = epd_info[1] or epd.declared_unit
 
         epd_data = {
             "id": str(epd.id),
