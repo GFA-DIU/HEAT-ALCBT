@@ -160,6 +160,7 @@
             <option value="volume">Volume (m³)</option>
             <option value="mass">Mass (kg)</option>
             <option value="length">Length (m)</option>
+            <option value="pcs">Pieces (pcs)</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
@@ -533,7 +534,7 @@
     document.getElementById('btn-add-component-2')?.addEventListener('click', () => structural_component_component_type_modal.showModal());
 
     document.getElementById('component_dimension')?.addEventListener('change', (e) => {
-      var units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm' };
+      var units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm', pcs: 'pcs' };
       document.getElementById('component_unit_display').textContent = units[e.target.value] || 'm²';
       document.getElementById('epd_filter_dimension').value = e.target.value;
     });
@@ -901,11 +902,6 @@
     materials.forEach((material, index) => {
       const materialNum = index + 1;
       const materialName = material.name ? `"${material.name}"` : `Material ${materialNum}`;
-
-      // Validate description
-      if (!material.description || material.description.trim() === '') {
-        errors.push(`${materialName}: Description is required`);
-      }
 
       // Validate quantity
       if (!material.quantity || material.quantity <= 0) {

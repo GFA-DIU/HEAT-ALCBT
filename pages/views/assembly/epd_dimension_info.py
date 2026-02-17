@@ -5,6 +5,10 @@ from pages.models.epd import Unit
 def get_epd_dimension_info(dimension: AssemblyDimension, declared_unit: Unit):
     """Rule for input texts and units depending on Dimension."""
     match (dimension, declared_unit):
+        case (AssemblyDimension.PCS, _):
+            # Pieces dimension — always use pcs unit regardless of declared unit
+            selection_text = "Quantity"
+            selection_unit = Unit.PCS
         case (_, Unit.PCS):
             # 'Pieces' EPD is treated the same across all assembly dimensions
             selection_text = "Quantity"

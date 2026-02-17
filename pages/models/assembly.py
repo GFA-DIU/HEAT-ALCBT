@@ -35,14 +35,16 @@ DIMENSION_UNIT_MAPPING = {
     "length": "m",
     "mass": "kg",
     "volume": "m^3",
+    "pcs": "pcs",
 }
 
 
 class AssemblyDimension(models.TextChoices):
     AREA = "area", "m²"  # Area-type calculations
     LENGTH = "length", "m"  # Length-type calculations
-    MASS = "mass", "kg"  # Length-type calculations
-    VOLUME = "volume", "m³"  # Length-type calculations
+    MASS = "mass", "kg"  # Mass-type calculations
+    VOLUME = "volume", "m³"  # Volume-type calculations
+    PCS = "pcs", "pcs"  # Piece-count calculations
 
 
 class AssemblyTechnique(models.Model):
