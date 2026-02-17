@@ -60,6 +60,8 @@ def handle_get_schedule(request):
             "heating_temperature_unit": building.heating_temp_unit,
             "room_cooling_temperature": float(building.cooling_temp) if building.cooling_temp else None,
             "cooling_temperature_unit": building.cooling_temp_unit,
+            "renewable_energy_percent": float(building.renewable_energy_percent) if building.renewable_energy_percent else None,
+            "building_smart_system": building.building_smart_system,
         }
     }
 
@@ -108,6 +110,12 @@ def handle_save_schedule(request):
         building.heating_temp_unit = data.get("heating_temperature_unit")
         building.cooling_temp = data.get("room_cooling_temperature")
         building.cooling_temp_unit = data.get("cooling_temperature_unit")
+
+        # Update new operational fields
+        renewable = data.get("renewable_energy_percent")
+        building.renewable_energy_percent = renewable if renewable not in (None, "", "0", 0) else None
+        smart_raw = data.get("building_smart_system", "no")
+        building.building_smart_system = smart_raw in (True, "yes", "true", "1", 1)
 
         building.save()
 
