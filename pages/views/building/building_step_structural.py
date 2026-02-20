@@ -206,25 +206,38 @@ def handle_get_categories(request):
 
 
 def handle_get_subcategories(request):
-    """Get material subcategories for a parent category (HTMX endpoint)."""
-    category_id = request.POST.get("category") or request.GET.get("category")
+    """Get material subcategories/childcategories for a parent category (HTMX endpoint).
 
-    if not category_id:
-        return HttpResponse('<option value="">Select category first</option>')
+    When `parent=subcategory` is passed, the `subcategory` param is used as the
+    parent to return child categories (level 3). Otherwise `category` is used to
+    return subcategories (level 2).
+    """
+    req = request.POST if request.method == "POST" else request.GET
+    parent_type = req.get("parent", "category")
+
+    if parent_type == "subcategory":
+        parent_id = req.get("subcategory")
+        empty_label = "All Child Categories"
+    else:
+        parent_id = req.get("category")
+        empty_label = "All Sub-categories"
+
+    if not parent_id:
+        return HttpResponse(f'<option value="">{empty_label}</option>')
 
     try:
-        subcategories = MaterialCategory.objects.filter(
-            parent_id=category_id
+        children = MaterialCategory.objects.filter(
+            parent_id=parent_id
         ).order_by("name_en").values('id', 'name_en')
 
-        options = ['<option value="">All Sub-categories</option>']
-        for subcat in subcategories:
-            options.append(f'<option value="{subcat["id"]}">{subcat["name_en"]}</option>')
+        options = [f'<option value="">{empty_label}</option>']
+        for child in children:
+            options.append(f'<option value="{child["id"]}">{child["name_en"]}</option>')
 
         return HttpResponse(''.join(options))
     except Exception as e:
         logger.error(f"Error fetching subcategories: {e}")
-        return HttpResponse('<option value="">Error loading subcategories</option>')
+        return HttpResponse(f'<option value="">Error loading categories</option>')
 
 
 @transaction.atomic
