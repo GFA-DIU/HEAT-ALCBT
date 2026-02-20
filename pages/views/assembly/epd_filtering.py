@@ -45,6 +45,8 @@ def filter_by_dimension(epds: BaseManager[EPD], dimension: AssemblyDimension):
             additional_filters = (
                 Q(declared_unit=Unit.KG) & Q(conversions__contains=[{"unit": "kg/m^3"}])
             ) | ~Q(declared_unit=Unit.KG)
+        case AssemblyDimension.PCS:
+            declared_units = [Unit.PCS]
         case _:
             raise ValueError(f"Unsupported dimension '{dimension}'")
 

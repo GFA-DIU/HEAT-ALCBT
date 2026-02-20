@@ -275,27 +275,45 @@
                     class="transition-transform duration-300 peer-checked:rotate-180"></span>
             </div>
             <div class="collapse-content mt-0 px-0">
-              <div class="grid grid-cols-2 gap-2">
-                <select name="category" id="epd_category_filter" class="select h-9 text-sm/5"
-                        hx-get="{% url 'building_step_structural' %}?action=get_subcategories"
-                        hx-target="#epd_subcategory_filter"
-                        hx-trigger="change"
-                        hx-swap="innerHTML"
-                        hx-include="this">
-                  <option value="">All Categories</option>
-                  {% for cat in epd_categories %}
-                    <option value="{{ cat.id }}">{{ cat.name_en }}</option>
-                  {% endfor %}
-                </select>
-                {% comment %} <select name="subcategory" id="epd_subcategory_filter" class="select h-9 text-sm/5">
-                  <option value="">All Sub-categories</option>
-                </select> {% endcomment %}
-                <select name="type" class="select h-9 text-sm/5">
-                  <option value="">All Types</option>
-                  {% for t in epd_types %}
-                    <option value="{{ t.value }}">{{ t.label }}</option>
-                  {% endfor %}
-                </select>
+              <div class="grid grid-cols-3 gap-2 mb-2">
+                <fieldset class="fieldset m-0 p-0">
+                  <legend class="fieldset-legend text-xs">Category</legend>
+                  <select name="category" id="epd_category_filter" class="select h-9 text-sm/5 w-full"
+                          onchange="loadEpdSubcategories(this.value)">
+                    <option value="">All Categories</option>
+                    {% for cat in epd_categories %}
+                      {% if cat.id and cat.name_en %}
+                        <option value="{{ cat.id }}">{{ cat.name_en }}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                </fieldset>
+                <fieldset class="fieldset m-0 p-0">
+                  <legend class="fieldset-legend text-xs">Subcategory</legend>
+                  <select name="subcategory" id="epd_subcategory_filter" class="select h-9 text-sm/5 w-full"
+                          onchange="loadEpdChildCategories(this.value)">
+                    <option value="">All Sub-categories</option>
+                  </select>
+                  <p class="fieldset-label text-xs text-[var(--text--sub-600)] mt-1">Select a category first</p>
+                </fieldset>
+                <fieldset class="fieldset m-0 p-0">
+                  <legend class="fieldset-legend text-xs">Child Category</legend>
+                  <select name="childcategory" id="epd_childcategory_filter" class="select h-9 text-sm/5 w-full">
+                    <option value="">All Child Categories</option>
+                  </select>
+                  <p class="fieldset-label text-xs text-[var(--text--sub-600)] mt-1">Select a subcategory first</p>
+                </fieldset>
+              </div>
+              <div class="grid grid-cols-1 gap-2">
+                <fieldset class="fieldset m-0 p-0">
+                  <legend class="fieldset-legend text-xs">EPD Type</legend>
+                  <select name="type" class="select h-9 text-sm/5 w-full">
+                    <option value="">All Types</option>
+                    {% for t in epd_types %}
+                      <option value="{{ t.value }}">{{ t.label }}</option>
+                    {% endfor %}
+                  </select>
+                </fieldset>
               </div>
             </div>
           </div>
@@ -1367,6 +1385,29 @@
 
   window.getStructuralFormData = () => window.structuralManager.getFormData();
   window.restoreStructuralData = (data) => window.structuralManager.restore(data);
+
+  window.loadEpdSubcategories = async function(categoryId) {
+    const subcatSelect = document.getElementById('epd_subcategory_filter');
+    const childSelect = document.getElementById('epd_childcategory_filter');
+    // Reset dependent selects
+    subcatSelect.innerHTML = '<option value="">All Sub-categories</option>';
+    childSelect.innerHTML = '<option value="">All Child Categories</option>';
+    if (!categoryId) return;
+    const url = '{% url "building_step_structural" %}?action=get_subcategories&category=' + encodeURIComponent(categoryId);
+    const resp = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    const html = await resp.text();
+    subcatSelect.innerHTML = html;
+  };
+
+  window.loadEpdChildCategories = async function(subcategoryId) {
+    const childSelect = document.getElementById('epd_childcategory_filter');
+    childSelect.innerHTML = '<option value="">All Child Categories</option>';
+    if (!subcategoryId) return;
+    const url = '{% url "building_step_structural" %}?action=get_subcategories&parent=subcategory&subcategory=' + encodeURIComponent(subcategoryId);
+    const resp = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    const html = await resp.text();
+    childSelect.innerHTML = html;
+  };
 
   // Restore data from server if available (for edit mode)
   {% if boq_items or component_items %}

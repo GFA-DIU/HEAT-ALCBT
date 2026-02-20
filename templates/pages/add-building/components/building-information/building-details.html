@@ -10,15 +10,9 @@
         id="building-type-select"
         name="building_type"
         class="select w-full"
-        {% if not selected_building_type %}
-        hx-get="/select_lists/?building_categories=1"
-        hx-trigger="load"
-        hx-target="this"
-        hx-swap="innerHTML"
-        {% endif %}
         required
       >
-        <option value="">Pick a building type</option>
+        <option value="" disabled {% if not selected_building_type %}selected{% endif %}>Pick a building type</option>
         {% for category in building_categories %}
           <option value="{{ category.id }}" {% if category.id == selected_building_type %}selected{% endif %}>{{ category.name }}</option>
         {% endfor %}
@@ -40,7 +34,7 @@
         hx-trigger="change from:#building-type-select"
         hx-target="this"
         hx-swap="innerHTML"
-        hx-vals='js:{"building_category": document.getElementById("building-type-select").value}'
+        hx-vals='js:{"building_category": document.getElementById("building-type-select").value, "country": "{{ country_id }}"}'
         required
       >
         <option value="">Pick a type of apartments</option>
@@ -297,5 +291,24 @@
       return false;
     }
   };
+  // When building type changes to empty, reset apartment type to placeholder
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'building-type-select' && !e.target.value) {
+      var aptSelect = document.getElementById('apartment-type-select');
+      if (aptSelect) {
+        aptSelect.innerHTML = '<option value="" disabled selected>Pick a type of apartments</option>';
+      }
+    }
+  });
+
+  // After HTMX swaps apartment type options, ensure placeholder shows if no value
+  document.addEventListener('htmx:afterSwap', function(e) {
+    if (e.detail && e.detail.target && e.detail.target.id === 'apartment-type-select') {
+      var aptSelect = document.getElementById('apartment-type-select');
+      if (aptSelect && !aptSelect.value) {
+        aptSelect.selectedIndex = 0;
+      }
+    }
+  });
 })();
 </script>
