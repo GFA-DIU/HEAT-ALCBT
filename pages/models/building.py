@@ -15,6 +15,8 @@ def boq_file_upload_path(instance, filename):
 
 from pages.views.building.impact_calculation import calculate_impact_operational
 
+from cities_light.models import Country
+
 from .assembly import Assembly
 from .base import BaseGeoModel, BaseModel
 from .product import BaseProduct
@@ -94,12 +96,19 @@ class BuildingCategory(models.Model):
 class CategorySubcategory(models.Model):
     category = models.ForeignKey(BuildingCategory, on_delete=models.CASCADE)
     subcategory = models.ForeignKey(BuildingSubcategory, on_delete=models.CASCADE)
+    country = models.ForeignKey(
+        Country,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text="Leave blank to mark this as global",
+    )
 
     class Meta:
-        unique_together = ("category", "subcategory")
+        unique_together = ("category", "subcategory", "country")
 
     def __str__(self):
-        return f"{self.category.name} - {self.subcategory.name}"
+        return f"{self.category} - {self.subcategory} ({self.country if self.country else 'Global'})"
 
 
 class BuildingOperationalInfo(models.Model):

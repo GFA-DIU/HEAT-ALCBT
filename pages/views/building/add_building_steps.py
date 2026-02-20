@@ -121,20 +121,40 @@ def handle_name_location_step(request):
 
 
 # Step 1.2: Building Details
+def _get_building_categories_for_country(country_id):
+    """Return building categories filtered for a country, falling back to global ones."""
+    if country_id:
+        country_cats = BuildingCategory.objects.filter(
+            categorysubcategory__country_id=country_id
+        ).distinct().order_by("name")
+        if country_cats.exists():
+            return country_cats
+        return BuildingCategory.objects.filter(
+            categorysubcategory__country__isnull=True
+        ).distinct().order_by("name")
+    return BuildingCategory.objects.all().order_by("name")
+
+
 def handle_details_step(request):
     """Provide building categories and optionally pre-populated apartment types for edit mode."""
 
-
     building_uuid = request.GET.get('building_uuid')
 
+    # country_id may be passed directly (new building flow) or read from building (edit flow)
+    try:
+        country_id = int(request.GET.get('country_id', ''))
+    except (ValueError, TypeError):
+        country_id = None
+
     context = {
-        "building_categories": BuildingCategory.objects.all().order_by("name"),
+        "building_categories": _get_building_categories_for_country(country_id),
         "apartment_types": [],
         "climate_zones": [{"id": c[0], "name": c[1]} for c in ClimateZone.choices],
         "selected_building_type": None,
         "selected_apartment_type": None,
         "selected_climate_type": None,
         "building_data": None,
+        "country_id": country_id,
     }
 
     # Edit mode: pre-populate dependent selects from existing building
@@ -171,21 +191,30 @@ def handle_details_step(request):
                 "boq_files": boq_info,
             }
 
-            # Pre-populate building_type and apartment_type
-            if building.category:
-                # building.category is a CategorySubcategory object
-                context["selected_building_type"] = building.category.category.id
-                context["selected_apartment_type"] = building.category.subcategory.id
-
-                # Pre-populate apartment_types for the selected building_type
-                subcategories = CategorySubcategory.objects.filter(
-                    category=building.category.category
-                ).select_related('subcategory').order_by('subcategory__name')
-                context["apartment_types"] = [cs.subcategory for cs in subcategories]
-
             # Pre-populate climate_type
             if building.climate_zone:
                 context["selected_climate_type"] = building.climate_zone
+
+            if building.country_id:
+                context["country_id"] = building.country_id
+                filtered_categories = _get_building_categories_for_country(building.country_id)
+                context["building_categories"] = filtered_categories
+                filtered_ids = set(filtered_categories.values_list('id', flat=True))
+            else:
+                filtered_ids = None
+
+            # Pre-populate building_type and apartment_type only if the saved
+            # category is valid for the currently filtered category list
+            if building.category:
+                saved_cat_id = building.category.category.id
+                if filtered_ids is None or saved_cat_id in filtered_ids:
+                    context["selected_building_type"] = saved_cat_id
+                    context["selected_apartment_type"] = building.category.subcategory.id
+                    subcategories = CategorySubcategory.objects.filter(
+                        category=building.category.category
+                    ).select_related('subcategory').order_by('subcategory__name')
+                    context["apartment_types"] = [cs.subcategory for cs in subcategories]
+                # else: saved category not valid for this country — leave selects empty
 
         except Building.DoesNotExist:
             logger.warning(f"Building not found for edit: {building_uuid}")
@@ -565,7 +594,6 @@ def save_building_step(request):
 
                     # Map form field names to model field names
                     field_mapping = {
-                        'building_type': 'category_id',  # FK to CategorySubcategory
                         'climate_type': 'climate_zone',
                         'assessment_period': 'reference_period',
                         'conditioned_floor_area': 'cond_floor_area',
@@ -579,6 +607,21 @@ def save_building_step(request):
                     for form_field, model_field in field_mapping.items():
                         if form_field in step_data and step_data[form_field]:
                             setattr(building, model_field, step_data[form_field])
+
+                    # Resolve building_type (BuildingCategory.id) + apartment_type
+                    # (BuildingSubcategory.id) → CategorySubcategory
+                    building_type_id = step_data.get('building_type')
+                    apartment_type_id = step_data.get('apartment_type')
+                    if building_type_id and apartment_type_id:
+                        try:
+                            cat_subcat = CategorySubcategory.objects.filter(
+                                category_id=building_type_id,
+                                subcategory_id=apartment_type_id,
+                            ).first()
+                            if cat_subcat:
+                                building.category = cat_subcat
+                        except Exception:
+                            pass
 
                     building.save()
                     building_uuid = str(building.uuid)

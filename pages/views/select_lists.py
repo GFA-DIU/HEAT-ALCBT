@@ -45,6 +45,7 @@ Lighting System Options:
 import logging
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
@@ -66,7 +67,35 @@ logger = logging.getLogger(__name__)
 @login_required
 @require_http_methods(["GET"])
 def select_lists(request):
-    if m := request.GET.get("country"):
+    if request.GET.get("building_category"):
+        m = request.GET.get("building_category")
+        category_id = int(m)
+        country_id = request.GET.get("country")
+        try:
+            country_id = int(country_id)
+        except (TypeError, ValueError):
+            country_id = None
+
+        if country_id:
+            subcategories = CategorySubcategory.objects.filter(
+                category_id=category_id, country_id=country_id
+            ).select_related('subcategory').order_by('subcategory__name')
+            if not subcategories.exists():
+                subcategories = CategorySubcategory.objects.filter(
+                    category_id=category_id, country__isnull=True
+                ).select_related('subcategory').order_by('subcategory__name')
+        else:
+            subcategories = CategorySubcategory.objects.filter(
+                category_id=category_id
+            ).select_related('subcategory').order_by('subcategory__name')
+
+        items = [cs.subcategory for cs in subcategories]
+        return render(
+            request,
+            "pages/utils/select_list.html",
+            {"items": items, "default_text": "Select apartment type"},
+        )
+    elif m := request.GET.get("country"):
         # Handle empty or invalid country values
         if not m or m in ['', '""', '\\"\\"']:
             return render(
@@ -146,26 +175,33 @@ def select_lists(request):
     
     # Building Categories and Types
     elif request.GET.get("building_categories"):
-        categories = BuildingCategory.objects.all().order_by("name")
-        
+        country_id = request.GET.get("country")
+        try:
+            country_id = int(country_id)
+        except (TypeError, ValueError):
+            country_id = None
+
+        if country_id:
+            # Get categories that have country-specific entries for this country
+            country_categories = BuildingCategory.objects.filter(
+                categorysubcategory__country_id=country_id
+            ).distinct().order_by("name")
+            if country_categories.exists():
+                categories = country_categories
+            else:
+                # Fall back to global (country=null) categories
+                categories = BuildingCategory.objects.filter(
+                    categorysubcategory__country__isnull=True
+                ).distinct().order_by("name")
+        else:
+            categories = BuildingCategory.objects.all().order_by("name")
+
         return render(
             request,
             "pages/utils/select_list.html",
             {"items": categories, "default_text": "Select a building type"},
         )
-    
-    elif m := request.GET.get("building_category"):
-        category_id = int(m)
-        subcategories = CategorySubcategory.objects.filter(
-            category_id=category_id
-        ).select_related('subcategory').order_by('subcategory__name')
-        # Extract just the subcategory objects for the template
-        items = [cs.subcategory for cs in subcategories]
-        return render(
-            request,
-            "pages/utils/select_list.html",
-            {"items": items, "default_text": "Select apartment type"},
-        )
+
     
     # Climate and System Choices (TextChoices)
     elif request.GET.get("climate_zones"):
