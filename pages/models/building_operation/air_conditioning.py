@@ -53,7 +53,8 @@ class CoolingSystemAirConditioner(models.Model):
         choices=RefrigerantType.choices,
         verbose_name=_("Type of Refrigerants"),
     )
-    refrigerant_quantity_kg = models.PositiveIntegerField(
+    refrigerant_quantity_kg = models.DecimalField(
+        max_digits=8, decimal_places=2,
         verbose_name=_("Refrigerant Quantity (Kg)")
     )
     total_cooling_load_rt = models.PositiveIntegerField(
