@@ -1,0 +1,136 @@
+<div class="size-full flex flex-col items-center justify-center p-4">
+
+  <!-- State 1: Validating -->
+  <div id="validate-loading" class="w-full max-w-[25.875rem] space-y-4">
+    <div class="space-y-1">
+      <div class="flex justify-between items-center gap-2">
+        <p class="label-small text-[var(--text--strong-950)]">Validating data</p>
+        <span class="paragraph-x-small text-[var(--text--sub-600)]" id="validate-percent">0%</span>
+      </div>
+      <progress id="validate-progress" class="progress progress-success w-full" value="0" max="100"></progress>
+      <p class="paragraph-small text-[var(--text--sub-600)]">
+        Checking row <span id="validate-row-count">0</span> of 5000...
+      </p>
+    </div>
+
+    <p class="label-small text-[var(--text--sub-600)] text-center">
+      We are checking your file for duplicates, formatting errors and missing fields, this will take some few minutes
+    </p>
+  </div>
+
+  <!-- State 2: Results -->
+  <div id="validate-result" class="size-full hidden flex-col gap-6">
+    <div class="space-y-1 shrink-0">
+      <h6 class="text-base font-bold text-[var(--text--strong-950)]">Data Validation results</h6>
+      <p class="text-sm text-[var(--text--sub-600)]">
+        Review the analysis of your data before proceeding to preview.
+      </p>
+    </div>
+
+    <div
+      class="flex-1 w-full max-w-[38.25rem] mx-auto overflow-y-auto hide-scrollbar flex flex-col items-center gap-6 pt-4">
+
+      <!-- Success Header -->
+      <div class="flex flex-col items-center justify-center gap-2 text-center">
+        <div class="rounded-full size-[5.75rem] bg-[var(--state--success--lighter)] shrink-0 grid place-items-center">
+          <span data-icon="file-check-fill" data-size="62" class="text-[var(--state--success--base)]"></span>
+        </div>
+        <h6 class="text-xl font-bold text-[var(--text--strong-950)]">Validation successful</h6>
+        <p class="paragraph-small text-[var(--text--sub-600)]">
+          Your CSV file has been validated successfully. Below is the summary
+        </p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="bg-[var(--bg--weak-50)] py-4.5 px-8 w-full grid grid-cols-4 gap-4 rounded-lg">
+        <div class="flex flex-col gap-1">
+          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--text--sub-600)]">Total records</span>
+          <h5 class="pl-2.5 h5-title text-[var(--text--strong-950)]">5000</h5>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--text--sub-600)]">Valid records</span>
+          <h5 class="pl-2.5 h5-title text-[var(--text--strong-950)]">5000</h5>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--state--warning--base)]">Warnings</span>
+          <h5 class="pl-2.5 h5-title text-[var(--state--warning--base)]">45</h5>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--state--error--base)]">Errors</span>
+          <h5 class="pl-2.5 h5-title text-[var(--state--error--base)]">0</h5>
+        </div>
+      </div>
+
+      <!-- Warnings Section -->
+      <div class="w-full flex items-start gap-3 py-4.5 px-4 bg-[var(--state--warning--lighter)] rounded-lg">
+        <span data-icon="error-warning-line" data-size="24" class="text-[var(--state--warning--base)] shrink-0"></span>
+        <div class="flex-1 flex flex-col gap-1">
+          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-[var(--text--sub-600)] text-sm leading-5">
+            45 Warnings found
+          </span>
+          <strong class="pl-2.5 text-sm font-semibold text-[var(--text--strong-950)]">
+            Row 45: Missing optional field 'comments'
+          </strong>
+        </div>
+      </div>
+
+      <!-- Errors Section (Hidden for success demo) -->
+      <div id="validate-errors-container"
+        class="hidden w-full items-start gap-3 py-4.5 px-4 bg-[var(--state--error--lighter)] rounded-lg">
+        <span data-icon="close-circle-fill" data-size="24" class="text-[var(--state--error--base)] shrink-0"></span>
+        <div class="flex-1 flex flex-col gap-1">
+          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-[var(--text--sub-600)] text-sm leading-5">
+            200 Errors found
+          </span>
+          <strong class="pl-2.5 text-sm font-semibold text-[var(--text--strong-950)]">
+            Row 80: Invalid date format
+          </strong>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const totalRows = 5000;
+    const duration = 2000; // ms
+    let startTime = null;
+
+    const loadingSection = document.getElementById('validate-loading');
+    const resultSection = document.getElementById('validate-result');
+    const progressBar = document.getElementById('validate-progress');
+    const percentText = document.getElementById('validate-percent');
+    const rowCountText = document.getElementById('validate-row-count');
+
+    // Start
+    requestAnimationFrame(function animate(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      const percentVal = Math.floor(progress * 100);
+      const rowsVal = Math.floor(progress * totalRows);
+
+      if (progressBar) progressBar.value = percentVal;
+      if (percentText) percentText.textContent = `${percentVal}%`;
+      if (rowCountText) rowCountText.textContent = rowsVal;
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        finish();
+      }
+    });
+
+    function finish() {
+      if (loadingSection) loadingSection.classList.add('hidden');
+      if (resultSection) {
+        resultSection.classList.remove('hidden');
+        resultSection.classList.add('flex');
+      }
+      if (window.IconComponent) window.IconComponent.initialize();
+    }
+  })();
+</script>
