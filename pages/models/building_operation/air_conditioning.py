@@ -57,7 +57,16 @@ class CoolingSystemAirConditioner(models.Model):
         verbose_name=_("Refrigerant Quantity (Kg)")
     )
     total_cooling_load_rt = models.PositiveIntegerField(
+        null=True,
+        blank=True,
         verbose_name=_("Total Cooling Load for Split/VRV (RT)")
+    )
+    cooling_capacity_per_unit_kw = models.DecimalField(
+        max_digits=10,
+        decimal_places=3,
+        null=True,
+        blank=True,
+        verbose_name=_("Cooling Capacity per Unit (kW)"),
     )
     baseline_efficiency_kw_per_rt = models.DecimalField(
         max_digits=5,
@@ -65,6 +74,20 @@ class CoolingSystemAirConditioner(models.Model):
         null=True,
         blank=True,
         verbose_name=_("Baseline Split Unit/VRV System Efficiency (kW/RT)"),
+    )
+    eer_iseer_cop = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name=_("EER / ISEER / COP"),
+    )
+    power_input_per_unit_kw = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        null=True,
+        blank=True,
+        verbose_name=_("Power Input per Unit (kW)"),
     )
     baseline_refrigerant_emission_factor = models.PositiveIntegerField(
         null=True,
