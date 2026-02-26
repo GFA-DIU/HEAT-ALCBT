@@ -17,7 +17,7 @@ from .views.building.add_building_steps import (building_step_view,
                                                 complete_building_setup,
                                                 get_building_data,
                                                 save_building_step)
-from .views.building.building import building
+from .views.building.building import building, savings_tab
 from .views.building.building_simulation import building_simulation
 from .views.building.building_step_operational import \
     building_step_operational_products, get_building_total_kwh
@@ -37,6 +37,9 @@ from .views.building.cooling_system import (create_or_update_cooling_system,
 from .views.building.hot_water_system import (
     create_or_update_hot_water_system, delete_hot_water_system,
     get_hot_water_systems)
+from .views.building.import_building import (view_import_building_step,
+                                             view_import_dialog,
+                                             view_initial_import_dialog)
 from .views.building.lift_escalator_system import (
     create_or_update_lift_escalator_system, delete_lift_escalator_system,
     get_lift_escalator_systems)
@@ -89,6 +92,7 @@ urlpatterns = [
     path("building/step/structural", building_step_structural_products, name="building_step_structural"),
     path("building/complete", complete_building_setup, name="complete_building_setup"),
     path("building/<uuid:building_id>/", building, name="building"),
+    path("building/<uuid:building_id>/savings/", savings_tab, name="savings_tab"),
     path(
         "building/<uuid:building_id>/simulation",
         building_simulation,
@@ -127,4 +131,7 @@ urlpatterns = [
     path("cooling-system/", create_or_update_cooling_system, name="cooling_system_create_update"),
     path("cooling-system/<uuid:building_uuid>/", get_cooling_systems, name="cooling_system_list"),
     path("cooling-system/<int:system_id>/delete/", delete_cooling_system, name="cooling_system_delete"),
+    path("import-dialog/initial-dialog/", view_initial_import_dialog, name="import_dialog_initial"),
+    path("import-dialog/import-dialog/", view_import_dialog, name="import_dialog"),
+    path("import-dialog/step/<str:step_id>/", view_import_building_step, name="import_building_step"),
 ]

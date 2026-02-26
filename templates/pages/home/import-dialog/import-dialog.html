@@ -1,0 +1,162 @@
+<dialog id="import_dialog" class="modal modal-end">
+  <div class="modal-box right-side-dialog flex flex-col p-0">
+    <div class="w-full p-5 flex items-start justify-between gap-2">
+      <div class="space-y-1">
+        <h2 class="label-large">Import building</h2>
+        <p class="paragraph-small text-(--text--sub-600)">Follow our step-by-step wizard to quickly import building data
+          from a CSV file or Excel sheet.</p>
+      </div>
+      <button class="btn btn-ghost size-6 p-0 shrink-0" onclick="import_dialog.close()">
+        <span data-icon="close-line" data-size="20"></span>
+      </button>
+    </div>
+    <!-- Header / Stepper -->
+    <div class="w-full px-5 pb-4 pt-5 border-b border-[var(--stroke--soft-200)]">
+      <nav aria-label="breadcrumb">
+        <ol id="import-stepper"
+          class="flex flex-wrap items-center gap-1.5 break-words text-sm text-[var(--text--sub-600)] sm:gap-2.5">
+          <!-- Stepper items will be injected here -->
+        </ol>
+      </nav>
+    </div>
+
+    <!-- Content Area -->
+    <div id="import-content" class="flex-1 w-full overflow-y-auto p-5">
+      <!-- Step content will be injected here -->
+    </div>
+
+    <!-- Footer -->
+    <div id="import-footer"
+      class="flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)] p-5 w-full">
+      <button class="btn btn-outline h-9 px-4 label-small" onclick="import_dialog.close()">
+        Cancel
+      </button>
+      <button id="import-next-btn" class="btn btn-primary h-9 px-4 label-small" onclick="importStepper.next()">
+        <span id="import-next-label">Continue</span>
+        <span data-icon="arrow-right-s-line" data-size="20"></span>
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  window.importStepper = {
+    currentStep: 0,
+    steps: [
+      { id: 'upload', label: 'Upload' },
+      { id: 'map-fields', label: 'Map Fields' },
+      { id: 'validate', label: 'Validate', nextLabel: 'Process and import' },
+      { id: 'preview', label: 'Preview & Confirm', nextLabel: 'Confirm & Continue' },
+      { id: 'process', label: 'Process' }
+    ],
+
+    init() {
+      this.currentStep = 0;
+      this.render();
+    },
+
+    render() {
+      this.renderStepper();
+      this.renderContent();
+      this.renderFooter();
+    },
+
+    renderStepper() {
+      const container = document.getElementById('import-stepper');
+      if (!container) return;
+
+      container.innerHTML = this.steps.map((step, index) => {
+        const isActive = index === this.currentStep;
+        const isCompleted = index < this.currentStep;
+
+        let iconOrNumber = '';
+        if (isCompleted) {
+          iconOrNumber = `<span data-icon="select-box-circle-fill" data-size="20" data-color="var(--state--success--base)"></span>`;
+        } else {
+          // Active: blue bg, white text. Inactive: transparent bg, gray text.
+          const activeClass = isActive
+            ? 'bg-[var(--color-primary)] border-transparent text-[var(--text--strong-950)]'
+            : 'text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]';
+
+          iconOrNumber = `<div class="label-x-small size-5 rounded-full border grid place-items-center ${activeClass}">${index + 1}</div>`;
+        }
+
+        const labelClass = isActive ? 'text-[var(--text--strong-950)] font-medium' : 'text-[var(--text--sub-600)]';
+
+        // Separator between items (not after the last one)
+        const separator = index < this.steps.length - 1
+          ? `<span data-icon="arrow-right-s-line" data-size="16" data-color="var(--text--disabled-300)" class="opacity-50 mx-1"></span>`
+          : '';
+
+        return `
+          <li class="inline-flex items-center gap-2">
+            <button type="button" onclick="window.importStepper.goTo(${index})"
+              class="flex items-center gap-2 cursor-pointer hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
+              ${index > this.currentStep ? 'disabled' : ''}>
+              ${iconOrNumber}
+              <span class="paragraph-small ${labelClass}">${step.label}</span>
+            </button>
+            ${separator}
+          </li>
+        `;
+      }).join('');
+    },
+
+    renderContent() {
+      const container = document.getElementById('import-content');
+      if (!container) return;
+
+      const step = this.steps[this.currentStep];
+      const url = `/import-dialog/step/step-${step.id}/`;
+      console.log('Loading content for step:', step.id, 'from URL:', url);
+      htmx.ajax('GET', url, {
+        target: '#import-content',
+        swap: 'innerHTML'
+      })
+    },
+
+    renderFooter() {
+      const step = this.steps[this.currentStep];
+      const nextBtn = document.getElementById('import-next-btn');
+      const nextLabel = document.getElementById('import-next-label');
+      const footer = document.getElementById('import-footer')
+
+      if (nextBtn && nextLabel) {
+        // Last step logic
+        if (this.currentStep === this.steps.length - 1) {
+          footer.style.display = 'none';
+        } else {
+          footer.style.display = 'flex';
+          nextBtn.style.display = 'inline-flex';
+          nextLabel.textContent = step.nextLabel || 'Continue';
+        }
+      }
+    },
+
+    next() {
+      if (this.currentStep < this.steps.length - 1) {
+        this.currentStep++;
+        this.render();
+      }
+    },
+
+    goTo(index) {
+      if (index <= this.currentStep) {
+        this.currentStep = index;
+        this.render();
+      }
+    }
+  };
+
+  // Auto-init when the dialog opens or HTMX loads it
+  document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+    if (evt.detail.target.id === 'import_dialog') {
+      window.importStepper.init();
+    }
+  });
+
+  // Fallback init
+  if (document.getElementById('import-stepper')) {
+    window.importStepper.init();
+  }
+</script>
