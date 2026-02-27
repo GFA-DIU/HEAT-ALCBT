@@ -1,4 +1,4 @@
-<div class="w-full" id="savings-main-wrapper" style="--savings-primary: #FFA468;">
+<div class="w-full" id="savings-main-wrapper" style="--savings-primary: #FFA468; --savings-primary-secondary: #86EFAC;">
 
   <div id="project-benchmark-top" hx-swap-oob="innerHTML:#tab-content-container-top" class="w-full">
     <div class="w-full flex flex-col gap-6">
@@ -8,8 +8,8 @@
           Your project is performing better than <span
             class="font-bold underline cursor-pointer decoration-dotted">78%</span> of peer projects in Germany.
           <span class="bg-[#D5EDCD] text-xs text-[var(--text--strong-950)] font-extrabold rounded-full px-1.25 py-1">Top
-            25%
-            tier</span>
+            25% tier
+          </span>
         </p>
       </div>
 
@@ -146,28 +146,28 @@
             <div class="space-y-2">
               <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
                 <span>Ready-mix Concrete & Cement</span>
-                <span class="text-[#16A34A]">-35</span>
+                <span class="text-[#81F28E]">-35</span>
               </div>
               <progress class="progress progress-success w-full h-3" value="35" max="100"></progress>
             </div>
             <div class="space-y-2">
               <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
                 <span>Steel</span>
-                <span class="text-[#16A34A]">-14</span>
+                <span class="text-[#81F28E]">-14</span>
               </div>
               <progress class="progress progress-success w-full h-3" value="14" max="100"></progress>
             </div>
             <div class="space-y-2">
               <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
                 <span>Rebar</span>
-                <span class="text-[#16A34A]">-14</span>
+                <span class="text-[#81F28E]">-14</span>
               </div>
               <progress class="progress progress-success w-full h-3" value="14" max="100"></progress>
             </div>
             <div class="space-y-2">
               <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
                 <span>Pre-cast Concrete</span>
-                <span class="text-[#16A34A]">-7</span>
+                <span class="text-[#81F28E]">-7</span>
               </div>
               <progress class="progress progress-success w-full h-3" value="7" max="100"></progress>
             </div>
@@ -212,7 +212,7 @@
                 <div class="bg-[var(--savings-primary)] w-[60%] flex items-center px-2">104 kg
                   CO<sub>2</sub>e/m<sup>2</sup></div>
 
-                <div class="bg-[#86EFAC] w-[20%] flex items-center justify-center text-ellipsis">35</div>
+                <div class="bg-[var(--savings-primary-secondary)] w-[20%] flex items-center justify-center text-ellipsis">-40 kgCO₂e/m²</div>
               </div>
               <!-- Detail -->
               <div class="flex justify-between items-start text-xs pt-1">
@@ -241,7 +241,7 @@
                 <div class="bg-[var(--savings-primary)] w-[30%] flex items-center px-2">55 kg
                   CO<sub>2</sub>e/m<sup>2</sup></div>
 
-                <div class="bg-[#86EFAC] w-[10%] flex items-center justify-center text-ellipsis">-16 kg</div>
+                <div class="bg-[var(--savings-primary-secondary)] w-[20%] flex items-center justify-center text-ellipsis">-20 kgCO₂e/m²</div>
               </div>
               <!-- Detail -->
               <div class="flex justify-between items-start text-xs pt-1">
@@ -271,7 +271,7 @@
                 <div class="bg-[var(--savings-primary)] w-[18%] flex items-center px-2">32 kg
                   CO<sub>2</sub>e/m<sup>2</sup></div>
 
-                <div class="bg-[#86EFAC] w-[8%] flex items-center justify-center text-ellipsis">-14 kg</div>
+                <div class="bg-[var(--savings-primary-secondary)] w-[8%] flex items-center justify-center text-ellipsis">-7 ...</div>
               </div>
               <!-- Detail -->
               <div class="flex justify-between items-start text-xs pt-1">
@@ -373,19 +373,23 @@
       const wrapper = document.getElementById('savings-main-wrapper');
       if (wrapper) {
         if (view === 'operational') {
-          wrapper.style.setProperty('--savings-primary', '#7D52F4');
+          wrapper.style.setProperty('--savings-primary', '#E57CB5');
+          wrapper.style.setProperty('--savings-primary-secondary', '#18BB9D');
         } else {
           wrapper.style.setProperty('--savings-primary', '#FFA468');
+          wrapper.style.setProperty('--savings-primary-secondary', '#86EFAC');
         }
       }
 
       // Update Chart Color
       if (chartInstance) {
-        const color = view === 'operational' ? '#7D52F4' : '#FFA468'; // Purple vs Orange
-        const hoverColor = view === 'operational' ? '#6B46C1' : '#F97316';
+        const color = view === 'operational' ? '#E57CB5' : '#FFA468'; // Purple vs Orange
+        const hoverColor = view === 'operational' ? '#E57CB5' : '#F97316';
+        const color2 = view === 'operational' ? '#18BB9D' : '#86EFAC';
+        const hoverColor2 = view === 'operational' ? '#18BB9D' : '#4ADE80';
 
-        chartInstance.data.datasets[0].backgroundColor = [color, '#86EFAC'];
-        chartInstance.data.datasets[0].hoverBackgroundColor = [hoverColor, '#4ADE80'];
+        chartInstance.data.datasets[0].backgroundColor = [color, color2];
+        chartInstance.data.datasets[0].hoverBackgroundColor = [hoverColor, hoverColor2];
         chartInstance.update();
       }
 
