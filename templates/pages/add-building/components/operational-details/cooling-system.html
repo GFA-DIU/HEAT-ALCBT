@@ -77,7 +77,7 @@
       <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2021" required min="1900" max="{% now "Y" %}"
-          onchange="applyRefrigerantDefault(this.form,'window-ac')" />
+          onchange="applyRefrigerantDefault(this.form,'window-ac'); applyLeakageDefault(this.form)" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -105,7 +105,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
-        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 1.0" required min="0" step="0.01"
+        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 1.0" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'window-ac'); recalcWindowAcEnergy(this.form)" />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
@@ -130,7 +130,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_leakage_factor" placeholder="e.g. 2" required min="0" max="100" value="2" />
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -230,7 +230,7 @@
       <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2021" required min="1900" max="{% now "Y" %}"
-          onchange="applyRefrigerantDefault(this.form,'split-ac')" />
+          onchange="applyRefrigerantDefault(this.form,'split-ac'); applyLeakageDefault(this.form)" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -258,7 +258,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
-        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 1.5" required min="0" step="0.01"
+        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 1.5" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'split-ac'); recalcWindowAcEnergy(this.form)" />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
@@ -283,7 +283,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_leakage_factor" placeholder="Typical: 3 – 7%" required min="0" max="100" value="3" />
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -375,7 +375,7 @@
       <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2022" required min="1900" max="{% now "Y" %}"
-          onchange="applyRefrigerantDefault(this.form,'vrf-system')" />
+          onchange="applyRefrigerantDefault(this.form,'vrf-system'); applyLeakageDefault(this.form)" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -403,7 +403,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
-        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 10" required min="0" step="0.01"
+        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 10" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'vrf-system'); recalcWindowAcEnergy(this.form)" />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
@@ -428,7 +428,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_leakage_factor" placeholder="Typical: 2 – 5%" required min="0" max="100" value="2" />
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -531,7 +531,7 @@
       <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2020" required min="1900" max="{% now "Y" %}"
-          onchange="applyRefrigerantDefault(this.form,'packaged-ac')" />
+          onchange="applyRefrigerantDefault(this.form,'packaged-ac'); applyLeakageDefault(this.form)" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -559,7 +559,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
-        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 5" required min="0" step="0.01"
+        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 5" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'packaged-ac'); recalcWindowAcEnergy(this.form)" />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
@@ -584,7 +584,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_leakage_factor" placeholder="Typical: 2 – 5%" required min="0" max="100" value="2" />
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -677,7 +677,7 @@
       <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2019" required min="1900" max="{% now "Y" %}"
-          onchange="applyRefrigerantDefault(this.form,'water_cooled')" />
+          onchange="applyRefrigerantDefault(this.form,'water_cooled'); applyLeakageDefault(this.form)" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -724,7 +724,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_leakage_factor" placeholder="Typical: 1 – 3%" required min="0" max="100" value="2" />
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -837,7 +837,7 @@
       <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2020" required min="1900" max="{% now "Y" %}"
-          onchange="applyRefrigerantDefault(this.form,'air_cooled')" />
+          onchange="applyRefrigerantDefault(this.form,'air_cooled'); applyLeakageDefault(this.form)" />
       </label>
       <p class="validator-hint">This field is required</p>
     </fieldset>
@@ -884,7 +884,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_leakage_factor" placeholder="Typical: 1 – 3%" required min="0" max="100" value="2" />
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
       <p class="validator-hint">This field is required</p>
@@ -1098,6 +1098,19 @@
       }
     };
     trySet();
+  };
+
+  // Set baseline leakage factor default based on year of installation:
+  // new system (installed < 7 years ago) → 2%, old system (≥ 7 years) → 10%
+  window.applyLeakageDefault = function(form) {
+    const yearEl = form.querySelector('[name="year_of_installation"]');
+    const leakageEl = form.querySelector('[name="baseline_leakage_factor"]');
+    if (!yearEl || !yearEl.value || !leakageEl) return;
+    const year = parseInt(yearEl.value);
+    if (isNaN(year)) return;
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - year;
+    leakageEl.value = age >= 7 ? 10 : 2;
   };
 
   // Mark refrigerant as user-chosen when the user manually changes the dropdown
