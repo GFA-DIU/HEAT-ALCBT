@@ -1,0 +1,107 @@
+<div class="size-full flex flex-col gap-5">
+  <div class="space-y-1 shrink-0">
+    <h6 class="h6-title text-[var(--text--strong-950)]">Building Details</h6>
+    <p class="paragraph-small text-[var(--text--sub-600)]">
+      Review the data read from your file. Upload certification and/or BoQ files if required.
+    </p>
+  </div>
+
+  <!-- Parsed data summary -->
+  <div class="w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden shrink-0">
+    <table class="table w-full border-collapse">
+      <thead class="bg-[var(--bg--weak-50)]">
+        <tr>
+          <th class="py-2.5 px-4 text-left font-normal label-x-small text-[var(--text--sub-600)] border-b-0 w-1/2">Field</th>
+          <th class="py-2.5 px-4 text-left font-normal label-x-small text-[var(--text--sub-600)] border-b-0">Value from file</th>
+        </tr>
+      </thead>
+      <tbody id="details-summary" class="paragraph-small text-[var(--text--strong-950)]">
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Certification file upload (shown when has_certification = Yes) -->
+  <div id="cert-upload-section" class="hidden flex flex-col gap-2">
+    <p class="label-small text-[var(--text--strong-950)]">
+      Certification file
+      <span class="text-[var(--state--error--base)]">*</span>
+    </p>
+    <p class="paragraph-x-small text-[var(--text--sub-600)]">
+      Your template indicates this building has a certification. Please upload the certificate file.
+      Accepted formats: JPG, PNG, GIF, WEBP, PDF — max 20 MB.
+    </p>
+    <input
+      type="file"
+      id="import-cert-file"
+      accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
+      class="file-input file-input-bordered file-input-sm w-full max-w-sm"
+    />
+  </div>
+
+  <!-- BoQ files upload (shown when has_boq = Yes) -->
+  <div id="boq-upload-section" class="hidden flex flex-col gap-2">
+    <p class="label-small text-[var(--text--strong-950)]">
+      Bill of Quantities (BoQ) files
+      <span class="text-[var(--state--error--base)]">*</span>
+    </p>
+    <p class="paragraph-x-small text-[var(--text--sub-600)]">
+      Your template indicates this building has BoQ files. Please upload one or more files.
+      Accepted formats: JPG, PNG, GIF, WEBP, PDF — max 20 MB each.
+    </p>
+    <input
+      type="file"
+      id="import-boq-files"
+      accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
+      multiple
+      class="file-input file-input-bordered file-input-sm w-full max-w-sm"
+    />
+  </div>
+</div>
+
+<script>
+  (function () {
+    const t2 = (window.importState && window.importState.tab2) || {};
+
+    const FIELD_LABELS = [
+      { key: 'building_type',         label: 'Building type' },
+      { key: 'climate_type',          label: 'Climate type' },
+      { key: 'assessment_period',     label: 'Assessment period (years)' },
+      { key: 'total_floor_area',      label: 'Total floor area (m²)' },
+      { key: 'conditioned_floor_area',label: 'Conditioned floor area (m²)' },
+      { key: 'construction_year',     label: 'Construction year' },
+      { key: 'floors_below_ground',   label: 'Floors below ground' },
+      { key: 'has_certification',     label: 'Has certification' },
+      { key: 'has_boq',              label: 'Has BoQ' },
+    ];
+
+    const tbody = document.getElementById('details-summary');
+    if (tbody) {
+      tbody.innerHTML = FIELD_LABELS.map(({ key, label }) => {
+        const value = t2[key] || '—';
+        return `
+          <tr class="border-b border-[var(--stroke--soft-200)] last:border-0">
+            <td class="px-4 py-2.5 text-[var(--text--sub-600)]">${label}</td>
+            <td class="px-4 py-2.5 font-medium">${value}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Show certification upload if needed
+    const hasCert = (t2.has_certification || '').toLowerCase() === 'yes';
+    const certSection = document.getElementById('cert-upload-section');
+    if (hasCert && certSection) {
+      certSection.classList.remove('hidden');
+      certSection.classList.add('flex');
+    }
+
+    // Show BoQ upload if needed
+    const hasBoq = (t2.has_boq || '').toLowerCase() === 'yes';
+    const boqSection = document.getElementById('boq-upload-section');
+    if (hasBoq && boqSection) {
+      boqSection.classList.remove('hidden');
+      boqSection.classList.add('flex');
+    }
+  })();
+</script>

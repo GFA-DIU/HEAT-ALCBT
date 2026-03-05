@@ -73,7 +73,9 @@ class VentilationSystem(models.Model):
     number_of_units_installed = models.PositiveIntegerField(
         verbose_name=_("Total Number of Ventilation Type Installed")
     )
-    total_energy_consumption_kwh_per_year = models.PositiveIntegerField(
+    total_energy_consumption_kwh_per_year = models.DecimalField(
+        max_digits=12,
+        decimal_places=3,
         null=True,
         blank=True,
         verbose_name=_(

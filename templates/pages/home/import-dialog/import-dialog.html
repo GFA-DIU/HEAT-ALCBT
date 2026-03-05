@@ -4,9 +4,9 @@
       <div class="space-y-1">
         <h2 class="label-large">Import building</h2>
         <p class="paragraph-small text-(--text--sub-600)">Follow our step-by-step wizard to quickly import building data
-          from a CSV file or Excel sheet.</p>
+          from an Excel file.</p>
       </div>
-      <button class="btn btn-ghost size-6 p-0 shrink-0" onclick="import_dialog.close()">
+      <button class="btn btn-ghost size-6 p-0 shrink-0" onclick="importStepper.cancelAndClose()">
         <span data-icon="close-line" data-size="20"></span>
       </button>
     </div>
@@ -28,7 +28,7 @@
     <!-- Footer -->
     <div id="import-footer"
       class="flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)] p-5 w-full">
-      <button class="btn btn-outline h-9 px-4 label-small" onclick="import_dialog.close()">
+      <button class="btn btn-outline h-9 px-4 label-small" onclick="importStepper.cancelAndClose()">
         Cancel
       </button>
       <button id="import-next-btn" class="btn btn-primary h-9 px-4 label-small" onclick="importStepper.next()">
@@ -40,18 +40,39 @@
 </dialog>
 
 <script>
+  // ---------------------------------------------------------------------------
+  // Shared import state — persists across steps
+  // ---------------------------------------------------------------------------
+  window.importState = window.importState || {
+    file: null,               // File object from upload step
+    workbook: null,           // Parsed SheetJS workbook
+    tab1: null,               // Parsed data from Tab 1 — Building Name & Location
+    tab2: null,               // Parsed data from Tab 2 — Building Details
+    tab3: null,               // Parsed data from Tab 3 — Operational Schedule & Temperature
+    coolingSystems: null,     // Parsed rows from all 6 cooling tabs
+    ventilationSystems: null, // Parsed rows from all 5 ventilation tabs
+    lightingSystems: null,    // Parsed rows from all 5 lighting tabs
+    liftEscalator: null,      // Parsed rows from Lift & Escalator tab
+    hotWaterSystems: null,    // Parsed rows from all 3 hot water tabs
+    energyCarriers: null,     // Parsed rows from Operational Energy Carriers tab
+    structuralComponents: null, // Parsed rows from Structural Components tab
+    building_uuid: null       // Created after Tab 1 is submitted
+  };
+
+  // Stepper
   window.importStepper = {
     currentStep: 0,
     steps: [
-      { id: 'upload', label: 'Upload' },
+      { id: 'upload',     label: 'Upload' },
       { id: 'map-fields', label: 'Map Fields' },
-      { id: 'validate', label: 'Validate', nextLabel: 'Process and import' },
-      { id: 'preview', label: 'Preview & Confirm', nextLabel: 'Confirm & Continue' },
-      { id: 'process', label: 'Process' }
+      { id: 'preview',    label: 'Preview & Confirm', nextLabel: 'Confirm & Import' },
+      { id: 'process',    label: 'Process' },
     ],
 
     init() {
       this.currentStep = 0;
+      window.importState = { file: null, workbook: null, tab1: null, tab2: null, tab3: null, coolingSystems: null, ventilationSystems: null, lightingSystems: null, liftEscalator: null, hotWaterSystems: null, energyCarriers: null, structuralComponents: null, building_uuid: null };
+      this._clearError();
       this.render();
     },
 
@@ -69,28 +90,24 @@
         const isActive = index === this.currentStep;
         const isCompleted = index < this.currentStep;
 
-        let iconOrNumber = '';
+        let iconOrNumber;
         if (isCompleted) {
           iconOrNumber = `<span data-icon="select-box-circle-fill" data-size="20" data-color="var(--state--success--base)"></span>`;
         } else {
-          // Active: blue bg, white text. Inactive: transparent bg, gray text.
           const activeClass = isActive
             ? 'bg-[var(--color-primary)] border-transparent text-[var(--text--strong-950)]'
             : 'text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]';
-
           iconOrNumber = `<div class="label-x-small size-5 rounded-full border grid place-items-center ${activeClass}">${index + 1}</div>`;
         }
 
         const labelClass = isActive ? 'text-[var(--text--strong-950)] font-medium' : 'text-[var(--text--sub-600)]';
-
-        // Separator between items (not after the last one)
         const separator = index < this.steps.length - 1
           ? `<span data-icon="arrow-right-s-line" data-size="16" data-color="var(--text--disabled-300)" class="opacity-50 mx-1"></span>`
           : '';
 
         return `
           <li class="inline-flex items-center gap-2">
-            <button type="button" onclick="window.importStepper.goTo(${index})"
+            <button type="button"
               class="flex items-center gap-2 cursor-pointer hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
               ${index > this.currentStep ? 'disabled' : ''}>
               ${iconOrNumber}
@@ -100,62 +117,810 @@
           </li>
         `;
       }).join('');
+
+      if (window.IconComponent) window.IconComponent.initialize();
     },
 
     renderContent() {
       const container = document.getElementById('import-content');
       if (!container) return;
-
       const step = this.steps[this.currentStep];
-      const url = `/import-dialog/step/step-${step.id}/`;
-      console.log('Loading content for step:', step.id, 'from URL:', url);
-      htmx.ajax('GET', url, {
+      htmx.ajax('GET', `/import-dialog/step/step-${step.id}/`, {
         target: '#import-content',
         swap: 'innerHTML'
-      })
+      });
     },
 
     renderFooter() {
       const step = this.steps[this.currentStep];
       const nextBtn = document.getElementById('import-next-btn');
       const nextLabel = document.getElementById('import-next-label');
-      const footer = document.getElementById('import-footer')
+      const footer = document.getElementById('import-footer');
 
-      if (nextBtn && nextLabel) {
-        // Last step logic
-        if (this.currentStep === this.steps.length - 1) {
-          footer.style.display = 'none';
-        } else {
-          footer.style.display = 'flex';
-          nextBtn.style.display = 'inline-flex';
-          nextLabel.textContent = step.nextLabel || 'Continue';
+      if (!nextBtn || !nextLabel || !footer) return;
+
+      if (this.currentStep === this.steps.length - 1) {
+        // Process step — hide footer (success screen has its own CTA)
+        footer.style.display = 'none';
+      } else {
+        footer.style.display = 'flex';
+        nextBtn.style.display = 'inline-flex';
+        nextBtn.disabled = false;
+        nextLabel.textContent = step.nextLabel || 'Continue';
+
+        // Disable Continue on upload step until a file is chosen
+        if (step.id === 'upload' && !window.importState.file) {
+          nextBtn.disabled = true;
         }
       }
     },
 
-    next() {
+    // Step navigation
+    async next() {
+      const step = this.steps[this.currentStep];
+      this._clearError();
+
+      // --- Upload step: parse the file and extract all tab data ---
+      if (step.id === 'upload') {
+        if (!window.importState.file) {
+          this._showError('Please select an Excel file first.');
+          return;
+        }
+        this._setNextLoading(true, 'Reading file…');
+        try {
+          await this._parseFile();
+          this.currentStep++;
+          this.render();
+        } catch (err) {
+          this._showError(err.message || 'Could not read the file.');
+        } finally {
+          this._setNextLoading(false, step.nextLabel || 'Continue');
+        }
+        return;
+      }
+
+      // --- Map Fields step: just advance (mapping is saved in importState) ---
+      if (step.id === 'map-fields') {
+        this.currentStep++;
+        this.render();
+        return;
+      }
+
+      // --- Preview & Confirm step: submit Tab 1, Tab 2, Tab 3 to the backend ---
+      if (step.id === 'preview') {
+        this._setNextLoading(true, 'Importing…');
+        try {
+          await this._submitTab1();
+          await this._submitTab2();
+          await this._submitTab3();
+          await this._submitCoolingSystems();
+          await this._submitVentilationSystems();
+          await this._submitLightingSystems();
+          await this._submitLiftEscalator();
+          await this._submitHotWaterSystems();
+          await this._submitEnergyCarriers();
+          await this._submitStructuralComponents();
+          this.currentStep++;
+          this.render();
+        } catch (err) {
+          this._showError(err.message || 'Import failed. Please check your data and try again.');
+        } finally {
+          this._setNextLoading(false, step.nextLabel || 'Confirm & Import');
+        }
+        return;
+      }
+
       if (this.currentStep < this.steps.length - 1) {
         this.currentStep++;
         this.render();
       }
     },
 
-    goTo(index) {
-      if (index <= this.currentStep) {
-        this.currentStep = index;
-        this.render();
+    // Cancel: delete any partially created building, then close
+    async cancelAndClose() {
+      if (window.importState && window.importState.building_uuid) {
+        try {
+          const csrfToken = this._getCsrfToken();
+          await fetch(`/import-dialog/import/cancel/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ building_uuid: window.importState.building_uuid }),
+          });
+        } catch (_) {
+          // Best-effort — don't block closing
+        }
       }
-    }
+      window.importStepper.init();
+      import_dialog.close();
+    },
+
+    // -------------------------------------------------------------------------
+    // File parsing (runs on upload step → next)
+    // -------------------------------------------------------------------------
+    async _parseFile() {
+      const XLSX = await this._loadXLSX();
+      const buffer = await window.importState.file.arrayBuffer();
+      const wb = XLSX.read(buffer, { type: 'array' });
+      window.importState.workbook = wb;
+
+      // Helper: read a sheet as array-of-arrays, return header row + first data row
+      const readFirstRow = (sheetIndex) => {
+        const sheet = wb.Sheets[wb.SheetNames[sheetIndex]];
+        if (!sheet) return null;
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+        if (rows.length < 2) return null;
+        const headers = rows[0].map(h => String(h || '').replace(/\n/g, ' ').trim());
+        const dataRow = rows[1];
+        const get = (label) => {
+          const idx = headers.findIndex(h => h.toLowerCase().includes(label.toLowerCase()));
+          return idx >= 0 ? String(dataRow[idx] || '').trim() : '';
+        };
+        return { headers, dataRow, get };
+      };
+
+      // --- Tab 1: Building Name and Location ---
+      const t1 = readFirstRow(0);
+      if (!t1) throw new Error('Tab 1 (Building Name and Location) appears to be empty.');
+      window.importState.tab1 = {
+        building_name:  t1.get('building name'),
+        address:        t1.get('address'),
+        country:        t1.get('country'),
+        region:         t1.get('region'),
+        city:           t1.get('city'),
+        longitude:      t1.get('longitude'),
+        latitude:       t1.get('latitude'),
+      };
+
+      // --- Tab 2: Building Details ---
+      const t2 = readFirstRow(1);
+      if (!t2) throw new Error('Tab 2 (Building Details) appears to be empty.');
+      window.importState.tab2 = {
+        building_type:           t2.get('building type'),
+        climate_type:            t2.get('climate'),
+        assessment_period:       t2.get('assessment period'),
+        construction_year:       t2.get('construction year'),
+        total_floor_area:        t2.get('total floor area'),
+        conditioned_floor_area:  t2.get('conditioned floor area'),
+        floors_below_ground:     t2.get('floors below ground'),
+        has_certification:       t2.get('certification'),
+        has_boq:                 t2.get('bill of quantities'),
+      };
+
+      // --- Cooling system tabs (tabs 3–8, names contain "Cooling" or "Chiller") ---
+      const COOLING_TAB_KEYS = {
+        'cooling system - window ac': 'window ac',
+        'cooling system - split ac':  'split ac',
+        'cooling system - vrf':       'vrf',
+        'cooling system - packagedductab': 'packagedductab',
+        'chiller system - water cooled':   'water cooled',
+        'chiller system - air cooled':     'air cooled',
+      };
+      const coolingPayload = [];
+      for (let si = 0; si < wb.SheetNames.length; si++) {
+        const sheetName = wb.SheetNames[si];
+        const nameLower = sheetName.toLowerCase();
+        // Find matching key (partial match to handle trimmed sheet names)
+        let matchedKey = null;
+        for (const [fragment, tabKey] of Object.entries(COOLING_TAB_KEYS)) {
+          if (nameLower.includes(fragment.split(' - ')[1] || fragment)) {
+            matchedKey = tabKey;
+            break;
+          }
+        }
+        // More robust: match on any sheet whose name contains 'cooling' or 'chiller'
+        if (!matchedKey) {
+          if (nameLower.includes('window')) matchedKey = 'window ac';
+          else if (nameLower.includes('split')) matchedKey = 'split ac';
+          else if (nameLower.includes('vrf') || nameLower.includes('variable')) matchedKey = 'vrf';
+          else if (nameLower.includes('packaged') || nameLower.includes('ductab')) matchedKey = 'packagedductab';
+          else if (nameLower.includes('water cooled') || (nameLower.includes('water') && nameLower.includes('chiller'))) matchedKey = 'water cooled';
+          else if (nameLower.includes('air cooled') || (nameLower.includes('air') && nameLower.includes('chiller'))) matchedKey = 'air cooled';
+        }
+        if (!matchedKey) continue;
+
+        const ws = wb.Sheets[wb.SheetNames[si]];
+        const sheetRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+        // Skip header row (row 0), collect data rows (row 1+)
+        const dataRows = sheetRows.slice(1).map(row =>
+          // Convert each cell to string or null
+          row.map(c => (c === null || c === undefined) ? null : String(c).trim())
+        ).filter(row =>
+          // Skip completely empty rows (all null/empty)
+          row.some(c => c !== null && c !== '' && c.toLowerCase() !== 'none')
+        );
+
+        if (dataRows.length > 0) {
+          coolingPayload.push({ tab: matchedKey, rows: dataRows });
+        }
+      }
+      window.importState.coolingSystems = coolingPayload;
+
+      // --- Ventilation system tabs (sheet names contain "Ventill" or "Ventil") ---
+      const VENT_TAB_KEYS = {
+        'ahu':       'ahu',
+        'fcu':       'fcu',
+        'ceilingwa': 'ceilingwa',  // Ceiling/Wall Cassette AC
+        'doas':      'doas',
+        'ceilingex': 'ceilingex',  // Ceiling/Exhaust/Wall Fan
+      };
+      const ventPayload = [];
+      for (let si = 0; si < wb.SheetNames.length; si++) {
+        const sheetName = wb.SheetNames[si];
+        const nameLower = sheetName.toLowerCase().replace(/\s+/g, '');
+        let matchedKey = null;
+        if (nameLower.includes('ahu'))                                          matchedKey = 'ahu';
+        else if (nameLower.includes('fcu'))                                     matchedKey = 'fcu';
+        else if (nameLower.includes('ceilingwa') || nameLower.includes('cassette')) matchedKey = 'ceilingwa';
+        else if (nameLower.includes('doas'))                                    matchedKey = 'doas';
+        else if (nameLower.includes('ceilingex') || nameLower.includes('exhaustfan') || nameLower.includes('ceilingfan')) matchedKey = 'ceilingex';
+        if (!matchedKey) continue;
+
+        const ws = wb.Sheets[wb.SheetNames[si]];
+        const sheetRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+        const dataRows = sheetRows.slice(1).map(row =>
+          row.map(c => (c === null || c === undefined) ? null : String(c).trim())
+        ).filter(row =>
+          row.some(c => c !== null && c !== '' && c.toLowerCase() !== 'none')
+        );
+
+        if (dataRows.length > 0) {
+          ventPayload.push({ tab: matchedKey, rows: dataRows });
+        }
+      }
+      window.importState.ventilationSystems = ventPayload;
+
+      // --- Lighting system tabs (sheet names contain "Lightning") ---
+      const lightingPayload = [];
+      for (let si = 0; si < wb.SheetNames.length; si++) {
+        const sheetName = wb.SheetNames[si];
+        const nameLower = sheetName.toLowerCase().replace(/\s+/g, '');
+        let lightingKey = null;
+        if (nameLower.includes('lightning') || nameLower.includes('lighting')) {
+          if (nameLower.includes('fluorescent'))      lightingKey = 'fluorescent';
+          else if (nameLower.includes('cfl'))         lightingKey = 'cfl';
+          else if (nameLower.includes('incandescent')) lightingKey = 'incandescent';
+          else if (nameLower.includes('hid'))         lightingKey = 'hid';
+          else if (nameLower.includes('led'))         lightingKey = 'led';
+        }
+        if (!lightingKey) continue;
+
+        const ws = wb.Sheets[wb.SheetNames[si]];
+        const sheetRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+        const dataRows = sheetRows.slice(1).map(row =>
+          row.map(c => (c === null || c === undefined) ? null : String(c).trim())
+        ).filter(row =>
+          // Skip rows where col[3] (fixture count) is blank
+          row.length > 3 && row[3] !== null && row[3] !== ''
+        );
+
+        if (dataRows.length > 0) {
+          lightingPayload.push({ tab: lightingKey, rows: dataRows });
+        }
+      }
+      window.importState.lightingSystems = lightingPayload;
+
+      // --- Lift & Escalator System tab ---
+      let liftRows = null;
+      for (let si = 0; si < wb.SheetNames.length; si++) {
+        const nameLower = wb.SheetNames[si].toLowerCase().replace(/\s+/g, '');
+        if (nameLower.includes('lift') || nameLower.includes('escalator')) {
+          const ws = wb.Sheets[wb.SheetNames[si]];
+          const sheetRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+          liftRows = sheetRows.slice(1).map(row =>
+            row.map(c => (c === null || c === undefined) ? null : String(c).trim())
+          ).filter(row =>
+            row.length > 0 && row[0] !== null && row[0] !== ''
+          );
+          break;
+        }
+      }
+      window.importState.liftEscalator = liftRows || [];
+
+      // --- Hot Water System tabs (3 tabs: Heat Pump, Boiler, Water Heater) ---
+      const hotWaterPayload = [];
+      for (let si = 0; si < wb.SheetNames.length; si++) {
+        const sheetName = wb.SheetNames[si];
+        const nameLower = sheetName.toLowerCase().replace(/\s+/g, '');
+        let hwKey = null;
+        if (nameLower.includes('hotwater') || nameLower.includes('hot water') || nameLower.includes('hotwater')) {
+          if (nameLower.includes('heatpump') || nameLower.includes('heat pump') || nameLower.includes('heatpu')) hwKey = 'heat-pump';
+          else if (nameLower.includes('boiler'))                                                                   hwKey = 'boiler';
+          else if (nameLower.includes('waterheater') || nameLower.includes('water heater') || nameLower.includes('waterhe')) hwKey = 'water-heater';
+        }
+        if (!hwKey) continue;
+
+        const ws = wb.Sheets[wb.SheetNames[si]];
+        const sheetRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+        const dataRows = sheetRows.slice(1).map(row =>
+          row.map(c => (c === null || c === undefined) ? null : String(c).trim())
+        ).filter(row =>
+          // Skip rows where col[2] (number_of_equipment) is blank
+          row.length > 2 && row[2] !== null && row[2] !== ''
+        );
+
+        if (dataRows.length > 0) {
+          hotWaterPayload.push({ tab: hwKey, rows: dataRows });
+        }
+      }
+      window.importState.hotWaterSystems = hotWaterPayload;
+
+      // --- Operational Energy Carriers tab ---
+      let energyCarrierRows = null;
+      for (let si = 0; si < wb.SheetNames.length; si++) {
+        const nameLower = wb.SheetNames[si].toLowerCase().replace(/\s+/g, '');
+        if (nameLower.includes('operationalenergy') || nameLower.includes('energycarrier')) {
+          const ws = wb.Sheets[wb.SheetNames[si]];
+          const sheetRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+          energyCarrierRows = sheetRows.slice(1).map(row =>
+            row.map(c => (c === null || c === undefined) ? null : String(c).trim())
+          ).filter(row =>
+            row.length > 0 && row[0] !== null && row[0] !== ''
+          );
+          break;
+        }
+      }
+      window.importState.energyCarriers = energyCarrierRows || [];
+
+      // --- Structural Components - By Component tab ---
+      // Row 1 = section headers, Row 2 = "Added Materials" sub-headers → skip both
+      // Data starts from row 3 (index 2)
+      let structuralRows = null;
+      for (let si = 0; si < wb.SheetNames.length; si++) {
+        const nameLower = wb.SheetNames[si].toLowerCase().replace(/\s+/g, '');
+        if (nameLower.includes('structural') && nameLower.includes('comp')) {
+          const ws = wb.Sheets[wb.SheetNames[si]];
+          const sheetRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+          // Skip first 2 header rows; keep all subsequent rows (even sparse ones)
+          structuralRows = sheetRows.slice(2).map(row =>
+            row.map(c => (c === null || c === undefined) ? null : String(c).trim())
+          ).filter(row =>
+            // Keep rows that have at least a Building Component (col 1) OR an EPD name (col 8)
+            (row.length > 1 && row[1] !== null && row[1] !== '') ||
+            (row.length > 8 && row[8] !== null && row[8] !== '')
+          );
+          break;
+        }
+      }
+      window.importState.structuralComponents = structuralRows || [];
+
+      // --- Tab 3: Operational Schedule and Temperature ---
+      const t3 = readFirstRow(2);
+      if (t3) {
+        // For Tab 3, use indexed column positions based on known template column order:
+        // 0: residents, 1: hours/day, 2: days/week, 3: weeks/year,
+        // 4: heating temp, 5: heating unit, 6: cooling temp, 7: cooling unit,
+        // 8: renewable %, 9: smart system
+        const d3 = t3.dataRow;
+        const strVal = (v) => String(v === null || v === undefined ? '' : v).trim();
+        window.importState.tab3 = {
+          num_residents:             strVal(d3[0]),
+          hours_per_workday:         strVal(d3[1]),
+          workdays_per_week:         strVal(d3[2]),
+          weeks_per_year:            strVal(d3[3]),
+          heating_temp:              strVal(d3[4]),
+          heating_temp_unit:         strVal(d3[5]),
+          cooling_temp:              strVal(d3[6]),
+          cooling_temp_unit:         strVal(d3[7]),
+          renewable_energy_percent:  strVal(d3[8]),
+          building_smart_system:     strVal(d3[9]),
+        };
+      }
+    },
+
+    // Backend submission
+    async _submitTab1() {
+      const csrfToken = this._getCsrfToken();
+      const payload = { ...window.importState.tab1 };
+      if (window.importState.building_uuid) {
+        payload.building_uuid = window.importState.building_uuid;
+      }
+
+      const resp = await fetch('/import-dialog/import/name-location/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await resp.json();
+      if (!result.success) {
+        const messages = Object.values(result.errors || {}).flat().join('\n');
+        throw new Error(messages || 'Validation failed for Building Name & Location tab.');
+      }
+      window.importState.building_uuid = result.building_uuid;
+    },
+
+    async _submitTab2() {
+      if (!window.importState.building_uuid) {
+        throw new Error('Building UUID missing — Tab 1 must be submitted first.');
+      }
+
+      const formData = new FormData();
+      formData.append('building_uuid', window.importState.building_uuid);
+
+      const t2 = window.importState.tab2 || {};
+      formData.append('building_type',          t2.building_type || '');
+      formData.append('climate_type',           t2.climate_type || '');
+      formData.append('assessment_period',      t2.assessment_period || '');
+      formData.append('total_floor_area',       t2.total_floor_area || '');
+      formData.append('conditioned_floor_area', t2.conditioned_floor_area || '');
+      formData.append('construction_year',      t2.construction_year || '');
+      formData.append('floors_below_ground',    t2.floors_below_ground || '');
+      formData.append('has_certification',      t2.has_certification || 'No');
+      formData.append('has_boq',               t2.has_boq || 'No');
+
+      // Attach certification file if user uploaded one
+      const certInput = document.getElementById('import-cert-file');
+      if (certInput && certInput.files.length > 0) {
+        formData.append('certification_file', certInput.files[0]);
+      }
+
+      // Attach BoQ files if user uploaded any
+      const boqInput = document.getElementById('import-boq-files');
+      if (boqInput && boqInput.files.length > 0) {
+        for (const f of boqInput.files) {
+          formData.append('boq_files', f);
+        }
+      }
+
+      const csrfToken = this._getCsrfToken();
+      const resp = await fetch('/import-dialog/import/details/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        body: formData,
+      });
+
+      const result = await resp.json();
+      if (!result.success) {
+        const messages = Object.entries(result.errors || {})
+          .map(([field, msg]) => `${field}: ${msg}`)
+          .join('\n');
+        throw new Error(messages || 'Validation failed for Building Details tab.');
+      }
+    },
+
+    async _submitTab3() {
+      if (!window.importState.building_uuid) {
+        throw new Error('Building UUID missing — Tab 1 must be submitted first.');
+      }
+      if (!window.importState.tab3) return; // Tab 3 is optional — skip if not parsed
+
+      const csrfToken = this._getCsrfToken();
+      const t3 = window.importState.tab3;
+
+      const resp = await fetch('/import-dialog/import/operational-schedule/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          building_uuid:            window.importState.building_uuid,
+          num_residents:            t3.num_residents,
+          hours_per_workday:        t3.hours_per_workday,
+          workdays_per_week:        t3.workdays_per_week,
+          weeks_per_year:           t3.weeks_per_year,
+          heating_temp:             t3.heating_temp,
+          heating_temp_unit:        t3.heating_temp_unit,
+          cooling_temp:             t3.cooling_temp,
+          cooling_temp_unit:        t3.cooling_temp_unit,
+          renewable_energy_percent: t3.renewable_energy_percent,
+          building_smart_system:    t3.building_smart_system,
+        }),
+      });
+
+      const result = await resp.json();
+      if (!result.success) {
+        const messages = Object.entries(result.errors || {})
+          .map(([field, msg]) => `${field}: ${msg}`)
+          .join('\n');
+        throw new Error(messages || 'Validation failed for Operational Schedule & Temperature tab.');
+      }
+    },
+
+    async _submitCoolingSystems() {
+      if (!window.importState.building_uuid) {
+        throw new Error('Building UUID missing — Tab 1 must be submitted first.');
+      }
+      const systems = window.importState.coolingSystems;
+      // Cooling is optional — if nothing was parsed, skip silently
+      if (!systems || systems.length === 0) return;
+
+      const csrfToken = this._getCsrfToken();
+      const resp = await fetch('/import-dialog/import/cooling-systems/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          building_uuid: window.importState.building_uuid,
+          systems: systems,
+        }),
+      });
+
+      const result = await resp.json();
+      if (!result.success) {
+        // Format errors: each key is "Tab name row N"
+        const messages = Object.entries(result.errors || {})
+          .map(([location, fieldErrors]) => {
+            const fieldMsgs = Object.entries(fieldErrors)
+              .map(([f, errs]) => `  ${f}: ${Array.isArray(errs) ? errs.join(', ') : errs}`)
+              .join('\n');
+            return `${location}:\n${fieldMsgs}`;
+          })
+          .join('\n\n');
+        throw new Error(messages || 'Validation failed for cooling system tabs.');
+      }
+    },
+
+    async _submitVentilationSystems() {
+      if (!window.importState.building_uuid) {
+        throw new Error('Building UUID missing — Tab 1 must be submitted first.');
+      }
+      const systems = window.importState.ventilationSystems;
+      // Ventilation is optional — skip silently if nothing was parsed
+      if (!systems || systems.length === 0) return;
+
+      const csrfToken = this._getCsrfToken();
+      const resp = await fetch('/import-dialog/import/ventilation-systems/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          building_uuid: window.importState.building_uuid,
+          systems: systems,
+        }),
+      });
+
+      const result = await resp.json();
+      if (!result.success) {
+        const messages = Object.entries(result.errors || {})
+          .map(([location, fieldErrors]) => {
+            const fieldMsgs = Object.entries(fieldErrors)
+              .map(([f, errs]) => `  ${f}: ${Array.isArray(errs) ? errs.join(', ') : errs}`)
+              .join('\n');
+            return `${location}:\n${fieldMsgs}`;
+          })
+          .join('\n\n');
+        throw new Error(messages || 'Validation failed for ventilation system tabs.');
+      }
+    },
+
+    async _submitLightingSystems() {
+      if (!window.importState.building_uuid) {
+        throw new Error('Building UUID missing — Tab 1 must be submitted first.');
+      }
+      const systems = window.importState.lightingSystems;
+      // Lighting is optional — skip silently if nothing was parsed
+      if (!systems || systems.length === 0) return;
+
+      const csrfToken = this._getCsrfToken();
+      const resp = await fetch('/import-dialog/import/lighting-systems/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          building_uuid: window.importState.building_uuid,
+          systems: systems,
+        }),
+      });
+
+      const result = await resp.json();
+      if (!result.success) {
+        const messages = Object.entries(result.errors || {})
+          .map(([location, fieldErrors]) => {
+            const fieldMsgs = Object.entries(fieldErrors)
+              .map(([f, errs]) => `  ${f}: ${Array.isArray(errs) ? errs.join(', ') : errs}`)
+              .join('\n');
+            return `${location}:\n${fieldMsgs}`;
+          })
+          .join('\n\n');
+        throw new Error(messages || 'Validation failed for lighting system tabs.');
+      }
+    },
+
+    async _submitLiftEscalator() {
+      if (!window.importState.building_uuid) {
+        throw new Error('Building UUID missing — Tab 1 must be submitted first.');
+      }
+      const rows = window.importState.liftEscalator;
+      // Lift & Escalator is optional — skip silently if nothing was parsed
+      if (!rows || rows.length === 0) return;
+
+      const csrfToken = this._getCsrfToken();
+      const resp = await fetch('/import-dialog/import/lift-escalator/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          building_uuid: window.importState.building_uuid,
+          rows: rows,
+        }),
+      });
+
+      const result = await resp.json();
+      if (!result.success) {
+        const messages = Object.entries(result.errors || {})
+          .map(([k, v]) => Array.isArray(v) ? v.join(', ') : String(v))
+          .join('\n');
+        throw new Error(messages || 'Validation failed for lift & escalator system.');
+      }
+    },
+
+    async _submitHotWaterSystems() {
+      if (!window.importState.building_uuid) {
+        throw new Error('Building UUID missing — Tab 1 must be submitted first.');
+      }
+      const systems = window.importState.hotWaterSystems;
+      // Hot water is optional — skip silently if nothing was parsed
+      if (!systems || systems.length === 0) return;
+
+      const csrfToken = this._getCsrfToken();
+      const resp = await fetch('/import-dialog/import/hot-water-systems/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          building_uuid: window.importState.building_uuid,
+          systems: systems,
+        }),
+      });
+
+      const result = await resp.json();
+      if (!result.success) {
+        const messages = Object.entries(result.errors || {})
+          .map(([location, fieldErrors]) => {
+            const fieldMsgs = Object.entries(fieldErrors)
+              .map(([f, errs]) => `  ${f}: ${Array.isArray(errs) ? errs.join(', ') : errs}`)
+              .join('\n');
+            return `${location}:\n${fieldMsgs}`;
+          })
+          .join('\n\n');
+        throw new Error(messages || 'Validation failed for hot water system tabs.');
+      }
+    },
+
+    async _submitEnergyCarriers() {
+      if (!window.importState.building_uuid) {
+        throw new Error('Building UUID missing — Tab 1 must be submitted first.');
+      }
+      const rows = window.importState.energyCarriers;
+      if (!rows || rows.length === 0) return;
+
+      const csrfToken = this._getCsrfToken();
+      const resp = await fetch('/import-dialog/import/energy-carriers/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+        body: JSON.stringify({ building_uuid: window.importState.building_uuid, rows }),
+      });
+
+      const result = await resp.json();
+      if (!result.success) {
+        const messages = Object.entries(result.errors || {})
+          .map(([location, fieldErrors]) => {
+            if (typeof fieldErrors === 'string') return `${location}: ${fieldErrors}`;
+            const fieldMsgs = Object.entries(fieldErrors)
+              .map(([f, errs]) => `  ${f}: ${Array.isArray(errs) ? errs.join(', ') : errs}`)
+              .join('\n');
+            return `${location}:\n${fieldMsgs}`;
+          })
+          .join('\n\n');
+        throw new Error(messages || 'Validation failed for operational energy carriers.');
+      }
+    },
+
+    async _submitStructuralComponents() {
+      if (!window.importState.building_uuid) {
+        throw new Error('Building UUID missing — Tab 1 must be submitted first.');
+      }
+      const rows = window.importState.structuralComponents;
+      if (!rows || rows.length === 0) return;
+
+      const csrfToken = this._getCsrfToken();
+      const resp = await fetch('/import-dialog/import/structural-components/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+        body: JSON.stringify({ building_uuid: window.importState.building_uuid, rows }),
+      });
+
+      const result = await resp.json();
+      if (!result.success) {
+        const messages = Object.entries(result.errors || {})
+          .map(([location, fieldErrors]) => {
+            if (typeof fieldErrors === 'string') return `${location}: ${fieldErrors}`;
+            const fieldMsgs = Object.entries(fieldErrors)
+              .map(([f, errs]) => `  ${f}: ${Array.isArray(errs) ? errs.join(', ') : errs}`)
+              .join('\n');
+            return `${location}:\n${fieldMsgs}`;
+          })
+          .join('\n\n');
+        throw new Error(messages || 'Validation failed for structural components.');
+      }
+    },
+
+    // UI helpers
+    _setNextLoading(loading, label) {
+      const nextBtn = document.getElementById('import-next-btn');
+      const nextLabel = document.getElementById('import-next-label');
+      if (!nextBtn) return;
+      nextBtn.disabled = loading;
+      if (nextLabel) nextLabel.textContent = loading ? label : (this.steps[this.currentStep].nextLabel || 'Continue');
+      // Show/hide spinner
+      let spinner = nextBtn.querySelector('.btn-spinner');
+      if (loading && !spinner) {
+        spinner = document.createElement('span');
+        spinner.className = 'btn-spinner loading loading-spinner loading-xs';
+        nextBtn.insertBefore(spinner, nextBtn.firstChild);
+      } else if (!loading && spinner) {
+        spinner.remove();
+      }
+    },
+
+    _showError(message) {
+      this._clearError();
+      const banner = document.createElement('div');
+      banner.id = 'import-step-error';
+      banner.className = 'mx-5 mb-3 flex items-start gap-3 py-3 px-4 bg-[var(--state--error--lighter)] rounded-lg text-sm';
+      banner.innerHTML = `
+        <span data-icon="close-circle-fill" data-size="18" class="text-[var(--state--error--base)] shrink-0 mt-0.5"></span>
+        <span class="text-[var(--text--strong-950)] whitespace-pre-line">${this._escapeHtml(message)}</span>
+      `;
+      const footer = document.getElementById('import-footer');
+      if (footer) footer.insertAdjacentElement('beforebegin', banner);
+      if (window.IconComponent) window.IconComponent.initialize();
+    },
+
+    _clearError() {
+      const existing = document.getElementById('import-step-error');
+      if (existing) existing.remove();
+    },
+
+    _escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    },
+
+    _getCsrfToken() {
+      const cookie = document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='));
+      return cookie ? cookie.split('=')[1].trim() : '';
+    },
+
+    async _loadXLSX() {
+      if (window.XLSX) return window.XLSX;
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+        script.onload = () => resolve(window.XLSX);
+        script.onerror = () => reject(new Error('Could not load the Excel parser library. Check your internet connection.'));
+        document.head.appendChild(script);
+      });
+    },
   };
 
-  // Auto-init when the dialog opens or HTMX loads it
+  // Auto-init when dialog is opened via HTMX
   document.body.addEventListener('htmx:afterOnLoad', function (evt) {
     if (evt.detail.target.id === 'import_dialog') {
       window.importStepper.init();
     }
   });
 
-  // Fallback init
+  // Fallback init on direct page load
   if (document.getElementById('import-stepper')) {
     window.importStepper.init();
   }

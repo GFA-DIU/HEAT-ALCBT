@@ -1,8 +1,9 @@
+{% load static %}
 <div class="flex-1 size-full flex flex-col items-center justify-center gap-4 py-5">
   <div class="sapce-y-0.5 text-center max-w-70 text-[var(--text--strong-950)]">
     <h6 class="h6-title">Upload Your Data File</h6>
     <p class="paragraph-small">
-      Supported format : CSV, Excel (.xlsx, .xls)
+      Supported format: Excel (.xlsx, .xls)
     </p>
   </div>
 
@@ -12,7 +13,7 @@
 
   <p class="paragraph-small text-[var(--text--strong-950)]">
     Need a template?
-    <a href="#" class="text-[var(--state--information--base)] underline cursor-pointer">
+    <a href="{% static 'docs/import-template.xlsx' %}" download class="text-[var(--state--information--base)] underline cursor-pointer">
       Download sample template
     </a>
   </p>
@@ -30,7 +31,7 @@
     <div class="space-y-1.5 text-center">
       <p class="paragraph-small text-[var(--text--strong-950)]">Choose a file or drag & drop it here.</p>
       <p class="paragraph-x-small text-[var(--text--sub-600)]">
-        CSV and Excel up to 50 MB.
+        Excel (.xlsx, .xls) up to 50 MB.
       </p>
     </div>
 
@@ -38,51 +39,49 @@
       onclick="document.getElementById('file-upload').click()">
       Browse file
     </button>
-    <input type="file" id="file-upload" class="hidden" accept=".csv,.xlsx,.xls" onchange="handleFileSelect(event)" />
+    <input type="file" id="file-upload" class="hidden" accept=".xlsx,.xls" onchange="handleFileSelect(event)" />
   </div>
 </template>
 
-<!-- State 2: File Uploading / Selected -->
+<!-- State 2: File Selected -->
 <template id="template-upload-file">
   <div class="w-full max-w-[25rem] border border-[var(--stroke--sub-300)] rounded-[0.75rem] p-4 space-y-4">
     <div class="flex items-start justify-between gap-3">
-      <span data-icon="file-csv" data-size="40" id="file-icon-placeholder"></span>
+      <span data-icon="file-xlsx" data-size="40" id="file-icon-placeholder"></span>
 
       <div class="space-y-1 flex-1 min-w-0">
-        <p class="label-small text-[var(--text--strong-950)] truncate" id="file-name">example.csv</p>
+        <p class="label-small text-[var(--text--strong-950)] truncate" id="file-name">example.xlsx</p>
 
         <p class="paragraph-x-small text-[var(--text--sub-600)] inline-flex items-center gap-1" id="status-container">
-          <!-- Content injected via JS -->
-          <span id="size-text">0 KB of 0 KB • </span>
-          <span class="text-[var(--color-primary)] inline-flex items-center gap-1" id="status-wrapper">
-            <span data-icon="loader-2-fill" data-size="16" class="animate-spin"></span>
-            <span class="text-[var(--text--strong-950)]">Uploading...</span>
+          <span id="size-text"></span>
+          <span class="inline-flex items-center gap-1" id="status-wrapper">
+            <span data-icon="select-box-circle-fill" data-size="16" class="text-[var(--state--success--base)]"></span>
+            <span class="text-[var(--text--strong-950)]">Ready</span>
           </span>
         </p>
       </div>
 
       <button class="btn btn-ghost btn-sm btn-square size-8 min-h-0" onclick="resetUpload()" id="cancel-upload-btn">
-        <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
+        <span data-icon="delete-bin-5-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
     </div>
-
-    <progress id="upload-progress" class="progress progress-primary w-full" value="0" max="100"></progress>
   </div>
 </template>
 
 <script>
-  // Simple file upload logic
   (function () {
     const container = document.getElementById('upload-component');
     const emptyTemplate = document.getElementById('template-upload-empty');
 
-    // Initialize with empty state (if not already populated)
     if (container && emptyTemplate && !container.textContent.trim()) {
-      container.innerHTML = emptyTemplate.innerHTML;
-      if (window.IconComponent) window.IconComponent.initialize();
+      // If a file was already selected (user navigated back), restore it
+      if (window.importState && window.importState.file) {
+        renderFileReady(window.importState.file);
+      } else {
+        container.innerHTML = emptyTemplate.innerHTML;
+        if (window.IconComponent) window.IconComponent.initialize();
+      }
     }
-
-    // --- Global Helpers (attached to window for event attributes) ---
 
     window.handleDragEnter = (e) => {
       e.preventDefault();
@@ -96,15 +95,12 @@
       if (zone) zone.classList.remove('bg-[var(--bg--weak-50)]');
     };
 
-    window.handleDragOver = (e) => {
-      e.preventDefault();
-    };
+    window.handleDragOver = (e) => { e.preventDefault(); };
 
     window.handleDrop = (e) => {
       e.preventDefault();
       const zone = e.currentTarget;
       if (zone) zone.classList.remove('bg-[var(--bg--weak-50)]');
-
       const files = e.dataTransfer.files;
       if (files.length > 0) processFile(files[0]);
     };
@@ -115,82 +111,52 @@
     };
 
     window.resetUpload = () => {
-      const container = document.getElementById('upload-component');
-      const emptyTemplate = document.getElementById('template-upload-empty');
-      if (container && emptyTemplate) {
-        container.innerHTML = emptyTemplate.innerHTML;
+      if (window.importState) {
+        window.importState.file = null;
+        window.importState.building_uuid = null;
+      }
+      const c = document.getElementById('upload-component');
+      const t = document.getElementById('template-upload-empty');
+      if (c && t) {
+        c.innerHTML = t.innerHTML;
         if (window.IconComponent) window.IconComponent.initialize();
       }
+      // Disable the Continue button until a file is selected again
+      const nextBtn = document.getElementById('import-next-btn');
+      if (nextBtn) nextBtn.disabled = true;
     };
 
-    // --- Internal Logic ---
-
     function processFile(file) {
-      const container = document.getElementById('upload-component');
-      const fileTemplate = document.getElementById('template-upload-file');
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!['xlsx', 'xls'].includes(ext)) {
+        alert('Only Excel files (.xlsx, .xls) are supported.');
+        return;
+      }
+      // Store file in shared import state
+      if (!window.importState) window.importState = {};
+      window.importState.file = file;
 
-      if (!container || !fileTemplate) return;
+      renderFileReady(file);
 
-      // Render File Template
-      container.innerHTML = fileTemplate.innerHTML;
+      // Enable the Continue button
+      const nextBtn = document.getElementById('import-next-btn');
+      if (nextBtn) nextBtn.disabled = false;
+    }
 
-      // Update File Name
-      const nameEl = container.querySelector('#file-name');
+    function renderFileReady(file) {
+      const c = document.getElementById('upload-component');
+      const t = document.getElementById('template-upload-file');
+      if (!c || !t) return;
+
+      c.innerHTML = t.innerHTML;
+
+      const nameEl = c.querySelector('#file-name');
       if (nameEl) nameEl.textContent = file.name;
 
-      // Update File Icon
-      const icon = file.name.endsWith('.csv') ? 'file-csv' : 'file-xlsx';
-      const iconEl = container.querySelector('#file-icon-placeholder');
-      if (iconEl) iconEl.setAttribute('data-icon', icon);
-
-      // Initial Status State
-      const sizeStr = (file.size / 1024).toFixed(1) + ' KB';
-
-      const sizeText = container.querySelector('#size-text');
-      if (sizeText) sizeText.textContent = `0 KB of ${sizeStr} • `;
+      const sizeText = c.querySelector('#size-text');
+      if (sizeText) sizeText.textContent = (file.size / 1024).toFixed(1) + ' KB • ';
 
       if (window.IconComponent) window.IconComponent.initialize();
-
-      // Mock Upload Progress
-      const progress = container.querySelector('#upload-progress');
-      const statusWrapper = container.querySelector('#status-wrapper');
-      const cancelBtn = container.querySelector('#cancel-upload-btn');
-
-      let percent = 0;
-
-      const interval = setInterval(() => {
-        percent += 5;
-        if (progress) progress.value = percent;
-
-        // Update size text dynamically
-        if (sizeText) {
-          const currentSize = ((file.size * (percent / 100)) / 1024).toFixed(1) + ' KB';
-          sizeText.textContent = `${currentSize} of ${sizeStr} • `;
-        }
-
-        if (percent >= 100) {
-          clearInterval(interval);
-
-          // --- Completion State ---
-
-          // 1. Update Status Text & Icon
-          if (statusWrapper) {
-            statusWrapper.innerHTML = `
-              <span data-icon="select-box-circle-fill" data-size="16" class="text-[var(--state--success--base)]"></span>
-              <span class="text-[var(--text--strong-950)]">Completed</span>
-            `;
-            statusWrapper.className = "inline-flex items-center gap-1";
-          }
-
-          // 2. Change Cancel Button to Delete Icon
-          if (cancelBtn) {
-            cancelBtn.innerHTML = `<span data-icon="delete-bin-5-line" data-size="16" data-color="var(--icon--sub-600)"></span>`;
-          }
-
-          // Re-init new icons
-          if (window.IconComponent) window.IconComponent.initialize();
-        }
-      }, 150);
     }
   })();
 </script>

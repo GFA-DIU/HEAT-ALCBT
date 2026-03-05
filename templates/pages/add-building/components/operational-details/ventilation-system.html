@@ -524,7 +524,7 @@
 
     // Recalculate power_input from airflow when all three inputs are present
     if (!isNaN(airflow) && !isNaN(eff) && !isNaN(units) && airflow > 0 && units > 0) {
-      if (powerEl) powerEl.value = ((airflow * eff * units) / 1000).toFixed(4);
+      if (powerEl) powerEl.value = ((airflow * eff * units) / 1000).toFixed(2);
     }
 
     // Recalculate annual energy
@@ -548,7 +548,7 @@
     var vsdFactor = (vsdEl && vsdEl.value === 'yes') ? 0.80 : 1.00;
     var dcvFactor = (dcvEl && dcvEl.value === 'yes') ? 0.70 : 1.00;
 
-    energyEl.value = (power * hrs * days * weeks * vsdFactor * dcvFactor).toFixed(2);
+    energyEl.value = (power * hrs * days * weeks * vsdFactor * dcvFactor).toFixed(3);
   };
 
   // FCU / Cassette / Fan: annual_energy = power_input × h × d × w
@@ -570,7 +570,7 @@
       energyEl.value = '';
       return;
     }
-    energyEl.value = (power * hrs * days * weeks).toFixed(2);
+    energyEl.value = (power * hrs * days * weeks).toFixed(3);
   };
 
   var VENT_CLIMATE_ZONE = "{{ climate_zone }}";

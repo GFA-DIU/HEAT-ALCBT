@@ -22,7 +22,9 @@ class LiftEscalatorSystem(models.Model):
         verbose_name=_("Installation of VVVF and Sleep Mode"), default=False
     )
 
-    annual_energy_consumption_kwh = models.PositiveIntegerField(
+    annual_energy_consumption_kwh = models.DecimalField(
+        max_digits=12,
+        decimal_places=3,
         null=True,
         blank=True,
         verbose_name=_("Annual Lift System Energy Consumption (kWh/year)"),

@@ -119,7 +119,9 @@ class HotWaterSystem(models.Model):
         db_column="power_input_kw",
     )
 
-    total_energy_consumption_kwh_per_year = models.PositiveIntegerField(
+    total_energy_consumption_kwh_per_year = models.DecimalField(
+        max_digits=12,
+        decimal_places=3,
         null=True,
         blank=True,
         verbose_name=_("Total Energy Consumption Annually (kWh/year)"),

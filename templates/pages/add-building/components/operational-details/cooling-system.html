@@ -1483,14 +1483,14 @@
 
     if (power > 0) {
       // Use power input per unit path
-      energyEl.value = (power * units * hrs * days * weeks).toFixed(2);
+      energyEl.value = (power * units * hrs * days * weeks).toFixed(3);
     } else {
       // Use capacity / EER path
       var eer = parseFloat(eerEl && eerEl.value) || 0;
       var unit = unitEl ? unitEl.value : 'kw';
       var cap  = capacityToKw(parseFloat(capEl && capEl.value) || 0, unit);
       if (cap > 0 && eer > 0) {
-        energyEl.value = ((cap * units / eer) * hrs * days * weeks).toFixed(2);
+        energyEl.value = ((cap * units / eer) * hrs * days * weeks).toFixed(3);
       } else {
         energyEl.value = '';
       }
@@ -1516,7 +1516,7 @@
     var days  = parseFloat(daysEl.value)  || 0;
     var weeks = parseFloat(weeksEl.value) || 0;
     if (load > 0 && units > 0 && eff > 0 && hrs > 0 && days > 0 && weeks > 0) {
-      energyEl.value = (load * units * eff * hrs * days * weeks).toFixed(2);
+      energyEl.value = (load * units * eff * hrs * days * weeks).toFixed(3);
     } else {
       energyEl.value = '';
     }
@@ -1547,7 +1547,7 @@
     var vsdFactor = (vsdEl && vsdEl.value === 'yes') ? 0.80 : 1.00;
     var hrFactor  = (hrEl  && hrEl.value  === 'yes') ? 0.70 : 1.00;
     if (load > 0 && units > 0 && eff > 0 && hrs > 0 && days > 0 && weeks > 0) {
-      energyEl.value = (load * units * eff * hrs * days * weeks * vsdFactor * hrFactor).toFixed(2);
+      energyEl.value = (load * units * eff * hrs * days * weeks * vsdFactor * hrFactor).toFixed(3);
     } else {
       energyEl.value = '';
     }

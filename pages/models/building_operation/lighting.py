@@ -100,7 +100,9 @@ class LightingSystem(models.Model):
         verbose_name=_("Installation of Sensors"), default=False
     )
 
-    total_energy_consumption_kwh_per_year = models.PositiveIntegerField(
+    total_energy_consumption_kwh_per_year = models.DecimalField(
+        max_digits=12,
+        decimal_places=3,
         null=True,
         blank=True,
         verbose_name=_(
