@@ -126,5 +126,12 @@ def _delete_building(building_id):
     
     
     building_to_delete = get_object_or_404(Building, id=building_id)
+
+    # Delete certification file and BoQ files from storage before deleting the building
+    if building_to_delete.certification_file:
+        building_to_delete.certification_file.delete(save=False)
+    for boq in building_to_delete.boq_files.all():
+        boq.file.delete(save=False)
+
     building_to_delete.delete()
     logger.info("Successfully deleted building '%s' from list", building_to_delete)
