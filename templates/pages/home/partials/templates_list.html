@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 
 <div id="templates-list">
   <ul class="grid grid-cols-1 gap-2.75 mt-6">
@@ -42,7 +43,7 @@
             {% with first_product=assembly.structuralproduct_set.first %}
               {% if first_product %}
                 <span class="badge gap-0 text-xs/4 py-1 px-2 font-medium">
-                  Quantity: {{ first_product.quantity|floatformat:2 }}{{ assembly.get_dimension_display }}
+                  {% translate "Quantity:" %} {{ first_product.quantity|floatformat:2 }}{{ assembly.get_dimension_display }}
                 </span>
               {% endif %}
             {% endwith %}
@@ -55,7 +56,7 @@
                   data-size="16"
                   data-color="var(--icon--soft-400)"
                 ></span>
-                System component
+                {% translate "System component" %}
               </span>
             {% else %}
               <span class="badge text-xs/4 py-1 px-2 font-medium gap-1">
@@ -64,13 +65,13 @@
                   data-size="16"
                   data-color="var(--icon--soft-400)"
                 ></span>
-                My component
+                {% translate "My component" %}
               </span>
             {% endif %}
             <button
               class="btn size-5 btn-ghost p-0"
               onclick="viewTemplate('{{ assembly.id }}')"
-              title="View details"
+              title="{% translate 'View details' %}"
             >
               <span
                 data-icon="eye-line"
@@ -81,7 +82,7 @@
             <button
               class="btn size-5 btn-ghost p-0"
               onclick="duplicateTemplate('{{ assembly.id }}')"
-              title="Duplicate template"
+              title="{% translate 'Duplicate template' %}"
             >
               <span
                 data-icon="file-copy-line"
@@ -92,7 +93,7 @@
             <button
               class="btn size-5 btn-ghost p-0"
               onclick="deleteTemplate('{{ assembly.id }}', '{{ assembly.name }}')"
-              title="Delete template"
+              title="{% translate 'Delete template' %}"
             >
               <span
                 data-icon="delete-bin-5-line"
@@ -107,13 +108,9 @@
       <section class="flex flex-col flex-1">
         <div class="flex flex-col flex-1 items-center justify-center gap-4">
           <img src="{% static 'assets/building.png' %}" alt="map" />
-          <span class="text-sm/5 font-medium text-center">No templates available</span>            
-            {% comment %} <button class="btn btn-outline rounded-lg" onclick="template_detail_modal.showModal()">
-              <span data-icon="add-large-fill"></span>
-              Add Template
-            </button> {% endcomment %}
+          <span class="text-sm/5 font-medium text-center">{% translate "No templates available" %}</span>
         </div>
-      </section> 
+      </section>
     {% endfor %}
   </ul>
 
@@ -133,7 +130,7 @@
         data-size="20"
         data-color="var(--icon--soft-400)"
       ></span>
-      Previous
+      {% translate "Previous" %}
     </button>
     <ul class="flex items-center gap-2">
       {% for num in page_obj.paginator.page_range %}
@@ -167,7 +164,7 @@
         disabled
       {% endif %}
     >
-      Next
+      {% translate "Next" %}
       <span
         data-icon="arrow-right"
         data-size="20"

@@ -1,17 +1,18 @@
+{% load i18n %}
 <div class="size-full flex flex-col items-center justify-center p-8">
 
   <!-- State 1: Importing -->
   <div id="process-loading" class="w-full max-w-[25.875rem] space-y-4">
     <div class="space-y-1">
       <div class="flex justify-between items-center gap-2">
-        <p class="label-small text-[var(--text--strong-950)]">Importing data</p>
+        <p class="label-small text-[var(--text--strong-950)]">{% translate "Importing data" %}</p>
         <span class="paragraph-x-small text-[var(--text--sub-600)]" id="process-percent">0%</span>
       </div>
       <progress id="process-progress" class="progress progress-success w-full" value="0" max="100"></progress>
     </div>
 
     <p class="label-small text-[var(--text--sub-600)] text-center">
-      Please wait while we process your file. Do not close this window
+      {% translate "Please wait while we process your file. Do not close this window" %}
     </p>
   </div>
 
@@ -23,16 +24,16 @@
     </div>
     <div class="space-y-2">
       <h6 class="h6-title text-[var(--text--strong-950)] font-bold">
-        Import complete!
+        {% translate "Import complete!" %}
       </h6>
       <p class="paragraph-small text-[var(--text--sub-600)] text-center">
-        Building have been successfully added to your database
+        {% translate "Building have been successfully added to your database" %}
       </p>
     </div>
 
     <!-- Final CTA -->
     <button class="btn btn-primary h-9 px-4 label-small" onclick="import_dialog.close(); window.location.href='/';">
-      Go to buildings
+      {% translate "Go to buildings" %}
     </button>
   </div>
 

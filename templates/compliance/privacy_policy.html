@@ -1,22 +1,23 @@
 {% extends 'compliance/_compliance-base.html' %}
+{% load i18n %}
 
-{% block title %}Privacy Policy{% endblock %}
+{% block title %}{% translate "Privacy Policy" %}{% endblock %}
 
 {% block content %}
 <div class="w-full max-w-[78.563rem] mx-auto px-4 py-8 lg:py-12">
 
   <!-- Page Header -->
   <div class="mb-8 lg:mb-12">
-    <h1 class="text-3xl lg:text-4xl font-bold text-[var(--text--main-900)] mb-3">Privacy Policy</h1>
+    <h1 class="text-3xl lg:text-4xl font-bold text-[var(--text--main-900)] mb-3">{% translate "Privacy Policy" %}</h1>
     <p class="text-base text-[var(--text--sub-600)] max-w-3xl">
-      Your privacy is important to us. This policy outlines how we collect, use, and protect your personal information.
+      {% translate "Your privacy is important to us. This policy outlines how we collect, use, and protect your personal information." %}
     </p>
   </div>
 
   <!-- Responsible Authority Section -->
   <div class="card bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl mb-6 overflow-hidden">
     <div class="card-body p-6 lg:p-8">
-      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-6">Responsible Authority</h2>
+      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-6">{% translate "Responsible Authority" %}</h2>
 
       <div class="grid md:grid-cols-2 gap-6">
         <div class="space-y-4">
@@ -41,17 +42,17 @@
 
         <div class="space-y-4">
           <div>
-            <h3 class="text-base font-semibold text-[var(--text--main-900)] mb-2">Data Protection Officer</h3>
+            <h3 class="text-base font-semibold text-[var(--text--main-900)] mb-2">{% translate "Data Protection Officer" %}</h3>
             <div class="text-sm text-[var(--text--sub-600)] leading-relaxed">
               <p>Susanne Eggers</p>
-              <p class="mt-2">Contact: <a href="mailto:datenschutz@gfa-group.de" class="link link-primary hover:underline">datenschutz@gfa-group.de</a></p>
+              <p class="mt-2">{% translate "Contact:" %} <a href="mailto:datenschutz@gfa-group.de" class="link link-primary hover:underline">datenschutz@gfa-group.de</a></p>
             </div>
           </div>
 
           <div>
-            <h3 class="text-base font-semibold text-[var(--text--main-900)] mb-2">Supervisory Authority</h3>
+            <h3 class="text-base font-semibold text-[var(--text--main-900)] mb-2">{% translate "Supervisory Authority" %}</h3>
             <div class="text-sm text-[var(--text--sub-600)] leading-relaxed">
-              <p>Data Protection Authority of Hessen</p>
+              <p>{% translate "Data Protection Authority of Hessen" %}</p>
               <p class="mt-2"><a href="https://datenschutz.hessen.de" target="_blank" rel="noopener noreferrer" class="link link-primary hover:underline">datenschutz.hessen.de</a></p>
             </div>
           </div>
@@ -63,16 +64,16 @@
   <!-- Data Privacy Section -->
   <div class="card bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl mb-6 overflow-hidden">
     <div class="card-body p-6 lg:p-8">
-      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">Data Privacy</h2>
+      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">{% translate "Data Privacy" %}</h2>
       <div class="prose max-w-none space-y-4">
         <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-          HEAT GmbH, which operates this website, takes the protection of your personal data very seriously. We treat your personal data confidentially in accordance with statutory data protection regulations and this Data Privacy Statement.
+          {% translate "HEAT GmbH, which operates this website, takes the protection of your personal data very seriously. We treat your personal data confidentially in accordance with statutory data protection regulations and this Data Privacy Statement." %}
         </p>
         <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-          Any personal data (for example name, address or email address) that is collected on our website is collected on a voluntary basis insofar as this is possible. This data will not be disclosed to any third party without your express consent.
+          {% translate "Any personal data (for example name, address or email address) that is collected on our website is collected on a voluntary basis insofar as this is possible. This data will not be disclosed to any third party without your express consent." %}
         </p>
         <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-          Please note that data transmission via the internet (e.g., in the case of communication by email) may be subject to security gaps. It is not possible to protect such data completely against access by third parties.
+          {% translate "Please note that data transmission via the internet (e.g., in the case of communication by email) may be subject to security gaps. It is not possible to protect such data completely against access by third parties." %}
         </p>
       </div>
     </div>
@@ -81,9 +82,9 @@
   <!-- Purpose of Data Collection -->
   <div class="card bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl mb-6 overflow-hidden">
     <div class="card-body p-6 lg:p-8">
-      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">Purpose of Data Collection, Processing, or Use</h2>
+      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">{% translate "Purpose of Data Collection, Processing, or Use" %}</h2>
       <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-        In the context of the Webtool, personal data is used to respond to requests or inquiries, customize the site for users (e.g. show locationally relevant information), operate and improve the site, including usage analysis and audits, protection against fraud, spam, harassment, intellectual property infringement, crime and security risks, and to maintain and improve the safety and security of the site.
+        {% translate "In the context of the Webtool, personal data is used to respond to requests or inquiries, customize the site for users (e.g. show locationally relevant information), operate and improve the site, including usage analysis and audits, protection against fraud, spam, harassment, intellectual property infringement, crime and security risks, and to maintain and improve the safety and security of the site." %}
       </p>
     </div>
   </div>
@@ -91,9 +92,9 @@
   <!-- Data Categories -->
   <div class="card bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl mb-6 overflow-hidden">
     <div class="card-body p-6 lg:p-8">
-      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">Description of Affected Groups and Their Related Data</h2>
+      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">{% translate "Description of Affected Groups and Their Related Data" %}</h2>
       <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-        Within the context of the Registration and Use of the Webtool, basic personal User information is collected, consisting of an email address, username, and voluntary city-level location information. Additionally, individuals without registration might submit personal information through support requests.
+        {% translate "Within the context of the Registration and Use of the Webtool, basic personal User information is collected, consisting of an email address, username, and voluntary city-level location information. Additionally, individuals without registration might submit personal information through support requests." %}
       </p>
     </div>
   </div>
@@ -101,9 +102,9 @@
   <!-- Data Deletion -->
   <div class="card bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl mb-6 overflow-hidden">
     <div class="card-body p-6 lg:p-8">
-      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">Standard Periods for the Deletion of Data</h2>
+      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">{% translate "Standard Periods for the Deletion of Data" %}</h2>
       <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-        Personal data is deleted on a regular basis when it is no longer needed to fulfill a contract, if the person in question has not provided their separate approval to retain said data or if statutory retention obligations and deadlines do not stipulate that data be retained for a longer period.
+        {% translate "Personal data is deleted on a regular basis when it is no longer needed to fulfill a contract, if the person in question has not provided their separate approval to retain said data or if statutory retention obligations and deadlines do not stipulate that data be retained for a longer period." %}
       </p>
     </div>
   </div>
@@ -111,9 +112,9 @@
   <!-- Third Country Transmission -->
   <div class="card bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl mb-6 overflow-hidden">
     <div class="card-body p-6 lg:p-8">
-      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">Planned Transmission of Data to Third Countries</h2>
+      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">{% translate "Planned Transmission of Data to Third Countries" %}</h2>
       <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-        In general, no personal data will be transmitted to third countries by electronic means. Exceptions to this are possible when there is a specific legal basis for such a transmission.
+        {% translate "In general, no personal data will be transmitted to third countries by electronic means. Exceptions to this are possible when there is a specific legal basis for such a transmission." %}
       </p>
     </div>
   </div>
@@ -121,20 +122,20 @@
   <!-- Your Rights -->
   <div class="card bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl mb-6 overflow-hidden">
     <div class="card-body p-6 lg:p-8">
-      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">Your Rights</h2>
+      <h2 class="text-xl lg:text-2xl font-semibold text-[var(--text--main-900)] mb-4">{% translate "Your Rights" %}</h2>
       <div class="space-y-4">
         <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-          You may at any time request information about the use of your personal data (according to § 15 DSGVO) or request the verification, correction or deletion of your personal data (§§ 16 and 17 DSGVO). You may also at any time request the restriction of the use or processing of your personal data (§§ 18 and 19 DSGVO), request the transmission of your personal data to third parties (§ 20 DSGVO), or object to the use of your personal data (§ 21 DSGVO).
+          {% translate "You may at any time request information about the use of your personal data (according to § 15 DSGVO) or request the verification, correction or deletion of your personal data (§§ 16 and 17 DSGVO). You may also at any time request the restriction of the use or processing of your personal data (§§ 18 and 19 DSGVO), request the transmission of your personal data to third parties (§ 20 DSGVO), or object to the use of your personal data (§ 21 DSGVO)." %}
         </p>
         <div class="bg-[var(--bg--base-700)] rounded-lg p-4">
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            If you want to exercise any of the above-mentioned rights, please send an email to:
+            {% blocktranslate %}If you want to exercise any of the above-mentioned rights, please send an email to:
             <a href="mailto:datenschutz@gfa-group.de" class="link link-primary font-semibold hover:underline">datenschutz@gfa-group.de</a>.
-            We will endeavor to take the necessary measures as soon as possible. To that purpose, you will receive an access form to be completed, allowing you to indicate which rights you wish to exercise with regard to your personal data.
+            We will endeavor to take the necessary measures as soon as possible. To that purpose, you will receive an access form to be completed, allowing you to indicate which rights you wish to exercise with regard to your personal data.{% endblocktranslate %}
           </p>
         </div>
         <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-          You also have the right to file a complaint against the use of your personal data. The competent complaints board is the Data Protection Supervisory Authority (Datenschutzaufsichtsbehörde) of Hessen.
+          {% translate "You also have the right to file a complaint against the use of your personal data. The competent complaints board is the Data Protection Supervisory Authority (Datenschutzaufsichtsbehörde) of Hessen." %}
         </p>
       </div>
     </div>
@@ -147,12 +148,12 @@
     <div class="collapse collapse-arrow bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl">
       <input type="checkbox" />
       <div class="collapse-title text-lg font-semibold text-[var(--text--main-900)]">
-        Web Fonts
+        {% translate "Web Fonts" %}
       </div>
       <div class="collapse-content">
         <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-          This site uses Bootstrap 5, which relies on native Browser fonts. For further details, see
-          <a href="https://getbootstrap.com/docs/5.0/content/reboot/#native-font-stack" target="_blank" rel="noopener noreferrer" class="link link-primary hover:underline">Bootstrap Native Font Stack</a>.
+          {% blocktranslate %}This site uses Bootstrap 5, which relies on native Browser fonts. For further details, see
+          <a href="https://getbootstrap.com/docs/5.0/content/reboot/#native-font-stack" target="_blank" rel="noopener noreferrer" class="link link-primary hover:underline">Bootstrap Native Font Stack</a>.{% endblocktranslate %}
         </p>
       </div>
     </div>
@@ -161,22 +162,22 @@
     <div class="collapse collapse-arrow bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl">
       <input type="checkbox" />
       <div class="collapse-title text-lg font-semibold text-[var(--text--main-900)]">
-        Data Privacy Regarding the Use of OpenStreetMap
+        {% translate "Data Privacy Regarding the Use of OpenStreetMap" %}
       </div>
       <div class="collapse-content">
         <div class="space-y-4">
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            This site uses the map service OpenStreetMap. The provider is the OpenStreetMap Foundation, St John's Innovation Centre, Cowley Road, Cambridge, CB4 0WS, United Kingdom (short OSMF).
+            {% translate "This site uses the map service OpenStreetMap. The provider is the OpenStreetMap Foundation, St John's Innovation Centre, Cowley Road, Cambridge, CB4 0WS, United Kingdom (short OSMF)." %}
           </p>
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            To use the functions of OpenStreetMap, it is necessary to store your IP address. This information is transferred to one of the OpenStreetMap servers located in either United Kingdom, Ireland, and the Netherlands. The provider of this site has no influence on this data transmission.
+            {% translate "To use the functions of OpenStreetMap, it is necessary to store your IP address. This information is transferred to one of the OpenStreetMap servers located in either United Kingdom, Ireland, and the Netherlands. The provider of this site has no influence on this data transmission." %}
           </p>
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            The use of OpenStreetMap is in the interest of an appealing presentation of our online offers and an easy location of the places indicated by us on the website. This represents a legitimate interest within the meaning of Art. 6 para. 1 lit. f DSGVO.
+            {% translate "The use of OpenStreetMap is in the interest of an appealing presentation of our online offers and an easy location of the places indicated by us on the website. This represents a legitimate interest within the meaning of Art. 6 para. 1 lit. f DSGVO." %}
           </p>
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            More information on the handling of user data can be found in OSMF's Privacy Policy:
-            <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer" class="link link-primary hover:underline">wiki.osmfoundation.org/wiki/Privacy_Policy</a>
+            {% blocktranslate %}More information on the handling of user data can be found in OSMF's Privacy Policy:
+            <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer" class="link link-primary hover:underline">wiki.osmfoundation.org/wiki/Privacy_Policy</a>{% endblocktranslate %}
           </p>
         </div>
       </div>
@@ -186,23 +187,23 @@
     <div class="collapse collapse-arrow bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl">
       <input type="checkbox" />
       <div class="collapse-title text-lg font-semibold text-[var(--text--main-900)]">
-        Server Log Files
+        {% translate "Server Log Files" %}
       </div>
       <div class="collapse-content">
         <div class="space-y-4">
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            The provider of this website automatically collects and stores information in so-called server log files which your browser automatically transmits to us.
+            {% translate "The provider of this website automatically collects and stores information in so-called server log files which your browser automatically transmits to us." %}
           </p>
-          <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed font-semibold">This information includes:</p>
+          <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed font-semibold">{% translate "This information includes:" %}</p>
           <ul class="list-disc list-inside text-sm lg:text-base text-[var(--text--sub-600)] space-y-2 ml-4">
-            <li>Browser type/browser version</li>
-            <li>Operating system being used</li>
-            <li>Referrer URL</li>
-            <li>Host name of accessing computer</li>
-            <li>Time of server request</li>
+            <li>{% translate "Browser type/browser version" %}</li>
+            <li>{% translate "Operating system being used" %}</li>
+            <li>{% translate "Referrer URL" %}</li>
+            <li>{% translate "Host name of accessing computer" %}</li>
+            <li>{% translate "Time of server request" %}</li>
           </ul>
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            The data thus collected cannot be connected to a specific person. The data is not merged or compared with data from other sources. We reserve the right to subsequently examine this data if concrete evidence of unlawful use is made known to us.
+            {% translate "The data thus collected cannot be connected to a specific person. The data is not merged or compared with data from other sources. We reserve the right to subsequently examine this data if concrete evidence of unlawful use is made known to us." %}
           </p>
         </div>
       </div>
@@ -212,18 +213,18 @@
     <div class="collapse collapse-arrow bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl">
       <input type="checkbox" />
       <div class="collapse-title text-lg font-semibold text-[var(--text--main-900)]">
-        Cookies
+        {% translate "Cookies" %}
       </div>
       <div class="collapse-content">
         <div class="space-y-4">
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            Parts of this website use so-called cookies. Cookies will not harm your computer and do not contain any virus. Cookies are used to make our offer more user-friendly, effective, and safe. Cookies are small text files that are stored on your computer and saved by your browser.
+            {% translate "Parts of this website use so-called cookies. Cookies will not harm your computer and do not contain any virus. Cookies are used to make our offer more user-friendly, effective, and safe. Cookies are small text files that are stored on your computer and saved by your browser." %}
           </p>
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            We only use necessary technical cookies, such as so-called "session cookies". Session cookies are automatically deleted at the end of your visit. Other cookies are stored on your computer until you delete them. These cookies make it possible for us to recognize your browser the next time you visit our website.
+            {% translate "We only use necessary technical cookies, such as so-called \"session cookies\". Session cookies are automatically deleted at the end of your visit. Other cookies are stored on your computer until you delete them. These cookies make it possible for us to recognize your browser the next time you visit our website." %}
           </p>
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            The data is processed according to Art. 6 paragraph 1 (f) of the EU General Data Protection Regulation (GDPR) with the legitimate interest of analyzing usage to improve the company's website.
+            {% translate "The data is processed according to Art. 6 paragraph 1 (f) of the EU General Data Protection Regulation (GDPR) with the legitimate interest of analyzing usage to improve the company's website." %}
           </p>
         </div>
       </div>
@@ -233,11 +234,11 @@
     <div class="collapse collapse-arrow bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl">
       <input type="checkbox" />
       <div class="collapse-title text-lg font-semibold text-[var(--text--main-900)]">
-        Objection to Promotion Mail
+        {% translate "Objection to Promotion Mail" %}
       </div>
       <div class="collapse-content">
         <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-          The use of the contact information included in the Legal Notice to send unsolicited advertising and informational materials is herewith prohibited. The operators of this website expressly reserve the right to take legal steps in the event that unsolicited advertising materials are sent, specifically through spam email.
+          {% translate "The use of the contact information included in the Legal Notice to send unsolicited advertising and informational materials is herewith prohibited. The operators of this website expressly reserve the right to take legal steps in the event that unsolicited advertising materials are sent, specifically through spam email." %}
         </p>
       </div>
     </div>
@@ -246,16 +247,16 @@
     <div class="collapse collapse-arrow bg-base-100 border border-[var(--stroke--soft-200)] rounded-xl">
       <input type="checkbox" />
       <div class="collapse-title text-lg font-semibold text-[var(--text--main-900)]">
-        Heroku
+        {% translate "Heroku" %}
       </div>
       <div class="collapse-content">
         <div class="space-y-4">
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            GFA uses the service provider Heroku, a Salesforce company. Heroku processes your data on behalf of GFA on secure servers within the EU.
+            {% translate "GFA uses the service provider Heroku, a Salesforce company. Heroku processes your data on behalf of GFA on secure servers within the EU." %}
           </p>
           <p class="text-sm lg:text-base text-[var(--text--sub-600)] leading-relaxed">
-            For more details, please refer to the data protection provisions of Heroku at:
-            <a href="https://devcenter.heroku.com/articles/security-privacy-compliance/" target="_blank" rel="noopener noreferrer" class="link link-primary hover:underline">Heroku Security & Privacy Compliance</a>
+            {% blocktranslate %}For more details, please refer to the data protection provisions of Heroku at:
+            <a href="https://devcenter.heroku.com/articles/security-privacy-compliance/" target="_blank" rel="noopener noreferrer" class="link link-primary hover:underline">Heroku Security &amp; Privacy Compliance</a>{% endblocktranslate %}
           </p>
         </div>
       </div>
@@ -266,8 +267,8 @@
   <!-- Last Updated Notice -->
   <div class="mt-8 pt-6 border-t border-[var(--stroke--soft-200)]">
     <p class="text-sm text-[var(--text--sub-600)] text-center">
-      If you have any questions about this Privacy Policy, please contact us at
-      <a href="mailto:datenschutz@gfa-group.de" class="link link-primary hover:underline">datenschutz@gfa-group.de</a>
+      {% blocktranslate %}If you have any questions about this Privacy Policy, please contact us at
+      <a href="mailto:datenschutz@gfa-group.de" class="link link-primary hover:underline">datenschutz@gfa-group.de</a>{% endblocktranslate %}
     </p>
   </div>
 

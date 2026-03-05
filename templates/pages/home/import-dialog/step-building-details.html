@@ -1,8 +1,9 @@
+{% load i18n %}
 <div class="size-full flex flex-col gap-5">
   <div class="space-y-1 shrink-0">
-    <h6 class="h6-title text-[var(--text--strong-950)]">Building Details</h6>
+    <h6 class="h6-title text-[var(--text--strong-950)]">{% translate "Building Details" %}</h6>
     <p class="paragraph-small text-[var(--text--sub-600)]">
-      Review the data read from your file. Upload certification and/or BoQ files if required.
+      {% translate "Review the data read from your file. Upload certification and/or BoQ files if required." %}
     </p>
   </div>
 
@@ -11,8 +12,8 @@
     <table class="table w-full border-collapse">
       <thead class="bg-[var(--bg--weak-50)]">
         <tr>
-          <th class="py-2.5 px-4 text-left font-normal label-x-small text-[var(--text--sub-600)] border-b-0 w-1/2">Field</th>
-          <th class="py-2.5 px-4 text-left font-normal label-x-small text-[var(--text--sub-600)] border-b-0">Value from file</th>
+          <th class="py-2.5 px-4 text-left font-normal label-x-small text-[var(--text--sub-600)] border-b-0 w-1/2">{% translate "Field" %}</th>
+          <th class="py-2.5 px-4 text-left font-normal label-x-small text-[var(--text--sub-600)] border-b-0">{% translate "Value from file" %}</th>
         </tr>
       </thead>
       <tbody id="details-summary" class="paragraph-small text-[var(--text--strong-950)]">
@@ -24,12 +25,12 @@
   <!-- Certification file upload (shown when has_certification = Yes) -->
   <div id="cert-upload-section" class="hidden flex flex-col gap-2">
     <p class="label-small text-[var(--text--strong-950)]">
-      Certification file
+      {% translate "Certification file" %}
       <span class="text-[var(--state--error--base)]">*</span>
     </p>
     <p class="paragraph-x-small text-[var(--text--sub-600)]">
-      Your template indicates this building has a certification. Please upload the certificate file.
-      Accepted formats: JPG, PNG, GIF, WEBP, PDF — max 20 MB.
+      {% translate "Your template indicates this building has a certification. Please upload the certificate file." %}
+      {% translate "Accepted formats: JPG, PNG, GIF, WEBP, PDF — max 20 MB." %}
     </p>
     <input
       type="file"
@@ -42,12 +43,12 @@
   <!-- BoQ files upload (shown when has_boq = Yes) -->
   <div id="boq-upload-section" class="hidden flex flex-col gap-2">
     <p class="label-small text-[var(--text--strong-950)]">
-      Bill of Quantities (BoQ) files
+      {% translate "Bill of Quantities (BoQ) files" %}
       <span class="text-[var(--state--error--base)]">*</span>
     </p>
     <p class="paragraph-x-small text-[var(--text--sub-600)]">
-      Your template indicates this building has BoQ files. Please upload one or more files.
-      Accepted formats: JPG, PNG, GIF, WEBP, PDF — max 20 MB each.
+      {% translate "Your template indicates this building has BoQ files. Please upload one or more files." %}
+      {% translate "Accepted formats: JPG, PNG, GIF, WEBP, PDF — max 20 MB each." %}
     </p>
     <input
       type="file"
@@ -64,15 +65,15 @@
     const t2 = (window.importState && window.importState.tab2) || {};
 
     const FIELD_LABELS = [
-      { key: 'building_type',         label: 'Building type' },
-      { key: 'climate_type',          label: 'Climate type' },
-      { key: 'assessment_period',     label: 'Assessment period (years)' },
-      { key: 'total_floor_area',      label: 'Total floor area (m²)' },
-      { key: 'conditioned_floor_area',label: 'Conditioned floor area (m²)' },
-      { key: 'construction_year',     label: 'Construction year' },
-      { key: 'floors_below_ground',   label: 'Floors below ground' },
-      { key: 'has_certification',     label: 'Has certification' },
-      { key: 'has_boq',              label: 'Has BoQ' },
+      { key: 'building_type',         label: "{% translate 'Building type' %}" },
+      { key: 'climate_type',          label: "{% translate 'Climate type' %}" },
+      { key: 'assessment_period',     label: "{% translate 'Assessment period (years)' %}" },
+      { key: 'total_floor_area',      label: "{% translate 'Total floor area (m²)' %}" },
+      { key: 'conditioned_floor_area',label: "{% translate 'Conditioned floor area (m²)' %}" },
+      { key: 'construction_year',     label: "{% translate 'Construction year' %}" },
+      { key: 'floors_below_ground',   label: "{% translate 'Floors below ground' %}" },
+      { key: 'has_certification',     label: "{% translate 'Has certification' %}" },
+      { key: 'has_boq',              label: "{% translate 'Has BoQ' %}" },
     ];
 
     const tbody = document.getElementById('details-summary');

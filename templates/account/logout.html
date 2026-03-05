@@ -1,21 +1,22 @@
 {% extends 'account/_auth.html' %}
+{% load i18n %}
 
-{% block title %}Sign Out{% endblock %}
+{% block title %}{% translate "Sign Out" %}{% endblock %}
 
 {% block auth_content %}
   <div class="flex flex-col gap-6 w-full">
 
     <div class="flex flex-col gap-2 text-center">
-      <h1 class="text-xl font-bold text-(--text--strong-950)">Sign out</h1>
-      <p class="text-sm text-[var(--text--sub-600)]">Are you sure you want to sign out?</p>
+      <h1 class="text-xl font-bold text-(--text--strong-950)">{% translate "Sign out" %}</h1>
+      <p class="text-sm text-[var(--text--sub-600)]">{% translate "Are you sure you want to sign out?" %}</p>
     </div>
 
     <form method="post" action="{% url 'account_logout' %}">
       {% csrf_token %}
-      <button class="btn btn-primary w-full" type="submit">Sign Out</button>
+      <button class="btn btn-primary w-full" type="submit">{% translate "Sign Out" %}</button>
     </form>
 
-    <a href="/" class="btn btn-outline w-full">Cancel</a>
+    <a href="/" class="btn btn-outline w-full">{% translate "Cancel" %}</a>
 
   </div>
 {% endblock auth_content %}

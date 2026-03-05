@@ -1,9 +1,10 @@
 {% load static %}
+{% load i18n %}
 <div id="lift-escalator-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button id="add-lift-escalator-btn" class="btn btn-outline w-fit" onclick="openLiftEscalatorSystemModal()">
       <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-      Add a lift & escalator system
+      {% translate "Add a lift & escalator system" %}
     </button>
     <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
     <ul id="lift-escalator-systems-list" class="grid grid-cols-1 gap-2"></ul>
@@ -14,8 +15,8 @@
   <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">Add a lift & escalator system</h3>
-        <p class="text-sm/5 text-[var(--text--sub-600)]">Provide details on lift & escalator system.</p>
+        <h3 class="text-lg/6 font-medium">{% translate "Add a lift & escalator system" %}</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">{% translate "Provide details on lift & escalator system." %}</p>
       </div>
       <button type="button" onclick="closeLiftEscalatorSystemModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
@@ -26,43 +27,43 @@
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Number of lifts<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Number of lifts" %}<span class="text-[var(--state--error--base)]">*</span></legend>
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 5" name="number_of_lifts" required min="1" />
           </label>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Installation of lift regenerative features<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Installation of lift regenerative features" %}<span class="text-[var(--state--error--base)]">*</span></legend>
           <div class="flex items-center gap-2.5 mt-1">
-            <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="yes" class="radio radio-xs" /> Yes</label>
-            <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="no" class="radio radio-xs" checked /> No</label>
+            <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="yes" class="radio radio-xs" /> {% translate "Yes" %}</label>
+            <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="no" class="radio radio-xs" checked /> {% translate "No" %}</label>
           </div>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Installation of VVVF and sleep mode<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Installation of VVVF and sleep mode" %}<span class="text-[var(--state--error--base)]">*</span></legend>
           <div class="flex items-center gap-2.5 mt-1">
-            <label class="flex items-center gap-2"><input type="radio" name="vvvf_sleep_mode" value="yes" class="radio radio-xs" /> Yes</label>
-            <label class="flex items-center gap-2"><input type="radio" name="vvvf_sleep_mode" value="no" class="radio radio-xs" checked /> No</label>
+            <label class="flex items-center gap-2"><input type="radio" name="vvvf_sleep_mode" value="yes" class="radio radio-xs" /> {% translate "Yes" %}</label>
+            <label class="flex items-center gap-2"><input type="radio" name="vvvf_sleep_mode" value="no" class="radio radio-xs" checked /> {% translate "No" %}</label>
           </div>
         </fieldset>
 
         <!-- Annual energy consumption = total building operational kWh × 7.5% -->
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Annual lift system energy consumption</legend>
+          <legend class="fieldset-legend">{% translate "Annual lift system energy consumption" %}</legend>
           <label class="input w-full bg-[var(--bg--weak-50)]">
-            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+            <input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">Total building operational energy × 7.5%</p>
+          <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total building operational energy × 7.5%" %}</p>
         </fieldset>
 
       </div>
     </form>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeLiftEscalatorSystemModal()">Cancel</button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLiftEscalatorSystem()">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeLiftEscalatorSystemModal()">{% translate "Cancel" %}</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLiftEscalatorSystem()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -73,12 +74,12 @@
       <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
         <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)"></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
-      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">You are about to permanently remove this lift & escalator system.</p>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">{% translate "You are about to permanently remove this lift & escalator system." %}</p>
     </div>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="lift_escalator_system_modal_delete.close()">Cancel</button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteLiftEscalatorSystem()">Remove</button>
+      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="lift_escalator_system_modal_delete.close()">{% translate "Cancel" %}</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteLiftEscalatorSystem()">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -86,12 +87,21 @@
 <template id="no-lift-escalator-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
     <img src="{% static 'assets/lift-escalator-system.png' %}" alt="Lift & Escalator System Image" />
-    <p class="text-sm/5 font-medium">Click button below to add a lift & escalator system</p>
-    <button class="btn btn-primary" onclick="lift_escalator_system_modal.showModal()">Add lift & escalator system</button>
+    <p class="text-sm/5 font-medium">{% translate "Click button below to add a lift & escalator system" %}</p>
+    <button class="btn btn-primary" onclick="lift_escalator_system_modal.showModal()">{% translate "Add lift & escalator system" %}</button>
   </div>
 </template>
 
 <script>
+  var i18n = {
+    yes:                  "{% translate 'Yes' %}",
+    no:                   "{% translate 'No' %}",
+    liftEscalatorSystem:  "{% translate 'Lift & Escalator System' %}",
+    lifts:                "{% translate 'Lifts' %}",
+    regenerative:         "{% translate 'Regenerative' %}",
+    vvvf:                 "{% translate 'VVVF' %}",
+  };
+
   if (!window.editingLiftEscalatorSystemId) {
     window.editingLiftEscalatorSystemId = null;
   }
@@ -214,17 +224,17 @@
       }
 
       listContainer.innerHTML = systems.map(function(system) {
-        var regenerative = system.lift_regenerative_features ? 'Yes' : 'No';
-        var vvvf = system.vvvf_sleep_mode ? 'Yes' : 'No';
+        var regenerative = system.lift_regenerative_features ? i18n.yes : i18n.no;
+        var vvvf = system.vvvf_sleep_mode ? i18n.yes : i18n.no;
 
         return '<li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">'
           + '<span data-icon="stairs-line" data-size="20" data-color="var(--icon--strong-950)" class="shrink-0 self-start"></span>'
           + '<div class="flex flex-col flex-1">'
-          + '<p class="text-sm/5 font-medium">Lift & Escalator System</p>'
+          + '<p class="text-sm/5 font-medium">' + i18n.liftEscalatorSystem + '</p>'
           + '<p class="text-sm/5 text-[var(--text--sub-600)] gap-0">'
-          + '<span class="border-r border-[var(--text--sub-600)] pr-1">Lifts: ' + system.number_of_lifts + '</span>'
-          + '<span class="border-r border-[var(--text--sub-600)] px-1">Regenerative: ' + regenerative + '</span>'
-          + '<span class="pl-1">VVVF: ' + vvvf + '</span>'
+          + '<span class="border-r border-[var(--text--sub-600)] pr-1">' + i18n.lifts + ': ' + system.number_of_lifts + '</span>'
+          + '<span class="border-r border-[var(--text--sub-600)] px-1">' + i18n.regenerative + ': ' + regenerative + '</span>'
+          + '<span class="pl-1">' + i18n.vvvf + ': ' + vvvf + '</span>'
           + '</p>'
           + '</div>'
           + '<div class="flex items-center gap-3">'

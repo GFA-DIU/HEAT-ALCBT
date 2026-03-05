@@ -1,29 +1,30 @@
+{% load i18n %}
 <div class="size-full flex flex-col items-center justify-center p-4">
 
   <!-- State 1: Validating -->
   <div id="validate-loading" class="w-full max-w-[25.875rem] space-y-4">
     <div class="space-y-1">
       <div class="flex justify-between items-center gap-2">
-        <p class="label-small text-[var(--text--strong-950)]">Validating data</p>
+        <p class="label-small text-[var(--text--strong-950)]">{% translate "Validating data" %}</p>
         <span class="paragraph-x-small text-[var(--text--sub-600)]" id="validate-percent">0%</span>
       </div>
       <progress id="validate-progress" class="progress progress-success w-full" value="0" max="100"></progress>
       <p class="paragraph-small text-[var(--text--sub-600)]">
-        Checking row <span id="validate-row-count">0</span> of 5000...
+        {% blocktranslate trimmed %}Checking row <span id="validate-row-count">0</span> of 5000...{% endblocktranslate %}
       </p>
     </div>
 
     <p class="label-small text-[var(--text--sub-600)] text-center">
-      We are checking your file for duplicates, formatting errors and missing fields, this will take some few minutes
+      {% translate "We are checking your file for duplicates, formatting errors and missing fields, this will take some few minutes" %}
     </p>
   </div>
 
   <!-- State 2: Results -->
   <div id="validate-result" class="size-full hidden flex-col gap-6">
     <div class="space-y-1 shrink-0">
-      <h6 class="text-base font-bold text-[var(--text--strong-950)]">Data Validation results</h6>
+      <h6 class="text-base font-bold text-[var(--text--strong-950)]">{% translate "Data Validation results" %}</h6>
       <p class="text-sm text-[var(--text--sub-600)]">
-        Review the analysis of your data before proceeding to preview.
+        {% translate "Review the analysis of your data before proceeding to preview." %}
       </p>
     </div>
 
@@ -35,28 +36,28 @@
         <div class="rounded-full size-[5.75rem] bg-[var(--state--success--lighter)] shrink-0 grid place-items-center">
           <span data-icon="file-check-fill" data-size="62" class="text-[var(--state--success--base)]"></span>
         </div>
-        <h6 class="text-xl font-bold text-[var(--text--strong-950)]">Validation successful</h6>
+        <h6 class="text-xl font-bold text-[var(--text--strong-950)]">{% translate "Validation successful" %}</h6>
         <p class="paragraph-small text-[var(--text--sub-600)]">
-          Your CSV file has been validated successfully. Below is the summary
+          {% translate "Your CSV file has been validated successfully. Below is the summary" %}
         </p>
       </div>
 
       <!-- Stats Grid -->
       <div class="bg-[var(--bg--weak-50)] py-4.5 px-8 w-full grid grid-cols-4 gap-4 rounded-lg">
         <div class="flex flex-col gap-1">
-          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--text--sub-600)]">Total records</span>
+          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--text--sub-600)]">{% translate "Total records" %}</span>
           <h5 class="pl-2.5 h5-title text-[var(--text--strong-950)]">5000</h5>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--text--sub-600)]">Valid records</span>
+          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--text--sub-600)]">{% translate "Valid records" %}</span>
           <h5 class="pl-2.5 h5-title text-[var(--text--strong-950)]">5000</h5>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--state--warning--base)]">Warnings</span>
+          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--state--warning--base)]">{% translate "Warnings" %}</span>
           <h5 class="pl-2.5 h5-title text-[var(--state--warning--base)]">45</h5>
         </div>
         <div class="flex flex-col gap-1">
-          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--state--error--base)]">Errors</span>
+          <span class="border-l-2 border-[#D5EDCD] pl-2.5 text-sm text-[var(--state--error--base)]">{% translate "Errors" %}</span>
           <h5 class="pl-2.5 h5-title text-[var(--state--error--base)]">0</h5>
         </div>
       </div>

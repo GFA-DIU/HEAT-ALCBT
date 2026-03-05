@@ -1,4 +1,4 @@
-{% load custom_filters %}
+{% load custom_filters i18n %}
 <li class="d-flex align-items-center list-group-item" 
     id="epd-{{epd.id}}" 
     data-id="{{ epd.id }}">
@@ -12,14 +12,14 @@
                 name="material_{{ epd.id }}_description_{{epd.timestamp}}"
                 class="form-control form-control-sm"
                 rows="2"
-                placeholder="Add description ..."
+                placeholder="{% translate 'Add description ...' %}"
                 maxlength="255">{% if epd.description%}{{epd.description}}{% endif %}</textarea>
             </div>
         </div>
     </div>
     {% if is_boq %}
     <div class="col container" >
-        <label for="material_{{ epd.id }}_category_{{epd.timestamp}}" class="text-muted">Category</label>
+        <label for="material_{{ epd.id }}_category_{{epd.timestamp}}" class="text-muted">{% translate "Category" %}</label>
         <select id="material_{{ epd.id }}_category_{{epd.timestamp}}"
                 name="material_{{ epd.id }}_category_{{epd.timestamp}}"
                 class="select form-select form-select-sm">
@@ -50,7 +50,7 @@
                        id="material_{{ epd.id }}_quantity_{{epd.timestamp}}"  
                        name="material_{{ epd.id }}_quantity_{{epd.timestamp}}" 
                        class="form-control w-auto"
-                       placeholder="Quantity"
+                       placeholder="{% translate 'Quantity' %}"
                        min="{{ epd.selection_unit | get_step }}"
                        {% if epd.selection_unit == "percent" %} max="100" {% endif %}
                        step="{{ epd.selection_unit | get_step }}"
@@ -91,7 +91,7 @@
                 hx-vals='{"action": "remove_epd"}'
                 hx-target="#epd-{{epd.id}}"
                 hx-swap="outerHTML">
-            Remove
+            {% translate "Remove" %}
         </button>
     </div>
 </li>

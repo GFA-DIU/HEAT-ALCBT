@@ -1,9 +1,10 @@
 {% extends '_base.html' %}
 {% load static %}
+{% load i18n %}
 
 {% load crispy_forms_tags %}
 
-{% block title %}List view{% endblock title %}
+{% block title %}{% translate "Dashboard" %}{% endblock title %}
 
 {% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock %}
 
@@ -22,9 +23,9 @@
           <div
             class="flex flex-col text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]"
           >
-            Welcome back, {{ user.username }}!
+            {% blocktranslate with username=user.username %}Welcome back, {{ username }}!{% endblocktranslate %}
             <p class="text-sm font-normal text-[var(--text--sub-600)]">
-              Last seen on
+              {% translate "Last seen on" %}
               <span class="text-[var(--text--strong-950)]"
                 >{{ user.last_login|date:"jS F, Y (H:i T)" }}</span
               >
@@ -32,16 +33,16 @@
           </div>
         </div>
       </div>
-  
+
       <div class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem]"></div>
 
       <div class="card-body p-0 px-4 max-w-[68.75rem] mx-auto w-full text-[var(--text--strong-950)]">
-        
+
         <div class="flex items-center justify-between mt-6">
           <div class="flex flex-col">
-            <span class="text-xl font-bold">Your buildings</span>
+            <span class="text-xl font-bold">{% translate "Your buildings" %}</span>
             <p class="text-sm font-normal text-[var(--text--sub-600)]">
-              Add your buildings to access for low carbon
+              {% translate "Add your buildings to access for low carbon" %}
             </p>
           </div>
           <div class="flex items-center gap-2 flex-1 justify-end">
@@ -54,7 +55,7 @@
               <input
                 type="text"
                 name="search"
-                placeholder="Search buildings..."
+                placeholder="{% translate 'Search buildings...' %}"
                 value="{{ search_query|default:'' }}"
                 hx-get="{% url 'home' %}"
                 hx-trigger="keyup changed delay:500ms"
@@ -67,34 +68,15 @@
                 <span class="loading loading-spinner loading-lg text-primary"></span>
               </div>
             </label>
-            {% comment %} <ul class="filter-radio-group flex">
-              <li>
-                <input
-                  type="radio"
-                  name="filter-radio-group"
-                  id="list"
-                  checked
-                />
-                <label for="list">
-                  <span data-icon="list-indefinite"></span>
-                </label>
-              </li>
-              <li>
-                <input type="radio" name="filter-radio-group" id="map" />
-                <label for="map">
-                  <span data-icon="road-map-line"></span>
-                </label>
-              </li>
-            </ul> {% endcomment %}
             <a href="{% url 'new_building' %}">
               <button class="btn btn-primary rounded-lg w-max">
                 <span data-icon="add-large-fill"></span>
-                <span class="shrink-0">Add building</span>
+                <span class="shrink-0">{% translate "Add building" %}</span>
               </button>
             </a>
             <button id="import-btn" class="btn btn-outline rounded-lg w-max" onclick="import_dialog.showModal()">
               <span data-icon="import-line"></span>
-              <span class="shrink-0">Import building</span>
+              <span class="shrink-0">{% translate "Import building" %}</span>
             </button>
           </div>
         </div>
@@ -106,30 +88,6 @@
 
 
 
-{% comment %}
-<h2>Buildings overview</h2>
-
- <div hx-get="{% url 'map' %}?model=building&ids=[]" 
-     hx-trigger="load"
-     hx-target="#buildings_map"
-     hx-swap="innerHTML"
-     id="buildings_map"
-     >
-  <img alt="Result loading..." class="htmx-indicator" width="150" src="https://htmx.org/img/bars.svg"/>
-</div> {% endcomment %}
-{% comment %} <div class="row my-2">
-  <div class='fs-4 fw-bold col-10'>Your buildings</div>
- <!-- Button to trigger modal -->
-  <a href="{% url 'new_building' %}"  class="icon-button btn btn-primary fs-6 col">
-    Add building
-  </a>
-</div>
-<div id="buildings_list">
-
-</div> {% endcomment %}
-
-
-
     <dialog
       id="account_success_modal"
       class="modal modal-bottom sm:modal-middle w-screen"
@@ -137,10 +95,10 @@
       <div class="modal-box w-full max-w-[30rem] !max-h-[97vh] hide-scrollbar overflow-x-hidden overflow-y-auto flex flex-col items-center px-10">
         <img src="{% static 'assets/confetti.png' %}" alt="confetti icon" />
         <h3 class="text-lg font-extrabold text-center">
-          Well done your account has been created.
+          {% translate "Well done your account has been created." %}
         </h3>
         <p class="text-sm text-[var(--text--sub-600)] text-center">
-          Please fill the fields below to finish setting your profile
+          {% translate "Please fill the fields below to finish setting your profile" %}
         </p>
 
         <div id="profile-form-messages" class="w-full mt-4">
@@ -153,7 +111,7 @@
 
           <fieldset class="fieldset">
             <legend class="fieldset-legend">
-              Username<span class="text-error">*</span>
+              {% translate "Username" %}<span class="text-error">*</span>
             </legend>
             <label class="input w-full">
               <span
@@ -169,7 +127,7 @@
 
           <fieldset class="fieldset">
             <legend class="fieldset-legend">
-              Email<span class="text-error">*</span>
+              {% translate "Email" %}<span class="text-error">*</span>
             </legend>
             <label class="input w-full">
               <span
@@ -185,7 +143,7 @@
 
           <fieldset class="fieldset">
             <legend class="fieldset-legend">
-              Country<span class="text-error">*</span>
+              {% translate "Country" %}<span class="text-error">*</span>
             </legend>
             <label class="w-full flex relative">
               <div class="select-icon">
@@ -203,7 +161,7 @@
 
           <fieldset class="fieldset">
             <legend class="fieldset-legend">
-              Region or State
+              {% translate "Region or State" %}
             </legend>
             <label class="w-full flex relative">
               <div class="select-icon">
@@ -221,7 +179,7 @@
 
           <fieldset class="fieldset">
             <legend class="fieldset-legend">
-              City
+              {% translate "City" %}
             </legend>
             <label class="w-full flex relative">
               <div class="select-icon">
@@ -241,19 +199,19 @@
             class="label mt-4 mb-6 text-[var(--text--strong-950)] text-sm/5 font-medium"
           >
             {{ profile_form.consent_flag }}
-            <span class="ml-2">Share my info with BEAT tool maintainers</span>
+            <span class="ml-2">{% translate "Share my info with BEAT tool maintainers" %}</span>
           </label>
 
           <div class="w-full space-y-1">
             <button type="submit" class="btn btn-primary btn-block">
-            Save & Continue
+            {% translate "Save & Continue" %}
           </button>
           <button
             type="button"
             class="btn btn-ghost btn-block mt-3"
             onclick="closeAccountSuccessModal()"
           >
-            I'll do this later
+            {% translate "I'll do this later" %}
           </button>
           </div>
         </form>
@@ -264,6 +222,11 @@
     </div>
 
     <script>
+    var i18n = {
+      correctErrors:   "{% translate 'Please correct the following errors:' %}",
+      updateError:     "{% translate 'An error occurred while updating your profile. Please try again.' %}",
+    };
+
     const accountSuccessModal = document.getElementById(
       "account_success_modal"
     );
@@ -290,7 +253,7 @@
       modalProfileForm.addEventListener("submit", async function(e) {
         e.preventDefault();
 
-        const formData = new FormData(modalProfileForm); 
+        const formData = new FormData(modalProfileForm);
         const errorDiv = document.getElementById("error-message");
         const successDiv = document.getElementById("success-message");
 
@@ -304,7 +267,7 @@
           });
 
           const data = await response.json();
-        
+
           if (data.success) {
             // Show success message
             successDiv.textContent = data.message;
@@ -319,27 +282,23 @@
             }, 1500);
           } else {
             // Show error messages
-            let errorText = "Please correct the following errors:\n";
+            let errorText = i18n.correctErrors + "\n";
             for (const [field, errors] of Object.entries(data.errors)) {
               errorText += `${field}: ${errors.join(", ")} <br/> `;
             }
-            
+
             errorDiv.innerHTML = errorText;
             errorDiv.classList.remove("hidden");
             successDiv.classList.add("hidden");
           }
         } catch (error) {
           console.error("Error updating profile:", error);
-          errorDiv.textContent = "An error occurred while updating your profile. Please try again.";
+          errorDiv.textContent = i18n.updateError;
           errorDiv.parentElement.classList.remove("hidden");
           successDiv.parentElement.classList.add("hidden");
         }
       });
     }
-
-    {% comment %} function goToBuildingDetails(id) {
-      window.location.href = "{% url 'building' building_id=" + id + " %}";
-    } {% endcomment %}
 
   let initalTab = 'organizations';
 
@@ -390,5 +349,5 @@
     }
   });
 </script>
-    
+
 {% endblock %}

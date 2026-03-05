@@ -94,6 +94,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # i18n language detection
     "django.middleware.common.CommonMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",  # Django Debug Toolbar
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -192,6 +193,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/topics/i18n/
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = "en-us"
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('vi', 'Tiếng Việt'),  # Vietnamese
+    ('th', 'ไทย'),  # Thai
+    ('id', 'Bahasa Indonesia'),  # Indonesian
+    ('fil', 'Filipino'),  # Filipino/Tagalog
+    ('km', 'ខ្មែរ'),  # Khmer/Cambodian
+    ('lo', 'ລາວ'),  # Lao
+    ('my', 'မြန်မာ'),  # Burmese/Myanmar
+]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
 TIME_ZONE = "UTC"

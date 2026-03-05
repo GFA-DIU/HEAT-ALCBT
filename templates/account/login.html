@@ -1,22 +1,23 @@
 {% extends 'account/_auth.html' %}
 {% load crispy_forms_tags %}
+{% load i18n %}
 
  {% block action_content  %}
     <a href="{% url 'account_signup' %}">
-      <button type="button" class="btn btn-outline btn-sm">Sign Up</button>
+      <button type="button" class="btn btn-outline btn-sm">{% translate "Sign Up" %}</button>
     </a>
   {% endblock action_content %}
 
 {% block auth_content %}
- 
+
   <div class="m-auto flex flex-col w-full max-w-[22.25rem]">
             <h1
               class="text-xl font-bold text-center text-(--text--strong-950)"
             >
-              Login
+              {% translate "Login" %}
             </h1>
             <form  method="post" class="flex flex-col">
-              <div class="crispy-forms"> 
+              <div class="crispy-forms">
                 {% csrf_token %} {{ form|crispy }}
               </div>
               {% comment %} <fieldset class="fieldset">
@@ -44,7 +45,7 @@
                   ></span>
                   <input
                     type="password"
-                    placeholder="Enter password"
+                    placeholder="{% translate 'Enter password' %}"
                     required
                     minlength="8"
                   />
@@ -59,22 +60,22 @@
               </fieldset> {% endcomment %}
 
               <button class="btn btn-primary w-full" type="submit">
-                Login
+                {% translate "Login" %}
               </button>
             </form>
-            <div class="divider">OR</div>
+            <div class="divider">{% translate "OR" %}</div>
             <button class="btn btn-accent w-full">
-              <span data-icon="google"></span> Sign up with Google
+              <span data-icon="google"></span> {% translate "Sign up with Google" %}
             </button>
             <span
               class="text-sm/5 text-center mt-5 text-[var(--text--strong-950)]"
-              >Don't have an account.
+              >{% translate "Don't have an account." %}
               <a href="{% url 'account_signup' %}" class="font-bold"
-                >Sign up</a
+                >{% translate "Sign up" %}</a
               ></span
             >
           </div>
-   
+
 
 
 {% endblock auth_content %}
