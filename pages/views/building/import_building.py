@@ -353,14 +353,14 @@ def import_operational_schedule(request):
     if err:
         errors["cooling_temp_unit"] = err
 
-    # Renewable energy percent — optional, 0.01–100
+    # Renewable energy percent — optional, 0–100
     renewable_raw = _str(data.get("renewable_energy_percent"))
     renewable_energy_percent = None
     if renewable_raw:
         try:
             rval = float(renewable_raw)
-            if rval < 0.01 or rval > 100:
-                errors["renewable_energy_percent"] = "Renewable energy % must be between 0.01 and 100."
+            if rval < 0 or rval > 100:
+                errors["renewable_energy_percent"] = "Renewable energy % must be between 0 and 100."
             else:
                 renewable_energy_percent = rval
         except (ValueError, TypeError):
@@ -527,7 +527,7 @@ def _calc_ac_energy(row_data):
             return ''
         energy = (cap_kw * units / eer) * hrs * days * weeks
 
-    return str(int(round(energy)))
+    return str(round(Decimal(str(energy)), 3))
 
 
 def _calc_chiller_energy(row_data):
@@ -564,7 +564,7 @@ def _calc_chiller_energy(row_data):
     hr_factor  = 0.70 if _yes('installation_of_heat_recovery_systems') else 1.00
 
     energy = load * units * eff * hrs * days * weeks * vsd_factor * hr_factor
-    return str(int(round(energy)))
+    return str(round(Decimal(str(energy)), 3))
 
 
 def _parse_cooling_rows(sheet_key, raw_rows):
@@ -891,7 +891,7 @@ def _calc_vent_energy(power, hours, days, weeks, vsd=False, dcv=False):
             return None
         vsd_factor = 0.80 if vsd else 1.00
         dcv_factor = 0.70 if dcv else 1.00
-        return int(round(p * h * d * w * vsd_factor * dcv_factor))
+        return round(Decimal(str(p * h * d * w * vsd_factor * dcv_factor)), 3)
     except (ValueError, TypeError):
         return None
 
@@ -1260,7 +1260,7 @@ def _calc_lighting_energy(total_power_kw, hours, days, weeks, sensors):
         if p <= 0 or h <= 0 or d <= 0 or w <= 0:
             return None
         sensor_factor = 0.80 if sensors else 1.00
-        return int(round(p * h * d * w * sensor_factor))
+        return round(Decimal(str(p * h * d * w * sensor_factor)), 3)
     except (ValueError, TypeError):
         return None
 
@@ -1382,7 +1382,7 @@ def _parse_lighting_rows(tab_layout, raw_rows):
                 row_data['baseline_lighting_power_density'] = str(lpd)
             energy = _calc_lighting_energy(total_power, hours, days, weeks, sensors)
             if energy is not None:
-                row_data['total_energy_consumption_kwh_per_year'] = str(int(energy))
+                row_data['total_energy_consumption_kwh_per_year'] = str(energy)
 
         # --- Energy efficiency label ---
         label_str = label_raw.lower()
@@ -1574,14 +1574,8 @@ def import_lift_escalator_system(request):
         # No data — silently skip
         return JsonResponse({"success": True, "saved_count": 0, "building_uuid": str(building.uuid)})
 
-    # Enforce one lift system per building
-    if LiftEscalatorSystem.objects.filter(building=building).exists():
-        return JsonResponse(
-            {"success": False, "errors": {"__all__": ["Only one lift & escalator system is allowed per building."]}},
-            status=400,
-        )
-
-    form = LiftEscalatorSystemForm(row_data)
+    existing = LiftEscalatorSystem.objects.filter(building=building).first()
+    form = LiftEscalatorSystemForm(row_data, instance=existing)
     if not form.is_valid():
         return JsonResponse({"success": False, "errors": dict(form.errors)}, status=400)
 
@@ -1675,7 +1669,7 @@ def _calc_hws_energy(system_type, power, num, hours, days, weeks, cop_or_eff, fu
             # Boiler or Water Heater: divide by (efficiency% / 100)
             result = base / (e / 100)
 
-        return int(round(result))
+        return round(Decimal(str(result)), 3)
     except (ValueError, TypeError):
         return None
 
@@ -1807,7 +1801,7 @@ def _parse_hot_water_rows(hws_type, raw_rows):
                                       fuel_type=fuel_val_str)
 
         if energy is not None:
-            row_data['total_energy_consumption_kwh_per_year'] = str(int(energy))
+            row_data['total_energy_consumption_kwh_per_year'] = str(energy)
 
         results.append(row_data)
 
@@ -2396,20 +2390,20 @@ def import_structural_components(request):
                 errors[label] = {"epd_quantity": [f"Invalid material quantity '{epd_qty}'."]}
                 continue
 
-            # Resolve material unit
-            mat_unit = STRUCTURAL_UNIT_MAP.get(epd_unit.lower())
-            mat_unit_str = mat_unit if mat_unit else epd_unit  # keep raw if not in map
-
             # Look up EPD
             epd, epd_error = _lookup_structural_epd(epd_name, epd_country)
             if epd_error:
                 errors[label] = {"epd_name": [epd_error]}
                 continue
 
+            # Derive the correct input_unit from the assembly dimension (same logic as UI)
+            from pages.views.assembly.epd_dimension_info import get_epd_dimension_info
+            _, expected_unit = get_epd_dimension_info(current_assembly["dimension"], epd.declared_unit)
+
             current_assembly["materials"].append({
                 "epd":      epd,
                 "quantity": mat_qty,
-                "unit":     mat_unit_str,
+                "unit":     expected_unit,
             })
 
     # Remove assemblies that ended up with no materials

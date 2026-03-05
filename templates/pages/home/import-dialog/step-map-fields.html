@@ -40,6 +40,22 @@
   </tr>
 </template>
 
+<template id="template-row-map-section">
+  <tr class="bg-[var(--bg--weak-50)]">
+    <td colspan="3" class="px-4 py-2 label-small text-[var(--text--sub-600)] col-section"></td>
+  </tr>
+</template>
+
+<template id="template-row-map-count">
+  <tr class="border-b border-[var(--stroke--soft-200)] last:border-0 hover:bg-[var(--bg--weak-50)] transition-colors">
+    <td class="px-4 py-3 text-[var(--text--sub-600)] col-tab"></td>
+    <td class="px-4 py-3 font-medium col-header"></td>
+    <td class="px-4 py-3 col-value">
+      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)] paragraph-x-small col-badge"></span>
+    </td>
+  </tr>
+</template>
+
 <script>
   (function () {
     const state = window.importState || {};
@@ -78,9 +94,13 @@
 
     const tbody = document.getElementById('map-fields-body');
     const template = document.getElementById('template-row-map');
+    const templateSection = document.getElementById('template-row-map-section');
+    const templateCount = document.getElementById('template-row-map-count');
 
     if (tbody && template) {
       tbody.innerHTML = '';
+
+      // Render tab1/2/3 rows
       rows.forEach(row => {
         const clone = template.content.cloneNode(true);
         clone.querySelector('.col-tab').textContent = row.tab;
@@ -88,6 +108,86 @@
         clone.querySelector('.col-value').textContent = row.value || '—';
         tbody.appendChild(clone);
       });
+
+      // Helper: add section divider
+      function addSection(label) {
+        const clone = templateSection.content.cloneNode(true);
+        clone.querySelector('.col-section').textContent = label;
+        tbody.appendChild(clone);
+      }
+
+      // Helper: add a tab row with row count badge
+      function addCountRow(tabGroup, tabName, count) {
+        const clone = templateCount.content.cloneNode(true);
+        clone.querySelector('.col-tab').textContent = tabGroup;
+        clone.querySelector('.col-header').textContent = tabName;
+        clone.querySelector('.col-badge').textContent = count + (count === 1 ? ' row' : ' rows');
+        tbody.appendChild(clone);
+      }
+
+      // Tab labels
+      const COOLING_LABELS = {
+        'window ac': 'Window AC', 'split ac': 'Split AC', 'vrf': 'VRF',
+        'packagedductab': 'Packaged / Ducted', 'water cooled': 'Water-cooled Chiller', 'air cooled': 'Air-cooled Chiller',
+      };
+      const VENT_LABELS = {
+        'ahu': 'AHU', 'fcu': 'FCU', 'ceilingwa': 'Cassette AC', 'doas': 'DOAS', 'ceilingex': 'Ceiling / Exhaust Fan',
+      };
+      const LIGHTING_LABELS = {
+        'led': 'LED', 'fluorescent': 'Fluorescent', 'cfl': 'CFL', 'incandescent': 'Incandescent', 'hid': 'HID',
+      };
+      const HWS_LABELS = {
+        'heat-pump': 'Heat Pump', 'boiler': 'Boiler', 'water-heater': 'Water Heater',
+      };
+
+      // Cooling Systems
+      const cooling = state.coolingSystems || [];
+      if (cooling.length > 0) {
+        addSection('Cooling Systems');
+        cooling.forEach(s => addCountRow('Cooling Systems', COOLING_LABELS[s.tab] || s.tab, s.rows.length));
+      }
+
+      // Ventilation Systems
+      const vent = state.ventilationSystems || [];
+      if (vent.length > 0) {
+        addSection('Ventilation Systems');
+        vent.forEach(s => addCountRow('Ventilation Systems', VENT_LABELS[s.tab] || s.tab, s.rows.length));
+      }
+
+      // Lighting Systems
+      const lighting = state.lightingSystems || [];
+      if (lighting.length > 0) {
+        addSection('Lighting Systems');
+        lighting.forEach(s => addCountRow('Lighting Systems', LIGHTING_LABELS[s.tab] || s.tab, s.rows.length));
+      }
+
+      // Lift & Escalator
+      const lift = state.liftEscalator || [];
+      if (lift.length > 0) {
+        addSection('Lift & Escalator');
+        addCountRow('Lift & Escalator', 'Lift & Escalator System', lift.length);
+      }
+
+      // Hot Water Systems
+      const hws = state.hotWaterSystems || [];
+      if (hws.length > 0) {
+        addSection('Hot Water Systems');
+        hws.forEach(s => addCountRow('Hot Water Systems', HWS_LABELS[s.tab] || s.tab, s.rows.length));
+      }
+
+      // Energy Carriers
+      const ec = state.energyCarriers || [];
+      if (ec.length > 0) {
+        addSection('Operational Energy Carriers');
+        addCountRow('Energy Carriers', 'Operational Energy Carriers', ec.length);
+      }
+
+      // Structural Components
+      const sc = state.structuralComponents || [];
+      if (sc.length > 0) {
+        addSection('Structural Components');
+        addCountRow('Structural Components', 'By Component', sc.length);
+      }
     }
 
     if (window.IconComponent) window.IconComponent.initialize();

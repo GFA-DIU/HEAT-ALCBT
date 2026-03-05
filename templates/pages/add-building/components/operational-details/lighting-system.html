@@ -846,7 +846,7 @@
     var sensorEl = form.querySelector('[name="installation_of_sensors"]:checked');
     var sensorFactor = (sensorEl && sensorEl.value === 'yes') ? 0.80 : 1.00;
 
-    energyEl.value = (power * hrs * days * weeks * sensorFactor).toFixed(2);
+    energyEl.value = (power * hrs * days * weeks * sensorFactor).toFixed(3);
   };
 
   // ================================================================

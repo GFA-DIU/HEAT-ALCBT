@@ -600,7 +600,7 @@ class TestImportVentilationSystems:
         assert resp.status_code == 200
         sys_obj = VentilationSystem.objects.filter(building=building).first()
         # energy = 0.5 * 10 * 5 * 50 * 0.80 * 0.70 = 700 kWh
-        assert sys_obj.total_energy_consumption_kwh_per_year == 700
+        assert sys_obj.total_energy_consumption_kwh_per_year == Decimal('700.000')
 
     def test_fcu_happy_path(self, client, user, building):
         client.force_login(user)
@@ -743,8 +743,8 @@ class TestImportLightingSystems:
         assert light.lighting_bulb_type == "LED_BULB"
         # Auto-calc: 5 * 1 * 12 / 1000 = 0.06 kW
         assert light.total_lighting_power_kw == Decimal("0.06")
-        # Energy: 0.06 * 12 * 7 * 52 * 1.0 = 262.08 → 262
-        assert light.total_energy_consumption_kwh_per_year == 262
+        # Energy: 0.06 * 12 * 7 * 52 * 1.0 = 262.08
+        assert light.total_energy_consumption_kwh_per_year == Decimal('262.080')
 
     def test_led_case_insensitive_room_type(self, client, user, building):
         client.force_login(user)
@@ -771,8 +771,8 @@ class TestImportLightingSystems:
         })
         assert resp.status_code == 200
         light = LightingSystem.objects.filter(building=building).first()
-        # Energy: 0.06 * 12 * 7 * 52 * 0.80 = 209.66 → rounded int
-        assert light.total_energy_consumption_kwh_per_year <= 210
+        # Energy: 0.06 * 12 * 7 * 52 * 0.80 = 209.664
+        assert light.total_energy_consumption_kwh_per_year == Decimal('209.664')
 
     def test_fluorescent_with_tubes(self, client, user, building):
         client.force_login(user)
@@ -917,20 +917,22 @@ class TestImportLiftEscalator:
         assert lift.lift_regenerative_features is True
         assert lift.vvvf_sleep_mode is False
 
-    def test_one_per_building_enforced(self, client, user, building):
+    def test_second_import_updates_existing(self, client, user, building):
         client.force_login(user)
         # First save
         _post_json(client, "import_lift_escalator", {
             "building_uuid": str(building.uuid),
             "rows": [["3", "No", "Yes"]],
         })
-        # Second attempt should fail
+        # Second import should update, not create a duplicate
         resp = _post_json(client, "import_lift_escalator", {
             "building_uuid": str(building.uuid),
             "rows": [["5", "Yes", "No"]],
         })
-        assert resp.status_code == 400
+        assert resp.status_code == 200
         assert LiftEscalatorSystem.objects.filter(building=building).count() == 1
+        lift = LiftEscalatorSystem.objects.get(building=building)
+        assert lift.number_of_lifts == 5
 
     def test_empty_rows_skipped(self, client, user, building):
         client.force_login(user)
@@ -990,7 +992,7 @@ class TestImportHotWaterSystems:
         hws = HotWaterSystem.objects.filter(building=building).first()
         assert hws.type_of_hot_water_system == "heat-pump"
         # Auto-calc: 5 * 2 * 4 * 7 * 52 / 3.5 = 4160 kWh
-        assert hws.total_energy_consumption_kwh_per_year == 4160
+        assert hws.total_energy_consumption_kwh_per_year == Decimal('4160.000')
 
     def test_boiler_happy_path(self, client, user, building):
         client.force_login(user)
@@ -1017,7 +1019,7 @@ class TestImportHotWaterSystems:
         hws = HotWaterSystem.objects.filter(building=building).first()
         assert hws.type_of_hot_water_system == "boiler"
         # Auto-calc: 100 * 1 * 8 * 5 * 50 / (80/100) = 250000 kWh
-        assert hws.total_energy_consumption_kwh_per_year == 250000
+        assert hws.total_energy_consumption_kwh_per_year == Decimal('250000.000')
 
     def test_water_heater_solar_zero_energy(self, client, user, building):
         client.force_login(user)
@@ -1038,7 +1040,7 @@ class TestImportHotWaterSystems:
         })
         assert resp.status_code == 200
         hws = HotWaterSystem.objects.filter(building=building).first()
-        assert hws.total_energy_consumption_kwh_per_year == 0
+        assert hws.total_energy_consumption_kwh_per_year == Decimal('0')
 
     def test_water_heater_electric_energy_calc(self, client, user, building):
         client.force_login(user)
@@ -1059,8 +1061,8 @@ class TestImportHotWaterSystems:
         })
         assert resp.status_code == 200
         hws = HotWaterSystem.objects.filter(building=building).first()
-        # 3.5 * 2 * 1 * 7 * 52 / (90/100) = 2831.11 → 2831
-        assert hws.total_energy_consumption_kwh_per_year == 2831
+        # 3.5 * 2 * 1 * 7 * 52 / (90/100) = 2831.111...
+        assert abs(hws.total_energy_consumption_kwh_per_year - Decimal('2831.111')) < Decimal('0.001')
 
     def test_fuel_type_case_insensitive(self, client, user, building):
         client.force_login(user)
@@ -1559,12 +1561,12 @@ class TestAutoCalcHelpers:
     def test_calc_lighting_energy_no_sensors(self):
         from pages.views.building.import_building import _calc_lighting_energy
         e = _calc_lighting_energy(0.06, 12, 7, 52, False)
-        assert e == 262  # 0.06 * 12 * 7 * 52 = 262.08 → 262
+        assert e == Decimal('262.080')  # 0.06 * 12 * 7 * 52 = 262.08
 
     def test_calc_lighting_energy_with_sensors(self):
         from pages.views.building.import_building import _calc_lighting_energy
         e = _calc_lighting_energy(0.06, 12, 7, 52, True)
-        assert e == 210  # 262.08 * 0.80 = 209.664 → 210
+        assert e == Decimal('209.664')  # 262.08 * 0.80 = 209.664
 
     def test_calc_lighting_lpd(self):
         from pages.views.building.import_building import _calc_lighting_lpd
