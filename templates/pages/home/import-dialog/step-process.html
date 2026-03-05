@@ -1,0 +1,99 @@
+<div class="size-full flex flex-col items-center justify-center p-8">
+
+  <!-- State 1: Importing -->
+  <div id="process-loading" class="w-full max-w-[25.875rem] space-y-4">
+    <div class="space-y-1">
+      <div class="flex justify-between items-center gap-2">
+        <p class="label-small text-[var(--text--strong-950)]">Importing data</p>
+        <span class="paragraph-x-small text-[var(--text--sub-600)]" id="process-percent">0%</span>
+      </div>
+      <progress id="process-progress" class="progress progress-success w-full" value="0" max="100"></progress>
+    </div>
+
+    <p class="label-small text-[var(--text--sub-600)] text-center">
+      Please wait while we process your file. Do not close this window
+    </p>
+  </div>
+
+  <!-- State 2: Success -->
+  <div id="process-result"
+    class="flex flex-col items-center justify-center gap-6 w-full max-w-md text-center hidden animate-in fade-in zoom-in duration-500">
+    <div class="rounded-full size-[5.75rem] bg-[var(--state--success--lighter)] shrink-0 grid place-items-center">
+      <span data-icon="check-double-line" data-size="62" class="text-[var(--state--success--base)]"></span>
+    </div>
+    <div class="space-y-2">
+      <h6 class="h6-title text-[var(--text--strong-950)] font-bold">
+        Import complete!
+      </h6>
+      <p class="paragraph-small text-[var(--text--sub-600)] text-center">
+        Building have been successfully added to your database
+      </p>
+    </div>
+
+    <!-- Final CTA -->
+    <button class="btn btn-primary h-9 px-4 label-small" onclick="import_dialog.close(); window.location.href='/';">
+      Go to buildings
+    </button>
+  </div>
+
+</div>
+
+<script>
+  (function () {
+    const duration = 2500; // 2.5s
+    let startTime = null;
+
+    const loadingSection = document.getElementById('process-loading');
+    const resultSection = document.getElementById('process-result');
+    const progressBar = document.getElementById('process-progress');
+    const percentText = document.getElementById('process-percent');
+
+    // Check if we already finished (useful for dev HMR or revisit)
+    if (loadingSection && resultSection) {
+      loadingSection.classList.remove('hidden');
+      resultSection.classList.add('hidden');
+      if (window.IconComponent) window.IconComponent.initialize();
+    }
+
+    // Start Animation
+    requestAnimationFrame(function animate(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const percentVal = Math.floor(progress * 100);
+
+      if (progressBar) progressBar.value = percentVal;
+      if (percentText) percentText.textContent = `${percentVal}%`;
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        finish();
+      }
+    });
+
+    function finish() {
+      if (loadingSection) loadingSection.classList.add('hidden');
+      if (resultSection) {
+        resultSection.classList.remove('hidden');
+        resultSection.classList.add('flex'); // restore flex
+
+        // Confetti or visual cue could go here
+      }
+      if (window.IconComponent) window.IconComponent.initialize();
+
+      // Hide generic footer buttons on final success screen if needed,
+      // but typically the wizard footer hides itself on the last step?
+      // Let's ensure the wizard footer is hidden.
+      const footer = document.getElementById('import-footer');
+      if (footer) footer.style.display = 'none';
+
+      const nav = document.getElementById('import-stepper');
+      // Mark final step as done visually
+      if (nav) {
+        // logic is inside import-dialog.html, handled by stepper
+      }
+    }
+
+  })();
+</script>

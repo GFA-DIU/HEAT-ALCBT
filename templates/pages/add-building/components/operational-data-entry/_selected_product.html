@@ -1,12 +1,9 @@
-{% load i18n %}
 {% load custom_filters %}
 
-<form>
-  {% csrf_token %}
-  <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      id="epd-{{ epd.id }}-{{ epd.timestamp }}"
-        >
+<li
+      class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
+    id="epd-{{ epd.id }}-{{ epd.timestamp }}"
+      >
         <span
           data-icon="gas-station-line"
           data-size="20"
@@ -28,48 +25,40 @@
             <fieldset>
               <label class="input w-full validator">
               <input
-                name="description"
+                name="material_{{ epd.id }}_description_{{ epd.timestamp }}"
                 value="{% if epd.description %}{{ epd.description }}{% endif %}"
-                type="text" placeholder="{% translate 'Add a description' %}"  required class="block w-full" />
+                type="text" placeholder="Add a description"  required class="block w-full" />
               </label>
-              <p class="validator-hint hidden">{% translate "required" %}</p>
+              <p class="validator-hint hidden">required</p>
             </fieldset>
 
             <fieldset>
-              <label class="input pr-0 grid grid-cols-2 validator">
-              <input type="number" name='quantity' class='block w-full' placeholder="{% translate 'Quantity' %}" required min="1"  />
-              <select
-                class="select select-ghost w-fit !outline-none !border-none block w-full"
-                name="unit"
+              <label class="input validator w-full">
+              <input type="number"
+                name='material_{{ epd.id }}_quantity_{{ epd.timestamp }}'
+                value="{% if epd.selection_quantity %}{{ epd.selection_quantity }}{% endif %}"
+                class='block w-full'
+                placeholder="Quantity"
                 required
-              >
-                {% for unit in epd.op_units %}
-                    <option value="{{ unit }}" {% if unit == epd.selection_unit %}selected{% endif %}>
-                        {{ unit }}
-                    </option>
-                {% endfor %}
-              </select>
+                min="1"
+                step="0.01" />
+              <input type="hidden" name="material_{{ epd.id }}_unit_{{ epd.timestamp }}" value="{{ epd.selection_unit }}" />
+              <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{{ epd.selection_unit }}</span>
             </label>
-            <p class="validator-hint hidden">{% translate "Please enter a valid quantity" %}</p>
+            <p class="validator-hint hidden">Please enter a valid quantity</p>
             </fieldset>
 
           </div>
 
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            {% comment %} <span class="border-r border-[var(--text--sub-600)] pr-1">Airflow rate: 45CMH</span> {% endcomment %}
-            <span>{% translate "Capacity units:" %} {{epd.op_units }} </span>
-          </p>
         </div>
         <div class="flex items-center gap-3">
           <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="energy_carrier_modal_delete.showModal()"
             type="button"
-            class="btn btn-ghost btn-sm btn-square remove-epd"
+            class="btn size-5 btn-ghost p-0 remove-epd"
             data-epd-id="{{ epd.id }}"
             data-timestamp="{{ epd.timestamp }}"
             data-element-id="epd-{{ epd.id }}-{{ epd.timestamp }}"
-            title="{% translate 'Remove energy carrier' %}"
+            title="Remove energy carrier"
           >
             <span
               data-icon="delete-bin-5-line"
@@ -79,7 +68,6 @@
           </button>
         </div>
       </li>
-</form>
 
 
 
@@ -102,11 +90,11 @@
                         {{ epd.category }}
                     </span>
                 </div>
-
+                
                 {% if epd.description %}
                 <p class="text-xs text-[var(--text--sub-600)] mb-3">{{ epd.description }}</p>
                 {% endif %}
-
+                
                 <!-- Input Fields -->
                 <div class="grid grid-cols-2 gap-3">
                     <!-- Quantity Input -->
@@ -114,7 +102,7 @@
                         <div class="label py-1">
                             <span class="label-text text-xs">Quantity</span>
                         </div>
-                        <input type="number"
+                        <input type="number" 
                                name="material_{{ epd.id }}_quantity_{{ epd.timestamp }}"
                                value="{% if epd.selection_quantity %}{{ epd.selection_quantity }}{% endif %}"
                                step="0.01"
@@ -123,7 +111,7 @@
                                class="input input-bordered input-sm"
                                required />
                     </label>
-
+                    
                     <!-- Unit Selection -->
                     <label class="form-control">
                         <div class="label py-1">
@@ -140,7 +128,7 @@
                         </select>
                     </label>
                 </div>
-
+                
                 <!-- Description Field -->
                 <label class="form-control mt-3">
                     <div class="label py-1">
@@ -152,7 +140,7 @@
                               class="textarea textarea-bordered textarea-sm text-xs">{% if epd.description %}{{ epd.description }}{% endif %}</textarea>
                 </label>
             </div>
-
+            
             <!-- Delete Button -->
             <button type="button"
                     class="btn btn-ghost btn-sm btn-square remove-epd"

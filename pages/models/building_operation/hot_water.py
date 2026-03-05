@@ -8,24 +8,26 @@ from pages.models.building import Building
 class HotWaterSystemType(models.TextChoices):
     HEAT_PUMP = "heat-pump", _("Heat Pump Water Heater")
     BOILER = "boiler", _("Boiler")
-    SOLAR = "solar", _("Solar Water Heaters")
+    SOLAR = "solar", _("Water Heaters")
 
 
 class FuelType(models.TextChoices):
     ELECTRICITY = "electricity", _("Electricity")
-    LIGHT_FUEL_OIL = "light-fuel-oil", _("Light Fuel Oil")
-    HEAVY_FUEL_OIL = "heavy-fuel-oil", _("Heavy Fuel Oil")
-    LPG = "lpg", _("Liquified Petroleum Gas (LPG)")
     NATURAL_GAS = "natural-gas", _("Natural Gas")
-    COAL = "coal", _("Coal")
-    LIGNITE = "lignite", _("Lignite")
+    LPG = "lpg", _("LPG")
     DIESEL = "diesel", _("Diesel")
     KEROSENE = "kerosene", _("Kerosene")
+    COAL = "coal", _("Coal")
+    SOLAR = "solar", _("Solar")
+    LIGHT_FUEL_OIL = "light-fuel-oil", _("Light Fuel Oil")
+    HEAVY_FUEL_OIL = "heavy-fuel-oil", _("Heavy Fuel Oil")
+    LIGNITE = "lignite", _("Lignite")
     FIRE_WOOD_LOG = "fire-wood-log", _("Fire Wood (Log Wood)")
     FIRE_WOOD_CHIPS = "fire-wood-chips", _("Fire Wood (Wood Chips)")
     FIRE_WOOD_PELLETS = "fire-wood-pellets", _("Fire Wood (Wood Pellets)")
-    CHAR_COAL = "char-coal", _("Char Coal")
+    CHAR_COAL = "char-coal", _("Charcoal")
     IGNITE = "ignite", _("Ignite")
+    NONE = "none", _("None")
     OTHER = "other", _("Other")
 
 
@@ -56,7 +58,13 @@ class HotWaterSystem(models.Model):
     fuel_type = models.CharField(
         max_length=50,
         choices=FuelType.choices,
-        verbose_name=_("Fuel Type")
+        verbose_name=_("Fuel Type"),
+    )
+
+    number_of_equipment = models.PositiveIntegerField(
+        validators=[MinValueValidator(1)],
+        verbose_name=_("Number of Hot Water Equipment Installed"),
+        db_column="number_of_equipments",
     )
 
     operating_hours_per_day = models.DecimalField(
@@ -79,27 +87,18 @@ class HotWaterSystem(models.Model):
         db_column="workweeks_per_year",
     )
 
-    fuel_consumption = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        validators=[MinValueValidator(0)],
-        verbose_name=_("Fuel Consumption (Liters/m³)"),
-    )
-
-    power_input = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        validators=[MinValueValidator(0)],
-        verbose_name=_("Hot Water System Power Input (kW)"),
-        db_column="power_input_kw",
-    )
-
     baseline_efficiency = models.DecimalField(
         max_digits=10,
         decimal_places=3,
         validators=[MinValueValidator(0)],
-        verbose_name=_("Baseline Hot Water System Efficiency (COP)"),
+        verbose_name=_("Baseline Hot Water System Efficiency"),
         db_column="baseline_efficiency_cop",
+    )
+
+    heat_recovery_system = models.BooleanField(
+        verbose_name=_("Installation of Heat Recovery Systems"),
+        default=False,
+        db_column="heat_recovery_installed",
     )
 
     equipment_efficiency_level = models.DecimalField(
@@ -110,23 +109,38 @@ class HotWaterSystem(models.Model):
         db_column="baseline_equipment_efficiency_percentage",
     )
 
-    heat_recovery_system = models.BooleanField(
-        verbose_name=_("Installation of Heat Recovery Systems"),
-        default=False,
-        db_column="heat_recovery_installed",
-    )
-
-    number_of_equipment = models.PositiveIntegerField(
-        validators=[MinValueValidator(1)],
-        verbose_name=_("Number of Hot Water Equipment Installed"),
-        db_column="number_of_equipments",
-    )
-
-    energy_efficiency_label = models.PositiveSmallIntegerField(
+    power_input = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
         null=True,
         blank=True,
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
-        verbose_name=_("Energy Efficiency Star Rating (1-5)"),
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Hot Water System Power Input (kW)"),
+        db_column="power_input_kw",
+    )
+
+    total_energy_consumption_kwh_per_year = models.DecimalField(
+        max_digits=12,
+        decimal_places=3,
+        null=True,
+        blank=True,
+        verbose_name=_("Total Energy Consumption Annually (kWh/year)"),
+    )
+
+    total_fuel_consumption = models.DecimalField(
+        max_digits=15,
+        decimal_places=3,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Total Fuel Consumption (Boiler)"),
+    )
+
+    fuel_consumption_unit = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        verbose_name=_("Fuel Consumption Unit"),
     )
 
     class Meta:

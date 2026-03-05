@@ -102,6 +102,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
+    "accounts.middleware.HtmxLoginRedirectMiddleware",
+    "accounts.middleware.EmailVerificationMiddleware",
     # # own
     # "django_project.middleware.LoginRequiredMiddleware",
 ]
@@ -274,9 +276,15 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
 
+# Site domain configuration
+# For local development, use 127.0.0.1:8000
+# For production, use your actual domain (e.g., beat.example.com)
+SITE_DOMAIN = os.environ.get("SITE_DOMAIN", "127.0.0.1:8000")
+SITE_NAME = os.environ.get("SITE_NAME", "BEAT")
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = "home"
-ACCOUNT_SIGNUP_REDIRECT_URL = "update_profile"
+ACCOUNT_SIGNUP_REDIRECT_URL = "home"
 
 # https://django-allauth.readthedocs.io/en/latest/views.html#logout-account-logout
 ACCOUNT_LOGOUT_REDIRECT_URL = "home"
@@ -293,6 +301,7 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
 
 
 # Security

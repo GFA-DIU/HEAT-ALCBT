@@ -1,0 +1,408 @@
+<div class="w-full" id="savings-main-wrapper" style="--savings-primary: #FFA468; --savings-primary-secondary: #86EFAC;">
+
+  <div id="project-benchmark-top" hx-swap-oob="innerHTML:#tab-content-container-top" class="w-full">
+    <div class="w-full flex flex-col gap-6">
+      <div class="space-y-1">
+        <h6 class="text-xl text-[var(--text--strong-950)] font-bold">Project Performance Benchmark</h6>
+        <p class="text-sm text-[var(--text--strong-950)]">
+          Your project is performing better than <span
+            class="font-bold underline cursor-pointer decoration-dotted">78%</span> of peer projects in Germany.
+          <span class="bg-[#D5EDCD] text-xs text-[var(--text--strong-950)] font-extrabold rounded-full px-1.25 py-1">Top
+            25% tier
+          </span>
+        </p>
+      </div>
+
+      <!-- Benchmark Logic Visual -->
+      <div class="relative w-full min-h-27.5 mt-4">
+        <!-- Gradient Bar -->
+        <div class="absolute top-[28px] left-0 right-0 h-4 rounded-[0.25rem]"
+          style="background: repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0, rgba(0,0,0,0.2) 1px, transparent 1px, transparent 4px), linear-gradient(90deg, #81F28E 0%, #FEEA93 50%, #FFCFC2 100%);">
+        </div>
+
+        <!-- Markers -->
+        <!-- Best Practice -->
+        <div class="absolute top-[28px] left-[10%] -translate-x-1/2 flex items-end gap-1 group">
+          <div class="grid grid-cols-1 place-items-center">
+            <div class="size-2 bg-[#41B84E] rounded-full translate-y-1"></div>
+            <div class="h-13.5 w-0.5 bg-[#41B84E]"></div>
+          </div>
+          <div class="space-y-1 flex flex-col">
+            <span class="text-sm font-medium text-[var(--text--strong-950)]">Best Practice</span>
+            <span class="text-sm font-bold text-[var(--text--strong-950)] bg-[#4EDF81] px-1 py-0.5">320
+              kgCO<sub>2</sub>e/m<sup>2</sup></span>
+          </div>
+        </div>
+
+        <!-- Your Building -->
+        <div class="absolute top-0 left-[45%] -translate-x-1/2 -translate-y-[24px] flex flex-col items-center z-10">
+          <div class="text-base text-[var(--text--strong-950)] w-max text-center">Your
+            Building</div>
+          <div class="bg-[var(--text--strong-950)] text-white text-xs font-extrabold px-1 py-0.5">
+            463 kgCO<sub>2</sub>e/m<sup>2</sup>
+          </div>
+          <div class="grid grid-cols-1 place-items-center gap-0">
+            <div class="h-3.25 w-0.5 bg-black"></div>
+            <div class="size-2 bg-black rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- National Avg -->
+        <div class="absolute top-[28px] right-[10%] translate-x-1/2 flex items-end gap-1">
+          <div class="grid grid-cols-1 place-items-center">
+            <div class="size-2 bg-[#E99C96] rounded-full translate-y-1"></div>
+            <div class="h-13.5 w-0.5 bg-[#E99C96]"></div>
+          </div>
+          <div class="space-y-1 flex flex-col">
+            <span class="text-sm font-medium text-[var(--text--strong-950)]">National Avg</span>
+            <span class="text-sm font-bold text-[var(--text--strong-950)] bg-[#FECBC9] px-1 py-0.5">640
+              kgCO<sub>2</sub>e/m<sup>2</sup></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center gap-1.5 text-center">
+        <span data-icon="information-fill" data-size="16" class="text-[var(--icon--sub-600)]"></span>
+        <span class="text-xs text-[var(--text--sub-600)]">Benchmark based on 452 residential projects in
+          Baden-Württemberg region (2024-2025).</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content: Savings Grid -->
+  <div class="flex flex-col gap-6 w-full">
+
+    <!-- Content Tabs -->
+    <div class="w-full bg-[var(--bg--weak-50)] p-1 rounded-lg flex gap-1">
+      <button
+        class="px-4 py-1.5 rounded-md text-sm font-semibold text-[var(--text--strong-950)] bg-[#86EFAC] shadow-sm transition-all"
+        onclick="toggleSavingsView('embodied', this)">
+        Embodied Carbon Savings
+      </button>
+      <button
+        class="px-4 py-1.5 rounded-md text-sm font-medium text-[var(--text--sub-600)] hover:bg-white/50 transition-all"
+        onclick="toggleSavingsView('operational', this)">
+        Operational Carbon Savings
+      </button>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-[20rem_1fr] gap-6 items-start">
+
+      <!-- Left Column -->
+      <div class="space-y-6">
+        <!-- Chart Card -->
+        <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-5 rounded-2xl space-y-6">
+          <div class="flex items-center gap-2">
+            <span data-icon="leaf-line" data-size="20"></span>
+            <h6 class="text-sm font-semibold">Carbon Reduction</h6>
+          </div>
+
+          <div class="space-y-1 p-4 bg-[var(--bg--weak-100)] rounded-[0.5rem]">
+            <p class="text-xs text-[var(--text--sub-600)]">Material focus</p>
+            <div class="flex items-baseline gap-2">
+              <h3 class="text-3xl font-bold text-[#16A34A]">-85<span class="text-lg font-medium text-[#16A34A]">kg
+                  CO<sub>2</sub>eq/m<sup>2</sup></span></h3>
+            </div>
+            <div class="flex items-center gap-1 text-xs font-medium">
+              <span class="text-[var(--text--strong-950)]">12.5%</span>
+              <span data-icon="arrow-up-circle-fill" data-size="16" class="text-[#16A34A]"></span>
+              <span class="text-[var(--text--sub-600)]">Reduction</span>
+            </div>
+          </div>
+
+          <div class="w-full h-[200px] relative">
+            <canvas id="savings-reduction-chart"></canvas>
+          </div>
+
+
+          <div class="grid grid-cols-2 gap-2.25">
+            <div class="bg-[var(--bg--weak-100)] p-2 rounded-[0.5rem] space-y-0.5">
+              <span class="text-[var(--text--strong-950)] label-x-small">
+                <span class="text-[var(--savings-primary)] h5-title font-bold">330</span>
+                co<sub>2</sub>eq/m<sup>2</sup>
+              </span>
+              <span class="text-xs font-semibold text-[var(--text--strong-950)]">Baseline</span>
+            </div>
+            <div class="bg-[var(--bg--weak-100)] p-2 rounded-[0.5rem] space-y-0.5">
+              <span class="text-[var(--text--strong-950)] label-x-small">
+                <span class="text-[var(--savings-primary)] h5-title font-bold">246</span>
+                co<sub>2</sub>eq/m<sup>2</sup>
+              </span>
+              <span class="text-xs font-semibold text-[var(--text--strong-950)]">Optimized</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- List Card -->
+        <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-5 rounded-2xl space-y-6">
+          <div class="flex items-center gap-2">
+            <span data-icon="bar-chart-horizontal-line" data-size="20"></span>
+            <h6 class="text-base font-medium">Savings by Category</h6>
+          </div>
+
+          <!-- List Items -->
+          <div class="space-y-2.5">
+            <div class="space-y-2">
+              <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
+                <span>Ready-mix Concrete & Cement</span>
+                <span class="text-[#81F28E]">-35</span>
+              </div>
+              <progress class="progress progress-success w-full h-3" value="35" max="100"></progress>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
+                <span>Steel</span>
+                <span class="text-[#81F28E]">-14</span>
+              </div>
+              <progress class="progress progress-success w-full h-3" value="14" max="100"></progress>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
+                <span>Rebar</span>
+                <span class="text-[#81F28E]">-14</span>
+              </div>
+              <progress class="progress progress-success w-full h-3" value="14" max="100"></progress>
+            </div>
+            <div class="space-y-2">
+              <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
+                <span>Pre-cast Concrete</span>
+                <span class="text-[#81F28E]">-7</span>
+              </div>
+              <progress class="progress progress-success w-full h-3" value="7" max="100"></progress>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="space-y-6">
+        <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-6 rounded-2xl">
+          <div class="flex items-center gap-2 pb-4 mb-4 border-b border-border">
+            <span data-icon="bar-chart-box-line" data-size="20"></span> <!-- Just a generic icon -->
+            <h6 class="text-base font-semibold">Optimization Strategies</h6>
+          </div>
+
+          <div class="flex gap-4 mb-6 text-sm">
+            <div class="flex items-center gap-1.5">
+              <span class="size-2 rounded-full bg-[var(--savings-primary)]"></span>
+
+              <span class="text-[var(--text--sub-600)]">Baseline</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="size-2 rounded-full bg-[#4ADE80]"></span>
+              <span class="text-[var(--text--sub-600)]">Potential savings</span>
+            </div>
+          </div>
+
+          <!-- Strategy Items -->
+          <div class="space-y-8">
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                  <span data-icon="lego" data-size="16"></span>
+                  <span class="paragraph-x-small font-bold text-[var(--text--strong-950)]">Ready-mix concrete &
+                    cement</span>
+                </div>
+                <span class="text-xs font-semibold text-[var(--text--sub-600)]">30% of total</span>
+              </div>
+              <div
+                class="flex h-8 w-full rounded-md overflow-hidden text-[10px] font-medium text-[var(--text--strong-950)] bg-[var(--bg--weak-100)]">
+                <div class="bg-[var(--savings-primary)] w-[60%] flex items-center px-2">104 kg
+                  CO<sub>2</sub>e/m<sup>2</sup></div>
+
+                <div class="bg-[var(--savings-primary-secondary)] w-[20%] flex items-center justify-center text-ellipsis">-40 kgCO₂e/m²</div>
+              </div>
+              <!-- Detail -->
+              <div class="flex justify-between items-start text-xs pt-1">
+                <p class="text-[var(--text--strong-950)] max-w-[80%]">
+                  <span class="font-bold text-[#16A34A]">25%</span> replace with GGBS/Fly Ash blend <span
+                    class="text-[var(--text--sub-600)]">• 139 kg
+                    CO<sub>2</sub>e/m<sup>2</sup> -> 104 kg CO<sub>2</sub>e/m<sup>2</sup> (-35 kg
+                    CO<sub>2</sub>e/m<sup>2</sup>)</span>
+                </p>
+                <button class="flex items-center gap-0.5 text-[var(--text--sub-600)] underline decoration-dotted">
+                  View details <span data-icon="caret-down" data-size="14"></span>
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                  <span data-icon="lego" data-size="16"></span>
+                  <span class="paragraph-x-small font-bold text-[var(--text--strong-950)]">Steel</span>
+                </div>
+                <span class="text-xs font-semibold text-[var(--text--sub-600)]">15% of total</span>
+              </div>
+              <div
+                class="flex h-8 w-full rounded-md overflow-hidden text-[10px] font-medium text-[var(--text--strong-950)] bg-[var(--bg--weak-100)]">
+                <div class="bg-[var(--savings-primary)] w-[30%] flex items-center px-2">55 kg
+                  CO<sub>2</sub>e/m<sup>2</sup></div>
+
+                <div class="bg-[var(--savings-primary-secondary)] w-[20%] flex items-center justify-center text-ellipsis">-20 kgCO₂e/m²</div>
+              </div>
+              <!-- Detail -->
+              <div class="flex justify-between items-start text-xs pt-1">
+                <p class="text-[var(--text--strong-950)] max-w-[80%]">
+                  <span class="font-bold text-[#16A34A]">20%</span> with recycled content <span
+                    class="text-[var(--text--sub-600)]">• 69 kg
+                    CO<sub>2</sub>e/m<sup>2</sup> -> 55 kg CO<sub>2</sub>e/m<sup>2</sup> (-35 kg
+                    CO<sub>2</sub>e/m<sup>2</sup>)</span>
+                </p>
+                <button class="flex items-center gap-0.5 text-[var(--text--sub-600)] underline decoration-dotted">
+                  View details <span data-icon="caret-down" data-size="14"></span>
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                  <span data-icon="lego" data-size="16"></span>
+                  <span class="paragraph-x-small font-bold text-[var(--text--strong-950)]">Reinforcement bar
+                    (rebar)</span>
+                </div>
+                <span class="text-xs font-semibold text-[var(--text--sub-600)]">15% of total</span>
+              </div>
+              <div
+                class="flex h-8 w-full rounded-md overflow-hidden text-[10px] font-medium text-[var(--text--strong-950)] bg-[var(--bg--weak-100)]">
+                <div class="bg-[var(--savings-primary)] w-[18%] flex items-center px-2">32 kg
+                  CO<sub>2</sub>e/m<sup>2</sup></div>
+
+                <div class="bg-[var(--savings-primary-secondary)] w-[8%] flex items-center justify-center text-ellipsis">-7 ...</div>
+              </div>
+              <!-- Detail -->
+              <div class="flex justify-between items-start text-xs pt-1">
+                <p class="text-[var(--text--strong-950)] max-w-[80%]">
+                  <span class="font-bold text-[#16A34A]">20%</span> with recycled content <span
+                    class="text-[var(--text--sub-600)]">• 69 kg
+                    CO<sub>2</sub>e/m<sup>2</sup> -> 55 kg CO<sub>2</sub>e/m<sup>2</sup> (-35 kg
+                    CO<sub>2</sub>e/m<sup>2</sup>)</span>
+                </p>
+                <button class="flex items-center gap-0.5 text-[var(--text--sub-600)] underline decoration-dotted">
+                  View details <span data-icon="caret-down" data-size="14"></span>
+                </button>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+        <!-- Material Insight Card -->
+        <div class="bg-[var(--bg--strong-950)] text-white py-5 px-4 rounded-2xl flex flex-col gap-2">
+          <h6 class="text-base font-medium">Material Insight</h6>
+          <p class="text-xs leading-5">
+            Replacing standard cement with supplementary cementitious materials (SCMs) is often the most cost-effective
+            reduction strategy.
+          </p>
+          <button class="btn btn-primary btn-sm border-none w-fit mt-1.5 shadow-none">
+            Read LCA Guidelines
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  (function () {
+    // Initialize Chart
+    const ctx = document.getElementById('savings-reduction-chart');
+    let chartInstance = null;
+
+    if (ctx) {
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Baseline', 'Optimized'],
+          datasets: [{
+            data: [550, 465],
+            backgroundColor: ['#FFA468', '#86EFAC'],
+            borderRadius: 4,
+            barThickness: 60,
+            hoverBackgroundColor: ['#F97316', '#4ADE80']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 600,
+              ticks: { stepSize: 100, color: '#94a3b8', font: { size: 10 } },
+              grid: { color: '#e2e8f0', borderDash: [4, 4], drawBorder: false },
+              border: { display: false }
+            },
+            x: {
+              grid: { display: false },
+              border: { display: false },
+              ticks: {
+                display: true,
+                color: '#64748b', // slate-500
+                font: {
+                  size: 12,
+                  weight: '500'
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+
+    // Toggle Logic
+    window.toggleSavingsView = (view, btn) => {
+      // Reset buttons
+      const parent = btn.parentElement;
+      Array.from(parent.children).forEach(b => {
+        b.className = "px-4 py-1.5 rounded-md text-sm font-medium text-[var(--text--sub-600)] hover:bg-white/50 transition-all cursor-pointer";
+      });
+
+      // Active button
+      btn.className = "px-4 py-1.5 rounded-md text-sm font-semibold text-[var(--text--strong-950)] bg-[#86EFAC] shadow-sm transition-all cursor-default text-[#0f172a]";
+
+      // Toggle CSS Variable
+      const wrapper = document.getElementById('savings-main-wrapper');
+      if (wrapper) {
+        if (view === 'operational') {
+          wrapper.style.setProperty('--savings-primary', '#E57CB5');
+          wrapper.style.setProperty('--savings-primary-secondary', '#18BB9D');
+        } else {
+          wrapper.style.setProperty('--savings-primary', '#FFA468');
+          wrapper.style.setProperty('--savings-primary-secondary', '#86EFAC');
+        }
+      }
+
+      // Update Chart Color
+      if (chartInstance) {
+        const color = view === 'operational' ? '#E57CB5' : '#FFA468'; // Purple vs Orange
+        const hoverColor = view === 'operational' ? '#E57CB5' : '#F97316';
+        const color2 = view === 'operational' ? '#18BB9D' : '#86EFAC';
+        const hoverColor2 = view === 'operational' ? '#18BB9D' : '#4ADE80';
+
+        chartInstance.data.datasets[0].backgroundColor = [color, color2];
+        chartInstance.data.datasets[0].hoverBackgroundColor = [hoverColor, hoverColor2];
+        chartInstance.update();
+      }
+
+      // Update Stats (Mock)
+      const statValue = document.querySelector('#savings-main-wrapper h3');
+      if (statValue) {
+        if (view === 'operational') {
+          statValue.innerHTML = '-65<span class="text-lg font-medium text-[#16A34A] ml-1">kg CO<sub>2</sub>eq/m<sup>2</sup></span>';
+        } else {
+          statValue.innerHTML = '-85<span class="text-lg font-medium text-[#16A34A] ml-1">kg CO<sub>2</sub>eq/m<sup>2</sup></span>';
+        }
+      }
+    };
+
+  })();
+</script>

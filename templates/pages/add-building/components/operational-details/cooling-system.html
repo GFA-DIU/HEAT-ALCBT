@@ -1,89 +1,46 @@
 {% load static %}
-{% load i18n %}
 <div id="cooling-system-container" class="w-full">
   <div class="w-full flex flex-col">
-    <button
-      class="btn btn-outline w-fit"
-      onclick="openCoolingSystemModal()"
-    >
-      <span
-        data-icon="add-large-fill"
-        data-size="20"
-        data-color="var(--icon--strong-950)"
-      ></span>
-      {% translate "Add a cooling system" %}
+    <button class="btn btn-outline w-fit" onclick="openCoolingSystemModal()">
+      <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+      Add a cooling system
     </button>
-    <div
-      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
-    ></div>
-    <ul class="grid grid-cols-1 gap-2" id="cooling-systems-list">
-      <!-- Cooling systems will be added here dynamically -->
-    </ul>
+    <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
+    <ul class="grid grid-cols-1 gap-2" id="cooling-systems-list"></ul>
   </div>
 </div>
 
 <dialog id="cooling_system_modal" class="modal modal-bottom sm:modal-end">
-  <div
-    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
-  >
+  <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">{% translate "Add a cooling system" %}</h3>
-        <p class="text-sm/5 text-[var(--text--sub-600)]">
-          {% translate "Enter details of the building's cooling system, including type and capacity" %}
-        </p>
+        <h3 class="text-lg/6 font-medium">Add a cooling system</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">Enter details of the building's cooling system, including type and capacity</p>
       </div>
-      <button
-        type="button"
-        onclick="cooling_system_modal.close()"
-        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-      >
-        <span
-          data-icon="close-line"
-          data-size="16"
-          data-color="var(--icon--sub-600)"
-        ></span>
+      <button type="button" onclick="cooling_system_modal.close()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+        <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
     </div>
     <form id="cooling-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
-        {% csrf_token %}
+      {% csrf_token %}
       <div class="px-5 py-4">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">{% translate "Type of cooling system" %}</legend>
-          <select
-            class="select w-full"
-            id="cooling-system-type"
-            name="cooling_system_type"
+          <legend class="fieldset-legend">Type of cooling system<span class="text-[var(--state--error--base)]">*</span></legend>
+          <select class="select w-full" id="cooling-system-type" name="cooling_system_type"
             hx-get="/select_lists/?cooling_types=1"
             hx-trigger="load"
             hx-target="this"
             hx-swap="innerHTML"
-            onchange="handleCoolingSystemTypeChange(this.value)"
-          >
-            <option value="">{% translate "Select a cooling system" %}</option>
+            onchange="handleCoolingSystemTypeChange(this.value)">
+            <option value="">Select a cooling system</option>
           </select>
         </fieldset>
       </div>
-
       <div id="selected-cooling-system"></div>
     </form>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <button
-        type="button"
-        class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
-        onclick="closeCoolingSystemModal()"
-      >
-        {% translate "Cancel" %}
-      </button>
-      <button
-        type="button"
-        class="btn flex-1 btn-sm btn-primary"
-        onclick="saveCoolingSystem()"
-      >
-        {% translate "Save" %}
-      </button>
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeCoolingSystemModal()">Cancel</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveCoolingSystem()">Save</button>
     </div>
   </div>
 </dialog>
@@ -91,393 +48,172 @@
 <dialog id="cooling_system_modal_delete" class="modal modal-middle">
   <div class="modal-box w-full max-w-[26.375rem] p-0">
     <div class="flex flex-col items-center p-5">
-      <div
-        class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]"
-      >
-        <span
-          data-icon="alert-fill"
-          data-size="24"
-          data-color="var(--state--warning--base)"
-        ></span>
+      <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
+        <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)]"></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
-      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        {% translate "You are about to remove or delete added cooling system. This will action will permanently remove it." %}
-      </p>
+      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">You are about to permanently remove this cooling system.</p>
     </div>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <button
-        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
-        onclick="cooling_system_modal_delete.close()"
-      >
-        {% translate "Cancel" %}
-      </button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteCoolingSystem()">{% translate "Remove" %}</button>
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="cooling_system_modal_delete.close()">Cancel</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteCoolingSystem()">Remove</button>
     </div>
   </div>
 </dialog>
 
-<template id="cooling-system-template">
-  <div class="w-full flex flex-col">
-    <button
-      class="btn btn-outline w-fit"
-      onclick="cooling_system_modal.showModal()"
-    >
-      <span
-        data-icon="add-large-fill"
-        data-size="20"
-        data-color="var(--icon--strong-950)"
-      ></span>
-      {% translate "Add a cooling system" %}
-    </button>
-    <div
-      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
-    ></div>
-    <ul class="grid grid-cols-1">
-      <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="snowflake-fill"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-          class="shrink-0 self-start"
-        ></span>
-        <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">
-            {% translate "Chiller system - Water cooled chiller" %}
-          </p>
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >{% translate "Type:" %} R-290 Propane</span
-            >
-            <span>{% translate "Refrigerant quantity:" %} 23 kg</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="cooling_system_modal_delete.showModal()"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
-    </ul>
-  </div>
-</template>
-
 <template id="no-cooling-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
-    <img src="{% static 'assets/cooling-system.png' %}" alt="{% translate 'Cooling System Image' %}" />
-    <p class="text-sm/5 font-medium">
-      {% translate "Click button below to add a cooling system" %}
-    </p>
-    <button class="btn btn-primary" onclick="cooling_system_modal.showModal()">
-      {% translate "Add a cooling system" %}
-    </button>
+    <img src="{% static 'assets/cooling-system.png' %}" alt="Cooling System" />
+    <p class="text-sm/5 font-medium">Click button below to add a cooling system</p>
+    <button class="btn btn-primary" onclick="cooling_system_modal.showModal()">Add a cooling system</button>
   </div>
 </template>
 
-<template id="chiller-system-template">
-  <div
-    class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4"
-  >
-    {% translate "CHILLER SYSTEM DATA" %}
-  </div>
+<template id="window-ac-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">WINDOW AIR CONDITIONER DATA</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Chiller system" %}<span class="text-[var(--state--error--base)]">*</span>
-      </legend>
-      <select class="select w-full" name="chiller_system" required>
-        <option disabled selected value="">{% translate "Select an option" %}</option>
-        <option value="water-cooled">{% translate "Water cooled chiller" %}</option>
-        <option value="air-cooled">{% translate "Air cooled chiller" %}</option>
-      </select>
-    </fieldset>
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Year of installation" %}<span class="text-[var(--state--error--base)]"
-          >*</span
-        >
-      </legend>
+      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="text" placeholder="{% translate 'eg. 2012' %}" required min="1900" max="2099" name="year_of_installation" />
+        <input type="number" name="year_of_installation" placeholder="e.g. 2021" required min="1900" max="{% now "Y" %}"
+          onchange="applyRefrigerantDefault(this.form,'window-ac'); applyLeakageDefault(this.form)" />
       </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
-    </fieldset>
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Type of refrigerants" %}<span class="text-[var(--state--error--base)]"
-          >*</span
-        >
-      </legend>
-      <select
-        class="select w-full"
-        name="type_of_refrigerants"
-        hx-get="/select_lists/?refrigerant_types=1"
-        hx-trigger="load"
-        hx-target="this"
-        hx-swap="innerHTML"
-      >
-        <option disabled selected value="">{% translate "Select an option" %}</option>
-      </select>
-    </fieldset>
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Refrigerant quantity" %}<span class="text-[var(--state--error--base)]"
-          >*</span
-        ><span class="text-[var(--text--sub-600)]">(kg)</span>
-      </legend>
-      <label class="input validator w-full">
-        <input type="number" placeholder="{% translate 'eg.  134' %}" name="refrigerant_quantity" required min="0" />
-        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-          >kg</span
-        >
-      </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
-    </fieldset>
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Installation of variable speed drives" %}<span
-          class="text-[var(--state--error--base)]"
-          >*</span
-        ><span
-          data-icon="info-custom-fill"
-          data-size="20"
-          data-color="var(--icon--disabled-300)"
-        ></span>
-      </legend>
-      <div class="flex items-center gap-2.5">
-        <label class="flex items-center gap-2">
-          <input
-            type="radio"
-            name="installation_of_variable_speed_drives"
-            class="radio radio-xs"
-          />
-          {% translate "Yes" %}
-        </label>
-        <label class="flex items-center gap-2">
-          <input
-            type="radio"
-            name="installation_of_variable_speed_drives"
-            class="radio radio-xs"
-          />
-          {% translate "No" %}
-        </label>
-      </div>
-    </fieldset>
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Installation of heat recovery systems" %}<span
-          class="text-[var(--state--error--base)]"
-          >*</span
-        ><span
-          data-icon="info-custom-fill"
-          data-size="20"
-          data-color="var(--icon--disabled-300)"
-        ></span>
-      </legend>
-      <div class="flex items-center gap-2.5">
-        <label class="flex items-center gap-2">
-          <input
-            type="radio"
-            name="installation_of_heat_recovery_systems"
-            class="radio radio-xs"
-          />
-          {% translate "Yes" %}
-        </label>
-        <label class="flex items-center gap-2">
-          <input
-            type="radio"
-            name="installation_of_heat_recovery_systems"
-            class="radio radio-xs"
-          />
-          {% translate "No" %}
-        </label>
-      </div>
-    </fieldset>
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Total cooling load for chiller system" %}<span
-          class="text-[var(--state--error--base)]"
-          >*</span
-        >
-      </legend>
-      <label class="input validator w-full">
-        <input type="text" placeholder="{% translate 'eg. 342' %}" name="total_chiller_system"  required min="1" />
-      </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
+      <p class="validator-hint">This field is required</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}</legend>
+      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <select class="select w-full" name="type_of_refrigerants"
+        hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
+        onchange="clearIfUserChanged(this)">
+        <option disabled selected value="">Select an option</option>
+      </select>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="{% translate 'eg. 2' %}" name="baseline_leakage_factor" required min="1" />
-        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-          >%</span
-        >
+        <input type="number" name="refrigerant_quantity" placeholder="e.g. 0.5 – 1.5 kg/unit" required min="0" step="0.1" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
       </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical = Capacity (Tons) × 0.6 kg</p>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 1.0" required min="0" step="0.001"
+          oninput="applyRefrigerantQtyDefaultCapacity(this.form,'window-ac'); recalcWindowAcEnergy(this.form)" />
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
+          onchange="recalcWindowAcEnergy(this.form)">
+          <option value="ton">Ton</option>
+          <option value="btu_hr">BTU/hr</option>
+          <option value="kw">kW</option>
+        </select>
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">1 Ton = 12,000 BTU/hr = 3.516 kW</p>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_units" placeholder="e.g. 5" required min="1"
+          oninput="recalcWindowAcEnergy(this.form)" />
+      </label>
+      <p class="validator-hint">Must be at least 1</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">
-        {% translate "Annual operating schedule" %}<span
-          data-icon="info-custom-fill"
-          data-size="20"
-          data-color="var(--icon--disabled-300)"
-        ></span>
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="{% translate 'eg. 1' %}" name="annual_operating_hours_per_day"  required min="1" max="24" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >{% translate "Hours / day" %}</span
-            >
+            <input type="number" name="hours_per_day" id="window-ac-hours" placeholder="e.g. 8" required min="1" max="24"
+              oninput="recalcWindowAcEnergy(this.form)" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="{% translate 'eg. 1' %}" name="annual_operating_days_per_week"  required min="1" max="7" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >{% translate "days / week" %}</span
-            >
+            <input type="number" name="days_per_week" id="window-ac-days" placeholder="e.g. 5" required min="1" max="7"
+              oninput="recalcWindowAcEnergy(this.form)" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
-            <input type="number" placeholder="{% translate 'eg. 1' %}" name="annual_operating_weeks_per_year"  required min="1" max="52" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >{% translate "weeks / year" %}</span
-            >
+            <input type="number" name="weeks_per_year" id="window-ac-weeks" placeholder="e.g. 52" required min="1" max="52"
+              oninput="recalcWindowAcEnergy(this.form)" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
           </label>
         </div>
       </div>
     </fieldset>
+
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">
-        {% translate "Baseline Air Cooled/Water Cooled Chiller Cooling Efficiency" %}
-      </legend>
-      <label class="input w-full">
-        <input type="number" placeholder="{% translate 'eg. 2' %}" name="baseline_cooling_efficiency"  required min="1" />
+      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="eer_iseer_cop" placeholder="e.g. 2.8" required min="0.01" step="0.01"
+          oninput="recalcWindowAcEnergy(this.form)" />
       </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">From BEE/EGAT/SNI label. Typical EER: 2.3 – 3.5. Cannot be zero.</p>
+      <p class="validator-hint">Value must be greater than zero</p>
     </fieldset>
+
+    <!-- OTHER DETAILS -->
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
-        <div
-          class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
-        >
-          {% translate "OTHER DETAILS" %}
-          <span
-            data-icon="caret-down"
-            data-size="16"
-            data-color="var(--icon--soft-400)"
-            class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"
-          ></span>
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS
+          <span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">
-                {% translate "Number of chillers" %}<span class="text-[var(--text--sub-600)]"
-                  >({% translate "Optional" %})</span
-                >
-              </legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 2' %}" name="number_of_chillers"  required min="0" />
-              </label>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+              <select class="select w-full" name="energy_efficiency_label">
+                <option disabled selected value="">Select</option>
+                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
+              </select>
             </fieldset>
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">
-                {% translate "Total chiller system power input" %}<span
-                  class="text-[var(--text--sub-600)]"
-                  >({% translate "Optional" %})</span
-                >
-              </legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 2000' %}" name="total_chiller_system_power_input"  required min="0" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >kWH</span
-                >
-              </label>
-            </fieldset>
-            <fieldset class="fieldset col-span-2">
-              <legend class="fieldset-legend">
-                {% translate "Water-cooled chiller cooling load factor" %}<span
-                  class="text-[var(--text--sub-600)]"
-                  >({% translate "Optional" %}) %</span
-                >
-              </legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 45' %}" name="water_cooled_chiller_cooling_load_factor"  required min="0"/>
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >%</span
-                >
-              </label>
-            </fieldset>
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "COP" %}</legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 2' %}" name="cop"  required min="0" />
-              </label>
-            </fieldset>
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "IPVL" %}</legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 2' %}" name="ipvl"  required min="0" />
-              </label>
-            </fieldset>
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
-              <select class="select w-full" name="energy_efficiency_label"  required>
-                <option disabled selected value="">{% translate "Select an option" %}</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="G">G</option>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+              <select class="select w-full" name="number_of_stars">
+                <option disabled selected value="">Select</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
-              <select class="select w-full" name="number_of_stars" required>
-                <option disabled selected value="">{% translate "Select an option" %}</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-            </fieldset>
-            <fieldset class="fieldset col-span-2">
-              <legend class="fieldset-legend">
-                {% translate "Total energy consumption of chiller system anually (kwh/year)" %}
-              </legend>
+              <legend class="fieldset-legend">Power input per unit <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
               <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 200' %}" name="total_energy_consumption_of_chiller_system_annually"  required min="0" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >kWh/year</span
-                >
+                <input type="number" name="power_input_per_unit" placeholder="0.8 – 1.8 kW" min="0" step="0.01"
+                  oninput="recalcWindowAcEnergy(this.closest('form'))" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
               </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: 0.8 – 1.8 kW for 0.75 – 2.0 Ton units</p>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">If power input given: Power/unit × Units × h/day × d/week × w/year. Otherwise: (Capacity(kW) × Units / EER) × h/day × d/week × w/year</p>
             </fieldset>
           </div>
         </div>
@@ -486,234 +222,761 @@
   </div>
 </template>
 
-<template id="air-condition-system-template">
-  <div
-    class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4"
-  >
-    {% translate "AIR CONDITION SYSTEM DATA" %}
-  </div>
+<template id="split-ac-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">SPLIT AIR CONDITIONER DATA</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Type of air condition" %}<span class="text-[var(--state--error--base)]"
-          >*</span
-        >
-      </legend>
-      <select class="select w-full" name="type_of_air_condition" required>
-        <option disabled selected value="">{% translate "Select an option" %}</option>
-        <option value="split">{% translate "Split air condition" %}</option>
-        <option value="VRV">
-          {% translate "Variable Refrigerant Volume (VRV) / Variable Refrigerant Flow (VRF)" %}
-        </option>
+      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="year_of_installation" placeholder="e.g. 2021" required min="1900" max="{% now "Y" %}"
+          onchange="applyRefrigerantDefault(this.form,'split-ac'); applyLeakageDefault(this.form)" />
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <select class="select w-full" name="type_of_refrigerants"
+        hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
+        onchange="clearIfUserChanged(this)">
+        <option disabled selected value="">Select an option</option>
       </select>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
     </fieldset>
+
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Year of installation" %}<span class="text-[var(--state--error--base)]"
-          >*</span
-        >
-      </legend>
+      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="{% translate 'eg. 2012' %}" min="1900" max="{% now "Y" %}" name="year_of_installation" required />
+        <input type="number" name="refrigerant_quantity" placeholder="Typical: 1.5 – 5 kg/unit" required min="0" step="0.1" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
       </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical = Capacity (Tons) × 1.0 kg</p>
+      <p class="validator-hint">This field is required</p>
     </fieldset>
+
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Type of refrigerants" %}<span class="text-[var(--state--error--base)]"
-          >*</span
-        >
-      </legend>
-      <select
-        class="select w-full"
-        name="type_of_refrigerants"
-        hx-get="/select_lists/?refrigerant_types=1"
-        hx-trigger="load"
-        hx-target="this"
-        hx-swap="innerHTML"
-        required
-      >
-        <option disabled selected value="">{% translate "Select an option" %}</option>
-      </select>
+      <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 1.5" required min="0" step="0.001"
+          oninput="applyRefrigerantQtyDefaultCapacity(this.form,'split-ac'); recalcWindowAcEnergy(this.form)" />
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
+          onchange="recalcWindowAcEnergy(this.form)">
+          <option value="ton">Ton</option>
+          <option value="btu_hr">BTU/hr</option>
+          <option value="kw">kW</option>
+        </select>
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">1 Ton = 12,000 BTU/hr = 3.516 kW</p>
+      <p class="validator-hint">This field is required</p>
     </fieldset>
+
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Refrigerant quantity" %}<span class="text-[var(--state--error--base)]"
-          >*</span
-        ><span class="text-[var(--text--sub-600)]">(kg)</span>
-      </legend>
+      <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="{% translate 'eg.  134' %}" name="refrigerant_quantity" required min="0" />
-        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-          >kg</span
-        >
+        <input type="number" name="number_of_units" placeholder="e.g. 25" required min="1"
+          oninput="recalcWindowAcEnergy(this.form)" />
       </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
+      <p class="validator-hint">Must be at least 1</p>
     </fieldset>
+
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">
-        {% translate "Total cooling load for split/VRV" %}<span
-          class="text-[var(--state--error--base)]"
-          >*</span
-        >
-      </legend>
+      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" placeholder="{% translate 'eg. 342' %}" name="total_cooling_load_for_split_vrv" required min="0" />
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
+      <p class="validator-hint">This field is required</p>
     </fieldset>
-    <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}</legend>
-      <label class="input validator w-full">
-        <input type="number" placeholder="{% translate 'eg. 2' %}" name="baseline_leakage_factor" required min="0" />
-        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-          >%</span
-        >
-      </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
-    </fieldset>
+
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">
-        {% translate "System operating schedule" %}<span
-          data-icon="info-custom-fill"
-          data-size="20"
-          data-color="var(--icon--disabled-300)"
-        ></span>
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
-        <div class="flex-1">
-          <label class="input validator w-full">
-            <input type="number" placeholder="{% translate 'eg. 1' %}" name="hours_per_day" required min="1" max="24" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >{% translate "Hours / day" %}</span
-            >
-          </label>
-        </div>
-        <div class="flex-1">
-          <label class="input validator w-full">
-            <input type="number" placeholder="{% translate 'eg. 1' %}" name="days_per_week" required min="1" max="7" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >{% translate "days / week" %}</span
-            >
-          </label>
-        </div>
-        <div class="flex-1">
-          <label class="input validator w-full">
-            <input type="number" placeholder="{% translate 'eg. 1' %}" name="weeks_per_year" required min="1" max="52" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >{% translate "weeks / year" %}</span
-            >
-          </label>
-        </div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="hours_per_day" id="split-ac-hours" placeholder="e.g. 8" required min="1" max="24"
+            oninput="recalcWindowAcEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="days_per_week" id="split-ac-days" placeholder="e.g. 5" required min="1" max="7"
+            oninput="recalcWindowAcEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="weeks_per_year" id="split-ac-weeks" placeholder="e.g. 52" required min="1" max="52"
+            oninput="recalcWindowAcEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+        </label></div>
       </div>
     </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="eer_iseer_cop" placeholder="e.g. 2.8" required min="0.01" step="0.01"
+          oninput="recalcWindowAcEnergy(this.form)" />
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">From BEE/EGAT/SNI label. Typical EER: 2.3 – 3.5. Cannot be zero.</p>
+      <p class="validator-hint">Value must be greater than zero</p>
+    </fieldset>
+
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
-        <div
-          class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]"
-        >
-          {% translate "OTHER DETAILS" %}
-          <span
-            data-icon="caret-down"
-            data-size="16"
-            data-color="var(--icon--soft-400)"
-            class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"
-          ></span>
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">
-                {% translate "Total number of split/VRV units" %}
-              </legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 2' %}" name="total_number_of_split_vrv_units" />
-              </label>
-            </fieldset>
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">
-                {% translate "Total split unit//VRV system" %}
-              </legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 400' %}" name="total_split_unit_vrv_system" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >kW</span
-                >
-              </label>
-            </fieldset>
-            <fieldset class="fieldset col-span-2">
-              <legend class="fieldset-legend">
-                {% translate "Total energy consumption of chiller system annually" %}<span
-                  class="text-[var(--text--sub-600)]"
-                  >(kWh/year)</span
-                >
-              </legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 200' %}" name="total_chiller_system_annually" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >%</span
-                >
-              </label>
-            </fieldset>
-            <fieldset class="fieldset col-span-2">
-              <legend class="fieldset-legend">
-                {% translate "Baseline split unit/VRV system efficiency" %}
-              </legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 333' %}" name="baseline_split_unit_vrv_system_efficiency" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >watt</span
-                >
-              </label>
-            </fieldset>
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "ISSER rating" %}</legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 4.5' %}" name="isser_rating" />
-              </label>
-            </fieldset>
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "COP" %}</legend>
-              <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 2' %}" name="cop" />
-              </label>
-            </fieldset>
-
-            <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
               <select class="select w-full" name="energy_efficiency_label">
-                <option disabled selected value="">{% translate "Select an option" %}</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="G">G</option>
+                <option disabled selected value="">Select</option>
+                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+              <select class="select w-full" name="number_of_stars">
+                <option disabled selected value="">Select</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
-              <select class="select w-full" name="number_of_stars">
-                <option disabled selected value="">{% translate "Select an option" %}</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
+              <legend class="fieldset-legend">Power input per unit <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <label class="input w-full">
+                <input type="number" name="power_input_per_unit" placeholder="0.8 – 2.5 kW" min="0" step="0.01"
+                  oninput="recalcWindowAcEnergy(this.closest('form'))" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: 0.8 – 2.5 kW for 1.0 – 2.0 Ton units</p>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">If power input given: Power/unit × Units × h/day × d/week × w/year. Otherwise: (Capacity(kW) × Units / EER) × h/day × d/week × w/year</p>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="vrf-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">VARIABLE REFRIGERANT FLOW (VRF) SYSTEM DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="year_of_installation" placeholder="e.g. 2022" required min="1900" max="{% now "Y" %}"
+          onchange="applyRefrigerantDefault(this.form,'vrf-system'); applyLeakageDefault(this.form)" />
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <select class="select w-full" name="type_of_refrigerants"
+        hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
+        onchange="clearIfUserChanged(this)">
+        <option disabled selected value="">Select an option</option>
+      </select>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="refrigerant_quantity" placeholder="Typical: 30 – 200 kg" required min="0" step="0.1" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical = (Capacity(Tons) × 0.6) + 30 kg</p>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 10" required min="0" step="0.001"
+          oninput="applyRefrigerantQtyDefaultCapacity(this.form,'vrf-system'); recalcWindowAcEnergy(this.form)" />
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
+          onchange="recalcWindowAcEnergy(this.form)">
+          <option value="ton">Ton</option>
+          <option value="btu_hr">BTU/hr</option>
+          <option value="kw">kW</option>
+        </select>
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">1 Ton = 12,000 BTU/hr = 3.516 kW</p>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Number of outdoor units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_units" placeholder="e.g. 3" required min="1"
+          oninput="recalcWindowAcEnergy(this.form)" />
+      </label>
+      <p class="validator-hint">Must be at least 1</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="hours_per_day" id="vrf-hours" placeholder="10 – 16" required min="1" max="24"
+            oninput="recalcWindowAcEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="days_per_week" id="vrf-days" placeholder="5 – 7" required min="1" max="7"
+            oninput="recalcWindowAcEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="weeks_per_year" id="vrf-weeks" placeholder="50 – 52" required min="1" max="52"
+            oninput="recalcWindowAcEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+        </label></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="eer_iseer_cop" placeholder="e.g. 4.0" required min="0.01" step="0.01"
+          oninput="recalcWindowAcEnergy(this.form)" />
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">From BEE/EGAT/SNI label. Typical EER: 3.5 – 5.5. Cannot be zero.</p>
+      <p class="validator-hint">Value must be greater than zero</p>
+    </fieldset>
+
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+              <select class="select w-full" name="energy_efficiency_label">
+                <option disabled selected value="">Select</option>
+                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2">
-              <legend class="fieldset-legend">
-                {% translate "Total energy consumption of chiller system anually (kwh/year)" %}
-              </legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+              <select class="select w-full" name="number_of_stars">
+                <option disabled selected value="">Select</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                <option value="4">4</option><option value="5">5</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Power input per unit <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
               <label class="input w-full">
-                <input type="number" placeholder="{% translate 'eg. 200' %}" name="total_chiller_system_annually" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >kWh/year</span
-                >
+                <input type="number" name="power_input_per_unit" placeholder="5 – 50 kW" min="0" step="0.01"
+                  oninput="recalcWindowAcEnergy(this.closest('form'))" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
               </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: 5 – 50 kW per outdoor unit</p>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">If power input given: Power/unit × Units × h/day × d/week × w/year. Otherwise: (Capacity(kW) × Units / EER) × h/day × d/week × w/year</p>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="packaged-ac-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">PACKAGED / DUCTABLE AIR CONDITIONER DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">System sub-type<span class="text-[var(--state--error--base)]">*</span></legend>
+      <select class="select w-full" name="packaged_subtype" required>
+        <option disabled selected value="">Select sub-type</option>
+        <option value="rooftop">Rooftop Unit</option>
+        <option value="floor_standing">Floor-standing</option>
+        <option value="ductable">Ductable</option>
+        <option value="cassette">Cassette</option>
+      </select>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="year_of_installation" placeholder="e.g. 2020" required min="1900" max="{% now "Y" %}"
+          onchange="applyRefrigerantDefault(this.form,'packaged-ac'); applyLeakageDefault(this.form)" />
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <select class="select w-full" name="type_of_refrigerants"
+        hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
+        onchange="clearIfUserChanged(this)">
+        <option disabled selected value="">Select an option</option>
+      </select>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="refrigerant_quantity" placeholder="Typical: 5 – 100 kg" required min="0" step="0.1" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical quantity = Total cooling capacity (RT) × 0.6</p>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 5" required min="0" step="0.001"
+          oninput="applyRefrigerantQtyDefaultCapacity(this.form,'packaged-ac'); recalcWindowAcEnergy(this.form)" />
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
+          onchange="recalcWindowAcEnergy(this.form)">
+          <option value="ton">Ton</option>
+          <option value="btu_hr">BTU/hr</option>
+          <option value="kw">kW</option>
+        </select>
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">1 Ton = 12,000 BTU/hr = 3.516 kW</p>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_units" placeholder="e.g. 4" required min="1"
+          oninput="recalcWindowAcEnergy(this.form)" />
+      </label>
+      <p class="validator-hint">Must be at least 1</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="hours_per_day" id="packaged-hours" placeholder="e.g. 10" required min="1" max="24"
+            oninput="recalcWindowAcEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="days_per_week" id="packaged-days" placeholder="e.g. 5" required min="1" max="7"
+            oninput="recalcWindowAcEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="weeks_per_year" id="packaged-weeks" placeholder="e.g. 50" required min="1" max="52"
+            oninput="recalcWindowAcEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+        </label></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="eer_iseer_cop" placeholder="e.g. 3.0" required min="0.01" step="0.01"
+          oninput="recalcWindowAcEnergy(this.form)" />
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">From BEE/EGAT/SNI label. Typical EER: 2.5 – 4.0. Cannot be zero.</p>
+      <p class="validator-hint">Value must be greater than zero</p>
+    </fieldset>
+
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+              <select class="select w-full" name="energy_efficiency_label">
+                <option disabled selected value="">Select</option>
+                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+              <select class="select w-full" name="number_of_stars">
+                <option disabled selected value="">Select</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                <option value="4">4</option><option value="5">5</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Power input per unit <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <label class="input w-full">
+                <input type="number" name="power_input_per_unit" placeholder="3 – 20 kW" min="0" step="0.01"
+                  oninput="recalcWindowAcEnergy(this.closest('form'))" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: 3 – 20 kW for 2 – 15 Ton units</p>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">If power input given: Power/unit × Units × h/day × d/week × w/year. Otherwise: (Capacity(kW) × Units / EER) × h/day × d/week × w/year</p>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="water-cooled-chiller-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">WATER COOLED CHILLER DATA</div>
+  <input type="hidden" name="chiller_system" value="water-cooled" />
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="year_of_installation" placeholder="e.g. 2019" required min="1900" max="{% now "Y" %}"
+          onchange="applyRefrigerantDefault(this.form,'water_cooled'); applyLeakageDefault(this.form)" />
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <select class="select w-full" name="type_of_refrigerants"
+        hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
+        onchange="clearIfUserChanged(this)">
+        <option disabled selected value="">Select an option</option>
+      </select>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="refrigerant_quantity" placeholder="Typical: 200 – 2,000 kg" required min="0" step="0.1" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical = (RT × 0.6) + 100 kg</p>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total cooling load<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="total_cooling_load" placeholder="e.g. 500" required min="0" step="0.1"
+          oninput="applyRefrigerantQtyDefault(this.form,'water_cooled'); recalcChillerEnergy(this.form)" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">RT</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_chillers" placeholder="e.g. 2" required min="1"
+          oninput="recalcChillerEnergy(this.form)" />
+      </label>
+      <p class="validator-hint">Must be at least 1</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="annual_operating_hours_per_day" id="water-chiller-hours" placeholder="12 – 24" required min="1" max="24"
+            oninput="recalcChillerEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="annual_operating_days_per_week" id="water-chiller-days" placeholder="5 – 7" required min="1" max="7"
+            oninput="recalcChillerEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="annual_operating_weeks_per_year" id="water-chiller-weeks" placeholder="50 – 52" required min="1" max="52"
+            oninput="recalcChillerEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+        </label></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Baseline cooling efficiency<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_cooling_efficiency" placeholder="e.g. 0.70" required min="0" step="0.01"
+          oninput="recalcChillerEnergy(this.form)" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/RT</span>
+      </label>
+      <p class="validator-hint">Value cannot be negative</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Installation of variable speed drives<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5">
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Installation of heat recovery systems<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5">
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
+      </div>
+    </fieldset>
+
+    <!-- OTHER DETAILS -->
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">IPLV (Integrated Part Load Value) <span class="text-[var(--text--sub-600)]">(Optional, 5.0 – 8.0)</span></legend>
+              <label class="input w-full"><input type="number" name="ipvl" placeholder="e.g. 6.0" min="0" step="0.01" /></label>
+            </fieldset>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Water-cooled chiller cooling load factor <span class="text-[var(--text--sub-600)]">(Optional, Typical: 10 – 25%)</span></legend>
+              <label class="input w-full"><input type="number" name="water_cooled_chiller_cooling_load_factor" placeholder="e.g. 15" min="0" max="100" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span></label>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Total system power input <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <label class="input w-full"><input type="number" name="total_chiller_system_power_input" placeholder="e.g. 2000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span></label>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">COP <span class="text-[var(--text--sub-600)]">(Optional, 4.0 – 7.0)</span></legend>
+              <label class="input w-full"><input type="number" name="cop" placeholder="e.g. 5.5" min="0" step="0.01" /></label>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+              <select class="select w-full" name="energy_efficiency_label">
+                <option disabled selected value="">Select</option>
+                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+              <select class="select w-full" name="number_of_stars">
+                <option disabled selected value="">Select</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                <option value="4">4</option><option value="5">5</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_of_chiller_system_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Cooling load (RT) × Units × Efficiency (kW/RT) × h/day × d/week × w/year × VSD factor (0.80 if Yes) × HR factor (0.70 if Yes)</p>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="air-cooled-chiller-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">AIR COOLED CHILLER DATA</div>
+  <input type="hidden" name="chiller_system" value="air-cooled" />
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="year_of_installation" placeholder="e.g. 2020" required min="1900" max="{% now "Y" %}"
+          onchange="applyRefrigerantDefault(this.form,'air_cooled'); applyLeakageDefault(this.form)" />
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <select class="select w-full" name="type_of_refrigerants"
+        hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
+        onchange="clearIfUserChanged(this)">
+        <option disabled selected value="">Select an option</option>
+      </select>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="refrigerant_quantity" placeholder="Typical: 50 – 500 kg" required min="0" step="0.1" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
+      </label>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical = (RT × 0.5) + 50 kg</p>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total cooling load<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="total_cooling_load" placeholder="e.g. 200" required min="0" step="0.1"
+          oninput="applyRefrigerantQtyDefault(this.form,'air_cooled'); recalcChillerEnergy(this.form)" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">RT</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_chillers" placeholder="e.g. 3" required min="1"
+          oninput="recalcChillerEnergy(this.form)" />
+      </label>
+      <p class="validator-hint">Must be at least 1</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="annual_operating_hours_per_day" id="air-chiller-hours" placeholder="10 – 24" required min="1" max="24"
+            oninput="recalcChillerEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="annual_operating_days_per_week" id="air-chiller-days" placeholder="5 – 7" required min="1" max="7"
+            oninput="recalcChillerEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="annual_operating_weeks_per_year" id="air-chiller-weeks" placeholder="50 – 52" required min="1" max="52"
+            oninput="recalcChillerEnergy(this.form)" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+        </label></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Baseline cooling efficiency<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_cooling_efficiency" placeholder="e.g. 1.00" required min="0" step="0.01"
+          oninput="recalcChillerEnergy(this.form)" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/RT</span>
+      </label>
+      <p class="validator-hint">Value cannot be negative</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Installation of variable speed drives<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5">
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Installation of heat recovery systems<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5">
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
+      </div>
+    </fieldset>
+
+    <!-- OTHER DETAILS -->
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">IPLV (Integrated Part Load Value) <span class="text-[var(--text--sub-600)]">(Optional, 4.0 – 6.0)</span></legend>
+              <label class="input w-full"><input type="number" name="ipvl" placeholder="e.g. 5.0" min="0" step="0.01" /></label>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Total system power input <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <label class="input w-full"><input type="number" name="total_chiller_system_power_input" placeholder="e.g. 800" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span></label>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">COP <span class="text-[var(--text--sub-600)]">(Optional, 3.0 – 4.5)</span></legend>
+              <label class="input w-full"><input type="number" name="cop" placeholder="e.g. 3.8" min="0" step="0.01" /></label>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+              <select class="select w-full" name="energy_efficiency_label">
+                <option disabled selected value="">Select</option>
+                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+              <select class="select w-full" name="number_of_stars">
+                <option disabled selected value="">Select</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                <option value="4">4</option><option value="5">5</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
+                <input type="number" name="total_energy_consumption_of_chiller_system_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+              </label>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Cooling load (RT) × Units × Efficiency (kW/RT) × h/day × d/week × w/year × VSD factor (0.80 if Yes) × HR factor (0.70 if Yes)</p>
             </fieldset>
           </div>
         </div>
@@ -723,119 +986,256 @@
 </template>
 
 <script>
-  // Store editing system ID and type on window
-  if (!window.editingCoolingSystemId) {
-    window.editingCoolingSystemId = null;
-  }
-  if (!window.editingCoolingSystemType) {
-    window.editingCoolingSystemType = null;
+  // Climate zone passed from Django view (use var to avoid re-declaration errors when step is reloaded)
+  var BUILDING_CLIMATE_ZONE = "{{ climate_zone }}";
+
+  if (!window.editingCoolingSystemId) window.editingCoolingSystemId = null;
+  if (!window.editingCoolingSystemType) window.editingCoolingSystemType = null;
+
+  // Top-level cooling type → { templateId, backendType, acType }
+  // chiller types now have their own top-level values (chiller-water / chiller-air)
+  var COOLING_TYPE_MAP = {
+    'window-ac':    { templateId: 'window-ac-template',         backendType: 'air_conditioner', acType: 'window' },
+    'split-ac':     { templateId: 'split-ac-template',          backendType: 'air_conditioner', acType: 'split' },
+    'vrf-system':   { templateId: 'vrf-template',               backendType: 'air_conditioner', acType: 'vrv' },
+    'packaged-ac':  { templateId: 'packaged-ac-template',       backendType: 'air_conditioner', acType: 'packaged' },
+    'chiller-water':{ templateId: 'water-cooled-chiller-template', backendType: 'chiller',       acType: null },
+    'chiller-air':  { templateId: 'air-cooled-chiller-template',   backendType: 'chiller',       acType: null },
+  };
+
+  // ── Default operating hours by climate zone ──────────────────────────────
+  // Hours expressed as total annual hours; we convert to h/day × d/week × w/year
+  // The doc gives total annual hours. We break them into sensible defaults:
+  //   hours_per_day = total / (days_per_week * weeks_per_year)
+  var OPERATING_DEFAULTS = {
+    // [hours_per_day, days_per_week, weeks_per_year]
+    residential: { // Window AC, Split AC
+      'tropical-wet': [8,  7, 52],
+      'warm-humid':   [7,  7, 48],
+      'hot-dry':      [8,  7, 44],
+      'composite':    [7,  7, 36],
+      'temperate':    [5,  7, 28],
+      'cold':         [4,  7, 14],
+    },
+    commercial: { // VRF, Packaged
+      'tropical-wet': [10, 7, 52],
+      'warm-humid':   [10, 6, 50],
+      'hot-dry':      [10, 6, 46],
+      'composite':    [10, 6, 40],
+      'temperate':    [9,  6, 32],
+      'cold':         [8,  6, 20],
+    },
+    chiller: { // Water/Air cooled chiller
+      'tropical-wet': [14, 7, 52],
+      'warm-humid':   [12, 7, 50],
+      'hot-dry':      [12, 6, 46],
+      'composite':    [12, 6, 40],
+      'temperate':    [10, 6, 32],
+      'cold':         [8,  6, 20],
+    },
+  };
+
+  function getOperatingDefaults(systemType, climateZone) {
+    if (!climateZone) return null;
+    let category;
+    if (systemType === 'window-ac' || systemType === 'split-ac') category = 'residential';
+    else if (systemType === 'vrf-system' || systemType === 'packaged-ac') category = 'commercial';
+    else category = 'chiller';
+    return (OPERATING_DEFAULTS[category] || {})[climateZone] || null;
   }
 
-  // Get CSRF token
+  function applyOperatingDefaults(form, systemType) {
+    const defaults = getOperatingDefaults(systemType, BUILDING_CLIMATE_ZONE);
+    if (!defaults) return;
+    const [h, d, w] = defaults;
+    // AC forms use hours_per_day / days_per_week / weeks_per_year
+    // Chiller forms use annual_operating_hours_per_day etc.
+    ['hours_per_day', 'annual_operating_hours_per_day'].forEach(n => {
+      const el = form.querySelector(`[name="${n}"]`);
+      if (el && !el.value) el.value = h;
+    });
+    ['days_per_week', 'annual_operating_days_per_week'].forEach(n => {
+      const el = form.querySelector(`[name="${n}"]`);
+      if (el && !el.value) el.value = d;
+    });
+    ['weeks_per_year', 'annual_operating_weeks_per_year'].forEach(n => {
+      const el = form.querySelector(`[name="${n}"]`);
+      if (el && !el.value) el.value = w;
+    });
+  }
+
+  // ── Default refrigerant by year ───────────────────────────────────────────
+  var REFRIGERANT_DEFAULTS = {
+    'window-ac':   { pre2015: 'R-22', y2015: 'R-410A', post2020: 'R-32' },
+    'split-ac':    { pre2015: 'R-22', y2015: 'R-410A', post2020: 'R-32' },
+    'vrf-system':  { pre2015: 'R-410A', y2015: 'R-410A', post2020: 'R-32' },
+    'water_cooled':{ pre2015: 'R-134a', y2015: 'R-134a', post2020: 'R-134a' },
+    'air_cooled':  { pre2015: 'R-410A', y2015: 'R-410A', post2020: 'R-410A' },
+    'packaged-ac': { pre2015: 'R-410A', y2015: 'R-410A', post2020: 'R-32' },
+  };
+
+  window.applyRefrigerantDefault = function(form, systemType) {
+    const yearEl = form.querySelector('[name="year_of_installation"]');
+    if (!yearEl || !yearEl.value) return;
+    const year = parseInt(yearEl.value);
+    const defs = REFRIGERANT_DEFAULTS[systemType];
+    if (!defs) return;
+    let refrigerant;
+    if (year < 2015) refrigerant = defs.pre2015;
+    else if (year <= 2020) refrigerant = defs.y2015;
+    else refrigerant = defs.post2020;
+    const select = form.querySelector('[name="type_of_refrigerants"]');
+    if (!select) return;
+    const trySet = () => {
+      if (select.options.length > 1) {
+        // Always update if empty or if the current value was auto-suggested (not user-chosen)
+        if (!select.value || select.value === '' || select.dataset.autoSet === 'true') {
+          select.value = refrigerant;
+          select.dataset.autoSet = 'true';
+        }
+      } else {
+        setTimeout(trySet, 100);
+      }
+    };
+    trySet();
+  };
+
+  // Set baseline leakage factor default based on year of installation:
+  // new system (installed < 7 years ago) → 2%, old system (≥ 7 years) → 10%
+  window.applyLeakageDefault = function(form) {
+    const yearEl = form.querySelector('[name="year_of_installation"]');
+    const leakageEl = form.querySelector('[name="baseline_leakage_factor"]');
+    if (!yearEl || !yearEl.value || !leakageEl) return;
+    const year = parseInt(yearEl.value);
+    if (isNaN(year)) return;
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - year;
+    leakageEl.value = age >= 7 ? 10 : 2;
+  };
+
+  // Mark refrigerant as user-chosen when the user manually changes the dropdown
+  window.clearIfUserChanged = function(select) {
+    select.dataset.autoSet = 'false';
+  };
+
+  // Helper: convert cooling capacity input to kW for JS calculations
+  function capacityToKw(value, unit) {
+    if (!value || isNaN(value)) return 0;
+    if (unit === 'ton') return value * 3.516;
+    if (unit === 'btu_hr') return value * 3.516 / 12000;
+    return value; // kw
+  }
+
+  // Refrigerant quantity default using cooling_capacity_per_unit field (for window/split/vrf/packaged)
+  window.applyRefrigerantQtyDefaultCapacity = function(form, systemType) {
+    const capEl  = form.querySelector('[name="cooling_capacity_per_unit"]');
+    const unitEl = form.querySelector('[name="cooling_capacity_unit"]');
+    const qtyEl  = form.querySelector('[name="refrigerant_quantity"]');
+    if (!capEl || !qtyEl) return;
+    const rawVal = parseFloat(capEl.value);
+    if (isNaN(rawVal) || rawVal <= 0) return;
+    if (qtyEl.value) return; // don't overwrite user input
+    const unit = unitEl ? unitEl.value : 'kw';
+    // Convert to Tons for the formula (formula uses Tons)
+    let tons;
+    if (unit === 'ton') tons = rawVal;
+    else if (unit === 'btu_hr') tons = rawVal / 12000;
+    else tons = rawVal / 3.516; // kw → tons
+    const formula = QTY_FORMULAS[systemType];
+    if (formula) qtyEl.value = Math.round(formula(tons) * 10) / 10;
+  };
+
+  // ── Default refrigerant quantity formula ─────────────────────────────────
+  var QTY_FORMULAS = {
+    'window-ac':   rt => rt * 0.6,
+    'split-ac':    rt => rt * 1.0,
+    'vrf-system':  rt => rt * 0.6 + 30,
+    'water_cooled':rt => rt * 0.6 + 100,
+    'air_cooled':  rt => rt * 0.5 + 50,
+    'packaged-ac': rt => rt * 0.6,
+  };
+
+  window.applyRefrigerantQtyDefault = function(form, systemType) {
+    const rtEl = form.querySelector('[name="total_cooling_load"]');
+    const qtyEl = form.querySelector('[name="refrigerant_quantity"]');
+    if (!rtEl || !qtyEl) return;
+    const rt = parseFloat(rtEl.value);
+    if (isNaN(rt) || rt <= 0) return;
+    // Only fill if the user hasn't entered a value yet
+    if (qtyEl.value) return;
+    const formula = QTY_FORMULAS[systemType];
+    if (formula) qtyEl.value = Math.round(formula(rt) * 10) / 10;
+  };
+
   function getCSRFToken() {
     return document.querySelector('[name=csrfmiddlewaretoken]').value;
   }
 
-  // Get building UUID from URL parameters
   function getBuildingId() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('building_uuid');
+    return new URLSearchParams(window.location.search).get('building_uuid');
   }
 
-  // Open modal for adding new system
+  // ── Modal ─────────────────────────────────────────────────────────────────
   window.openCoolingSystemModal = function() {
     window.editingCoolingSystemId = null;
     window.editingCoolingSystemType = null;
     document.getElementById('cooling-system-form').reset();
     document.getElementById('selected-cooling-system').innerHTML = '';
     cooling_system_modal.showModal();
-  }
+  };
 
-  // Close modal
   window.closeCoolingSystemModal = function() {
     cooling_system_modal.close();
     window.editingCoolingSystemId = null;
     window.editingCoolingSystemType = null;
-  }
+  };
 
-  // Handle cooling system type change
-  window.handleCoolingSystemTypeChange = function(systemType) {
-    const selectedSystemDiv = document.getElementById('selected-cooling-system');
-
-    if (!systemType) {
-      selectedSystemDiv.innerHTML = '';
-      return;
-    }
-
-    // Get the selected option text
-    const selectElement = document.getElementById('cooling-system-type');
-    const selectedText = selectElement.options[selectElement.selectedIndex].text;
-
-    // Determine which template to load based on system type
-    if (selectedText.toLowerCase().includes('chiller')) {
-      loadTemplate('chiller-system-template', selectedSystemDiv);
-    } else {
-      loadTemplate('air-condition-system-template', selectedSystemDiv);
-    }
-  }
-
-  // Load template content
+  // ── Template loading ──────────────────────────────────────────────────────
   function loadTemplate(templateId, targetElement) {
-    const template = document.getElementById(templateId);
-    if (template) {
-      targetElement.innerHTML = template.innerHTML;
-
-      // Process HTMX attributes in the newly loaded template
-      if (typeof htmx !== 'undefined') {
-        htmx.process(targetElement);
-      }
+    const tmpl = document.getElementById(templateId);
+    if (tmpl) {
+      targetElement.innerHTML = tmpl.innerHTML;
+      if (typeof htmx !== 'undefined') htmx.process(targetElement);
     }
   }
 
-  // Save cooling system
+  window.handleCoolingSystemTypeChange = function(systemType) {
+    const container = document.getElementById('selected-cooling-system');
+    if (!systemType) { container.innerHTML = ''; return; }
+    const mapping = COOLING_TYPE_MAP[systemType];
+    if (!mapping) { container.innerHTML = ''; return; }
+    loadTemplate(mapping.templateId, container);
+    // Apply climate-zone operating defaults after a tick (DOM is ready)
+    setTimeout(() => {
+      const form = document.getElementById('cooling-system-form');
+      applyOperatingDefaults(form, systemType);
+    }, 50);
+  };
+
+  // ── Save ──────────────────────────────────────────────────────────────────
   window.saveCoolingSystem = async function() {
     const form = document.getElementById('cooling-system-form');
     const formData = new FormData(form);
     const buildingId = getBuildingId();
+    if (!buildingId) { Toast.error('Building ID not found'); return; }
 
-    if (!buildingId) {
-      Toast.error('{% translate "Building ID not found" %}');
-      return;
-    }
-
-    //validate required fields
     const validator = new window.FormValidator(form);
-    if (!validator.validate()) {
-      console.error('Form validation failed', validator.errors);
-      return;
-    }
+    if (!validator.validate()) { console.error('Validation failed', validator.errors); return; }
 
-    // Get cooling system type
     const systemTypeSelect = document.getElementById('cooling-system-type');
     const systemType = systemTypeSelect.value;
-    const systemTypeName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+    if (!systemType) { Toast.error('Please select a cooling system type'); return; }
 
-    if (!systemType) {
-      Toast.error('{% translate "Please select a cooling system type" %}');
-      return;
-    }
+    const mapping = COOLING_TYPE_MAP[systemType];
+    if (!mapping) { Toast.error('Unknown cooling system type'); return; }
 
-    // Determine if this is chiller or air conditioner
-    const isChiller = systemTypeName.toLowerCase().includes('chiller');
-    const cooling_system_type = isChiller ? 'chiller' : 'air_conditioner';
-
-    // Collect all form data
     const systemData = {
       building_uuid: buildingId,
-      cooling_system_type: cooling_system_type,
+      cooling_system_type: mapping.backendType,
     };
+    if (window.editingCoolingSystemId) systemData.cooling_system_id = window.editingCoolingSystemId;
+    if (mapping.acType) systemData.type_of_air_condition = mapping.acType;
 
-    // Add system ID if editing
-    if (window.editingCoolingSystemId) {
-      systemData.cooling_system_id = window.editingCoolingSystemId;
-    }
-
-    // Add all form fields (skip csrftoken and cooling_system_type as we already set it)
     for (const [key, value] of formData.entries()) {
       if (key !== 'csrfmiddlewaretoken' && key !== 'cooling_system_type') {
         systemData[key] = value;
@@ -845,379 +1245,320 @@
     try {
       const method = window.editingCoolingSystemId ? 'PUT' : 'POST';
       const response = await fetch('/cooling-system/', {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCSRFToken(),
-        },
+        method,
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
         body: JSON.stringify(systemData),
       });
-
       const result = await response.json();
-
       if (result.success) {
-        // Refresh the list
         await window.renderCoolingSystems();
-        // Close modal
         window.closeCoolingSystemModal();
       } else {
-        Toast.error('{% translate "Error saving cooling system:" %} ' + JSON.stringify(result.errors));
+        Toast.error('Error saving cooling system: ' + JSON.stringify(result.errors));
       }
-    } catch (error) {
-      console.error('Error:', error);
-      Toast.error('{% translate "An error occurred while saving the cooling system" %}');
+    } catch (e) {
+      console.error(e);
+      Toast.error('An error occurred while saving the cooling system');
     }
-  }
+  };
 
-  // Render cooling systems list
+  // ── Render list ───────────────────────────────────────────────────────────
   window.renderCoolingSystems = async function() {
     const buildingId = getBuildingId();
-    if (!buildingId) {
-      console.error('Building ID not found');
-      return;
-    }
-
-    const listContainer = document.getElementById('cooling-systems-list');
-
+    if (!buildingId) return;
+    const list = document.getElementById('cooling-systems-list');
     try {
-      const response = await fetch(`/cooling-system/${buildingId}/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const result = await response.json();
-
+      const resp = await fetch(`/cooling-system/${buildingId}/`, { headers: { 'Content-Type': 'application/json' } });
+      const result = await resp.json();
       if (result.success && result.cooling_systems) {
         const systems = result.cooling_systems;
-
-        if (systems.length === 0) {
-          listContainer.innerHTML = document.getElementById('no-cooling-system-template').innerHTML;
+        if (!systems.length) {
+          list.innerHTML = document.getElementById('no-cooling-system-template').innerHTML;
           return;
         }
-
-        listContainer.innerHTML = systems.map((system) => {
-          const refrigerantType = system.refrigerant_type || 'N/A';
-          const refrigerantQty = system.refrigerant_quantity_kg || 'N/A';
-
-          let systemTypeName = '';
-          let chillerType = '';
-
+        list.innerHTML = systems.map(system => {
+          let label = '';
           if (system.cooling_system_type === 'chiller') {
-            systemTypeName = '{% translate "Chiller System" %}';
-            chillerType = system.chiller_type_display || '';
+            label = 'Chiller System - ' + (system.chiller_type_display || '');
           } else {
-            systemTypeName = '{% translate "Air Conditioner" %}';
-            chillerType = system.ac_type_display || '';
+            label = system.ac_type_display || 'Air Conditioner';
+            if (system.packaged_subtype_display) label += ' – ' + system.packaged_subtype_display;
           }
-
           return `
-            <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)] mb-2">
-              <span
-                data-icon="snowflake-fill"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-                class="shrink-0 self-start"
-              ></span>
+            <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
+              <span data-icon="snowflake-fill" data-size="20" data-color="var(--icon--strong-950)" class="shrink-0 self-start"></span>
               <div class="flex flex-col flex-1">
-                <p class="text-sm/5 font-medium">
-                  ${systemTypeName}${chillerType ? ' - ' + chillerType : ''}
-                </p>
-                <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-                  <span class="border-r border-[var(--text--sub-600)] pr-1">{% translate "Type:" %} ${refrigerantType}</span>
-                  <span>{% translate "Refrigerant quantity:" %} ${refrigerantQty} kg</span>
+                <p class="text-sm/5 font-medium">${label}</p>
+                <p class="text-sm/5 text-[var(--text--sub-600)]">
+                  <span class="border-r border-[var(--text--sub-600)] pr-1">Refrigerant: ${system.refrigerant_type || 'N/A'}</span>
+                  <span class="pl-1">Qty: ${system.refrigerant_quantity_kg || 'N/A'} kg</span>
                 </p>
               </div>
               <div class="flex items-center gap-3">
-                <button class="btn size-5 btn-ghost p-0" onclick="editCoolingSystem(${system.id}, '${system.cooling_system_type}')">
-                  <span
-                    data-icon="edit-line"
-                    data-size="16"
-                    data-color="var(--icon--strong-950)"
-                  ></span>
+                <button class="btn size-5 btn-ghost p-0" onclick="editCoolingSystem(${system.id},'${system.cooling_system_type}')">
+                  <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
                 </button>
-                <button
-                  class="btn size-5 btn-ghost p-0"
-                  onclick="confirmDeleteCoolingSystem(${system.id}, '${system.cooling_system_type}')"
-                >
-                  <span
-                    data-icon="delete-bin-5-line"
-                    data-size="16"
-                    data-color="var(--icon--strong-950)"
-                  ></span>
+                <button class="btn size-5 btn-ghost p-0" onclick="confirmDeleteCoolingSystem(${system.id},'${system.cooling_system_type}')">
+                  <span data-icon="delete-bin-5-line" data-size="16" data-color="var(--icon--strong-950)"></span>
                 </button>
               </div>
-            </li>
-          `;
+            </li>`;
         }).join('');
+        if (typeof window.initIcons === 'function') window.initIcons();
       } else {
-        listContainer.innerHTML = document.getElementById('no-cooling-system-template').innerHTML;
-        console.error('Error fetching cooling systems:', result.errors);
-        Toast.error('{% translate "Error fetching cooling systems" %}');
+        list.innerHTML = document.getElementById('no-cooling-system-template').innerHTML;
       }
-    } catch (error) {
-      console.error('Error:', error);
-        Toast.error('{% translate "Error fetching cooling systems" %}');
-      listContainer.innerHTML = document.getElementById('no-cooling-system-template').innerHTML;
+    } catch (e) {
+      console.error(e);
+      list.innerHTML = document.getElementById('no-cooling-system-template').innerHTML;
     }
-  }
+  };
 
-  // Edit cooling system
+  // ── Edit ──────────────────────────────────────────────────────────────────
   window.editCoolingSystem = async function(systemId, coolingSystemType) {
     const buildingId = getBuildingId();
-
-    if (!buildingId) {
-      Toast.error('{% translate "Building ID not found" %}');
-      return;
-    }
-
+    if (!buildingId) return;
     try {
-      const response = await fetch(`/cooling-system/${buildingId}/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const resp = await fetch(`/cooling-system/${buildingId}/`, { headers: { 'Content-Type': 'application/json' } });
+      const result = await resp.json();
+      if (!result.success) return;
+      const system = result.cooling_systems.find(s => s.id === systemId && s.cooling_system_type === coolingSystemType);
+      if (!system) return;
 
-      const result = await response.json();
+      window.editingCoolingSystemId = systemId;
+      window.editingCoolingSystemType = coolingSystemType;
+      document.getElementById('cooling-system-form').reset();
+      document.getElementById('selected-cooling-system').innerHTML = '';
 
-      if (result.success && result.cooling_systems) {
-        const system = result.cooling_systems.find(s => s.id === systemId && s.cooling_system_type === coolingSystemType);
+      const typeSelect = document.getElementById('cooling-system-type');
 
-        if (system) {
-          window.editingCoolingSystemId = systemId;
-          window.editingCoolingSystemType = coolingSystemType;
+      if (coolingSystemType === 'chiller') {
+        const topLevel = system.chiller_type === 'water_cooled' ? 'chiller-water' : 'chiller-air';
+        typeSelect.value = topLevel;
+        handleCoolingSystemTypeChange(topLevel);
+        setTimeout(() => {
+          const form = document.getElementById('cooling-system-form');
+          setField(form, 'year_of_installation', system.year_of_installation);
+          setRefrigerant(form, system.refrigerant_type);
+          setField(form, 'refrigerant_quantity', system.refrigerant_quantity_kg);
+          setField(form, 'total_cooling_load', system.total_cooling_load_rt);
+          setField(form, 'number_of_chillers', system.number_of_chillers);
+          setField(form, 'baseline_leakage_factor', system.baseline_leakage_factor_percent);
+          setField(form, 'annual_operating_hours_per_day', system.operation_hours_per_workday);
+          setField(form, 'annual_operating_days_per_week', system.workdays_per_week);
+          setField(form, 'annual_operating_weeks_per_year', system.workweeks_per_year);
+          setField(form, 'baseline_cooling_efficiency', system.baseline_cooling_efficiency_kw_h);
+          setRadio(form, 'installation_of_variable_speed_drives', system.variable_speed_drives ? 'yes' : 'no');
+          setRadio(form, 'installation_of_heat_recovery_systems', system.heat_recovery_system ? 'yes' : 'no');
+          setField(form, 'ipvl', system.ip_lv);
+          setField(form, 'cop', system.cop);
+          setField(form, 'total_chiller_system_power_input', system.total_chiller_system_power_input_kw);
+          setField(form, 'water_cooled_chiller_cooling_load_factor', system.water_cooled_chiller_cooling_load_factor_percent);
+          setField(form, 'energy_efficiency_label', system.energy_efficiency_label);
+          setField(form, 'number_of_stars', system.number_of_stars);
+          recalcChillerEnergy(form);
+        }, 200);
+      } else {
+        const acToTop = { window: 'window-ac', split: 'split-ac', vrv: 'vrf-system', packaged: 'packaged-ac' };
+        const topLevel = acToTop[system.ac_type] || 'split-ac';
+        typeSelect.value = topLevel;
+        handleCoolingSystemTypeChange(topLevel);
+        setTimeout(() => {
+          const form = document.getElementById('cooling-system-form');
+          setField(form, 'year_of_installation', system.year_of_installation);
+          setRefrigerant(form, system.refrigerant_type);
+          setField(form, 'refrigerant_quantity', system.refrigerant_quantity_kg);
+          setField(form, 'number_of_units', system.number_of_units);
+          setField(form, 'baseline_leakage_factor', system.baseline_leakage_factor_percent);
+          setField(form, 'energy_efficiency_label', system.energy_efficiency_label);
+          setField(form, 'number_of_stars', system.number_of_stars);
+          if (system.packaged_subtype) setField(form, 'packaged_subtype', system.packaged_subtype);
 
-          // Reset form
-          document.getElementById('cooling-system-form').reset();
-
-          // Set system type in dropdown and trigger template load
-          const systemTypeSelect = document.getElementById('cooling-system-type');
-          // We need to find the option that corresponds to this system type
-          // For now, trigger the change after setting a placeholder value
-          if (system.cooling_system_type === 'chiller') {
-            // Find chiller option
-            for (let option of systemTypeSelect.options) {
-              if (option.text.toLowerCase().includes('chiller')) {
-                systemTypeSelect.value = option.value;
-                break;
-              }
+          // window, split, vrv and packaged use cooling_capacity_per_unit + eer_iseer_cop
+          if (system.ac_type === 'window' || system.ac_type === 'split' || system.ac_type === 'vrv' || system.ac_type === 'packaged') {
+            if (system.cooling_capacity_per_unit_kw) {
+              setField(form, 'cooling_capacity_per_unit', system.cooling_capacity_per_unit_kw);
+              setField(form, 'cooling_capacity_unit', 'kw');
+            } else if (system.total_cooling_load_rt) {
+              setField(form, 'cooling_capacity_per_unit', system.total_cooling_load_rt);
+              setField(form, 'cooling_capacity_unit', 'ton');
             }
-          } else {
-            // Find air conditioner option
-            for (let option of systemTypeSelect.options) {
-              if (option.text.toLowerCase().includes('air') || option.text.toLowerCase().includes('vr')) {
-                systemTypeSelect.value = option.value;
-                break;
-              }
-            }
+            setField(form, 'power_input_per_unit', system.power_input_per_unit_kw);
+            setField(form, 'eer_iseer_cop', system.eer_iseer_cop);
+            setField(form, 'hours_per_day', system.operation_hours_per_workday);
+            setField(form, 'days_per_week', system.workdays_per_week);
+            setField(form, 'weeks_per_year', system.workweeks_per_year);
+            recalcWindowAcEnergy(form);
           }
-
-          // Trigger template load
-          window.handleCoolingSystemTypeChange(systemTypeSelect.value);
-
-          // Wait for template to load, then populate fields
-          setTimeout(() => {
-            const form = document.getElementById('cooling-system-form');
-
-            if (system.cooling_system_type === 'chiller') {
-              // Populate chiller fields
-              const chillerTypeMapping = {
-                'water_cooled': 'water-cooled',
-                'air_cooled': 'air-cooled',
-              };
-              if (form.querySelector('[name="chiller_system"]')) {
-                form.querySelector('[name="chiller_system"]').value = chillerTypeMapping[system.chiller_type] || system.chiller_type;
-              }
-              if (form.querySelector('[name="year_of_installation"]')) {
-                form.querySelector('[name="year_of_installation"]').value = system.year_of_installation;
-              }
-              if (form.querySelector('[name="type_of_refrigerants"]')) {
-                form.querySelector('[name="type_of_refrigerants"]').value = system.refrigerant_type;
-              }
-              if (form.querySelector('[name="refrigerant_quantity"]')) {
-                form.querySelector('[name="refrigerant_quantity"]').value = system.refrigerant_quantity_kg;
-              }
-
-              // Set radio buttons for boolean fields
-              if (system.variable_speed_drives !== null) {
-                const vsdValue = system.variable_speed_drives ? 'yes' : 'no';
-                const vsdRadio = form.querySelector(`[name="installation_of_variable_speed_drives"][value="${vsdValue}"]`);
-                if (vsdRadio) vsdRadio.checked = true;
-              }
-              if (system.heat_recovery_system !== null) {
-                const hrsValue = system.heat_recovery_system ? 'yes' : 'no';
-                const hrsRadio = form.querySelector(`[name="installation_of_heat_recovery_systems"][value="${hrsValue}"]`);
-                if (hrsRadio) hrsRadio.checked = true;
-              }
-
-              if (form.querySelector('[name="total_chiller_system"]')) {
-                form.querySelector('[name="total_chiller_system"]').value = system.total_cooling_load_rt;
-              }
-              if (form.querySelector('[name="baseline_leakage_factor"]')) {
-                form.querySelector('[name="baseline_leakage_factor"]').value = system.baseline_leakage_factor_percent;
-              }
-              if (form.querySelector('[name="annual_operating_hours_per_day"]')) {
-                form.querySelector('[name="annual_operating_hours_per_day"]').value = system.operation_hours_per_workday;
-              }
-              if (form.querySelector('[name="annual_operating_days_per_week"]')) {
-                form.querySelector('[name="annual_operating_days_per_week"]').value = system.workdays_per_week;
-              }
-              if (form.querySelector('[name="annual_operating_weeks_per_year"]')) {
-                form.querySelector('[name="annual_operating_weeks_per_year"]').value = system.workweeks_per_year;
-              }
-              if (form.querySelector('[name="baseline_cooling_efficiency"]') && system.baseline_cooling_efficiency_kw_h) {
-                form.querySelector('[name="baseline_cooling_efficiency"]').value = system.baseline_cooling_efficiency_kw_h;
-              }
-              if (form.querySelector('[name="number_of_chillers"]') && system.number_of_chillers) {
-                form.querySelector('[name="number_of_chillers"]').value = system.number_of_chillers;
-              }
-              if (form.querySelector('[name="total_chiller_system_power_input"]') && system.total_chiller_system_power_input_kw) {
-                form.querySelector('[name="total_chiller_system_power_input"]').value = system.total_chiller_system_power_input_kw;
-              }
-              if (form.querySelector('[name="water_cooled_chiller_cooling_load_factor"]') && system.water_cooled_chiller_cooling_load_factor_percent) {
-                form.querySelector('[name="water_cooled_chiller_cooling_load_factor"]').value = system.water_cooled_chiller_cooling_load_factor_percent;
-              }
-              if (form.querySelector('[name="cop"]') && system.cop) {
-                form.querySelector('[name="cop"]').value = system.cop;
-              }
-              if (form.querySelector('[name="ipvl"]') && system.ip_lv) {
-                form.querySelector('[name="ipvl"]').value = system.ip_lv;
-              }
-              if (form.querySelector('[name="energy_efficiency_label"]') && system.energy_efficiency_label) {
-                form.querySelector('[name="energy_efficiency_label"]').value = system.energy_efficiency_label;
-              }
-              if (form.querySelector('[name="number_of_stars"]') && system.energy_efficiency_label) {
-                form.querySelector('[name="number_of_stars"]').value = system.energy_efficiency_label;
-              }
-              if (form.querySelector('[name="total_energy_consumption_of_chiller_system_annually"]') && system.total_energy_consumption_kwh_per_year) {
-                form.querySelector('[name="total_energy_consumption_of_chiller_system_annually"]').value = system.total_energy_consumption_kwh_per_year;
-              }
-            } else {
-              // Populate air conditioner fields
-              if (form.querySelector('[name="type_of_air_condition"]')) {
-                form.querySelector('[name="type_of_air_condition"]').value = system.ac_type;
-              }
-              if (form.querySelector('[name="year_of_installation"]')) {
-                form.querySelector('[name="year_of_installation"]').value = system.year_of_installation;
-              }
-              if (form.querySelector('[name="type_of_refrigerants"]')) {
-                form.querySelector('[name="type_of_refrigerants"]').value = system.refrigerant_type;
-              }
-              if (form.querySelector('[name="refrigerant_quantity"]')) {
-                form.querySelector('[name="refrigerant_quantity"]').value = system.refrigerant_quantity_kg;
-              }
-              if (form.querySelector('[name="total_cooling_load_for_split_vrv"]')) {
-                form.querySelector('[name="total_cooling_load_for_split_vrv"]').value = system.total_cooling_load_rt;
-              }
-              if (form.querySelector('[name="baseline_leakage_factor"]')) {
-                form.querySelector('[name="baseline_leakage_factor"]').value = system.baseline_leakage_factor_percent;
-              }
-              if (form.querySelector('[name="hours_per_day"]')) {
-                form.querySelector('[name="hours_per_day"]').value = system.operation_hours_per_workday;
-              }
-              if (form.querySelector('[name="days_per_week"]')) {
-                form.querySelector('[name="days_per_week"]').value = system.workdays_per_week;
-              }
-              if (form.querySelector('[name="weeks_per_year"]')) {
-                form.querySelector('[name="weeks_per_year"]').value = system.workweeks_per_year;
-              }
-              if (form.querySelector('[name="total_number_of_split_vrv_units"]') && system.number_of_units) {
-                form.querySelector('[name="total_number_of_split_vrv_units"]').value = system.number_of_units;
-              }
-              if (form.querySelector('[name="total_split_unit_vrv_system"]') && system.total_system_power_kw) {
-                form.querySelector('[name="total_split_unit_vrv_system"]').value = system.total_system_power_kw;
-              }
-              if (form.querySelector('[name="baseline_split_unit_vrv_system_efficiency"]') && system.baseline_efficiency_kw_per_rt) {
-                form.querySelector('[name="baseline_split_unit_vrv_system_efficiency"]').value = system.baseline_efficiency_kw_per_rt;
-              }
-              if (form.querySelector('[name="isser_rating"]') && system.iseer_rating) {
-                form.querySelector('[name="isser_rating"]').value = system.iseer_rating;
-              }
-              if (form.querySelector('[name="cop"]') && system.cop) {
-                form.querySelector('[name="cop"]').value = system.cop;
-              }
-              if (form.querySelector('[name="energy_efficiency_label"]') && system.energy_efficiency_label) {
-                form.querySelector('[name="energy_efficiency_label"]').value = system.energy_efficiency_label;
-              }
-              if (form.querySelector('[name="number_of_stars"]') && system.energy_efficiency_label) {
-                form.querySelector('[name="number_of_stars"]').value = system.energy_efficiency_label;
-              }
-              if (form.querySelector('[name="total_chiller_system_annually"]') && system.total_energy_consumption_kwh_per_year) {
-                form.querySelector('[name="total_chiller_system_annually"]').value = system.total_energy_consumption_kwh_per_year;
-              }
-            }
-          }, 200);
-
-          cooling_system_modal.showModal();
-        }
+        }, 200);
       }
-    } catch (error) {
-      console.error('Error:', error);
-      Toast.error('{% translate "An error occurred while loading the cooling system" %}');
+
+      cooling_system_modal.showModal();
+    } catch (e) {
+      console.error(e);
+      Toast.error('An error occurred while loading the cooling system');
     }
+  };
+
+  function setField(form, name, value) {
+    if (value === null || value === undefined) return;
+    const el = form.querySelector(`[name="${name}"]`);
+    if (el) el.value = value;
   }
 
-  // Confirm delete
-  if (!window.deleteCoolingSystemId) {
-    window.deleteCoolingSystemId = null;
-  }
-  if (!window.deleteCoolingSystemType) {
-    window.deleteCoolingSystemType = null;
+  function setRadio(form, name, value) {
+    const el = form.querySelector(`[name="${name}"][value="${value}"]`);
+    if (el) el.checked = true;
   }
 
-  window.confirmDeleteCoolingSystem = function(systemId, coolingSystemType) {
-    window.deleteCoolingSystemId = systemId;
-    window.deleteCoolingSystemType = coolingSystemType;
+  function setRefrigerant(form, refrigerantType) {
+    if (!refrigerantType) return;
+    const select = form.querySelector('[name="type_of_refrigerants"]');
+    if (!select) return;
+    const trySet = () => {
+      select.value = refrigerantType;
+      if (!select.value) setTimeout(trySet, 100);
+    };
+    select.addEventListener('htmx:afterSwap', trySet, { once: true });
+    trySet();
+  }
+
+  // ── Delete ────────────────────────────────────────────────────────────────
+  if (!window.deleteCoolingSystemId) window.deleteCoolingSystemId = null;
+  if (!window.deleteCoolingSystemType) window.deleteCoolingSystemType = null;
+
+  window.confirmDeleteCoolingSystem = function(id, type) {
+    window.deleteCoolingSystemId = id;
+    window.deleteCoolingSystemType = type;
     cooling_system_modal_delete.showModal();
-  }
+  };
 
-  // Delete cooling system
   window.deleteCoolingSystem = async function() {
-    if (window.deleteCoolingSystemId !== null && window.deleteCoolingSystemType !== null) {
-      try {
-        const response = await fetch(`/cooling-system/${window.deleteCoolingSystemId}/delete/?cooling_system_type=${window.deleteCoolingSystemType}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(),
-          },
-        });
+    if (window.deleteCoolingSystemId === null) return;
+    try {
+      const resp = await fetch(`/cooling-system/${window.deleteCoolingSystemId}/delete/?cooling_system_type=${window.deleteCoolingSystemType}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+      });
+      const result = await resp.json();
+      if (result.success) {
+        await window.renderCoolingSystems();
+        window.deleteCoolingSystemId = null;
+        window.deleteCoolingSystemType = null;
+        cooling_system_modal_delete.close();
+      } else {
+        Toast.error('Error: ' + JSON.stringify(result.errors));
+      }
+    } catch (e) {
+      console.error(e);
+      Toast.error('An error occurred while deleting the cooling system');
+    }
+  };
 
-        const result = await response.json();
+  // ── Auto-calculation: Window AC (new formula) ────────────────────────────
+  //   If power_input_per_unit is given:
+  //     Annual Energy = Power/unit (kW) × Units × h × d × w
+  //   Else:
+  //     Annual Energy = (Capacity/unit (kW) × Units / EER) × h × d × w
+  window.recalcWindowAcEnergy = function(form) {
+    if (!form) return;
+    var capEl    = form.querySelector('[name="cooling_capacity_per_unit"]');
+    var unitEl   = form.querySelector('[name="cooling_capacity_unit"]');
+    var powerEl  = form.querySelector('[name="power_input_per_unit"]');
+    var eerEl    = form.querySelector('[name="eer_iseer_cop"]');
+    var unitsEl  = form.querySelector('[name="number_of_units"]');
+    var hrsEl    = form.querySelector('[name="hours_per_day"]');
+    var daysEl   = form.querySelector('[name="days_per_week"]');
+    var weeksEl  = form.querySelector('[name="weeks_per_year"]');
+    var energyEl = form.querySelector('[name="total_energy_consumption_annually"]');
+    if (!energyEl) return;
 
-        if (result.success) {
-          await window.renderCoolingSystems();
-          window.deleteCoolingSystemId = null;
-          window.deleteCoolingSystemType = null;
-          cooling_system_modal_delete.close();
-        } else {
-          Toast.error('{% translate "Error deleting cooling system:" %} ' + JSON.stringify(result.errors));
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        Toast.error('{% translate "An error occurred while deleting the cooling system" %}');
+    var units = parseFloat(unitsEl && unitsEl.value) || 0;
+    var hrs   = parseFloat(hrsEl   && hrsEl.value)   || 0;
+    var days  = parseFloat(daysEl  && daysEl.value)  || 0;
+    var weeks = parseFloat(weeksEl && weeksEl.value) || 0;
+    var power = parseFloat(powerEl && powerEl.value) || 0;
+
+    if (units <= 0 || hrs <= 0 || days <= 0 || weeks <= 0) { energyEl.value = ''; return; }
+
+    if (power > 0) {
+      // Use power input per unit path
+      energyEl.value = (power * units * hrs * days * weeks).toFixed(3);
+    } else {
+      // Use capacity / EER path
+      var eer = parseFloat(eerEl && eerEl.value) || 0;
+      var unit = unitEl ? unitEl.value : 'kw';
+      var cap  = capacityToKw(parseFloat(capEl && capEl.value) || 0, unit);
+      if (cap > 0 && eer > 0) {
+        energyEl.value = ((cap * units / eer) * hrs * days * weeks).toFixed(3);
+      } else {
+        energyEl.value = '';
       }
     }
-  }
+  };
 
-  // Initialize on page load
-  document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('cooling-systems-list')) {
-      window.renderCoolingSystems();
+  // ── Auto-calculation: Total Energy Consumption (legacy simple formula) ───
+  //   Annual Energy (kWh/year) = Cooling_Load (RT) × Units × Efficiency (kW/RT) × h × d × w
+  window.recalcCoolingSimpleEnergy = function(form, systemType) {
+    if (!form) return;
+    var loadEl  = form.querySelector('[name="total_cooling_load"]');
+    var unitsEl = form.querySelector('[name="number_of_units"]');
+    var effEl   = form.querySelector('[name="baseline_cooling_efficiency"]');
+    var hrsEl   = form.querySelector('[name="hours_per_day"]');
+    var daysEl  = form.querySelector('[name="days_per_week"]');
+    var weeksEl = form.querySelector('[name="weeks_per_year"]');
+    var energyEl = form.querySelector('[name="total_energy_consumption_annually"]');
+    if (!loadEl || !unitsEl || !effEl || !hrsEl || !daysEl || !weeksEl || !energyEl) return;
+    var load  = parseFloat(loadEl.value)  || 0;
+    var units = parseFloat(unitsEl.value) || 0;
+    var eff   = parseFloat(effEl.value)   || 0;
+    var hrs   = parseFloat(hrsEl.value)   || 0;
+    var days  = parseFloat(daysEl.value)  || 0;
+    var weeks = parseFloat(weeksEl.value) || 0;
+    if (load > 0 && units > 0 && eff > 0 && hrs > 0 && days > 0 && weeks > 0) {
+      energyEl.value = (load * units * eff * hrs * days * weeks).toFixed(3);
+    } else {
+      energyEl.value = '';
     }
-  });
+  };
 
-  // If HTMX is processing this content dynamically, also initialize after htmx:afterSwap
-  document.addEventListener('htmx:afterSwap', function(evt) {
-    if (evt.detail.target.id === 'dynamic-content') {
-      window.renderCoolingSystems();
+  // Chiller formula (Water/Air cooled):
+  //   Annual Energy = Cooling_Load × Units × Efficiency × h × d × w × VSD_factor × HR_factor
+  //   VSD_factor = 0.80 if VSD=yes else 1.00
+  //   HR_factor  = 0.70 if HR=yes  else 1.00
+  window.recalcChillerEnergy = function(form) {
+    if (!form) return;
+    var loadEl   = form.querySelector('[name="total_cooling_load"]');
+    var unitsEl  = form.querySelector('[name="number_of_chillers"]');
+    var effEl    = form.querySelector('[name="baseline_cooling_efficiency"]');
+    var hrsEl    = form.querySelector('[name="annual_operating_hours_per_day"]');
+    var daysEl   = form.querySelector('[name="annual_operating_days_per_week"]');
+    var weeksEl  = form.querySelector('[name="annual_operating_weeks_per_year"]');
+    var vsdEl    = form.querySelector('[name="installation_of_variable_speed_drives"]:checked');
+    var hrEl     = form.querySelector('[name="installation_of_heat_recovery_systems"]:checked');
+    var energyEl = form.querySelector('[name="total_energy_consumption_of_chiller_system_annually"]');
+    if (!loadEl || !unitsEl || !effEl || !hrsEl || !daysEl || !weeksEl || !energyEl) return;
+    var load  = parseFloat(loadEl.value)  || 0;
+    var units = parseFloat(unitsEl.value) || 0;
+    var eff   = parseFloat(effEl.value)   || 0;
+    var hrs   = parseFloat(hrsEl.value)   || 0;
+    var days  = parseFloat(daysEl.value)  || 0;
+    var weeks = parseFloat(weeksEl.value) || 0;
+    var vsdFactor = (vsdEl && vsdEl.value === 'yes') ? 0.80 : 1.00;
+    var hrFactor  = (hrEl  && hrEl.value  === 'yes') ? 0.70 : 1.00;
+    if (load > 0 && units > 0 && eff > 0 && hrs > 0 && days > 0 && weeks > 0) {
+      energyEl.value = (load * units * eff * hrs * days * weeks * vsdFactor * hrFactor).toFixed(3);
+    } else {
+      energyEl.value = '';
     }
-  });
+  };
 
-  // Initialize immediately for dynamically loaded content
-  if (document.getElementById('cooling-systems-list')) {
-    window.renderCoolingSystems();
-  }
+  // ── Init ──────────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('cooling-systems-list')) window.renderCoolingSystems();
+  });
+  document.addEventListener('htmx:afterSwap', evt => {
+    if (evt.detail.target.id === 'dynamic-content') window.renderCoolingSystems();
+  });
+  if (document.getElementById('cooling-systems-list')) window.renderCoolingSystems();
 </script>

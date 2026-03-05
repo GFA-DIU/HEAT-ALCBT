@@ -1,5 +1,5 @@
 {% load static %}
-{% load i18n %}
+
 <div id="templates-list">
   <ul class="grid grid-cols-1 gap-2.75 mt-6">
     {% for item in assemblies_with_gwp %}
@@ -42,7 +42,7 @@
             {% with first_product=assembly.structuralproduct_set.first %}
               {% if first_product %}
                 <span class="badge gap-0 text-xs/4 py-1 px-2 font-medium">
-                  {% translate "Quantity" %}: {{ first_product.quantity|floatformat:2 }}{{ assembly.get_dimension_display }}
+                  Quantity: {{ first_product.quantity|floatformat:2 }}{{ assembly.get_dimension_display }}
                 </span>
               {% endif %}
             {% endwith %}
@@ -55,7 +55,7 @@
                   data-size="16"
                   data-color="var(--icon--soft-400)"
                 ></span>
-                {% translate "System component" %}
+                System component
               </span>
             {% else %}
               <span class="badge text-xs/4 py-1 px-2 font-medium gap-1">
@@ -64,7 +64,7 @@
                   data-size="16"
                   data-color="var(--icon--soft-400)"
                 ></span>
-                {% translate "My component" %}
+                My component
               </span>
             {% endif %}
             <button
@@ -133,7 +133,7 @@
         data-size="20"
         data-color="var(--icon--soft-400)"
       ></span>
-      {% translate "Previous" %}
+      Previous
     </button>
     <ul class="flex items-center gap-2">
       {% for num in page_obj.paginator.page_range %}
@@ -167,7 +167,7 @@
         disabled
       {% endif %}
     >
-      {% translate "Next" %}
+      Next
       <span
         data-icon="arrow-right"
         data-size="20"

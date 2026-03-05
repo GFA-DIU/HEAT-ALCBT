@@ -1,7 +1,9 @@
+
 // @ts-check
 class StepManager {
-   
+
   editMode = false;
+  isPopStateNavigation = false;
 
   constructor() {
     this.currentStep = 1;
@@ -84,6 +86,7 @@ class StepManager {
             description: gettext("Provide details on lift & escalator systems in your building if any."),
           },
           {
+            id: "hot-water-system",
             formId: "hot-water-system",
             name: gettext("Hot Water System"),
             component: "operational-details/hot-water-system.html",
@@ -136,6 +139,7 @@ class StepManager {
   }
 
   init() {
+    this.initUrlNavigation();
     this.renderStepNavigation();
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
@@ -177,6 +181,171 @@ class StepManager {
       this.updateButtonStates();
     });
   }
+
+  // ========== URL Navigation Methods ==========
+
+  /**
+   * Initialize URL-based navigation
+   * Parses URL params and binds popstate handler
+   */
+  initUrlNavigation() {
+    const urlParams = this.parseUrlParams();
+
+    // Restore step from URL if valid
+    if (urlParams.step && urlParams.substep) {
+      const resolved = this.resolveStepFromIds(urlParams.step, urlParams.substep);
+      if (resolved) {
+        // Validate access - can't skip to later steps without building_uuid in create mode
+        if (!this.editMode && !urlParams.building_uuid && resolved.step > 1) {
+          console.warn('Cannot access this step without creating a building first');
+          this.currentStep = 1;
+          this.currentSubStep = 1;
+        } else {
+          this.currentStep = resolved.step;
+          this.currentSubStep = resolved.subStep;
+        }
+      } else {
+        console.warn(`Invalid step params: step=${urlParams.step}, substep=${urlParams.substep}`);
+      }
+    }
+
+    // Bind popstate handler for browser back/forward
+    window.addEventListener('popstate', (event) => this.handlePopState(event));
+
+    // Set initial history state
+    this.updateUrl({ replaceState: true });
+  }
+
+  /**
+   * Parse URL query parameters
+   * @returns {{ step: string|null, substep: string|null, building_uuid: string|null }}
+   */
+  parseUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      step: params.get('step'),
+      substep: params.get('substep'),
+      building_uuid: params.get('building_uuid')
+    };
+  }
+
+  /**
+   * Convert semantic step/substep IDs to numeric values
+   * @param {string} stepId - The step ID (e.g., "building-information")
+   * @param {string} subStepId - The substep ID (e.g., "building-name-location")
+   * @returns {{ step: number, subStep: number }|null}
+   */
+  resolveStepFromIds(stepId, subStepId) {
+    for (const [stepNum, config] of Object.entries(this.stepConfig)) {
+      if (config.id === stepId) {
+        const subStepIndex = config.subSteps.findIndex(s => s.id === subStepId);
+        if (subStepIndex !== -1) {
+          return {
+            step: parseInt(stepNum),
+            subStep: subStepIndex + 1
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Convert numeric step/substep to semantic IDs
+   * @param {number} step - The step number (1-4)
+   * @param {number} subStep - The substep number (1-N)
+   * @returns {{ stepId: string, subStepId: string }|null}
+   */
+  resolveIdsFromStep(step, subStep) {
+    // @ts-ignore - stepConfig uses numeric keys
+    const config = this.stepConfig[step];
+    if (!config) return null;
+
+    const subStepConfig = config.subSteps[subStep - 1];
+    if (!subStepConfig) return null;
+
+    return {
+      stepId: config.id,
+      subStepId: subStepConfig.id
+    };
+  }
+
+  /**
+   * Update browser URL with current step state
+   * @param {{ pushState?: boolean, replaceState?: boolean }} options
+   */
+  updateUrl(options = {}) {
+    const { pushState = false, replaceState = false } = options;
+
+    const ids = this.resolveIdsFromStep(this.currentStep, this.currentSubStep);
+    if (!ids) return;
+
+    const url = new URL(window.location.href);
+
+    // Set step params
+    url.searchParams.set('step', ids.stepId);
+    url.searchParams.set('substep', ids.subStepId);
+
+    // Preserve building_uuid if it exists
+    const buildingUuid = this.getBuildingId() ||
+      this.formData['building-information/building-name-location']?.building_uuid;
+    if (buildingUuid) {
+      url.searchParams.set('building_uuid', buildingUuid);
+    }
+
+    // Store state for popstate handling
+    const state = {
+      step: this.currentStep,
+      subStep: this.currentSubStep,
+      building_uuid: buildingUuid || null
+    };
+
+    if (pushState) {
+      window.history.pushState(state, '', url);
+    } else if (replaceState) {
+      window.history.replaceState(state, '', url);
+    }
+  }
+
+  /**
+   * Handle browser back/forward button navigation
+   * @param {PopStateEvent} event
+   */
+  handlePopState(event) {
+    this.isPopStateNavigation = true;
+
+    if (event.state && typeof event.state.step === 'number' && typeof event.state.subStep === 'number') {
+      // Use state from history entry
+      this.currentStep = event.state.step;
+      this.currentSubStep = event.state.subStep;
+    } else {
+      // Parse from URL (for manual URL changes or missing state)
+      const urlParams = this.parseUrlParams();
+      if (urlParams.step && urlParams.substep) {
+        const resolved = this.resolveStepFromIds(urlParams.step, urlParams.substep);
+        if (resolved) {
+          this.currentStep = resolved.step;
+          this.currentSubStep = resolved.subStep;
+        } else {
+          this.currentStep = 1;
+          this.currentSubStep = 1;
+        }
+      } else {
+        this.currentStep = 1;
+        this.currentSubStep = 1;
+      }
+    }
+
+    // Update UI without pushing new history
+    this.renderStepNavigation();
+    this.updateCurrentStepInfo();
+    this.loadCurrentStep();
+    this.updateProgress();
+
+    this.isPopStateNavigation = false;
+  }
+
+  // ========== End URL Navigation Methods ==========
 
   handleFormStatusChange(statusData) {
     // statusData should contain: { isValid: boolean, stepKey?: string, data?: object }
@@ -296,20 +465,26 @@ class StepManager {
 
     try {
       // Use the new Django step view endpoint
-      // Get building UUID if it exists in form data
-      const buildingUuid = this.formData['building-information/building-name-location']?.building_uuid || '';
+      // Get building UUID from URL params first (covers refresh/shared links), then fall back to formData
+      const buildingUuid = this.getBuildingId()
+        || this.formData['building-information/building-name-location']?.building_uuid
+        || '';
       const url = buildingUuid
         ? `/building/step?step=${subStep.component}&building_uuid=${buildingUuid}`
         : `/building/step?step=${subStep.component}`;
 
-      // Update browser URL to include UUID if available
-      if (buildingUuid && !window.location.search.includes('building_uuid')) {
-        const newUrl = new URL(window.location);
-        newUrl.searchParams.set('building_uuid', buildingUuid);
-        window.history.pushState({}, '', newUrl);
+      // Update browser URL with current step and building_uuid (uses replaceState to avoid extra history entries)
+      if (buildingUuid) {
+        this.updateUrl({ replaceState: true });
       }
 
       const response = await fetch(url);
+
+      // If the session expired, the server redirects to login.
+      if (response.url && response.url.indexOf('/accounts/login/') !== -1) {
+        window.location.href = '/accounts/login/?next=' + encodeURIComponent(window.location.pathname + window.location.search);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -317,6 +492,10 @@ class StepManager {
 
       const html = await response.text();
       contentArea.innerHTML = html;
+
+      // Initialize icons for dynamically loaded content before scripts run
+      // @ts-ignore - IconComponent is set globally by icons.js module
+      if (window.IconComponent) { window.IconComponent.initialize(contentArea); }
 
       // Reset validation status for the new step (let the component re-validate)
       const currentStepKey = `step-${this.currentStep}-${this.currentSubStep}`;
@@ -327,7 +506,7 @@ class StepManager {
 
       // Update button states
       this.updateButtonStates();
- 
+
       // Process HTMX for dynamically loaded content
       if (typeof htmx !== 'undefined') {
         htmx.process(contentArea);
@@ -343,8 +522,8 @@ class StepManager {
           newScript.textContent = script.textContent;
         }
         document.body.appendChild(newScript);
-        // Remove the new script after execution to avoid duplicates
-        setTimeout(() => newScript.remove(), 100);
+        // Clean up script element after execution
+        newScript.remove();
       });
     } catch (error) {
       console.error("Failed to load step component:", error);
@@ -403,7 +582,6 @@ class StepManager {
   }
 
   updateButtonStates() {
-    console.log("Updating button states...");
     const step = this.stepConfig[this.currentStep];
     const subStep = step.subSteps[this.currentSubStep - 1];
     const saveBtn = document.getElementById("save-and-continue");
@@ -481,17 +659,47 @@ class StepManager {
     }
 
     if (stepKey === 'operational-data-entry/operational-data-entry'){
-      const forms = document.getElementById('selected_op_products')?.querySelectorAll("form");
-      if (!forms || forms.length === 0) {
-        Toast.error("No operational products found. Please add at least one.");
+      console.log('[StepManager] Checking operational data entry');
+      const productsList = document.getElementById('selected_op_products');
+      const productItems = productsList?.querySelectorAll("li[id^='epd-']");
+      console.log('[StepManager] Found product items:', productItems ? productItems.length : 0);
+
+      if (!productItems || productItems.length === 0) {
+        console.error('[StepManager] No product items found in #selected_op_products');
+        Toast.error("Please add at least one energy carrier.");
         throw new Error("No operational products found.");
       }
-      /**
-       * @type {{ [k: string]: FormDataEntryValue; }[]}
-       */
-      const combinedData = [];
-      
-      forms.forEach((form) => {
+
+      // Check if products are saved to database
+      const form = document.getElementById('operational-products-form');
+      console.log('[StepManager] Form found?', !!form);
+      console.log('[StepManager] Form dataset.saved value:', form?.dataset?.saved);
+      const isSaved = form && form.dataset.saved === 'true';
+      console.log('[StepManager] Is saved?', isSaved);
+
+      if (!isSaved) {
+        // Products need to be saved - trigger the form submission
+        console.log('[StepManager] Triggering save for operational products...');
+
+        // Return a marker that tells saveToServer to use custom save logic
+        return {
+          _useCustomEndpoint: true,
+          _customEndpoint: 'operational-products',
+          _customFormId: 'operational-products-form',
+          building_uuid: this.getBuildingId()
+        };
+      }
+
+      // Products are already saved, just verify and continue
+      console.log('[StepManager] Operational products already saved, continuing...');
+      return {
+        building_uuid: this.getBuildingId(),
+        operational_data_saved: true
+      };
+
+    } else if (stepKey === 'building-information/building-details') {
+      const form = document.getElementById("form");
+      if (form) {
         const formData = new FormData(form);
         let validator = new window.FormValidator(form);
         let isValid = validator.validate();
@@ -499,14 +707,34 @@ class StepManager {
           Toast.error("Please correct the errors in the form before proceeding.");
           throw new Error("Form validation failed.");
         }
-        combinedData.push(Object.fromEntries(formData.entries()));
-      });
-      
-      return { 
-        building_uuid: this.getBuildingId(),
-        operation_products: combinedData 
-      };
-
+        return {
+          building_uuid: this.getBuildingId(),
+          _useCustomEndpoint: true,
+          _customEndpoint: 'building-details-files',
+          ...Object.fromEntries(formData.entries())
+        };
+      }
+      throw new Error("Form not found.");
+    } else if (stepKey === 'operational-details/operational-schedule-temperature') {
+      // For operational schedule, we need to call our custom save function
+      // Return a marker that tells saveToServer to use custom logic
+      const form = document.getElementById("form");
+      if (form) {
+        const formData = new FormData(form);
+        let validator = new window.FormValidator(form);
+        let isValid = validator.validate();
+        if (!isValid) {
+          Toast.error("Please correct the errors in the form before proceeding.");
+          throw new Error("Form validation failed.");
+        }
+        return {
+          building_uuid: this.getBuildingId(),
+          _useCustomEndpoint: true,
+          _customEndpoint: 'operational-schedule',
+          ...Object.fromEntries(formData.entries())
+        };
+      }
+      throw new Error("Form not found.");
     } else {
       const form = document.getElementById("form");
       if (form) {
@@ -540,8 +768,6 @@ class StepManager {
       console.warn("No data to save for this step.");
       return null;
     }
-
-    console.log("Saving step data:", stepData);
     this.formData[stepKey] = stepData;
 
     // Save to server via Django
@@ -556,7 +782,136 @@ class StepManager {
    */
   async saveToServer(stepKey, stepData) {
     try {
+      console.log('[StepManager] saveToServer called with stepKey:', stepKey);
+      console.log('[StepManager] saveToServer stepData:', stepData);
+
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+      // Handle custom endpoints (like operational schedule and operational products)
+      if (stepData._useCustomEndpoint && stepData._customEndpoint) {
+        console.log('[StepManager] Using custom endpoint:', stepData._customEndpoint);
+
+        // Special handling for operational products - trigger the form submission
+        if (stepData._customEndpoint === 'operational-products') {
+          const formId = stepData._customFormId || 'operational-products-form';
+          const form = document.getElementById(formId);
+
+          if (!form) {
+            console.error('[StepManager] Form not found:', formId);
+            return { success: false, error: 'Form not found' };
+          }
+
+          console.log('[StepManager] Triggering form submission for operational products');
+
+          // Use HTMX to submit the form and wait for response
+          return new Promise((resolve) => {
+            // Listen for the custom trigger event from server
+            const handleSaved = () => {
+              console.log('[StepManager] Operational products saved successfully');
+              document.body.removeEventListener('operationalProductsSaved', handleSaved);
+              resolve({ success: true, building_uuid: this.getBuildingId() });
+            };
+
+            document.body.addEventListener('operationalProductsSaved', handleSaved);
+
+            // Trigger the form submission
+            htmx.trigger(form, 'submit');
+
+            // Timeout fallback
+            setTimeout(() => {
+              document.body.removeEventListener('operationalProductsSaved', handleSaved);
+              console.warn('[StepManager] Save timeout, checking form state');
+              const savedForm = document.getElementById(formId);
+              if (savedForm?.dataset?.saved === 'true') {
+                resolve({ success: true, building_uuid: this.getBuildingId() });
+              } else {
+                resolve({ success: false, error: 'Save timeout' });
+              }
+            }, 5000);
+          });
+        }
+
+        // Handle building-details-files: save text fields via JSON, then upload files
+        if (stepData._customEndpoint === 'building-details-files') {
+          // Validate file uploads before proceeding
+          if (typeof window.validateBuildingFiles === 'function') {
+            if (!window.validateBuildingFiles()) {
+              return { success: false, error: 'File validation failed' };
+            }
+          }
+
+          const buildingUuid = this.getBuildingId();
+          if (!buildingUuid) {
+            return { success: false, error: 'Building UUID not found. Please complete step 1 first.' };
+          }
+
+          // 1. Save the text fields via the existing JSON endpoint
+          const textData = { ...stepData };
+          delete textData._useCustomEndpoint;
+          delete textData._customEndpoint;
+          delete textData._customFormId;
+          // Strip file-only fields that can't be serialized as JSON
+          delete textData.certification_file;
+          delete textData.boq_files;
+          // Strip radio fields handled by file upload endpoint
+          // (has_certification and has_boq are saved by the file upload endpoint)
+          delete textData.has_certification;
+          delete textData.has_boq;
+
+          const jsonPayload = {
+            building_uuid: buildingUuid,
+            step_key: 'building-information/building-details',
+            data: { ...textData, building_uuid: buildingUuid }
+          };
+
+          const jsonResponse = await fetch('/building/step/save', {
+            method: this.editMode ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken || '' },
+            body: JSON.stringify(jsonPayload)
+          });
+          const jsonResult = await jsonResponse.json();
+          if (!jsonResponse.ok || !jsonResult.success) {
+            return { success: false, error: jsonResult.error || 'Failed to save building details' };
+          }
+
+          // 2. Upload files via multipart endpoint
+          if (typeof window.uploadBuildingFiles === 'function') {
+            const uploadOk = await window.uploadBuildingFiles(buildingUuid);
+            if (!uploadOk) {
+              Toast.error('Failed to upload files. Please try again.');
+              return { success: false, error: 'File upload failed' };
+            }
+          }
+
+          return { success: true, building_uuid: buildingUuid };
+        }
+
+        // Handle other custom endpoints (like operational schedule)
+        // Remove the markers from the data
+        const cleanData = { ...stepData };
+        delete cleanData._useCustomEndpoint;
+        delete cleanData._customEndpoint;
+        delete cleanData._customFormId;
+
+        const response = await fetch(`/building/step/${stepData._customEndpoint}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken || '',
+          },
+          body: JSON.stringify(cleanData)
+        });
+
+        const result = await response.json();
+        console.log('[StepManager] Custom endpoint response:', result);
+
+        if (!response.ok || !result.success) {
+          console.error('[StepManager] Failed to save via custom endpoint:', result);
+          return { success: false, error: result.error || 'Failed to save' };
+        }
+
+        return { success: true, building_uuid: this.getBuildingId() };
+      }
 
       // Get building_uuid from URL params or from formData
       const urlParams = new URLSearchParams(window.location.search);
@@ -569,23 +924,28 @@ class StepManager {
         building_uuid: urlUuid || formUuid || stepData.building_uuid || ''
       };
 
+      const payload = {
+        building_uuid: this.getBuildingId(),
+        step_key: stepKey,
+        data: dataWithUuid
+      };
+
+      console.log('[StepManager] Sending payload to /building/step/save:', payload);
+
       const response = await fetch('/building/step/save', {
         method: this.editMode ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken || '',
         },
-        body: JSON.stringify({
-          building_uuid: this.getBuildingId(),
-          step_key: stepKey,
-          data: dataWithUuid
-        })
+        body: JSON.stringify(payload)
       });
 
       const result = await response.json();
+      console.log('[StepManager] Server response:', result);
 
       if (!response.ok) {
-        console.error('Failed to save step data to server:', result);
+        console.error('[StepManager] Failed to save step data to server:', result);
         return { success: false, error: result.error || 'Failed to save' };
       }
 
@@ -809,6 +1169,7 @@ class StepManager {
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
     this.updateProgress();
+    this.updateUrl({ pushState: true });
   }
 
   goToSubStep(step, subStep) {
@@ -818,6 +1179,7 @@ class StepManager {
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
     this.updateProgress();
+    this.updateUrl({ pushState: true });
   }
 
   async saveAndContinue(skipSave = false) {
@@ -852,12 +1214,16 @@ class StepManager {
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
     this.updateProgress();
+    this.updateUrl({ pushState: true });
   }
 
   async goBack() {
-    const response = await confirmDialog.warning("Are you sure you want to go back? Unsaved changes will be lost.");
-    if (!response) {
-      return;
+    // Skip confirmation dialog if triggered by browser back/forward
+    if (!this.isPopStateNavigation) {
+      const response = await confirmDialog.warning("Are you sure you want to go back? Unsaved changes will be lost.");
+      if (!response) {
+        return;
+      }
     }
 
     if (this.currentSubStep > 1) {
@@ -876,6 +1242,11 @@ class StepManager {
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
     this.updateProgress();
+
+    // Only update URL if not from popstate (popstate already has correct URL)
+    if (!this.isPopStateNavigation) {
+      this.updateUrl({ pushState: true });
+    }
   }
 
   async skip() {
@@ -895,7 +1266,7 @@ class StepManager {
     const contentArea = document.getElementById("dynamic-content");
     if (contentArea) {
       contentArea.innerHTML = `
-        <div class="flex items-center justify-center h-64">
+        <div class="flex items-center justify-center h-64 w-fit mx-auto">
           <div class="loading loading-spinner loading-lg text-primary"></div>
           <p class="ml-4">Completing building setup...</p>
         </div>
@@ -905,13 +1276,14 @@ class StepManager {
     try {
       const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
       
-      const response = await fetch('/building/complete', {
+      const response = await fetch(`/building/complete?building_uuid=${this.getBuildingId()}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken || '',
         },
         body: JSON.stringify({
+          building_uuid: this.getBuildingId(),
           all_data: this.formData
         })
       });
@@ -920,55 +1292,21 @@ class StepManager {
 
       if (response.ok && result.success) {
         // Show completion message
-        if (contentArea) {
-          contentArea.innerHTML = `
-            <div class="flex flex-col items-center justify-center h-64 text-center">
-              <div class="alert alert-success max-w-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div>
-                  <h3 class="font-bold">Building Setup Completed!</h3>
-                  <div class="text-xs">${result.message || 'All information has been saved successfully.'}</div>
-                </div>
-              </div>
-              <div class="mt-6 space-x-2">
-                <button class="btn btn-primary" onclick="window.location.href='${result.redirect_url || '/dashboard/'}'">
-                  Go to Dashboard
-                </button>
-                <button class="btn btn-outline" onclick="stepManager.resetForm()">
-                  Add Another Building
-                </button>
-              </div>
-            </div>
-          `;
-        }
+          Toast.success("Building setup completed successfully!");
+          
+          setTimeout(() => {
+            window.location.href = `/building/${result.building_uuid}/dashboard`;
+          }, 1000);
 
         // Clear localStorage
         localStorage.removeItem("building-form-data");
       } else {
+        Toast.error(`Failed to complete setup: ${result.error || 'Unknown error'}`);
         throw new Error(result.error || 'Failed to complete building setup');
       }
     } catch (error) {
       console.error('Error completing setup:', error);
-      if (contentArea) {
-        contentArea.innerHTML = `
-          <div class="flex flex-col items-center justify-center h-64 text-center">
-            <div class="alert alert-error max-w-md">
-              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h3 class="font-bold">Error Completing Setup</h3>
-                <div class="text-xs">${error.message}</div>
-              </div>
-            </div>
-            <button onclick="stepManager.completeSetup()" class="btn btn-primary mt-4">
-              Retry
-            </button>
-          </div>
-        `;
-      }
+      Toast.error(`Error completing setup: ${error.message || 'Unknown error'}`);
       return;
     }
 
@@ -1017,8 +1355,18 @@ class StepManager {
     this.currentStep = 1;
     this.currentSubStep = 1;
 
-    // Reinitialize
-    this.init();
+    // Clear URL params and reset to base URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('step');
+    url.searchParams.delete('substep');
+    url.searchParams.delete('building_uuid');
+    window.history.replaceState({}, '', url);
+
+    // Reinitialize (skip URL parsing since we just reset)
+    this.renderStepNavigation();
+    this.updateCurrentStepInfo();
+    this.loadCurrentStep();
+    this.updateProgress();
 
     // Show navigation buttons again
     const goBackBtn = document.getElementById("go-back");
@@ -1046,9 +1394,6 @@ class StepManager {
   getCurrentStepInfo() {
     const step = this.stepConfig[this.currentStep];
     const subStep = step.subSteps[this.currentSubStep - 1];
-
-    console.log(subStep.title);
-    console.log(subStep.description);
 
     return {
       step: this.currentStep,

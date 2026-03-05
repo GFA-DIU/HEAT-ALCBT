@@ -1,119 +1,68 @@
 {% load static %}
-{% load i18n %}
 <div id="lift-escalator-system-container" class="w-full">
   <div class="w-full flex flex-col">
-    <button
-      class="btn btn-outline w-fit"
-      onclick="openLiftEscalatorSystemModal()"
-    >
-      <span
-        data-icon="add-large-fill"
-        data-size="20"
-        data-color="var(--icon--strong-950)"
-      ></span>
-      {% translate "Add a lift & escalator system" %}
+    <button id="add-lift-escalator-btn" class="btn btn-outline w-fit" onclick="openLiftEscalatorSystemModal()">
+      <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+      Add a lift & escalator system
     </button>
-    <div
-      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
-    ></div>
-    <ul id="lift-escalator-systems-list" class="grid grid-cols-1">
-    </ul>
+    <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
+    <ul id="lift-escalator-systems-list" class="grid grid-cols-1 gap-2"></ul>
   </div>
 </div>
 
-<dialog
-  id="lift_escalator_system_modal"
-  class="modal modal-bottom sm:modal-end"
->
-  <div
-    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
-  >
+<dialog id="lift_escalator_system_modal" class="modal modal-bottom sm:modal-end">
+  <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">{% translate "Add a lift & escalator system" %}</h3>
-        <p class="text-sm/5 text-[var(--text--sub-600)]">
-          {% translate "Provide details on lift & escalator system." %}
-        </p>
+        <h3 class="text-lg/6 font-medium">Add a lift & escalator system</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">Provide details on lift & escalator system.</p>
       </div>
-      <button
-        type="button"
-        onclick="closeLiftEscalatorSystemModal()"
-        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-      >
-        <span
-          data-icon="close-line"
-          data-size="16"
-          data-color="var(--icon--sub-600)"
-        ></span>
+      <button type="button" onclick="closeLiftEscalatorSystemModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+        <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
     </div>
     <form id="lift-escalator-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
-        {% csrf_token %}
+      {% csrf_token %}
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">
-            {% translate "Number of lifts" %}<span class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
+          <legend class="fieldset-legend">Number of lifts<span class="text-[var(--state--error--base)]">*</span></legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="{% translate 'eg. 5' %}" name="number_of_lifts" required min="0" />
-          </label>
-          <p class="validator-hint">{% translate "This field is required" %}</p>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            {% translate "Installation of Lift regenerative Features" %}<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <select class="select w-full" name="lift_regenerative_features" required>
-            <option disabled selected value="">{% translate "Select an option" %}</option>
-            <option value="yes">{% translate "Yes" %}</option>
-            <option value="no">{% translate "No" %}</option>
-          </select>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            {% translate "Installation of VVVF and sleep mode" %}<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <select class="select w-full" name="vvvf_sleep_mode" required>
-            <option disabled selected value="">{% translate "Select an option" %}</option>
-            <option value="yes">{% translate "Yes" %}</option>
-            <option value="no">{% translate "No" %}</option>
-          </select>
-        </fieldset>
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">
-            {% translate "Annual lift system energy consumption" %}<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <label class="input validator w-full">
-            <input type="number" placeholder="{% translate 'eg. 343' %}" name="annual_energy_consumption" required min="0" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >kWh/year</span
-            >
+            <input type="number" placeholder="e.g. 5" name="number_of_lifts" required min="1" />
           </label>
         </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Installation of lift regenerative features<span class="text-[var(--state--error--base)]">*</span></legend>
+          <div class="flex items-center gap-2.5 mt-1">
+            <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="yes" class="radio radio-xs" /> Yes</label>
+            <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="no" class="radio radio-xs" checked /> No</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Installation of VVVF and sleep mode<span class="text-[var(--state--error--base)]">*</span></legend>
+          <div class="flex items-center gap-2.5 mt-1">
+            <label class="flex items-center gap-2"><input type="radio" name="vvvf_sleep_mode" value="yes" class="radio radio-xs" /> Yes</label>
+            <label class="flex items-center gap-2"><input type="radio" name="vvvf_sleep_mode" value="no" class="radio radio-xs" checked /> No</label>
+          </div>
+        </fieldset>
+
+        <!-- Annual energy consumption = total building operational kWh × 7.5% -->
+        <fieldset class="fieldset col-span-2">
+          <legend class="fieldset-legend">Annual lift system energy consumption</legend>
+          <label class="input w-full bg-[var(--bg--weak-50)]">
+            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
+          </label>
+          <p class="label-text-alt text-[var(--text--soft-400)]">Total building operational energy × 7.5%</p>
+        </fieldset>
+
       </div>
     </form>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <button
-        type="button"
-        class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
-        onclick="closeLiftEscalatorSystemModal()"
-      >
-        {% translate "Cancel" %}
-      </button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLiftEscalatorSystem()">{% translate "Save" %}</button>
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeLiftEscalatorSystemModal()">Cancel</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLiftEscalatorSystem()">Save</button>
     </div>
   </div>
 </dialog>
@@ -121,172 +70,97 @@
 <dialog id="lift_escalator_system_modal_delete" class="modal modal-middle">
   <div class="modal-box w-full max-w-[26.375rem] p-0">
     <div class="flex flex-col items-center p-5">
-      <div
-        class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]"
-      >
-        <span
-          data-icon="alert-fill"
-          data-size="24"
-          data-color="var(--state--warning--base)"
-        ></span>
+      <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
+        <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)"></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
-      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        {% translate "You are about to remove or delete added lighting system. This will action will permanently remove it." %}
-      </p>
+      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">You are about to permanently remove this lift & escalator system.</p>
     </div>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <button
-        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
-        onclick="lift_escalator_system_modal_delete.close()"
-      >
-        {% translate "Cancel" %}
-      </button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteLiftEscalatorSystem()">{% translate "Remove" %}</button>
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="lift_escalator_system_modal_delete.close()">Cancel</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteLiftEscalatorSystem()">Remove</button>
     </div>
   </div>
 </dialog>
 
-<template id="lift-escalator-system-template">
-  <div class="w-full flex flex-col">
-    <button
-      class="btn btn-outline w-fit"
-      onclick="lift_escalator_system_modal.showModal()"
-    >
-      <span
-        data-icon="add-large-fill"
-        data-size="20"
-        data-color="var(--icon--strong-950)"
-      ></span>
-      {% translate "Add a lift & escalator system" %}
-    </button>
-    <div
-      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
-    ></div>
-    <ul class="grid grid-cols-1">
-      <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="stairs-line"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-          class="shrink-0 self-start"
-        ></span>
-        <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">{% translate "Lift & Escalator 01" %}</p>
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span>{% translate "Lift Regenerative Features" %}</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="lift_escalator_system_modal_delete.showModal()"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
-    </ul>
-  </div>
-</template>
-
 <template id="no-lift-escalator-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
-    <img
-      src="{% static 'assets/lift-escalator-system.png' %}"
-      alt="{% translate 'lift-escalator System Image' %}"
-    />
-    <p class="text-sm/5 font-medium">
-      {% translate "Click button below to add a lift & escalator system" %}
-    </p>
-    <button
-      class="btn btn-primary"
-      onclick="lift_escalator_system_modal.showModal()"
-    >
-      {% translate "Add lift & escalator system" %}
-    </button>
+    <img src="{% static 'assets/lift-escalator-system.png' %}" alt="Lift & Escalator System Image" />
+    <p class="text-sm/5 font-medium">Click button below to add a lift & escalator system</p>
+    <button class="btn btn-primary" onclick="lift_escalator_system_modal.showModal()">Add lift & escalator system</button>
   </div>
 </template>
 
 <script>
-  // Track editing state
   if (!window.editingLiftEscalatorSystemId) {
     window.editingLiftEscalatorSystemId = null;
   }
 
-  // Helper to get CSRF token
   function getCSRFToken() {
     return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
   }
 
-  // Helper to get building ID from session/localStorage
   function getBuildingId() {
-    // Get building UUID from URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
+    var urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('building_uuid');
   }
 
-  // Open modal
+  function computeAndSetLiftEnergy(buildingId) {
+    fetch('/building/' + buildingId + '/total-kwh/')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        console.log('[Lift] total-kwh response:', data);
+        if (data.success) {
+          var form = document.getElementById('lift-escalator-system-form');
+          var energyEl = form ? form.querySelector('[name="annual_energy_consumption"]') : null;
+          console.log('[Lift] energyEl:', energyEl);
+          if (energyEl) {
+            energyEl.value = (data.total_kwh * 0.075).toFixed(3);
+            console.log('[Lift] set value to:', energyEl.value);
+          }
+        }
+      })
+      .catch(function(err) { console.error('[Lift] total-kwh fetch error:', err); });
+  }
+
   window.openLiftEscalatorSystemModal = function() {
     window.editingLiftEscalatorSystemId = null;
     document.getElementById('lift-escalator-system-form').reset();
+    var buildingId = getBuildingId();
+    if (buildingId) computeAndSetLiftEnergy(buildingId);
     lift_escalator_system_modal.showModal();
-  }
+  };
 
-  // Close modal
   window.closeLiftEscalatorSystemModal = function() {
     lift_escalator_system_modal.close();
     window.editingLiftEscalatorSystemId = null;
-  }
+  };
 
-  // Save lift & escalator system - POST to API
   window.saveLiftEscalatorSystem = async function() {
-    const form = document.getElementById('lift-escalator-system-form');
-    const formData = new FormData(form);
+    var form = document.getElementById('lift-escalator-system-form');
 
-    // Get number of lifts
-    const numberOfLifts = formData.get('number_of_lifts');
+    var buildingId = getBuildingId();
+    if (!buildingId) {
+      Toast.error('Building ID not found. Please save building information first.');
+      return;
+    }
 
-    const validator = new window.FormValidator(form);
+    var validator = new window.FormValidator(form);
     if (!validator.validate()) {
       console.error('Form validation failed', validator.errors);
       return;
     }
 
-    // Get building ID
-    const buildingId = getBuildingId();
-    if (!buildingId) {
-      Toast.error('{% translate "Building ID not found. Please save building information first." %}');
-      return;
-    }
-
-    // Collect all form data
-    const systemData = Object.fromEntries(formData.entries());
+    var formData = new FormData(form);
+    var systemData = Object.fromEntries(formData.entries());
     systemData.building_uuid = buildingId;
 
-    // If editing, include the system ID
     if (window.editingLiftEscalatorSystemId) {
       systemData.lift_escalator_system_id = window.editingLiftEscalatorSystemId;
     }
 
     try {
-      // Save to database via API
-      const response = await fetch('/lift-escalator-system/', {
+      var response = await fetch('/lift-escalator-system/', {
         method: window.editingLiftEscalatorSystemId ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -295,155 +169,131 @@
         body: JSON.stringify(systemData)
       });
 
-      const result = await response.json();
+      var result = await response.json();
 
       if (response.ok && result.success) {
-        // Success - reload the list
         await window.renderLiftEscalatorSystems();
         window.closeLiftEscalatorSystemModal();
-
-        // Show success message
-        console.log(result.message);
       } else {
-        // Show validation errors
-        Toast.error('{% translate "Error saving lift & escalator system:" %}\n' + JSON.stringify(result.errors || result.error));
+        Toast.error('Error saving lift & escalator system:\n' + JSON.stringify(result.errors || result.error));
       }
     } catch (error) {
       console.error('Error saving lift & escalator system:', error);
-      Toast.error('{% translate "Failed to save lift & escalator system. Please try again." %}');
+      Toast.error('Failed to save lift & escalator system. Please try again.');
     }
-  }
+  };
 
-  // Render lift & escalator systems list - FETCH from database
   window.renderLiftEscalatorSystems = async function() {
-    const listContainer = document.getElementById('lift-escalator-systems-list');
-    const noSystemsContainer = document.getElementById('no-lift-escalator-system-template');
+    var listContainer = document.getElementById('lift-escalator-systems-list');
+    var noSystemsTemplate = document.getElementById('no-lift-escalator-system-template');
 
-    // Get building ID
-    const buildingId = getBuildingId();
+    var buildingId = getBuildingId();
     if (!buildingId) {
       console.error('Building ID not found');
       return;
     }
 
     try {
-      // Fetch from database
-      const response = await fetch(`/lift-escalator-system/${buildingId}/`);
-      const result = await response.json();
+      var response = await fetch('/lift-escalator-system/' + buildingId + '/');
+      var result = await response.json();
 
       if (!response.ok || !result.success) {
         console.error('Failed to load lift & escalator systems');
         return;
       }
 
-      const systems = result.lift_escalator_systems || [];
+      var systems = result.lift_escalator_systems || [];
+
+      // Show/hide Add button — only one lift system allowed
+      var addBtn = document.getElementById('add-lift-escalator-btn');
+      if (addBtn) addBtn.style.display = systems.length > 0 ? 'none' : '';
 
       if (systems.length === 0) {
-        listContainer.innerHTML = noSystemsContainer.innerHTML;
+        listContainer.innerHTML = noSystemsTemplate.innerHTML;
         return;
       }
 
-      // Render systems from database
-      listContainer.innerHTML = systems.map((system) => {
-        const numberOfLifts = system.number_of_lifts || 'N/A';
-        const regenerativeFeatures = system.lift_regenerative_features ? '{% translate "Yes" %}' : '{% translate "No" %}';
+      listContainer.innerHTML = systems.map(function(system) {
+        var regenerative = system.lift_regenerative_features ? 'Yes' : 'No';
+        var vvvf = system.vvvf_sleep_mode ? 'Yes' : 'No';
 
-        return `
-          <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
-            <span
-              data-icon="stairs-line"
-              data-size="20"
-              data-color="var(--icon--strong-950)"
-              class="shrink-0 self-start"
-            ></span>
-            <div class="flex flex-col flex-1">
-              <p class="text-sm/5 font-medium">{% translate "Lift & Escalator System" %} ${system.id}</p>
-              <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-                <span class="border-r border-[var(--text--sub-600)] pr-1">{% translate "Number of lifts:" %} ${numberOfLifts}</span>
-                <span>{% translate "Regenerative features:" %} ${regenerativeFeatures}</span>
-              </p>
-            </div>
-            <div class="flex items-center gap-3">
-              <button class="btn size-5 btn-ghost p-0" onclick="editLiftEscalatorSystem(${system.id})">
-                <span
-                  data-icon="edit-line"
-                  data-size="16"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-              <button
-                class="btn size-5 btn-ghost p-0"
-                onclick="confirmDeleteLiftEscalatorSystem(${system.id})"
-              >
-                <span
-                  data-icon="delete-bin-5-line"
-                  data-size="16"
-                  data-color="var(--icon--strong-950)"
-                ></span>
-              </button>
-            </div>
-          </li>
-        `;
+        return '<li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">'
+          + '<span data-icon="stairs-line" data-size="20" data-color="var(--icon--strong-950)" class="shrink-0 self-start"></span>'
+          + '<div class="flex flex-col flex-1">'
+          + '<p class="text-sm/5 font-medium">Lift & Escalator System</p>'
+          + '<p class="text-sm/5 text-[var(--text--sub-600)] gap-0">'
+          + '<span class="border-r border-[var(--text--sub-600)] pr-1">Lifts: ' + system.number_of_lifts + '</span>'
+          + '<span class="border-r border-[var(--text--sub-600)] px-1">Regenerative: ' + regenerative + '</span>'
+          + '<span class="pl-1">VVVF: ' + vvvf + '</span>'
+          + '</p>'
+          + '</div>'
+          + '<div class="flex items-center gap-3">'
+          + '<button class="btn size-5 btn-ghost p-0" onclick="editLiftEscalatorSystem(' + system.id + ')">'
+          + '<span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>'
+          + '</button>'
+          + '<button class="btn size-5 btn-ghost p-0" onclick="confirmDeleteLiftEscalatorSystem(' + system.id + ')">'
+          + '<span data-icon="delete-bin-5-line" data-size="16" data-color="var(--icon--strong-950)"></span>'
+          + '</button>'
+          + '</div>'
+          + '</li>';
       }).join('');
+
+      if (window.initIcons) window.initIcons();
     } catch (error) {
       console.error('Error loading lift & escalator systems:', error);
-      listContainer.innerHTML = `
-        <li class="flex flex-col items-center justify-center py-8 text-center">
-          <span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>
-          <p class="text-sm/5 text-[var(--text--sub-600)] mt-2">{% translate "Error loading lift & escalator systems" %}</p>
-        </li>
-      `;
+      listContainer.innerHTML = '<li class="flex flex-col items-center justify-center py-8 text-center">'
+        + '<span data-icon="error-warning-fill" data-size="48" data-color="var(--state--error--base)"></span>'
+        + '<p class="text-sm/5 text-[var(--text--sub-600)] mt-2">Error loading lift & escalator systems</p>'
+        + '</li>';
     }
-  }
+  };
 
-  // Edit lift & escalator system - LOAD from database
   window.editLiftEscalatorSystem = async function(systemId) {
     window.editingLiftEscalatorSystemId = systemId;
 
-    // Get building ID
-    const buildingId = getBuildingId();
+    var buildingId = getBuildingId();
     if (!buildingId) {
-      Toast.error('{% translate "Building ID not found" %}');
+      Toast.error('Building ID not found');
       return;
     }
 
     try {
-      // Fetch all systems to find the one we're editing
-      const response = await fetch(`/lift-escalator-system/${buildingId}/`);
-      const result = await response.json();
+      var response = await fetch('/lift-escalator-system/' + buildingId + '/');
+      var result = await response.json();
 
       if (!response.ok || !result.success) {
-        Toast.error('{% translate "Failed to load lift & escalator system" %}');
+        Toast.error('Failed to load lift & escalator system');
         return;
       }
 
-      const system = result.lift_escalator_systems.find(s => s.id === systemId);
+      var system = result.lift_escalator_systems.find(function(s) { return s.id === systemId; });
       if (!system) {
-        Toast.error('{% translate "Lift & escalator system not found" %}');
+        Toast.error('Lift & escalator system not found');
         return;
       }
 
-      // Reset form
-      const form = document.getElementById('lift-escalator-system-form');
+      var form = document.getElementById('lift-escalator-system-form');
       form.reset();
 
-      // Populate form fields
       form.querySelector('[name="number_of_lifts"]').value = system.number_of_lifts;
-      form.querySelector('[name="lift_regenerative_features"]').value = system.lift_regenerative_features ? 'yes' : 'no';
-      form.querySelector('[name="vvvf_sleep_mode"]').value = system.vvvf_sleep_mode ? 'yes' : 'no';
 
-      if (system.annual_energy_consumption_kwh !== null) {
-        form.querySelector('[name="annual_energy_consumption"]').value = system.annual_energy_consumption_kwh;
-      }
+      form.querySelectorAll('[name="lift_regenerative_features"]').forEach(function(r) {
+        r.checked = (r.value === (system.lift_regenerative_features ? 'yes' : 'no'));
+      });
+      form.querySelectorAll('[name="vvvf_sleep_mode"]').forEach(function(r) {
+        r.checked = (r.value === (system.vvvf_sleep_mode ? 'yes' : 'no'));
+      });
+
+      // Always recompute energy from current operational data
+      computeAndSetLiftEnergy(buildingId);
 
       lift_escalator_system_modal.showModal();
     } catch (error) {
       console.error('Error loading lift & escalator system for edit:', error);
-      Toast.error('{% translate "Failed to load lift & escalator system" %}');
+      Toast.error('Failed to load lift & escalator system');
     }
-  }
+  };
 
-  // Confirm delete
   if (!window.deleteLiftEscalatorSystemId) {
     window.deleteLiftEscalatorSystemId = null;
   }
@@ -451,50 +301,42 @@
   window.confirmDeleteLiftEscalatorSystem = function(systemId) {
     window.deleteLiftEscalatorSystemId = systemId;
     lift_escalator_system_modal_delete.showModal();
-  }
+  };
 
-  // Delete lift & escalator system - DELETE from database
   window.deleteLiftEscalatorSystem = async function() {
     if (window.deleteLiftEscalatorSystemId !== null) {
       try {
-        const response = await fetch(`/lift-escalator-system/${window.deleteLiftEscalatorSystemId}/delete/`, {
+        var response = await fetch('/lift-escalator-system/' + window.deleteLiftEscalatorSystemId + '/delete/', {
           method: 'DELETE',
-          headers: {
-            'X-CSRFToken': getCSRFToken()
-          }
+          headers: { 'X-CSRFToken': getCSRFToken() }
         });
 
-        const result = await response.json();
+        var result = await response.json();
 
         if (response.ok && result.success) {
-          // Success - reload the list
           await window.renderLiftEscalatorSystems();
           window.deleteLiftEscalatorSystemId = null;
           lift_escalator_system_modal_delete.close();
-          console.log('Lift & escalator system deleted successfully');
         } else {
-          Toast.error('{% translate "Failed to delete lift & escalator system" %}');
+          Toast.error('Failed to delete lift & escalator system');
         }
       } catch (error) {
         console.error('Error deleting lift & escalator system:', error);
-        Toast.error('{% translate "Failed to delete lift & escalator system" %}');
+        Toast.error('Failed to delete lift & escalator system');
       }
     }
-  }
+  };
 
-  // Initialize on page load
   document.addEventListener('DOMContentLoaded', function() {
     window.renderLiftEscalatorSystems();
   });
 
-  // If HTMX is processing this content dynamically, also initialize after htmx:afterSwap
   document.addEventListener('htmx:afterSwap', function(evt) {
     if (evt.detail.target.id === 'dynamic-content') {
       window.renderLiftEscalatorSystems();
     }
   });
 
-  // Initialize immediately for dynamically loaded content
   if (document.getElementById('lift-escalator-systems-list')) {
     window.renderLiftEscalatorSystems();
   }

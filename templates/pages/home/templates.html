@@ -1,22 +1,21 @@
 {% extends "_base.html" %}
 {% load static %}
-{% load i18n %}
 
-{% block title %}{% translate "Home" %} - HEAT Building LCA{% endblock %}
+{% block title %}Home - HEAT Building LCA{% endblock %}
 
 {% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock body_class %}
 
 {% block content %}
-
+ 
     <section class="flex-1 card bg-white rounded-none rounded-t-[var(--radius-24)] border border-[var(--stroke--soft-200)] pb-6">
       <div class="max-w-[68.75rem] mx-auto w-full px-4">
         <div class="flex flex-col gap-6 w-full mt-7">
           <div
             class="flex flex-col text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]"
           >
-            {% translate "Reusable Templates" %}
+            Reusable Templates
             <p class="text-sm font-normal text-[var(--text--sub-600)]">
-              {% translate "Add your buildings to access for low carbon" %}
+              Add your buildings to access for low carbon
             </p>
           </div>
         </div>
@@ -27,6 +26,7 @@
           hx-swap="outerHTML"
           hx-trigger="submit, change from:#search-form select delay:300ms, keyup changed delay:500ms from:#search-form input[name='search_query']"
           class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)] mt-5"
+          hx-indicator="#buildings-loading-spinner"
         >
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
@@ -35,10 +35,13 @@
                 data-size="16"
                 data-color="var(--icon--soft-400)"
               ></span>
-              <input type="text" name="search_query" placeholder="{% translate 'Search templates...' %}" value="{{ search_query }}" />
+              <input type="text" name="search_query" placeholder="Search templates..." value="{{ search_query }}" />
+              <div id="buildings-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
+                <span class="loading loading-spinner loading-sm text-primary"></span>
+              </div>
             </label>
             <select class="select" name="country">
-              <option value="" >{% translate "All Countries" %}</option>
+              <option value="" >All Countries </option>
               {% for country in countries %}
                 <option  value="{{ country.id }}" {% if selected_country == country.id|stringformat:"s" %}selected{% endif %}>
                  <span data-country="{{country.code2}}"></span>  {{ country.name }}
@@ -57,9 +60,9 @@
                   data-size="20"
                   data-color="var(--icon--strong-950)"
                 ></span>
-                {% translate "Advanced Search" %}
+                Advanced Search
                 <span class="text-xs/5 text-[var(--text--sub-600)]"
-                  >{% translate "Click here for a more advanced search option" %}</span
+                  >Click here for a more advanced search option</span
                 >
               </span>
               <span
@@ -82,7 +85,7 @@
                     name="category"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option value="">{% translate "Building Component" %}</option>
+                    <option value="">Building Component</option>
                     {% for category in categories %}
                       <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
                         {{ category.name }}
@@ -101,7 +104,7 @@
                     name="technique"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option value="">{% translate "Construction Technique" %}</option>
+                    <option value="">Construction Technique</option>
                     {% for technique in techniques %}
                       <option value="{{ technique.id }}" {% if selected_technique == technique.id|stringformat:"s" %}selected{% endif %}>
                         {{ technique.name }}
@@ -120,9 +123,9 @@
                     name="mode"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option value="">{% translate "All Types" %}</option>
-                    <option value="system" {% if selected_mode == 'system' %}selected{% endif %}>{% translate "System Component" %}</option>
-                    <option value="custom" {% if selected_mode == 'custom' %}selected{% endif %}>{% translate "My Component" %}</option>
+                    <option value="">All Types</option>
+                    <option value="system" {% if selected_mode == 'system' %}selected{% endif %}>System Component</option>
+                    <option value="custom" {% if selected_mode == 'custom' %}selected{% endif %}>My Component</option>
                   </select>
                 </label>
                 <label class="relative">
@@ -136,20 +139,21 @@
                     name="sort_by"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option value="name" {% if selected_sort == 'name' %}selected{% endif %}>{% translate "Name (A-Z)" %}</option>
-                    <option value="-name" {% if selected_sort == '-name' %}selected{% endif %}>{% translate "Name (Z-A)" %}</option>
-                    <option value="-created_at" {% if selected_sort == '-created_at' %}selected{% endif %}>{% translate "Newest First" %}</option>
-                    <option value="created_at" {% if selected_sort == 'created_at' %}selected{% endif %}>{% translate "Oldest First" %}</option>
+                    <option value="name" {% if selected_sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                    <option value="-name" {% if selected_sort == '-name' %}selected{% endif %}>Name (Z-A)</option>
+                    <option value="-created_at" {% if selected_sort == '-created_at' %}selected{% endif %}>Newest First</option>
+                    <option value="created_at" {% if selected_sort == 'created_at' %}selected{% endif %}>Oldest First</option>
                   </select>
                 </label>
               </div>
             </div>
           </div>
-          <button type="submit" class="btn btn-outline btn-block">{% translate "Search" %}</button>
+          <button type="submit" class="btn btn-outline btn-block">Search</button>
         </form>
 
         {% include "pages/home/partials/templates_list.html" %}
-
+        
+      
       </div>
     </section>
 
@@ -157,11 +161,11 @@
     <dialog id="template_detail_modal" class="modal modal-bottom sm:modal-end">
       <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-[95vw] !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
         <div class="flex justify-between p-5 w-full">
-          <h3 id="modal-template-name" class="text-lg/6 font-medium">{% translate "Loading..." %}</h3>
+          <h3 id="modal-template-name" class="text-lg/6 font-medium">Loading...</h3>
           <div class="flex items-center">
             <button id="modal-delete-btn" type="button" class="flex items-center mr-3" style="display:none;" onclick="deleteTemplateFromDialog()">
               <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--sub-600)"></span>
-              <span class="var(--text--sub-600) ml-1 underline">{% translate "Delete" %}</span>
+              <span class="var(--text--sub-600) ml-1 underline">Delete</span>
             </button>
             <button type="button" onclick="template_detail_modal.close()" class="btn btn-sm btn-circle btn-ghost">
               <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
@@ -174,17 +178,17 @@
           <input type="hidden" id="can-edit" value="false" />
           <div class="px-5 py-4 grid grid-cols-3 gap-4">
             <fieldset class="fieldset col-span-3">
-              <legend class="fieldset-legend">{% translate "Title" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+              <legend class="fieldset-legend">Title<span class="text-[var(--state--error--base)]">*</span></legend>
               <label class="input validator w-full">
                 <input id="template-name" name="name" type="text" required minlength="2" maxlength="200" />
               </label>
-              <p class="validator-hint">{% translate "Required (2-200 characters)" %}</p>
+              <p class="validator-hint">Required (2-200 characters)</p>
             </fieldset>
 
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "Country" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+              <legend class="fieldset-legend">Country<span class="text-[var(--state--error--base)]">*</span></legend>
               <select id="template-country" name="country_id" class="select" required>
-                <option value="">{% translate "Select country" %}</option>
+                <option value="">Select country</option>
                 {% for country in countries %}
                   <option value="{{ country.id }}"> <span data-country="{{ country.code2 }}"></span> {{ country.name }}</option>
                 {% endfor %}
@@ -192,9 +196,9 @@
             </fieldset>
 
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "Building component" %}</legend>
+              <legend class="fieldset-legend">Building component</legend>
               <select id="template-category" name="category_id" class="select" disabled>
-                <option value="">{% translate "Select category" %}</option>
+                <option value="">Select category</option>
                 {% for category in categories %}
                   <option value="{{ category.id }}">{{ category.name }}</option>
                 {% endfor %}
@@ -202,9 +206,9 @@
             </fieldset>
 
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">{% translate "Construction technique" %}</legend>
+              <legend class="fieldset-legend">Construction technique</legend>
               <select id="template-technique" name="technique_id" class="select" disabled>
-                <option value="">{% translate "Select technique" %}</option>
+                <option value="">Select technique</option>
                 {% for technique in techniques %}
                   <option value="{{ technique.id }}">{{ technique.name }}</option>
                 {% endfor %}
@@ -212,39 +216,39 @@
             </fieldset>
 
             <fieldset class="fieldset col-span-3">
-              <legend class="fieldset-legend">{% translate "Comment" %}</legend>
-              <textarea id="template-comment" name="comment" class="textarea w-full" rows="3" placeholder="{% translate 'Add a comment' %}"></textarea>
+              <legend class="fieldset-legend">Comment</legend>
+              <textarea id="template-comment" name="comment" class="textarea w-full" rows="3" placeholder="Add a comment"></textarea>
             </fieldset>
 
           </div>
           <h2 class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4">
-            {% translate "MATERIALS" %} (<span id="modal-materials-count">0</span>)
+            MATERIALS (<span id="modal-materials-count">0</span>)
           </h2>
           <div class="px-5 pb-4">
             <div class="flex items-end justify-between border-b border-[var(--stroke--soft-200)] pb-4">
               <div class="flex-1">
-                <h4 class="text-base/5 font-extrabold mb-1">{% translate "Added Materials" %}</h4>
-                <p class="text-sm/5 text-[var(--text--sub-600)]">{% translate "Materials from EPD libraries" %}</p>
+                <h4 class="text-base/5 font-extrabold mb-1">Added Materials</h4>
+                <p class="text-sm/5 text-[var(--text--sub-600)]">Materials from EPD libraries</p>
               </div>
               <button type="button" class="btn btn-sm btn-outline" onclick="structural_component_epd_modal.showModal()">
                 <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-                {% translate "Add from EPD library" %}
+                Add from EPD library
               </button>
             </div>
             <ul id="modal-materials-list" class="grid grid-cols-1 gap-2.5 mt-4 mb-[100px]">
-
+              
             </ul>
           </div>
           <div class="p-5 w-full border-t border-[var(--stroke--soft-200)] flex items-center justify-between absolute bottom-0 bg-white">
             <button type="button" class="btn btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit" onclick="template_detail_modal.close()">
-              {% translate "Cancel" %}
+              Cancel
             </button>
             <div class="flex items-center gap-2">
               <button type="button" id="modal-duplicate-btn" class="btn btn-outline text-[var(--text--strong-950)] border-[var(--stroke--strong-950)] w-fit" onclick="handleDuplicate()">
-                {% translate "Save & duplicate" %}
+                Save & duplicate
               </button>
               <button type="button" id="modal-update-btn" class="btn btn-primary w-fit" style="display:none;" onclick="handleUpdate()">
-                {% translate "Update" %}
+                Update
               </button>
             </div>
           </div>
@@ -267,10 +271,10 @@
               data-size="16"
               data-color="var(--icon--soft-400)"
             ></span>
-            {% translate "Go back" %}
+            Go back
           </button>
           <h3 class="text-lg/6 font-medium w-full text-left p-5">
-            {% translate "Add from EPD Library" %}
+            Add from EPD Library
           </h3>
           <button
             type="button"
@@ -291,18 +295,20 @@
           hx-swap="outerHTML"
           hx-trigger="submit, change from:#epd-country-filter delay:300ms, change from:#epd-category-filter delay:300ms, change from:#epd-type-filter delay:300ms, keyup changed delay:500ms from:#epd-search-query"
           class="flex-1 overflow-y-auto hide-scrollbar"
+          hx-indicator="#epd-loading-spinner"
           >
           <div class="px-5 py-2.5 w-full">
-            <div
-              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
-            >
+            <div class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]">
               <div class="flex items-stretch gap-2">
                 <label class="input w-full">
                   <span data-icon="search-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
-                  <input name='epd_search_query' id="epd-search-query" type="text" placeholder="{% translate 'Search EPDs...' %}" />
+                  <input name='epd_search_query' id="epd-search-query" type="text" placeholder="Search EPDs..." />
+                  <div id="epd-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
+                    <span class="loading loading-spinner loading-sm text-primary"></span>
+                  </div>
                 </label>
                 <select name="country" id="epd-country-filter" class="select">
-                  <option value="">{% translate "All Countries" %}</option>
+                  <option value="">All Countries</option>
                   {% for country in countries %}
                     <option value="{{ country.id }}"> <span data-country="{{country.code2}}"></span> {{ country.name }}</option>
                   {% endfor %}
@@ -319,8 +325,8 @@
                       data-size="20"
                       data-color="var(--icon--strong-950)"
                     ></span>
-                    {% translate "Advanced Search" %}
-                    <span class="text-xs/5 text-[var(--text--sub-600)]" >{% translate "Click here for a more advanced search option" %}</span>
+                    Advanced Search
+                    <span class="text-xs/5 text-[var(--text--sub-600)]" >Click here for a more advanced search option</span>
                   </span>
                   <span
                     data-icon="caret-down"
@@ -334,7 +340,7 @@
                     <label class="relative">
                       <span data-icon="filter-3-line" data-size="20" data-color="var(--icon--soft-400)" class="select-icon w-8"></span>
                       <select name="category" id="epd-category-filter" class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]">
-                        <option value="">{% translate "All Categories" %}</option>
+                        <option value="">All Categories</option>
                         {% for category in epd_categories %}
                           <option value="{{ category.id }}">{{ category.name_en }}</option>
                         {% endfor %}
@@ -343,7 +349,7 @@
                     <label class="relative">
                       <span data-icon="filter-3-line" data-size="20" data-color="var(--icon--soft-400)" class="select-icon w-8"></span>
                       <select name="type" id="epd-type-filter" class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]">
-                        <option value="">{% translate "All Types" %}</option>
+                        <option value="">All Types</option>
                         {% for type in epd_types %}
                           <option value="{{ type.value }}">{{ type.label }}</option>
                         {% endfor %}
@@ -352,21 +358,208 @@
                   </div>
                 </div>
               </div>
-              <button id="epd-search-btn" type="submit" class="btn btn-outline btn-block">{% translate "Search" %}</button>
+              <div class="flex gap-2">
+                <button id="epd-search-btn" type="submit" class="btn btn-outline flex-1">Search</button>
+                <button id="epd-reset-btn" type="button" class="btn btn-ghost" onclick="document.getElementById('epd-search-form').reset(); htmx.trigger('#epd-search-form', 'submit');">
+                  Reset
+                </button>
+              </div>
             </div>
             <div id="epd-search-list" class="mt-4">
-              <p class="text-center py-8 text-[var(--text--sub-600)]">{% translate "Enter search criteria and click Search" %}</p>
+              <p class="text-center py-8 text-[var(--text--sub-600)]">Enter search criteria and click Search</p>
             </div>
             {% comment %} <ul id="epd-results-list" class="grid grid-cols-1" style="display:none;"> {% endcomment %}
-              {% comment %} ... (commented out example list items remain as-is) {% endcomment %}
+              {% comment %} <li
+                class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+              >
+                <div class="flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between">
+                    <span
+                      >Structural concrete M6582A09 (C30/37, F4, 16, XC4, XF1,
+                      XA1, XD1, WA, slow)</span
+                    >
+                  </div>
+                  <div class="flex items-stretch gap-1.25">
+                    <span
+                      class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                      >Germany</span
+                    >
+                    <div
+                      class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                    ></div>
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >Precast concrete elements and goods</span
+                    >
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >169.40 kgCO2e</span
+                    >
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2.5 w-fit">
+                  <span
+                    data-icon="external-link-line"
+                    data-size="20"
+                    data-color="var(--icon--sub-600)"
+                  ></span>
+                  <button
+                    class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                    type="button"
+                  >
+                    <span
+                      data-icon="add-large-fill"
+                      data-size="20"
+                      data-color="var(--icon--strong-950)"
+                    ></span>
+                    Add
+                  </button>
+                </div>
+              </li>
+              <li
+                class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+              >
+                <div class="flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between">
+                    <span>Shower Hoses</span>
+                  </div>
+                  <div class="flex items-stretch gap-1.25">
+                    <span
+                      class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                      >Germany</span
+                    >
+                    <div
+                      class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                    ></div>
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >Mounting</span
+                    >
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >0.59 kgCO2e</span
+                    >
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2.5 w-fit">
+                  <span
+                    data-icon="external-link-line"
+                    data-size="20"
+                    data-color="var(--icon--sub-600)"
+                  ></span>
+                  <button
+                    class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                    type="button"
+                  >
+                    <span
+                      data-icon="add-large-fill"
+                      data-size="20"
+                      data-color="var(--icon--strong-950)"
+                    ></span>
+                    Add
+                  </button>
+                </div>
+              </li>
+              <li
+                class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+              >
+                <div class="flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between">
+                    <span>ACC M35 Ready Mixed Concrete (RMC)</span>
+                  </div>
+                  <div class="flex items-stretch gap-1.25">
+                    <span
+                      class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                      >India</span
+                    >
+                    <div
+                      class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                    ></div>
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >Ready mixed concrete</span
+                    >
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >396 kgCO2e</span
+                    >
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2.5 w-fit">
+                  <span
+                    data-icon="external-link-line"
+                    data-size="20"
+                    data-color="var(--icon--sub-600)"
+                  ></span>
+                  <button
+                    class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                    type="button"
+                  >
+                    <span
+                      data-icon="add-large-fill"
+                      data-size="20"
+                      data-color="var(--icon--strong-950)"
+                    ></span>
+                    Add
+                  </button>
+                </div>
+              </li>
+              <li
+                class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]"
+              >
+                <div class="flex flex-col gap-2.5">
+                  <div class="flex items-center justify-between">
+                    <span
+                      >semi-finished products - Kunststoffwerke Katzbach GmbH &
+                      Co. KG - EPP mold</span
+                    >
+                  </div>
+                  <div class="flex items-stretch gap-1.25">
+                    <span
+                      class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                      >Germany</span
+                    >
+                    <div
+                      class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"
+                    ></div>
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >Ready mixed concrete</span
+                    >
+                    <span
+                      class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
+                      >396 kgCO2e</span
+                    >
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2.5 w-fit">
+                  <span
+                    data-icon="external-link-line"
+                    data-size="20"
+                    data-color="var(--icon--sub-600)"
+                  ></span>
+                  <button
+                    class="btn btn-sm btn-outline w-fit border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]"
+                    type="button"
+                  >
+                    <span
+                      data-icon="add-large-fill"
+                      data-size="20"
+                      data-color="var(--icon--strong-950)"
+                    ></span>
+                    Add
+                  </button>
+                </div>
+              </li> {% endcomment %}
             {% comment %} </ul> {% endcomment %}
           </div>
         </form>
         <div id="epd-modal-footer" class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+          
           <div id="epd-pagination"></div>
 
           <button type="button" class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit" onclick="structural_component_epd_modal.close()">
-            {% translate "Close" %}
+            Close
           </button>
         </div>
       </div>
@@ -376,21 +569,21 @@
       // Global vars for tracking
       let deletedMaterialIds = [];
       let currentTemplateData = null;
-
+      
       // View template details and populate form
       function viewTemplate(assemblyId) {
         // Show loading
-        document.getElementById('modal-template-name').textContent = "{% translate 'Loading...' %}";
-        document.getElementById('modal-materials-list').innerHTML = '<li class="text-center py-4">{% translate "Loading..." %}</li>';
+        document.getElementById('modal-template-name').textContent = 'Loading...';
+        document.getElementById('modal-materials-list').innerHTML = '<li class="text-center py-4">Loading...</li>';
         deletedMaterialIds = [];
-
+      
         template_detail_modal.showModal();
         // Fetch data
         fetch(`/templates/${assemblyId}/`)
           .then(response => response.ok ? response.json() : Promise.reject('Failed to load'))
           .then(data => {
             currentTemplateData = data;
-
+      
             // Populate form
             document.getElementById('template-id').value = data.id;
             document.getElementById('can-edit').value = data.can_edit;
@@ -400,35 +593,35 @@
             document.getElementById('template-category').value = data.category_id || '';
             document.getElementById('template-technique').value = data.technique_id || '';
             document.getElementById('template-comment').value = data.comment || '';
-
+      
             // Show/hide controls based on permissions
             const canEdit = data.can_edit;
             document.getElementById('modal-delete-btn').style.display = canEdit ? 'flex' : 'none';
             document.getElementById('modal-update-btn').style.display = canEdit ? 'block' : 'none';
-
+      
             // Update materials count
             document.getElementById('modal-materials-count').textContent = data.materials.length;
-
+      
             // Render materials
             renderMaterials(data.materials, canEdit);
           })
           .catch(error => {
             console.error('Error:', error);
-            document.getElementById('modal-template-name').textContent = "{% translate 'Error' %}";
+            document.getElementById('modal-template-name').textContent = 'Error';
             document.getElementById('modal-materials-list').innerHTML =
-              '<li class="text-center py-4 text-red-600">{% translate "Failed to load template" %}</li>';
+              '<li class="text-center py-4 text-red-600">Failed to load template</li>';
           });
       }
-
+      
       // Render materials list
       function renderMaterials(materials, canEdit) {
         const list = document.getElementById('modal-materials-list');
-
+      
         if (materials.length === 0) {
-          list.innerHTML = '<li class="text-center py-4 text-[var(--text--sub-600)]">{% translate "No materials added" %}</li>';
+          list.innerHTML = '<li class="text-center py-4 text-[var(--text--sub-600)]">No materials added</li>';
           return;
         }
-
+      
         list.innerHTML = materials.map(m => `
           <li class="bg-[var(--bg--weak-50)] rounded-xl p-4" data-material-id="${m.id}">
             <div class="flex items-center justify-between mb-2">
@@ -438,7 +631,7 @@
             <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
               ${m.country_code ? `<div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"><span data-country="${m.country_code}" data-width="20"></span></div>` : ''}
               <label class="input flex-[2.5]">
-                <input type="text" class="material-description" value="${m.description || ''}" placeholder="{% translate 'Add description' %}" ${!canEdit ? 'readonly' : ''} />
+                <input type="text" class="material-description" value="${m.description || ''}" placeholder="Add description" ${!canEdit ? 'readonly' : ''} />
               </label>
               <label class="input flex-1">
                 <input type="number" class="material-quantity" value="${m.quantity}" ${!canEdit ? 'readonly' : ''} />
@@ -454,18 +647,20 @@
           </li>
         `).join('');
       }
-
+      
       // Delete material
-      function deleteMaterial(materialId) {
-        if (!confirm("{% translate 'Remove this material?' %}")) return;
-
+      async function deleteMaterial(materialId) {
+        
+        const confirmDelete = await confirmDialog.delete('Are you sure you want to remove this material from the template?');
+        if (!confirmDelete) return;
+      
         deletedMaterialIds.push(materialId);
         document.querySelector(`[data-material-id="${materialId}"]`)?.remove();
-
+      
         const count = document.querySelectorAll('#modal-materials-list > li').length;
         document.getElementById('modal-materials-count').textContent = count;
       }
-
+      
       // Collect form data
       function collectFormData() {
         const materials = [];
@@ -505,7 +700,7 @@
           deleted_materials: deletedMaterialIds
         };
       }
-
+      
       // Update template
       function handleUpdate() {
         const form = document.getElementById('template-form');
@@ -513,10 +708,10 @@
           form.reportValidity();
           return;
         }
-
+      
         const templateId = document.getElementById('template-id').value;
         const data = collectFormData();
-
+      
         fetch(`/templates/${templateId}/update/`, {
           method: 'POST',
           headers: {
@@ -530,17 +725,17 @@
           if (result.success) {
             template_detail_modal.close();
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success("{% translate 'Template updated' %}");
+            if (typeof Toast !== 'undefined') Toast.success('Template updated');
           } else {
-            Toast.error(result.error || "{% translate 'Update failed' %}");
+            Toast.error(result.error || 'Update failed');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          Toast.error("{% translate 'An error occurred' %}");
+          Toast.error('An error occurred');
         });
       }
-
+      
       // Duplicate template
       function handleDuplicate() {
         const form = document.getElementById('template-form');
@@ -548,10 +743,10 @@
           form.reportValidity();
           return;
         }
-
+      
         const templateId = document.getElementById('template-id').value;
         const data = collectFormData();
-
+      
         fetch(`/templates/${templateId}/duplicate/`, {
           method: 'POST',
           headers: {
@@ -565,24 +760,26 @@
           if (result.success) {
             template_detail_modal.close();
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success("{% translate 'Template duplicated' %}");
+            if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
           } else {
-            Toast.error(result.error || "{% translate 'Duplication failed' %}");
+            Toast.error(result.error || 'Duplication failed');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          Toast.error("{% translate 'An error occurred' %}");
+          Toast.error('An error occurred');
         });
       }
-
+      
       // Delete template from dialog
-      function deleteTemplateFromDialog() {
+      async function deleteTemplateFromDialog() {
         const templateId = document.getElementById('template-id').value;
         const templateName = document.getElementById('template-name').value;
-
-        if (!confirm("{% translate 'Delete' %} \"" + templateName + "\"? {% translate 'This cannot be undone.' %}")) return;
-
+      
+        
+        const confirmDelete = await confirmDialog.delete(`Are you sure you want to remove "${templateName}" from the template?`);
+        if (!confirmDelete) return;
+      
         fetch(`/templates/${templateId}/delete/`, {
           method: 'DELETE',
           headers: { 'X-CSRFToken': getCsrfToken() }
@@ -592,20 +789,22 @@
           if (result.success) {
             template_detail_modal.close();
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success("{% translate 'Template deleted' %}");
+            if (typeof Toast !== 'undefined') Toast.success('Template deleted');
           } else {
-            Toast.error(result.error || "{% translate 'Deletion failed' %}");
+            Toast.error(result.error || 'Deletion failed');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          Toast.error("{% translate 'An error occurred' %}");
+          Toast.error('An error occurred');
         });
       }
-
+      
       // Delete from list (existing function)
-      function deleteTemplate(assemblyId, assemblyName) {
-        if (!confirm("{% translate 'Delete' %} \"" + assemblyName + "\"? {% translate 'This cannot be undone.' %}")) return;
+      async function deleteTemplate(assemblyId, assemblyName) {
+      
+        const confirmDelete = await confirmDialog.delete(`Are you sure you want to remove "${assemblyName}" from the template? This action cannot be undone.`);
+        if (!confirmDelete) return;
 
         fetch(`/templates/${assemblyId}/delete/`, {
           method: 'DELETE',
@@ -615,21 +814,21 @@
         .then(result => {
           if (result.success) {
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success("{% translate 'Template deleted' %}");
+            if (typeof Toast !== 'undefined') Toast.success('Template deleted');
           } else {
-            Toast.error(result.error || "{% translate 'Deletion failed' %}");
+            Toast.error(result.error || 'Deletion failed');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          if (typeof Toast !== 'undefined') Toast.error("{% translate 'An error occurred' %}");
+          if (typeof Toast !== 'undefined') Toast.error('An error occurred');
         });
       }
-
+      
       // Duplicate from list (existing function)
-      function duplicateTemplate(assemblyId) {
-        if (!confirm("{% translate 'Create a copy of this template?' %}")) return;
-
+      async function duplicateTemplate(assemblyId) {
+        const confirmDelete = await confirmDialog.info('Create a copy of this template?');
+        if (!confirmDelete) return;
         // Simple duplication without modifications
         fetch(`/templates/${assemblyId}/duplicate/`, {
           method: 'POST',
@@ -643,17 +842,17 @@
         .then(result => {
           if (result.success) {
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success("{% translate 'Template duplicated' %}");
+            if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
           } else {
-            Toast.error(result.error || "{% translate 'Duplication failed' %}");
+            Toast.error(result.error || 'Duplication failed');
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          Toast.error("{% translate 'An error occurred' %}");
+          Toast.error('An error occurred');
         });
       }
-
+      
       // Get CSRF token
       function getCsrfToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
@@ -697,7 +896,7 @@
           // Change button to "Added" state
           addBtn.innerHTML = `
             <span data-icon="check-line" data-size="20" data-color="var(--icon--disabled-300)"></span>
-            {% translate "Added" %}
+            Added
           `;
           addBtn.classList.remove('btn-outline');
           addBtn.classList.add('btn-success');
@@ -720,7 +919,7 @@
             <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
               ${epd.country_code ? `<div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"><span data-country="${epd.country_code}" data-width="20"></span></div>` : ''}
               <label class="input flex-[2.5]">
-                <input type="text" class="material-description" value="" placeholder="{% translate 'Add description' %}" data-epd-id="${epd.id}" />
+                <input type="text" class="material-description" value="" placeholder="Add description" data-epd-id="${epd.id}" />
               </label>
               <label class="input flex-1">
                 <input type="number" class="material-quantity" value="1" data-epd-id="${epd.id}" min="0" step="any" />

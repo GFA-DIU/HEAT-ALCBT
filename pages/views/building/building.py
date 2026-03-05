@@ -19,11 +19,9 @@ from pages.models.building import (Building, BuildingAssembly,
                                    SimulatedOperationalProduct)
 from pages.models.epd import EPDImpact, MaterialCategory
 from pages.views.assembly.epd_processing import get_epd_list
-from pages.views.building.impact_calculation import calculate_impacts
 from pages.views.building.building_stats import (
-    get_building_detail_statistics,
-    get_building_chart_data,
-)
+    get_building_chart_data, get_building_detail_statistics)
+from pages.views.building.impact_calculation import calculate_impacts
 from pages.views.building.operational_products.operational_products import (
     get_op_product, get_op_product_list, handle_op_products_save,
     serialize_operational_products)
@@ -384,3 +382,8 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
         impact_list.extend(assembly_impact_list)
 
     return structural_components, impact_list
+
+def savings_tab(request, building_id):
+    if request.method == "GET":
+        context, _, _, _ = handle_building_load(request, building_id, simulation=False)
+        return render(request, "pages/building/savings_tab.html", context)

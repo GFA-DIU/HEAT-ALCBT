@@ -35,14 +35,16 @@ DIMENSION_UNIT_MAPPING = {
     "length": "m",
     "mass": "kg",
     "volume": "m^3",
+    "pcs": "pcs",
 }
 
 
 class AssemblyDimension(models.TextChoices):
     AREA = "area", "m²"  # Area-type calculations
     LENGTH = "length", "m"  # Length-type calculations
-    MASS = "mass", "kg"  # Length-type calculations
-    VOLUME = "volume", "m³"  # Length-type calculations
+    MASS = "mass", "kg"  # Mass-type calculations
+    VOLUME = "volume", "m³"  # Volume-type calculations
+    PCS = "pcs", "pcs"  # Piece-count calculations
 
 
 class AssemblyTechnique(models.Model):
@@ -146,6 +148,13 @@ class Assembly(BaseModel):
         EPD, blank=True, related_name="assemblies", through="StructuralProduct"
     )
     is_boq = models.BooleanField(default=False)
+    is_template = models.BooleanField(default=False, help_text="Whether this assembly can be reused as a template")
+    public = models.BooleanField(default=False, help_text="Whether this template is publicly accessible")
+    draft = models.BooleanField(default=False, help_text="Whether this assembly is in draft state")
+    from_template = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='derived_assemblies', help_text="Original template this was created from"
+    )
 
     def __str__(self):
         return self.name

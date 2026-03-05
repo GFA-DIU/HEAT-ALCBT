@@ -1,6 +1,8 @@
 """
 Form for validating and saving Lighting System data.
 """
+from decimal import Decimal, InvalidOperation
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -20,32 +22,34 @@ class LightingSystemForm(forms.ModelForm):
             'area_of_room',
             'lighting_bulb_type',
             'number_of_bulbs',
+            'tubes_per_fixture',
+            'light_bulb_power_rating_w',
+            'total_lighting_power_kw',
+            'baseline_lighting_power_density',
             'operation_hours_per_workday',
             'workdays_per_week',
             'workweeks_per_year',
-            'light_bulb_power_rating_w',
-            'baseline_lighting_power_density',
             'sensors_installed',
             'total_energy_consumption_kwh_per_year',
             'energy_efficiency_label',
+            'number_of_stars',
         ]
 
     def __init__(self, data=None, *args, **kwargs):
-        # Handle the field name mapping from frontend
         if data is not None:
             data = data.copy()
 
-            # Map frontend field names to model field names
             field_mapping = {
                 'lighting_type': 'lighting_bulb_type',
+                'number_of_fixtures': 'number_of_bulbs',
                 'bulb_power_rating': 'light_bulb_power_rating_w',
+                'total_lighting_power': 'total_lighting_power_kw',
+                'baseline_lpd': 'baseline_lighting_power_density',
                 'operating_hours_per_day': 'operation_hours_per_workday',
                 'operating_days_per_week': 'workdays_per_week',
                 'operating_weeks_per_year': 'workweeks_per_year',
                 'installation_of_sensors': 'sensors_installed',
-                'baseline_lpd': 'baseline_lighting_power_density',
                 'annual_energy_consumption': 'total_energy_consumption_kwh_per_year',
-                'number_of_stars': 'energy_efficiency_label',
             }
 
             for frontend_name, model_name in field_mapping.items():
@@ -55,7 +59,6 @@ class LightingSystemForm(forms.ModelForm):
         super().__init__(data=data, *args, **kwargs)
 
     def clean_sensors_installed(self):
-        """Convert 'yes'/'no' string values to boolean."""
         value = self.data.get('sensors_installed') or self.data.get('installation_of_sensors', '')
 
         if isinstance(value, bool):
@@ -68,51 +71,54 @@ class LightingSystemForm(forms.ModelForm):
             elif value_lower == 'no':
                 return False
 
-        # Default to False if not specified
         return False
 
-    def clean_energy_efficiency_label(self):
-        """Validate energy efficiency label (number of stars)."""
-        # Check both possible field names
-        value = self.data.get('energy_efficiency_label') or self.data.get('number_of_stars')
-
+    def clean_number_of_stars(self):
+        value = self.cleaned_data.get('number_of_stars')
         if value is None or value == '':
             return None
-
         try:
             value = int(value)
             if value < 1 or value > 5:
-                raise forms.ValidationError(_('Energy efficiency label must be between 1 and 5 stars.'))
+                raise forms.ValidationError(_('Number of stars must be between 1 and 5.'))
             return value
         except (ValueError, TypeError):
-            raise forms.ValidationError(_('Please enter a valid number for energy efficiency label.'))
+            raise forms.ValidationError(_('Please enter a valid number for stars.'))
 
-    def clean_baseline_lighting_power_density(self):
-        """Validate baseline lighting power density."""
-        value = self.data.get('baseline_lighting_power_density') or self.data.get('baseline_lpd')
-
+    def clean_total_lighting_power_kw(self):
+        value = self.cleaned_data.get('total_lighting_power_kw')
         if value is None or value == '':
             return None
-
         try:
-            value = int(value)
+            from decimal import Decimal
+            value = Decimal(str(value))
+            if value < 0:
+                raise forms.ValidationError(_('Total lighting power cannot be negative.'))
+            return value
+        except Exception:
+            raise forms.ValidationError(_('Please enter a valid number.'))
+
+    def clean_baseline_lighting_power_density(self):
+        value = self.cleaned_data.get('baseline_lighting_power_density')
+        if value is None or value == '':
+            return None
+        try:
+            from decimal import Decimal
+            value = Decimal(str(value))
             if value < 0:
                 raise forms.ValidationError(_('Baseline lighting power density cannot be negative.'))
             return value
-        except (ValueError, TypeError):
+        except Exception:
             raise forms.ValidationError(_('Please enter a valid number.'))
 
     def clean_total_energy_consumption_kwh_per_year(self):
-        """Validate total energy consumption."""
-        value = self.data.get('total_energy_consumption_kwh_per_year') or self.data.get('annual_energy_consumption')
-
+        value = self.cleaned_data.get('total_energy_consumption_kwh_per_year')
         if value is None or value == '':
             return None
-
         try:
-            value = int(value)
+            value = Decimal(str(value))
             if value < 0:
                 raise forms.ValidationError(_('Total energy consumption cannot be negative.'))
             return value
-        except (ValueError, TypeError):
+        except (InvalidOperation, ValueError, TypeError):
             raise forms.ValidationError(_('Please enter a valid number.'))

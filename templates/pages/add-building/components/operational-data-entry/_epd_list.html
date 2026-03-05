@@ -1,4 +1,3 @@
-{% load i18n %}
 {% load crispy_forms_tags %}
 
 <ul class="flex flex-col gap-2">
@@ -19,14 +18,14 @@
                   ></span>
                   <span class="text-[var(--text--sub-600)]">
                     {% if epd.type == "official" %}
-                    <a href="{{ epd.source }}"
-                       target="_blank"
+                    <a href="{{ epd.source }}" 
+                       target="_blank" 
                        rel="noopener noreferrer"
                        class="btn btn-ghost btn-xs btn-square">
                         <span data-icon="external-link-line" data-size="16" data-color="var(--icon--sub-600)"></span>
                     </a>
                     {% elif epd.type == "generic" %}
-                    {% translate "Generic" %}
+                    Generic
                     {% endif %}
                   </span>
                 </div>
@@ -39,7 +38,7 @@
                 >
                 <span
                   class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >{% translate "Unit:" %} {{ epd.declared_unit }}</span
+                  >Unit: {{ epd.declared_unit }}</span
                 >
                 <span
                   class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
@@ -64,13 +63,13 @@
                 data-size="20"
                 data-color="var(--icon--strong-950)"
               ></span>
-              {% translate "Add" %}
+              Add
             </button>
           </li>
     {% empty %}
-    <li class="text-center py-8 text-[var(--text--sub-600)]">
-        <span data-icon="inbox-line" data-size="48" data-color="var(--icon--soft-400)" class="mx-auto block mb-2"></span>
-        <p>{% translate "No energy carriers found matching your criteria" %}</p>
+    <li class="text-center py-8 text-[var(--text--sub-600)] flex flex-col items-center">
+        <span data-icon="oil-line" data-size="48" data-color="var(--icon--soft-400)" class="mx-auto block mb-2"></span>
+        <p>No energy carriers found matching your criteria</p>
     </li>
     {% endfor %}
 </ul>
@@ -98,14 +97,14 @@
                     hx-target="#operational-epd-list"
                     hx-swap="innerHTML">
                 <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
-                {% translate "Previous" %}
+                Previous
             </button>
             {% else %}
             <button class="btn btn-ghost btn-sm btn-disabled" disabled>
                 <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
-                {% translate "Previous" %}
+                Previous
             </button>
-            {% endif %}
+            {% endif %} 
 
             <!-- Page Numbers -->
             {% for num in epd_list.paginator.page_range %}
@@ -129,12 +128,12 @@
                     hx-get="{% url 'building_step_operational' %}?page={{ epd_list.next_page_number }}&{{ filters|urlencode }}"
                     hx-target="#operational-epd-list"
                     hx-swap="innerHTML">
-                    {% translate "Next" %}
+                    Next
                 <span data-icon="arrow-right" data-size="20" data-color="var(--icon--strong-950)"></span>
             </button>
             {% else %}
             <button class="btn btn-ghost btn-sm btn-disabled" disabled>
-                {% translate "Next" %}
+                Next
                 <span data-icon="arrow-right" data-size="16" data-color="var(--icon--strong-950)"></span>
             </button>
             {% endif %}

@@ -88,6 +88,14 @@ def create_or_update_cooling_system(request):
 
         # Check if this is an update or create
         cooling_system_id = data.get('cooling_system_id')
+        if cooling_system_id is not None:
+            try:
+                cooling_system_id = int(cooling_system_id)
+            except (ValueError, TypeError):
+                return JsonResponse({
+                    'success': False,
+                    'errors': {'cooling_system_id': ['Invalid cooling system ID.']}
+                }, status=400)
         is_update = bool(cooling_system_id)
 
         if cooling_system_type == 'chiller':
@@ -165,6 +173,7 @@ def _handle_chiller_system(request, building, data, cooling_system_id, is_update
                 'cop': float(chiller_system.cop) if chiller_system.cop else None,
                 'ip_lv': float(chiller_system.ip_lv) if chiller_system.ip_lv else None,
                 'energy_efficiency_label': chiller_system.energy_efficiency_label,
+                'number_of_stars': chiller_system.number_of_stars,
                 'total_energy_consumption_kwh_per_year': chiller_system.total_energy_consumption_kwh_per_year,
                 'baseline_refrigerant_emission_factor': chiller_system.baseline_refrigerant_emission_factor,
             }
@@ -216,6 +225,8 @@ def _handle_air_conditioner_system(request, building, data, cooling_system_id, i
                 'cooling_system_type': 'air_conditioner',
                 'ac_type': ac_system.ac_type,
                 'ac_type_display': ac_system.get_ac_type_display(),
+                'packaged_subtype': ac_system.packaged_subtype,
+                'packaged_subtype_display': ac_system.get_packaged_subtype_display() if ac_system.packaged_subtype else None,
                 'year_of_installation': ac_system.year_of_installation,
                 'operation_hours_per_workday': ac_system.operation_hours_per_workday,
                 'workdays_per_week': ac_system.workdays_per_week,
@@ -223,6 +234,9 @@ def _handle_air_conditioner_system(request, building, data, cooling_system_id, i
                 'refrigerant_type': ac_system.refrigerant_type,
                 'refrigerant_quantity_kg': ac_system.refrigerant_quantity_kg,
                 'total_cooling_load_rt': ac_system.total_cooling_load_rt,
+                'cooling_capacity_per_unit_kw': float(ac_system.cooling_capacity_per_unit_kw) if ac_system.cooling_capacity_per_unit_kw else None,
+                'power_input_per_unit_kw': float(ac_system.power_input_per_unit_kw) if ac_system.power_input_per_unit_kw else None,
+                'eer_iseer_cop': float(ac_system.eer_iseer_cop) if ac_system.eer_iseer_cop else None,
                 'baseline_efficiency_kw_per_rt': float(ac_system.baseline_efficiency_kw_per_rt) if ac_system.baseline_efficiency_kw_per_rt else None,
                 'baseline_refrigerant_emission_factor': ac_system.baseline_refrigerant_emission_factor,
                 'baseline_leakage_factor_percent': ac_system.baseline_leakage_factor_percent,
@@ -232,6 +246,7 @@ def _handle_air_conditioner_system(request, building, data, cooling_system_id, i
                 'cop': float(ac_system.cop) if ac_system.cop else None,
                 'iseer_rating': float(ac_system.iseer_rating) if ac_system.iseer_rating else None,
                 'energy_efficiency_label': ac_system.energy_efficiency_label,
+                'number_of_stars': ac_system.number_of_stars,
             }
         }
 
@@ -306,6 +321,7 @@ def get_cooling_systems(request, building_uuid):
                 'cop': float(system.cop) if system.cop else None,
                 'ip_lv': float(system.ip_lv) if system.ip_lv else None,
                 'energy_efficiency_label': system.energy_efficiency_label,
+                'number_of_stars': system.number_of_stars,
                 'total_energy_consumption_kwh_per_year': system.total_energy_consumption_kwh_per_year,
                 'baseline_refrigerant_emission_factor': system.baseline_refrigerant_emission_factor,
             })
@@ -317,6 +333,8 @@ def get_cooling_systems(request, building_uuid):
                 'cooling_system_type': 'air_conditioner',
                 'ac_type': system.ac_type,
                 'ac_type_display': system.get_ac_type_display(),
+                'packaged_subtype': system.packaged_subtype,
+                'packaged_subtype_display': system.get_packaged_subtype_display() if system.packaged_subtype else None,
                 'year_of_installation': system.year_of_installation,
                 'operation_hours_per_workday': system.operation_hours_per_workday,
                 'workdays_per_week': system.workdays_per_week,
@@ -324,6 +342,9 @@ def get_cooling_systems(request, building_uuid):
                 'refrigerant_type': system.refrigerant_type,
                 'refrigerant_quantity_kg': system.refrigerant_quantity_kg,
                 'total_cooling_load_rt': system.total_cooling_load_rt,
+                'cooling_capacity_per_unit_kw': float(system.cooling_capacity_per_unit_kw) if system.cooling_capacity_per_unit_kw else None,
+                'power_input_per_unit_kw': float(system.power_input_per_unit_kw) if system.power_input_per_unit_kw else None,
+                'eer_iseer_cop': float(system.eer_iseer_cop) if system.eer_iseer_cop else None,
                 'baseline_efficiency_kw_per_rt': float(system.baseline_efficiency_kw_per_rt) if system.baseline_efficiency_kw_per_rt else None,
                 'baseline_refrigerant_emission_factor': system.baseline_refrigerant_emission_factor,
                 'baseline_leakage_factor_percent': system.baseline_leakage_factor_percent,
@@ -333,6 +354,7 @@ def get_cooling_systems(request, building_uuid):
                 'cop': float(system.cop) if system.cop else None,
                 'iseer_rating': float(system.iseer_rating) if system.iseer_rating else None,
                 'energy_efficiency_label': system.energy_efficiency_label,
+                'number_of_stars': system.number_of_stars,
             })
 
         return JsonResponse({

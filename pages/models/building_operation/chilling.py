@@ -4,6 +4,37 @@ from django.utils.translation import gettext_lazy as _
 from pages.models.building import Building
 
 
+class RefrigerantGWP(models.Model):
+    """Stores Global Warming Potential (GWP) values per refrigerant type.
+    Admins can manage these via the admin interface and add new types as needed.
+    """
+
+    refrigerant_code = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name=_("Refrigerant Code"),
+    )
+    gwp_value = models.PositiveIntegerField(
+        verbose_name=_("GWP Value"),
+    )
+
+    class Meta:
+        verbose_name = _("Refrigerant GWP")
+        verbose_name_plural = _("Refrigerant GWP Values")
+        ordering = ["refrigerant_code"]
+
+    def __str__(self):
+        return f"{self.refrigerant_code}: {self.gwp_value}"
+
+    @classmethod
+    def get_gwp(cls, refrigerant_code):
+        """Return GWP value for a given refrigerant code, or None if not found."""
+        try:
+            return cls.objects.get(refrigerant_code=refrigerant_code).gwp_value
+        except cls.DoesNotExist:
+            return None
+
+
 class RefrigerantType(models.TextChoices):
     R290 = "R-290", _("R-290 (Propane)")
     R600A = "R-600a", _("R-600a (Isobutane)")
@@ -131,14 +162,15 @@ class CoolingSystemChiller(models.Model):
         choices=RefrigerantType.choices,
         verbose_name=_("Type of Refrigerants"),
     )
-    refrigerant_quantity_kg = models.PositiveIntegerField(
+    refrigerant_quantity_kg = models.DecimalField(
+        max_digits=8, decimal_places=2,
         verbose_name=_("Refrigerant Quantity (Kg)")
     )
     total_cooling_load_rt = models.PositiveIntegerField(
         verbose_name=_("Total Cooling Load for Chiller System (RT)")
     )
-    baseline_cooling_efficiency_kw_h = models.PositiveIntegerField(
-        null=True, blank=True, verbose_name=_("Baseline Cooling Efficiency (kW/h)")
+    baseline_cooling_efficiency_kw_h = models.DecimalField(
+        max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=_("Baseline Cooling Efficiency (kW/RT)")
     )
     variable_speed_drives = models.BooleanField(
         verbose_name=_("Installation of Variable Speed Drives (VSDs)"), default=False
@@ -154,7 +186,9 @@ class CoolingSystemChiller(models.Model):
     baseline_leakage_factor_percent = models.PositiveIntegerField(
         default=2, verbose_name=_("Baseline Leakage Factor (%)")
     )
-    total_energy_consumption_kwh_per_year = models.PositiveIntegerField(
+    total_energy_consumption_kwh_per_year = models.DecimalField(
+        max_digits=12,
+        decimal_places=3,
         null=True,
         blank=True,
         verbose_name=_(
@@ -178,9 +212,21 @@ class CoolingSystemChiller(models.Model):
     ip_lv = models.DecimalField(
         max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=_("IPLV")
     )
-    energy_efficiency_label = models.PositiveSmallIntegerField(
+    energy_efficiency_label = models.CharField(
+        max_length=1,
+        null=True,
+        blank=True,
+        choices=[(c, c) for c in ['A', 'B', 'C', 'D', 'E', 'F', 'G']],
+        verbose_name=_("Energy Efficiency Label (A–G)"),
+    )
+    number_of_stars = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
         choices=[(i, _(str(i))) for i in range(1, 6)],
-        verbose_name=_("Energy Efficiency Label"),
+        verbose_name=_("Number of Stars (1–5)"),
     )
+
+    def save(self, *args, **kwargs):
+        if self.baseline_refrigerant_emission_factor is None and self.refrigerant_type:
+            self.baseline_refrigerant_emission_factor = RefrigerantGWP.get_gwp(self.refrigerant_type)
+        super().save(*args, **kwargs)

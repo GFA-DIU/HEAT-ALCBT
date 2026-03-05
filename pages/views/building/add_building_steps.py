@@ -3,11 +3,11 @@ Views for handling the multi-step building creation process.
 Each step loads a template and provides necessary context data.
 """
 
-
-
+import os as _os
 import json
 import logging
 import uuid as uuid_lib
+from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -18,11 +18,12 @@ from cities_light.models import Country
 
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
-from pages.models.building import BuildingCategory
+from pages.models.building import Building, BuildingAssembly, BuildingCategory, OperationalProduct,CategorySubcategory, ClimateZone
 from pages.models.epd import EPD, EPDType, MaterialCategory
+from accounts.models import CustomCity, CustomRegion
+from pages.models.assembly import Assembly, StructuralProduct
 
 logger = logging.getLogger(__name__)
-from pages.models import Building
 
 
 @login_required
@@ -68,7 +69,7 @@ def building_step_view(request):
 # Step 1.1: Building Name & Location
 def handle_name_location_step(request):
     """Provide countries and optionally pre-populated region/city for edit mode."""
-    from accounts.models import CustomCity, CustomRegion
+
 
     building_uuid = request.GET.get('building_uuid')
 
@@ -120,26 +121,62 @@ def handle_name_location_step(request):
 
 
 # Step 1.2: Building Details
+def _get_building_categories_for_country(country_id):
+    """Return building categories filtered for a country, falling back to global ones."""
+    if country_id:
+        country_cats = BuildingCategory.objects.filter(
+            categorysubcategory__country_id=country_id
+        ).distinct().order_by("name")
+        if country_cats.exists():
+            return country_cats
+        return BuildingCategory.objects.filter(
+            categorysubcategory__country__isnull=True
+        ).distinct().order_by("name")
+    return BuildingCategory.objects.all().order_by("name")
+
+
 def handle_details_step(request):
     """Provide building categories and optionally pre-populated apartment types for edit mode."""
-    from pages.models.building import CategorySubcategory, ClimateZone
 
     building_uuid = request.GET.get('building_uuid')
 
+    # country_id may be passed directly (new building flow) or read from building (edit flow)
+    try:
+        country_id = int(request.GET.get('country_id', ''))
+    except (ValueError, TypeError):
+        country_id = None
+
     context = {
-        "building_categories": BuildingCategory.objects.all().order_by("name"),
+        "building_categories": _get_building_categories_for_country(country_id),
         "apartment_types": [],
         "climate_zones": [{"id": c[0], "name": c[1]} for c in ClimateZone.choices],
         "selected_building_type": None,
         "selected_apartment_type": None,
         "selected_climate_type": None,
         "building_data": None,
+        "country_id": country_id,
     }
 
     # Edit mode: pre-populate dependent selects from existing building
     if building_uuid:
         try:
             building = Building.objects.get(uuid=building_uuid, created_by=request.user)
+
+
+            cert_info = None
+            if building.certification_file:
+                cert_info = {
+                    "name": _os.path.basename(building.certification_file.name),
+                    "url": f"/building/files/serve/?building_uuid={building.uuid}&type=certification",
+                }
+            boq_info = [
+                {
+                    "id": bf.id,
+                    "name": bf.original_filename or _os.path.basename(bf.file.name),
+                    "url": f"/building/files/serve/?building_uuid={building.uuid}&type=boq&file_id={bf.id}",
+                }
+                for bf in building.boq_files.all()
+            ]
 
             # Pre-fill text fields
             context["building_data"] = {
@@ -148,23 +185,36 @@ def handle_details_step(request):
                 "total_floor_area": building.total_floor_area,
                 "conditioned_floor_area": building.cond_floor_area,
                 "floors_below_ground": building.floors_below_ground,
+                "has_certification": building.has_certification,
+                "certification_file": cert_info,
+                "has_boq": building.has_boq,
+                "boq_files": boq_info,
             }
-
-            # Pre-populate building_type and apartment_type
-            if building.category:
-                # building.category is a CategorySubcategory object
-                context["selected_building_type"] = building.category.category.id
-                context["selected_apartment_type"] = building.category.subcategory.id
-
-                # Pre-populate apartment_types for the selected building_type
-                subcategories = CategorySubcategory.objects.filter(
-                    category=building.category.category
-                ).select_related('subcategory').order_by('subcategory__name')
-                context["apartment_types"] = [cs.subcategory for cs in subcategories]
 
             # Pre-populate climate_type
             if building.climate_zone:
                 context["selected_climate_type"] = building.climate_zone
+
+            if building.country_id:
+                context["country_id"] = building.country_id
+                filtered_categories = _get_building_categories_for_country(building.country_id)
+                context["building_categories"] = filtered_categories
+                filtered_ids = set(filtered_categories.values_list('id', flat=True))
+            else:
+                filtered_ids = None
+
+            # Pre-populate building_type and apartment_type only if the saved
+            # category is valid for the currently filtered category list
+            if building.category:
+                saved_cat_id = building.category.category.id
+                if filtered_ids is None or saved_cat_id in filtered_ids:
+                    context["selected_building_type"] = saved_cat_id
+                    context["selected_apartment_type"] = building.category.subcategory.id
+                    subcategories = CategorySubcategory.objects.filter(
+                        category=building.category.category
+                    ).select_related('subcategory').order_by('subcategory__name')
+                    context["apartment_types"] = [cs.subcategory for cs in subcategories]
+                # else: saved category not valid for this country — leave selects empty
 
         except Building.DoesNotExist:
             logger.warning(f"Building not found for edit: {building_uuid}")
@@ -190,8 +240,18 @@ def handle_schedule_temp_step(request):
 # Step 2.2: Cooling System
 def handle_cooling_system_step(request):
     """Handle cooling system configuration step."""
+    building_uuid = request.GET.get('building_uuid', '')
+    climate_zone = ''
+    if building_uuid:
+        try:
+
+            building = Building.objects.get(uuid=uuid_lib.UUID(building_uuid), created_by=request.user)
+            climate_zone = building.climate_zone
+        except Exception:
+            pass
     context = {
-        "building_uuid": request.GET.get('building_uuid', '')
+        "building_uuid": building_uuid,
+        "climate_zone": climate_zone,
     }
     return render(
         request,
@@ -203,8 +263,18 @@ def handle_cooling_system_step(request):
 # Step 2.3: Ventilation System
 def handle_ventilation_system_step(request):
     """Handle ventilation system configuration step."""
+    building_uuid = request.GET.get('building_uuid', '')
+    climate_zone = ''
+    if building_uuid:
+        try:
+            building = Building.objects.get(uuid=uuid_lib.UUID(building_uuid), created_by=request.user)
+            if building.climate_zone:
+                climate_zone = building.climate_zone
+        except Exception:
+            pass
     context = {
-        "building_uuid": request.GET.get('building_uuid', '')
+        "building_uuid": building_uuid,
+        "climate_zone": climate_zone,
     }
     return render(
         request,
@@ -278,37 +348,48 @@ def handle_operational_data_step(request):
     except MaterialCategory.DoesNotExist:
         logger.warning("Energy carrier categories not found")
     
-    # Load previously saved operational products from session
+    # Load previously saved operational products from database (if building exists)
     selected_products = []
-    building_data = request.session.get("building_form_data", {})
-    operational_data = building_data.get("operational_products", [])
-    
-    for product_data in operational_data:
+    building_uuid = request.GET.get('building_uuid')
+
+    logger.info(f"Loading operational data step with building_uuid: {building_uuid}")
+
+    if building_uuid:
         try:
-            epd = EPD.objects.get(id=product_data["id"])
-            
-            # Get available units and ensure it's a list
-            available_units = epd.get_available_units()
-            if available_units is None:
-                available_units = [epd.declared_unit]
-            elif isinstance(available_units, set):
-                available_units = sorted(list(available_units))
-            elif not isinstance(available_units, list):
-                available_units = list(available_units)
-            
-            selected_products.append({
-                "id": str(epd.id),
-                "name": epd.name,
-                "country": epd.country.name if epd.country else "Unknown",
-                "category": epd.category.name_en if epd.category else "Unknown",
-                "description": product_data.get("description", ""),
-                "selection_unit": product_data.get("unit", epd.declared_unit),
-                "selection_quantity": product_data.get("quantity", ""),
-                "timestamp": product_data.get("timestamp", ""),
-                "op_units": available_units,
-            })
-        except EPD.DoesNotExist:
-            logger.warning(f"EPD {product_data['id']} not found")
+            uuid_obj = uuid_lib.UUID(building_uuid)
+            building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+            logger.info(f"Found building: {building.id} - {building.name}")
+
+            # Get saved operational products from database
+            saved_products = OperationalProduct.objects.filter(
+                building=building
+            ).select_related('epd', 'epd__country', 'epd__category')
+
+            logger.info(f"Found {saved_products.count()} saved operational products")
+
+            for op_product in saved_products:
+                # Get available units and ensure it's a list
+                available_units = op_product.epd.get_available_units()
+                if available_units is None:
+                    available_units = [op_product.epd.declared_unit]
+                elif isinstance(available_units, set):
+                    available_units = sorted(list(available_units))
+                elif not isinstance(available_units, list):
+                    available_units = list(available_units)
+
+                selected_products.append({
+                    "id": str(op_product.epd.id),
+                    "name": op_product.epd.name,
+                    "country": op_product.epd.country.name if op_product.epd.country else "Unknown",
+                    "category": op_product.epd.category.name_en if op_product.epd.category else "Unknown",
+                    "description": op_product.description,
+                    "selection_unit": op_product.input_unit,
+                    "selection_quantity": op_product.quantity,
+                    "timestamp": datetime.now().strftime("%Y%m%d%H%M%S%f"),
+                    "op_units": available_units,
+                })
+        except (ValueError, Building.DoesNotExist):
+            logger.warning(f"Building not found for UUID: {building_uuid}")
     
     context = {
         'epd_filters_form': epd_filters_form,
@@ -325,15 +406,101 @@ def handle_operational_data_step(request):
 # Step 4: Building Structural Components
 def handle_structural_components_step(request):
     """Handle building structural components step."""
+
+
     # Get filter dropdown data for EPD library search
     countries = Country.objects.all().order_by("name")
     epd_categories = MaterialCategory.objects.filter(parent__isnull=True).order_by("name_en")
     epd_types = [{"value": t[0], "label": t[1]} for t in EPDType.choices]
 
+    # Load previously saved assemblies from database (if building exists)
+    boq_items = []
+    component_items = []
+    building_uuid = request.GET.get('building_uuid')
+
+    if building_uuid:
+        try:
+            uuid_obj = uuid_lib.UUID(building_uuid)
+            building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+
+            # Get saved assemblies with their structural products
+            building_assemblies = BuildingAssembly.objects.filter(
+                building=building
+            ).select_related(
+                'assembly'
+            ).prefetch_related(
+                'assembly__structuralproduct_set__epd',
+                'assembly__structuralproduct_set__epd__country',
+                'assembly__structuralproduct_set__epd__category',
+                'assembly__structuralproduct_set__classification__category'
+            )
+
+            for ba in building_assemblies:
+                assembly = ba.assembly
+
+                # Get materials for this assembly
+                materials = []
+                for sp in assembly.structuralproduct_set.all():
+                    material = {
+                        'epd_id': sp.epd.id,
+                        'name': sp.epd.name,
+                        'quantity': float(sp.quantity),
+                        'unit': sp.input_unit,
+                        'description': sp.description or '',
+                        'gwp': float(sp.epd.get_gwp_impact_sum("A1-A3") or 0),
+                        'country': sp.epd.country.name if sp.epd.country else 'Unknown',
+                    }
+
+                    # Add category for BOQ items
+                    if assembly.is_boq and sp.classification:
+                        material['category'] = sp.classification.category.id
+                        material['category_name'] = sp.classification.category.name
+
+                    materials.append(material)
+
+                # Calculate total GWP
+                total_gwp = sum(m['gwp'] * m['quantity'] for m in materials)
+
+                if assembly.is_boq:
+                    # BOQ item
+                    boq_items.append({
+                        'id': assembly.id,
+                        'name': assembly.name,
+                        'comment': assembly.comment or '',
+                        'materials': materials,
+                        'total_gwp': total_gwp,
+                        'is_template': assembly.is_template
+                    })
+                else:
+                    # Component item
+                    classification = assembly.classification
+                    component_items.append({
+                        'id': assembly.id,
+                        'title': assembly.name,
+                        'category': classification.category.id if classification else None,
+                        'category_name': classification.category.name if classification else '',
+                        'technique': classification.technique.id if classification and classification.technique else None,
+                        'dimension': assembly.dimension,
+                        'quantity': float(ba.quantity),
+                        'comment': assembly.comment or '',
+                        'materials': materials,
+                        'total_gwp': total_gwp,
+                        'is_template': assembly.is_template
+                    })
+
+        except (ValueError, Building.DoesNotExist):
+            logger.warning(f"Building not found for UUID: {building_uuid}")
+        except Exception as e:
+            logger.exception(f"Error loading structural assemblies: {str(e)}")
+
+    logger.info(f"Loaded {len(boq_items)} BOQ items and {len(component_items)} component items")
+
     context = {
         'countries': countries,
         'epd_categories': epd_categories,
         'epd_types': epd_types,
+        'boq_items': boq_items,
+        'component_items': component_items,
     }
     return render(
         request,
@@ -386,6 +553,10 @@ def save_building_step(request):
                         building.region_id = step_data['region']
                     if 'city' in step_data and step_data['city']:
                         building.city_id = step_data['city']
+                    if 'longitude' in step_data:
+                        building.longitude = step_data['longitude'] if step_data['longitude'] else None
+                    if 'latitude' in step_data:
+                        building.latitude = step_data['latitude'] if step_data['latitude'] else None
 
                     building.save()
                     building_uuid = str(building.uuid)
@@ -403,6 +574,8 @@ def save_building_step(request):
                     country_id=step_data.get('country') if step_data.get('country') else None,
                     region_id=step_data.get('region') if step_data.get('region') else None,
                     city_id=step_data.get('city') if step_data.get('city') else None,
+                    longitude=step_data.get('longitude') if step_data.get('longitude') else None,
+                    latitude=step_data.get('latitude') if step_data.get('latitude') else None,
                     created_by=request.user,
                     # Add minimal defaults for required fields
                     climate_zone='tropical-wet',  # Default, will be updated in step 1.2
@@ -421,7 +594,6 @@ def save_building_step(request):
 
                     # Map form field names to model field names
                     field_mapping = {
-                        'building_type': 'category_id',  # FK to CategorySubcategory
                         'climate_type': 'climate_zone',
                         'assessment_period': 'reference_period',
                         'conditioned_floor_area': 'cond_floor_area',
@@ -436,6 +608,21 @@ def save_building_step(request):
                         if form_field in step_data and step_data[form_field]:
                             setattr(building, model_field, step_data[form_field])
 
+                    # Resolve building_type (BuildingCategory.id) + apartment_type
+                    # (BuildingSubcategory.id) → CategorySubcategory
+                    building_type_id = step_data.get('building_type')
+                    apartment_type_id = step_data.get('apartment_type')
+                    if building_type_id and apartment_type_id:
+                        try:
+                            cat_subcat = CategorySubcategory.objects.filter(
+                                category_id=building_type_id,
+                                subcategory_id=apartment_type_id,
+                            ).first()
+                            if cat_subcat:
+                                building.category = cat_subcat
+                        except Exception:
+                            pass
+
                     building.save()
                     building_uuid = str(building.uuid)
 
@@ -443,6 +630,77 @@ def save_building_step(request):
                     return JsonResponse({"error": "Invalid building UUID"}, status=400)
             else:
                 return JsonResponse({"error": "Building must be created in step 1.1 first"}, status=400)
+
+        # Step 3: Operational Data Entry - Save operational products
+        elif step_key in ["operational-data-entry/operational-data-entry", "operational-data-entry/operational-data-entry.html"]:
+            logger.info(f"Handling operational data entry step for building_uuid: {building_uuid}")
+            logger.info(f"Step data: {step_data}")
+
+            if not building_uuid:
+                return JsonResponse({"error": "Building UUID is required"}, status=400)
+
+            try:
+                uuid_obj = uuid_lib.UUID(building_uuid)
+                building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+                logger.info(f"Found building: {building.id}")
+
+                # Extract operational products from step_data
+                operation_products = step_data.get('operation_products', [])
+                logger.info(f"Found {len(operation_products)} operational products in step_data")
+
+                if operation_products:
+                    # Delete existing operational products for this building
+                    OperationalProduct.objects.filter(building=building).delete()
+
+                    # Create new operational products
+                    created_count = 0
+                    for product in operation_products:
+                        # Extract the actual product data (skip csrf token)
+                        epd_id = product.get('id')
+                        if epd_id:
+                            try:
+                                # The id is a UUID string (EPD uses UUID as primary key)
+                                epd_uuid_obj = uuid_lib.UUID(epd_id)
+                                epd = EPD.objects.get(id=epd_uuid_obj)
+
+                                # Extract quantity and unit from the material_* fields
+                                quantity = None
+                                unit = None
+                                description = None
+
+                                # Find the material fields with this EPD's UUID
+                                for key, value in product.items():
+                                    if key.startswith(f'material_{epd_id}_quantity_'):
+                                        quantity = float(value)
+                                    elif key.startswith(f'material_{epd_id}_unit_'):
+                                        unit = value
+                                    elif key.startswith(f'material_{epd_id}_description_'):
+                                        description = value
+
+                                if quantity is not None and unit:
+                                    OperationalProduct.objects.create(
+                                        building=building,
+                                        epd=epd,
+                                        quantity=quantity,
+                                        input_unit=unit,
+                                        description=description or ''
+                                    )
+                                    created_count += 1
+                                else:
+                                    logger.warning(f"Missing quantity or unit for EPD {epd_id}")
+                            except (ValueError, EPD.DoesNotExist) as e:
+                                logger.warning(f"EPD not found for UUID: {epd_id}, error: {e}")
+                                continue
+                        else:
+                            logger.warning(f"Product missing EPD ID: {product}")
+
+                    logger.info(f"Saved {created_count} operational products for building {building.id}")
+
+            except (ValueError, Building.DoesNotExist):
+                return JsonResponse({"error": "Invalid building UUID or building not found"}, status=400)
+            except Exception as e:
+                logger.exception(f"Error saving operational products: {str(e)}")
+                return JsonResponse({"error": str(e)}, status=500)
 
         # For all other steps, just acknowledge receipt
         # Operational systems are saved immediately via their dedicated APIs
@@ -493,6 +751,8 @@ def get_building_data(request):
             'country': building.country_id,
             'region': building.region_id,
             'city': building.city_id,
+            'longitude': building.longitude,
+            'latitude': building.latitude,
 
             # Step 1.2 fields (use form field names)
             'building_type': building_type_id,

@@ -1,7 +1,17 @@
+{% load i18n %}
 Hi {{ user.username }},
 
-Thank you for signing up! Please confirm your email by clicking the link below:
+Welcome to BEAT! We're excited to have you on board.
+
+To get started, please confirm your email address by clicking the link below:
 
 {{ activate_url }}
 
-If you did not sign up for this account, please ignore this email.
+If you didn't create this account, you can safely ignore this email.
+
+Best regards,
+The BEAT Team
+
+---
+BEAT - Building Life Cycle Assessment Tool
+This email was sent to you as part of your account registration.

@@ -1,4 +1,3 @@
-{% load i18n %}
 {% load crispy_forms_tags %}
 {% load static %}
 <div
@@ -11,7 +10,7 @@
     data-size="16"
     data-color="var(--icon--strong-950)"
   ></span>
-  {% translate "You need to add at least one energy carrier to continue" %}
+  You need to add at least one energy carrier to continue
 </div>
 
 <div id="energy_carrier_template_container" class="w-full">
@@ -26,18 +25,20 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      {% translate "Add energy carrier" %}
+      Add energy carrier
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
     ></div>
-
+    
     <!-- Selected Products Container -->
     <form id="operational-products-form"
           hx-post="{% url 'building_step_operational' %}"
-          hx-vals='{"action": "save_op_products"}'
+          hx-vals='js:{"action": "save_op_products", "building_uuid": new URLSearchParams(window.location.search).get("building_uuid")}'
           hx-target="#operational-products-form"
-          hx-swap="outerHTML">
+          hx-swap="outerHTML"
+          {% if selected_products %}data-saved="true"{% endif %}>
+      {% csrf_token %}
 
       <ul class="grid grid-cols-1 gap-2" id="selected_op_products">
         {% if selected_products %}
@@ -46,12 +47,12 @@
             {% empty %}
             <div id="no-energy-carrier-template">
               <div class="w-full flex flex-col gap-3 items-center justify-center mt-10">
-                <img src="{% static 'assets/energy-carrier.png' %}" alt="{% translate 'Energy Carrier Image' %}" />
+                <img src="{% static 'assets/energy-carrier.png' %}" alt="Energy Carrier Image" />
                 <p class="text-sm/5 font-medium">
-                  {% translate "Click button below to add a energy carrier" %}
+                  Click button below to add a energy carrier
                 </p>
                 <button class="btn btn-primary" onclick="energy_carrier_modal.showModal()">
-                  {% translate "Add an energy carrier" %}
+                  Add an energy carrier
                 </button>
               </div>
             </div>
@@ -59,28 +60,31 @@
           {% else%}
             <div id="no-energy-carrier-template">
               <div class="w-full flex flex-col gap-3 items-center justify-center mt-10">
-                <img src="{% static 'assets/energy-carrier.png' %}" alt="{% translate 'Energy Carrier Image' %}" />
+                <img src="{% static 'assets/energy-carrier.png' %}" alt="Energy Carrier Image" />
                 <p class="text-sm/5 font-medium">
-                  {% translate "Click button below to add a energy carrier" %}
+                  Click button below to add a energy carrier
                 </p>
                 <button class="btn btn-primary" onclick="energy_carrier_modal.showModal()">
-                  {% translate "Add an energy carrier" %}
+                  Add an energy carrier
                 </button>
               </div>
             </div>
         {% endif %}
       </ul>
-
+      
       <div class="flex items-center gap-2 mt-4" id="save_button_container" {% if not selected_products %}hidden{% endif %}>
         <button
           type="submit"
           class="btn btn-sm btn-primary"
           id="save_button"
         >
-          <span data-icon="save-line" data-size="16" data-color="currentColor"></span>
-          {% translate "Save Energy Carriers" %}
+          <span data-icon="save-line" data-size="16" data-color="currentColor" class="button-icon"></span>
+          <span class="loading loading-spinner loading-xs button-loading hidden"></span>
+          <span class="button-text">Save Energy Carriers</span>
         </button>
-        <span class="text-xs text-[var(--text--sub-600)]" id="save_status"></span>
+        <span class="text-xs text-[var(--text--sub-600)]" id="save_status">
+          <span class="text-warning font-medium unsaved-indicator">⚠ Unsaved changes</span>
+        </span>
       </div>
     </form>
   </div>
@@ -89,7 +93,7 @@
 <dialog id="energy_carrier_modal" class="modal modal-bottom sm:modal-end">
   <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[44.5rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full border-b border-[var(--stroke--soft-200)]">
-      <h3 class="text-lg/6 font-medium">{% translate "Energy Carrier Emission Factor" %}</h3>
+      <h3 class="text-lg/6 font-medium">Energy Carrier Emission Factor</h3>
       <button
         type="button"
         onclick="energy_carrier_modal.close()"
@@ -102,16 +106,17 @@
         ></span>
       </button>
     </div>
-
+    
     <div class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-2.5 w-full">
         <!-- Filter Form -->
-        <form id="epd-filter-form"
+        <form id="epd-filter-form" 
               hx-post="{% url 'building_step_operational' %}"
               hx-vals='{"action": "filter"}'
               hx-target="#operational-epd-list"
               hx-swap="innerHTML"
-              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]">
+              class="p-2.5 flex flex-col w-full rounded-[var(--radius-10)] bg-[var(--bg--weak-50)]"
+              hx-indicator="#energy-loading-spinner">
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
               <span
@@ -119,35 +124,37 @@
                 data-size="16"
                 data-color="var(--icon--soft-400)"
               ></span>
-              <input
-                type="text"
+              <input 
+                type="text" 
                 name="search_query"
-                placeholder="{% translate 'Search energy carriers...' %}"
+                placeholder="Search energy carriers..." 
               />
+              <!-- Loading spinner -->
+              <div id="energy-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+              </div>
             </label>
             <select name="country" class="select min-w-[120px]">
-              <option value="">{% translate "All Countries" %}</option>
+              <option value="">All Countries</option>
               {% for country in countries %}
               <option value="{{ country.id }}">{{ country.name }}</option>
               {% endfor %}
             </select>
           </div>
-
+          
           <!-- Advanced Search Collapse -->
           <div class="collapse rounded-none">
             <input type="checkbox" class="peer" id="advanced-search-toggle" />
-            <div
-              class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)] cursor-pointer"
-            >
+            <div class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)] cursor-pointer">
               <span class="flex items-center gap-2">
                 <span
                   data-icon="menu-search-line"
                   data-size="20"
                   data-color="var(--icon--strong-950)"
                 ></span>
-                {% translate "Advanced Search" %}
+                Advanced Search
                 <span class="text-xs/5 text-[var(--text--sub-600)]"
-                  >{% translate "Click here for more advanced filters" %}</span
+                  >Click here for more advanced filters</span
                 >
               </span>
               <span
@@ -178,7 +185,7 @@
                   <input type="hidden" name="category" value="{{ epd_filters_form.category.initial.id }}" />
                   {% endif %}
                 </label>
-
+                
                 <!-- Sub-category - Pre-filled and disabled -->
                 <label class="relative col-span-2">
                   <span
@@ -198,7 +205,7 @@
                   <input type="hidden" name="subcategory" value="{{ epd_filters_form.subcategory.initial.id }}" />
                   {% endif %}
                 </label>
-
+                
                 <!-- Child-category - User selectable -->
                 <label class="relative col-span-2">
                   <span
@@ -211,13 +218,13 @@
                     name="childcategory"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option value="">{% translate "All Types" %}</option>
+                    <option value="">All Types</option>
                     {% for child in epd_filters_form.childcategory.field.queryset %}
                     <option value="{{ child.id }}">{{ child.name_en }}</option>
                     {% endfor %}
                   </select>
                 </label>
-
+                
                 <!-- EPD Type -->
                 <label class="relative col-span-2">
                   <span
@@ -230,22 +237,27 @@
                     name="type"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option value="">{% translate "All EPD Types" %}</option>
-                    <option value="generic">{% translate "Generic" %}</option>
-                    <option value="official">{% translate "Official" %}</option>
+                    <option value="">All EPD Types</option>
+                    <option value="generic">Generic</option>
+                    <option value="official">Official</option>
                   </select>
                 </label>
               </div>
             </div>
           </div>
-          <button class="btn btn-outline btn-block mt-2" type="submit">
-            <span data-icon="search-2-line" data-size="16" data-color="currentColor"></span>
-            {% translate "Search" %}
-          </button>
+          <div class='flex gap-2 mt-2'>
+            <button class="btn btn-outline btn-block  flex-1" type="submit">
+              <span data-icon="search-2-line" data-size="16" data-color="currentColor"></span>
+              Search
+            </button>
+            <button id="epd-reset-btn" type="button" class="btn btn-ghost" onclick="document.getElementById('epd-filter-form').reset(); htmx.trigger('#epd-filter-form', 'submit');">
+              Reset
+            </button>
+          </div>
         </form>
-
+        
         <!-- EPD List Container -->
-        <div id="operational-epd-list"
+        <div id="operational-epd-list" 
              class="mt-4"
              hx-get="{% url 'building_step_operational' %}"
              hx-trigger="load"
@@ -258,7 +270,7 @@
 
       </div>
     </div>
-
+    
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
       <div id="pagination">
 
@@ -267,7 +279,7 @@
         class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit"
         onclick="energy_carrier_modal.close()"
         type="button">
-        {% translate "Close" %}
+        Close
       </button>
     </div>
 
@@ -287,9 +299,9 @@
           data-color="var(--state--warning--base)"
         ></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
+      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        {% translate "You are about to remove this energy carrier. This action cannot be undone." %}
+        You are about to remove this energy carrier. This action cannot be undone.
       </p>
     </div>
     <div
@@ -300,97 +312,232 @@
         onclick="energy_carrier_modal_delete.close()"
         type="button"
       >
-        {% translate "Cancel" %}
+        Cancel
       </button>
-      <button
-        class="btn btn-sm btn-error flex-1 remove-epd"
+      <button 
+        class="btn btn-sm btn-error flex-1 remove-epd" 
         id="confirm-delete-btn"
         type="button"
       >
-        {% translate "Remove" %}
+        Remove
       </button>
     </div>
   </div>
 </dialog>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-
+(function() {
+  // Use IIFE to avoid polluting global scope but allow re-execution on dynamic load
 
   const selectedOpProducts = document.getElementById('selected_op_products');
   const selectEpdText = document.getElementById('select_epd_text');
   const saveButtonContainer = document.getElementById('save_button_container');
   const deleteModal = document.getElementById('energy_carrier_modal_delete');
   const mainModal = document.getElementById('energy_carrier_modal');
+  const saveButton = document.getElementById('save_button');
   let epdToDelete = null;
-
+  
   // Update UI based on selected products count
   function updateUI() {
-    const hasProducts = selectedOpProducts && selectedOpProducts.children.length > 0;
+    // Check for actual EPD items (not just the empty state template)
+    const actualProducts = selectedOpProducts?.querySelectorAll('li[id^="epd-"]');
+    const hasProducts = actualProducts && actualProducts.length > 0;
+
     if (selectEpdText) selectEpdText.hidden = hasProducts;
     if (saveButtonContainer) saveButtonContainer.hidden = !hasProducts;
-  }
 
+    // Also hide/show the empty state template
+    const emptyTemplate = document.getElementById('no-energy-carrier-template');
+    if (emptyTemplate) {
+      emptyTemplate.style.display = hasProducts ? 'none' : 'block';
+    }
+
+    // Show unsaved indicator if there are products but not saved
+    const form = document.getElementById('operational-products-form');
+    const isSaved = form && form.dataset.saved === 'true';
+    const unsavedIndicator = document.querySelector('.unsaved-indicator');
+    if (unsavedIndicator) {
+      unsavedIndicator.style.display = (hasProducts && !isSaved) ? 'inline' : 'none';
+    }
+  }
+  
   // Handle successful EPD addition
   document.body.addEventListener('htmx:afterSwap', function(event) {
     if (event.detail.target.id === 'selected_op_products') {
       updateUI();
+      // Mark form as unsaved since a new product was added
+      const form = document.getElementById('operational-products-form');
+      if (form) {
+        form.removeAttribute('data-saved');
+      }
       // Close modal after adding
-      Toast.info('{% translate "Energy carrier added successfully" %}');
+      Toast.warning('Energy carrier added. Click "Save Energy Carriers" to save changes!');
       if (mainModal) mainModal.close();
     }
   });
-
+  
   // Handle Remove EPD button clicks
   if (selectedOpProducts) {
     selectedOpProducts.addEventListener('click', function(event) {
+      console.log('[Operational] Click event detected', event.target);
       const removeBtn = event.target.closest('.remove-epd');
+      console.log('[Operational] Remove button found:', removeBtn);
       if (removeBtn) {
         epdToDelete = {
           id: removeBtn.dataset.epdId,
           timestamp: removeBtn.dataset.timestamp,
           elementId: removeBtn.dataset.elementId
         };
-        deleteModal.showModal();
+        console.log('[Operational] EPD to delete:', epdToDelete);
+        console.log('[Operational] Delete modal:', deleteModal);
+        if (deleteModal) {
+          deleteModal.showModal();
+        } else {
+          console.error('[Operational] Delete modal not found!');
+        }
       }
     });
+  } else {
+    console.error('[Operational] selectedOpProducts element not found!');
   }
-
+  
   // Handle delete confirmation
   const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
   if (confirmDeleteBtn) {
-    confirmDeleteBtn.addEventListener('click', function() {
-      energy_carrier_modal_delete.open();
+    confirmDeleteBtn.addEventListener('click', async function() {
       if (epdToDelete) {
-        const epdElement = document.getElementById(epdToDelete.elementId);
-        if (epdElement) {
-          epdElement.remove();
-          updateUI();
+        const buildingUuid = new URLSearchParams(window.location.search).get('building_uuid');
+
+        if (!buildingUuid) {
+          Toast.error('Building UUID not found');
+          deleteModal.close();
+          return;
         }
-        epdToDelete = null;
+
+        // Disable button during request
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Removing...';
+
+        try {
+          const response = await fetch('{% url "building_step_operational" %}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                             document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || ''
+            },
+            body: JSON.stringify({
+              action: 'delete_op_product',
+              building_uuid: buildingUuid,
+              epd_id: epdToDelete.id
+            })
+          });
+
+          console.log('[Operational] Response status:', response.status);
+          console.log('[Operational] Response content-type:', response.headers.get('content-type'));
+
+          // Check if response is JSON
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('[Operational] Server returned non-JSON response:', text.substring(0, 500));
+            Toast.error('Server error: Expected JSON response');
+            return;
+          }
+
+          const result = await response.json();
+          console.log('[Operational] Delete result:', result);
+
+          if (result.success) {
+            // Remove element from DOM
+            const epdElement = document.getElementById(epdToDelete.elementId);
+            if (epdElement) {
+              epdElement.remove();
+              updateUI();
+            }
+            Toast.success('Energy carrier removed successfully');
+          } else {
+            Toast.error(result.error || 'Failed to remove energy carrier');
+          }
+        } catch (error) {
+          console.error('Error removing energy carrier:', error);
+          Toast.error('Failed to remove energy carrier: ' + error.message);
+        } finally {
+          // Reset button
+          confirmDeleteBtn.disabled = false;
+          confirmDeleteBtn.innerHTML = 'Remove';
+          epdToDelete = null;
+          deleteModal.close();
+        }
       }
-      deleteModal.close();
     });
   }
-
-  // Handle successful save
-  document.body.addEventListener('htmx:afterRequest', function(event) {
-    if (event.detail.target.id === 'operational-products-form' && event.detail.successful) {
-      const saveStatus = document.getElementById('save_status');
-      if (saveStatus) {
-        saveStatus.textContent = '{% translate "Saved successfully!" %}';
-        saveStatus.classList.add('text-success');
-        setTimeout(() => {
-          saveStatus.textContent = '';
-          saveStatus.classList.remove('text-success');
-        }, 3000);
+  
+  // Handle save button loading state
+  document.body.addEventListener('htmx:beforeRequest', function(event) {
+    if (event.detail.target.id === 'operational-products-form') {
+      const btn = document.getElementById('save_button');
+      if (btn) {
+        btn.disabled = true;
+        const icon = btn.querySelector('.button-icon');
+        const loading = btn.querySelector('.button-loading');
+        const text = btn.querySelector('.button-text');
+        if (icon) icon.classList.add('hidden');
+        if (loading) loading.classList.remove('hidden');
+        if (text) text.textContent = 'Saving...';
       }
     }
   });
 
+  // Handle successful save
+  document.body.addEventListener('htmx:afterRequest', function(event) {
+    if (event.detail.target.id === 'operational-products-form') {
+      const btn = document.getElementById('save_button');
+      if (btn) {
+        btn.disabled = false;
+        const icon = btn.querySelector('.button-icon');
+        const loading = btn.querySelector('.button-loading');
+        const text = btn.querySelector('.button-text');
+        if (icon) icon.classList.remove('hidden');
+        if (loading) loading.classList.add('hidden');
+        if (text) text.textContent = 'Save Energy Carriers';
+      }
+
+      if (event.detail.successful) {
+        // Form already has data-saved="true" from server response
+        // Just show success message
+        const saveStatus = document.getElementById('save_status');
+        if (saveStatus) {
+          saveStatus.innerHTML = '<span class="text-success font-medium">✓ Saved successfully!</span>';
+          setTimeout(() => {
+            saveStatus.innerHTML = '';
+          }, 3000);
+        }
+        Toast.success('Energy carriers saved successfully');
+      }
+    }
+  });
+
+  // Mark form as unsaved when any field changes
+  if (selectedOpProducts) {
+    selectedOpProducts.addEventListener('input', function(event) {
+      const form = document.getElementById('operational-products-form');
+      if (form && form.dataset.saved === 'true') {
+        form.removeAttribute('data-saved');
+        const saveStatus = document.getElementById('save_status');
+        if (saveStatus) {
+          saveStatus.textContent = 'Unsaved changes';
+          saveStatus.classList.remove('text-success');
+          saveStatus.classList.add('text-warning');
+        }
+      }
+    });
+  }
+
   // Initialize UI on load
   updateUI();
-});
+})();
 </script>
 
 <!-- Remove old templates as they're not needed with Django rendering -->
+

@@ -1,6 +1,5 @@
 import logging
 
-from allauth.account.models import EmailAddress
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.db import models, transaction
@@ -35,12 +34,6 @@ def buildings_list(request):
             models.Q(street__icontains=search_query)
         ).distinct()
 
-    # Check if user's email is verified
-    email_verified = EmailAddress.objects.filter(
-        user=request.user,
-        verified=True
-    ).exists()
-
     # Check if this is a new user (first time on home page after signup)
     show_account_success_modal = request.session.pop('show_account_success_modal', False)
 
@@ -59,7 +52,6 @@ def buildings_list(request):
     context = {
         "buildings": buildings_with_stats,
         "search_query": search_query,
-        "email_verified": email_verified,
         "show_account_success_modal": show_account_success_modal,
         "user_form": user_form,
         "profile_form": profile_form,
@@ -79,12 +71,12 @@ def buildings_list(request):
     elif request.method == "DELETE":
         context = handle_delete_building(request)
         if request.headers.get("HX-Request"):
-            return render(request, "pages/home/buildings_list.html", context)
+            return render(request, "pages/home/partials/buildings_list.html", context)
         return JsonResponse({"status": "success"}, status=200)
     
     # If HTMX request, return only the buildings list partial
     if request.headers.get("HX-Request"):
-        return render(request, "pages/home/buildings_list.html", context)
+        return render(request, "pages/home/partials/buildings_list.html", context)
 
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
@@ -134,5 +126,12 @@ def _delete_building(building_id):
     
     
     building_to_delete = get_object_or_404(Building, id=building_id)
+
+    # Delete certification file and BoQ files from storage before deleting the building
+    if building_to_delete.certification_file:
+        building_to_delete.certification_file.delete(save=False)
+    for boq in building_to_delete.boq_files.all():
+        boq.file.delete(save=False)
+
     building_to_delete.delete()
     logger.info("Successfully deleted building '%s' from list", building_to_delete)

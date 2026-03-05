@@ -1,11 +1,9 @@
-{% load i18n %}
-<form>
-    <li class="bg-[var(--bg--weak-50)] rounded-xl p-4"
-        id="material-{{ epd.id }}-{{ epd.timestamp }}"
-        data-epd-id="{{ epd.id }}"
-        data-timestamp="{{ epd.timestamp }}"
-        data-name="{{ epd.name }}"
-        data-gwp="{{ epd.gwp }}">
+<li class="bg-[var(--bg--weak-50)] rounded-xl p-4"
+    id="material-{{ epd.id }}-{{ epd.timestamp }}"
+    data-epd-id="{{ epd.id }}"
+    data-timestamp="{{ epd.timestamp }}"
+    data-name="{{ epd.name }}"
+    data-gwp="{{ epd.gwp }}">
       <div class="flex items-center justify-between mb-2 w-full">
         <span class="text-sm/5 font-medium truncate flex-1">{{ epd.name|truncatechars:50 }}</span>
         <div class="flex items-center gap-2">
@@ -16,46 +14,39 @@
         </div>
       </div>
 
-      <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
-        <div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]">
-          <span data-country="{{ epd.country }}" data-width="20"></span>
-        </div>
+  <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
+    <div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]">
+      <span data-country="{{ epd.country }}" data-width="20"></span>
+    </div>
 
-        <label class="input w-full">
-          <input type="text"
-                name="material_{{ epd.id }}_description_{{ epd.timestamp }}"
-                placeholder="{% translate 'Add description' %}"
-                class="material-description" required />
-        </label>
+    <label class="input w-full">
+      <input type="text"
+            placeholder="Add description"
+            class="material-description" />
+    </label>
 
-        {% if mode == 'boq' %}
-        <select name="material_{{ epd.id }}_category_{{ epd.timestamp }}"
-                class="select material-category"
-                required>
-          <option value="" selected disabled>{% translate "Category" %}</option>
-          {% for cat in categories %}
-          <option value="{{ cat.id }}">{{ cat.name }}</option>
-          {% endfor %}
-        </select>
-        {% endif %}
+    {% if mode == 'boq' %}
+    <select class="select material-category" required>
+      <option value="" selected disabled>Category</option>
+      {% for cat in categories %}
+      <option value="{{ cat.id }}">{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+    {% endif %}
 
-        <label class="input w-full max-w-[140px]">
-          <input type="number"
-                name="material_{{ epd.id }}_quantity_{{ epd.timestamp }}"
-                placeholder="{% translate 'Qty' %}"
-                step="0.01"
-                min="0"
-                class="material-quantity"
-                required />
-          <select name="material_{{ epd.id }}_unit_{{ epd.timestamp }}"
-                  class="select select-ghost w-fit !outline-none !border-none material-unit">
-            {% for unit in epd.available_units %}
-            <option value="{{ unit }}" {% if unit == epd.selection_unit %}selected{% endif %}>{{ unit }}</option>
-            {% endfor %}
-          </select>
-        </label>
+    <label class="input w-full max-w-[140px]">
+      <input type="number"
+            placeholder="Qty"
+            step="0.01"
+            min="0"
+            class="material-quantity"
+            required />
+      <span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="{{ epd.selection_unit }}">{{ epd.selection_unit }}</span>
+      <input type="hidden" class="material-unit-value" value="{{ epd.selection_unit }}" />
+    </label>
 
-        <div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"></div>
+    <div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"></div>
+
 
         <button type="button"
                 class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch remove-material-btn"
@@ -67,4 +58,3 @@
       <input type="hidden" name="material_{{ epd.id }}_id_{{ epd.timestamp }}" value="{{ epd.id }}" />
       <input type="hidden" name="material_{{ epd.id }}_gwp_{{ epd.timestamp }}" value="{{ epd.gwp }}" />
     </li>
-</form>

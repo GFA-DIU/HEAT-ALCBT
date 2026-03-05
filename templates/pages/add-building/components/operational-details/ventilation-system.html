@@ -1,277 +1,47 @@
-{% load i18n %}
 {% load static %}
 <div id="ventilation-system-container" class="w-full">
   <div class="w-full flex flex-col">
-    <button
-      class="btn btn-outline w-fit"
-      onclick="openVentilationSystemModal()"
-    >
-      <span
-        data-icon="add-large-fill"
-        data-size="20"
-        data-color="var(--icon--strong-950)"
-      ></span>
-      {% translate "Add ventilation system" %}
+    <button class="btn btn-outline w-fit" onclick="openVentilationSystemModal()">
+      <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+      Add ventilation system
     </button>
-    <div
-      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
-    ></div>
-    <ul id="ventilation-systems-list" class="grid grid-cols-1">
-    </ul>
+    <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
+    <ul id="ventilation-systems-list" class="grid grid-cols-1 gap-2"></ul>
   </div>
 </div>
 
 <dialog id="ventilation_system_modal" class="modal modal-bottom sm:modal-end">
-  <div
-    class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between"
-  >
+  <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">{% translate "Add a ventilation system" %}</h3>
-        <p class="text-sm/5 text-[var(--text--sub-600)]">
-          {% translate "Enter details of the building's ventilation system, including type and capacity" %}
-        </p>
+        <h3 class="text-lg/6 font-medium">Add a ventilation system</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">Enter details of the building's ventilation system, including type and capacity</p>
       </div>
-      <button
-        type="button"
-        onclick="closeVentilationSystemModal()"
-        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-      >
-        <span
-          data-icon="close-line"
-          data-size="16"
-          data-color="var(--icon--sub-600)"
-        ></span>
+      <button type="button" onclick="closeVentilationSystemModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+        <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
     </div>
     <form id="ventilation-system-form" class="flex-1 overflow-y-auto hide-scrollbar">
-        {% csrf_token %}
-      <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+      {% csrf_token %}
+      <div class="px-5 py-4">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            {% translate "Ventilation type" %}<span class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <select
-            class="select w-full"
-            id="ventilation-type"
-            name="ventilation_type"
+          <legend class="fieldset-legend">Type of ventilation system<span class="text-[var(--state--error--base)]">*</span></legend>
+          <select class="select w-full" id="ventilation-type-select" name="ventilation_type"
             hx-get="/select_lists/?ventilation_types=1"
             hx-trigger="load"
             hx-target="this"
             hx-swap="innerHTML"
-            required
-          >
-            <option value="">{% translate "Select an option" %}</option>
-          </select>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            {% translate "Ventilation capacity" %}<span class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <select
-            class="select w-full"
-            name="ventilation_capacity"
-            hx-get="/select_lists/?ventilation_capacity_types=1"
-            hx-trigger="load"
-            hx-target="this"
-            hx-swap="innerHTML"
-          >
-            <option disabled selected value="">{% translate "Select an option" %}</option>
-          </select>
-        </fieldset>
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">
-            {% translate "Baseline verification system efficiency" %}<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <label class="input w-full">
-            <input type="number" placeholder="{% translate 'eg. 2' %}" name="baseline_efficiency" required min="0" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >{% translate "W/CMH" %}</span
-            >
-          </label>
-        </fieldset>
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">
-            {% translate "System operating schedule" %}<span
-              data-icon="info-custom-fill"
-              data-size="20"
-              data-color="var(--icon--disabled-300)"
-            ></span>
-          </legend>
-          <div class="w-full flex gap-1.5 items-center">
-            <div class="flex-1">
-              <label class="input validator w-full">
-                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_hours_per_day" required min="0" max="24" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >{% translate "Hours / day" %}</span
-                >
-              </label>
-            </div>
-            <div class="flex-1">
-              <label class="input validator w-full">
-                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_days_per_week" required min="0" max="7" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >{% translate "days / week" %}</span
-                >
-              </label>
-            </div>
-            <div class="flex-1">
-              <label class="input validator w-full">
-                <input type="number" placeholder="{% translate 'eg. 1' %}" name="operating_weeks_per_year" required min="0" max="52" />
-                <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-                  >{% translate "weeks / year" %}</span
-                >
-              </label>
-            </div>
-          </div>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            {% translate "Total ventilation system power input" %}<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <label class="input w-full">
-            <input type="number" placeholder="{% translate 'eg. 2' %}" name="power_input" required min="0" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >{% translate "Watts" %}</span
-            >
-          </label>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            {% translate "Airflow rate" %}<span class="text-[var(--state--error--base)]">*</span>
-          </legend>
-          <label class="input w-full pr-0 overflow-hidden">
-            <input type="number" placeholder="{% translate 'eg. 2' %}" name="airflow_rate" />
-            <select
-              class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25"
-              name="airflow_rate_unit" required
-            >
-              <option value="cmh" selected>{% translate "CMH" %}</option>
-              <option value="cfm">{% translate "CFM" %}</option>
-            </select>
-          </label>
-        </fieldset>
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">
-            {% translate "Installation of Demand Controlled Ventilation" %}<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            ><span
-              data-icon="info-custom-fill"
-              data-size="20"
-              data-color="var(--icon--disabled-300)"
-            ></span>
-          </legend>
-          <div class="flex items-center gap-2.5">
-            <label class="flex items-center gap-2">
-              <input
-                type="radio"
-                name="demand_controlled_ventilation"
-                value="yes"
-                class="radio radio-xs"
-              />
-              {% translate "Yes" %}
-            </label>
-            <label class="flex items-center gap-2">
-              <input
-                type="radio"
-                name="demand_controlled_ventilation"
-                value="no"
-                class="radio radio-xs"
-              />
-              {% translate "No" %}
-            </label>
-          </div>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            {% translate "Installation of variable speed drives" %}<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            ><span
-              data-icon="info-custom-fill"
-              data-size="20"
-              data-color="var(--icon--disabled-300)"
-            ></span>
-          </legend>
-          <select class="select w-full" name="variable_speed_drives">
-            <option disabled selected value="">{% translate "Select an option" %}</option>
-            <option value="yes">{% translate "Yes" %}</option>
-            <option value="no">{% translate "No" %}</option>
-          </select>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">
-            {% translate "Total number of ventilation type installed" %}<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <label class="input w-full">
-            <input type="number" placeholder="{% translate 'eg. 2' %}" name="number_of_units" />
-          </label>
-        </fieldset>
-        <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">
-            {% translate "Total energy consumption of ventilation system annually" %}<span
-              class="text-[var(--state--error--base)]"
-              >*</span
-            >
-          </legend>
-          <label class="input w-full">
-            <input type="number" placeholder="{% translate 'eg. 2' %}" name="annual_energy_consumption" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-              >{% translate "kWh/year" %}</span
-            >
-          </label>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
-          <select class="select w-full" name="energy_efficiency_label">
-            <option disabled selected value="">{% translate "Select an option" %}</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-            <option value="E">E</option>
-            <option value="F">F</option>
-            <option value="G">G</option>
-          </select>
-        </fieldset>
-        <fieldset class="fieldset">
-          <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
-          <select class="select w-full" name="number_of_stars">
-            <option disabled selected value="">{% translate "Select an option" %}</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
+            onchange="handleVentilationTypeChange(this.value)"
+            required>
+            <option value="">Select a ventilation system</option>
           </select>
         </fieldset>
       </div>
+      <div id="selected-ventilation-system"></div>
     </form>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <button
-        type="button"
-        class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]"
-        onclick="closeVentilationSystemModal()"
-      >
-        {% translate "Cancel" %}
-      </button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveVentilationSystem()">{% translate "Save" %}</button>
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeVentilationSystemModal()">Cancel</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveVentilationSystem()">Save</button>
     </div>
   </div>
 </dialog>
@@ -279,414 +49,794 @@
 <dialog id="ventilation_system_modal_delete" class="modal modal-middle">
   <div class="modal-box w-full max-w-[26.375rem] p-0">
     <div class="flex flex-col items-center p-5">
-      <div
-        class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]"
-      >
-        <span
-          data-icon="alert-fill"
-          data-size="24"
-          data-color="var(--state--warning--base)"
-        ></span>
+      <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
+        <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)"></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
-      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        {% translate "You are about to remove or delete added ventilation system. This will action will permanently remove it." %}
-      </p>
+      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">You are about to permanently remove this ventilation system.</p>
     </div>
-    <div
-      class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full"
-    >
-      <button
-        class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
-        onclick="ventilation_system_modal_delete.close()"
-      >
-        {% translate "Cancel" %}
-      </button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteVentilationSystem()">{% translate "Remove" %}</button>
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="ventilation_system_modal_delete.close()">Cancel</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteVentilationSystem()">Remove</button>
     </div>
   </div>
 </dialog>
 
-<template id="ventilation-system-template">
-  <div class="w-full flex flex-col">
-    <button
-      class="btn btn-outline w-fit"
-      onclick="ventilation_system_modal.showModal()"
-    >
-      <span
-        data-icon="add-large-fill"
-        data-size="20"
-        data-color="var(--icon--strong-950)"
-      ></span>
-      {% translate "Add ventilation system" %}
-    </button>
-    <div
-      class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
-    ></div>
-    <ul class="grid grid-cols-1">
-      <li
-        class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="windy-fill"
-          data-size="20"
-          data-color="var(--icon--strong-950)"
-          class="shrink-0 self-start"
-        ></span>
-        <div class="flex flex-col flex-1">
-          <p class="text-sm/5 font-medium">{% translate "Air Handling Units (AHUs)" %}</p>
-          <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-            <span class="border-r border-[var(--text--sub-600)] pr-1"
-              >{% translate "Airflow rate:" %} 45CMH</span
-            >
-            <span>{% translate "Capacity units:" %} m<sup>3</sup>/hr</span>
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button class="btn size-5 btn-ghost p-0">
-            <span
-              data-icon="edit-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-          <button
-            class="btn size-5 btn-ghost p-0"
-            onclick="ventilation_system_modal_delete.showModal()"
-          >
-            <span
-              data-icon="delete-bin-5-line"
-              data-size="16"
-              data-color="var(--icon--strong-950)"
-            ></span>
-          </button>
-        </div>
-      </li>
-    </ul>
+<template id="no-ventilation-system-template">
+  <div class="w-full flex flex-col gap-3 items-center justify-center">
+    <img src="{% static 'assets/ventilation-system.png' %}" alt="Ventilation System" />
+    <p class="text-sm/5 font-medium">Click button below to add a ventilation system</p>
+    <button class="btn btn-primary" onclick="ventilation_system_modal.showModal()">Add ventilation system</button>
   </div>
 </template>
 
-<template id="no-ventilation-system-template">
-  <div class="w-full flex flex-col gap-3 items-center justify-center">
-    <img
-      src="{% static 'assets/ventilation-system.png' %}"
-      alt="{% translate 'Ventilation System Image' %}"
-    />
-    <p class="text-sm/5 font-medium">
-      {% translate "Click button below to add a ventilation system" %}
-    </p>
-    <button
-      class="btn btn-primary"
-      onclick="ventilation_system_modal.showModal()"
-    >
-      {% translate "Add ventilation system" %}
-    </button>
+<template id="ahu-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">AIR HANDLING UNIT (AHU) DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_units" placeholder="e.g. 3" required min="1" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
+      </label>
+      <p class="validator-hint">Must be at least 1</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
+      </label>
+      <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Installation of Variable Speed Drives (VSD)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5 mt-1">
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> No</label>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Installation of Demand Controlled Ventilation (DCV)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5 mt-1">
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> No</label>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_hours_per_day" id="ahu-hours" placeholder="e.g. 10" required min="1" max="24" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_days_per_week" id="ahu-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_weeks_per_year" id="ahu-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+        </label></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Total ventilation system power input</legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="power_input" placeholder="Auto-calculated" min="0" step="0.01" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000</p>
+    </fieldset>
+
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <label class="input w-full pr-0 overflow-hidden">
+                <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="0" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
+                <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+                  <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor</p>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="fcu-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">FAN COIL UNIT (FCU) DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_units" placeholder="e.g. 50" required min="1" />
+      </label>
+      <p class="validator-hint">Must be at least 1</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
+      </label>
+      <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_hours_per_day" id="fcu-hours" placeholder="e.g. 10" required min="1" max="24" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_days_per_week" id="fcu-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_weeks_per_year" id="fcu-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+        </label></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="power_input" placeholder="e.g. 8" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <label class="input w-full pr-0 overflow-hidden">
+                <input type="number" name="airflow_rate" placeholder="e.g. 2000" min="0" />
+                <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+                  <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr</p>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="doas-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">DEDICATED OUTDOOR AIR SYSTEM (DOAS) DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_units" placeholder="e.g. 2" required min="1" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
+      </label>
+      <p class="validator-hint">Must be at least 1</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
+      </label>
+      <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Installation of Variable Speed Drives (VSD)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5 mt-1">
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> No</label>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Installation of Demand Controlled Ventilation (DCV)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <div class="flex items-center gap-2.5 mt-1">
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> Yes</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> No</label>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_hours_per_day" id="doas-hours" placeholder="e.g. 12" required min="1" max="24" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_days_per_week" id="doas-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_weeks_per_year" id="doas-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+        </label></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Total ventilation system power input</legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="power_input" placeholder="Auto-calculated" min="0" step="0.01" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+      <p class="label-text-alt text-[var(--text--soft-400)]">Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000</p>
+    </fieldset>
+
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <label class="input w-full pr-0 overflow-hidden">
+                <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="0" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
+                <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+                  <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor</p>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="cassette-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">CEILING/WALL MOUNTED CASSETTE AC DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_units" placeholder="e.g. 10" required min="1" />
+      </label>
+      <p class="validator-hint">Must be at least 1</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Fresh air ratio<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="fresh_air_ratio" placeholder="Typical: 10 – 30%" required min="0" max="100" value="20" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
+      </label>
+      <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_hours_per_day" id="cassette-hours" placeholder="e.g. 10" required min="1" max="24" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_days_per_week" id="cassette-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_weeks_per_year" id="cassette-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+        </label></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="power_input" placeholder="e.g. 12" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <label class="input w-full pr-0 overflow-hidden">
+                <input type="number" name="airflow_rate" placeholder="e.g. 3000" min="0" />
+                <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+                  <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr</p>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="fan-template">
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">CEILING / EXHAUST / WALL FAN DATA</div>
+  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="number_of_units" placeholder="e.g. 15" required min="1" />
+      </label>
+      <p class="validator-hint">Must be at least 1</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
+      </label>
+      <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+      </legend>
+      <div class="w-full flex gap-1.5 items-center">
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_hours_per_day" id="fan-hours" placeholder="e.g. 12" required min="1" max="24" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_days_per_week" id="fan-days" placeholder="e.g. 7" required min="1" max="7" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+        </label></div>
+        <div class="flex-1"><label class="input validator w-full">
+          <input type="number" name="operating_weeks_per_year" id="fan-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+        </label></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="power_input" placeholder="e.g. 2" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
+      <p class="validator-hint">This field is required</p>
+    </fieldset>
+
+    <div class="col-span-2 mt-3">
+      <div class="collapse rounded-none">
+        <input type="checkbox" class="peer" />
+        <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
+          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+        </div>
+        <div class="collapse-content mt-4 px-0">
+          <div class="grid grid-cols-2 gap-2">
+            <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <label class="input w-full pr-0 overflow-hidden">
+                <input type="number" name="airflow_rate" placeholder="e.g. 500" min="0" />
+                <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+                  <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+              <select class="select w-full" name="number_of_stars">
+                <option disabled selected value="">Select</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                <option value="4">4</option><option value="5">5</option>
+              </select>
+            </fieldset>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr</p>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-  const noSystemsContainer = document.getElementById('no-ventilation-system-template');
-  // Store editing system ID on window
-  if (!window.editingVentilationSystemId) {
-    window.editingVentilationSystemId = null;
+  // ================================================================
+  // Auto-calculation helpers for ventilation systems
+  // ================================================================
+
+  // AHU / DOAS: power_input = airflow × baseline_efficiency × units ÷ 1000
+  //             annual_energy = power_input × h × d × w × VSD_factor × DCV_factor
+  window.recalcVentPowerAndEnergy = function(form, ventType) {
+    if (!form) return;
+    var airflowEl   = form.querySelector('[name="airflow_rate"]');
+    var effEl       = form.querySelector('[name="baseline_efficiency"]');
+    var unitsEl     = form.querySelector('[name="number_of_units"]');
+    var powerEl     = form.querySelector('[name="power_input"]');
+    var energyEl    = form.querySelector('[name="annual_energy_consumption"]');
+
+    var airflow  = airflowEl  ? parseFloat(airflowEl.value)  : NaN;
+    var eff      = effEl      ? parseFloat(effEl.value)      : NaN;
+    var units    = unitsEl    ? parseFloat(unitsEl.value)    : NaN;
+
+    // Recalculate power_input from airflow when all three inputs are present
+    if (!isNaN(airflow) && !isNaN(eff) && !isNaN(units) && airflow > 0 && units > 0) {
+      if (powerEl) powerEl.value = ((airflow * eff * units) / 1000).toFixed(2);
+    }
+
+    // Recalculate annual energy
+    if (!energyEl || !powerEl) return;
+    var power = parseFloat(powerEl.value);
+    var hrsEl   = form.querySelector('[name="operating_hours_per_day"]');
+    var daysEl  = form.querySelector('[name="operating_days_per_week"]');
+    var weeksEl = form.querySelector('[name="operating_weeks_per_year"]');
+    var hrs   = hrsEl   ? parseFloat(hrsEl.value)   : NaN;
+    var days  = daysEl  ? parseFloat(daysEl.value)  : NaN;
+    var weeks = weeksEl ? parseFloat(weeksEl.value) : NaN;
+
+    if (isNaN(power) || isNaN(hrs) || isNaN(days) || isNaN(weeks)) {
+      energyEl.value = '';
+      return;
+    }
+
+    // VSD factor (AHU/DOAS only)
+    var vsdEl = form.querySelector('[name="variable_speed_drives"]:checked');
+    var dcvEl = form.querySelector('[name="demand_controlled_ventilation"]:checked');
+    var vsdFactor = (vsdEl && vsdEl.value === 'yes') ? 0.80 : 1.00;
+    var dcvFactor = (dcvEl && dcvEl.value === 'yes') ? 0.70 : 1.00;
+
+    energyEl.value = (power * hrs * days * weeks * vsdFactor * dcvFactor).toFixed(3);
+  };
+
+  // FCU / Cassette / Fan: annual_energy = power_input × h × d × w
+  window.recalcVentSimpleEnergy = function(form) {
+    if (!form) return;
+    var powerEl  = form.querySelector('[name="power_input"]');
+    var energyEl = form.querySelector('[name="annual_energy_consumption"]');
+    if (!powerEl || !energyEl) return;
+
+    var power = parseFloat(powerEl.value);
+    var hrsEl   = form.querySelector('[name="operating_hours_per_day"]');
+    var daysEl  = form.querySelector('[name="operating_days_per_week"]');
+    var weeksEl = form.querySelector('[name="operating_weeks_per_year"]');
+    var hrs   = hrsEl   ? parseFloat(hrsEl.value)   : NaN;
+    var days  = daysEl  ? parseFloat(daysEl.value)  : NaN;
+    var weeks = weeksEl ? parseFloat(weeksEl.value) : NaN;
+
+    if (isNaN(power) || isNaN(hrs) || isNaN(days) || isNaN(weeks)) {
+      energyEl.value = '';
+      return;
+    }
+    energyEl.value = (power * hrs * days * weeks).toFixed(3);
+  };
+
+  var VENT_CLIMATE_ZONE = "{{ climate_zone }}";
+
+  if (!window.editingVentilationSystemId) window.editingVentilationSystemId = null;
+
+  var VENT_TYPE_MAP = {
+    'AHU':        'ahu-template',
+    'FCU':        'fcu-template',
+    'DOAS':       'doas-template',
+    'CASSETTE_AC':'cassette-template',
+    'FAN':        'fan-template',
+  };
+
+  // Annual hours → [h/day, d/week, w/year]
+  // AHU/FCU/DOAS/Cassette use 5d/52wk; Fans use 7d/52wk
+  var VENT_OPERATING_DEFAULTS = {
+    // total hrs/year ÷ (d/w × 52): AHU/FCU/DOAS/CASSETTE=5d/w, FAN=7d/w
+    'AHU': {
+      'hot-dry':     [14, 5, 52], 'warm-humid':  [17, 5, 52], 'composite':   [10, 5, 52],
+      'temperate':   [9,  5, 52], 'cold':        [7,  5, 52], 'tropical-wet':[19, 5, 52],
+    },
+    'FCU': {
+      'hot-dry':     [12, 5, 52], 'warm-humid':  [17, 5, 52], 'composite':   [9,  5, 52],
+      'temperate':   [7,  5, 52], 'cold':        [5,  5, 52], 'tropical-wet':[20, 5, 52],
+    },
+    'DOAS': {
+      'hot-dry':     [14, 5, 52], 'warm-humid':  [14, 5, 52], 'composite':   [13, 5, 52],
+      'temperate':   [9,  5, 52], 'cold':        [7,  5, 52], 'tropical-wet':[17, 5, 52],
+    },
+    'CASSETTE_AC': {
+      'hot-dry':     [14, 5, 52], 'warm-humid':  [13, 5, 52], 'composite':   [10, 5, 52],
+      'temperate':   [7,  5, 52], 'cold':        [5,  5, 52], 'tropical-wet':[16, 5, 52],
+    },
+    'FAN': {
+      'hot-dry':     [15, 7, 52], 'warm-humid':  [18, 7, 52], 'composite':   [12, 7, 52],
+      'temperate':   [9,  7, 52], 'cold':        [7,  7, 52], 'tropical-wet':[20, 7, 52],
+    },
+  };
+
+  function applyVentOperatingDefaults(form, ventType) {
+    if (!VENT_CLIMATE_ZONE) return;
+    const defaults = (VENT_OPERATING_DEFAULTS[ventType] || {})[VENT_CLIMATE_ZONE];
+    if (!defaults) return;
+    const [h, d, w] = defaults;
+    const hEl = form.querySelector('[name="operating_hours_per_day"]');
+    const dEl = form.querySelector('[name="operating_days_per_week"]');
+    const wEl = form.querySelector('[name="operating_weeks_per_year"]');
+    if (hEl && !hEl.value) hEl.value = h;
+    if (dEl && !dEl.value) dEl.value = d;
+    if (wEl && !wEl.value) wEl.value = w;
   }
 
-  // Get CSRF token
   function getCSRFToken() {
     return document.querySelector('[name=csrfmiddlewaretoken]').value;
   }
 
-  // Get building ID from the page context
   function getBuildingId() {
-    // Get building UUID from URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('building_uuid');
+    return new URLSearchParams(window.location.search).get('building_uuid');
   }
 
-  // Open modal for adding new system
   window.openVentilationSystemModal = function() {
     window.editingVentilationSystemId = null;
     document.getElementById('ventilation-system-form').reset();
+    document.getElementById('selected-ventilation-system').innerHTML = '';
     ventilation_system_modal.showModal();
-  }
+  };
 
-  // Close modal
   window.closeVentilationSystemModal = function() {
     ventilation_system_modal.close();
     window.editingVentilationSystemId = null;
+  };
+
+  function loadVentTemplate(ventType) {
+    const templateId = VENT_TYPE_MAP[ventType];
+    if (!templateId) return;
+    const tmpl = document.getElementById(templateId);
+    const container = document.getElementById('selected-ventilation-system');
+    if (tmpl) {
+      container.innerHTML = tmpl.innerHTML;
+      if (typeof htmx !== 'undefined') htmx.process(container);
+    }
+    setTimeout(() => {
+      applyVentOperatingDefaults(document.getElementById('ventilation-system-form'), ventType);
+    }, 50);
   }
 
-  // Save ventilation system
+  window.handleVentilationTypeChange = function(ventType) {
+    if (!ventType) {
+      document.getElementById('selected-ventilation-system').innerHTML = '';
+      return;
+    }
+    loadVentTemplate(ventType);
+  };
+
   window.saveVentilationSystem = async function() {
     const form = document.getElementById('ventilation-system-form');
     const formData = new FormData(form);
     const buildingId = getBuildingId();
+    if (!buildingId) { Toast.error('Building ID not found'); return; }
 
-    if (!buildingId) {
-      Toast.error('{% translate "Building ID not found" %}');
-      return;
-    }
-
-    //validate required fields
     const validator = new window.FormValidator(form);
-    if (!validator.validate()) {
-      console.error('{% translate "Form validation failed" %}', validator.errors);
-      return;
-    }
-    // Collect all form data
-    const systemData = {
-      building_uuid: buildingId,
-      ventilation_type: formData.get('ventilation_type'),
-      ventilation_capacity: formData.get('ventilation_capacity'),
-      baseline_efficiency: formData.get('baseline_efficiency'),
-      operating_hours_per_day: formData.get('operating_hours_per_day'),
-      operating_days_per_week: formData.get('operating_days_per_week'),
-      operating_weeks_per_year: formData.get('operating_weeks_per_year'),
-      power_input: formData.get('power_input'),
-      airflow_rate: formData.get('airflow_rate'),
-      demand_controlled_ventilation: formData.get('demand_controlled_ventilation'),
-      variable_speed_drives: formData.get('variable_speed_drives'),
-      number_of_units: formData.get('number_of_units'),
-      annual_energy_consumption: formData.get('annual_energy_consumption'),
-      energy_efficiency_label: formData.get('energy_efficiency_label'),
-      number_of_stars: formData.get('number_of_stars'),
-    };
+    if (!validator.validate()) { console.error('Validation failed', validator.errors); return; }
 
-    // Add system ID if editing
-    if (window.editingVentilationSystemId) {
-      systemData.ventilation_system_id = window.editingVentilationSystemId;
+    const ventType = document.getElementById('ventilation-type-select').value;
+    if (!ventType) { Toast.error('Please select a ventilation system type'); return; }
+
+    const systemData = { building_uuid: buildingId, ventilation_type: ventType };
+    if (window.editingVentilationSystemId) systemData.ventilation_system_id = window.editingVentilationSystemId;
+
+    for (const [key, value] of formData.entries()) {
+      if (key !== 'csrfmiddlewaretoken' && key !== 'ventilation_type') {
+        systemData[key] = value;
+      }
     }
 
     try {
       const method = window.editingVentilationSystemId ? 'PUT' : 'POST';
       const response = await fetch('/ventilation-system/', {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCSRFToken(),
-        },
+        method,
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
         body: JSON.stringify(systemData),
       });
-
       const result = await response.json();
-
       if (result.success) {
-        // Refresh the list
         await window.renderVentilationSystems();
-        // Close modal
         window.closeVentilationSystemModal();
       } else {
-        Toast.error('{% translate "Error saving ventilation system:" %} ' + JSON.stringify(result.errors));
+        Toast.error('Error saving ventilation system: ' + JSON.stringify(result.errors));
       }
-    } catch (error) {
-      console.error('{% translate "Error:" %}', error);
-      Toast.error('{% translate "An error occurred while saving the ventilation system" %}');
+    } catch (e) {
+      console.error(e);
+      Toast.error('An error occurred while saving the ventilation system');
     }
-  }
+  };
 
-  // Render ventilation systems list
   window.renderVentilationSystems = async function() {
     const buildingId = getBuildingId();
-    if (!buildingId) {
-      console.error('{% translate "Building ID not found" %}');
-      return;
-    }
-
-    const listContainer = document.getElementById('ventilation-systems-list');
-
+    if (!buildingId) return;
+    const list = document.getElementById('ventilation-systems-list');
     try {
-      const response = await fetch(`/ventilation-system/${buildingId}/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const result = await response.json();
-
+      const resp = await fetch(`/ventilation-system/${buildingId}/`, { headers: { 'Content-Type': 'application/json' } });
+      const result = await resp.json();
       if (result.success && result.ventilation_systems) {
         const systems = result.ventilation_systems;
-
-        if (systems.length === 0) {
-          listContainer.innerHTML = noSystemsContainer.innerHTML;
+        if (!systems.length) {
+          list.innerHTML = document.getElementById('no-ventilation-system-template').innerHTML;
           return;
         }
-
-        listContainer.innerHTML = systems.map((system) => {
-          const airflowRate = system.air_flow_rate || 'N/A';
-          const capacity = system.ventilation_capacity_display || 'N/A';
-
+        list.innerHTML = systems.map(system => {
+          const airflow = system.air_flow_rate ? `${system.air_flow_rate} ${system.ventilation_capacity_display || ''}` : 'N/A';
           return `
-            <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)] mb-2">
-              <span
-                data-icon="windy-fill"
-                data-size="20"
-                data-color="var(--icon--strong-950)"
-                class="shrink-0 self-start"
-              ></span>
+            <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
+              <span data-icon="windy-fill" data-size="20" data-color="var(--icon--strong-950)" class="shrink-0 self-start"></span>
               <div class="flex flex-col flex-1">
                 <p class="text-sm/5 font-medium">${system.ventilation_type_display}</p>
-                <p class="text-sm/5 text-[var(--text--sub-600)] gap-0">
-                  <span class="border-r border-[var(--text--sub-600)] pr-1">{% translate "Airflow rate:" %} ${airflowRate}</span>
-                  <span>{% translate "Capacity:" %} ${capacity}</span>
+                <p class="text-sm/5 text-[var(--text--sub-600)]">
+                  <span class="border-r border-[var(--text--sub-600)] pr-1">Units: ${system.number_of_units_installed}</span>
+                  <span class="pl-1">Airflow: ${airflow}</span>
                 </p>
               </div>
               <div class="flex items-center gap-3">
                 <button class="btn size-5 btn-ghost p-0" onclick="editVentilationSystem(${system.id})">
-                  <span
-                    data-icon="edit-line"
-                    data-size="16"
-                    data-color="var(--icon--strong-950)"
-                  ></span>
+                  <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
                 </button>
-                <button
-                  class="btn size-5 btn-ghost p-0"
-                  onclick="confirmDeleteVentilationSystem(${system.id})"
-                >
-                  <span
-                    data-icon="delete-bin-5-line"
-                    data-size="16"
-                    data-color="var(--icon--strong-950)"
-                  ></span>
+                <button class="btn size-5 btn-ghost p-0" onclick="confirmDeleteVentilationSystem(${system.id})">
+                  <span data-icon="delete-bin-5-line" data-size="16" data-color="var(--icon--strong-950)"></span>
                 </button>
               </div>
-            </li>
-          `;
+            </li>`;
         }).join('');
-
+        if (typeof window.initIcons === 'function') window.initIcons();
       } else {
-        listContainer.innerHTML = noSystemsContainer.innerHTML;
-        console.error('{% translate "Error fetching ventilation systems:" %}', result.errors);
-        Toast.error('{% translate "Error fetching ventilation systems" %}');
+        list.innerHTML = document.getElementById('no-ventilation-system-template').innerHTML;
       }
-    } catch (error) {
-      listContainer.innerHTML = noSystemsContainer.innerHTML;
-      Toast.error('{% translate "Error fetching ventilation systems" %}');
-      console.error('{% translate "Error:" %}', error);
+    } catch (e) {
+      console.error(e);
+      list.innerHTML = document.getElementById('no-ventilation-system-template').innerHTML;
     }
-  }
+  };
 
-  // Edit ventilation system
   window.editVentilationSystem = async function(systemId) {
     const buildingId = getBuildingId();
-
-    if (!buildingId) {
-      Toast.error('{% translate "Building ID not found" %}');
-      return;
-    }
-
+    if (!buildingId) return;
     try {
-      const response = await fetch(`/ventilation-system/${buildingId}/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const resp = await fetch(`/ventilation-system/${buildingId}/`, { headers: { 'Content-Type': 'application/json' } });
+      const result = await resp.json();
+      if (!result.success) return;
+      const system = result.ventilation_systems.find(s => s.id === systemId);
+      if (!system) return;
 
-      const result = await response.json();
+      window.editingVentilationSystemId = systemId;
+      document.getElementById('ventilation-system-form').reset();
+      document.getElementById('selected-ventilation-system').innerHTML = '';
 
-      if (result.success && result.ventilation_systems) {
-        const system = result.ventilation_systems.find(s => s.id === systemId);
+      const typeSelect = document.getElementById('ventilation-type-select');
+      typeSelect.value = system.ventilation_type;
+      loadVentTemplate(system.ventilation_type);
 
-        if (system) {
-          window.editingVentilationSystemId = systemId;
+      setTimeout(() => {
+        const form = document.getElementById('ventilation-system-form');
+        const sf = (name, val) => { if (val === null || val === undefined) return; const el = form.querySelector(`[name="${name}"]`); if (el) el.value = val; };
+        const sr = (name, val) => { const el = form.querySelector(`[name="${name}"][value="${val}"]`); if (el) el.checked = true; };
 
-          // Reset form
-          document.getElementById('ventilation-system-form').reset();
+        sf('number_of_units', system.number_of_units_installed);
+        sf('baseline_efficiency', system.baseline_efficiency_w_cmh);
+        sf('operating_hours_per_day', system.operation_hours_per_workday);
+        sf('operating_days_per_week', system.workdays_per_week);
+        sf('operating_weeks_per_year', system.workweeks_per_year);
+        sf('power_input', system.total_power_input_kw);
+        sf('airflow_rate', system.air_flow_rate);
+        sf('ventilation_capacity', system.ventilation_capacity);
+        sf('annual_energy_consumption', system.total_energy_consumption_kwh_per_year);
+        sf('fresh_air_ratio', system.fresh_air_ratio_percent);
+        sf('number_of_stars', system.number_of_stars);
+        sr('variable_speed_drives', system.variable_speed_drives ? 'yes' : 'no');
+        sr('demand_controlled_ventilation', system.demand_controlled_ventilation ? 'yes' : 'no');
 
-          // Populate form fields - mapping backend field names to frontend field names
-          const form = document.getElementById('ventilation-system-form');
-
-          form.querySelector('[name="ventilation_type"]').value = system.ventilation_type;
-          form.querySelector('[name="ventilation_capacity"]').value = system.ventilation_capacity;
-          form.querySelector('[name="baseline_efficiency"]').value = system.baseline_efficiency_w_cmh;
-          form.querySelector('[name="operating_hours_per_day"]').value = system.operation_hours_per_workday;
-          form.querySelector('[name="operating_days_per_week"]').value = system.workdays_per_week;
-          form.querySelector('[name="operating_weeks_per_year"]').value = system.workweeks_per_year;
-          form.querySelector('[name="power_input"]').value = system.total_power_input_w;
-          form.querySelector('[name="airflow_rate"]').value = system.air_flow_rate;
-
-          // Set radio buttons for demand controlled ventilation
-          const demandControlValue = system.demand_controlled_ventilation ? 'yes' : 'no';
-          const demandControlRadio = form.querySelector(`[name="demand_controlled_ventilation"][value="${demandControlValue}"]`);
-          if (demandControlRadio) demandControlRadio.checked = true;
-
-          // Set variable speed drives dropdown
-          form.querySelector('[name="variable_speed_drives"]').value = system.variable_speed_drives ? 'yes' : 'no';
-
-          form.querySelector('[name="number_of_units"]').value = system.number_of_units_installed;
-
-          if (system.total_energy_consumption_kwh_per_year) {
-            form.querySelector('[name="annual_energy_consumption"]').value = system.total_energy_consumption_kwh_per_year;
-          }
-
-          if (system.energy_efficiency_label) {
-            form.querySelector('[name="number_of_stars"]').value = system.energy_efficiency_label;
-          }
-
-          ventilation_system_modal.showModal();
+        // Recompute auto-calculated fields with loaded values
+        if (system.ventilation_type === 'AHU' || system.ventilation_type === 'DOAS') {
+          recalcVentPowerAndEnergy(form, system.ventilation_type.toLowerCase());
+        } else {
+          recalcVentSimpleEnergy(form);
         }
-      }
-    } catch (error) {
-      console.error('{% translate "Error:" %}', error);
-      Toast.error('{% translate "An error occurred while loading the ventilation system" %}');
-    }
-  }
+      }, 200);
 
-  // Confirm delete
-  if (!window.deleteVentilationSystemId) {
-    window.deleteVentilationSystemId = null;
-  }
+      ventilation_system_modal.showModal();
+    } catch (e) {
+      console.error(e);
+      Toast.error('An error occurred while loading the ventilation system');
+    }
+  };
+
+  if (!window.deleteVentilationSystemId) window.deleteVentilationSystemId = null;
 
   window.confirmDeleteVentilationSystem = function(systemId) {
     window.deleteVentilationSystemId = systemId;
     ventilation_system_modal_delete.showModal();
-  }
+  };
 
-  // Delete ventilation system
   window.deleteVentilationSystem = async function() {
-    if (window.deleteVentilationSystemId !== null) {
-      try {
-        const response = await fetch(`/ventilation-system/${window.deleteVentilationSystemId}/delete/`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(),
-          },
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          await window.renderVentilationSystems();
-          window.deleteVentilationSystemId = null;
-          ventilation_system_modal_delete.close();
-        } else {
-          Toast.error('{% translate "Error deleting ventilation system:" %} ' + JSON.stringify(result.errors));
-        }
-      } catch (error) {
-        console.error('{% translate "Error:" %}', error);
-        Toast.error('{% translate "An error occurred while deleting the ventilation system" %}');
+    if (window.deleteVentilationSystemId === null) return;
+    try {
+      const resp = await fetch(`/ventilation-system/${window.deleteVentilationSystemId}/delete/`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+      });
+      const result = await resp.json();
+      if (result.success) {
+        await window.renderVentilationSystems();
+        window.deleteVentilationSystemId = null;
+        ventilation_system_modal_delete.close();
+      } else {
+        Toast.error('Error: ' + JSON.stringify(result.errors));
       }
+    } catch (e) {
+      console.error(e);
+      Toast.error('An error occurred while deleting the ventilation system');
     }
-  }
+  };
 
-  // Initialize on page load
-  document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('ventilation-systems-list')) {
-      window.renderVentilationSystems();
-    }
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('ventilation-systems-list')) window.renderVentilationSystems();
   });
-
-  // If HTMX is processing this content dynamically, also initialize after htmx:afterSwap
-  document.addEventListener('htmx:afterSwap', function(evt) {
-    if (evt.detail.target.id === 'dynamic-content') {
-      window.renderVentilationSystems();
-    }
+  document.addEventListener('htmx:afterSwap', evt => {
+    if (evt.detail.target.id === 'dynamic-content') window.renderVentilationSystems();
   });
-
-  // Initialize immediately for dynamically loaded content
-  if (document.getElementById('ventilation-systems-list')) {
-    window.renderVentilationSystems();
-  }
+  if (document.getElementById('ventilation-systems-list')) window.renderVentilationSystems();
 </script>

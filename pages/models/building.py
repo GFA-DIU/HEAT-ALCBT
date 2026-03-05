@@ -1,15 +1,26 @@
+import os
 import uuid
 from django.db import models
 from django.utils.translation import gettext as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+
+def certification_upload_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return f"uploads/buildings/{instance.id}/certification/{filename}"
+
+
+def boq_file_upload_path(instance, filename):
+    return f"uploads/buildings/{instance.building_id}/designs-boq/{filename}"
+
 from pages.views.building.impact_calculation import calculate_impact_operational
+
+from cities_light.models import Country
 
 from .assembly import Assembly
 from .base import BaseGeoModel, BaseModel
 from .product import BaseProduct
 from .epd import EPD, Unit
-from cities_light.models import Country
 
 
 class ClimateZone(models.TextChoices):
@@ -34,9 +45,9 @@ class CoolingType(models.TextChoices):
     WINDOW_AC = "window-ac", "Window air conditioners"
     SPLIT_AC = "split-ac", "Split air conditioners"
     VRF_SYSTEM = "vrf-system", "Variable refrigerant flow (VRF) systems"
-    PACKAGED_AC = "packaged-ac", "Packaged air conditioners"
-    CHILLER_SYSTEM = "chiller-system", "Chiller systems"
-    OTHER = "other", "Other cooling type"
+    PACKAGED_AC = "packaged-ac", "Packaged/Ductable air conditioners"
+    CHILLER_WATER = "chiller-water", "Chiller system - Water cooled chiller"
+    CHILLER_AIR = "chiller-air", "Chiller system - Air cooled chiller"
 
 
 class VentilationType(models.TextChoices):
@@ -90,15 +101,16 @@ class CategorySubcategory(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        help_text="Leave blank to mark this as universal"
+        help_text="Leave blank to mark this as global",
     )
 
     class Meta:
         unique_together = ("category", "subcategory", "country")
 
     def __str__(self):
-        return f"{self.category} - {self.subcategory} ({self.country if self.country else 'Universal'})"
-        
+        return f"{self.category} - {self.subcategory} ({self.country if self.country else 'Global'})"
+
+
 class BuildingOperationalInfo(models.Model):
     ### Operational Emissions
     operational_components = models.ManyToManyField(
@@ -167,6 +179,33 @@ class BuildingOperationalInfo(models.Model):
         choices=[c for c in Unit.choices if c[0] in (Unit.CELSIUS, Unit.FAHRENHEIT)],
         null=True,
         blank=True,
+    )
+    renewable_energy_percent = models.DecimalField(
+        _("Renewable Energy Installation (%)"),
+        max_digits=5,
+        decimal_places=2,
+        validators=[MinValueValidator(0.01), MaxValueValidator(100)],
+        null=True,
+        blank=True,
+    )
+    building_smart_system = models.BooleanField(
+        _("Building Smart System Installation"),
+        default=False,
+    )
+    ### Certification & Documentation
+    has_certification = models.BooleanField(
+        _("Has Certification"),
+        default=False,
+    )
+    certification_file = models.FileField(
+        _("Certification File"),
+        upload_to=certification_upload_path,
+        null=True,
+        blank=True,
+    )
+    has_boq = models.BooleanField(
+        _("Has Design Drawings / BoQ"),
+        default=False,
     )
     ### Building Services
     heating_type = models.CharField(
@@ -408,3 +447,26 @@ class SimulatedOperationalProduct(BaseProduct):
 
     def get_impacts(self):
         return calculate_impact_operational(self)
+
+
+class BuildingBoQFile(models.Model):
+    """Stores design drawings and BoQ files uploaded for a building."""
+
+    building = models.ForeignKey(
+        Building,
+        on_delete=models.CASCADE,
+        related_name="boq_files",
+    )
+    file = models.FileField(
+        _("BoQ / Design File"),
+        upload_to=boq_file_upload_path,
+    )
+    original_filename = models.CharField(_("Original Filename"), max_length=255, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Building BoQ File"
+        verbose_name_plural = "Building BoQ Files"
+
+    def __str__(self):
+        return f"{self.building.name} - {self.original_filename}"

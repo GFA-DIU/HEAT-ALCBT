@@ -559,6 +559,22 @@
 
   <!-- HTMX -->
   {% comment %} <script src="{% static 'js/htmx1.6.1/htmx.min.js' %}"></script> {% endcomment %}
+
+  <script>
+    // When a session expires during an HTMX request, the server redirects to
+    // the login page.
+    document.body.addEventListener('htmx:beforeSwap', function(evt) {
+      var xhr = evt.detail.xhr;
+      if (!xhr) return;
+      // Check if the final response URL contains the login path
+      var finalUrl = xhr.responseURL || '';
+      if (finalUrl.indexOf('/accounts/login/') !== -1) {
+        evt.detail.shouldSwap = false;
+        window.location.href = '/accounts/login/?next=' + encodeURIComponent(window.location.pathname + window.location.search);
+      }
+    });
+  </script>
+
   {% endblock javascript %}
   
   {% if request and request|cookie_group_accepted:"analytics" %}

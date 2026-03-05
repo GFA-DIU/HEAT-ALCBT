@@ -1,11 +1,14 @@
 import logging
 
+from allauth.account.utils import send_email_confirmation
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.contrib.messages import get_messages
 from django.db import transaction
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
+from django.shortcuts import redirect, render
+from django.utils import timezone
 
 from .forms import CustomUserUpdateForm, UserProfileUpdateForm
 from pages.models.building import Building
@@ -37,6 +40,31 @@ def update_profile(request):
     context = {"user_form": user_form, "profile_form": profile_form}
 
     return render(request, "account/update_profile.html", context)
+
+
+@login_required
+def verify_email(request):
+    """Page shown to authenticated users who have not yet verified their email."""
+    # Consume any queued allauth messages (e.g. "Successfully signed in",
+    # "Confirmation email sent") so they don't appear on this page.
+    list(get_messages(request))
+
+    days_since_joined = (timezone.now() - request.user.date_joined).days
+    can_resend = days_since_joined >= 7
+
+    return render(request, "account/verify_email.html", {
+        "can_resend": can_resend,
+    })
+
+
+@login_required
+def resend_confirmation_email(request):
+    """Resend email confirmation to the current user."""
+    days_since_joined = (timezone.now() - request.user.date_joined).days
+    if days_since_joined >= 7:
+        send_email_confirmation(request, request.user, signup=False)
+
+    return redirect("verify_email")
 
 
 @transaction.atomic

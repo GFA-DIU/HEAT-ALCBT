@@ -2,7 +2,14 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from pages.models.building import Building
-from pages.models.building_operation.chilling import RefrigerantType
+from pages.models.building_operation.chilling import RefrigerantGWP, RefrigerantType
+
+
+class PackagedACSubType(models.TextChoices):
+    ROOFTOP = "rooftop", _("Rooftop Unit")
+    FLOOR_STANDING = "floor_standing", _("Floor-standing")
+    DUCTABLE = "ductable", _("Ductable")
+    CASSETTE = "cassette", _("Cassette")
 
 
 class CoolingSystemAirConditioner(models.Model):
@@ -15,10 +22,19 @@ class CoolingSystemAirConditioner(models.Model):
     ac_type = models.CharField(
         max_length=50,
         choices=[
-            ("vrv", _("VRV/VRF (Variable Refrigerant Volume/Flow)")),
+            ("window", _("Window Air Conditioners")),
             ("split", _("Split Air Conditioners")),
+            ("vrv", _("VRV/VRF (Variable Refrigerant Volume/Flow)")),
+            ("packaged", _("Packaged/Ductable Air Conditioners")),
         ],
         verbose_name=_("Air Conditioners Type"),
+    )
+    packaged_subtype = models.CharField(
+        max_length=50,
+        choices=PackagedACSubType.choices,
+        null=True,
+        blank=True,
+        verbose_name=_("Packaged AC Sub-type"),
     )
     year_of_installation = models.PositiveIntegerField(
         verbose_name=_("Year of Installation")
@@ -37,11 +53,21 @@ class CoolingSystemAirConditioner(models.Model):
         choices=RefrigerantType.choices,
         verbose_name=_("Type of Refrigerants"),
     )
-    refrigerant_quantity_kg = models.PositiveIntegerField(
+    refrigerant_quantity_kg = models.DecimalField(
+        max_digits=8, decimal_places=2,
         verbose_name=_("Refrigerant Quantity (Kg)")
     )
     total_cooling_load_rt = models.PositiveIntegerField(
+        null=True,
+        blank=True,
         verbose_name=_("Total Cooling Load for Split/VRV (RT)")
+    )
+    cooling_capacity_per_unit_kw = models.DecimalField(
+        max_digits=10,
+        decimal_places=3,
+        null=True,
+        blank=True,
+        verbose_name=_("Cooling Capacity per Unit (kW)"),
     )
     baseline_efficiency_kw_per_rt = models.DecimalField(
         max_digits=5,
@@ -49,6 +75,20 @@ class CoolingSystemAirConditioner(models.Model):
         null=True,
         blank=True,
         verbose_name=_("Baseline Split Unit/VRV System Efficiency (kW/RT)"),
+    )
+    eer_iseer_cop = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name=_("EER / ISEER / COP"),
+    )
+    power_input_per_unit_kw = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        null=True,
+        blank=True,
+        verbose_name=_("Power Input per Unit (kW)"),
     )
     baseline_refrigerant_emission_factor = models.PositiveIntegerField(
         null=True,
@@ -58,7 +98,9 @@ class CoolingSystemAirConditioner(models.Model):
     baseline_leakage_factor_percent = models.PositiveIntegerField(
         default=2, verbose_name=_("Baseline Leakage Factor (%)")
     )
-    total_energy_consumption_kwh_per_year = models.PositiveIntegerField(
+    total_energy_consumption_kwh_per_year = models.DecimalField(
+        max_digits=12,
+        decimal_places=3,
         null=True,
         blank=True,
         verbose_name=_(
@@ -81,9 +123,21 @@ class CoolingSystemAirConditioner(models.Model):
         blank=True,
         verbose_name=_("ISEER Rating"),
     )
-    energy_efficiency_label = models.PositiveSmallIntegerField(
+    energy_efficiency_label = models.CharField(
+        max_length=1,
+        null=True,
+        blank=True,
+        choices=[(c, c) for c in ['A', 'B', 'C', 'D', 'E', 'F', 'G']],
+        verbose_name=_("Energy Efficiency Label (A–G)"),
+    )
+    number_of_stars = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
         choices=[(i, _(str(i))) for i in range(1, 6)],
-        verbose_name=_("Energy Efficiency Label"),
+        verbose_name=_("Number of Stars (1–5)"),
     )
+
+    def save(self, *args, **kwargs):
+        if self.baseline_refrigerant_emission_factor is None and self.refrigerant_type:
+            self.baseline_refrigerant_emission_factor = RefrigerantGWP.get_gwp(self.refrigerant_type)
+        super().save(*args, **kwargs)

@@ -1,0 +1,152 @@
+{% load static %}
+
+<div id="structural_templates_list">
+  <ul class="grid grid-cols-1 gap-2.75 mt-3">
+    {% for item in assemblies_with_gwp %}
+      {% with assembly=item.assembly total_gwp=item.total_gwp classification=item.classification %}
+        <li class="bg-[var(--bg--weak-50)] rounded-lg px-2.5 py-4 flex justify-between gap-2">
+          <div class="flex flex-col items-center h-full justify-between">
+            <span
+              data-icon="building-3-line"
+              data-size="20"
+              data-color="var(--icon--strong-950)"
+            ></span>
+            <div
+              class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center"
+            >
+              <span
+                data-icon="leaf-line"
+                data-size="14"
+                data-color="var(--bg--strong-950)"
+              ></span>
+            </div>
+          </div>
+          <div class="flex-1 flex flex-col gap-2.5">
+            <h6 class="text-sm/5 font-bold">{{ assembly.name }}</h6>
+
+            <div class="flex items-center">
+              <div class="text-sm/5 font-medium pl-2 pr-1">
+                {{ total_gwp }}kg CO2e eq/{{ assembly.get_dimension_display }}
+              </div>
+              {% if classification %}
+                <p class="text-sm/5 text-[var(--text--sub-600)] pr-1">
+                  {{ classification.category.name }}{% if classification.technique %} - {{ classification.technique.name }}{% endif %}
+                </p>
+              {% endif %}
+              {% if assembly.country %}
+                <span data-country="{{ assembly.country.code2 }}" data-width="20"></span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="flex gap-2 items-center">
+            {% with first_product=assembly.structuralproduct_set.first %}
+              {% if first_product %}
+                <span class="badge gap-0 text-xs/4 py-1 px-2 font-medium">
+                  Quantity: {{ first_product.quantity|floatformat:2 }}{{ assembly.get_dimension_display }}
+                </span>
+              {% endif %}
+            {% endwith %}
+            {% if assembly.mode == 'system' %}
+              <span
+                class="badge bg-[var(--state--information--light)] text-xs/4 py-1 px-2 font-medium gap-1"
+              >
+                <span
+                  data-icon="settings-4-line"
+                  data-size="16"
+                  data-color="var(--icon--soft-400)"
+                ></span>
+                System
+              </span>
+            {% else %}
+              <span class="badge text-xs/4 py-1 px-2 font-medium gap-1">
+                <span
+                  data-icon="save-line"
+                  data-size="16"
+                  data-color="var(--icon--soft-400)"
+                ></span>
+                My component
+              </span>
+            {% endif %}
+            <button
+              class="btn btn-sm btn-outline border-[var(--stroke--soft-200)] rounded-[var(--radius-8)] self-end"
+              onclick="structuralManager.selectTemplate('{{ assembly.id }}')"
+              title="Select this template"
+            >
+              <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+              Add
+            </button>
+          </div>
+        </li>
+      {% endwith %}
+    {% empty %}
+      <section class="flex flex-col flex-1">
+        <div class="flex flex-col flex-1 items-center justify-center gap-4 py-8">
+          <img src="{% static 'assets/building.png' %}" alt="No templates" class="w-32" />
+          <span class="text-sm/5 font-medium text-center text-[var(--text--sub-600)]">No templates found</span>
+          <p class="text-xs/4 text-center text-[var(--text--sub-600)]">Try adjusting your search criteria</p>
+        </div>
+      </section>
+    {% endfor %}
+  </ul>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div id='template-pagination-swap'  hx-swap-oob="true" class="flex items-center justify-center gap-2 mt-4">
+    <button
+      class="btn btn-ghost btn-sm py-2 px-3"
+      {% if page_obj.has_previous %}
+        hx-get="{% url 'building_step_structural' %}?action=search_templates&page={{ page_obj.previous_page_number }}&search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&technique={{ selected_technique }}&mode={{ selected_mode }}&sort_by={{ selected_sort }}"
+        hx-target="#structural_templates_list"
+        hx-swap="outerHTML"
+      {% else %}
+        disabled
+      {% endif %}
+    >
+      <span
+        data-icon="arrow-left"
+        data-size="20"
+        data-color="var(--icon--soft-400)"
+      ></span>
+      Previous
+    </button>
+    <ul class="flex items-center gap-2">
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li>
+            <button class="btn btn-sm rounded-[var(--radius-8)] btn-neutral">
+              {{ num }}
+            </button>
+          </li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li>
+            <button
+              class="btn btn-sm rounded-[var(--radius-8)] btn-ghost"
+              hx-get="{% url 'building_step_structural' %}?action=search_templates&page={{ num }}&search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&technique={{ selected_technique }}&mode={{ selected_mode }}&sort_by={{ selected_sort }}"
+              hx-target="#structural_templates_list"
+              hx-swap="outerHTML"
+            >
+              {{ num }}
+            </button>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+    <button
+      class="btn btn-ghost btn-sm py-2 px-3"
+      {% if page_obj.has_next %}
+        hx-get="{% url 'building_step_structural' %}?action=search_templates&page={{ page_obj.next_page_number }}&search_query={{ search_query }}&country={{ selected_country }}&category={{ selected_category }}&technique={{ selected_technique }}&mode={{ selected_mode }}&sort_by={{ selected_sort }}"
+        hx-target="#structural_templates_list"
+        hx-swap="outerHTML"
+      {% else %}
+        disabled
+      {% endif %}
+    >
+      Next
+      <span
+        data-icon="arrow-right"
+        data-size="20"
+        data-color="var(--icon--strong-950)"
+      ></span>
+    </button>
+  </div>
+  {% endif %}
+</div>

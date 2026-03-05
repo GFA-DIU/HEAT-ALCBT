@@ -1,0 +1,163 @@
+<div class="flex-1 size-full flex flex-col items-center justify-center gap-4 py-5">
+  <div class="sapce-y-0.5 text-center max-w-70 text-[var(--text--strong-950)]">
+    <h6 class="h6-title">Upload Your Data File</h6>
+    <p class="paragraph-small">
+      Supported format: Excel (.xlsx, .xls)
+    </p>
+  </div>
+
+  <div id="upload-component" class="w-full flex justify-center">
+    <!-- Component injected by JS -->
+  </div>
+
+  {% if import_template_url %}
+  <p class="paragraph-small text-[var(--text--strong-950)]">
+    Need a template?
+    <a href="{{ import_template_url }}" download class="text-[var(--state--information--base)] underline cursor-pointer">
+      Download sample template
+    </a>
+  </p>
+  {% endif %}
+</div>
+
+<!-- State 1: No File Selected -->
+<template id="template-upload-empty">
+  <div
+    class="w-full min-h-[12.625rem] max-w-[25rem] border border-dashed border-[var(--stroke--sub-300)] rounded-[0.75rem] p-4 flex flex-col items-center justify-center gap-5 transition-colors"
+    id="drop-zone" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)"
+    ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+
+    <span data-icon="upload-cloud-2-line" data-size="24" data-color="var(--icon--sub-600)"></span>
+
+    <div class="space-y-1.5 text-center">
+      <p class="paragraph-small text-[var(--text--strong-950)]">Choose a file or drag & drop it here.</p>
+      <p class="paragraph-x-small text-[var(--text--sub-600)]">
+        Excel (.xlsx, .xls) up to 50 MB.
+      </p>
+    </div>
+
+    <button class="btn btn-outline h-8 min-h-0 px-3 label-x-small"
+      onclick="document.getElementById('file-upload').click()">
+      Browse file
+    </button>
+    <input type="file" id="file-upload" class="hidden" accept=".xlsx,.xls" onchange="handleFileSelect(event)" />
+  </div>
+</template>
+
+<!-- State 2: File Selected -->
+<template id="template-upload-file">
+  <div class="w-full max-w-[25rem] border border-[var(--stroke--sub-300)] rounded-[0.75rem] p-4 space-y-4">
+    <div class="flex items-start justify-between gap-3">
+      <span data-icon="file-xlsx" data-size="40" id="file-icon-placeholder"></span>
+
+      <div class="space-y-1 flex-1 min-w-0">
+        <p class="label-small text-[var(--text--strong-950)] truncate" id="file-name">example.xlsx</p>
+
+        <p class="paragraph-x-small text-[var(--text--sub-600)] inline-flex items-center gap-1" id="status-container">
+          <span id="size-text"></span>
+          <span class="inline-flex items-center gap-1" id="status-wrapper">
+            <span data-icon="select-box-circle-fill" data-size="16" class="text-[var(--state--success--base)]"></span>
+            <span class="text-[var(--text--strong-950)]">Ready</span>
+          </span>
+        </p>
+      </div>
+
+      <button class="btn btn-ghost btn-sm btn-square size-8 min-h-0" onclick="resetUpload()" id="cancel-upload-btn">
+        <span data-icon="delete-bin-5-line" data-size="16" data-color="var(--icon--sub-600)"></span>
+      </button>
+    </div>
+  </div>
+</template>
+
+<script>
+  (function () {
+    const container = document.getElementById('upload-component');
+    const emptyTemplate = document.getElementById('template-upload-empty');
+
+    if (container && emptyTemplate && !container.textContent.trim()) {
+      // If a file was already selected (user navigated back), restore it
+      if (window.importState && window.importState.file) {
+        renderFileReady(window.importState.file);
+      } else {
+        container.innerHTML = emptyTemplate.innerHTML;
+        if (window.IconComponent) window.IconComponent.initialize();
+      }
+    }
+
+    window.handleDragEnter = (e) => {
+      e.preventDefault();
+      const zone = e.currentTarget;
+      if (zone) zone.classList.add('bg-[var(--bg--weak-50)]');
+    };
+
+    window.handleDragLeave = (e) => {
+      e.preventDefault();
+      const zone = e.currentTarget;
+      if (zone) zone.classList.remove('bg-[var(--bg--weak-50)]');
+    };
+
+    window.handleDragOver = (e) => { e.preventDefault(); };
+
+    window.handleDrop = (e) => {
+      e.preventDefault();
+      const zone = e.currentTarget;
+      if (zone) zone.classList.remove('bg-[var(--bg--weak-50)]');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) processFile(files[0]);
+    };
+
+    window.handleFileSelect = (e) => {
+      const files = e.target.files;
+      if (files.length > 0) processFile(files[0]);
+    };
+
+    window.resetUpload = () => {
+      if (window.importState) {
+        window.importState.file = null;
+        window.importState.building_uuid = null;
+      }
+      const c = document.getElementById('upload-component');
+      const t = document.getElementById('template-upload-empty');
+      if (c && t) {
+        c.innerHTML = t.innerHTML;
+        if (window.IconComponent) window.IconComponent.initialize();
+      }
+      // Disable the Continue button until a file is selected again
+      const nextBtn = document.getElementById('import-next-btn');
+      if (nextBtn) nextBtn.disabled = true;
+    };
+
+    function processFile(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!['xlsx', 'xls'].includes(ext)) {
+        alert('Only Excel files (.xlsx, .xls) are supported.');
+        return;
+      }
+      // Store file in shared import state
+      if (!window.importState) window.importState = {};
+      window.importState.file = file;
+
+      renderFileReady(file);
+
+      // Enable the Continue button
+      const nextBtn = document.getElementById('import-next-btn');
+      if (nextBtn) nextBtn.disabled = false;
+    }
+
+    function renderFileReady(file) {
+      const c = document.getElementById('upload-component');
+      const t = document.getElementById('template-upload-file');
+      if (!c || !t) return;
+
+      c.innerHTML = t.innerHTML;
+
+      const nameEl = c.querySelector('#file-name');
+      if (nameEl) nameEl.textContent = file.name;
+
+      const sizeText = c.querySelector('#size-text');
+      if (sizeText) sizeText.textContent = (file.size / 1024).toFixed(1) + ' KB • ';
+
+      if (window.IconComponent) window.IconComponent.initialize();
+    }
+  })();
+</script>
