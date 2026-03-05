@@ -245,10 +245,18 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline hot water system equipment efficiency level<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="equipment_efficiency_level" placeholder="75–95" required min="0.01" max="100" step="0.01" />
+        <input type="number" name="equipment_efficiency_level" placeholder="75–95" required min="0.01" max="100" step="0.01" oninput="recomputeHWSEnergy()" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
       <p class="validator-hint">Typical: 75%–95%</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Baseline efficiency (COP)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_efficiency" placeholder="e.g. 0.85" required min="0.01" step="0.001" />
+      </label>
+      <p class="validator-hint">Equivalent COP for this boiler type</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -331,10 +339,18 @@
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">Baseline hot water system equipment efficiency level<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="equipment_efficiency_level" placeholder="75–99" required min="0.01" max="100" step="0.01" />
+        <input type="number" name="equipment_efficiency_level" placeholder="75–99" required min="0.01" max="100" step="0.01" oninput="recomputeHWSEnergy()" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
       <p class="validator-hint">Electric: 95–99%. Gas: 75–85%.</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">Baseline efficiency (COP)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full">
+        <input type="number" name="baseline_efficiency" placeholder="e.g. 0.90" required min="0.01" step="0.001" />
+      </label>
+      <p class="validator-hint">Equivalent COP for this water heater type</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -455,7 +471,7 @@
       var copEl = form.querySelector('[name="baseline_efficiency"]');
       var cop   = parseFloat(copEl ? copEl.value : '');
       if (!isNaN(power) && !isNaN(num) && !isNaN(hrs) && !isNaN(days) && !isNaN(weeks) && !isNaN(cop) && cop > 0) {
-        totalEl.value = parseFloat(((power * num * hrs * days * weeks) / cop).toFixed(2));
+        totalEl.value = ((power * num * hrs * days * weeks) / cop).toFixed(3);
       } else {
         totalEl.value = '';
       }
@@ -465,7 +481,7 @@
       var effEl = form.querySelector('[name="equipment_efficiency_level"]');
       var eff   = parseFloat(effEl ? effEl.value : '');
       if (!isNaN(power) && !isNaN(num) && !isNaN(hrs) && !isNaN(days) && !isNaN(weeks) && !isNaN(eff) && eff > 0) {
-        totalEl.value = parseFloat(((power * num * hrs * days * weeks) / (eff / 100)).toFixed(2));
+        totalEl.value = ((power * num * hrs * days * weeks) / (eff / 100)).toFixed(3);
       } else {
         totalEl.value = '';
       }
@@ -482,7 +498,7 @@
       var effEl2 = form.querySelector('[name="equipment_efficiency_level"]');
       var eff2   = parseFloat(effEl2 ? effEl2.value : '');
       if (!isNaN(power) && !isNaN(num) && !isNaN(hrs) && !isNaN(days) && !isNaN(weeks) && !isNaN(eff2) && eff2 > 0) {
-        totalEl.value = parseFloat(((power * num * hrs * days * weeks) / (eff2 / 100)).toFixed(2));
+        totalEl.value = ((power * num * hrs * days * weeks) / (eff2 / 100)).toFixed(3);
       } else {
         totalEl.value = '';
       }

@@ -115,7 +115,7 @@
           var energyEl = form ? form.querySelector('[name="annual_energy_consumption"]') : null;
           console.log('[Lift] energyEl:', energyEl);
           if (energyEl) {
-            energyEl.value = parseFloat((data.total_kwh * 0.075).toFixed(2));
+            energyEl.value = (data.total_kwh * 0.075).toFixed(3);
             console.log('[Lift] set value to:', energyEl.value);
           }
         }

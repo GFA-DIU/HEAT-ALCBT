@@ -2,7 +2,7 @@ from django import forms
 from django.utils.translation import gettext as _
 
 from pages.models.building_operation import HotWaterSystem, HotWaterSystemType, FuelType
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 
 class HotWaterSystemForm(forms.ModelForm):
@@ -64,11 +64,11 @@ class HotWaterSystemForm(forms.ModelForm):
         if value is None or value == '':
             return None
         try:
-            value = int(value)
+            value = Decimal(str(value))
             if value < 0:
                 raise forms.ValidationError(_('Total energy consumption cannot be negative.'))
             return value
-        except (ValueError, TypeError):
+        except (InvalidOperation, ValueError, TypeError):
             raise forms.ValidationError(_('Please enter a valid number.'))
 
     def clean_total_fuel_consumption(self):

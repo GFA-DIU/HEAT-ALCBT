@@ -1,6 +1,8 @@
 """
 Form for validating and saving Lighting System data.
 """
+from decimal import Decimal, InvalidOperation
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -114,9 +116,9 @@ class LightingSystemForm(forms.ModelForm):
         if value is None or value == '':
             return None
         try:
-            value = int(value)
+            value = Decimal(str(value))
             if value < 0:
                 raise forms.ValidationError(_('Total energy consumption cannot be negative.'))
             return value
-        except (ValueError, TypeError):
+        except (InvalidOperation, ValueError, TypeError):
             raise forms.ValidationError(_('Please enter a valid number.'))

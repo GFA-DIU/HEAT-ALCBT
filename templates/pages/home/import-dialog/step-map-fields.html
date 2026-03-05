@@ -2,17 +2,16 @@
   <div class="space-y-1 shrink-0">
     <h6 class="h6-title text-[var(--text--strong-950)]">Map Your Columns</h6>
     <p class="paragraph-small text-[var(--text--sub-600)]">
-      Map your file columns to BEAT data fields
+      Review the column mapping detected from your file. All columns matched automatically.
     </p>
   </div>
 
   <!-- Status Alert -->
   <div id="map-status-alert"
-    class="w-full flex items-center justify-center gap-3 px-12 py-3 rounded-md text-[var(--state--warning--base)] bg-[var(--state--warning--lighter)]">
-    <span data-icon="alert-fill" data-size="20"></span>
+    class="w-full flex items-center justify-center gap-3 px-12 py-3 rounded-md text-[var(--state--success--base)] bg-[var(--state--success--lighter)]">
+    <span data-icon="select-box-circle-fill" data-size="20"></span>
     <span class="label-small text-[var(--text--strong-950)]">
-      You have <span id="mismatch-count">2</span> column field mismatch •
-      <span class="paragraph-small">Please fix this to continue</span>
+      All columns mapped automatically from the template
     </span>
   </div>
 
@@ -21,160 +20,176 @@
     <table class="table w-full relative border-collapse">
       <thead class="bg-[var(--bg--weak-50)] sticky top-0 z-10 text-[var(--text--sub-600)] label-small">
         <tr>
-          <th class="w-[33%] py-3 px-4 text-left font-normal border-b-0">Your file’s imported column</th>
-          <th class="w-[40.5%] py-3 px-4 text-left font-normal border-b-0">System required headers</th>
-          <th class="py-3 px-4 text-left font-normal border-b-0">Type</th>
-          <th class="py-3 px-4 text-left font-normal border-b-0">Status</th>
+          <th class="w-[30%] py-3 px-4 text-left font-normal border-b-0">Tab</th>
+          <th class="w-[40%] py-3 px-4 text-left font-normal border-b-0">Excel column header</th>
+          <th class="py-3 px-4 text-left font-normal border-b-0">Value</th>
         </tr>
       </thead>
       <tbody id="map-fields-body" class="text-[var(--text--strong-950)] paragraph-small">
-        <!-- Rows will be injected via JS -->
+        <!-- Populated by JS -->
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- Template for Mismatch Row -->
-<template id="template-row-mismatch">
+<template id="template-row-map">
   <tr class="border-b border-[var(--stroke--soft-200)] last:border-0 hover:bg-[var(--bg--weak-50)] transition-colors">
-    <td class="px-4 py-3 font-medium col-file"></td>
-    <td class="px-4 py-3">
-      <select class="select select-bordered select-sm w-full h-9 bg-white focus:outline-none col-select"
-        onchange="window.handleMapChange(this)">
-        <option disabled selected>-- Select Header --</option>
-        <option value="building_identifier">building_identifier</option>
-        <option value="building_address">building_address</option>
-        <option value="region_state">region_state</option>
-        <option value="building_city">building_city</option>
-        <option value="country">country</option>
-      </select>
-    </td>
-    <td class="px-4 py-3 col-type"></td>
-    <td class="px-4 py-3">
-      <span data-icon="error-warning-fill" data-size="26"
-        class="text-[var(--state--warning--base)] col-status-icon"></span>
-    </td>
+    <td class="px-4 py-3 text-[var(--text--sub-600)] col-tab"></td>
+    <td class="px-4 py-3 font-medium col-header"></td>
+    <td class="px-4 py-3 col-value"></td>
   </tr>
 </template>
 
-<!-- Template for Success Row -->
-<template id="template-row-success">
+<template id="template-row-map-section">
+  <tr class="bg-[var(--bg--weak-50)]">
+    <td colspan="3" class="px-4 py-2 label-small text-[var(--text--sub-600)] col-section"></td>
+  </tr>
+</template>
+
+<template id="template-row-map-count">
   <tr class="border-b border-[var(--stroke--soft-200)] last:border-0 hover:bg-[var(--bg--weak-50)] transition-colors">
-    <td class="px-4 py-3 font-medium col-file"></td>
-    <td class="px-4 py-3">
-      <div
-        class="h-9 px-3 py-2 border border-[var(--stroke--sub-300)] rounded-md bg-[var(--bg--weak-50)] text-[var(--text--main-900)] text-sm w-full truncate col-mapped">
-        <!-- Mapped Value -->
-      </div>
-    </td>
-    <td class="px-4 py-3 col-type"></td>
-    <td class="px-4 py-3">
-      <span data-icon="select-box-circle-fill" data-size="20" class="text-[var(--state--success--base)]"></span>
+    <td class="px-4 py-3 text-[var(--text--sub-600)] col-tab"></td>
+    <td class="px-4 py-3 font-medium col-header"></td>
+    <td class="px-4 py-3 col-value">
+      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)] paragraph-x-small col-badge"></span>
     </td>
   </tr>
 </template>
 
 <script>
   (function () {
-    // Mock Data
-    const columns = [
-      { id: '1', fileColumn: 'Building ID', requiredHeader: 'building_identifier', type: 'Text', status: 'success' },
-      { id: '2', fileColumn: 'Address Line 1', requiredHeader: null, type: 'Text', status: 'mismatch' },
-      { id: '3', fileColumn: 'City Name', requiredHeader: null, type: 'Text', status: 'mismatch' },
-      { id: '4', fileColumn: 'Country Code', requiredHeader: 'country', type: 'Text', status: 'success' },
+    const state = window.importState || {};
+    const t1 = state.tab1 || {};
+    const t2 = state.tab2 || {};
+    const t3 = state.tab3 || {};
+
+    const rows = [
+      { tab: 'Name & Location',              header: 'Building name or Code',                           value: t1.building_name },
+      { tab: 'Name & Location',              header: 'Address',                                         value: t1.address },
+      { tab: 'Name & Location',              header: 'Country',                                         value: t1.country },
+      { tab: 'Name & Location',              header: 'Region or State',                                 value: t1.region },
+      { tab: 'Name & Location',              header: 'City',                                            value: t1.city },
+      { tab: 'Name & Location',              header: 'Longitude',                                       value: t1.longitude },
+      { tab: 'Name & Location',              header: 'Latitude',                                        value: t1.latitude },
+      { tab: 'Building Details',             header: 'Building type',                                   value: t2.building_type },
+      { tab: 'Building Details',             header: 'Area climate type',                               value: t2.climate_type },
+      { tab: 'Building Details',             header: 'Assessment period (years)',                       value: t2.assessment_period },
+      { tab: 'Building Details',             header: 'Total floor area (m²)',                           value: t2.total_floor_area },
+      { tab: 'Building Details',             header: 'Conditioned floor area (m²)',                     value: t2.conditioned_floor_area },
+      { tab: 'Building Details',             header: 'Construction year',                               value: t2.construction_year },
+      { tab: 'Building Details',             header: 'Floors below ground',                             value: t2.floors_below_ground },
+      { tab: 'Building Details',             header: 'Has certification',                               value: t2.has_certification },
+      { tab: 'Building Details',             header: 'Has BoQ / design drawings',                       value: t2.has_boq },
+      { tab: 'Operational Schedule & Temp',  header: 'Number of residents',                             value: t3.num_residents },
+      { tab: 'Operational Schedule & Temp',  header: 'Annual operating schedule (Hours/Day)',           value: t3.hours_per_workday },
+      { tab: 'Operational Schedule & Temp',  header: 'Annual operating schedule (Days/Week)',           value: t3.workdays_per_week },
+      { tab: 'Operational Schedule & Temp',  header: 'Annual operating schedule (Weeks/Year)',          value: t3.weeks_per_year },
+      { tab: 'Operational Schedule & Temp',  header: 'Room heating temperature',                        value: t3.heating_temp },
+      { tab: 'Operational Schedule & Temp',  header: 'Room heating temperature unit',                   value: t3.heating_temp_unit },
+      { tab: 'Operational Schedule & Temp',  header: 'Room cooling temperature',                        value: t3.cooling_temp },
+      { tab: 'Operational Schedule & Temp',  header: 'Room cooling temperature unit',                   value: t3.cooling_temp_unit },
+      { tab: 'Operational Schedule & Temp',  header: 'Renewable energy installation (%)',               value: t3.renewable_energy_percent },
+      { tab: 'Operational Schedule & Temp',  header: 'Building smart system installation',              value: t3.building_smart_system },
     ];
 
     const tbody = document.getElementById('map-fields-body');
-    const mismatchTemplate = document.getElementById('template-row-mismatch');
-    const successTemplate = document.getElementById('template-row-success');
-    let mismatchCount = 0;
+    const template = document.getElementById('template-row-map');
+    const templateSection = document.getElementById('template-row-map-section');
+    const templateCount = document.getElementById('template-row-map-count');
 
-    if (tbody && mismatchTemplate && successTemplate) {
-      tbody.innerHTML = ''; // clear
+    if (tbody && template) {
+      tbody.innerHTML = '';
 
-      columns.forEach(col => {
-        let clone;
-        if (col.status === 'success') {
-          clone = successTemplate.content.cloneNode(true);
-          clone.querySelector('.col-mapped').textContent = col.requiredHeader;
-        } else {
-          clone = mismatchTemplate.content.cloneNode(true);
-          const select = clone.querySelector('.col-select');
-          select.dataset.id = col.id; // Store ID for logic
-          mismatchCount++;
-        }
-
-        clone.querySelector('.col-file').textContent = col.fileColumn;
-        clone.querySelector('.col-type').textContent = col.type;
-
+      // Render tab1/2/3 rows
+      rows.forEach(row => {
+        const clone = template.content.cloneNode(true);
+        clone.querySelector('.col-tab').textContent = row.tab;
+        clone.querySelector('.col-header').textContent = row.header;
+        clone.querySelector('.col-value').textContent = row.value || '—';
         tbody.appendChild(clone);
       });
 
-      updateStatus(mismatchCount);
-      if (window.IconComponent) window.IconComponent.initialize();
-    }
+      // Helper: add section divider
+      function addSection(label) {
+        const clone = templateSection.content.cloneNode(true);
+        clone.querySelector('.col-section').textContent = label;
+        tbody.appendChild(clone);
+      }
 
-    // Handle Select Change
-    window.handleMapChange = (select) => {
-      const row = select.closest('tr');
-      const statusCell = row.querySelector('td:last-child');
+      // Helper: add a tab row with row count badge
+      function addCountRow(tabGroup, tabName, count) {
+        const clone = templateCount.content.cloneNode(true);
+        clone.querySelector('.col-tab').textContent = tabGroup;
+        clone.querySelector('.col-header').textContent = tabName;
+        clone.querySelector('.col-badge').textContent = count + (count === 1 ? ' row' : ' rows');
+        tbody.appendChild(clone);
+      }
 
-      // Show loading state
-      statusCell.innerHTML = `<span data-icon="loader-2-fill" data-size="18" class="text-[var(--icon--sub-600)] animate-spin"></span>`;
-      if (window.IconComponent) window.IconComponent.initialize();
-      select.disabled = true;
+      // Tab labels
+      const COOLING_LABELS = {
+        'window ac': 'Window AC', 'split ac': 'Split AC', 'vrf': 'VRF',
+        'packagedductab': 'Packaged / Ducted', 'water cooled': 'Water-cooled Chiller', 'air cooled': 'Air-cooled Chiller',
+      };
+      const VENT_LABELS = {
+        'ahu': 'AHU', 'fcu': 'FCU', 'ceilingwa': 'Cassette AC', 'doas': 'DOAS', 'ceilingex': 'Ceiling / Exhaust Fan',
+      };
+      const LIGHTING_LABELS = {
+        'led': 'LED', 'fluorescent': 'Fluorescent', 'cfl': 'CFL', 'incandescent': 'Incandescent', 'hid': 'HID',
+      };
+      const HWS_LABELS = {
+        'heat-pump': 'Heat Pump', 'boiler': 'Boiler', 'water-heater': 'Water Heater',
+      };
 
-      // Simulate Async Validation
-      setTimeout(() => {
-        // Replace with mapped div
-        const val = select.value;
-        const mappedDiv = document.createElement('div');
-        mappedDiv.className = 'h-9 px-3 py-2 border border-[var(--stroke--sub-300)] rounded-md bg-[var(--bg--weak-50)] text-[var(--text--main-900)] text-sm w-full truncate';
-        mappedDiv.textContent = val;
-        select.parentElement.replaceChild(mappedDiv, select);
+      // Cooling Systems
+      const cooling = state.coolingSystems || [];
+      if (cooling.length > 0) {
+        addSection('Cooling Systems');
+        cooling.forEach(s => addCountRow('Cooling Systems', COOLING_LABELS[s.tab] || s.tab, s.rows.length));
+      }
 
-        // Update Status Icon
-        statusCell.innerHTML = `<span data-icon="select-box-circle-fill" data-size="20" class="text-[var(--state--success--base)]"></span>`;
-        if (window.IconComponent) window.IconComponent.initialize();
+      // Ventilation Systems
+      const vent = state.ventilationSystems || [];
+      if (vent.length > 0) {
+        addSection('Ventilation Systems');
+        vent.forEach(s => addCountRow('Ventilation Systems', VENT_LABELS[s.tab] || s.tab, s.rows.length));
+      }
 
-        // Update Global Status
-        const countEl = document.getElementById('mismatch-count');
-        if (countEl) {
-          let count = parseInt(countEl.textContent || '0');
-          updateStatus(Math.max(0, count - 1));
-        }
+      // Lighting Systems
+      const lighting = state.lightingSystems || [];
+      if (lighting.length > 0) {
+        addSection('Lighting Systems');
+        lighting.forEach(s => addCountRow('Lighting Systems', LIGHTING_LABELS[s.tab] || s.tab, s.rows.length));
+      }
 
-      }, 1500);
-    };
+      // Lift & Escalator
+      const lift = state.liftEscalator || [];
+      if (lift.length > 0) {
+        addSection('Lift & Escalator');
+        addCountRow('Lift & Escalator', 'Lift & Escalator System', lift.length);
+      }
 
-    function updateStatus(count) {
-      const alertBox = document.getElementById('map-status-alert');
-      const countSpan = document.getElementById('mismatch-count');
+      // Hot Water Systems
+      const hws = state.hotWaterSystems || [];
+      if (hws.length > 0) {
+        addSection('Hot Water Systems');
+        hws.forEach(s => addCountRow('Hot Water Systems', HWS_LABELS[s.tab] || s.tab, s.rows.length));
+      }
 
-      if (countSpan) countSpan.textContent = count;
+      // Energy Carriers
+      const ec = state.energyCarriers || [];
+      if (ec.length > 0) {
+        addSection('Operational Energy Carriers');
+        addCountRow('Energy Carriers', 'Operational Energy Carriers', ec.length);
+      }
 
-      if (alertBox) {
-        if (count > 0) {
-          alertBox.className = 'w-full flex items-center justify-center gap-3 px-12 py-3 text-[var(--state--warning--base)] bg-[var(--state--warning--lighter)] rounded-md transition-colors';
-          alertBox.innerHTML = `
-                <span data-icon="alert-fill" data-size="20"></span>
-                <span class="label-small text-[var(--text--strong-950)]">
-                  You have <span id="mismatch-count">${count}</span> column field mismatch • 
-                  <span class="paragraph-small">Please fix this to continue</span>
-                </span>
-             `;
-        } else {
-          alertBox.className = 'w-full flex items-center justify-center gap-3 px-12 py-3 text-[var(--state--success--base)] bg-[var(--state--success--lighter)] rounded-md transition-colors';
-          alertBox.innerHTML = `
-                <span data-icon="select-box-circle-fill" data-size="20"></span>
-                <span class="label-small text-[var(--text--strong-950)]">
-                   All columns mapped successfully
-                </span>
-             `;
-        }
-        if (window.IconComponent) window.IconComponent.initialize();
+      // Structural Components
+      const sc = state.structuralComponents || [];
+      if (sc.length > 0) {
+        addSection('Structural Components');
+        addCountRow('Structural Components', 'By Component', sc.length);
       }
     }
 
+    if (window.IconComponent) window.IconComponent.initialize();
   })();
 </script>

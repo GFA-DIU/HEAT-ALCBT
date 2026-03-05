@@ -1,57 +1,257 @@
-<div class="size-full space-y-4 flex flex-col">
+<div class="size-full space-y-5 flex flex-col">
   <div class="space-y-1 shrink-0">
     <h6 class="h6-title text-[var(--text--strong-950)]">Preview & Confirm</h6>
     <p class="paragraph-small text-[var(--text--sub-600)]">
-      Map your file columns to BEAT data fields
+      Review the data that will be imported. Upload any required files below, then click Confirm & Import.
     </p>
   </div>
 
-  <div class="w-full flex-1 overflow-auto hide-scrollbar rounded-lg bg-white border border-[var(--stroke--soft-200)]">
-    <table class="table w-full relative border-collapse">
-      <thead class="bg-[var(--bg--weak-50)] sticky top-0 z-10 text-[var(--text--sub-600)] label-small">
-        <tr>
-          <th class="w-[30%] py-3 px-4 text-left font-normal border-b-0">Your file’s imported column</th>
-          <th class="w-[40%] py-3 px-4 text-left font-normal border-b-0">System required headers</th>
-          <th class="py-3 px-4 text-left font-normal border-b-0">Value</th>
-        </tr>
-      </thead>
-      <tbody id="preview-body" class="text-[var(--text--strong-950)] paragraph-small">
-        <!-- Rows injected via JS -->
-      </tbody>
-    </table>
+  <!-- Tab 1 summary -->
+  <div class="space-y-2 shrink-0">
+    <p class="label-small text-[var(--text--strong-950)]">Building Name &amp; Location</p>
+    <div class="w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
+      <table class="table w-full border-collapse">
+        <tbody id="preview-tab1" class="paragraph-small text-[var(--text--strong-950)]">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab 2 summary -->
+  <div class="space-y-2 shrink-0">
+    <p class="label-small text-[var(--text--strong-950)]">Building Details</p>
+    <div class="w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
+      <table class="table w-full border-collapse">
+        <tbody id="preview-tab2" class="paragraph-small text-[var(--text--strong-950)]">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab 3 summary -->
+  <div id="preview-tab3-section" class="space-y-2 shrink-0">
+    <p class="label-small text-[var(--text--strong-950)]">Operational Schedule &amp; Temperature</p>
+    <div class="w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
+      <table class="table w-full border-collapse">
+        <tbody id="preview-tab3" class="paragraph-small text-[var(--text--strong-950)]">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- System tabs — injected by JS -->
+  <div id="preview-systems-container" class="space-y-3 shrink-0"></div>
+
+  <!-- Certification file upload — shown when has_certification = Yes -->
+  <div id="cert-upload-section" class="hidden flex-col gap-2 shrink-0">
+    <p class="label-small text-[var(--text--strong-950)]">
+      Certification file
+      <span class="text-[var(--state--error--base)] ml-0.5">*</span>
+    </p>
+    <p class="paragraph-x-small text-[var(--text--sub-600)]">
+      Your template indicates this building has a certification. Please upload the certificate.
+      Accepted: JPG, PNG, GIF, WEBP, PDF &mdash; max 20&thinsp;MB.
+    </p>
+    <input
+      type="file"
+      id="import-cert-file"
+      accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
+      class="file-input file-input-bordered file-input-sm w-full max-w-sm"
+    />
+  </div>
+
+  <!-- BoQ files upload — shown when has_boq = Yes -->
+  <div id="boq-upload-section" class="hidden flex-col gap-2 shrink-0">
+    <p class="label-small text-[var(--text--strong-950)]">
+      Bill of Quantities &amp; design drawings
+      <span class="text-[var(--state--error--base)] ml-0.5">*</span>
+    </p>
+    <p class="paragraph-x-small text-[var(--text--sub-600)]">
+      Your template indicates this building has BoQ / design drawing files. Please upload one or more files.
+      Accepted: JPG, PNG, GIF, WEBP, PDF &mdash; max 20&thinsp;MB each.
+    </p>
+    <input
+      type="file"
+      id="import-boq-files"
+      accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
+      multiple
+      class="file-input file-input-bordered file-input-sm w-full max-w-sm"
+    />
   </div>
 </div>
 
-<template id="template-row-preview">
-  <tr class="border-b border-[var(--stroke--soft-200)] last:border-0 hover:bg-[var(--bg--weak-50)] transition-colors">
-    <td class="px-4 py-3 font-medium col-file"></td>
-    <td class="px-4 py-3 col-header"></td>
-    <td class="px-4 py-3 col-value"></td>
-  </tr>
-</template>
-
 <script>
   (function () {
-    // Mock Data (consistent with map-fields)
-    const columns = [
-      { id: '1', fileColumn: 'Building ID', requiredHeader: 'building_identifier', sampleValue: 'BLD-1001' },
-      { id: '2', fileColumn: 'Address Line 1', requiredHeader: 'building_address', sampleValue: '123 Innovation Dr' },
-      { id: '3', fileColumn: 'City Name', requiredHeader: 'building_city', sampleValue: 'San Francisco' },
-      { id: '4', fileColumn: 'Country Code', requiredHeader: 'country', sampleValue: 'USA' },
-    ];
+    const state = window.importState || {};
+    const t1 = state.tab1 || {};
+    const t2 = state.tab2 || {};
+    const t3 = state.tab3 || {};
 
-    const tbody = document.getElementById('preview-body');
-    const template = document.getElementById('template-row-preview');
+    function renderTable(tbodyId, rows) {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      tbody.innerHTML = rows.map(([label, value]) => `
+        <tr class="border-b border-[var(--stroke--soft-200)] last:border-0">
+          <td class="px-4 py-2.5 w-1/2 text-[var(--text--sub-600)]">${label}</td>
+          <td class="px-4 py-2.5 font-medium">${value || '—'}</td>
+        </tr>
+      `).join('');
+    }
 
-    if (tbody && template) {
-      tbody.innerHTML = '';
-      columns.forEach(col => {
-        const clone = template.content.cloneNode(true);
-        clone.querySelector('.col-file').textContent = col.fileColumn;
-        clone.querySelector('.col-header').textContent = col.requiredHeader || '--';
-        clone.querySelector('.col-value').textContent = col.sampleValue || '--';
-        tbody.appendChild(clone);
+    renderTable('preview-tab1', [
+      ['Building name',  t1.building_name],
+      ['Address',        t1.address],
+      ['Country',        t1.country],
+      ['Region',         t1.region],
+      ['City',           t1.city],
+      ['Longitude',      t1.longitude],
+      ['Latitude',       t1.latitude],
+    ]);
+
+    renderTable('preview-tab2', [
+      ['Building type',             t2.building_type],
+      ['Climate type',              t2.climate_type],
+      ['Assessment period (years)', t2.assessment_period],
+      ['Total floor area (m²)',     t2.total_floor_area],
+      ['Conditioned floor area (m²)', t2.conditioned_floor_area],
+      ['Construction year',         t2.construction_year],
+      ['Floors below ground',       t2.floors_below_ground],
+      ['Has certification',         t2.has_certification],
+      ['Has BoQ / design drawings', t2.has_boq],
+    ]);
+
+    renderTable('preview-tab3', [
+      ['Number of residents',                 t3.num_residents],
+      ['Hours per day',                       t3.hours_per_workday],
+      ['Days per week',                       t3.workdays_per_week],
+      ['Weeks per year',                      t3.weeks_per_year],
+      ['Room heating temperature',            t3.heating_temp],
+      ['Heating temperature unit',            t3.heating_temp_unit],
+      ['Room cooling temperature',            t3.cooling_temp],
+      ['Cooling temperature unit',            t3.cooling_temp_unit],
+      ['Renewable energy installation (%)',   t3.renewable_energy_percent],
+      ['Building smart system installation',  t3.building_smart_system],
+    ]);
+
+    // Hide Tab 3 section if no data was parsed
+    if (!state.tab3) {
+      const tab3Section = document.getElementById('preview-tab3-section');
+      if (tab3Section) tab3Section.classList.add('hidden');
+    }
+
+    // -----------------------------------------------------------------------
+    // System tabs — collapsible sections
+    // -----------------------------------------------------------------------
+    const container = document.getElementById('preview-systems-container');
+
+    function makeCollapsible(title, rowCount, tableHtml, rawTable) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'space-y-2 shrink-0';
+      const tableContent = rawTable
+        ? `<table class="table w-full border-collapse paragraph-small text-[var(--text--strong-950)] whitespace-nowrap">${tableHtml}</table>`
+        : `<table class="table w-full border-collapse paragraph-small text-[var(--text--strong-950)] whitespace-nowrap"><tbody>${tableHtml}</tbody></table>`;
+      wrapper.innerHTML = `
+        <div class="collapse rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
+          <input type="checkbox" class="peer" />
+          <div class="group collapse-title py-2.5 px-4 bg-[var(--bg--weak-50)] flex items-center justify-between">
+            <span class="label-small text-[var(--text--strong-950)]">${title}</span>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[var(--bg--soft-200)] paragraph-x-small text-[var(--text--sub-600)]">${rowCount} ${rowCount === 1 ? 'row' : 'rows'}</span>
+              <span data-icon="caret-down" data-size="16" class="transition-transform duration-300 ease-in-out peer-checked:rotate-180"></span>
+            </div>
+          </div>
+          <div class="collapse-content px-0 mt-0 overflow-x-auto">
+            ${tableContent}
+          </div>
+        </div>
+      `;
+      return wrapper;
+    }
+
+    function rowsToTableHtml(rows) {
+      return rows.map((row) => {
+        const cells = row.map(c => `<td class="px-4 py-2 text-[var(--text--sub-600)]">${c !== null && c !== '' ? c : '—'}</td>`).join('');
+        return `<tr class="border-b border-[var(--stroke--soft-200)] last:border-0">${cells}</tr>`;
+      }).join('');
+    }
+
+    function structuralRowsToTableHtml(rows) {
+      const headers = ['Component', 'Technique', 'Dimension', 'Qty', 'Unit', 'EPD Name', 'Country', 'EPD Qty', 'EPD Unit'];
+      const thead = `<thead class="bg-[var(--bg--weak-50)]"><tr>${headers.map(h => `<th class="px-4 py-2 text-left font-normal paragraph-x-small text-[var(--text--sub-600)]">${h}</th>`).join('')}</tr></thead>`;
+      const tbody = rows.map(row => {
+        const c = (i) => { const v = row[i]; return (v !== null && v !== undefined && v !== '') ? v : '—'; };
+        // cols: 1=component, 2=technique, 3=dimension, 4=qty, 5=unit, 8=epd name, 9=country, 10=epd qty, 11=epd unit
+        const cells = [c(1), c(2), c(3), c(4), c(5), c(8), c(9), c(10), c(11)]
+          .map(v => `<td class="px-4 py-2 text-[var(--text--sub-600)]">${v}</td>`).join('');
+        return `<tr class="border-b border-[var(--stroke--soft-200)] last:border-0">${cells}</tr>`;
+      }).join('');
+      return `${thead}<tbody>${tbody}</tbody>`;
+    }
+
+    const COOLING_LABELS = {
+      'window ac': 'Cooling — Window AC', 'split ac': 'Cooling — Split AC', 'vrf': 'Cooling — VRF',
+      'packagedductab': 'Cooling — Packaged / Ducted', 'water cooled': 'Cooling — Water-cooled Chiller', 'air cooled': 'Cooling — Air-cooled Chiller',
+    };
+    const VENT_LABELS = {
+      'ahu': 'Ventilation — AHU', 'fcu': 'Ventilation — FCU', 'ceilingwa': 'Ventilation — Cassette AC',
+      'doas': 'Ventilation — DOAS', 'ceilingex': 'Ventilation — Ceiling / Exhaust Fan',
+    };
+    const LIGHTING_LABELS = {
+      'led': 'Lighting — LED', 'fluorescent': 'Lighting — Fluorescent', 'cfl': 'Lighting — CFL',
+      'incandescent': 'Lighting — Incandescent', 'hid': 'Lighting — HID',
+    };
+    const HWS_LABELS = {
+      'heat-pump': 'Hot Water — Heat Pump', 'boiler': 'Hot Water — Boiler', 'water-heater': 'Hot Water — Water Heater',
+    };
+
+    function renderSystemTabs(systems, labelMap) {
+      (systems || []).forEach(s => {
+        if (!s.rows || s.rows.length === 0) return;
+        const label = labelMap[s.tab] || s.tab;
+        container.appendChild(makeCollapsible(label, s.rows.length, rowsToTableHtml(s.rows)));
       });
+    }
+
+    renderSystemTabs(state.coolingSystems, COOLING_LABELS);
+    renderSystemTabs(state.ventilationSystems, VENT_LABELS);
+    renderSystemTabs(state.lightingSystems, LIGHTING_LABELS);
+
+    // Lift & Escalator (flat array)
+    const lift = state.liftEscalator || [];
+    if (lift.length > 0) {
+      container.appendChild(makeCollapsible('Lift & Escalator System', lift.length, rowsToTableHtml(lift)));
+    }
+
+    renderSystemTabs(state.hotWaterSystems, HWS_LABELS);
+
+    // Energy Carriers (flat array)
+    const ec = state.energyCarriers || [];
+    if (ec.length > 0) {
+      container.appendChild(makeCollapsible('Operational Energy Carriers', ec.length, rowsToTableHtml(ec)));
+    }
+
+    // Structural Components (flat array)
+    const sc = state.structuralComponents || [];
+    if (sc.length > 0) {
+      container.appendChild(makeCollapsible('Structural Components', sc.length, structuralRowsToTableHtml(sc), true));
+    }
+
+    if (window.IconComponent) window.IconComponent.initialize();
+
+    // Show file upload sections based on template flags
+    const hasCert = (t2.has_certification || '').toLowerCase() === 'yes';
+    const hasBoq  = (t2.has_boq || '').toLowerCase() === 'yes';
+
+    const certSection = document.getElementById('cert-upload-section');
+    if (hasCert && certSection) {
+      certSection.classList.remove('hidden');
+      certSection.classList.add('flex');
+    }
+
+    const boqSection = document.getElementById('boq-upload-section');
+    if (hasBoq && boqSection) {
+      boqSection.classList.remove('hidden');
+      boqSection.classList.add('flex');
     }
   })();
 </script>
