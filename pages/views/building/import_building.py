@@ -6,6 +6,7 @@ from decimal import Decimal, InvalidOperation
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.templatetags.static import static
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import CustomCity, CustomRegion
@@ -2506,6 +2507,15 @@ def cancel_import(request):
     try:
         uuid_obj = uuid_lib.UUID(building_uuid_str)
         building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+
+        # Delete certification file from storage
+        if building.certification_file:
+            building.certification_file.delete(save=False)
+
+        # Delete all BoQ files from storage
+        for boq in building.boq_files.all():
+            boq.file.delete(save=False)
+
         building.delete()
         logger.info(f"Import cancelled: building {building_uuid_str} deleted by {request.user}")
     except (ValueError, Building.DoesNotExist):
@@ -2528,7 +2538,13 @@ def view_initial_import_dialog(request):
 
 def view_import_building_step(request, step_id):
     logger.debug(f"Received request for import building step: {step_id}")
-    return render(request, f"pages/home/import-dialog/{step_id}.html")
+    context = {}
+    if step_id == "step-upload":
+        try:
+            context["import_template_url"] = static("docs/import-template.xlsx")
+        except Exception:
+            context["import_template_url"] = None
+    return render(request, f"pages/home/import-dialog/{step_id}.html", context)
 
 
 # ---------------------------------------------------------------------------
