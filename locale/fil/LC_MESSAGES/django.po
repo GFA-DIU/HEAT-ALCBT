@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-05 20:03+0200\n"
+"POT-Creation-Date: 2026-03-05 21:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -313,6 +313,9 @@ msgstr ""
 #: .\pages\models\building.py:383 .\pages\models\building.py:406
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:167
 #: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:35
+#: .\templates\pages\assembly\selected_epd.html:53
+#: .\templates\pages\building\operational_info\selected_operational_product.html:24
+#: .\templates\pages\building\operational_info\selected_operational_product.html:30
 msgid "Quantity"
 msgstr ""
 
@@ -1398,8 +1401,9 @@ msgstr ""
 msgid "Dashboard"
 msgstr ""
 
-#: .\templates\_base.html:88 .\templates\pages\home\resources.html:20
-#: .\templates\pages\resources.html:13 .\templates\pages\resources.html:15
+#: .\templates\_base.html:88 .\templates\pages\home\datasets.html:13
+#: .\templates\pages\home\resources.html:20 .\templates\pages\resources.html:13
+#: .\templates\pages\resources.html:15
 msgid "Resources"
 msgstr ""
 
@@ -1482,6 +1486,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:100
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:44
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:60
+#: .\templates\pages\building\operational_info\operational_products.html:28
 #: .\templates\pages\home\templates.html:245
 #: .\templates\pages\profile\profile.html:228
 msgid "Cancel"
@@ -2429,6 +2434,10 @@ msgstr ""
 msgid "Back to top"
 msgstr ""
 
+#: .\templates\components\toasts\_error.html:7
+msgid "An account already exist with a similar email."
+msgstr ""
+
 #: .\templates\footer.html:16
 msgid "Copyright"
 msgstr ""
@@ -2463,6 +2472,7 @@ msgid "steps"
 msgstr ""
 
 #: .\templates\pages\add-building\add-building.html:73
+#: .\templates\pages\home\import-dialog\step-preview.html:12
 msgid "Building Name & Location"
 msgstr ""
 
@@ -2838,7 +2848,15 @@ msgstr ""
 #: .\templates\pages\add-building\components\building-structural-components\_selected_material.html:31
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:280
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:518
+#: .\templates\pages\assembly\selected_epd.html:22
 msgid "Category"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-structural-components\_selected_material.html:40
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:517
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:981
+#: .\templates\pages\home\import-dialog\step-preview.html:190
+msgid "Qty"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:10
@@ -2900,6 +2918,8 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:94
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:197
+#: .\templates\pages\assembly\assembly.html:70
+#: .\templates\pages\assembly\boq.html:43
 #: .\templates\pages\home\templates.html:236
 msgid "Add from EPD library"
 msgstr ""
@@ -2927,6 +2947,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:66
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:85
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:45
+#: .\templates\pages\building\operational_info\operational_products.html:29
 msgid "Save"
 msgstr ""
 
@@ -3097,6 +3118,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:82
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:101
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:61
+#: .\templates\pages\assembly\selected_epd.html:94
 msgid "Remove"
 msgstr ""
 
@@ -3155,12 +3177,6 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:514
 msgid "Edit Component"
-msgstr ""
-
-#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:517
-#: .\templates\pages\add-building\components\operational-details\cooling-system.html:981
-#: .\templates\pages\home\import-dialog\step-preview.html:190
-msgid "Qty"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:519
@@ -3238,6 +3254,7 @@ msgid "You need to add at least one energy carrier to continue"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:29
+#: .\templates\pages\building\operational_info\operational_products.html:9
 msgid "Add energy carrier"
 msgstr ""
 
@@ -3668,12 +3685,20 @@ msgstr ""
 msgid "SPLIT AIR CONDITIONER DATA"
 msgstr ""
 
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:251
+msgid "Typical: 1.5 – 5 kg/unit"
+msgstr ""
+
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:254
 msgid "Tip: typical = Capacity (Tons) × 1.0 kg"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:369
 msgid "VARIABLE REFRIGERANT FLOW (VRF) SYSTEM DATA"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:394
+msgid "Typical: 30 – 200 kg"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:417
@@ -3696,12 +3721,20 @@ msgstr ""
 msgid "Select sub-type"
 msgstr ""
 
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:547
+msgid "Typical: 5 – 100 kg"
+msgstr ""
+
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:616
 msgid "From BEE/EGAT/SNI label. Typical EER: 2.5 – 4.0. Cannot be zero."
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:664
 msgid "WATER COOLED CHILLER DATA"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:690
+msgid "Typical: 200 – 2,000 kg"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:697
@@ -3740,6 +3773,10 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:822
 msgid "AIR COOLED CHILLER DATA"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:848
+msgid "Typical: 50 – 500 kg"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:978
@@ -4303,6 +4340,11 @@ msgstr ""
 msgid "Fresh air ratio"
 msgstr ""
 
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:352
+#, python-format
+msgid "Typical: 10 – 30%%"
+msgstr ""
+
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:424
 msgid "CEILING / EXHAUST / WALL FAN DATA"
 msgstr ""
@@ -4319,11 +4361,30 @@ msgstr ""
 msgid "Airflow"
 msgstr ""
 
+#: .\templates\pages\assembly\assembly.html:68
+#: .\templates\pages\building\building.html:140
+#: .\templates\pages\building\building.html:307
+#: .\templates\pages\building\building.html:354
+msgid "Materials"
+msgstr ""
+
+#: .\templates\pages\assembly\assembly.html:78
+#: .\templates\pages\assembly\boq.html:51
+msgid "Please select at least one EPD"
+msgstr ""
+
+#: .\templates\pages\assembly\boq.html:6
 #: .\templates\pages\building\building.html:5
 msgid "Building View"
 msgstr ""
 
+#: .\templates\pages\assembly\selected_epd.html:15
+#: .\templates\pages\building\operational_info\selected_operational_product.html:15
+msgid "Add description ..."
+msgstr ""
+
 #: .\templates\pages\building\building.html:59
+#: .\templates\pages\building\operational_info\operational_products.html:37
 msgid "Edit"
 msgstr ""
 
@@ -4353,12 +4414,6 @@ msgstr ""
 #: .\templates\pages\building\building.html:306
 #: .\templates\pages\building\building.html:354
 msgid "Assembly"
-msgstr ""
-
-#: .\templates\pages\building\building.html:140
-#: .\templates\pages\building\building.html:307
-#: .\templates\pages\building\building.html:354
-msgid "Materials"
 msgstr ""
 
 #: .\templates\pages\building\building.html:146
@@ -4407,12 +4462,247 @@ msgstr ""
 msgid "Delete Building?"
 msgstr ""
 
-#: .\templates\pages\building\savings_tab.html:315
+#: .\templates\pages\building\operational_info\operational_products.html:18
+msgid "Please select at least one energy carrier"
+msgstr ""
+
+#: .\templates\pages\building\operational_info\operational_products.html:47
+msgid "Energy Carrier Emission factor"
+msgstr ""
+
+#: .\templates\pages\building\operational_info\selected_operational_product.html:66
+#: .\templates\pages\home\templates.html:169
+msgid "Delete"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:7
+msgid "Project Performance Benchmark"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:9
+#, python-format
+msgid ""
+"Your project is performing better than <span class=\"font-bold underline "
+"cursor-pointer decoration-dotted\">78%%</span> of peer projects in Germany."
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:10
+#, python-format
+msgid "Top 25%% tier"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:30
+msgid "Best Practice"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:38
+msgid "Your Building"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:55
+msgid "National Avg"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:64
+msgid ""
+"Benchmark based on 452 residential projects in Baden-Württemberg region "
+"(2024-2025)."
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:77
+msgid "Embodied Carbon Savings"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:82
+msgid "Operational Carbon Savings"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:95
+msgid "Carbon Reduction"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:99
+msgid "Material focus"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:107
+msgid "Reduction"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:122
+#: .\templates\pages\building\savings_tab.html:187
+#: .\templates\pages\building\savings_tab.html:311
 msgid "Baseline"
 msgstr ""
 
-#: .\templates\pages\building\savings_tab.html:316
+#: .\templates\pages\building\savings_tab.html:129
+#: .\templates\pages\building\savings_tab.html:312
 msgid "Optimized"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:138
+msgid "Savings by Category"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:180
+msgid "Optimization Strategies"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:191
+msgid "Potential savings"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:223
+#: .\templates\pages\building\savings_tab.html:252
+#: .\templates\pages\building\savings_tab.html:282
+#: .\templates\pages\home\partials\templates_list.html:74
+msgid "View details"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:293
+msgid "Material Insight"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:295
+msgid ""
+"Replacing standard cement with supplementary cementitious materials (SCMs) "
+"is often the most cost-effective reduction strategy."
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:298
+msgid "Read LCA Guidelines"
+msgstr ""
+
+#: .\templates\pages\building\structural_info\structural_info.html:5
+msgid ""
+"*If the data is available in the form of total quantity used per material, "
+"please select “Add from BoQ”. If material quantities are available per "
+"structural components (foundation, bottom floor, roof,.. etc.) use “Add "
+"component”. (For more detail please refer to BEAT handbook)"
+msgstr ""
+
+#: .\templates\pages\building\structural_info\structural_info.html:11
+msgid "Add from BoQ"
+msgstr ""
+
+#: .\templates\pages\building\structural_info\structural_info.html:19
+msgid "Add component"
+msgstr ""
+
+#: .\templates\pages\building\structural_info\structural_info.html:21
+msgid "Please save the building before adding any components"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:10
+#: .\templates\pages\home\resources.html:10 .\templates\pages\resources.html:10
+msgid "Resource page"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:15
+msgid ""
+"Welcome to the <span class=\"fw-bold\">Resources</span> section of the <span "
+"class=\"fw-bolder\" style=\"color:#F26716\">BEAT</span>. Here you'll find "
+"key materials to help you understand, navigate, and maximise the use of the "
+"Building Emissions Assessment Tool."
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:22
+#: .\templates\pages\home\resources.html:31 .\templates\pages\resources.html:22
+msgid "Introduction video"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:24
+msgid ""
+"Watch our short video to get a quick overview of <span class=\"fw-bolder\" "
+"style=\"color:#F26716\">BEAT</span> — what it does, how it works, and how it "
+"can support your low-carbon building strategies."
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:41
+#: .\templates\pages\home\resources.html:53 .\templates\pages\resources.html:41
+msgid "This content requires media cookies to be enabled for embedded videos."
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:43
+#: .\templates\pages\home\resources.html:60 .\templates\pages\resources.html:43
+msgid "Manage Cookie Settings"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:57
+#: .\templates\pages\home\resources.html:72 .\templates\pages\resources.html:57
+msgid "User Handbook"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:59
+msgid ""
+"Download the official <span class=\"fw-bolder\">BEAT</span> Handbook (Part "
+"1) for a detailed, step-by-step guide on using the tool effectively. The "
+"handbook covers:"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:63
+#: .\templates\pages\home\resources.html:77 .\templates\pages\resources.html:63
+msgid "Key functionalities and workflow"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:64
+#: .\templates\pages\home\resources.html:78 .\templates\pages\resources.html:64
+msgid "Data input requirements"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:65
+#: .\templates\pages\home\resources.html:79 .\templates\pages\resources.html:65
+msgid "Methodology"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:67
+#: .\templates\pages\home\resources.html:82 .\templates\pages\resources.html:67
+msgid "For guidance, please refer to the BEAT"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:68
+#: .\templates\pages\home\resources.html:83 .\templates\pages\resources.html:68
+msgid "user documentation"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:74
+msgid "The <span style=\"color:#F26716\">BEAT</span> Community"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:76
+#: .\templates\pages\home\resources.html:95 .\templates\pages\resources.html:76
+msgid ""
+"Join a growing community of policymakers, planners, and practitioners "
+"working to reduce building emissions. Together, we will work on advancing "
+"practical, data-driven solutions for a low-carbon future."
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:79
+#: .\templates\pages\home\resources.html:100
+#: .\templates\pages\resources.html:79
+msgid "Host"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:92
+#: .\templates\pages\home\resources.html:113
+#: .\templates\pages\resources.html:92
+msgid "Lead partners"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:109
+#: .\templates\pages\home\resources.html:130
+#: .\templates\pages\resources.html:109
+msgid "Development partners"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:128
+msgid "Interested in contributing or partnering? We’d love to"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:129
+#: .\templates\pages\home\resources.html:151
+#: .\templates\pages\resources.html:129
+msgid "hear from you"
 msgstr ""
 
 #: .\templates\pages\home\home.html:26
@@ -4478,6 +4768,7 @@ msgid "Map Fields"
 msgstr ""
 
 #: .\templates\pages\home\import-dialog\import-dialog.html:47
+#: .\templates\pages\home\import-dialog\step-preview.html:4
 msgid "Preview & Confirm"
 msgstr ""
 
@@ -4513,6 +4804,55 @@ msgstr ""
 msgid "Import failed. Please check your data and try again."
 msgstr ""
 
+#: .\templates\pages\home\import-dialog\step-building-details.html:4
+#: .\templates\pages\home\import-dialog\step-map-fields.html:64
+#: .\templates\pages\home\import-dialog\step-preview.html:23
+msgid "Building Details"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:6
+msgid ""
+"Review the data read from your file. Upload certification and/or BoQ files "
+"if required."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:15
+msgid "Field"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:16
+msgid "Value from file"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:28
+#: .\templates\pages\home\import-dialog\step-preview.html:49
+msgid "Certification file"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:32
+msgid ""
+"Your template indicates this building has a certification. Please upload the "
+"certificate file."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:33
+msgid "Accepted formats: JPG, PNG, GIF, WEBP, PDF — max 20 MB."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:46
+msgid "Bill of Quantities (BoQ) files"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:50
+msgid ""
+"Your template indicates this building has BoQ files. Please upload one or "
+"more files."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:51
+msgid "Accepted formats: JPG, PNG, GIF, WEBP, PDF — max 20 MB each."
+msgstr ""
+
 #: .\templates\pages\home\import-dialog\step-building-details.html:69
 #: .\templates\pages\home\import-dialog\step-preview.html:122
 msgid "Climate type"
@@ -4540,12 +4880,34 @@ msgstr ""
 msgid "Has BoQ"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\step-map-fields.html:63
-msgid "Name & Location"
+#: .\templates\pages\home\import-dialog\step-map-fields.html:4
+msgid "Map Your Columns"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\step-map-fields.html:64
-msgid "Building Details"
+#: .\templates\pages\home\import-dialog\step-map-fields.html:6
+msgid ""
+"Review the column mapping detected from your file. All columns matched "
+"automatically."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:15
+msgid "All columns mapped automatically from the template"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:24
+msgid "Tab"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:25
+msgid "Excel column header"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:26
+msgid "Value"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:63
+msgid "Name & Location"
 msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-map-fields.html:65
@@ -4625,6 +4987,40 @@ msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-map-fields.html:108
 msgid "Room cooling temperature unit"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:6
+msgid ""
+"Review the data that will be imported. Upload any required files below, then "
+"click Confirm & Import."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:34
+msgid "Operational Schedule & Temperature"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:53
+msgid ""
+"Your template indicates this building has a certification. Please upload the "
+"certificate."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:54
+msgid "Accepted: JPG, PNG, GIF, WEBP, PDF — max 20 MB."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:67
+msgid "Bill of Quantities & design drawings"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:71
+msgid ""
+"Your template indicates this building has BoQ / design drawing files. Please "
+"upload one or more files."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:72
+msgid "Accepted: JPG, PNG, GIF, WEBP, PDF — max 20 MB each."
 msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-preview.html:111
@@ -4755,8 +5151,106 @@ msgstr ""
 msgid "Hot Water — Water Heater"
 msgstr ""
 
+#: .\templates\pages\home\import-dialog\step-process.html:8
+msgid "Importing data"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-process.html:15
+msgid "Please wait while we process your file. Do not close this window"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-process.html:27
+msgid "Import complete!"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-process.html:30
+msgid "Building have been successfully added to your database"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-process.html:36
+msgid "Go to buildings"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:4
+msgid "Upload Your Data File"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:6
+msgid "Supported format: Excel (.xlsx, .xls)"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:16
+msgid "Need a template?"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:18
+msgid "Download sample template"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:34
+msgid "Choose a file or drag & drop it here."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:36
+msgid "Excel (.xlsx, .xls) up to 50 MB."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:42
+msgid "Browse file"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:61
+msgid "Ready"
+msgstr ""
+
 #: .\templates\pages\home\import-dialog\step-upload.html:76
 msgid "Only Excel files (.xlsx, .xls) are supported."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:8
+msgid "Validating data"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:13
+msgid "Checking row <span id=\"validate-row-count\">0</span> of 5000..."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:18
+msgid ""
+"We are checking your file for duplicates, formatting errors and missing "
+"fields, this will take some few minutes"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:25
+msgid "Data Validation results"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:27
+msgid "Review the analysis of your data before proceeding to preview."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:39
+msgid "Validation successful"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:41
+msgid "Your CSV file has been validated successfully. Below is the summary"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:48
+msgid "Total records"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:52
+msgid "Valid records"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:56
+msgid "Warnings"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:60
+msgid "Errors"
 msgstr ""
 
 #: .\templates\pages\home\partials\buildings_list.html:51
@@ -4787,12 +5281,12 @@ msgstr ""
 msgid "You have no buildings added"
 msgstr ""
 
-#: .\templates\pages\home\partials\templates_list.html:59
-msgid "System component"
+#: .\templates\pages\home\partials\epd_components_list.html:28
+msgid "No EPDs found matching your search criteria"
 msgstr ""
 
-#: .\templates\pages\home\partials\templates_list.html:74
-msgid "View details"
+#: .\templates\pages\home\partials\templates_list.html:59
+msgid "System component"
 msgstr ""
 
 #: .\templates\pages\home\partials\templates_list.html:85
@@ -4807,16 +5301,8 @@ msgstr ""
 msgid "No templates available"
 msgstr ""
 
-#: .\templates\pages\home\resources.html:10 .\templates\pages\resources.html:10
-msgid "Resource page"
-msgstr ""
-
 #: .\templates\pages\home\resources.html:22
 msgid "Manage your resources to access for low carbon"
-msgstr ""
-
-#: .\templates\pages\home\resources.html:31 .\templates\pages\resources.html:22
-msgid "Introduction video"
 msgstr ""
 
 #: .\templates\pages\home\resources.html:33 .\templates\pages\resources.html:24
@@ -4833,18 +5319,6 @@ msgstr ""
 msgid "YouTube video player"
 msgstr ""
 
-#: .\templates\pages\home\resources.html:53 .\templates\pages\resources.html:41
-msgid "This content requires media cookies to be enabled for embedded videos."
-msgstr ""
-
-#: .\templates\pages\home\resources.html:60 .\templates\pages\resources.html:43
-msgid "Manage Cookie Settings"
-msgstr ""
-
-#: .\templates\pages\home\resources.html:72 .\templates\pages\resources.html:57
-msgid "User Handbook"
-msgstr ""
-
 #: .\templates\pages\home\resources.html:74 .\templates\pages\resources.html:59
 msgid "Download the official"
 msgstr ""
@@ -4855,26 +5329,6 @@ msgid ""
 "effectively. The handbook covers:"
 msgstr ""
 
-#: .\templates\pages\home\resources.html:77 .\templates\pages\resources.html:63
-msgid "Key functionalities and workflow"
-msgstr ""
-
-#: .\templates\pages\home\resources.html:78 .\templates\pages\resources.html:64
-msgid "Data input requirements"
-msgstr ""
-
-#: .\templates\pages\home\resources.html:79 .\templates\pages\resources.html:65
-msgid "Methodology"
-msgstr ""
-
-#: .\templates\pages\home\resources.html:82 .\templates\pages\resources.html:67
-msgid "For guidance, please refer to the BEAT"
-msgstr ""
-
-#: .\templates\pages\home\resources.html:83 .\templates\pages\resources.html:68
-msgid "user documentation"
-msgstr ""
-
 #: .\templates\pages\home\resources.html:92 .\templates\pages\resources.html:74
 msgid "The"
 msgstr ""
@@ -4883,34 +5337,12 @@ msgstr ""
 msgid "Community"
 msgstr ""
 
-#: .\templates\pages\home\resources.html:95 .\templates\pages\resources.html:76
-msgid ""
-"Join a growing community of policymakers, planners, and practitioners "
-"working to reduce building emissions. Together, we will work on advancing "
-"practical, data-driven solutions for a low-carbon future."
-msgstr ""
-
-#: .\templates\pages\home\resources.html:100
-#: .\templates\pages\resources.html:79
-msgid "Host"
-msgstr ""
-
 #: .\templates\pages\home\resources.html:105
 msgid "Host logo"
 msgstr ""
 
-#: .\templates\pages\home\resources.html:113
-#: .\templates\pages\resources.html:92
-msgid "Lead partners"
-msgstr ""
-
 #: .\templates\pages\home\resources.html:120
 msgid "Lead partner logo"
-msgstr ""
-
-#: .\templates\pages\home\resources.html:130
-#: .\templates\pages\resources.html:109
-msgid "Development partners"
 msgstr ""
 
 #: .\templates\pages\home\resources.html:137
@@ -4920,11 +5352,6 @@ msgstr ""
 #: .\templates\pages\home\resources.html:150
 #: .\templates\pages\resources.html:128
 msgid "Interested in contributing or partnering? We'd love to"
-msgstr ""
-
-#: .\templates\pages\home\resources.html:151
-#: .\templates\pages\resources.html:129
-msgid "hear from you"
 msgstr ""
 
 #: .\templates\pages\home\templates.html:5
@@ -4956,10 +5383,6 @@ msgstr ""
 #: .\templates\pages\home\templates.html:165
 #: .\templates\pages\home\templates.html:387
 msgid "Loading..."
-msgstr ""
-
-#: .\templates\pages\home\templates.html:169
-msgid "Delete"
 msgstr ""
 
 #: .\templates\pages\home\templates.html:186
@@ -5033,6 +5456,30 @@ msgstr ""
 
 #: .\templates\pages\home\templates.html:397
 msgid "Create a copy of this template?"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:398
+msgid "Error"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:399
+msgid "Failed to load template"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:400
+msgid "Update failed"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:401
+msgid "Duplication failed"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:402
+msgid "Deletion failed"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:403
+msgid "An error occurred"
 msgstr ""
 
 #: .\templates\pages\profile\profile.html:16

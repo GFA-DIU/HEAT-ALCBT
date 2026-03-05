@@ -1,4 +1,4 @@
-{% load custom_filters %}
+{% load custom_filters i18n %}
 <li class="d-flex align-items-center list-group-item" 
 id="epd-{{epd.id}}-{{epd.timestamp}}" 
 data-id="{{ epd.id }}">
@@ -12,7 +12,7 @@ data-id="{{ epd.id }}">
                     name="material_{{ epd.id }}_description_{{epd.timestamp}}"
                     class="form-control form-control-sm"
                     rows="2"
-                    placeholder="Add description ..."
+                    placeholder="{% translate 'Add description ...' %}"
                     maxlength="255">{% if epd.description%}{{epd.description}}{% endif %}</textarea>
         {% endif %}
         <span class="text-muted ms-1 me-3">
@@ -21,13 +21,13 @@ data-id="{{ epd.id }}">
     </div>
     <div class="col-3 container" >
         {% if edit_mode is True %}
-            <label for="material_{{ epd.id }}_quantity_{{epd.timestamp}}" class="text-muted">Quantity</label>
+            <label for="material_{{ epd.id }}_quantity_{{epd.timestamp}}" class="text-muted">{% translate "Quantity" %}</label>
             <div class="input-group input-group-sm">
                 <input type="number" 
                         id="material_{{ epd.id }}_quantity_{{epd.timestamp}}"  
                         name="material_{{ epd.id }}_quantity_{{epd.timestamp}}" 
                         class="form-control w-auto"
-                        placeholder="Quantity"
+                        placeholder="{% translate 'Quantity' %}"
                         min="{{ epd.selection_unit | get_step }}"
                         {% if epd.selection_unit == "percent" %} max="100" {% endif %}
                         step="{{ epd.selection_unit | get_step }}"
@@ -63,7 +63,7 @@ data-id="{{ epd.id }}">
                 {% else %} hx-delete="{% url 'building' building_id=building_id %}?op_product_id={{ epd.product_id }}" {% endif %}
                 hx-target="#epd-{{epd.id}}-{{epd.timestamp}}" 
                 hx-swap="outerHTML">
-                Delete
+                {% translate "Delete" %}
             </button>
         {% endif %}
     </div>

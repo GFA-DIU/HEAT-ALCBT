@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-05 20:03+0200\n"
+"POT-Creation-Date: 2026-03-05 21:05+0200\n"
 "PO-Revision-Date: 2025-07-03 16:28+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Vietnamese <vi@li.org>\n"
@@ -329,6 +329,9 @@ msgstr "Số năm sử dụng tòa nhà"
 #: .\pages\models\building.py:383 .\pages\models\building.py:406
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:167
 #: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:35
+#: .\templates\pages\assembly\selected_epd.html:53
+#: .\templates\pages\building\operational_info\selected_operational_product.html:24
+#: .\templates\pages\building\operational_info\selected_operational_product.html:30
 msgid "Quantity"
 msgstr "Số lượng"
 
@@ -1488,8 +1491,9 @@ msgstr "Số lượng EPD"
 msgid "Dashboard"
 msgstr "Bảng điều khiển"
 
-#: .\templates\_base.html:88 .\templates\pages\home\resources.html:20
-#: .\templates\pages\resources.html:13 .\templates\pages\resources.html:15
+#: .\templates\_base.html:88 .\templates\pages\home\datasets.html:13
+#: .\templates\pages\home\resources.html:20 .\templates\pages\resources.html:13
+#: .\templates\pages\resources.html:15
 msgid "Resources"
 msgstr "Tài nguyên"
 
@@ -1574,6 +1578,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:100
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:44
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:60
+#: .\templates\pages\building\operational_info\operational_products.html:28
 #: .\templates\pages\home\templates.html:245
 #: .\templates\pages\profile\profile.html:228
 msgid "Cancel"
@@ -2619,6 +2624,10 @@ msgstr ""
 msgid "Back to top"
 msgstr "Trở về đầu trang"
 
+#: .\templates\components\toasts\_error.html:7
+msgid "An account already exist with a similar email."
+msgstr ""
+
 #: .\templates\footer.html:16
 msgid "Copyright"
 msgstr "Bản quyền"
@@ -2655,6 +2664,7 @@ msgid "steps"
 msgstr "bước"
 
 #: .\templates\pages\add-building\add-building.html:73
+#: .\templates\pages\home\import-dialog\step-preview.html:12
 msgid "Building Name & Location"
 msgstr "Tên và vị trí tòa nhà"
 
@@ -3040,8 +3050,16 @@ msgstr "Mô tả"
 #: .\templates\pages\add-building\components\building-structural-components\_selected_material.html:31
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:280
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:518
+#: .\templates\pages\assembly\selected_epd.html:22
 msgid "Category"
 msgstr "Danh mục"
+
+#: .\templates\pages\add-building\components\building-structural-components\_selected_material.html:40
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:517
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:981
+#: .\templates\pages\home\import-dialog\step-preview.html:190
+msgid "Qty"
+msgstr "Số lượng"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:10
 msgid "If data is available as total quantity per material, select \\"
@@ -3106,6 +3124,8 @@ msgstr "Thêm vật liệu từ thư viện EPD"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:94
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:197
+#: .\templates\pages\assembly\assembly.html:70
+#: .\templates\pages\assembly\boq.html:43
 #: .\templates\pages\home\templates.html:236
 msgid "Add from EPD library"
 msgstr "Thêm từ thư viện EPD"
@@ -3133,6 +3153,7 @@ msgstr "Thêm nữa"
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:66
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:85
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:45
+#: .\templates\pages\building\operational_info\operational_products.html:29
 msgid "Save"
 msgstr "Lưu"
 
@@ -3315,6 +3336,7 @@ msgstr "Hành động này sẽ xóa vĩnh viễn mục này."
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:82
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:101
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:61
+#: .\templates\pages\assembly\selected_epd.html:94
 msgid "Remove"
 msgstr "Xóa"
 
@@ -3386,12 +3408,6 @@ msgstr "Chọn danh mục"
 #| msgid "My Component"
 msgid "Edit Component"
 msgstr "Thành phần của tôi"
-
-#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:517
-#: .\templates\pages\add-building\components\operational-details\cooling-system.html:981
-#: .\templates\pages\home\import-dialog\step-preview.html:190
-msgid "Qty"
-msgstr "Số lượng"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:519
 msgid "BOQ"
@@ -3480,6 +3496,7 @@ msgid "You need to add at least one energy carrier to continue"
 msgstr "Bạn cần thêm ít nhất một nguồn năng lượng để tiếp tục"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:29
+#: .\templates\pages\building\operational_info\operational_products.html:9
 msgid "Add energy carrier"
 msgstr "Thêm nguồn năng lượng"
 
@@ -3944,12 +3961,20 @@ msgstr ""
 msgid "SPLIT AIR CONDITIONER DATA"
 msgstr "DỮ LIỆU HỆ THỐNG ĐIỀU HÒA KHÔNG KHÍ"
 
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:251
+msgid "Typical: 1.5 – 5 kg/unit"
+msgstr ""
+
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:254
 msgid "Tip: typical = Capacity (Tons) × 1.0 kg"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:369
 msgid "VARIABLE REFRIGERANT FLOW (VRF) SYSTEM DATA"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:394
+msgid "Typical: 30 – 200 kg"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:417
@@ -3976,12 +4001,20 @@ msgstr ""
 msgid "Select sub-type"
 msgstr "Chọn quốc gia"
 
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:547
+msgid "Typical: 5 – 100 kg"
+msgstr ""
+
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:616
 msgid "From BEE/EGAT/SNI label. Typical EER: 2.5 – 4.0. Cannot be zero."
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:664
 msgid "WATER COOLED CHILLER DATA"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:690
+msgid "Typical: 200 – 2,000 kg"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:697
@@ -4028,6 +4061,10 @@ msgstr "Tổng công suất đầu vào hệ thống chiller"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:822
 msgid "AIR COOLED CHILLER DATA"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:848
+msgid "Typical: 50 – 500 kg"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:978
@@ -4670,6 +4707,11 @@ msgstr ""
 msgid "Fresh air ratio"
 msgstr ""
 
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:352
+#, python-format
+msgid "Typical: 10 – 30%%"
+msgstr ""
+
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:424
 msgid "CEILING / EXHAUST / WALL FAN DATA"
 msgstr ""
@@ -4692,11 +4734,34 @@ msgstr "Đơn vị:"
 msgid "Airflow"
 msgstr "Tốc độ luồng khí:"
 
+#: .\templates\pages\assembly\assembly.html:68
+#: .\templates\pages\building\building.html:140
+#: .\templates\pages\building\building.html:307
+#: .\templates\pages\building\building.html:354
+msgid "Materials"
+msgstr "Vật liệu"
+
+#: .\templates\pages\assembly\assembly.html:78
+#: .\templates\pages\assembly\boq.html:51
+#, fuzzy
+#| msgid "Please select a region"
+msgid "Please select at least one EPD"
+msgstr "Vui lòng chọn vùng"
+
+#: .\templates\pages\assembly\boq.html:6
 #: .\templates\pages\building\building.html:5
 msgid "Building View"
 msgstr "Xem tòa nhà"
 
+#: .\templates\pages\assembly\selected_epd.html:15
+#: .\templates\pages\building\operational_info\selected_operational_product.html:15
+#, fuzzy
+#| msgid "Description"
+msgid "Add description ..."
+msgstr "Mô tả"
+
 #: .\templates\pages\building\building.html:59
+#: .\templates\pages\building\operational_info\operational_products.html:37
 msgid "Edit"
 msgstr "Chỉnh sửa"
 
@@ -4729,12 +4794,6 @@ msgstr "Tiết kiệm carbon"
 #| msgid "Assembly Mode"
 msgid "Assembly"
 msgstr "Chế độ lắp ráp"
-
-#: .\templates\pages\building\building.html:140
-#: .\templates\pages\building\building.html:307
-#: .\templates\pages\building\building.html:354
-msgid "Materials"
-msgstr "Vật liệu"
 
 #: .\templates\pages\building\building.html:146
 #: .\templates\pages\building\building.html:308
@@ -4784,13 +4843,306 @@ msgstr "Điều này sẽ xóa vĩnh viễn tòa nhà và tất cả dữ liệu
 msgid "Delete Building?"
 msgstr "Xóa tòa nhà?"
 
-#: .\templates\pages\building\savings_tab.html:315
+#: .\templates\pages\building\operational_info\operational_products.html:18
+#, fuzzy
+#| msgid "You need to add at least one energy carrier to continue"
+msgid "Please select at least one energy carrier"
+msgstr "Bạn cần thêm ít nhất một nguồn năng lượng để tiếp tục"
+
+#: .\templates\pages\building\operational_info\operational_products.html:47
+#, fuzzy
+#| msgid "Energy Carrier Emission Factor"
+msgid "Energy Carrier Emission factor"
+msgstr "Hệ số phát thải nguồn năng lượng"
+
+#: .\templates\pages\building\operational_info\selected_operational_product.html:66
+#: .\templates\pages\home\templates.html:169
+msgid "Delete"
+msgstr "Xóa"
+
+#: .\templates\pages\building\savings_tab.html:7
+msgid "Project Performance Benchmark"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:9
+#, python-format
+msgid ""
+"Your project is performing better than <span class=\"font-bold underline "
+"cursor-pointer decoration-dotted\">78%%</span> of peer projects in Germany."
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:10
+#, python-format
+msgid "Top 25%% tier"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:30
+msgid "Best Practice"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:38
+#, fuzzy
+#| msgid "Your buildings"
+msgid "Your Building"
+msgstr "Tòa nhà của bạn"
+
+#: .\templates\pages\building\savings_tab.html:55
+#, fuzzy
+#| msgid "Optional"
+msgid "National Avg"
+msgstr "Tùy chọn"
+
+#: .\templates\pages\building\savings_tab.html:64
+msgid ""
+"Benchmark based on 452 residential projects in Baden-Württemberg region "
+"(2024-2025)."
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:77
+#, fuzzy
+#| msgid "Embodied Carbon"
+msgid "Embodied Carbon Savings"
+msgstr "Carbon hóa thân"
+
+#: .\templates\pages\building\savings_tab.html:82
+#, fuzzy
+#| msgid "Operational Carbon"
+msgid "Operational Carbon Savings"
+msgstr "Carbon hoạt động"
+
+#: .\templates\pages\building\savings_tab.html:95
+#, fuzzy
+#| msgid "Carbon Footprint"
+msgid "Carbon Reduction"
+msgstr "Dấu chân carbon"
+
+#: .\templates\pages\building\savings_tab.html:99
+#, fuzzy
+#| msgid "Materials"
+msgid "Material focus"
+msgstr "Vật liệu"
+
+#: .\templates\pages\building\savings_tab.html:107
+#, fuzzy
+#| msgid "Location"
+msgid "Reduction"
+msgstr "Vị trí"
+
+#: .\templates\pages\building\savings_tab.html:122
+#: .\templates\pages\building\savings_tab.html:187
+#: .\templates\pages\building\savings_tab.html:311
 msgid "Baseline"
 msgstr ""
 
-#: .\templates\pages\building\savings_tab.html:316
+#: .\templates\pages\building\savings_tab.html:129
+#: .\templates\pages\building\savings_tab.html:312
 msgid "Optimized"
 msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:138
+#, fuzzy
+#| msgid "Category"
+msgid "Savings by Category"
+msgstr "Danh mục"
+
+#: .\templates\pages\building\savings_tab.html:180
+msgid "Optimization Strategies"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:191
+msgid "Potential savings"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:223
+#: .\templates\pages\building\savings_tab.html:252
+#: .\templates\pages\building\savings_tab.html:282
+#: .\templates\pages\home\partials\templates_list.html:74
+msgid "View details"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:293
+#, fuzzy
+#| msgid "Materials"
+msgid "Material Insight"
+msgstr "Vật liệu"
+
+#: .\templates\pages\building\savings_tab.html:295
+msgid ""
+"Replacing standard cement with supplementary cementitious materials (SCMs) "
+"is often the most cost-effective reduction strategy."
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:298
+msgid "Read LCA Guidelines"
+msgstr ""
+
+#: .\templates\pages\building\structural_info\structural_info.html:5
+#, fuzzy
+#| msgid ""
+#| "If data is available as total quantity per material, select 'Add from "
+#| "BoQ'. For quantities per components (foundation, floor, roof, etc.), use "
+#| "'Add component'."
+msgid ""
+"*If the data is available in the form of total quantity used per material, "
+"please select “Add from BoQ”. If material quantities are available per "
+"structural components (foundation, bottom floor, roof,.. etc.) use “Add "
+"component”. (For more detail please refer to BEAT handbook)"
+msgstr ""
+"Nếu dữ liệu có sẵn dưới dạng tổng số lượng mỗi vật liệu, chọn 'Thêm từ BoQ'. "
+"Đối với số lượng mỗi thành phần (móng, sàn, mái, v.v.), sử dụng 'Thêm thành "
+"phần'."
+
+#: .\templates\pages\building\structural_info\structural_info.html:11
+#, fuzzy
+#| msgid "Add from Bill of Quantity"
+msgid "Add from BoQ"
+msgstr "Thêm từ Bảng khối lượng"
+
+#: .\templates\pages\building\structural_info\structural_info.html:19
+#, fuzzy
+#| msgid "Comment"
+msgid "Add component"
+msgstr "Bình luận"
+
+#: .\templates\pages\building\structural_info\structural_info.html:21
+msgid "Please save the building before adding any components"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:10
+#: .\templates\pages\home\resources.html:10 .\templates\pages\resources.html:10
+msgid "Resource page"
+msgstr "Trang tài nguyên"
+
+#: .\templates\pages\home\datasets.html:15
+#, fuzzy
+#| msgid ""
+#| "Here you'll find key materials to help you understand, navigate, and "
+#| "maximise the use of the Building Emissions Assessment Tool."
+msgid ""
+"Welcome to the <span class=\"fw-bold\">Resources</span> section of the <span "
+"class=\"fw-bolder\" style=\"color:#F26716\">BEAT</span>. Here you'll find "
+"key materials to help you understand, navigate, and maximise the use of the "
+"Building Emissions Assessment Tool."
+msgstr ""
+"Tại đây bạn sẽ tìm thấy các tài liệu chính để giúp bạn hiểu, điều hướng và "
+"tối đa hóa việc sử dụng Công cụ Đánh giá Phát thải Tòa nhà."
+
+#: .\templates\pages\home\datasets.html:22
+#: .\templates\pages\home\resources.html:31 .\templates\pages\resources.html:22
+msgid "Introduction video"
+msgstr "Video giới thiệu"
+
+#: .\templates\pages\home\datasets.html:24
+#, fuzzy
+#| msgid ""
+#| "— what it does, how it works, and how it can support your low-carbon "
+#| "building strategies."
+msgid ""
+"Watch our short video to get a quick overview of <span class=\"fw-bolder\" "
+"style=\"color:#F26716\">BEAT</span> — what it does, how it works, and how it "
+"can support your low-carbon building strategies."
+msgstr ""
+"— nó làm gì, cách hoạt động và cách nó có thể hỗ trợ chiến lược xây dựng "
+"carbon thấp của bạn."
+
+#: .\templates\pages\home\datasets.html:41
+#: .\templates\pages\home\resources.html:53 .\templates\pages\resources.html:41
+msgid "This content requires media cookies to be enabled for embedded videos."
+msgstr "Nội dung này yêu cầu bật cookie phương tiện cho video nhúng."
+
+#: .\templates\pages\home\datasets.html:43
+#: .\templates\pages\home\resources.html:60 .\templates\pages\resources.html:43
+msgid "Manage Cookie Settings"
+msgstr "Quản lý cài đặt Cookie"
+
+#: .\templates\pages\home\datasets.html:57
+#: .\templates\pages\home\resources.html:72 .\templates\pages\resources.html:57
+msgid "User Handbook"
+msgstr "Sổ tay người dùng"
+
+#: .\templates\pages\home\datasets.html:59
+#, fuzzy
+#| msgid ""
+#| "Handbook (Part 1) for a detailed, step-by-step guide on using the tool "
+#| "effectively. The handbook covers:"
+msgid ""
+"Download the official <span class=\"fw-bolder\">BEAT</span> Handbook (Part "
+"1) for a detailed, step-by-step guide on using the tool effectively. The "
+"handbook covers:"
+msgstr ""
+"Sổ tay (Phần 1) để có hướng dẫn chi tiết, từng bước về cách sử dụng công cụ "
+"hiệu quả. Sổ tay bao gồm:"
+
+#: .\templates\pages\home\datasets.html:63
+#: .\templates\pages\home\resources.html:77 .\templates\pages\resources.html:63
+msgid "Key functionalities and workflow"
+msgstr "Chức năng chính và quy trình làm việc"
+
+#: .\templates\pages\home\datasets.html:64
+#: .\templates\pages\home\resources.html:78 .\templates\pages\resources.html:64
+msgid "Data input requirements"
+msgstr "Yêu cầu nhập dữ liệu"
+
+#: .\templates\pages\home\datasets.html:65
+#: .\templates\pages\home\resources.html:79 .\templates\pages\resources.html:65
+msgid "Methodology"
+msgstr "Phương pháp luận"
+
+#: .\templates\pages\home\datasets.html:67
+#: .\templates\pages\home\resources.html:82 .\templates\pages\resources.html:67
+msgid "For guidance, please refer to the BEAT"
+msgstr "Để được hướng dẫn, vui lòng tham khảo BEAT"
+
+#: .\templates\pages\home\datasets.html:68
+#: .\templates\pages\home\resources.html:83 .\templates\pages\resources.html:68
+msgid "user documentation"
+msgstr "tài liệu người dùng"
+
+#: .\templates\pages\home\datasets.html:74
+msgid "The <span style=\"color:#F26716\">BEAT</span> Community"
+msgstr ""
+
+#: .\templates\pages\home\datasets.html:76
+#: .\templates\pages\home\resources.html:95 .\templates\pages\resources.html:76
+msgid ""
+"Join a growing community of policymakers, planners, and practitioners "
+"working to reduce building emissions. Together, we will work on advancing "
+"practical, data-driven solutions for a low-carbon future."
+msgstr ""
+"Tham gia cộng đồng ngày càng phát triển của các nhà hoạch định chính sách, "
+"nhà quy hoạch và chuyên gia đang làm việc để giảm phát thải từ tòa nhà. Cùng "
+"nhau, chúng tôi sẽ làm việc để thúc đẩy các giải pháp thực tế, dựa trên dữ "
+"liệu cho tương lai carbon thấp."
+
+#: .\templates\pages\home\datasets.html:79
+#: .\templates\pages\home\resources.html:100
+#: .\templates\pages\resources.html:79
+msgid "Host"
+msgstr "Đơn vị chủ trì"
+
+#: .\templates\pages\home\datasets.html:92
+#: .\templates\pages\home\resources.html:113
+#: .\templates\pages\resources.html:92
+msgid "Lead partners"
+msgstr "Đối tác chính"
+
+#: .\templates\pages\home\datasets.html:109
+#: .\templates\pages\home\resources.html:130
+#: .\templates\pages\resources.html:109
+msgid "Development partners"
+msgstr "Đối tác phát triển"
+
+#: .\templates\pages\home\datasets.html:128
+#, fuzzy
+#| msgid "Interested in contributing or partnering? We'd love to"
+msgid "Interested in contributing or partnering? We’d love to"
+msgstr "Quan tâm đến việc đóng góp hoặc hợp tác? Chúng tôi rất mong được"
+
+#: .\templates\pages\home\datasets.html:129
+#: .\templates\pages\home\resources.html:151
+#: .\templates\pages\resources.html:129
+msgid "hear from you"
+msgstr "nghe từ bạn"
 
 #: .\templates\pages\home\home.html:26
 #, python-format
@@ -4859,6 +5211,7 @@ msgid "Map Fields"
 msgstr ""
 
 #: .\templates\pages\home\import-dialog\import-dialog.html:47
+#: .\templates\pages\home\import-dialog\step-preview.html:4
 msgid "Preview & Confirm"
 msgstr ""
 
@@ -4900,6 +5253,63 @@ msgstr ""
 msgid "Import failed. Please check your data and try again."
 msgstr ""
 
+#: .\templates\pages\home\import-dialog\step-building-details.html:4
+#: .\templates\pages\home\import-dialog\step-map-fields.html:64
+#: .\templates\pages\home\import-dialog\step-preview.html:23
+#, fuzzy
+#| msgid "Building UUID"
+msgid "Building Details"
+msgstr "UUID tòa nhà"
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:6
+msgid ""
+"Review the data read from your file. Upload certification and/or BoQ files "
+"if required."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:15
+msgid "Field"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:16
+#, fuzzy
+#| msgid "Updated at"
+msgid "Value from file"
+msgstr "Cập nhật vào"
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:28
+#: .\templates\pages\home\import-dialog\step-preview.html:49
+#, fuzzy
+#| msgid "Duplication failed"
+msgid "Certification file"
+msgstr "Nhân bản thất bại"
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:32
+msgid ""
+"Your template indicates this building has a certification. Please upload the "
+"certificate file."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:33
+msgid "Accepted formats: JPG, PNG, GIF, WEBP, PDF — max 20 MB."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:46
+#, fuzzy
+#| msgid "Bill of Quantity (BOQ)"
+msgid "Bill of Quantities (BoQ) files"
+msgstr "Bảng khối lượng (BOQ)"
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:50
+msgid ""
+"Your template indicates this building has BoQ files. Please upload one or "
+"more files."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:51
+msgid "Accepted formats: JPG, PNG, GIF, WEBP, PDF — max 20 MB each."
+msgstr ""
+
 #: .\templates\pages\home\import-dialog\step-building-details.html:69
 #: .\templates\pages\home\import-dialog\step-preview.html:122
 #, fuzzy
@@ -4935,17 +5345,37 @@ msgstr "Nhân bản thất bại"
 msgid "Has BoQ"
 msgstr ""
 
+#: .\templates\pages\home\import-dialog\step-map-fields.html:4
+msgid "Map Your Columns"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:6
+msgid ""
+"Review the column mapping detected from your file. All columns matched "
+"automatically."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:15
+msgid "All columns mapped automatically from the template"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:24
+msgid "Tab"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:25
+msgid "Excel column header"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:26
+msgid "Value"
+msgstr ""
+
 #: .\templates\pages\home\import-dialog\step-map-fields.html:63
 #, fuzzy
 #| msgid "Building Name & Location"
 msgid "Name & Location"
 msgstr "Tên và vị trí tòa nhà"
-
-#: .\templates\pages\home\import-dialog\step-map-fields.html:64
-#, fuzzy
-#| msgid "Building UUID"
-msgid "Building Details"
-msgstr "UUID tòa nhà"
 
 #: .\templates\pages\home\import-dialog\step-map-fields.html:65
 msgid "Operational Schedule & Temp"
@@ -5053,6 +5483,42 @@ msgstr "Đơn vị nhiệt độ sưởi"
 #| msgid "Cooling Temperature Unit"
 msgid "Room cooling temperature unit"
 msgstr "Đơn vị nhiệt độ làm mát"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:6
+msgid ""
+"Review the data that will be imported. Upload any required files below, then "
+"click Confirm & Import."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:34
+#, fuzzy
+#| msgid "Operation weeks per year"
+msgid "Operational Schedule & Temperature"
+msgstr "Số tuần hoạt động mỗi năm"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:53
+msgid ""
+"Your template indicates this building has a certification. Please upload the "
+"certificate."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:54
+msgid "Accepted: JPG, PNG, GIF, WEBP, PDF — max 20 MB."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:67
+msgid "Bill of Quantities & design drawings"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:71
+msgid ""
+"Your template indicates this building has BoQ / design drawing files. Please "
+"upload one or more files."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:72
+msgid "Accepted: JPG, PNG, GIF, WEBP, PDF — max 20 MB each."
+msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-preview.html:111
 #, fuzzy
@@ -5234,9 +5700,125 @@ msgstr "Hệ thống nước nóng"
 msgid "Hot Water — Water Heater"
 msgstr "Máy nước nóng bơm nhiệt"
 
+#: .\templates\pages\home\import-dialog\step-process.html:8
+#, fuzzy
+#| msgid "Your buildings"
+msgid "Importing data"
+msgstr "Tòa nhà của bạn"
+
+#: .\templates\pages\home\import-dialog\step-process.html:15
+msgid "Please wait while we process your file. Do not close this window"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-process.html:27
+#, fuzzy
+#| msgid "0%% completed"
+msgid "Import complete!"
+msgstr "0%% hoàn thành"
+
+#: .\templates\pages\home\import-dialog\step-process.html:30
+msgid "Building have been successfully added to your database"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-process.html:36
+#, fuzzy
+#| msgid "Your buildings"
+msgid "Go to buildings"
+msgstr "Tòa nhà của bạn"
+
+#: .\templates\pages\home\import-dialog\step-upload.html:4
+msgid "Upload Your Data File"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:6
+msgid "Supported format: Excel (.xlsx, .xls)"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:16
+#, fuzzy
+#| msgid "Reusable Templates"
+msgid "Need a template?"
+msgstr "Mẫu có thể tái sử dụng"
+
+#: .\templates\pages\home\import-dialog\step-upload.html:18
+#, fuzzy
+#| msgid "Duplication failed"
+msgid "Download sample template"
+msgstr "Nhân bản thất bại"
+
+#: .\templates\pages\home\import-dialog\step-upload.html:34
+msgid "Choose a file or drag & drop it here."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:36
+msgid "Excel (.xlsx, .xls) up to 50 MB."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:42
+#, fuzzy
+#| msgid "Profile"
+msgid "Browse file"
+msgstr "Hồ sơ"
+
+#: .\templates\pages\home\import-dialog\step-upload.html:61
+msgid "Ready"
+msgstr ""
+
 #: .\templates\pages\home\import-dialog\step-upload.html:76
 msgid "Only Excel files (.xlsx, .xls) are supported."
 msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:8
+msgid "Validating data"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:13
+msgid "Checking row <span id=\"validate-row-count\">0</span> of 5000..."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:18
+msgid ""
+"We are checking your file for duplicates, formatting errors and missing "
+"fields, this will take some few minutes"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:25
+msgid "Data Validation results"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:27
+msgid "Review the analysis of your data before proceeding to preview."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:39
+#, fuzzy
+#| msgid "BOQ saved successfully"
+msgid "Validation successful"
+msgstr "Đã lưu BOQ thành công"
+
+#: .\templates\pages\home\import-dialog\step-validate.html:41
+msgid "Your CSV file has been validated successfully. Below is the summary"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:48
+msgid "Total records"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:52
+msgid "Valid records"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-validate.html:56
+#, fuzzy
+#| msgid "Carbon Savings"
+msgid "Warnings"
+msgstr "Tiết kiệm carbon"
+
+#: .\templates\pages\home\import-dialog\step-validate.html:60
+#, fuzzy
+#| msgid "Error"
+msgid "Errors"
+msgstr "Lỗi"
 
 #: .\templates\pages\home\partials\buildings_list.html:51
 msgid "Building type:"
@@ -5268,15 +5850,17 @@ msgstr "Chỉnh sửa lần cuối:"
 msgid "You have no buildings added"
 msgstr "Bạn chưa thêm tòa nhà nào"
 
+#: .\templates\pages\home\partials\epd_components_list.html:28
+#, fuzzy
+#| msgid "No materials found matching your criteria"
+msgid "No EPDs found matching your search criteria"
+msgstr "Không tìm thấy vật liệu phù hợp với tiêu chí của bạn"
+
 #: .\templates\pages\home\partials\templates_list.html:59
 #, fuzzy
 #| msgid "System Component"
 msgid "System component"
 msgstr "Thành phần hệ thống"
-
-#: .\templates\pages\home\partials\templates_list.html:74
-msgid "View details"
-msgstr ""
 
 #: .\templates\pages\home\partials\templates_list.html:85
 #, fuzzy
@@ -5294,17 +5878,9 @@ msgstr "Mẫu có thể tái sử dụng"
 msgid "No templates available"
 msgstr ""
 
-#: .\templates\pages\home\resources.html:10 .\templates\pages\resources.html:10
-msgid "Resource page"
-msgstr "Trang tài nguyên"
-
 #: .\templates\pages\home\resources.html:22
 msgid "Manage your resources to access for low carbon"
 msgstr "Quản lý tài nguyên của bạn để truy cập carbon thấp"
-
-#: .\templates\pages\home\resources.html:31 .\templates\pages\resources.html:22
-msgid "Introduction video"
-msgstr "Video giới thiệu"
 
 #: .\templates\pages\home\resources.html:33 .\templates\pages\resources.html:24
 msgid "Watch our short video to get a quick overview of"
@@ -5322,18 +5898,6 @@ msgstr ""
 msgid "YouTube video player"
 msgstr "Trình phát video YouTube"
 
-#: .\templates\pages\home\resources.html:53 .\templates\pages\resources.html:41
-msgid "This content requires media cookies to be enabled for embedded videos."
-msgstr "Nội dung này yêu cầu bật cookie phương tiện cho video nhúng."
-
-#: .\templates\pages\home\resources.html:60 .\templates\pages\resources.html:43
-msgid "Manage Cookie Settings"
-msgstr "Quản lý cài đặt Cookie"
-
-#: .\templates\pages\home\resources.html:72 .\templates\pages\resources.html:57
-msgid "User Handbook"
-msgstr "Sổ tay người dùng"
-
 #: .\templates\pages\home\resources.html:74 .\templates\pages\resources.html:59
 msgid "Download the official"
 msgstr "Tải xuống tài liệu chính thức"
@@ -5346,26 +5910,6 @@ msgstr ""
 "Sổ tay (Phần 1) để có hướng dẫn chi tiết, từng bước về cách sử dụng công cụ "
 "hiệu quả. Sổ tay bao gồm:"
 
-#: .\templates\pages\home\resources.html:77 .\templates\pages\resources.html:63
-msgid "Key functionalities and workflow"
-msgstr "Chức năng chính và quy trình làm việc"
-
-#: .\templates\pages\home\resources.html:78 .\templates\pages\resources.html:64
-msgid "Data input requirements"
-msgstr "Yêu cầu nhập dữ liệu"
-
-#: .\templates\pages\home\resources.html:79 .\templates\pages\resources.html:65
-msgid "Methodology"
-msgstr "Phương pháp luận"
-
-#: .\templates\pages\home\resources.html:82 .\templates\pages\resources.html:67
-msgid "For guidance, please refer to the BEAT"
-msgstr "Để được hướng dẫn, vui lòng tham khảo BEAT"
-
-#: .\templates\pages\home\resources.html:83 .\templates\pages\resources.html:68
-msgid "user documentation"
-msgstr "tài liệu người dùng"
-
 #: .\templates\pages\home\resources.html:92 .\templates\pages\resources.html:74
 msgid "The"
 msgstr "Các"
@@ -5376,39 +5920,13 @@ msgstr "Các"
 msgid "Community"
 msgstr "Cộng đồng"
 
-#: .\templates\pages\home\resources.html:95 .\templates\pages\resources.html:76
-msgid ""
-"Join a growing community of policymakers, planners, and practitioners "
-"working to reduce building emissions. Together, we will work on advancing "
-"practical, data-driven solutions for a low-carbon future."
-msgstr ""
-"Tham gia cộng đồng ngày càng phát triển của các nhà hoạch định chính sách, "
-"nhà quy hoạch và chuyên gia đang làm việc để giảm phát thải từ tòa nhà. Cùng "
-"nhau, chúng tôi sẽ làm việc để thúc đẩy các giải pháp thực tế, dựa trên dữ "
-"liệu cho tương lai carbon thấp."
-
-#: .\templates\pages\home\resources.html:100
-#: .\templates\pages\resources.html:79
-msgid "Host"
-msgstr "Đơn vị chủ trì"
-
 #: .\templates\pages\home\resources.html:105
 msgid "Host logo"
 msgstr "Logo đơn vị chủ trì"
 
-#: .\templates\pages\home\resources.html:113
-#: .\templates\pages\resources.html:92
-msgid "Lead partners"
-msgstr "Đối tác chính"
-
 #: .\templates\pages\home\resources.html:120
 msgid "Lead partner logo"
 msgstr "Logo đối tác chính"
-
-#: .\templates\pages\home\resources.html:130
-#: .\templates\pages\resources.html:109
-msgid "Development partners"
-msgstr "Đối tác phát triển"
 
 #: .\templates\pages\home\resources.html:137
 msgid "Development partner logo"
@@ -5418,11 +5936,6 @@ msgstr "Logo đối tác phát triển"
 #: .\templates\pages\resources.html:128
 msgid "Interested in contributing or partnering? We'd love to"
 msgstr "Quan tâm đến việc đóng góp hoặc hợp tác? Chúng tôi rất mong được"
-
-#: .\templates\pages\home\resources.html:151
-#: .\templates\pages\resources.html:129
-msgid "hear from you"
-msgstr "nghe từ bạn"
 
 #: .\templates\pages\home\templates.html:5
 #: .\templates\pages\home\templates.html:17
@@ -5454,10 +5967,6 @@ msgstr "Cũ nhất trước"
 #: .\templates\pages\home\templates.html:387
 msgid "Loading..."
 msgstr "Đang tải..."
-
-#: .\templates\pages\home\templates.html:169
-msgid "Delete"
-msgstr "Xóa"
 
 #: .\templates\pages\home\templates.html:186
 msgid "Required (2-200 characters)"
@@ -5540,6 +6049,34 @@ msgstr "Không thể hoàn tác."
 #| msgid "Create a copy of this template?"
 msgid "Create a copy of this template?"
 msgstr "Tạo bản sao của mẫu này?"
+
+#: .\templates\pages\home\templates.html:398
+msgid "Error"
+msgstr "Lỗi"
+
+#: .\templates\pages\home\templates.html:399
+msgid "Failed to load template"
+msgstr "Không thể tải mẫu"
+
+#: .\templates\pages\home\templates.html:400
+#, fuzzy
+#| msgid "Updated at"
+msgid "Update failed"
+msgstr "Cập nhật vào"
+
+#: .\templates\pages\home\templates.html:401
+#, fuzzy
+#| msgid "Deletion failed"
+msgid "Duplication failed"
+msgstr "Xóa thất bại"
+
+#: .\templates\pages\home\templates.html:402
+msgid "Deletion failed"
+msgstr "Xóa thất bại"
+
+#: .\templates\pages\home\templates.html:403
+msgid "An error occurred"
+msgstr "Đã xảy ra lỗi"
 
 #: .\templates\pages\profile\profile.html:16
 msgid "Profile Settings"
@@ -5766,15 +6303,6 @@ msgstr ""
 #~ msgid "eg. 5.603722"
 #~ msgstr "vd. 5.603722"
 
-#~ msgid ""
-#~ "If data is available as total quantity per material, select 'Add from "
-#~ "BoQ'. For quantities per components (foundation, floor, roof, etc.), use "
-#~ "'Add component'."
-#~ msgstr ""
-#~ "Nếu dữ liệu có sẵn dưới dạng tổng số lượng mỗi vật liệu, chọn 'Thêm từ "
-#~ "BoQ'. Đối với số lượng mỗi thành phần (móng, sàn, mái, v.v.), sử dụng "
-#~ "'Thêm thành phần'."
-
 #~ msgid "eg. Main Structure BOQ"
 #~ msgstr "vd. BOQ kết cấu chính"
 
@@ -5799,9 +6327,6 @@ msgstr ""
 
 #~ msgid "Please add at least one material"
 #~ msgstr "Vui lòng thêm ít nhất một vật liệu"
-
-#~ msgid "BOQ saved successfully"
-#~ msgstr "Đã lưu BOQ thành công"
 
 #~ msgid "Please enter a component title"
 #~ msgstr "Vui lòng nhập tiêu đề thành phần"
@@ -6157,17 +6682,5 @@ msgstr ""
 #~ msgid "Home"
 #~ msgstr "Trang chủ"
 
-#~ msgid "Error"
-#~ msgstr "Lỗi"
-
-#~ msgid "Failed to load template"
-#~ msgstr "Không thể tải mẫu"
-
 #~ msgid "Remove this material?"
 #~ msgstr "Xóa vật liệu này?"
-
-#~ msgid "An error occurred"
-#~ msgstr "Đã xảy ra lỗi"
-
-#~ msgid "Deletion failed"
-#~ msgstr "Xóa thất bại"

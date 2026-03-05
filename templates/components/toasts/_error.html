@@ -1,8 +1,10 @@
+{% load static %}
+{% load i18n %}
 <div
   class="badge badge-error badge-xl w-full h-auto text-xs py-2 mb-5 justify-between"
 >
   <img src="{% static 'assets/icons/error-warning-fill.svg' %}" alt="warning icon" />
-  An account already exist with a similar email.
+  {% translate "An account already exist with a similar email." %}
   <button type="button" class="outline-none border-none">
     <img src="{% static 'assets/icons/close-line.svg' %}" alt="close-button" />
   </button>

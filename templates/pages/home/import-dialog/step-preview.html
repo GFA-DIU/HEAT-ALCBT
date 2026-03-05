@@ -1,15 +1,15 @@
 {% load i18n %}
 <div class="size-full space-y-5 flex flex-col">
   <div class="space-y-1 shrink-0">
-    <h6 class="h6-title text-[var(--text--strong-950)]">Preview & Confirm</h6>
+    <h6 class="h6-title text-[var(--text--strong-950)]">{% translate "Preview & Confirm" %}</h6>
     <p class="paragraph-small text-[var(--text--sub-600)]">
-      Review the data that will be imported. Upload any required files below, then click Confirm & Import.
+      {% translate "Review the data that will be imported. Upload any required files below, then click Confirm & Import." %}
     </p>
   </div>
 
   <!-- Tab 1 summary -->
   <div class="space-y-2 shrink-0">
-    <p class="label-small text-[var(--text--strong-950)]">Building Name &amp; Location</p>
+    <p class="label-small text-[var(--text--strong-950)]">{% translate "Building Name & Location" %}</p>
     <div class="w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
       <table class="table w-full border-collapse">
         <tbody id="preview-tab1" class="paragraph-small text-[var(--text--strong-950)]">
@@ -20,7 +20,7 @@
 
   <!-- Tab 2 summary -->
   <div class="space-y-2 shrink-0">
-    <p class="label-small text-[var(--text--strong-950)]">Building Details</p>
+    <p class="label-small text-[var(--text--strong-950)]">{% translate "Building Details" %}</p>
     <div class="w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
       <table class="table w-full border-collapse">
         <tbody id="preview-tab2" class="paragraph-small text-[var(--text--strong-950)]">
@@ -31,7 +31,7 @@
 
   <!-- Tab 3 summary -->
   <div id="preview-tab3-section" class="space-y-2 shrink-0">
-    <p class="label-small text-[var(--text--strong-950)]">Operational Schedule &amp; Temperature</p>
+    <p class="label-small text-[var(--text--strong-950)]">{% translate "Operational Schedule & Temperature" %}</p>
     <div class="w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
       <table class="table w-full border-collapse">
         <tbody id="preview-tab3" class="paragraph-small text-[var(--text--strong-950)]">
@@ -46,12 +46,12 @@
   <!-- Certification file upload — shown when has_certification = Yes -->
   <div id="cert-upload-section" class="hidden flex-col gap-2 shrink-0">
     <p class="label-small text-[var(--text--strong-950)]">
-      Certification file
+      {% translate "Certification file" %}
       <span class="text-[var(--state--error--base)] ml-0.5">*</span>
     </p>
     <p class="paragraph-x-small text-[var(--text--sub-600)]">
-      Your template indicates this building has a certification. Please upload the certificate.
-      Accepted: JPG, PNG, GIF, WEBP, PDF &mdash; max 20&thinsp;MB.
+      {% translate "Your template indicates this building has a certification. Please upload the certificate." %}
+      {% translate "Accepted: JPG, PNG, GIF, WEBP, PDF — max 20 MB." %}
     </p>
     <input
       type="file"
@@ -64,12 +64,12 @@
   <!-- BoQ files upload — shown when has_boq = Yes -->
   <div id="boq-upload-section" class="hidden flex-col gap-2 shrink-0">
     <p class="label-small text-[var(--text--strong-950)]">
-      Bill of Quantities &amp; design drawings
+      {% translate "Bill of Quantities & design drawings" %}
       <span class="text-[var(--state--error--base)] ml-0.5">*</span>
     </p>
     <p class="paragraph-x-small text-[var(--text--sub-600)]">
-      Your template indicates this building has BoQ / design drawing files. Please upload one or more files.
-      Accepted: JPG, PNG, GIF, WEBP, PDF &mdash; max 20&thinsp;MB each.
+      {% translate "Your template indicates this building has BoQ / design drawing files. Please upload one or more files." %}
+      {% translate "Accepted: JPG, PNG, GIF, WEBP, PDF — max 20 MB each." %}
     </p>
     <input
       type="file"

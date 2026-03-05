@@ -1,9 +1,9 @@
 {% load i18n %}
 <div class="size-full space-y-4 flex flex-col">
   <div class="space-y-1 shrink-0">
-    <h6 class="h6-title text-[var(--text--strong-950)]">Map Your Columns</h6>
+    <h6 class="h6-title text-[var(--text--strong-950)]">{% translate "Map Your Columns" %}</h6>
     <p class="paragraph-small text-[var(--text--sub-600)]">
-      Review the column mapping detected from your file. All columns matched automatically.
+      {% translate "Review the column mapping detected from your file. All columns matched automatically." %}
     </p>
   </div>
 
@@ -12,7 +12,7 @@
     class="w-full flex items-center justify-center gap-3 px-12 py-3 rounded-md text-[var(--state--success--base)] bg-[var(--state--success--lighter)]">
     <span data-icon="select-box-circle-fill" data-size="20"></span>
     <span class="label-small text-[var(--text--strong-950)]">
-      All columns mapped automatically from the template
+      {% translate "All columns mapped automatically from the template" %}
     </span>
   </div>
 
@@ -21,9 +21,9 @@
     <table class="table w-full relative border-collapse">
       <thead class="bg-[var(--bg--weak-50)] sticky top-0 z-10 text-[var(--text--sub-600)] label-small">
         <tr>
-          <th class="w-[30%] py-3 px-4 text-left font-normal border-b-0">Tab</th>
-          <th class="w-[40%] py-3 px-4 text-left font-normal border-b-0">Excel column header</th>
-          <th class="py-3 px-4 text-left font-normal border-b-0">Value</th>
+          <th class="w-[30%] py-3 px-4 text-left font-normal border-b-0">{% translate "Tab" %}</th>
+          <th class="w-[40%] py-3 px-4 text-left font-normal border-b-0">{% translate "Excel column header" %}</th>
+          <th class="py-3 px-4 text-left font-normal border-b-0">{% translate "Value" %}</th>
         </tr>
       </thead>
       <tbody id="map-fields-body" class="text-[var(--text--strong-950)] paragraph-small">

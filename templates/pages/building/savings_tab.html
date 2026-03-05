@@ -1,14 +1,13 @@
+{% load i18n %}
 <div class="w-full" id="savings-main-wrapper" style="--savings-primary: #FFA468; --savings-primary-secondary: #86EFAC;">
 
   <div id="project-benchmark-top" hx-swap-oob="innerHTML:#tab-content-container-top" class="w-full">
     <div class="w-full flex flex-col gap-6">
       <div class="space-y-1">
-        <h6 class="text-xl text-[var(--text--strong-950)] font-bold">Project Performance Benchmark</h6>
+        <h6 class="text-xl text-[var(--text--strong-950)] font-bold">{% translate "Project Performance Benchmark" %}</h6>
         <p class="text-sm text-[var(--text--strong-950)]">
-          Your project is performing better than <span
-            class="font-bold underline cursor-pointer decoration-dotted">78%</span> of peer projects in Germany.
-          <span class="bg-[#D5EDCD] text-xs text-[var(--text--strong-950)] font-extrabold rounded-full px-1.25 py-1">Top
-            25% tier
+          {% blocktranslate trimmed %}Your project is performing better than <span class="font-bold underline cursor-pointer decoration-dotted">78%</span> of peer projects in Germany.{% endblocktranslate %}
+          <span class="bg-[#D5EDCD] text-xs text-[var(--text--strong-950)] font-extrabold rounded-full px-1.25 py-1">{% translate "Top 25% tier" %}
           </span>
         </p>
       </div>
@@ -28,7 +27,7 @@
             <div class="h-13.5 w-0.5 bg-[#41B84E]"></div>
           </div>
           <div class="space-y-1 flex flex-col">
-            <span class="text-sm font-medium text-[var(--text--strong-950)]">Best Practice</span>
+            <span class="text-sm font-medium text-[var(--text--strong-950)]">{% translate "Best Practice" %}</span>
             <span class="text-sm font-bold text-[var(--text--strong-950)] bg-[#4EDF81] px-1 py-0.5">320
               kgCO<sub>2</sub>e/m<sup>2</sup></span>
           </div>
@@ -36,8 +35,7 @@
 
         <!-- Your Building -->
         <div class="absolute top-0 left-[45%] -translate-x-1/2 -translate-y-[24px] flex flex-col items-center z-10">
-          <div class="text-base text-[var(--text--strong-950)] w-max text-center">Your
-            Building</div>
+          <div class="text-base text-[var(--text--strong-950)] w-max text-center">{% translate "Your Building" %}</div>
           <div class="bg-[var(--text--strong-950)] text-white text-xs font-extrabold px-1 py-0.5">
             463 kgCO<sub>2</sub>e/m<sup>2</sup>
           </div>
@@ -54,7 +52,7 @@
             <div class="h-13.5 w-0.5 bg-[#E99C96]"></div>
           </div>
           <div class="space-y-1 flex flex-col">
-            <span class="text-sm font-medium text-[var(--text--strong-950)]">National Avg</span>
+            <span class="text-sm font-medium text-[var(--text--strong-950)]">{% translate "National Avg" %}</span>
             <span class="text-sm font-bold text-[var(--text--strong-950)] bg-[#FECBC9] px-1 py-0.5">640
               kgCO<sub>2</sub>e/m<sup>2</sup></span>
           </div>
@@ -63,8 +61,7 @@
 
       <div class="flex items-center justify-center gap-1.5 text-center">
         <span data-icon="information-fill" data-size="16" class="text-[var(--icon--sub-600)]"></span>
-        <span class="text-xs text-[var(--text--sub-600)]">Benchmark based on 452 residential projects in
-          Baden-Württemberg region (2024-2025).</span>
+        <span class="text-xs text-[var(--text--sub-600)]">{% translate "Benchmark based on 452 residential projects in Baden-Württemberg region (2024-2025)." %}</span>
       </div>
     </div>
   </div>
@@ -77,12 +74,12 @@
       <button
         class="px-4 py-1.5 rounded-md text-sm font-semibold text-[var(--text--strong-950)] bg-[#86EFAC] shadow-sm transition-all"
         onclick="toggleSavingsView('embodied', this)">
-        Embodied Carbon Savings
+        {% translate "Embodied Carbon Savings" %}
       </button>
       <button
         class="px-4 py-1.5 rounded-md text-sm font-medium text-[var(--text--sub-600)] hover:bg-white/50 transition-all"
         onclick="toggleSavingsView('operational', this)">
-        Operational Carbon Savings
+        {% translate "Operational Carbon Savings" %}
       </button>
     </div>
 
@@ -95,11 +92,11 @@
         <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-5 rounded-2xl space-y-6">
           <div class="flex items-center gap-2">
             <span data-icon="leaf-line" data-size="20"></span>
-            <h6 class="text-sm font-semibold">Carbon Reduction</h6>
+            <h6 class="text-sm font-semibold">{% translate "Carbon Reduction" %}</h6>
           </div>
 
           <div class="space-y-1 p-4 bg-[var(--bg--weak-100)] rounded-[0.5rem]">
-            <p class="text-xs text-[var(--text--sub-600)]">Material focus</p>
+            <p class="text-xs text-[var(--text--sub-600)]">{% translate "Material focus" %}</p>
             <div class="flex items-baseline gap-2">
               <h3 class="text-3xl font-bold text-[#16A34A]">-85<span class="text-lg font-medium text-[#16A34A]">kg
                   CO<sub>2</sub>eq/m<sup>2</sup></span></h3>
@@ -107,7 +104,7 @@
             <div class="flex items-center gap-1 text-xs font-medium">
               <span class="text-[var(--text--strong-950)]">12.5%</span>
               <span data-icon="arrow-up-circle-fill" data-size="16" class="text-[#16A34A]"></span>
-              <span class="text-[var(--text--sub-600)]">Reduction</span>
+              <span class="text-[var(--text--sub-600)]">{% translate "Reduction" %}</span>
             </div>
           </div>
 
@@ -122,14 +119,14 @@
                 <span class="text-[var(--savings-primary)] h5-title font-bold">330</span>
                 co<sub>2</sub>eq/m<sup>2</sup>
               </span>
-              <span class="text-xs font-semibold text-[var(--text--strong-950)]">Baseline</span>
+              <span class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Baseline" %}</span>
             </div>
             <div class="bg-[var(--bg--weak-100)] p-2 rounded-[0.5rem] space-y-0.5">
               <span class="text-[var(--text--strong-950)] label-x-small">
                 <span class="text-[var(--savings-primary)] h5-title font-bold">246</span>
                 co<sub>2</sub>eq/m<sup>2</sup>
               </span>
-              <span class="text-xs font-semibold text-[var(--text--strong-950)]">Optimized</span>
+              <span class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Optimized" %}</span>
             </div>
           </div>
         </div>
@@ -138,7 +135,7 @@
         <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-5 rounded-2xl space-y-6">
           <div class="flex items-center gap-2">
             <span data-icon="bar-chart-horizontal-line" data-size="20"></span>
-            <h6 class="text-base font-medium">Savings by Category</h6>
+            <h6 class="text-base font-medium">{% translate "Savings by Category" %}</h6>
           </div>
 
           <!-- List Items -->
@@ -180,18 +177,18 @@
         <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-6 rounded-2xl">
           <div class="flex items-center gap-2 pb-4 mb-4 border-b border-border">
             <span data-icon="bar-chart-box-line" data-size="20"></span> <!-- Just a generic icon -->
-            <h6 class="text-base font-semibold">Optimization Strategies</h6>
+            <h6 class="text-base font-semibold">{% translate "Optimization Strategies" %}</h6>
           </div>
 
           <div class="flex gap-4 mb-6 text-sm">
             <div class="flex items-center gap-1.5">
               <span class="size-2 rounded-full bg-[var(--savings-primary)]"></span>
 
-              <span class="text-[var(--text--sub-600)]">Baseline</span>
+              <span class="text-[var(--text--sub-600)]">{% translate "Baseline" %}</span>
             </div>
             <div class="flex items-center gap-1.5">
               <span class="size-2 rounded-full bg-[#4ADE80]"></span>
-              <span class="text-[var(--text--sub-600)]">Potential savings</span>
+              <span class="text-[var(--text--sub-600)]">{% translate "Potential savings" %}</span>
             </div>
           </div>
 
@@ -223,7 +220,7 @@
                     CO<sub>2</sub>e/m<sup>2</sup>)</span>
                 </p>
                 <button class="flex items-center gap-0.5 text-[var(--text--sub-600)] underline decoration-dotted">
-                  View details <span data-icon="caret-down" data-size="14"></span>
+                  {% translate "View details" %} <span data-icon="caret-down" data-size="14"></span>
                 </button>
               </div>
             </div>
@@ -252,7 +249,7 @@
                     CO<sub>2</sub>e/m<sup>2</sup>)</span>
                 </p>
                 <button class="flex items-center gap-0.5 text-[var(--text--sub-600)] underline decoration-dotted">
-                  View details <span data-icon="caret-down" data-size="14"></span>
+                  {% translate "View details" %} <span data-icon="caret-down" data-size="14"></span>
                 </button>
               </div>
             </div>
@@ -282,7 +279,7 @@
                     CO<sub>2</sub>e/m<sup>2</sup>)</span>
                 </p>
                 <button class="flex items-center gap-0.5 text-[var(--text--sub-600)] underline decoration-dotted">
-                  View details <span data-icon="caret-down" data-size="14"></span>
+                  {% translate "View details" %} <span data-icon="caret-down" data-size="14"></span>
                 </button>
               </div>
             </div>
@@ -293,13 +290,12 @@
 
         <!-- Material Insight Card -->
         <div class="bg-[var(--bg--strong-950)] text-white py-5 px-4 rounded-2xl flex flex-col gap-2">
-          <h6 class="text-base font-medium">Material Insight</h6>
+          <h6 class="text-base font-medium">{% translate "Material Insight" %}</h6>
           <p class="text-xs leading-5">
-            Replacing standard cement with supplementary cementitious materials (SCMs) is often the most cost-effective
-            reduction strategy.
+            {% translate "Replacing standard cement with supplementary cementitious materials (SCMs) is often the most cost-effective reduction strategy." %}
           </p>
           <button class="btn btn-primary btn-sm border-none w-fit mt-1.5 shadow-none">
-            Read LCA Guidelines
+            {% translate "Read LCA Guidelines" %}
           </button>
         </div>
 

@@ -395,6 +395,12 @@
         removeTemplateConfirm: "{% translate 'Are you sure you want to remove \"%s\" from the template?' %}",
         removeTemplateUndone:  "{% translate 'This action cannot be undone.' %}",
         duplicateConfirm:      "{% translate 'Create a copy of this template?' %}",
+        errorLabel:            "{% translate 'Error' %}",
+        failedToLoad:          "{% translate 'Failed to load template' %}",
+        updateFailed:          "{% translate 'Update failed' %}",
+        duplicationFailed:     "{% translate 'Duplication failed' %}",
+        deletionFailed:        "{% translate 'Deletion failed' %}",
+        anErrorOccurred:       "{% translate 'An error occurred' %}",
       };
 
       // Global vars for tracking
@@ -438,9 +444,9 @@
           })
           .catch(error => {
             console.error('Error:', error);
-            document.getElementById('modal-template-name').textContent = 'Error';
+            document.getElementById('modal-template-name').textContent = i18n.errorLabel;
             document.getElementById('modal-materials-list').innerHTML =
-              '<li class="text-center py-4 text-red-600">Failed to load template</li>';
+              `<li class="text-center py-4 text-red-600">${i18n.failedToLoad}</li>`;
           });
       }
 
@@ -558,12 +564,12 @@
             htmx.trigger('#search-form', 'submit');
             if (typeof Toast !== 'undefined') Toast.success(i18n.templateUpdated);
           } else {
-            Toast.error(result.error || 'Update failed');
+            Toast.error(result.error || i18n.updateFailed);
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          Toast.error('An error occurred');
+          Toast.error(i18n.anErrorOccurred);
         });
       }
 
@@ -593,12 +599,12 @@
             htmx.trigger('#search-form', 'submit');
             if (typeof Toast !== 'undefined') Toast.success(i18n.templateDuplicated);
           } else {
-            Toast.error(result.error || 'Duplication failed');
+            Toast.error(result.error || i18n.duplicationFailed);
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          Toast.error('An error occurred');
+          Toast.error(i18n.anErrorOccurred);
         });
       }
 
@@ -622,12 +628,12 @@
             htmx.trigger('#search-form', 'submit');
             if (typeof Toast !== 'undefined') Toast.success(i18n.templateDeleted);
           } else {
-            Toast.error(result.error || 'Deletion failed');
+            Toast.error(result.error || i18n.deletionFailed);
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          Toast.error('An error occurred');
+          Toast.error(i18n.anErrorOccurred);
         });
       }
 
@@ -647,12 +653,12 @@
             htmx.trigger('#search-form', 'submit');
             if (typeof Toast !== 'undefined') Toast.success(i18n.templateDeleted);
           } else {
-            Toast.error(result.error || 'Deletion failed');
+            Toast.error(result.error || i18n.deletionFailed);
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          if (typeof Toast !== 'undefined') Toast.error('An error occurred');
+          if (typeof Toast !== 'undefined') Toast.error(i18n.anErrorOccurred);
         });
       }
 
@@ -675,12 +681,12 @@
             htmx.trigger('#search-form', 'submit');
             if (typeof Toast !== 'undefined') Toast.success(i18n.templateDuplicated);
           } else {
-            Toast.error(result.error || 'Duplication failed');
+            Toast.error(result.error || i18n.duplicationFailed);
           }
         })
         .catch(error => {
           console.error('Error:', error);
-          Toast.error('An error occurred');
+          Toast.error(i18n.anErrorOccurred);
         });
       }
 
