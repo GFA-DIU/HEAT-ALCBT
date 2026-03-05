@@ -1,0 +1,154 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-27 21:48+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+#: .\libs\step-manager.js:13
+msgid "Edit Building Information"
+msgstr ""
+
+#: .\libs\step-manager.js:14
+msgid "Update the building information as needed."
+msgstr ""
+
+#: .\libs\step-manager.js:20
+msgid "Building Information"
+msgstr ""
+
+#: .\libs\step-manager.js:25 .\libs\step-manager.js:28
+msgid "Building Name & Location"
+msgstr ""
+
+#: .\libs\step-manager.js:29
+msgid "Add details concerning building name and locations of building."
+msgstr ""
+
+#: .\libs\step-manager.js:33 .\libs\step-manager.js:36
+msgid "Building Details"
+msgstr ""
+
+#: .\libs\step-manager.js:37
+msgid "Add detailed information about your building."
+msgstr ""
+
+#: .\libs\step-manager.js:42
+msgid "Operational Details"
+msgstr ""
+
+#: .\libs\step-manager.js:47 .\libs\step-manager.js:51
+msgid "Operational Schedule & Temperature"
+msgstr ""
+
+#: .\libs\step-manager.js:52
+msgid "Complete field below to add operations information about your building."
+msgstr ""
+
+#: .\libs\step-manager.js:56 .\libs\step-manager.js:59
+msgid "Cooling System"
+msgstr ""
+
+#: .\libs\step-manager.js:60
+msgid ""
+"Enter details of the building's cooling system, including type and capacity."
+msgstr ""
+
+#: .\libs\step-manager.js:64 .\libs\step-manager.js:67
+msgid "Ventilation System"
+msgstr ""
+
+#: .\libs\step-manager.js:68
+msgid ""
+"Provide details on the building,s ventilation type, capacity, and coverage "
+"to assess airflow and indoor air quality."
+msgstr ""
+
+#: .\libs\step-manager.js:72 .\libs\step-manager.js:75
+msgid "Lighting System"
+msgstr ""
+
+#: .\libs\step-manager.js:76
+msgid ""
+"Provide details on lighting types, power use, and controls to assess "
+"efficiency."
+msgstr ""
+
+#: .\libs\step-manager.js:80 .\libs\step-manager.js:83
+msgid "Lift & Escalator System"
+msgstr ""
+
+#: .\libs\step-manager.js:84
+msgid "Provide details on lift & escalator systems in your building if any."
+msgstr ""
+
+#: .\libs\step-manager.js:88 .\libs\step-manager.js:91
+msgid "Hot Water System"
+msgstr ""
+
+#: .\libs\step-manager.js:92
+msgid ""
+"Defines the building's method of producing and distributing hot water, "
+"including equipment type, energy source, and usage patterns."
+msgstr ""
+
+#: .\libs\step-manager.js:97
+msgid "Operational Data Entry"
+msgstr ""
+
+#: .\libs\step-manager.js:102
+msgid "Data Entry"
+msgstr ""
+
+#: .\libs\step-manager.js:105
+msgid "Operational Energy carrier"
+msgstr ""
+
+#: .\libs\step-manager.js:106
+msgid "Tell us what fuels or energy sources your building runs on."
+msgstr ""
+
+#: .\libs\step-manager.js:111 .\libs\step-manager.js:120
+msgid "Building Structural Components"
+msgstr ""
+
+#: .\libs\step-manager.js:116
+msgid "Structural Components"
+msgstr ""
+
+#: .\libs\step-manager.js:121
+msgid ""
+"Enter information about the building's walls, floors, roofs, and other "
+"structural parts."
+msgstr ""
+
+#: .\libs\step-manager.js:397
+#, javascript-format
+msgid "%s%% completed"
+msgstr ""
+
+#: .\libs\step-manager.js:782
+#, javascript-format
+msgid "%s out of"
+msgstr ""
+
+#: .\libs\step-manager.js:784
+#, javascript-format
+msgid "%s steps"
+msgstr ""
+
+#: .\libs\step-manager.js:983
+msgid "100% completed"
+msgstr ""

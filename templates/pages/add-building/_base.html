@@ -1,5 +1,6 @@
 {% extends "_base.html" %}
-{% load static  %}
+{% load static %}
+{% load i18n %}
 
 {% block title %}Add Building{% endblock %}
 
@@ -36,15 +37,15 @@
             alt="logo image"
             class="w-[3.25rem]"
           />
-          <h1 id="page-title" class="text-base font-extrabold mt-6">Add New Building</h1>
+          <h1 id="page-title" class="text-base font-extrabold mt-6">{% translate "Add New Building" %}</h1>
           <p id="page-description" class="text-sm font-medium mt-1 text-[var(--text--sub-600)]">
-            Complete the following steps to add a new building
+            {% translate "Complete the following steps to add a new building" %}
           </p>
           <div class="flex flex-col gap-1.5 mt-4">
             <span
               class="text-xs font-medium text-[var(--text--sub-600)]"
               id="progress-text"
-              >0% completed</span
+              >{% translate "0% completed" %}</span
             >
             <progress
               class="progress progress-primary w-full"
@@ -67,6 +68,7 @@
 {% block new-building %}
 
 {% endblock new-building %}
+  <script src="{% url 'javascript-catalog' %}"></script>
   <script src="{% static 'js/form-validator.js' %}"></script>
   <script src="{% static 'js/step-manager.js' %}"></script>
   <script src="{% static 'js/geo-location.js' %}"></script>

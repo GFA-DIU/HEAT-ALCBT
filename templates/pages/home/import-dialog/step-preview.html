@@ -1,14 +1,15 @@
+{% load i18n %}
 <div class="size-full space-y-5 flex flex-col">
   <div class="space-y-1 shrink-0">
-    <h6 class="h6-title text-[var(--text--strong-950)]">Preview & Confirm</h6>
+    <h6 class="h6-title text-[var(--text--strong-950)]">{% translate "Preview & Confirm" %}</h6>
     <p class="paragraph-small text-[var(--text--sub-600)]">
-      Review the data that will be imported. Upload any required files below, then click Confirm & Import.
+      {% translate "Review the data that will be imported. Upload any required files below, then click Confirm & Import." %}
     </p>
   </div>
 
   <!-- Tab 1 summary -->
   <div class="space-y-2 shrink-0">
-    <p class="label-small text-[var(--text--strong-950)]">Building Name &amp; Location</p>
+    <p class="label-small text-[var(--text--strong-950)]">{% translate "Building Name & Location" %}</p>
     <div class="w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
       <table class="table w-full border-collapse">
         <tbody id="preview-tab1" class="paragraph-small text-[var(--text--strong-950)]">
@@ -19,7 +20,7 @@
 
   <!-- Tab 2 summary -->
   <div class="space-y-2 shrink-0">
-    <p class="label-small text-[var(--text--strong-950)]">Building Details</p>
+    <p class="label-small text-[var(--text--strong-950)]">{% translate "Building Details" %}</p>
     <div class="w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
       <table class="table w-full border-collapse">
         <tbody id="preview-tab2" class="paragraph-small text-[var(--text--strong-950)]">
@@ -30,7 +31,7 @@
 
   <!-- Tab 3 summary -->
   <div id="preview-tab3-section" class="space-y-2 shrink-0">
-    <p class="label-small text-[var(--text--strong-950)]">Operational Schedule &amp; Temperature</p>
+    <p class="label-small text-[var(--text--strong-950)]">{% translate "Operational Schedule & Temperature" %}</p>
     <div class="w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
       <table class="table w-full border-collapse">
         <tbody id="preview-tab3" class="paragraph-small text-[var(--text--strong-950)]">
@@ -45,12 +46,12 @@
   <!-- Certification file upload — shown when has_certification = Yes -->
   <div id="cert-upload-section" class="hidden flex-col gap-2 shrink-0">
     <p class="label-small text-[var(--text--strong-950)]">
-      Certification file
+      {% translate "Certification file" %}
       <span class="text-[var(--state--error--base)] ml-0.5">*</span>
     </p>
     <p class="paragraph-x-small text-[var(--text--sub-600)]">
-      Your template indicates this building has a certification. Please upload the certificate.
-      Accepted: JPG, PNG, GIF, WEBP, PDF &mdash; max 20&thinsp;MB.
+      {% translate "Your template indicates this building has a certification. Please upload the certificate." %}
+      {% translate "Accepted: JPG, PNG, GIF, WEBP, PDF — max 20 MB." %}
     </p>
     <input
       type="file"
@@ -63,12 +64,12 @@
   <!-- BoQ files upload — shown when has_boq = Yes -->
   <div id="boq-upload-section" class="hidden flex-col gap-2 shrink-0">
     <p class="label-small text-[var(--text--strong-950)]">
-      Bill of Quantities &amp; design drawings
+      {% translate "Bill of Quantities & design drawings" %}
       <span class="text-[var(--state--error--base)] ml-0.5">*</span>
     </p>
     <p class="paragraph-x-small text-[var(--text--sub-600)]">
-      Your template indicates this building has BoQ / design drawing files. Please upload one or more files.
-      Accepted: JPG, PNG, GIF, WEBP, PDF &mdash; max 20&thinsp;MB each.
+      {% translate "Your template indicates this building has BoQ / design drawing files. Please upload one or more files." %}
+      {% translate "Accepted: JPG, PNG, GIF, WEBP, PDF — max 20 MB each." %}
     </p>
     <input
       type="file"
@@ -82,6 +83,14 @@
 
 <script>
   (function () {
+    var i18n = {
+      row:               "{% translate 'row' %}",
+      rows:              "{% translate 'rows' %}",
+      liftSystem:        "{% translate 'Lift & Escalator System' %}",
+      energyCarriers:    "{% translate 'Operational Energy Carriers' %}",
+      structuralComps:   "{% translate 'Structural Components' %}",
+    };
+
     const state = window.importState || {};
     const t1 = state.tab1 || {};
     const t2 = state.tab2 || {};
@@ -99,38 +108,38 @@
     }
 
     renderTable('preview-tab1', [
-      ['Building name',  t1.building_name],
-      ['Address',        t1.address],
-      ['Country',        t1.country],
-      ['Region',         t1.region],
-      ['City',           t1.city],
-      ['Longitude',      t1.longitude],
-      ['Latitude',       t1.latitude],
+      ["{% translate 'Building name' %}",  t1.building_name],
+      ["{% translate 'Address' %}",        t1.address],
+      ["{% translate 'Country' %}",        t1.country],
+      ["{% translate 'Region' %}",         t1.region],
+      ["{% translate 'City' %}",           t1.city],
+      ["{% translate 'Longitude' %}",      t1.longitude],
+      ["{% translate 'Latitude' %}",       t1.latitude],
     ]);
 
     renderTable('preview-tab2', [
-      ['Building type',             t2.building_type],
-      ['Climate type',              t2.climate_type],
-      ['Assessment period (years)', t2.assessment_period],
-      ['Total floor area (m²)',     t2.total_floor_area],
-      ['Conditioned floor area (m²)', t2.conditioned_floor_area],
-      ['Construction year',         t2.construction_year],
-      ['Floors below ground',       t2.floors_below_ground],
-      ['Has certification',         t2.has_certification],
-      ['Has BoQ / design drawings', t2.has_boq],
+      ["{% translate 'Building type' %}",             t2.building_type],
+      ["{% translate 'Climate type' %}",              t2.climate_type],
+      ["{% translate 'Assessment period (years)' %}", t2.assessment_period],
+      ["{% translate 'Total floor area (m²)' %}",     t2.total_floor_area],
+      ["{% translate 'Conditioned floor area (m²)' %}", t2.conditioned_floor_area],
+      ["{% translate 'Construction year' %}",         t2.construction_year],
+      ["{% translate 'Floors below ground' %}",       t2.floors_below_ground],
+      ["{% translate 'Has certification' %}",         t2.has_certification],
+      ["{% translate 'Has BoQ / design drawings' %}", t2.has_boq],
     ]);
 
     renderTable('preview-tab3', [
-      ['Number of residents',                 t3.num_residents],
-      ['Hours per day',                       t3.hours_per_workday],
-      ['Days per week',                       t3.workdays_per_week],
-      ['Weeks per year',                      t3.weeks_per_year],
-      ['Room heating temperature',            t3.heating_temp],
-      ['Heating temperature unit',            t3.heating_temp_unit],
-      ['Room cooling temperature',            t3.cooling_temp],
-      ['Cooling temperature unit',            t3.cooling_temp_unit],
-      ['Renewable energy installation (%)',   t3.renewable_energy_percent],
-      ['Building smart system installation',  t3.building_smart_system],
+      ["{% translate 'Number of residents' %}",                t3.num_residents],
+      ["{% translate 'Hours per day' %}",                      t3.hours_per_workday],
+      ["{% translate 'Days per week' %}",                      t3.workdays_per_week],
+      ["{% translate 'Weeks per year' %}",                     t3.weeks_per_year],
+      ["{% translate 'Room heating temperature' %}",           t3.heating_temp],
+      ["{% translate 'Heating temperature unit' %}",           t3.heating_temp_unit],
+      ["{% translate 'Room cooling temperature' %}",           t3.cooling_temp],
+      ["{% translate 'Cooling temperature unit' %}",           t3.cooling_temp_unit],
+      ["{% translate 'Renewable energy installation (%)' %}",  t3.renewable_energy_percent],
+      ["{% translate 'Building smart system installation' %}",  t3.building_smart_system],
     ]);
 
     // Hide Tab 3 section if no data was parsed
@@ -156,7 +165,7 @@
           <div class="group collapse-title py-2.5 px-4 bg-[var(--bg--weak-50)] flex items-center justify-between">
             <span class="label-small text-[var(--text--strong-950)]">${title}</span>
             <div class="flex items-center gap-2">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[var(--bg--soft-200)] paragraph-x-small text-[var(--text--sub-600)]">${rowCount} ${rowCount === 1 ? 'row' : 'rows'}</span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[var(--bg--soft-200)] paragraph-x-small text-[var(--text--sub-600)]">${rowCount} ${rowCount === 1 ? i18n.row : i18n.rows}</span>
               <span data-icon="caret-down" data-size="16" class="transition-transform duration-300 ease-in-out peer-checked:rotate-180"></span>
             </div>
           </div>
@@ -176,7 +185,11 @@
     }
 
     function structuralRowsToTableHtml(rows) {
-      const headers = ['Component', 'Technique', 'Dimension', 'Qty', 'Unit', 'EPD Name', 'Country', 'EPD Qty', 'EPD Unit'];
+      const headers = [
+        "{% translate 'Component' %}", "{% translate 'Technique' %}", "{% translate 'Dimension' %}",
+        "{% translate 'Qty' %}", "{% translate 'Unit' %}", "{% translate 'EPD Name' %}",
+        "{% translate 'Country' %}", "{% translate 'EPD Qty' %}", "{% translate 'EPD Unit' %}"
+      ];
       const thead = `<thead class="bg-[var(--bg--weak-50)]"><tr>${headers.map(h => `<th class="px-4 py-2 text-left font-normal paragraph-x-small text-[var(--text--sub-600)]">${h}</th>`).join('')}</tr></thead>`;
       const tbody = rows.map(row => {
         const c = (i) => { const v = row[i]; return (v !== null && v !== undefined && v !== '') ? v : '—'; };
@@ -189,19 +202,19 @@
     }
 
     const COOLING_LABELS = {
-      'window ac': 'Cooling — Window AC', 'split ac': 'Cooling — Split AC', 'vrf': 'Cooling — VRF',
-      'packagedductab': 'Cooling — Packaged / Ducted', 'water cooled': 'Cooling — Water-cooled Chiller', 'air cooled': 'Cooling — Air-cooled Chiller',
+      'window ac': "{% translate 'Cooling — Window AC' %}", 'split ac': "{% translate 'Cooling — Split AC' %}", 'vrf': "{% translate 'Cooling — VRF' %}",
+      'packagedductab': "{% translate 'Cooling — Packaged / Ducted' %}", 'water cooled': "{% translate 'Cooling — Water-cooled Chiller' %}", 'air cooled': "{% translate 'Cooling — Air-cooled Chiller' %}",
     };
     const VENT_LABELS = {
-      'ahu': 'Ventilation — AHU', 'fcu': 'Ventilation — FCU', 'ceilingwa': 'Ventilation — Cassette AC',
-      'doas': 'Ventilation — DOAS', 'ceilingex': 'Ventilation — Ceiling / Exhaust Fan',
+      'ahu': "{% translate 'Ventilation — AHU' %}", 'fcu': "{% translate 'Ventilation — FCU' %}", 'ceilingwa': "{% translate 'Ventilation — Cassette AC' %}",
+      'doas': "{% translate 'Ventilation — DOAS' %}", 'ceilingex': "{% translate 'Ventilation — Ceiling / Exhaust Fan' %}",
     };
     const LIGHTING_LABELS = {
-      'led': 'Lighting — LED', 'fluorescent': 'Lighting — Fluorescent', 'cfl': 'Lighting — CFL',
-      'incandescent': 'Lighting — Incandescent', 'hid': 'Lighting — HID',
+      'led': "{% translate 'Lighting — LED' %}", 'fluorescent': "{% translate 'Lighting — Fluorescent' %}", 'cfl': "{% translate 'Lighting — CFL' %}",
+      'incandescent': "{% translate 'Lighting — Incandescent' %}", 'hid': "{% translate 'Lighting — HID' %}",
     };
     const HWS_LABELS = {
-      'heat-pump': 'Hot Water — Heat Pump', 'boiler': 'Hot Water — Boiler', 'water-heater': 'Hot Water — Water Heater',
+      'heat-pump': "{% translate 'Hot Water — Heat Pump' %}", 'boiler': "{% translate 'Hot Water — Boiler' %}", 'water-heater': "{% translate 'Hot Water — Water Heater' %}",
     };
 
     function renderSystemTabs(systems, labelMap) {
@@ -219,7 +232,7 @@
     // Lift & Escalator (flat array)
     const lift = state.liftEscalator || [];
     if (lift.length > 0) {
-      container.appendChild(makeCollapsible('Lift & Escalator System', lift.length, rowsToTableHtml(lift)));
+      container.appendChild(makeCollapsible(i18n.liftSystem, lift.length, rowsToTableHtml(lift)));
     }
 
     renderSystemTabs(state.hotWaterSystems, HWS_LABELS);
@@ -227,13 +240,13 @@
     // Energy Carriers (flat array)
     const ec = state.energyCarriers || [];
     if (ec.length > 0) {
-      container.appendChild(makeCollapsible('Operational Energy Carriers', ec.length, rowsToTableHtml(ec)));
+      container.appendChild(makeCollapsible(i18n.energyCarriers, ec.length, rowsToTableHtml(ec)));
     }
 
     // Structural Components (flat array)
     const sc = state.structuralComponents || [];
     if (sc.length > 0) {
-      container.appendChild(makeCollapsible('Structural Components', sc.length, structuralRowsToTableHtml(sc), true));
+      container.appendChild(makeCollapsible(i18n.structuralComps, sc.length, structuralRowsToTableHtml(sc), true));
     }
 
     if (window.IconComponent) window.IconComponent.initialize();

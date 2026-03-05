@@ -1,20 +1,21 @@
 {% extends 'account/_auth.html' %}
 {% load crispy_forms_tags %}
+{% load i18n %}
 
 {% block auth_content %}
-  <h2 class="text-xl font-bold text-center text-[var(--text--strong-950)] mb-6">Update Profile</h2>
+  <h2 class="text-xl font-bold text-center text-[var(--text--strong-950)] mb-6">{% translate "Update Profile" %}</h2>
 
   <form method="post" action="{% url 'update_profile' %}" class="space-y-6">
     {% csrf_token %}
 
     <!-- Account Information Section -->
     <div class="space-y-4">
-      <h3 class="text-base font-bold text-[var(--text--strong-950)]">Account Information</h3>
+      <h3 class="text-base font-bold text-[var(--text--strong-950)]">{% translate "Account Information" %}</h3>
 
       <!-- Username Field -->
       <fieldset class="fieldset">
         <legend class="fieldset-legend">
-          Username<span class="text-error">*</span>
+          {% translate "Username" %}<span class="text-error">*</span>
         </legend>
         <label class="input w-full">
           {{ user_form.username }}
@@ -29,7 +30,7 @@
       <!-- Email Field -->
       <fieldset class="fieldset">
         <legend class="fieldset-legend">
-          Email<span class="text-error">*</span>
+          {% translate "Email" %}<span class="text-error">*</span>
         </legend>
         <label class="input w-full">
           {{ user_form.email }}
@@ -44,11 +45,11 @@
 
     <!-- Profile Information Section -->
     <div class="space-y-4">
-      <h3 class="text-base font-bold text-[var(--text--strong-950)]">Location Information</h3>
+      <h3 class="text-base font-bold text-[var(--text--strong-950)]">{% translate "Location Information" %}</h3>
 
       <!-- Country Field -->
       <fieldset class="fieldset">
-        <legend class="fieldset-legend">Country</legend>
+        <legend class="fieldset-legend">{% translate "Country" %}</legend>
         <label class="w-full flex relative">
           <select
             id="country-select"
@@ -56,7 +57,7 @@
             class="select w-full"
             onchange="handleCountryChange(this)"
           >
-            <option value="">Select a country</option>
+            <option value="">{% translate "Select a country" %}</option>
             {% for country in profile_form.country.field.queryset %}
               <option value="{{ country.id }}" {% if profile_form.country.value == country.id %}selected{% endif %}>
                 {{ country.name }}
@@ -74,7 +75,7 @@
       <!-- Region Field (Dynamic) -->
       <div id="region-container">
         <fieldset class="fieldset" id="region-fieldset">
-          <legend class="fieldset-legend">Region or State</legend>
+          <legend class="fieldset-legend">{% translate "Region or State" %}</legend>
           <label class="w-full flex relative">
             <select
               id="region-select"
@@ -82,7 +83,7 @@
               class="select w-full"
               onchange="handleRegionChange(this)"
             >
-              <option value="">Select a region or state</option>
+              <option value="">{% translate "Select a region or state" %}</option>
               {% if profile_form.region.value %}
                 {% for region in profile_form.region.field.queryset %}
                   <option value="{{ region.id }}" {% if profile_form.region.value == region.id %}selected{% endif %}>
@@ -101,13 +102,13 @@
 
         <!-- Text input for Global country (hidden by default) -->
         <fieldset class="fieldset hidden" id="region-text-fieldset">
-          <legend class="fieldset-legend">Region or State</legend>
+          <legend class="fieldset-legend">{% translate "Region or State" %}</legend>
           <label class="input w-full">
             <input
               type="text"
               id="region-text-input"
               name="region_text"
-              placeholder="Type region or state"
+              placeholder="{% translate 'Type region or state' %}"
               class="w-full"
             />
           </label>
@@ -117,14 +118,14 @@
       <!-- City Field (Dynamic) -->
       <div id="city-container">
         <fieldset class="fieldset" id="city-fieldset">
-          <legend class="fieldset-legend">City</legend>
+          <legend class="fieldset-legend">{% translate "City" %}</legend>
           <label class="w-full flex relative">
             <select
               id="city-select"
               name="city"
               class="select w-full"
             >
-              <option value="">Select a city</option>
+              <option value="">{% translate "Select a city" %}</option>
               {% if profile_form.city.value %}
                 {% for city in profile_form.city.field.queryset %}
                   <option value="{{ city.id }}" {% if profile_form.city.value == city.id %}selected{% endif %}>
@@ -143,13 +144,13 @@
 
         <!-- Text input for Global country (hidden by default) -->
         <fieldset class="fieldset hidden" id="city-text-fieldset">
-          <legend class="fieldset-legend">City</legend>
+          <legend class="fieldset-legend">{% translate "City" %}</legend>
           <label class="input w-full">
             <input
               type="text"
               id="city-text-input"
               name="city_text"
-              placeholder="Type city name"
+              placeholder="{% translate 'Type city name' %}"
               class="w-full"
             />
           </label>
@@ -159,7 +160,7 @@
       <!-- Consent Flag -->
       <label class="label cursor-pointer justify-start gap-3">
         {{ profile_form.consent_flag }}
-        <span class="text-sm text-[var(--text--strong-950)]">Share my info with BEAT tool maintainers</span>
+        <span class="text-sm text-[var(--text--strong-950)]">{% translate "Share my info with BEAT tool maintainers" %}</span>
       </label>
       {% if profile_form.consent_flag.errors %}
         <div class="label text-error text-xs">
@@ -167,27 +168,32 @@
         </div>
       {% endif %}
       <p class="text-xs text-[var(--text--sub-600)]">
-        By enabling this option, you allow the BEAT tool maintainers to access your profile information for support and improvement purposes.
+        {% translate "By enabling this option, you allow the BEAT tool maintainers to access your profile information for support and improvement purposes." %}
       </p>
     </div>
 
     <!-- Form Actions -->
     <div class="flex flex-col gap-3">
       <button type="submit" class="btn btn-primary w-full">
-        Update Profile
+        {% translate "Update Profile" %}
       </button>
-      <a href="{% url 'home' %}" class="btn btn-ghost w-full">Cancel</a>
+      <a href="{% url 'home' %}" class="btn btn-ghost w-full">{% translate "Cancel" %}</a>
       <button
         type="button"
         class="btn btn-error btn-outline w-full"
-        hx-confirm="Are you sure you want to delete your profile? This action cannot be undone."
+        hx-confirm="{% translate 'Are you sure you want to delete your profile? This action cannot be undone.' %}"
         hx-delete="{% url 'update_profile' %}">
-        Delete Account
+        {% translate "Delete Account" %}
       </button>
     </div>
   </form>
 
   <script>
+    var i18n = {
+      selectCity:   "{% translate 'Select a city' %}",
+      selectRegion: "{% translate 'Select a region or state' %}",
+    };
+
     // Check if country is Global on page load
     function handleCountryChange(selectElement) {
       const selectedOption = selectElement.options[selectElement.selectedIndex];
@@ -229,7 +235,7 @@
             .then(response => response.text())
             .then(html => {
               regionSelect.innerHTML = html;
-              citySelect.innerHTML = '<option value="">Select a city</option>';
+              citySelect.innerHTML = `<option value="">${i18n.selectCity}</option>`;
               // Reinitialize icons
               if (window.IconComponent) {
                 window.IconComponent.initialize();
@@ -237,11 +243,11 @@
             })
             .catch(error => {
               console.error('Error loading regions:', error);
-              regionSelect.innerHTML = '<option value="">Select a region or state</option>';
+              regionSelect.innerHTML = `<option value="">${i18n.selectRegion}</option>`;
             });
         } else {
-          regionSelect.innerHTML = '<option value="">Select a region or state</option>';
-          citySelect.innerHTML = '<option value="">Select a city</option>';
+          regionSelect.innerHTML = `<option value="">${i18n.selectRegion}</option>`;
+          citySelect.innerHTML = `<option value="">${i18n.selectCity}</option>`;
         }
       }
     }
@@ -251,7 +257,7 @@
       const citySelect = document.getElementById('city-select');
 
       if (!regionId) {
-        citySelect.innerHTML = '<option value="">Select a city</option>';
+        citySelect.innerHTML = `<option value="">${i18n.selectCity}</option>`;
         return;
       }
 
@@ -267,7 +273,7 @@
         })
         .catch(error => {
           console.error('Error loading cities:', error);
-          citySelect.innerHTML = '<option value="">Select a city</option>';
+          citySelect.innerHTML = `<option value="">${i18n.selectCity}</option>`;
         });
     }
 

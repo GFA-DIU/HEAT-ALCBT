@@ -1,4 +1,5 @@
 {% load crispy_forms_tags %}
+{% load i18n %}
 
 <ul class="flex flex-col gap-2">
     {% for epd in epd_list %}
@@ -18,14 +19,14 @@
                   ></span>
                   <span class="text-[var(--text--sub-600)]">
                     {% if epd.type == "official" %}
-                    <a href="{{ epd.source }}" 
-                       target="_blank" 
+                    <a href="{{ epd.source }}"
+                       target="_blank"
                        rel="noopener noreferrer"
                        class="btn btn-ghost btn-xs btn-square">
                         <span data-icon="external-link-line" data-size="16" data-color="var(--icon--sub-600)"></span>
                     </a>
                     {% elif epd.type == "generic" %}
-                    Generic
+                    {% translate "Generic" %}
                     {% endif %}
                   </span>
                 </div>
@@ -38,7 +39,7 @@
                 >
                 <span
                   class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >Unit: {{ epd.declared_unit }}</span
+                  >{% translate "Unit:" %} {{ epd.declared_unit }}</span
                 >
                 <span
                   class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
@@ -63,13 +64,13 @@
                 data-size="20"
                 data-color="var(--icon--strong-950)"
               ></span>
-              Add
+              {% translate "Add" %}
             </button>
           </li>
     {% empty %}
     <li class="text-center py-8 text-[var(--text--sub-600)] flex flex-col items-center">
         <span data-icon="oil-line" data-size="48" data-color="var(--icon--soft-400)" class="mx-auto block mb-2"></span>
-        <p>No energy carriers found matching your criteria</p>
+        <p>{% translate "No energy carriers found matching your criteria" %}</p>
     </li>
     {% endfor %}
 </ul>
@@ -78,18 +79,6 @@
 {% if epd_list %}
     <nav class='block w-fill' hx-swap-oob="true" id='pagination' aria-label="Pagination">
         <div class="flex items-center gap-2 w-full justify-center">
-            <!-- Jump to First Button -->
-            {% comment %} {% if epd_list.has_previous %}
-            <button class="join-item btn btn-sm"
-                    hx-get="{% url 'building_step_operational' %}?page=1&{{ filters|urlencode }}"
-                    hx-target="#operational-epd-list"
-                    hx-swap="innerHTML">
-                Start
-            </button>
-            {% else %}
-            <button class="join-item btn btn-sm btn-disabled" disabled>Start</button>
-            {% endif %} {% endcomment %}
-
             <!-- Previous Button -->
             {% if epd_list.has_previous %}
             <button class="btn btn-ghost btn-sm"
@@ -97,14 +86,14 @@
                     hx-target="#operational-epd-list"
                     hx-swap="innerHTML">
                 <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
-                Previous
+                {% translate "Previous" %}
             </button>
             {% else %}
             <button class="btn btn-ghost btn-sm btn-disabled" disabled>
                 <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
-                Previous
+                {% translate "Previous" %}
             </button>
-            {% endif %} 
+            {% endif %}
 
             <!-- Page Numbers -->
             {% for num in epd_list.paginator.page_range %}
@@ -128,27 +117,15 @@
                     hx-get="{% url 'building_step_operational' %}?page={{ epd_list.next_page_number }}&{{ filters|urlencode }}"
                     hx-target="#operational-epd-list"
                     hx-swap="innerHTML">
-                    Next
+                    {% translate "Next" %}
                 <span data-icon="arrow-right" data-size="20" data-color="var(--icon--strong-950)"></span>
             </button>
             {% else %}
             <button class="btn btn-ghost btn-sm btn-disabled" disabled>
-                Next
+                {% translate "Next" %}
                 <span data-icon="arrow-right" data-size="16" data-color="var(--icon--strong-950)"></span>
             </button>
             {% endif %}
-
-            <!-- Jump to Last Button -->
-            {% comment %} {% if epd_list.has_next %}
-            <button class="join-item btn btn-sm"
-                    hx-get="{% url 'building_step_operational' %}?page={{ epd_list.paginator.num_pages }}&{{ filters|urlencode }}"
-                    hx-target="#operational-epd-list"
-                    hx-swap="innerHTML">
-                End
-            </button>
-            {% else %}
-            <button class="join-item btn btn-sm btn-disabled" disabled>End</button>
-            {% endif %} {% endcomment %}
         </div>
     </nav>
 {% endif %}

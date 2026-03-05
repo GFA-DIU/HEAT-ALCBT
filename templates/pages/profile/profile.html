@@ -1,8 +1,9 @@
 {% extends '_base.html' %}
 {% load static %}
+{% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block title %}Profile - BEAT{% endblock title %}
+{% block title %}{% translate "Profile" %} - BEAT{% endblock title %}
 
 {% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock %}
 
@@ -12,9 +13,9 @@
     <!-- Header -->
     <div class="flex flex-col gap-6 w-full mt-7">
       <div class="flex flex-col text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]">
-        Profile Settings
+        {% translate "Profile Settings" %}
         <p class="text-sm font-normal text-[var(--text--sub-600)]">
-          Manage your account information and preferences
+          {% translate "Manage your account information and preferences" %}
         </p>
       </div>
     </div>
@@ -44,14 +45,14 @@
                 <div class="flex items-center gap-2 text-sm">
                   <span data-icon="calendar-view" data-size="20" data-color="var(--icon--sub-600)"></span>
                   <div class="flex flex-col">
-                    <span class="text-xs text-[var(--text--sub-600)]">Joined</span>
+                    <span class="text-xs text-[var(--text--sub-600)]">{% translate "Joined" %}</span>
                     <span class="font-medium">{{ user.date_joined|date:"M d, Y" }}</span>
                   </div>
                 </div>
                 <div class="flex items-center gap-2 text-sm">
                   <span data-icon="user-6-line" data-size="20" data-color="var(--icon--sub-600)"></span>
                   <div class="flex flex-col">
-                    <span class="text-xs text-[var(--text--sub-600)]">Last login</span>
+                    <span class="text-xs text-[var(--text--sub-600)]">{% translate "Last login" %}</span>
                     <span class="font-medium">{{ user.last_login|date:"M d, Y H:i" }}</span>
                   </div>
                 </div>
@@ -59,7 +60,7 @@
                 <div class="flex items-center gap-2 text-sm">
                   <span data-icon="global-line" data-size="20" data-color="var(--icon--sub-600)"></span>
                   <div class="flex flex-col">
-                    <span class="text-xs text-[var(--text--sub-600)]">Location</span>
+                    <span class="text-xs text-[var(--text--sub-600)]">{% translate "Location" %}</span>
                     <span class="font-medium">
                       {% if profile.city %}{{ profile.city }}, {% endif %}
                       {% if profile.region %}{{ profile.region }}, {% endif %}
@@ -76,15 +77,15 @@
         <!-- Quick Actions -->
         <div class="card bg-[var(--bg--base-600)] border border-[var(--stroke--soft-200)] shadow-sm mt-4">
           <div class="card-body p-4">
-            <h4 class="text-sm font-bold mb-3">Quick Actions</h4>
+            <h4 class="text-sm font-bold mb-3">{% translate "Quick Actions" %}</h4>
             <div class="space-y-2">
               <a href="{% url 'account_change_password' %}" class="btn btn-ghost btn-sm w-full justify-start">
                 <span data-icon="lock-2-line" data-size="20"></span>
-                <span>Change Password</span>
+                <span>{% translate "Change Password" %}</span>
               </a>
               <button onclick="showCookieSettings()" class="btn btn-ghost btn-sm w-full justify-start">
                 <span data-icon="settings-5-line" data-size="20"></span>
-                <span>Cookie Settings</span>
+                <span>{% translate "Cookie Settings" %}</span>
               </button>
             </div>
           </div>
@@ -95,7 +96,7 @@
       <div class="lg:col-span-2">
         <div class="card bg-[var(--bg--base-600)] border border-[var(--stroke--soft-200)] shadow-sm">
           <div class="card-body p-6">
-            <h3 class="text-xl font-bold mb-6">Edit Profile</h3>
+            <h3 class="text-xl font-bold mb-6">{% translate "Edit Profile" %}</h3>
 
             <form method="post" class="space-y-6">
               {% csrf_token %}
@@ -104,13 +105,13 @@
               <div class="space-y-4">
                 <h4 class="text-base font-bold text-[var(--text--strong-950)] flex items-center gap-2">
                   <span data-icon="user-6-line" data-size="20"></span>
-                  Account Information
+                  {% translate "Account Information" %}
                 </h4>
 
                 <!-- Username Field -->
                 <fieldset class="fieldset">
                   <legend class="fieldset-legend">
-                    Username<span class="text-error">*</span>
+                    {% translate "Username" %}<span class="text-error">*</span>
                   </legend>
                   <label class="input w-full">
                     <span data-icon="user-6-line" data-color="var(--icon--soft-400)"></span>
@@ -126,7 +127,7 @@
                 <!-- Email Field -->
                 <fieldset class="fieldset">
                   <legend class="fieldset-legend">
-                    Email<span class="text-error">*</span>
+                    {% translate "Email" %}<span class="text-error">*</span>
                   </legend>
                   <label class="input w-full">
                     <span data-icon="mail-fill" data-color="var(--icon--soft-400)"></span>
@@ -146,12 +147,12 @@
               <div class="space-y-4">
                 <h4 class="text-base font-bold text-[var(--text--strong-950)] flex items-center gap-2">
                   <span data-icon="global-line" data-size="20"></span>
-                  Location Information
+                  {% translate "Location Information" %}
                 </h4>
 
                 <!-- Country Field -->
                 <fieldset class="fieldset">
-                  <legend class="fieldset-legend">Country</legend>
+                  <legend class="fieldset-legend">{% translate "Country" %}</legend>
                   <label class="w-full flex relative">
                     <div class="select-icon">
                       <span data-icon="global-line" data-color="var(--icon--soft-400)"></span>
@@ -167,7 +168,7 @@
 
                 <!-- Region Field -->
                 <fieldset class="fieldset">
-                  <legend class="fieldset-legend">Region or State</legend>
+                  <legend class="fieldset-legend">{% translate "Region or State" %}</legend>
                   <label class="w-full flex relative">
                     <div class="select-icon">
                       <span data-icon="flashlight-line" data-color="var(--icon--soft-400)"></span>
@@ -183,7 +184,7 @@
 
                 <!-- City Field -->
                 <fieldset class="fieldset">
-                  <legend class="fieldset-legend">City</legend>
+                  <legend class="fieldset-legend">{% translate "City" %}</legend>
                   <label class="w-full flex relative">
                     <div class="select-icon">
                       <span data-icon="building-line" data-color="var(--icon--soft-400)"></span>
@@ -204,13 +205,13 @@
               <div class="space-y-4">
                 <h4 class="text-base font-bold text-[var(--text--strong-950)] flex items-center gap-2">
                   <span data-icon="question-line" data-size="20"></span>
-                  Privacy Settings
+                  {% translate "Privacy Settings" %}
                 </h4>
 
                 <!-- Consent Flag -->
                 <label class="label text-[var(--text--strong-950)] text-sm/5 font-medium cursor-pointer">
                   {{ profile_form.consent_flag }}
-                  <span class="ml-2">Share my info with BEAT tool maintainers</span>
+                  <span class="ml-2">{% translate "Share my info with BEAT tool maintainers" %}</span>
                 </label>
                 {% if profile_form.consent_flag.errors %}
                   <div class="label text-error text-xs">
@@ -218,16 +219,16 @@
                   </div>
                 {% endif %}
                 <p class="text-xs text-[var(--text--sub-600)] mt-1">
-                  By enabling this option, you allow the BEAT tool maintainers to access your profile information for support and improvement purposes.
+                  {% translate "By enabling this option, you allow the BEAT tool maintainers to access your profile information for support and improvement purposes." %}
                 </p>
               </div>
 
               <!-- Form Actions -->
               <div class="flex gap-3 justify-end pt-4">
-                <a href="{% url 'home' %}" class="btn btn-ghost">Cancel</a>
+                <a href="{% url 'home' %}" class="btn btn-ghost">{% translate "Cancel" %}</a>
                 <button type="submit" class="btn btn-primary">
                   <span data-icon="save-line" data-size="20"></span>
-                  Save Changes
+                  {% translate "Save Changes" %}
                 </button>
               </div>
             </form>

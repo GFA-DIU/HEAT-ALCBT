@@ -1,7 +1,8 @@
 {% extends '_base.html' %}
 {% load static %}
+{% load i18n %}
 {% load crispy_forms_tags %}
-{% block title %}Building View{% endblock title %}
+{% block title %}{% translate "Building View" %}{% endblock title %}
 {% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock body_class %}
 
 {% block content %}
@@ -42,7 +43,7 @@
                 data-color="var(--icon--soft-400)"
               ></span>
               <span class="text-xs/4 font-medium text-[var(--text--sub-600)]"
-                >Last updated: {{  building.updated_at | date:"d/m/Y - H:i A" }}</span
+                >{% translate "Last updated:" %} {{  building.updated_at | date:"d/m/Y - H:i A" }}</span
               >
             </li>
           </ul>
@@ -55,7 +56,7 @@
           </button>
           <a href="{% url 'edit_building' %}?building_uuid={{ building.uuid }}"  class="btn btn-primary">
             <span data-icon="edit-fill" data-size="20"></span>
-            <span>Edit</span>
+            <span>{% translate "Edit" %}</span>
           </a>
         </div>
       </div>
@@ -68,7 +69,7 @@
             <li class="flex flex-col flex-1">
               <span
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
-                >Carbon Footprint</span
+                >{% translate "Carbon Footprint" %}</span
               >
               <div class="flex px-2.5 items-end">
                 <span class="text-2xl/8 font-medium">{{ stats.total_carbon_footprint|floatformat:1|default:"0" }}</span>
@@ -80,7 +81,7 @@
             <li class="flex flex-col flex-1">
               <span
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
-                >Total Floor Area</span
+                >{% translate "Total Floor Area" %}</span
               >
               <div class="flex px-2.5 items-end">
                 <span class="text-2xl/8 font-medium">{{ building.total_floor_area|floatformat:0|default:"0" }}</span>
@@ -92,7 +93,7 @@
             <li class="flex flex-col flex-1">
               <span
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
-                >Embodied Carbon</span
+                >{% translate "Embodied Carbon" %}</span
               >
               <div class="flex px-2.5 items-end">
                 <span class="text-2xl/8 font-medium">{{ stats.total_embodied_carbon|floatformat:1|default:"0" }}</span>
@@ -104,7 +105,7 @@
             <li class="flex flex-col flex-1">
               <span
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
-                >Operational Carbon</span
+                >{% translate "Operational Carbon" %}</span
               >
               <div class="flex px-2.5 items-end">
                 <span class="text-2xl/8 font-medium">{{ stats.total_operational_carbon|floatformat:1|default:"0" }}</span>
@@ -116,7 +117,7 @@
             <li class="flex flex-col flex-1">
               <span
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
-                >Carbon Savings</span
+                >{% translate "Carbon Savings" %}</span
               >
               <div class="flex px-2.5 items-end">
                 <span class="text-2xl/8 font-medium">{{ stats.carbon_savings_percentage|floatformat:1|default:"0" }}%</span>
@@ -129,22 +130,22 @@
               type="radio"
               name="building-tabs"
               class="tab"
-              aria-label="Assembly"
+              aria-label="{% translate 'Assembly' %}"
               checked
             />
             <input
               type="radio"
               name="building-tabs"
               class="tab"
-              aria-label="Materials"
+              aria-label="{% translate 'Materials' %}"
             />
             <input
               type="radio"
               name="building-tabs"
               class="tab"
-              aria-label="Energy"
+              aria-label="{% translate 'Energy' %}"
             />
-            <input type="radio" name="building-tabs" class="tab" aria-label="Savings" />
+            <input type="radio" name="building-tabs" class="tab" aria-label="{% translate 'Savings' %}" />
           </div>
         </div>
       </div>
@@ -168,7 +169,7 @@
             data-size="24"
             data-color="var(--icon--sub-600)"
           ></span>
-          <span class="text-base/6 font-medium">Whole Life Carbon Cycle</span>
+          <span class="text-base/6 font-medium">{% translate "Whole Life Carbon Cycle" %}</span>
         </div>
         <div class="grid place-items-center mt-6 w-[16.5rem] mx-auto">
           <canvas id="whole-life-carbon-cycle"></canvas>
@@ -180,7 +181,7 @@
               style="background-color: var(--state--feature--base)"
             ></div>
             <span class="text-sm text-[var(--text--sub-600)]"
-              >Operational carbon:</span
+              >{% translate "Operational carbon:" %}</span
             >
           </div>
           <div class="flex items-center gap-2">
@@ -189,7 +190,7 @@
               style="background-color: var(--bg--surface-800)"
             ></div>
             <span class="text-sm text-[var(--text--sub-600)]"
-              >Embodied carbon:</span
+              >{% translate "Embodied carbon:" %}</span
             >
           </div>
         </div>
@@ -205,7 +206,7 @@
             data-size="24"
             data-color="var(--icon--sub-600)"
           ></span>
-          <span class="text-base/6 font-medium">Embodied Carbon</span>
+          <span class="text-base/6 font-medium">{% translate "Embodied Carbon" %}</span>
         </div>
         <div class="w-full">
           <canvas id="emboided-carbon-chart"></canvas>
@@ -226,7 +227,7 @@
             data-color="var(--icon--sub-600)"
           ></span>
           <span class="text-base/6 font-medium"
-            >Embodied Carbon by Material</span
+            >{% translate "Embodied Carbon by Material" %}</span
           >
         </div>
         <div class="w-full">
@@ -248,7 +249,7 @@
             data-color="var(--icon--sub-600)"
           ></span>
           <span class="text-base/6 font-medium"
-            >Embodied Carbon by Appliances</span
+            >{% translate "Embodied Carbon by Appliances" %}</span
           >
         </div>
         <div class="w-full">
@@ -259,13 +260,17 @@
 
 
   <script defer>
+    var i18n = {
+      noData: "{% translate 'No data' %}",
+    };
+
     // Dynamic chart data from backend
     const chartData = {{ chart_data|safe }};
 
     async function handleDelete(buildingId, redirectUrl) {
       const confirmed = await confirmDialog.delete(
-        'This will permanently delete the building and all associated data.',
-        'Delete Building?'
+        '{% translate "This will permanently delete the building and all associated data." %}',
+        '{% translate "Delete Building?" %}'
       );
 
       if (confirmed) {
@@ -298,14 +303,14 @@
       );
 
       const templateMap = {
-        "Assembly": "assembly-template",
-        "Materials": "materials-template",
-        "Energy": "energy-template",
+        "{% translate 'Assembly' %}": "assembly-template",
+        "{% translate 'Materials' %}": "materials-template",
+        "{% translate 'Energy' %}": "energy-template",
       };
       const tabContentContainerTop = document.getElementById("tab-content-container-top");
 
       function loadTabContent(tabLabel) {
-        if (tabLabel === "Savings") {
+        if (tabLabel === "{% translate 'Savings' %}") {
           if (tabContentContainerTop) tabContentContainerTop.classList.remove("hidden");
           // Show spinner while loading
           tabContentContainer.innerHTML = '<div class="flex justify-center items-center py-8 w-full"><span class="loading loading-spinner loading-lg"></span></div>';
@@ -315,7 +320,7 @@
           });
           return;
         }
-        
+
         if (tabContentContainerTop) tabContentContainerTop.classList.add("hidden");
 
         const templateId = templateMap[tabLabel];
@@ -346,7 +351,7 @@
       // Restore active tab from URL query param, or fall back to checked tab
       const urlParams = new URLSearchParams(window.location.search);
       const tabFromUrl = urlParams.get("tab");
-      const validTabs = ["Assembly", "Materials", "Energy", "Savings"];
+      const validTabs = ["{% translate 'Assembly' %}", "{% translate 'Materials' %}", "{% translate 'Energy' %}", "{% translate 'Savings' %}"];
 
       if (tabFromUrl && validTabs.includes(tabFromUrl)) {
         const targetInput = document.querySelector(
@@ -594,7 +599,7 @@
           new Chart(embodiedCtx, {
             ...barChartDefaults,
             data: {
-              labels: assemblyData.labels.length > 0 ? assemblyData.labels : ["No data"],
+              labels: assemblyData.labels.length > 0 ? assemblyData.labels : [i18n.noData],
               datasets: [
                 {
                   data: assemblyData.data.length > 0 ? assemblyData.data : [0],
@@ -618,7 +623,7 @@
           new Chart(embodiedCarbonByMaterialChart, {
             ...barChartDefaults,
             data: {
-              labels: materialData.labels.length > 0 ? materialData.labels : ["No data"],
+              labels: materialData.labels.length > 0 ? materialData.labels : [i18n.noData],
               datasets: [
                 {
                   data: materialData.data.length > 0 ? materialData.data : [0],
@@ -642,7 +647,7 @@
           new Chart(embodiedCarbonByAppliancesChart, {
             ...barChartDefaults,
             data: {
-              labels: systemData.labels.length > 0 ? systemData.labels : ["No data"],
+              labels: systemData.labels.length > 0 ? systemData.labels : [i18n.noData],
               datasets: [
                 {
                   data: systemData.data.length > 0 ? systemData.data : [0],
@@ -679,9 +684,3 @@
     }
   </style>
 {% endblock %}
-
-  
-
-
-  
-

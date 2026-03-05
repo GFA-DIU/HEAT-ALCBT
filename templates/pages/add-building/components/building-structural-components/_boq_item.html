@@ -1,3 +1,4 @@
+{% load i18n %}
 <li class="bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2"
     data-item-type="boq"
     data-item-index="{{ index }}">
@@ -12,7 +13,7 @@
         {{ item.total_gwp|floatformat:2 }} kgCO2eq
       </div>
       <p class="text-sm/5 text-[var(--text--sub-600)]">
-        Bill of Quantities ({{ item.materials|length }} materials)
+        {% blocktranslate with count=item.materials|length %}Bill of Quantities ({{ count }} materials){% endblocktranslate %}
       </p>
     </div>
   </div>
