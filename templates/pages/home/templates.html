@@ -383,6 +383,20 @@
     </dialog>
 
     <script>
+      var i18n = {
+        loading:               "{% translate 'Loading...' %}",
+        noMaterials:           "{% translate 'No materials added' %}",
+        addDescription:        "{% translate 'Add description' %}",
+        added:                 "{% translate 'Added' %}",
+        templateUpdated:       "{% translate 'Template updated' %}",
+        templateDuplicated:    "{% translate 'Template duplicated' %}",
+        templateDeleted:       "{% translate 'Template deleted' %}",
+        removeMaterialConfirm: "{% translate 'Are you sure you want to remove this material from the template?' %}",
+        removeTemplateConfirm: "{% translate 'Are you sure you want to remove \"%s\" from the template?' %}",
+        removeTemplateUndone:  "{% translate 'This action cannot be undone.' %}",
+        duplicateConfirm:      "{% translate 'Create a copy of this template?' %}",
+      };
+
       // Global vars for tracking
       let deletedMaterialIds = [];
       let currentTemplateData = null;
@@ -390,8 +404,8 @@
       // View template details and populate form
       function viewTemplate(assemblyId) {
         // Show loading
-        document.getElementById('modal-template-name').textContent = 'Loading...';
-        document.getElementById('modal-materials-list').innerHTML = '<li class="text-center py-4">Loading...</li>';
+        document.getElementById('modal-template-name').textContent = i18n.loading;
+        document.getElementById('modal-materials-list').innerHTML = `<li class="text-center py-4">${i18n.loading}</li>`;
         deletedMaterialIds = [];
 
         template_detail_modal.showModal();
@@ -435,7 +449,7 @@
         const list = document.getElementById('modal-materials-list');
 
         if (materials.length === 0) {
-          list.innerHTML = '<li class="text-center py-4 text-[var(--text--sub-600)]">No materials added</li>';
+          list.innerHTML = `<li class="text-center py-4 text-[var(--text--sub-600)]">${i18n.noMaterials}</li>`;
           return;
         }
 
@@ -448,7 +462,7 @@
             <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
               ${m.country_code ? `<div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"><span data-country="${m.country_code}" data-width="20"></span></div>` : ''}
               <label class="input flex-[2.5]">
-                <input type="text" class="material-description" value="${m.description || ''}" placeholder="Add description" ${!canEdit ? 'readonly' : ''} />
+                <input type="text" class="material-description" value="${m.description || ''}" placeholder="${i18n.addDescription}" ${!canEdit ? 'readonly' : ''} />
               </label>
               <label class="input flex-1">
                 <input type="number" class="material-quantity" value="${m.quantity}" ${!canEdit ? 'readonly' : ''} />
@@ -468,7 +482,7 @@
       // Delete material
       async function deleteMaterial(materialId) {
 
-        const confirmDelete = await confirmDialog.delete('Are you sure you want to remove this material from the template?');
+        const confirmDelete = await confirmDialog.delete(i18n.removeMaterialConfirm);
         if (!confirmDelete) return;
 
         deletedMaterialIds.push(materialId);
@@ -542,7 +556,7 @@
           if (result.success) {
             template_detail_modal.close();
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success('Template updated');
+            if (typeof Toast !== 'undefined') Toast.success(i18n.templateUpdated);
           } else {
             Toast.error(result.error || 'Update failed');
           }
@@ -577,7 +591,7 @@
           if (result.success) {
             template_detail_modal.close();
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
+            if (typeof Toast !== 'undefined') Toast.success(i18n.templateDuplicated);
           } else {
             Toast.error(result.error || 'Duplication failed');
           }
@@ -594,7 +608,7 @@
         const templateName = document.getElementById('template-name').value;
 
 
-        const confirmDelete = await confirmDialog.delete(`Are you sure you want to remove "${templateName}" from the template?`);
+        const confirmDelete = await confirmDialog.delete(i18n.removeTemplateConfirm.replace('%s', templateName));
         if (!confirmDelete) return;
 
         fetch(`/templates/${templateId}/delete/`, {
@@ -606,7 +620,7 @@
           if (result.success) {
             template_detail_modal.close();
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success('Template deleted');
+            if (typeof Toast !== 'undefined') Toast.success(i18n.templateDeleted);
           } else {
             Toast.error(result.error || 'Deletion failed');
           }
@@ -620,7 +634,7 @@
       // Delete from list (existing function)
       async function deleteTemplate(assemblyId, assemblyName) {
 
-        const confirmDelete = await confirmDialog.delete(`Are you sure you want to remove "${assemblyName}" from the template? This action cannot be undone.`);
+        const confirmDelete = await confirmDialog.delete(i18n.removeTemplateConfirm.replace('%s', assemblyName) + ' ' + i18n.removeTemplateUndone);
         if (!confirmDelete) return;
 
         fetch(`/templates/${assemblyId}/delete/`, {
@@ -631,7 +645,7 @@
         .then(result => {
           if (result.success) {
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success('Template deleted');
+            if (typeof Toast !== 'undefined') Toast.success(i18n.templateDeleted);
           } else {
             Toast.error(result.error || 'Deletion failed');
           }
@@ -644,7 +658,7 @@
 
       // Duplicate from list (existing function)
       async function duplicateTemplate(assemblyId) {
-        const confirmDelete = await confirmDialog.info('Create a copy of this template?');
+        const confirmDelete = await confirmDialog.info(i18n.duplicateConfirm);
         if (!confirmDelete) return;
         // Simple duplication without modifications
         fetch(`/templates/${assemblyId}/duplicate/`, {
@@ -659,7 +673,7 @@
         .then(result => {
           if (result.success) {
             htmx.trigger('#search-form', 'submit');
-            if (typeof Toast !== 'undefined') Toast.success('Template duplicated');
+            if (typeof Toast !== 'undefined') Toast.success(i18n.templateDuplicated);
           } else {
             Toast.error(result.error || 'Duplication failed');
           }
@@ -713,7 +727,7 @@
           // Change button to "Added" state
           addBtn.innerHTML = `
             <span data-icon="check-line" data-size="20" data-color="var(--icon--disabled-300)"></span>
-            Added
+            ${i18n.added}
           `;
           addBtn.classList.remove('btn-outline');
           addBtn.classList.add('btn-success');
@@ -736,7 +750,7 @@
             <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
               ${epd.country_code ? `<div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]"><span data-country="${epd.country_code}" data-width="20"></span></div>` : ''}
               <label class="input flex-[2.5]">
-                <input type="text" class="material-description" value="" placeholder="Add description" data-epd-id="${epd.id}" />
+                <input type="text" class="material-description" value="" placeholder="${i18n.addDescription}" data-epd-id="${epd.id}" />
               </label>
               <label class="input flex-1">
                 <input type="number" class="material-quantity" value="1" data-epd-id="${epd.id}" min="0" step="any" />

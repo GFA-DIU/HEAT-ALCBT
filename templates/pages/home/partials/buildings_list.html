@@ -184,13 +184,18 @@
 </ul>
 
 <script>
+  var i18n = {
+    deleteBuildingConfirm: "{% translate 'This will permanently delete the building and all associated data.' %}",
+    deleteBuildingTitle:   "{% translate 'Delete Building?' %}",
+  };
+
   async function handleBuildingDelete(event, buildingId) {
     event.preventDefault();
     event.stopPropagation();
 
     const confirmed = await confirmDialog.delete(
-      'This will permanently delete the building and all associated data.',
-      'Delete Building?'
+      i18n.deleteBuildingConfirm,
+      i18n.deleteBuildingTitle
     );
 
     if (confirmed) {

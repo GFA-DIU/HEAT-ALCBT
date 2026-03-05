@@ -311,6 +311,11 @@
 
 <script>
   (function () {
+    var i18n = {
+      baseline:  "{% translate 'Baseline' %}",
+      optimized: "{% translate 'Optimized' %}",
+    };
+
     // Initialize Chart
     const ctx = document.getElementById('savings-reduction-chart');
     let chartInstance = null;
@@ -319,7 +324,7 @@
       chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Baseline', 'Optimized'],
+          labels: [i18n.baseline, i18n.optimized],
           datasets: [{
             data: [550, 465],
             backgroundColor: ['#FFA468', '#86EFAC'],

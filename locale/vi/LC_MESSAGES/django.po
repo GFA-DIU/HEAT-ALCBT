@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-05 19:22+0200\n"
+"POT-Creation-Date: 2026-03-05 19:33+0200\n"
 "PO-Revision-Date: 2025-07-03 16:28+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Vietnamese <vi@li.org>\n"
@@ -2994,6 +2994,7 @@ msgstr "Tiếp"
 
 #: .\templates\pages\add-building\components\building-structural-components\_selected_material.html:25
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:516
+#: .\templates\pages\home\templates.html:389
 #, fuzzy
 #| msgid "Description"
 msgid "Add description"
@@ -4721,12 +4722,22 @@ msgid "Embodied Carbon by Appliances"
 msgstr "Carbon hóa thân theo thiết bị"
 
 #: .\templates\pages\building\building.html:268
+#: .\templates\pages\home\partials\buildings_list.html:188
 msgid "This will permanently delete the building and all associated data."
 msgstr "Điều này sẽ xóa vĩnh viễn tòa nhà và tất cả dữ liệu liên quan."
 
 #: .\templates\pages\building\building.html:269
+#: .\templates\pages\home\partials\buildings_list.html:189
 msgid "Delete Building?"
 msgstr "Xóa tòa nhà?"
+
+#: .\templates\pages\building\savings_tab.html:315
+msgid "Baseline"
+msgstr ""
+
+#: .\templates\pages\building\savings_tab.html:316
+msgid "Optimized"
+msgstr ""
 
 #: .\templates\pages\home\home.html:26
 #, python-format
@@ -4991,6 +5002,7 @@ msgid "Oldest First"
 msgstr "Cũ nhất trước"
 
 #: .\templates\pages\home\templates.html:165
+#: .\templates\pages\home\templates.html:387
 msgid "Loading..."
 msgstr "Đang tải..."
 
@@ -5035,6 +5047,50 @@ msgstr "Tìm kiếm EPD..."
 #: .\templates\pages\home\templates.html:370
 msgid "Enter search criteria and click Search"
 msgstr "Nhập tiêu chí tìm kiếm và nhấp Tìm kiếm"
+
+#: .\templates\pages\home\templates.html:388
+msgid "No materials added"
+msgstr "Chưa thêm vật liệu"
+
+#: .\templates\pages\home\templates.html:390
+msgid "Added"
+msgstr "Đã thêm"
+
+#: .\templates\pages\home\templates.html:391
+msgid "Template updated"
+msgstr "Đã cập nhật mẫu"
+
+#: .\templates\pages\home\templates.html:392
+msgid "Template duplicated"
+msgstr "Đã nhân bản mẫu"
+
+#: .\templates\pages\home\templates.html:393
+msgid "Template deleted"
+msgstr "Đã xóa mẫu"
+
+#: .\templates\pages\home\templates.html:394
+#, fuzzy
+#| msgid ""
+#| "You are about to remove this energy carrier. This action cannot be undone."
+msgid "Are you sure you want to remove this material from the template?"
+msgstr "Bạn sắp xóa nguồn năng lượng này. Hành động này không thể hoàn tác."
+
+#: .\templates\pages\home\templates.html:395
+#, python-format
+msgid "Are you sure you want to remove \\\"%%s\\\" from the template?"
+msgstr ""
+
+#: .\templates\pages\home\templates.html:396
+#, fuzzy
+#| msgid "This cannot be undone."
+msgid "This action cannot be undone."
+msgstr "Không thể hoàn tác."
+
+#: .\templates\pages\home\templates.html:397
+#, fuzzy
+#| msgid "Create a copy of this template?"
+msgid "Create a copy of this template?"
+msgstr "Tạo bản sao của mẫu này?"
 
 #: .\templates\pages\profile\profile.html:16
 msgid "Profile Settings"
@@ -5697,29 +5753,11 @@ msgstr ""
 #~ msgid "Failed to load template"
 #~ msgstr "Không thể tải mẫu"
 
-#~ msgid "No materials added"
-#~ msgstr "Chưa thêm vật liệu"
-
 #~ msgid "Remove this material?"
 #~ msgstr "Xóa vật liệu này?"
-
-#~ msgid "Template updated"
-#~ msgstr "Đã cập nhật mẫu"
 
 #~ msgid "An error occurred"
 #~ msgstr "Đã xảy ra lỗi"
 
-#~ msgid "Template duplicated"
-#~ msgstr "Đã nhân bản mẫu"
-
-#~ msgid "This cannot be undone."
-#~ msgstr "Không thể hoàn tác."
-
-#~ msgid "Template deleted"
-#~ msgstr "Đã xóa mẫu"
-
 #~ msgid "Deletion failed"
 #~ msgstr "Xóa thất bại"
-
-#~ msgid "Added"
-#~ msgstr "Đã thêm"
