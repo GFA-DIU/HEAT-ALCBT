@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-05 19:33+0200\n"
+"POT-Creation-Date: 2026-03-05 20:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -138,11 +138,15 @@ msgstr ""
 
 #: .\pages\models\base.py:55
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:147
+#: .\templates\pages\home\import-dialog\step-map-fields.html:90
+#: .\templates\pages\home\import-dialog\step-preview.html:116
 msgid "Longitude"
 msgstr ""
 
 #: .\pages\models\base.py:56
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:166
+#: .\templates\pages\home\import-dialog\step-map-fields.html:91
+#: .\templates\pages\home\import-dialog\step-preview.html:117
 msgid "Latitude"
 msgstr ""
 
@@ -289,6 +293,9 @@ msgid "Number of floors above"
 msgstr ""
 
 #: .\pages\models\building.py:360
+#: .\templates\pages\home\import-dialog\step-building-details.html:74
+#: .\templates\pages\home\import-dialog\step-map-fields.html:98
+#: .\templates\pages\home\import-dialog\step-preview.html:127
 msgid "Floors below ground"
 msgstr ""
 
@@ -1101,6 +1108,7 @@ msgid "Hot Water System"
 msgstr ""
 
 #: .\pages\models\building_operation\hot_water.py:148
+#: .\templates\pages\home\import-dialog\step-map-fields.html:72
 msgid "Hot Water Systems"
 msgstr ""
 
@@ -1490,6 +1498,14 @@ msgstr ""
 msgid "Save Preferences"
 msgstr ""
 
+#: .\templates\_base.html:383
+msgid "Failed to save cookie preferences. Please try again."
+msgstr ""
+
+#: .\templates\_base.html:384
+msgid "Always Active"
+msgstr ""
+
 #: .\templates\account\_auth.html:5 .\templates\account\login.html:75
 #: .\templates\account\signup.html:16
 msgid "Sign up"
@@ -1817,6 +1833,9 @@ msgstr ""
 #: .\templates\account\update_profile.html:52
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:50
 #: .\templates\pages\home\home.html:146
+#: .\templates\pages\home\import-dialog\step-map-fields.html:87
+#: .\templates\pages\home\import-dialog\step-preview.html:113
+#: .\templates\pages\home\import-dialog\step-preview.html:191
 #: .\templates\pages\home\templates.html:190
 #: .\templates\pages\profile\profile.html:155
 msgid "Country"
@@ -1831,11 +1850,13 @@ msgstr ""
 #: .\templates\account\update_profile.html:105
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:86
 #: .\templates\pages\home\home.html:164
+#: .\templates\pages\home\import-dialog\step-map-fields.html:88
 #: .\templates\pages\profile\profile.html:171
 msgid "Region or State"
 msgstr ""
 
 #: .\templates\account\update_profile.html:86
+#: .\templates\account\update_profile.html:194
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:107
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:194
 msgid "Select a region or state"
@@ -1849,11 +1870,14 @@ msgstr ""
 #: .\templates\account\update_profile.html:147
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:119
 #: .\templates\pages\home\home.html:182
+#: .\templates\pages\home\import-dialog\step-map-fields.html:89
+#: .\templates\pages\home\import-dialog\step-preview.html:115
 #: .\templates\pages\profile\profile.html:187
 msgid "City"
 msgstr ""
 
 #: .\templates\account\update_profile.html:128
+#: .\templates\account\update_profile.html:193
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:135
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:195
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:198
@@ -2463,6 +2487,9 @@ msgid "Save & continue"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:7
+#: .\templates\pages\home\import-dialog\step-building-details.html:68
+#: .\templates\pages\home\import-dialog\step-map-fields.html:92
+#: .\templates\pages\home\import-dialog\step-preview.html:121
 msgid "Building type"
 msgstr ""
 
@@ -2515,6 +2542,7 @@ msgid "Pick a type of apartments"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:52
+#: .\templates\pages\home\import-dialog\step-map-fields.html:93
 msgid "Area climate type"
 msgstr ""
 
@@ -2523,10 +2551,16 @@ msgid "Select climate type"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:78
+#: .\templates\pages\home\import-dialog\step-building-details.html:70
+#: .\templates\pages\home\import-dialog\step-map-fields.html:94
+#: .\templates\pages\home\import-dialog\step-preview.html:123
 msgid "Assessment period (years)"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:87
+#: .\templates\pages\home\import-dialog\step-building-details.html:73
+#: .\templates\pages\home\import-dialog\step-map-fields.html:97
+#: .\templates\pages\home\import-dialog\step-preview.html:126
 msgid "Construction year"
 msgstr ""
 
@@ -2626,6 +2660,7 @@ msgid ""
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:10
+#: .\templates\pages\home\import-dialog\step-map-fields.html:85
 msgid "Building name or Code"
 msgstr ""
 
@@ -2927,6 +2962,7 @@ msgid "Select technique"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:157
+#: .\templates\pages\home\import-dialog\step-preview.html:189
 msgid "Dimension"
 msgstr ""
 
@@ -3124,6 +3160,7 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:517
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:981
+#: .\templates\pages\home\import-dialog\step-preview.html:190
 msgid "Qty"
 msgstr ""
 
@@ -3932,6 +3969,8 @@ msgid "Add lift & escalator system"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:99
+#: .\templates\pages\home\import-dialog\step-map-fields.html:75
+#: .\templates\pages\home\import-dialog\step-preview.html:89
 msgid "Lift & Escalator System"
 msgstr ""
 
@@ -4115,6 +4154,8 @@ msgid "Enter a valid value"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:57
+#: .\templates\pages\home\import-dialog\step-map-fields.html:105
+#: .\templates\pages\home\import-dialog\step-preview.html:137
 msgid "Room heating temperature"
 msgstr ""
 
@@ -4129,10 +4170,14 @@ msgid "°Fahrenheit"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:74
+#: .\templates\pages\home\import-dialog\step-map-fields.html:107
+#: .\templates\pages\home\import-dialog\step-preview.html:139
 msgid "Room cooling temperature"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:92
+#: .\templates\pages\home\import-dialog\step-map-fields.html:109
+#: .\templates\pages\home\import-dialog\step-preview.html:141
 #, python-format
 msgid "Renewable energy installation (%%)"
 msgstr ""
@@ -4142,6 +4187,8 @@ msgid "Enter a value greater than 0"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:103
+#: .\templates\pages\home\import-dialog\step-map-fields.html:110
+#: .\templates\pages\home\import-dialog\step-preview.html:142
 msgid "Building smart system installation"
 msgstr ""
 
@@ -4304,26 +4351,26 @@ msgid "Carbon Savings"
 msgstr ""
 
 #: .\templates\pages\building\building.html:133
-#: .\templates\pages\building\building.html:302
-#: .\templates\pages\building\building.html:350
+#: .\templates\pages\building\building.html:306
+#: .\templates\pages\building\building.html:354
 msgid "Assembly"
 msgstr ""
 
 #: .\templates\pages\building\building.html:140
-#: .\templates\pages\building\building.html:303
-#: .\templates\pages\building\building.html:350
+#: .\templates\pages\building\building.html:307
+#: .\templates\pages\building\building.html:354
 msgid "Materials"
 msgstr ""
 
 #: .\templates\pages\building\building.html:146
-#: .\templates\pages\building\building.html:304
-#: .\templates\pages\building\building.html:350
+#: .\templates\pages\building\building.html:308
+#: .\templates\pages\building\building.html:354
 msgid "Energy"
 msgstr ""
 
 #: .\templates\pages\building\building.html:148
-#: .\templates\pages\building\building.html:309
-#: .\templates\pages\building\building.html:350
+#: .\templates\pages\building\building.html:313
+#: .\templates\pages\building\building.html:354
 msgid "Savings"
 msgstr ""
 
@@ -4347,12 +4394,16 @@ msgstr ""
 msgid "Embodied Carbon by Appliances"
 msgstr ""
 
-#: .\templates\pages\building\building.html:268
+#: .\templates\pages\building\building.html:264
+msgid "No data"
+msgstr ""
+
+#: .\templates\pages\building\building.html:272
 #: .\templates\pages\home\partials\buildings_list.html:188
 msgid "This will permanently delete the building and all associated data."
 msgstr ""
 
-#: .\templates\pages\building\building.html:269
+#: .\templates\pages\building\building.html:273
 #: .\templates\pages\home\partials\buildings_list.html:189
 msgid "Delete Building?"
 msgstr ""
@@ -4409,6 +4460,304 @@ msgstr ""
 
 #: .\templates\pages\home\home.html:214
 msgid "I'll do this later"
+msgstr ""
+
+#: .\templates\pages\home\home.html:226
+msgid "Please correct the following errors:"
+msgstr ""
+
+#: .\templates\pages\home\home.html:227
+msgid "An error occurred while updating your profile. Please try again."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:45
+msgid "Upload"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:46
+msgid "Map Fields"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:47
+msgid "Preview & Confirm"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:48
+msgid "Confirm & Import"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:49
+msgid "Process"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:50
+msgid "Continue"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:51
+msgid "Reading file…"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:52
+msgid "Importing…"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:53
+msgid "Please select an Excel file first."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:54
+msgid "Could not read the file."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:55
+msgid "Import failed. Please check your data and try again."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:69
+#: .\templates\pages\home\import-dialog\step-preview.html:122
+msgid "Climate type"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:71
+#: .\templates\pages\home\import-dialog\step-map-fields.html:95
+#: .\templates\pages\home\import-dialog\step-preview.html:124
+msgid "Total floor area (m²)"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:72
+#: .\templates\pages\home\import-dialog\step-map-fields.html:96
+#: .\templates\pages\home\import-dialog\step-preview.html:125
+msgid "Conditioned floor area (m²)"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:75
+#: .\templates\pages\home\import-dialog\step-map-fields.html:99
+#: .\templates\pages\home\import-dialog\step-preview.html:128
+msgid "Has certification"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:76
+msgid "Has BoQ"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:63
+msgid "Name & Location"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:64
+msgid "Building Details"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:65
+msgid "Operational Schedule & Temp"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:66
+#: .\templates\pages\home\import-dialog\step-preview.html:87
+msgid "row"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:67
+#: .\templates\pages\home\import-dialog\step-preview.html:88
+msgid "rows"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:68
+msgid "Cooling Systems"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:69
+msgid "Ventilation Systems"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:70
+msgid "Lighting Systems"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:71
+msgid "Lift & Escalator"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:73
+#: .\templates\pages\home\import-dialog\step-preview.html:90
+msgid "Operational Energy Carriers"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:74
+#: .\templates\pages\home\import-dialog\step-preview.html:91
+msgid "Structural Components"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:76
+msgid "By Component"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:86
+#: .\templates\pages\home\import-dialog\step-preview.html:112
+msgid "Address"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:100
+#: .\templates\pages\home\import-dialog\step-preview.html:129
+msgid "Has BoQ / design drawings"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:101
+#: .\templates\pages\home\import-dialog\step-preview.html:133
+msgid "Number of residents"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:102
+msgid "Annual operating schedule (Hours/Day)"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:103
+msgid "Annual operating schedule (Days/Week)"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:104
+msgid "Annual operating schedule (Weeks/Year)"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:106
+msgid "Room heating temperature unit"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:108
+msgid "Room cooling temperature unit"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:111
+msgid "Building name"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:114
+msgid "Region"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:134
+msgid "Hours per day"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:135
+msgid "Days per week"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:136
+msgid "Weeks per year"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:138
+msgid "Heating temperature unit"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:140
+msgid "Cooling temperature unit"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:189
+msgid "Component"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:189
+msgid "Technique"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:190
+msgid "Unit"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:190
+msgid "EPD Name"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:191
+msgid "EPD Qty"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:191
+msgid "EPD Unit"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:205
+msgid "Cooling — Window AC"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:205
+msgid "Cooling — Split AC"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:205
+msgid "Cooling — VRF"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:206
+msgid "Cooling — Packaged / Ducted"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:206
+msgid "Cooling — Water-cooled Chiller"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:206
+msgid "Cooling — Air-cooled Chiller"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:209
+msgid "Ventilation — AHU"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:209
+msgid "Ventilation — FCU"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:209
+msgid "Ventilation — Cassette AC"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:210
+msgid "Ventilation — DOAS"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:210
+msgid "Ventilation — Ceiling / Exhaust Fan"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:213
+msgid "Lighting — LED"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:213
+msgid "Lighting — Fluorescent"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:213
+msgid "Lighting — CFL"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:214
+msgid "Lighting — Incandescent"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:214
+msgid "Lighting — HID"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:217
+msgid "Hot Water — Heat Pump"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:217
+msgid "Hot Water — Boiler"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:217
+msgid "Hot Water — Water Heater"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-upload.html:76
+msgid "Only Excel files (.xlsx, .xls) are supported."
 msgstr ""
 
 #: .\templates\pages\home\partials\buildings_list.html:51

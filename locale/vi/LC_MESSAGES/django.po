@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-05 19:33+0200\n"
+"POT-Creation-Date: 2026-03-05 20:03+0200\n"
 "PO-Revision-Date: 2025-07-03 16:28+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Vietnamese <vi@li.org>\n"
@@ -149,11 +149,15 @@ msgstr "Mã bưu điện"
 
 #: .\pages\models\base.py:55
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:147
+#: .\templates\pages\home\import-dialog\step-map-fields.html:90
+#: .\templates\pages\home\import-dialog\step-preview.html:116
 msgid "Longitude"
 msgstr "Kinh độ"
 
 #: .\pages\models\base.py:56
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:166
+#: .\templates\pages\home\import-dialog\step-map-fields.html:91
+#: .\templates\pages\home\import-dialog\step-preview.html:117
 msgid "Latitude"
 msgstr "Vĩ độ"
 
@@ -304,6 +308,9 @@ msgid "Number of floors above"
 msgstr "Số tầng phía trên"
 
 #: .\pages\models\building.py:360
+#: .\templates\pages\home\import-dialog\step-building-details.html:74
+#: .\templates\pages\home\import-dialog\step-map-fields.html:98
+#: .\templates\pages\home\import-dialog\step-preview.html:127
 msgid "Floors below ground"
 msgstr "Số tầng dưới mặt đất"
 
@@ -1162,6 +1169,7 @@ msgid "Hot Water System"
 msgstr "Hệ thống nước nóng"
 
 #: .\pages\models\building_operation\hot_water.py:148
+#: .\templates\pages\home\import-dialog\step-map-fields.html:72
 msgid "Hot Water Systems"
 msgstr "Hệ thống nước nóng"
 
@@ -1581,6 +1589,16 @@ msgstr ""
 msgid "Save Preferences"
 msgstr ""
 
+#: .\templates\_base.html:383
+#, fuzzy
+#| msgid "Failed to save hot water system. Please try again."
+msgid "Failed to save cookie preferences. Please try again."
+msgstr "Không thể lưu hệ thống nước nóng. Vui lòng thử lại."
+
+#: .\templates\_base.html:384
+msgid "Always Active"
+msgstr ""
+
 #: .\templates\account\_auth.html:5 .\templates\account\login.html:75
 #: .\templates\account\signup.html:16
 msgid "Sign up"
@@ -1970,6 +1988,9 @@ msgstr "Thông tin vị trí"
 #: .\templates\account\update_profile.html:52
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:50
 #: .\templates\pages\home\home.html:146
+#: .\templates\pages\home\import-dialog\step-map-fields.html:87
+#: .\templates\pages\home\import-dialog\step-preview.html:113
+#: .\templates\pages\home\import-dialog\step-preview.html:191
 #: .\templates\pages\home\templates.html:190
 #: .\templates\pages\profile\profile.html:155
 msgid "Country"
@@ -1986,11 +2007,13 @@ msgstr "Được tạo vào"
 #: .\templates\account\update_profile.html:105
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:86
 #: .\templates\pages\home\home.html:164
+#: .\templates\pages\home\import-dialog\step-map-fields.html:88
 #: .\templates\pages\profile\profile.html:171
 msgid "Region or State"
 msgstr "Vùng hoặc Bang"
 
 #: .\templates\account\update_profile.html:86
+#: .\templates\account\update_profile.html:194
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:107
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:194
 msgid "Select a region or state"
@@ -2006,11 +2029,14 @@ msgstr "Chọn vùng hoặc bang"
 #: .\templates\account\update_profile.html:147
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:119
 #: .\templates\pages\home\home.html:182
+#: .\templates\pages\home\import-dialog\step-map-fields.html:89
+#: .\templates\pages\home\import-dialog\step-preview.html:115
 #: .\templates\pages\profile\profile.html:187
 msgid "City"
 msgstr "Thành phố"
 
 #: .\templates\account\update_profile.html:128
+#: .\templates\account\update_profile.html:193
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:135
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:195
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:198
@@ -2652,6 +2678,9 @@ msgid "Save & continue"
 msgstr "Lưu & tiếp tục"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:7
+#: .\templates\pages\home\import-dialog\step-building-details.html:68
+#: .\templates\pages\home\import-dialog\step-map-fields.html:92
+#: .\templates\pages\home\import-dialog\step-preview.html:121
 #, fuzzy
 #| msgid "Lighting Type"
 msgid "Building type"
@@ -2706,6 +2735,7 @@ msgid "Pick a type of apartments"
 msgstr "Chọn loại căn hộ"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:52
+#: .\templates\pages\home\import-dialog\step-map-fields.html:93
 msgid "Area climate type"
 msgstr "Loại khí hậu khu vực"
 
@@ -2714,10 +2744,16 @@ msgid "Select climate type"
 msgstr "Chọn loại khí hậu"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:78
+#: .\templates\pages\home\import-dialog\step-building-details.html:70
+#: .\templates\pages\home\import-dialog\step-map-fields.html:94
+#: .\templates\pages\home\import-dialog\step-preview.html:123
 msgid "Assessment period (years)"
 msgstr "Thời gian đánh giá (năm)"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:87
+#: .\templates\pages\home\import-dialog\step-building-details.html:73
+#: .\templates\pages\home\import-dialog\step-map-fields.html:97
+#: .\templates\pages\home\import-dialog\step-preview.html:126
 msgid "Construction year"
 msgstr "Năm xây dựng"
 
@@ -2817,6 +2853,7 @@ msgid ""
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:10
+#: .\templates\pages\home\import-dialog\step-map-fields.html:85
 msgid "Building name or Code"
 msgstr "Tên hoặc mã tòa nhà"
 
@@ -3130,6 +3167,7 @@ msgid "Select technique"
 msgstr "Chọn kỹ thuật"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:157
+#: .\templates\pages\home\import-dialog\step-preview.html:189
 msgid "Dimension"
 msgstr "Kích thước"
 
@@ -3351,6 +3389,7 @@ msgstr "Thành phần của tôi"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:517
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:981
+#: .\templates\pages\home\import-dialog\step-preview.html:190
 msgid "Qty"
 msgstr "Số lượng"
 
@@ -4249,6 +4288,8 @@ msgid "Add lift & escalator system"
 msgstr "Thêm hệ thống thang máy & thang cuốn"
 
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:99
+#: .\templates\pages\home\import-dialog\step-map-fields.html:75
+#: .\templates\pages\home\import-dialog\step-preview.html:89
 msgid "Lift & Escalator System"
 msgstr "Hệ thống thang máy & thang cuốn"
 
@@ -4452,6 +4493,8 @@ msgid "Enter a valid value"
 msgstr "Nhập giá trị hợp lệ"
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:57
+#: .\templates\pages\home\import-dialog\step-map-fields.html:105
+#: .\templates\pages\home\import-dialog\step-preview.html:137
 #, fuzzy
 #| msgid "Heating Temperature Unit"
 msgid "Room heating temperature"
@@ -4468,12 +4511,16 @@ msgid "°Fahrenheit"
 msgstr "°F"
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:74
+#: .\templates\pages\home\import-dialog\step-map-fields.html:107
+#: .\templates\pages\home\import-dialog\step-preview.html:139
 #, fuzzy
 #| msgid "Cooling Temperature Unit"
 msgid "Room cooling temperature"
 msgstr "Đơn vị nhiệt độ làm mát"
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:92
+#: .\templates\pages\home\import-dialog\step-map-fields.html:109
+#: .\templates\pages\home\import-dialog\step-preview.html:141
 #, fuzzy, python-format
 #| msgid "Renewable Energy (%)"
 msgid "Renewable energy installation (%%)"
@@ -4486,6 +4533,8 @@ msgid "Enter a value greater than 0"
 msgstr "Số lượng phải lớn hơn 0"
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:103
+#: .\templates\pages\home\import-dialog\step-map-fields.html:110
+#: .\templates\pages\home\import-dialog\step-preview.html:142
 msgid "Building smart system installation"
 msgstr ""
 
@@ -4674,28 +4723,28 @@ msgid "Carbon Savings"
 msgstr "Tiết kiệm carbon"
 
 #: .\templates\pages\building\building.html:133
-#: .\templates\pages\building\building.html:302
-#: .\templates\pages\building\building.html:350
+#: .\templates\pages\building\building.html:306
+#: .\templates\pages\building\building.html:354
 #, fuzzy
 #| msgid "Assembly Mode"
 msgid "Assembly"
 msgstr "Chế độ lắp ráp"
 
 #: .\templates\pages\building\building.html:140
-#: .\templates\pages\building\building.html:303
-#: .\templates\pages\building\building.html:350
+#: .\templates\pages\building\building.html:307
+#: .\templates\pages\building\building.html:354
 msgid "Materials"
 msgstr "Vật liệu"
 
 #: .\templates\pages\building\building.html:146
-#: .\templates\pages\building\building.html:304
-#: .\templates\pages\building\building.html:350
+#: .\templates\pages\building\building.html:308
+#: .\templates\pages\building\building.html:354
 msgid "Energy"
 msgstr "Năng lượng"
 
 #: .\templates\pages\building\building.html:148
-#: .\templates\pages\building\building.html:309
-#: .\templates\pages\building\building.html:350
+#: .\templates\pages\building\building.html:313
+#: .\templates\pages\building\building.html:354
 #, fuzzy
 #| msgid "Carbon Savings"
 msgid "Savings"
@@ -4721,12 +4770,16 @@ msgstr "Carbon hóa thân theo vật liệu"
 msgid "Embodied Carbon by Appliances"
 msgstr "Carbon hóa thân theo thiết bị"
 
-#: .\templates\pages\building\building.html:268
+#: .\templates\pages\building\building.html:264
+msgid "No data"
+msgstr ""
+
+#: .\templates\pages\building\building.html:272
 #: .\templates\pages\home\partials\buildings_list.html:188
 msgid "This will permanently delete the building and all associated data."
 msgstr "Điều này sẽ xóa vĩnh viễn tòa nhà và tất cả dữ liệu liên quan."
 
-#: .\templates\pages\building\building.html:269
+#: .\templates\pages\building\building.html:273
 #: .\templates\pages\home\partials\buildings_list.html:189
 msgid "Delete Building?"
 msgstr "Xóa tòa nhà?"
@@ -4788,6 +4841,402 @@ msgstr "Lưu & Tiếp tục"
 #: .\templates\pages\home\home.html:214
 msgid "I'll do this later"
 msgstr "Tôi sẽ làm điều này sau"
+
+#: .\templates\pages\home\home.html:226
+msgid "Please correct the following errors:"
+msgstr "Vui lòng sửa các lỗi sau:"
+
+#: .\templates\pages\home\home.html:227
+msgid "An error occurred while updating your profile. Please try again."
+msgstr "Đã xảy ra lỗi khi cập nhật hồ sơ của bạn. Vui lòng thử lại."
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:45
+msgid "Upload"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:46
+msgid "Map Fields"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:47
+msgid "Preview & Confirm"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:48
+msgid "Confirm & Import"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:49
+msgid "Process"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:50
+#, fuzzy
+#| msgid "Save & Continue"
+msgid "Continue"
+msgstr "Lưu & Tiếp tục"
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:51
+msgid "Reading file…"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:52
+#, fuzzy
+#| msgid "Your buildings"
+msgid "Importing…"
+msgstr "Tòa nhà của bạn"
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:53
+#, fuzzy
+#| msgid "Please select a city"
+msgid "Please select an Excel file first."
+msgstr "Vui lòng chọn thành phố"
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:54
+msgid "Could not read the file."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\import-dialog.html:55
+msgid "Import failed. Please check your data and try again."
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:69
+#: .\templates\pages\home\import-dialog\step-preview.html:122
+#, fuzzy
+#| msgid "Area climate type"
+msgid "Climate type"
+msgstr "Loại khí hậu khu vực"
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:71
+#: .\templates\pages\home\import-dialog\step-map-fields.html:95
+#: .\templates\pages\home\import-dialog\step-preview.html:124
+#, fuzzy
+#| msgid "Total floor area"
+msgid "Total floor area (m²)"
+msgstr "Tổng diện tích sàn"
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:72
+#: .\templates\pages\home\import-dialog\step-map-fields.html:96
+#: .\templates\pages\home\import-dialog\step-preview.html:125
+#, fuzzy
+#| msgid "Conditioned floor area"
+msgid "Conditioned floor area (m²)"
+msgstr "Diện tích sàn có điều hòa"
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:75
+#: .\templates\pages\home\import-dialog\step-map-fields.html:99
+#: .\templates\pages\home\import-dialog\step-preview.html:128
+#, fuzzy
+#| msgid "Duplication failed"
+msgid "Has certification"
+msgstr "Nhân bản thất bại"
+
+#: .\templates\pages\home\import-dialog\step-building-details.html:76
+msgid "Has BoQ"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:63
+#, fuzzy
+#| msgid "Building Name & Location"
+msgid "Name & Location"
+msgstr "Tên và vị trí tòa nhà"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:64
+#, fuzzy
+#| msgid "Building UUID"
+msgid "Building Details"
+msgstr "UUID tòa nhà"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:65
+msgid "Operational Schedule & Temp"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:66
+#: .\templates\pages\home\import-dialog\step-preview.html:87
+#, fuzzy
+#| msgid "Airflow rate:"
+msgid "row"
+msgstr "Tốc độ luồng khí:"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:67
+#: .\templates\pages\home\import-dialog\step-preview.html:88
+msgid "rows"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:68
+#, fuzzy
+#| msgid "Cooling System Image"
+msgid "Cooling Systems"
+msgstr "Hình ảnh hệ thống làm lạnh"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:69
+#, fuzzy
+#| msgid "Ventilation Type"
+msgid "Ventilation Systems"
+msgstr "Loại thông gió"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:70
+#, fuzzy
+#| msgid "Lighting Type"
+msgid "Lighting Systems"
+msgstr "Loại chiếu sáng"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:71
+#, fuzzy
+#| msgid "Lift & Escalator 01"
+msgid "Lift & Escalator"
+msgstr "Thang máy & Thang cuốn 01"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:73
+#: .\templates\pages\home\import-dialog\step-preview.html:90
+#, fuzzy
+#| msgid "Save Energy Carriers"
+msgid "Operational Energy Carriers"
+msgstr "Lưu nguồn năng lượng"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:74
+#: .\templates\pages\home\import-dialog\step-preview.html:91
+#, fuzzy
+#| msgid "Structural Component"
+msgid "Structural Components"
+msgstr "Thành phần kết cấu"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:76
+#, fuzzy
+#| msgid "My Component"
+msgid "By Component"
+msgstr "Thành phần của tôi"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:86
+#: .\templates\pages\home\import-dialog\step-preview.html:112
+msgid "Address"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:100
+#: .\templates\pages\home\import-dialog\step-preview.html:129
+msgid "Has BoQ / design drawings"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:101
+#: .\templates\pages\home\import-dialog\step-preview.html:133
+#, fuzzy
+#| msgid "Approx. number of residents"
+msgid "Number of residents"
+msgstr "Số lượng cư dân (ước tính)"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:102
+#, fuzzy
+#| msgid "Annual operating schedule"
+msgid "Annual operating schedule (Hours/Day)"
+msgstr "Lịch hoạt động hàng năm"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:103
+#, fuzzy
+#| msgid "Annual operating schedule"
+msgid "Annual operating schedule (Days/Week)"
+msgstr "Lịch hoạt động hàng năm"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:104
+#, fuzzy
+#| msgid "Annual operating schedule"
+msgid "Annual operating schedule (Weeks/Year)"
+msgstr "Lịch hoạt động hàng năm"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:106
+#, fuzzy
+#| msgid "Heating Temperature Unit"
+msgid "Room heating temperature unit"
+msgstr "Đơn vị nhiệt độ sưởi"
+
+#: .\templates\pages\home\import-dialog\step-map-fields.html:108
+#, fuzzy
+#| msgid "Cooling Temperature Unit"
+msgid "Room cooling temperature unit"
+msgstr "Đơn vị nhiệt độ làm mát"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:111
+#, fuzzy
+#| msgid "Building name/code"
+msgid "Building name"
+msgstr "Tên/mã tòa nhà"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:114
+msgid "Region"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:134
+#, fuzzy
+#| msgid "Hours / day"
+msgid "Hours per day"
+msgstr "Giờ / ngày"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:135
+#, fuzzy
+#| msgid "Operation days per week"
+msgid "Days per week"
+msgstr "Số ngày hoạt động mỗi tuần"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:136
+#, fuzzy
+#| msgid "Operation weeks per year"
+msgid "Weeks per year"
+msgstr "Số tuần hoạt động mỗi năm"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:138
+#, fuzzy
+#| msgid "Heating Temperature Unit"
+msgid "Heating temperature unit"
+msgstr "Đơn vị nhiệt độ sưởi"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:140
+#, fuzzy
+#| msgid "Cooling Temperature Unit"
+msgid "Cooling temperature unit"
+msgstr "Đơn vị nhiệt độ làm mát"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:189
+#, fuzzy
+#| msgid "My Component"
+msgid "Component"
+msgstr "Thành phần của tôi"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:189
+#, fuzzy
+#| msgid "Select technique"
+msgid "Technique"
+msgstr "Chọn kỹ thuật"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:190
+#, fuzzy
+#| msgid "Unit:"
+msgid "Unit"
+msgstr "Đơn vị:"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:190
+#, fuzzy
+#| msgid "Name"
+msgid "EPD Name"
+msgstr "Tên"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:191
+#, fuzzy
+#| msgid "All EPD Types"
+msgid "EPD Qty"
+msgstr "Tất cả loại EPD"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:191
+#, fuzzy
+#| msgid "Unit:"
+msgid "EPD Unit"
+msgstr "Đơn vị:"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:205
+msgid "Cooling — Window AC"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:205
+#, fuzzy
+#| msgid "Cooling Unit"
+msgid "Cooling — Split AC"
+msgstr "Đơn vị làm mát"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:205
+msgid "Cooling — VRF"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:206
+msgid "Cooling — Packaged / Ducted"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:206
+#, fuzzy
+#| msgid "Water cooled chiller"
+msgid "Cooling — Water-cooled Chiller"
+msgstr "Chiller làm lạnh bằng nước"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:206
+#, fuzzy
+#| msgid "Air cooled chiller"
+msgid "Cooling — Air-cooled Chiller"
+msgstr "Chiller làm lạnh bằng không khí"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:209
+#, fuzzy
+#| msgid "Ventilation Unit"
+msgid "Ventilation — AHU"
+msgstr "Đơn vị thông gió"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:209
+#, fuzzy
+#| msgid "Ventilation Unit"
+msgid "Ventilation — FCU"
+msgstr "Đơn vị thông gió"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:209
+#, fuzzy
+#| msgid "Ventilation Type"
+msgid "Ventilation — Cassette AC"
+msgstr "Loại thông gió"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:210
+#, fuzzy
+#| msgid "Ventilation Type"
+msgid "Ventilation — DOAS"
+msgstr "Loại thông gió"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:210
+#, fuzzy
+#| msgid "Ceiling/Exhaust/Wall Fan"
+msgid "Ventilation — Ceiling / Exhaust Fan"
+msgstr "Quạt trần/thông gió/tường"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:213
+#, fuzzy
+#| msgid "Lighting Type"
+msgid "Lighting — LED"
+msgstr "Loại chiếu sáng"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:213
+msgid "Lighting — Fluorescent"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:213
+#, fuzzy
+#| msgid "Lighting Type"
+msgid "Lighting — CFL"
+msgstr "Loại chiếu sáng"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:214
+msgid "Lighting — Incandescent"
+msgstr ""
+
+#: .\templates\pages\home\import-dialog\step-preview.html:214
+#, fuzzy
+#| msgid "Lighting Type"
+msgid "Lighting — HID"
+msgstr "Loại chiếu sáng"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:217
+#, fuzzy
+#| msgid "Hot Water System"
+msgid "Hot Water — Heat Pump"
+msgstr "Hệ thống nước nóng"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:217
+#, fuzzy
+#| msgid "Hot Water System"
+msgid "Hot Water — Boiler"
+msgstr "Hệ thống nước nóng"
+
+#: .\templates\pages\home\import-dialog\step-preview.html:217
+#, fuzzy
+#| msgid "Heat Pump Water Heater"
+msgid "Hot Water — Water Heater"
+msgstr "Máy nước nóng bơm nhiệt"
+
+#: .\templates\pages\home\import-dialog\step-upload.html:76
+msgid "Only Excel files (.xlsx, .xls) are supported."
+msgstr ""
 
 #: .\templates\pages\home\partials\buildings_list.html:51
 msgid "Building type:"
@@ -5326,9 +5775,6 @@ msgstr ""
 #~ "BoQ'. Đối với số lượng mỗi thành phần (móng, sàn, mái, v.v.), sử dụng "
 #~ "'Thêm thành phần'."
 
-#~ msgid "Structural Component"
-#~ msgstr "Thành phần kết cấu"
-
 #~ msgid "eg. Main Structure BOQ"
 #~ msgstr "vd. BOQ kết cấu chính"
 
@@ -5399,15 +5845,6 @@ msgstr ""
 
 #~ msgid "Refrigerant quantity:"
 #~ msgstr "Số lượng môi chất lạnh:"
-
-#~ msgid "Cooling System Image"
-#~ msgstr "Hình ảnh hệ thống làm lạnh"
-
-#~ msgid "Water cooled chiller"
-#~ msgstr "Chiller làm lạnh bằng nước"
-
-#~ msgid "Air cooled chiller"
-#~ msgstr "Chiller làm lạnh bằng không khí"
 
 #~ msgid "eg. 2012"
 #~ msgstr "vd. 2012"
@@ -5543,9 +5980,6 @@ msgstr ""
 #~ msgid "Error saving hot water system:"
 #~ msgstr "Lỗi khi lưu hệ thống nước nóng:"
 
-#~ msgid "Failed to save hot water system. Please try again."
-#~ msgstr "Không thể lưu hệ thống nước nóng. Vui lòng thử lại."
-
 #~ msgid "Error loading hot water systems"
 #~ msgstr "Lỗi khi tải hệ thống nước nóng"
 
@@ -5564,9 +5998,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Bạn sắp xóa hoặc xóa bỏ hệ thống chiếu sáng đã thêm. Hành động này sẽ xóa "
 #~ "vĩnh viễn nó."
-
-#~ msgid "Lift & Escalator 01"
-#~ msgstr "Thang máy & Thang cuốn 01"
 
 #~ msgid "Lift Regenerative Features"
 #~ msgstr "Tính năng tái tạo thang máy"
@@ -5619,11 +6050,6 @@ msgstr ""
 #~ msgid "Bulb type :"
 #~ msgstr "Loại bóng đèn:"
 
-#, fuzzy
-#~| msgid "Lighting Type"
-#~ msgid "Lighting System Image"
-#~ msgstr "Loại chiếu sáng"
-
 #~ msgid "Please select a room type"
 #~ msgstr "Vui lòng chọn loại phòng"
 
@@ -5655,11 +6081,6 @@ msgstr ""
 #~ msgstr "vd. 32"
 
 #, fuzzy
-#~| msgid "Ventilation Type"
-#~ msgid "Ventilation type"
-#~ msgstr "Loại thông gió"
-
-#, fuzzy
 #~| msgid "Ventilation Capacity"
 #~ msgid "Ventilation capacity"
 #~ msgstr "Công suất thông gió"
@@ -5688,11 +6109,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Bạn sắp xóa hoặc xóa bỏ hệ thống thông gió đã thêm. Hành động này sẽ xóa "
 #~ "vĩnh viễn nó."
-
-#, fuzzy
-#~| msgid "Ventilation Type"
-#~ msgid "Ventilation System Image"
-#~ msgstr "Loại thông gió"
 
 #~ msgid "Form validation failed"
 #~ msgstr "Xác thực biểu mẫu thất bại"
@@ -5731,12 +6147,6 @@ msgstr ""
 
 #~ msgid "confetti icon"
 #~ msgstr "biểu tượng pháo hoa"
-
-#~ msgid "Please correct the following errors:"
-#~ msgstr "Vui lòng sửa các lỗi sau:"
-
-#~ msgid "An error occurred while updating your profile. Please try again."
-#~ msgstr "Đã xảy ra lỗi khi cập nhật hồ sơ của bạn. Vui lòng thử lại."
 
 #~ msgid "Add your first building!"
 #~ msgstr "Thêm tòa nhà đầu tiên của bạn!"

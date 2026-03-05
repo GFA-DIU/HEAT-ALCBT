@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="flex-1 size-full flex flex-col items-center justify-center gap-4 py-5">
   <div class="sapce-y-0.5 text-center max-w-70 text-[var(--text--strong-950)]">
     <h6 class="h6-title">Upload Your Data File</h6>
@@ -71,6 +72,10 @@
 
 <script>
   (function () {
+    var i18n = {
+      excelOnly: "{% translate 'Only Excel files (.xlsx, .xls) are supported.' %}",
+    };
+
     const container = document.getElementById('upload-component');
     const emptyTemplate = document.getElementById('template-upload-empty');
 
@@ -130,7 +135,7 @@
     function processFile(file) {
       const ext = file.name.split('.').pop().toLowerCase();
       if (!['xlsx', 'xls'].includes(ext)) {
-        alert('Only Excel files (.xlsx, .xls) are supported.');
+        alert(i18n.excelOnly);
         return;
       }
       // Store file in shared import state

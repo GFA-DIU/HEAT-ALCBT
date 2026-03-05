@@ -260,6 +260,10 @@
 
 
   <script defer>
+    var i18n = {
+      noData: "{% translate 'No data' %}",
+    };
+
     // Dynamic chart data from backend
     const chartData = {{ chart_data|safe }};
 
@@ -595,7 +599,7 @@
           new Chart(embodiedCtx, {
             ...barChartDefaults,
             data: {
-              labels: assemblyData.labels.length > 0 ? assemblyData.labels : ["No data"],
+              labels: assemblyData.labels.length > 0 ? assemblyData.labels : [i18n.noData],
               datasets: [
                 {
                   data: assemblyData.data.length > 0 ? assemblyData.data : [0],
@@ -619,7 +623,7 @@
           new Chart(embodiedCarbonByMaterialChart, {
             ...barChartDefaults,
             data: {
-              labels: materialData.labels.length > 0 ? materialData.labels : ["No data"],
+              labels: materialData.labels.length > 0 ? materialData.labels : [i18n.noData],
               datasets: [
                 {
                   data: materialData.data.length > 0 ? materialData.data : [0],
@@ -643,7 +647,7 @@
           new Chart(embodiedCarbonByAppliancesChart, {
             ...barChartDefaults,
             data: {
-              labels: systemData.labels.length > 0 ? systemData.labels : ["No data"],
+              labels: systemData.labels.length > 0 ? systemData.labels : [i18n.noData],
               datasets: [
                 {
                   data: systemData.data.length > 0 ? systemData.data : [0],

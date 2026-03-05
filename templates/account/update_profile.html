@@ -189,6 +189,11 @@
   </form>
 
   <script>
+    var i18n = {
+      selectCity:   "{% translate 'Select a city' %}",
+      selectRegion: "{% translate 'Select a region or state' %}",
+    };
+
     // Check if country is Global on page load
     function handleCountryChange(selectElement) {
       const selectedOption = selectElement.options[selectElement.selectedIndex];
@@ -230,7 +235,7 @@
             .then(response => response.text())
             .then(html => {
               regionSelect.innerHTML = html;
-              citySelect.innerHTML = '<option value="">Select a city</option>';
+              citySelect.innerHTML = `<option value="">${i18n.selectCity}</option>`;
               // Reinitialize icons
               if (window.IconComponent) {
                 window.IconComponent.initialize();
@@ -238,11 +243,11 @@
             })
             .catch(error => {
               console.error('Error loading regions:', error);
-              regionSelect.innerHTML = '<option value="">Select a region or state</option>';
+              regionSelect.innerHTML = `<option value="">${i18n.selectRegion}</option>`;
             });
         } else {
-          regionSelect.innerHTML = '<option value="">Select a region or state</option>';
-          citySelect.innerHTML = '<option value="">Select a city</option>';
+          regionSelect.innerHTML = `<option value="">${i18n.selectRegion}</option>`;
+          citySelect.innerHTML = `<option value="">${i18n.selectCity}</option>`;
         }
       }
     }
@@ -252,7 +257,7 @@
       const citySelect = document.getElementById('city-select');
 
       if (!regionId) {
-        citySelect.innerHTML = '<option value="">Select a city</option>';
+        citySelect.innerHTML = `<option value="">${i18n.selectCity}</option>`;
         return;
       }
 
@@ -268,7 +273,7 @@
         })
         .catch(error => {
           console.error('Error loading cities:', error);
-          citySelect.innerHTML = '<option value="">Select a city</option>';
+          citySelect.innerHTML = `<option value="">${i18n.selectCity}</option>`;
         });
     }
 

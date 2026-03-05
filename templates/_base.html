@@ -371,6 +371,11 @@
   </dialog>
 
   <script>
+    var i18n = {
+      cookieSaveFailed: "{% translate 'Failed to save cookie preferences. Please try again.' %}",
+      alwaysActive:     "{% translate 'Always Active' %}",
+    };
+
     function showCookieBanner() {
       const banner = document.getElementById('cookieBanner');
       if (banner) {
@@ -468,7 +473,7 @@
                   </div>
                   <div class="flex items-center gap-2 shrink-0">
                     ${group.required
-                      ? `<span class="badge badge-sm badge-neutral">Always Active</span>
+                      ? `<span class="badge badge-sm badge-neutral">${i18n.alwaysActive}</span>
                          <input type="checkbox" class="toggle toggle-sm toggle-primary" id="cookie-${group.id}" checked disabled>`
                       : `<input type="checkbox" class="toggle toggle-sm toggle-primary" id="cookie-${group.id}" ${group.enabled ? 'checked' : ''}>`
                     }
@@ -528,7 +533,7 @@
         })
         .catch(error => {
           console.error('Error saving cookie settings:', error);
-          alert('Failed to save cookie preferences. Please try again.');
+          alert(i18n.cookieSaveFailed);
         });
     }
 

@@ -222,6 +222,11 @@
     </div>
 
     <script>
+    var i18n = {
+      correctErrors:   "{% translate 'Please correct the following errors:' %}",
+      updateError:     "{% translate 'An error occurred while updating your profile. Please try again.' %}",
+    };
+
     const accountSuccessModal = document.getElementById(
       "account_success_modal"
     );
@@ -277,7 +282,7 @@
             }, 1500);
           } else {
             // Show error messages
-            let errorText = "Please correct the following errors:\n";
+            let errorText = i18n.correctErrors + "\n";
             for (const [field, errors] of Object.entries(data.errors)) {
               errorText += `${field}: ${errors.join(", ")} <br/> `;
             }
@@ -288,7 +293,7 @@
           }
         } catch (error) {
           console.error("Error updating profile:", error);
-          errorDiv.textContent = "An error occurred while updating your profile. Please try again.";
+          errorDiv.textContent = i18n.updateError;
           errorDiv.parentElement.classList.remove("hidden");
           successDiv.parentElement.classList.add("hidden");
         }
