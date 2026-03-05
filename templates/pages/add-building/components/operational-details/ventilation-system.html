@@ -505,6 +505,12 @@
 </template>
 
 <script>
+  var i18n = {
+    units:   "{% translate 'Units' %}",
+    airflow: "{% translate 'Airflow' %}",
+    na:      "{% translate 'N/A' %}",
+  };
+
   // ================================================================
   // Auto-calculation helpers for ventilation systems
   // ================================================================
@@ -722,15 +728,15 @@
           return;
         }
         list.innerHTML = systems.map(system => {
-          const airflow = system.air_flow_rate ? `${system.air_flow_rate} ${system.ventilation_capacity_display || ''}` : 'N/A';
+          const airflow = system.air_flow_rate ? `${system.air_flow_rate} ${system.ventilation_capacity_display || ''}` : i18n.na;
           return `
             <li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">
               <span data-icon="windy-fill" data-size="20" data-color="var(--icon--strong-950)" class="shrink-0 self-start"></span>
               <div class="flex flex-col flex-1">
                 <p class="text-sm/5 font-medium">${system.ventilation_type_display}</p>
                 <p class="text-sm/5 text-[var(--text--sub-600)]">
-                  <span class="border-r border-[var(--text--sub-600)] pr-1">Units: ${system.number_of_units_installed}</span>
-                  <span class="pl-1">Airflow: ${airflow}</span>
+                  <span class="border-r border-[var(--text--sub-600)] pr-1">${i18n.units}: ${system.number_of_units_installed}</span>
+                  <span class="pl-1">${i18n.airflow}: ${airflow}</span>
                 </p>
               </div>
               <div class="flex items-center gap-3">

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-05 16:58+0200\n"
+"POT-Creation-Date: 2026-03-05 17:21+0200\n"
 "PO-Revision-Date: 2025-07-03 16:28+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Vietnamese <vi@li.org>\n"
@@ -2740,6 +2740,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:335
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:39
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:47
+#: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:97
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:183
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:305
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:420
@@ -2763,6 +2764,7 @@ msgstr "Có"
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:336
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:40
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:48
+#: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:98
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:184
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:306
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:421
@@ -2943,6 +2945,7 @@ msgid "Next"
 msgstr "Tiếp"
 
 #: .\templates\pages\add-building\components\building-structural-components\_selected_material.html:25
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:516
 #, fuzzy
 #| msgid "Description"
 msgid "Add description"
@@ -2950,6 +2953,7 @@ msgstr "Mô tả"
 
 #: .\templates\pages\add-building\components\building-structural-components\_selected_material.html:31
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:280
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:518
 msgid "Category"
 msgstr "Danh mục"
 
@@ -3047,6 +3051,7 @@ msgid "Save"
 msgstr "Lưu"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:126
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:515
 msgid "Create New Component"
 msgstr "Tạo thành phần mới"
 
@@ -3070,6 +3075,7 @@ msgid "Construction Technique"
 msgstr "Kỹ thuật xây dựng"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:153
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:513
 #: .\templates\pages\home\templates.html:212
 msgid "Select technique"
 msgstr "Chọn kỹ thuật"
@@ -3145,6 +3151,7 @@ msgid "Subcategory"
 msgstr "Danh mục"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:295
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:523
 msgid "All Sub-categories"
 msgstr "Tất cả danh mục con"
 
@@ -3161,6 +3168,7 @@ msgid "Child Category"
 msgstr "Danh mục"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:302
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:524
 #, fuzzy
 #| msgid "All Categories"
 msgid "All Child Categories"
@@ -3280,6 +3288,40 @@ msgstr "Thành phần hệ thống"
 #: .\templates\pages\home\templates.html:129
 msgid "My Component"
 msgstr "Thành phần của tôi"
+
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:512
+#: .\templates\pages\home\templates.html:202
+msgid "Select category"
+msgstr "Chọn danh mục"
+
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:514
+#, fuzzy
+#| msgid "My Component"
+msgid "Edit Component"
+msgstr "Thành phần của tôi"
+
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:517
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:981
+msgid "Qty"
+msgstr "Số lượng"
+
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:519
+msgid "BOQ"
+msgstr "BOQ"
+
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:520
+msgid "materials"
+msgstr "vật liệu"
+
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:521
+msgid "No category"
+msgstr "Không có danh mục"
+
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:522
+#, fuzzy
+#| msgid "Carbon Savings"
+msgid "Saving..."
+msgstr "Tiết kiệm carbon"
 
 #: .\templates\pages\add-building\components\building-structural-components\partials\templates_selection_list.html:46
 #: .\templates\pages\home\partials\templates_list.html:46
@@ -3886,6 +3928,29 @@ msgstr "Tổng công suất đầu vào hệ thống chiller"
 msgid "AIR COOLED CHILLER DATA"
 msgstr ""
 
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:978
+#, fuzzy
+#| msgid "Chiller system"
+msgid "Chiller System"
+msgstr "Hệ thống chiller"
+
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:979
+msgid "Air Conditioner"
+msgstr "Điều hòa không khí"
+
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:980
+#, fuzzy
+#| msgid "Refrigerant quantity"
+msgid "Refrigerant"
+msgstr "Số lượng môi chất lạnh"
+
+#: .\templates\pages\add-building\components\operational-details\cooling-system.html:982
+#: .\templates\pages\add-building\components\operational-details\hot-water-system.html:373
+#: .\templates\pages\add-building\components\operational-details\lighting-system.html:695
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:511
+msgid "N/A"
+msgstr ""
+
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:7
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:70
 msgid "Add hot water system"
@@ -3930,6 +3995,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:84
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:175
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:281
+#: .\templates\pages\add-building\components\operational-details\hot-water-system.html:371
 #, fuzzy
 #| msgid "Assembly type"
 msgid "Fuel type"
@@ -4065,6 +4131,12 @@ msgid ""
 "Power input × No. of equipment × schedule / efficiency level (0 if Solar)"
 msgstr ""
 
+#: .\templates\pages\add-building\components\operational-details\hot-water-system.html:372
+#, fuzzy
+#| msgid "Power input:"
+msgid "Power input"
+msgstr "Công suất đầu vào:"
+
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:7
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:18
 msgid "Add a lift & escalator system"
@@ -4112,6 +4184,24 @@ msgstr "Nhấp vào nút bên dưới để thêm hệ thống thang máy & than
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:91
 msgid "Add lift & escalator system"
 msgstr "Thêm hệ thống thang máy & thang cuốn"
+
+#: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:99
+msgid "Lift & Escalator System"
+msgstr "Hệ thống thang máy & thang cuốn"
+
+#: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:100
+msgid "Lifts"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:101
+#, fuzzy
+#| msgid "Regenerative features:"
+msgid "Regenerative"
+msgstr "Tính năng tái tạo:"
+
+#: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:102
+msgid "VVVF"
+msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:7
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:110
@@ -4277,6 +4367,10 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:661
 msgid "Total power (kW) × hrs/day × days/wk × wks/yr"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\lighting-system.html:694
+msgid "Area"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:6
@@ -4473,6 +4567,18 @@ msgstr ""
 #| msgid "Optional"
 msgid "Optional, 1–5"
 msgstr "Tùy chọn"
+
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:509
+#, fuzzy
+#| msgid "Unit:"
+msgid "Units"
+msgstr "Đơn vị:"
+
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:510
+#, fuzzy
+#| msgid "Airflow rate:"
+msgid "Airflow"
+msgstr "Tốc độ luồng khí:"
 
 #: .\templates\pages\building\building.html:5
 msgid "Building View"
@@ -4842,10 +4948,6 @@ msgstr "Chọn quốc gia"
 msgid "Building component"
 msgstr "Thành phần tòa nhà"
 
-#: .\templates\pages\home\templates.html:202
-msgid "Select category"
-msgstr "Chọn danh mục"
-
 #: .\templates\pages\home\templates.html:210
 msgid "Construction technique"
 msgstr "Kỹ thuật xây dựng"
@@ -5124,9 +5226,6 @@ msgstr ""
 #~ msgid "Latitude must be between -90 and 90"
 #~ msgstr "Vĩ độ phải nằm giữa -90 và 90"
 
-#~ msgid "Qty"
-#~ msgstr "Số lượng"
-
 #~ msgid ""
 #~ "If data is available as total quantity per material, select 'Add from "
 #~ "BoQ'. For quantities per components (foundation, floor, roof, etc.), use "
@@ -5176,15 +5275,6 @@ msgstr ""
 #~ msgid "Item removed"
 #~ msgstr "Đã xóa mục"
 
-#~ msgid "BOQ"
-#~ msgstr "BOQ"
-
-#~ msgid "materials"
-#~ msgstr "vật liệu"
-
-#~ msgid "No category"
-#~ msgstr "Không có danh mục"
-
 #~ msgid "Add at least one BOQ or component"
 #~ msgstr "Thêm ít nhất một BOQ hoặc thành phần"
 
@@ -5224,9 +5314,6 @@ msgstr ""
 
 #~ msgid "Cooling System Image"
 #~ msgstr "Hình ảnh hệ thống làm lạnh"
-
-#~ msgid "Chiller system"
-#~ msgstr "Hệ thống chiller"
 
 #~ msgid "Water cooled chiller"
 #~ msgstr "Chiller làm lạnh bằng nước"
@@ -5317,9 +5404,6 @@ msgstr ""
 #~ msgid "An error occurred while saving the cooling system"
 #~ msgstr "Đã xảy ra lỗi khi lưu hệ thống làm lạnh"
 
-#~ msgid "Air Conditioner"
-#~ msgstr "Điều hòa không khí"
-
 #~ msgid "Error fetching cooling systems"
 #~ msgstr "Lỗi khi tải hệ thống làm lạnh"
 
@@ -5408,16 +5492,10 @@ msgstr ""
 #~ msgid "Failed to save lift & escalator system. Please try again."
 #~ msgstr "Không thể lưu hệ thống thang máy & thang cuốn. Vui lòng thử lại."
 
-#~ msgid "Lift & Escalator System"
-#~ msgstr "Hệ thống thang máy & thang cuốn"
-
 #, fuzzy
 #~| msgid "Approx. number of residents"
 #~ msgid "Number of lifts:"
 #~ msgstr "Số lượng cư dân (ước tính)"
-
-#~ msgid "Regenerative features:"
-#~ msgstr "Tính năng tái tạo:"
 
 #~ msgid "Error loading lift & escalator systems"
 #~ msgstr "Lỗi khi tải hệ thống thang máy & thang cuốn"
@@ -5522,9 +5600,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Bạn sắp xóa hoặc xóa bỏ hệ thống thông gió đã thêm. Hành động này sẽ xóa "
 #~ "vĩnh viễn nó."
-
-#~ msgid "Airflow rate:"
-#~ msgstr "Tốc độ luồng khí:"
 
 #, fuzzy
 #~| msgid "Ventilation Type"

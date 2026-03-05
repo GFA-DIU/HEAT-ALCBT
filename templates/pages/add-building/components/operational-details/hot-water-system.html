@@ -367,6 +367,12 @@
 </template>
 
 <script>
+  var i18n = {
+    fuelType:   "{% translate 'Fuel type' %}",
+    powerInput: "{% translate 'Power input' %}",
+    na:         "{% translate 'N/A' %}",
+  };
+
   var HWS_TYPE_MAP = {
     'heat-pump': 'heat-pump-template',
     'boiler':    'boiler-template',
@@ -619,16 +625,16 @@
       }
 
       listContainer.innerHTML = systems.map(function(system) {
-        var fuelType   = system.fuel_type_display || 'N/A';
-        var powerInput = system.power_input !== null ? system.power_input + ' kW' : 'N/A';
+        var fuelType   = system.fuel_type_display || i18n.na;
+        var powerInput = system.power_input !== null ? system.power_input + ' kW' : i18n.na;
 
         return '<li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">'
           + '<span data-icon="temp-cold-line" data-size="20" data-color="var(--icon--strong-950)" class="shrink-0 self-start"></span>'
           + '<div class="flex flex-col flex-1">'
           + '<p class="text-sm/5 font-medium">' + system.type_of_hot_water_system_display + '</p>'
           + '<p class="text-sm/5 text-[var(--text--sub-600)] gap-0">'
-          + '<span class="border-r border-[var(--text--sub-600)] pr-1">Fuel type: ' + fuelType + '</span>'
-          + '<span class="pl-1">Power input: ' + powerInput + '</span>'
+          + '<span class="border-r border-[var(--text--sub-600)] pr-1">' + i18n.fuelType + ': ' + fuelType + '</span>'
+          + '<span class="pl-1">' + i18n.powerInput + ': ' + powerInput + '</span>'
           + '</p>'
           + '</div>'
           + '<div class="flex items-center gap-3">'

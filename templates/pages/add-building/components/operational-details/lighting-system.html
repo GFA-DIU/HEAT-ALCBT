@@ -690,6 +690,11 @@
 </template>
 
 <script>
+  var i18n = {
+    area: "{% translate 'Area' %}",
+    na:   "{% translate 'N/A' %}",
+  };
+
   // ================================================================
   // Operating schedule defaults by room type [hrs/day, days/week, weeks/year]
   // ================================================================
@@ -975,16 +980,16 @@
       }
 
       listContainer.innerHTML = systems.map(function(system) {
-        var areaOfRoom = system.area_of_room || 'N/A';
-        var bulbType   = system.lighting_bulb_type_display || 'N/A';
-        var roomType   = system.room_type_display || 'N/A';
+        var areaOfRoom = system.area_of_room || i18n.na;
+        var bulbType   = system.lighting_bulb_type_display || i18n.na;
+        var roomType   = system.room_type_display || i18n.na;
 
         return '<li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">'
           + '<span data-icon="lightbulb-line" data-size="20" data-color="var(--icon--strong-950)" class="shrink-0 self-start"></span>'
           + '<div class="flex flex-col flex-1">'
           + '<p class="text-sm/5 font-medium">' + roomType + '</p>'
           + '<p class="text-sm/5 text-[var(--text--sub-600)] gap-0">'
-          + '<span class="border-r border-[var(--text--sub-600)] pr-1">Area: ' + areaOfRoom + ' m²</span>'
+          + '<span class="border-r border-[var(--text--sub-600)] pr-1">' + i18n.area + ': ' + areaOfRoom + ' m²</span>'
           + '<span class="pl-1">' + bulbType + '</span>'
           + '</p>'
           + '</div>'

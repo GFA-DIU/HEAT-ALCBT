@@ -974,6 +974,14 @@
 </template>
 
 <script>
+  var i18n = {
+    chillerSystem:  "{% translate 'Chiller System' %}",
+    airConditioner: "{% translate 'Air Conditioner' %}",
+    refrigerant:    "{% translate 'Refrigerant' %}",
+    qty:            "{% translate 'Qty' %}",
+    na:             "{% translate 'N/A' %}",
+  };
+
   // Climate zone passed from Django view (use var to avoid re-declaration errors when step is reloaded)
   var BUILDING_CLIMATE_ZONE = "{{ climate_zone }}";
 
@@ -1251,9 +1259,9 @@
         list.innerHTML = systems.map(system => {
           let label = '';
           if (system.cooling_system_type === 'chiller') {
-            label = 'Chiller System - ' + (system.chiller_type_display || '');
+            label = i18n.chillerSystem + ' - ' + (system.chiller_type_display || '');
           } else {
-            label = system.ac_type_display || 'Air Conditioner';
+            label = system.ac_type_display || i18n.airConditioner;
             if (system.packaged_subtype_display) label += ' – ' + system.packaged_subtype_display;
           }
           return `
@@ -1262,8 +1270,8 @@
               <div class="flex flex-col flex-1">
                 <p class="text-sm/5 font-medium">${label}</p>
                 <p class="text-sm/5 text-[var(--text--sub-600)]">
-                  <span class="border-r border-[var(--text--sub-600)] pr-1">Refrigerant: ${system.refrigerant_type || 'N/A'}</span>
-                  <span class="pl-1">Qty: ${system.refrigerant_quantity_kg || 'N/A'} kg</span>
+                  <span class="border-r border-[var(--text--sub-600)] pr-1">${i18n.refrigerant}: ${system.refrigerant_type || i18n.na}</span>
+                  <span class="pl-1">${i18n.qty}: ${system.refrigerant_quantity_kg || i18n.na} kg</span>
                 </p>
               </div>
               <div class="flex items-center gap-3">

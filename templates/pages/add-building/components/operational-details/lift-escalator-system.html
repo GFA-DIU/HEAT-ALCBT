@@ -93,6 +93,15 @@
 </template>
 
 <script>
+  var i18n = {
+    yes:                  "{% translate 'Yes' %}",
+    no:                   "{% translate 'No' %}",
+    liftEscalatorSystem:  "{% translate 'Lift & Escalator System' %}",
+    lifts:                "{% translate 'Lifts' %}",
+    regenerative:         "{% translate 'Regenerative' %}",
+    vvvf:                 "{% translate 'VVVF' %}",
+  };
+
   if (!window.editingLiftEscalatorSystemId) {
     window.editingLiftEscalatorSystemId = null;
   }
@@ -215,17 +224,17 @@
       }
 
       listContainer.innerHTML = systems.map(function(system) {
-        var regenerative = system.lift_regenerative_features ? 'Yes' : 'No';
-        var vvvf = system.vvvf_sleep_mode ? 'Yes' : 'No';
+        var regenerative = system.lift_regenerative_features ? i18n.yes : i18n.no;
+        var vvvf = system.vvvf_sleep_mode ? i18n.yes : i18n.no;
 
         return '<li class="flex items-center justify-between gap-1.5 w-full p-2.5 rounded-[var(--radius-8)] bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)]">'
           + '<span data-icon="stairs-line" data-size="20" data-color="var(--icon--strong-950)" class="shrink-0 self-start"></span>'
           + '<div class="flex flex-col flex-1">'
-          + '<p class="text-sm/5 font-medium">Lift & Escalator System</p>'
+          + '<p class="text-sm/5 font-medium">' + i18n.liftEscalatorSystem + '</p>'
           + '<p class="text-sm/5 text-[var(--text--sub-600)] gap-0">'
-          + '<span class="border-r border-[var(--text--sub-600)] pr-1">Lifts: ' + system.number_of_lifts + '</span>'
-          + '<span class="border-r border-[var(--text--sub-600)] px-1">Regenerative: ' + regenerative + '</span>'
-          + '<span class="pl-1">VVVF: ' + vvvf + '</span>'
+          + '<span class="border-r border-[var(--text--sub-600)] pr-1">' + i18n.lifts + ': ' + system.number_of_lifts + '</span>'
+          + '<span class="border-r border-[var(--text--sub-600)] px-1">' + i18n.regenerative + ': ' + regenerative + '</span>'
+          + '<span class="pl-1">' + i18n.vvvf + ': ' + vvvf + '</span>'
           + '</p>'
           + '</div>'
           + '<div class="flex items-center gap-3">'
