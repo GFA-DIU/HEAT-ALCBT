@@ -274,20 +274,20 @@
     <div class="cookie-banner-content container mx-auto flex flex-col md:flex-row items-center justify-between p-4 gap-4">
       <div>
         <div class="cookie-text">
-          <h3 class='text-lg font-bold'><i class="bi bi-shield-check"></i> We Value Your Privacy</h3>
-          <p >We use cookies to enhance your experience, provide analytics, and enable embedded content. You can manage your preferences at any time.</p>
+          <h3 class='text-lg font-bold'><i class="bi bi-shield-check"></i> {% translate "We Value Your Privacy" %}</h3>
+          <p >{% translate "We use cookies to enhance your experience, provide analytics, and enable embedded content. You can manage your preferences at any time." %}</p>
         </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2 mt-3">
           <button type="button" class="btn btn-primary" onclick="acceptAllCookies()">
-            Accept All
+            {% translate "Accept All" %}
           </button>
           <button type="button" class="btn btn-error" onclick="declineOptionalCookies()">
-            Decline Optional
+            {% translate "Decline Optional" %}
           </button>
           <button type="button" class="btn btn-outline col-span-2" onclick="showCookieSettings()">
-            Manage Preferences
+            {% translate "Manage Preferences" %}
           </button>
         </div>
     </div>
@@ -306,9 +306,9 @@
           data-color="var(--state--warning--base)"
         ></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        You are about to log out of your account.
+        {% translate "You are about to log out of your account." %}
       </p>
     </div>
     <form  action="{% url 'account_logout' %}" method="post" class="w-full">
@@ -318,9 +318,9 @@
         class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1"
         onclick="logout_modal.close()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button class="btn btn-sm btn-error flex-1" type='submit'>Logout</button>
+      <button class="btn btn-sm btn-error flex-1" type='submit'>{% translate "Logout" %}</button>
     </div>
     </form>
   </div>
@@ -335,7 +335,7 @@
           <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-primary/10">
             <span data-icon="settings-5-line" data-size="24" data-color="var(--color-primary)"></span>
           </div>
-          <h3 class="text-lg font-semibold">Cookie Settings</h3>
+          <h3 class="text-lg font-semibold">{% translate "Cookie Settings" %}</h3>
         </div>
         <button type="button" class="btn btn-ghost btn-sm btn-circle" onclick="cookieSettingsModal.close()">
           <span data-icon="close-line" data-size="20"></span>
@@ -345,7 +345,7 @@
       <!-- Body (scrollable) -->
       <div class="p-5 overflow-y-auto flex-1 min-h-0">
         <p class="text-sm text-[var(--text--sub-600)] mb-4">
-          Manage your cookie preferences below. Essential cookies are required for the website to function properly.
+          {% translate "Manage your cookie preferences below. Essential cookies are required for the website to function properly." %}
         </p>
         <div id="cookieCategories" class="flex flex-col gap-4">
           <!-- Cookie categories loaded dynamically -->
@@ -355,13 +355,13 @@
       <!-- Footer (static) -->
       <div class="p-5 border-t border-[var(--stroke--soft-200)] flex flex-wrap gap-3 justify-end shrink-0">
         <button type="button" class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="cookieSettingsModal.close()">
-          Cancel
+          {% translate "Cancel" %}
         </button>
         <button type="button" class="btn btn-sm btn-error" onclick="declineOptionalCookies()">
-          Decline Optional
+          {% translate "Decline Optional" %}
         </button>
         <button type="button" class="btn btn-sm btn-primary" onclick="saveCustomSettings()">
-          Save Preferences
+          {% translate "Save Preferences" %}
         </button>
       </div>
     </div>

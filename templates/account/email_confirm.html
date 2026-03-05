@@ -1,31 +1,32 @@
 {% extends 'account/_auth.html' %}
 {% load crispy_forms_tags %}
+{% load i18n %}
 
-{% block title %}Email Confirmation{% endblock %}
+{% block title %}{% translate "Email Confirmation" %}{% endblock %}
 
 {% block auth_content %}
     <h1 class="text-xl font-bold text-center text-(--text--strong-950)">
-        Confirm Email Address
+        {% translate "Confirm Email Address" %}
     </h1>
     {% if confirmation %}
         {% if can_confirm %}
 
             <p>
-                Please confirm that <a href="mailto:{{ confirmation.email_address.email }}">{{ confirmation.email_address.email }}</a> is an email address for user {{ confirmation.email_address.user }}.
+                {% blocktranslate with email=confirmation.email_address.email user=confirmation.email_address.user %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an email address for user {{ user }}.{% endblocktranslate %}
             </p>
             <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
                 {% csrf_token %} {{ form|crispy }}
-                <button class="btn btn-success" type="submit">Confirm</button>
+                <button class="btn btn-success" type="submit">{% translate "Confirm" %}</button>
             </form>
         {% else %}
             <p>
-                Unable to confirm {{ email }} because it is already confirmed by a different account.
+                {% blocktranslate with email=email %}Unable to confirm {{ email }} because it is already confirmed by a different account.{% endblocktranslate %}
             </p>
         {% endif %}
     {% else %}
         {% url 'account_email' as email_url %}
         <p>
-            This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email confirmation request</a>.
+            {% blocktranslate with email_url=email_url %}This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email confirmation request</a>.{% endblocktranslate %}
         </p>
     {% endif %}
 {% endblock auth_content %}
