@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-05 17:21+0200\n"
+"POT-Creation-Date: 2026-03-05 19:22+0200\n"
 "PO-Revision-Date: 2025-07-03 16:28+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Vietnamese <vi@li.org>\n"
@@ -2701,7 +2701,7 @@ msgid "Type of apartments"
 msgstr "Loại căn hộ"
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:41
-#: .\templates\pages\add-building\components\building-information\building-details.html:300
+#: .\templates\pages\add-building\components\building-information\building-details.html:304
 msgid "Pick a type of apartments"
 msgstr "Chọn loại căn hộ"
 
@@ -2805,6 +2805,17 @@ msgid ""
 "new files to replace existing ones."
 msgstr ""
 
+#: .\templates\pages\add-building\components\building-information\building-details.html:211
+msgid ""
+"Please upload a certification file, or select \\\"No\\\" if not applicable."
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:212
+msgid ""
+"Please upload at least one BoQ / design drawing file, or select \\\"No\\\" "
+"if not applicable."
+msgstr ""
+
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:10
 msgid "Building name or Code"
 msgstr "Tên hoặc mã tòa nhà"
@@ -2839,6 +2850,7 @@ msgid "Address is required (minimum 5 characters)"
 msgstr "Địa chỉ là bắt buộc (tối thiểu 5 ký tự)"
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:80
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:293
 msgid "Please select a country"
 msgstr "Vui lòng chọn quốc gia"
 
@@ -2910,6 +2922,42 @@ msgstr "Tìm kiếm vị trí hoặc địa chỉ tại đây"
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:280
 msgid "Done"
 msgstr "Hoàn tất"
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:290
+msgid "Building name must be at least 2 characters"
+msgstr "Tên tòa nhà phải có ít nhất 2 ký tự"
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:291
+msgid "Building name cannot contain < or > characters"
+msgstr "Tên tòa nhà không được chứa ký tự < hoặc >"
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:292
+msgid "Address must be at least 5 characters"
+msgstr "Địa chỉ phải có ít nhất 5 ký tự"
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:294
+msgid "Please select a region"
+msgstr "Vui lòng chọn vùng"
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:295
+msgid "Please select a city"
+msgstr "Vui lòng chọn thành phố"
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:296
+msgid "Longitude must be a valid number"
+msgstr "Kinh độ phải là số hợp lệ"
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:297
+msgid "Longitude must be between -180 and 180"
+msgstr "Kinh độ phải nằm giữa -180 và 180"
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:298
+msgid "Latitude must be a valid number"
+msgstr "Vĩ độ phải là số hợp lệ"
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:299
+msgid "Latitude must be between -90 and 90"
+msgstr "Vĩ độ phải nằm giữa -90 và 90"
 
 #: .\templates\pages\add-building\components\building-structural-components\_boq_item.html:16
 #, python-format
@@ -3222,7 +3270,7 @@ msgstr "Hành động này sẽ xóa vĩnh viễn mục này."
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:364
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:323
-#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:469
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:476
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:60
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:61
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:82
@@ -3318,6 +3366,7 @@ msgid "No category"
 msgstr "Không có danh mục"
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:522
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:333
 #, fuzzy
 #| msgid "Carbon Savings"
 msgid "Saving..."
@@ -3372,7 +3421,7 @@ msgstr "Không tìm thấy nguồn năng lượng phù hợp với tiêu chí c�
 
 #: .\templates\pages\add-building\components\operational-data-entry\_form_section.html:24
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:84
-#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:504
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:511
 msgid "Save Energy Carriers"
 msgstr "Lưu nguồn năng lượng"
 
@@ -3405,6 +3454,7 @@ msgid "Add an energy carrier"
 msgstr "Thêm nguồn năng lượng"
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:87
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:335
 #, fuzzy
 #| msgid "Save Changes"
 msgid "Unsaved changes"
@@ -3434,6 +3484,18 @@ msgstr "Chính thức"
 msgid ""
 "You are about to remove this energy carrier. This action cannot be undone."
 msgstr "Bạn sắp xóa nguồn năng lượng này. Hành động này không thể hoàn tác."
+
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:332
+#, fuzzy
+#| msgid "Carbon Savings"
+msgid "Removing..."
+msgstr "Tiết kiệm carbon"
+
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:334
+#, fuzzy
+#| msgid "Saved successfully!"
+msgid "✓ Saved successfully!"
+msgstr "Đã lưu thành công!"
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:7
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:18
@@ -5199,33 +5261,6 @@ msgstr ""
 #~ msgid "eg. 5.603722"
 #~ msgstr "vd. 5.603722"
 
-#~ msgid "Building name must be at least 2 characters"
-#~ msgstr "Tên tòa nhà phải có ít nhất 2 ký tự"
-
-#~ msgid "Building name cannot contain < or > characters"
-#~ msgstr "Tên tòa nhà không được chứa ký tự < hoặc >"
-
-#~ msgid "Address must be at least 5 characters"
-#~ msgstr "Địa chỉ phải có ít nhất 5 ký tự"
-
-#~ msgid "Please select a region"
-#~ msgstr "Vui lòng chọn vùng"
-
-#~ msgid "Please select a city"
-#~ msgstr "Vui lòng chọn thành phố"
-
-#~ msgid "Longitude must be a valid number"
-#~ msgstr "Kinh độ phải là số hợp lệ"
-
-#~ msgid "Longitude must be between -180 and 180"
-#~ msgstr "Kinh độ phải nằm giữa -180 và 180"
-
-#~ msgid "Latitude must be a valid number"
-#~ msgstr "Vĩ độ phải là số hợp lệ"
-
-#~ msgid "Latitude must be between -90 and 90"
-#~ msgstr "Vĩ độ phải nằm giữa -90 và 90"
-
 #~ msgid ""
 #~ "If data is available as total quantity per material, select 'Add from "
 #~ "BoQ'. For quantities per components (foundation, floor, roof, etc.), use "
@@ -5292,9 +5327,6 @@ msgstr ""
 
 #~ msgid "Energy carrier added successfully"
 #~ msgstr "Đã thêm nguồn năng lượng thành công"
-
-#~ msgid "Saved successfully!"
-#~ msgstr "Đã lưu thành công!"
 
 #~ msgid ""
 #~ "You are about to remove or delete added cooling system. This will action "

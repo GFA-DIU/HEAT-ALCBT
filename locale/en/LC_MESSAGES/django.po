@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-05 17:21+0200\n"
+"POT-Creation-Date: 2026-03-05 19:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2510,7 +2510,7 @@ msgid "Type of apartments"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:41
-#: .\templates\pages\add-building\components\building-information\building-details.html:300
+#: .\templates\pages\add-building\components\building-information\building-details.html:304
 msgid "Pick a type of apartments"
 msgstr ""
 
@@ -2614,6 +2614,17 @@ msgid ""
 "new files to replace existing ones."
 msgstr ""
 
+#: .\templates\pages\add-building\components\building-information\building-details.html:211
+msgid ""
+"Please upload a certification file, or select \\\"No\\\" if not applicable."
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:212
+msgid ""
+"Please upload at least one BoQ / design drawing file, or select \\\"No\\\" "
+"if not applicable."
+msgstr ""
+
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:10
 msgid "Building name or Code"
 msgstr ""
@@ -2644,6 +2655,7 @@ msgid "Address is required (minimum 5 characters)"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:80
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:293
 msgid "Please select a country"
 msgstr ""
 
@@ -2712,6 +2724,42 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:280
 msgid "Done"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:290
+msgid "Building name must be at least 2 characters"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:291
+msgid "Building name cannot contain < or > characters"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:292
+msgid "Address must be at least 5 characters"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:294
+msgid "Please select a region"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:295
+msgid "Please select a city"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:296
+msgid "Longitude must be a valid number"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:297
+msgid "Longitude must be between -180 and 180"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:298
+msgid "Latitude must be a valid number"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-name-location.html:299
+msgid "Latitude must be between -90 and 90"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\_boq_item.html:16
@@ -3007,7 +3055,7 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:364
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:323
-#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:469
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:476
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:60
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:61
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:82
@@ -3091,6 +3139,7 @@ msgid "No category"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:522
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:333
 msgid "Saving..."
 msgstr ""
 
@@ -3135,7 +3184,7 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\operational-data-entry\_form_section.html:24
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:84
-#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:504
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:511
 msgid "Save Energy Carriers"
 msgstr ""
 
@@ -3166,6 +3215,7 @@ msgid "Add an energy carrier"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:87
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:335
 msgid "Unsaved changes"
 msgstr ""
 
@@ -3192,6 +3242,14 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:305
 msgid ""
 "You are about to remove this energy carrier. This action cannot be undone."
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:332
+msgid "Removing..."
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:334
+msgid "✓ Saved successfully!"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:7

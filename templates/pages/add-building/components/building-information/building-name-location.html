@@ -286,6 +286,19 @@
 <!-- Validation Script -->
 <script>
 (function() {
+  var i18n = {
+    buildingNameMinLength:   "{% translate 'Building name must be at least 2 characters' %}",
+    buildingNameInvalidChars:"{% translate 'Building name cannot contain < or > characters' %}",
+    addressMinLength:        "{% translate 'Address must be at least 5 characters' %}",
+    selectCountry:           "{% translate 'Please select a country' %}",
+    selectRegion:            "{% translate 'Please select a region' %}",
+    selectCity:              "{% translate 'Please select a city' %}",
+    longitudeInvalid:        "{% translate 'Longitude must be a valid number' %}",
+    longitudeRange:          "{% translate 'Longitude must be between -180 and 180' %}",
+    latitudeInvalid:         "{% translate 'Latitude must be a valid number' %}",
+    latitudeRange:           "{% translate 'Latitude must be between -90 and 90' %}",
+  };
+
   // Wait for form to be available
   const form = document.getElementById('form');
 
@@ -311,12 +324,12 @@
         if (!value) return null; // Will be caught by required attribute
 
         if (value.trim().length < 2) {
-          return 'Building name must be at least 2 characters';
+          return i18n.buildingNameMinLength;
         }
 
         // Prevent XSS
         if (/[<>]/.test(value)) {
-          return 'Building name cannot contain < or > characters';
+          return i18n.buildingNameInvalidChars;
         }
 
         return null; // Valid
@@ -327,7 +340,7 @@
         if (!value) return null;
 
         if (value.trim().length < 5) {
-          return 'Address must be at least 5 characters';
+          return i18n.addressMinLength;
         }
 
         return null;
@@ -336,7 +349,7 @@
       // Validate country selection
       country: (value) => {
         if (!value || value === '') {
-          return 'Please select a country';
+          return i18n.selectCountry;
         }
         return null;
       },
@@ -345,7 +358,7 @@
       region: (value, field, form) => {
         const countryField = form.querySelector('[name="country"]');
         if (countryField && countryField.value && (!value || value === '')) {
-          return 'Please select a region';
+          return i18n.selectRegion;
         }
         return null;
       },
@@ -354,7 +367,7 @@
       city: (value, field, form) => {
         const regionField = form.querySelector('[name="region"]');
         if (regionField && regionField.value && (!value || value === '')) {
-          return 'Please select a city';
+          return i18n.selectCity;
         }
         return null;
       },
@@ -365,10 +378,10 @@
 
         const lng = parseFloat(value);
         if (isNaN(lng)) {
-          return 'Longitude must be a valid number';
+          return i18n.longitudeInvalid;
         }
         if (lng < -180 || lng > 180) {
-          return 'Longitude must be between -180 and 180';
+          return i18n.longitudeRange;
         }
 
         return null;
@@ -380,10 +393,10 @@
 
         const lat = parseFloat(value);
         if (isNaN(lat)) {
-          return 'Latitude must be a valid number';
+          return i18n.latitudeInvalid;
         }
         if (lat < -90 || lat > 90) {
-          return 'Latitude must be between -90 and 90';
+          return i18n.latitudeRange;
         }
 
         return null;

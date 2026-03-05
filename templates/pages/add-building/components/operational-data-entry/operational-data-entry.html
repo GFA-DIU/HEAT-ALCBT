@@ -328,6 +328,13 @@
 
 <script>
 (function() {
+  var i18n = {
+    removing:       "{% translate 'Removing...' %}",
+    saving:         "{% translate 'Saving...' %}",
+    savedSuccess:   "{% translate '✓ Saved successfully!' %}",
+    unsavedChanges: "{% translate 'Unsaved changes' %}",
+  };
+
   // Use IIFE to avoid polluting global scope but allow re-execution on dynamic load
 
   const selectedOpProducts = document.getElementById('selected_op_products');
@@ -417,7 +424,7 @@
 
         // Disable button during request
         confirmDeleteBtn.disabled = true;
-        confirmDeleteBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Removing...';
+        confirmDeleteBtn.innerHTML = `<span class="loading loading-spinner loading-sm"></span> ${i18n.removing}`;
 
         try {
           const response = await fetch('{% url "building_step_operational" %}', {
@@ -485,7 +492,7 @@
         const text = btn.querySelector('.button-text');
         if (icon) icon.classList.add('hidden');
         if (loading) loading.classList.remove('hidden');
-        if (text) text.textContent = 'Saving...';
+        if (text) text.textContent = i18n.saving;
       }
     }
   });
@@ -509,7 +516,7 @@
         // Just show success message
         const saveStatus = document.getElementById('save_status');
         if (saveStatus) {
-          saveStatus.innerHTML = '<span class="text-success font-medium">✓ Saved successfully!</span>';
+          saveStatus.innerHTML = `<span class="text-success font-medium">${i18n.savedSuccess}</span>`;
           setTimeout(() => {
             saveStatus.innerHTML = '';
           }, 3000);
@@ -527,7 +534,7 @@
         form.removeAttribute('data-saved');
         const saveStatus = document.getElementById('save_status');
         if (saveStatus) {
-          saveStatus.textContent = 'Unsaved changes';
+          saveStatus.textContent = i18n.unsavedChanges;
           saveStatus.classList.remove('text-success');
           saveStatus.classList.add('text-warning');
         }

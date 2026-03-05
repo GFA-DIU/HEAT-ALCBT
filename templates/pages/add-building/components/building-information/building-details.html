@@ -207,6 +207,10 @@
 
 <script>
 (function () {
+  var i18n = {
+    uploadCertError: "{% translate 'Please upload a certification file, or select \"No\" if not applicable.' %}",
+    uploadBoqError:  "{% translate 'Please upload at least one BoQ / design drawing file, or select \"No\" if not applicable.' %}",
+  };
   function toggleCertUpload(val) {
     var section = document.getElementById('cert-upload-section');
     if (section) section.classList.toggle('hidden', val !== 'yes');
@@ -229,7 +233,7 @@
       var hasExisting = certExisting && certExisting.children.length > 0;
       var hasNew = certFile && certFile.files.length > 0;
       if (!hasExisting && !hasNew) {
-        Toast.error('Please upload a certification file, or select "No" if not applicable.');
+        Toast.error(i18n.uploadCertError);
         return false;
       }
     }
@@ -240,7 +244,7 @@
       var hasExistingBoq = boqExisting && boqExisting.children.length > 0;
       var hasNewBoq = boqFiles && boqFiles.files.length > 0;
       if (!hasExistingBoq && !hasNewBoq) {
-        Toast.error('Please upload at least one BoQ / design drawing file, or select "No" if not applicable.');
+        Toast.error(i18n.uploadBoqError);
         return false;
       }
     }
