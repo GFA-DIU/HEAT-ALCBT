@@ -1,3 +1,4 @@
+{% load i18n %}
 <li class="bg-[var(--bg--weak-50)] rounded-xl p-4"
     id="material-{{ epd.id }}-{{ epd.timestamp }}"
     data-epd-id="{{ epd.id }}"
@@ -21,13 +22,13 @@
 
     <label class="input w-full">
       <input type="text"
-            placeholder="Add description"
+            placeholder="{% translate 'Add description' %}"
             class="material-description" />
     </label>
 
     {% if mode == 'boq' %}
     <select class="select material-category" required>
-      <option value="" selected disabled>Category</option>
+      <option value="" selected disabled>{% translate "Category" %}</option>
       {% for cat in categories %}
       <option value="{{ cat.id }}">{{ cat.name }}</option>
       {% endfor %}

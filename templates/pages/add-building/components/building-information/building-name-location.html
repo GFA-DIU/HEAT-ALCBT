@@ -1,52 +1,53 @@
 <!-- Updated building-name-location.html with validation -->
 {% load static %}
+{% load i18n %}
 <form id="form" class="grid grid-cols-2 gap-x-2 gap-y-1">
   {% csrf_token %}
 
   <!-- Building Name Field -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
-      Building name or Code<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Building name or Code" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="input validator w-full">
       <input
         name="building_name"
         type="text"
-        placeholder="e.g. JP Plaza"
+        placeholder="{% translate 'e.g. JP Plaza' %}"
         required
         minlength="2"
         maxlength="200"
         {% if building_data.building_name %}value="{{ building_data.building_name }}"{% endif %}
       />
     </label>
-    <p class="validator-hint">Building name must be 2-200 characters</p>
+    <p class="validator-hint">{% translate "Building name must be 2-200 characters" %}</p>
   </fieldset>
 
   <!-- Address Field -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend w-full">
-      Address (Zip, Street)<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Address (Zip, Street)" %}<span class="text-[var(--state--error--base)]">*</span>
       <span class="flex-1 flex justify-end text-[var(--text--sub-600)]">
-        <a class="underline cursor-pointer" onclick="openGeoLocationModal()">Find location on map</a>
+        <a class="underline cursor-pointer" onclick="openGeoLocationModal()">{% translate "Find location on map" %}</a>
       </span>
     </legend>
     <label class="input validator w-full">
       <input
         name="address"
         type="text"
-        placeholder="e.g. 1885 L Street Northwest"
+        placeholder="{% translate 'e.g. 1885 L Street Northwest' %}"
         required
         minlength="5"
         {% if building_data.address %}value="{{ building_data.address }}"{% endif %}
       />
     </label>
-    <p class="validator-hint">Address is required (minimum 5 characters)</p>
+    <p class="validator-hint">{% translate "Address is required (minimum 5 characters)" %}</p>
   </fieldset>
 
   <!-- Country Field -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
-      Country<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Country" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full flex relative">
       <div class="select-icon" id="country-select-icon">
@@ -67,7 +68,7 @@
         hx-swap="innerHTML"
         hx-vals='js:{"country": this.value}'
       >
-        <option value="" disabled {% if not selected_country %}selected{% endif %}>Select a country</option>
+        <option value="" disabled {% if not selected_country %}selected{% endif %}>{% translate "Select a country" %}</option>
         {% for country in countries %}
           <option data-name="{{ country.name }}" value="{{ country.id }}" {% if country.id == selected_country %}selected{% endif %}>
             <span data-country="{{ country.name }}" data-width="20"></span>
@@ -76,13 +77,13 @@
         {% endfor %}
       </select>
     </label>
-    <p class="validator-hint">Please select a country</p>
+    <p class="validator-hint">{% translate "Please select a country" %}</p>
   </fieldset>
 
   <!-- Region Field -->
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Region or State<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Region or State" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full flex relative">
       <div class="select-icon">
@@ -103,19 +104,19 @@
         hx-swap="innerHTML"
         hx-vals='js:{"region": this.value}'
       >
-        <option value="">Select a region or state</option>
+        <option value="">{% translate "Select a region or state" %}</option>
         {% for region in regions %}
           <option data-name="{{ region.name }}" value="{{ region.id }}" {% if region.id == selected_region %}selected{% endif %}>{{ region.name }}</option>
         {% endfor %}
       </select>
     </label>
-    <p class="validator-hint">Select a country first, then choose region</p>
+    <p class="validator-hint">{% translate "Select a country first, then choose region" %}</p>
   </fieldset>
 
   <!-- City Field -->
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      City<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "City" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full flex relative">
       <div class="select-icon">
@@ -131,19 +132,19 @@
         class="select select-with-icon w-full"
         required
       >
-        <option value="">Select a city</option>
+        <option value="">{% translate "Select a city" %}</option>
         {% for city in cities %}
           <option value="{{ city.id }}" {% if city.id == selected_city %}selected{% endif %}>{{ city.name }}</option>
         {% endfor %}
       </select>
     </label>
-    <p class="validator-hint">Select a region first, then choose city</p>
+    <p class="validator-hint">{% translate "Select a region first, then choose city" %}</p>
   </fieldset>
 
   <!-- Longitude Field (Optional) -->
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Longitude <span class="text-[var(--text--sub-600)]">(Optional)</span>
+      {% translate "Longitude" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span>
     </legend>
     <label class="input validator w-full">
       <input
@@ -156,13 +157,13 @@
         {% if building_data.longitude is not None %}value="{{ building_data.longitude }}"{% endif %}
       />
     </label>
-    <p class="validator-hint">Must be between -180 and 180</p>
+    <p class="validator-hint">{% translate "Must be between -180 and 180" %}</p>
   </fieldset>
 
   <!-- Latitude Field (Optional) -->
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Latitude <span class="text-[var(--text--sub-600)]">(Optional)</span>
+      {% translate "Latitude" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span>
     </legend>
     <label class="input validator w-full">
       <input
@@ -175,7 +176,7 @@
         {% if building_data.latitude is not None %}value="{{ building_data.latitude }}"{% endif %}
       />
     </label>
-    <p class="validator-hint">Must be between -90 and 90</p>
+    <p class="validator-hint">{% translate "Must be between -90 and 90" %}</p>
   </fieldset>
 
 <script>
@@ -190,18 +191,18 @@
     // Reset dependent dropdowns when country is cleared or changed
     countrySelect.addEventListener('change', function() {
       if (!this.value) {
-        regionSelect.innerHTML = '<option value="">Select a region or state</option>';
-        citySelect.innerHTML = '<option value="">Select a city</option>';
+        regionSelect.innerHTML = '<option value="">{% translate "Select a region or state" %}</option>';
+        citySelect.innerHTML = '<option value="">{% translate "Select a city" %}</option>';
       } else {
         // When country changes, also reset city (region will be loaded by HTMX)
-        citySelect.innerHTML = '<option value="">Select a city</option>';
+        citySelect.innerHTML = '<option value="">{% translate "Select a city" %}</option>';
       }
     });
 
     // Reset city dropdown when region is cleared
     regionSelect.addEventListener('change', function() {
       if (!this.value) {
-        citySelect.innerHTML = '<option value="">Select a city</option>';
+        citySelect.innerHTML = '<option value="">{% translate "Select a city" %}</option>';
       }
     });
 
@@ -222,10 +223,9 @@
       class="flex items-center justify-between px-5 py-4 border-b border-[var(--stroke--soft-200)]"
     >
       <div>
-        <h3 class="text-sm/5 font-medium">Geo Location</h3>
+        <h3 class="text-sm/5 font-medium">{% translate "Geo Location" %}</h3>
         <p class="text-xs/4 text-[var(--text--sub-600)]">
-          An address is good, but a pin is precise—help us capture your
-          project's exact location.
+          {% translate "An address is good, but a pin is precise—help us capture your project's exact location." %}
         </p>
       </div>
       <button
@@ -238,7 +238,7 @@
     </div>
 
     <div class="flex-1 flex flex-col px-5">
-      <p class="text-sm/5 mt-5.5 mb-2.5">Find location on map</p>
+      <p class="text-sm/5 mt-5.5 mb-2.5">{% translate "Find location on map" %}</p>
       <div class="relative flex-1 flex rounded-2xl overflow-hidden">
         <div class="absolute top-4 left-4 z-[9999] w-full pr-4">
           <label class="input w-full max-w-[18.75rem]">
@@ -250,7 +250,7 @@
             <input
               type="text"
               id="location-search"
-              placeholder="Search location or address here"
+              placeholder="{% translate 'Search location or address here' %}"
             />
           </label>
         </div>
@@ -270,14 +270,14 @@
         class="btn btn-outline"
         onclick="closeGeoLocationModal()"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
       <button
         type="button"
         class="btn btn-primary"
         onclick="selectCurrentLocation()"
       >
-        Done
+        {% translate "Done" %}
       </button>
     </div>
   </div>
@@ -420,5 +420,3 @@
 
 })();
 </script>
-
-

@@ -1,9 +1,10 @@
 {% load static %}
+{% load i18n %}
 <div id="hot-water-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button class="btn btn-outline w-fit" onclick="openHotWaterSystemModal()">
       <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-      Add hot water system
+      {% translate "Add hot water system" %}
     </button>
     <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
     <ul id="hot-water-systems-list" class="grid grid-cols-1 gap-2"></ul>
@@ -14,8 +15,8 @@
   <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">Add a hot water system</h3>
-        <p class="text-sm/5 text-[var(--text--sub-600)]">Provide details on the building's method of producing and distributing hot water.</p>
+        <h3 class="text-lg/6 font-medium">{% translate "Add a hot water system" %}</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">{% translate "Provide details on the building's method of producing and distributing hot water." %}</p>
       </div>
       <button type="button" onclick="closeHotWaterSystemModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
@@ -25,7 +26,7 @@
       {% csrf_token %}
       <div class="px-5 py-4">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Type of hot water system<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Type of hot water system" %}<span class="text-[var(--state--error--base)]">*</span></legend>
           <select class="select w-full" id="hot-water-type-select" name="type_of_hot_water_system"
             hx-get="/select_lists/?hot_water_system_types=1"
             hx-trigger="load"
@@ -33,15 +34,15 @@
             hx-swap="innerHTML"
             onchange="handleHotWaterTypeChange(this.value)"
             required>
-            <option value="">Select a hot water system</option>
+            <option value="">{% translate "Select a hot water system" %}</option>
           </select>
         </fieldset>
       </div>
       <div id="selected-hot-water-system"></div>
     </form>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeHotWaterSystemModal()">Cancel</button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveHotWaterSystem()">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeHotWaterSystemModal()">{% translate "Cancel" %}</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveHotWaterSystem()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -52,12 +53,12 @@
       <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
         <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)"></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
-      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">You are about to permanently remove this hot water system.</p>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">{% translate "You are about to permanently remove this hot water system." %}</p>
     </div>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="hot_water_system_modal_delete.close()">Cancel</button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteHotWaterSystem()">Remove</button>
+      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="hot_water_system_modal_delete.close()">{% translate "Cancel" %}</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteHotWaterSystem()">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -65,8 +66,8 @@
 <template id="no-hot-water-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
     <img src="{% static 'assets/hot-water-system.png' %}" alt="Hot Water System Image" />
-    <p class="text-sm/5 font-medium">Click button below to add a hot water system</p>
-    <button class="btn btn-primary" onclick="hot_water_system_modal.showModal()">Add hot water system</button>
+    <p class="text-sm/5 font-medium">{% translate "Click button below to add a hot water system" %}</p>
+    <button class="btn btn-primary" onclick="hot_water_system_modal.showModal()">{% translate "Add hot water system" %}</button>
   </div>
 </template>
 
@@ -76,90 +77,90 @@
 
 <!-- Heat Pump Water Heater -->
 <template id="heat-pump-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">HEAT PUMP WATER HEATER DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "HEAT PUMP WATER HEATER DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Fuel type<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Fuel type" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <select class="select w-full" name="fuel_type" required>
-        <option value="">Select an option</option>
-        <option value="electricity">Electricity</option>
+        <option value="">{% translate "Select an option" %}</option>
+        <option value="electricity">{% translate "Electricity" %}</option>
       </select>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Number of hot water equipment<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of hot water equipment" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_equipment" placeholder="e.g. 2" required min="1" />
       </label>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">System operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <legend class="fieldset-legend">{% translate "System operating schedule" %}<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="operating_hours_per_day" placeholder="4" value="4" required min="1" max="24" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "hrs / day" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="operating_days_per_week" placeholder="7" value="7" required min="1" max="7" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="operating_weeks_per_year" placeholder="52" value="52" required min="1" max="52" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
           </label>
         </div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Coefficient of Performance (COP)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Coefficient of Performance (COP)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="2.5–4.5" required min="0.01" step="0.001" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">COP</span>
       </label>
-      <p class="validator-hint">Typical: 2.5–4.5 for heat pumps</p>
+      <p class="validator-hint">{% translate "Typical: 2.5–4.5 for heat pumps" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Hot water system power input<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Hot water system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="power_input" placeholder="2–15" required min="0" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="validator-hint">Typical: 2–15 kW for heat pumps</p>
+      <p class="validator-hint">{% translate "Typical: 2–15 kW for heat pumps" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Installation of heat recovery system<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of heat recovery system" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="yes" class="radio radio-xs" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" checked /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline hot water system equipment efficiency level<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline hot water system equipment efficiency level" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="equipment_efficiency_level" placeholder="75–95" required min="0" max="100" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">Typical: 75%–95%</p>
+      <p class="validator-hint">{% translate "Typical: 75%–95%" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total energy consumption annually</legend>
+      <legend class="fieldset-legend">{% translate "Total energy consumption annually" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+        <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Power input × No. of equipment × schedule / COP</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power input × No. of equipment × schedule / COP" %}</p>
     </fieldset>
 
   </div>
@@ -167,105 +168,105 @@
 
 <!-- Boiler -->
 <template id="boiler-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">BOILER DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "BOILER DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Fuel type<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Fuel type" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <select class="select w-full" name="fuel_type" required onchange="handleBoilerFuelTypeChange(this.value)">
-        <option value="">Select an option</option>
-        <option value="electricity">Electricity</option>
-        <option value="natural-gas">Natural Gas</option>
+        <option value="">{% translate "Select an option" %}</option>
+        <option value="electricity">{% translate "Electricity" %}</option>
+        <option value="natural-gas">{% translate "Natural Gas" %}</option>
         <option value="lpg">LPG</option>
-        <option value="diesel">Diesel</option>
-        <option value="kerosene">Kerosene</option>
-        <option value="coal">Coal</option>
-        <option value="other">Other</option>
+        <option value="diesel">{% translate "Diesel" %}</option>
+        <option value="kerosene">{% translate "Kerosene" %}</option>
+        <option value="coal">{% translate "Coal" %}</option>
+        <option value="other">{% translate "Other" %}</option>
       </select>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Number of hot water equipment<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of hot water equipment" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_equipment" placeholder="e.g. 1" required min="1" />
       </label>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">System operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <legend class="fieldset-legend">{% translate "System operating schedule" %}<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="operating_hours_per_day" placeholder="4" value="4" required min="1" max="24" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "hrs / day" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="operating_days_per_week" placeholder="7" value="7" required min="1" max="7" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="operating_weeks_per_year" placeholder="52" value="52" required min="1" max="52" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
           </label>
         </div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Hot water system power input<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Hot water system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="power_input" placeholder="10–300" required min="0" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="validator-hint">Typical: 10–300 kW</p>
+      <p class="validator-hint">{% translate "Typical: 10–300 kW" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total fuel consumption<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total fuel consumption" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_fuel_consumption" placeholder="e.g. 1000" required min="0" step="0.001" />
         <span id="boiler-fuel-unit" class="text-sm/5 align-middle text-[var(--text--sub-600)]">—</span>
         <input type="hidden" name="fuel_consumption_unit" id="boiler-fuel-unit-input" value="" />
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Select fuel type first to see the unit</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Select fuel type first to see the unit" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Installation of heat recovery system<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of heat recovery system" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="yes" class="radio radio-xs" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" checked /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline hot water system equipment efficiency level<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline hot water system equipment efficiency level" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="equipment_efficiency_level" placeholder="75–95" required min="0.01" max="100" step="0.01" oninput="recomputeHWSEnergy()" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">Typical: 75%–95%</p>
+      <p class="validator-hint">{% translate "Typical: 75%–95%" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline efficiency (COP)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency (COP)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="e.g. 0.85" required min="0.01" step="0.001" />
       </label>
-      <p class="validator-hint">Equivalent COP for this boiler type</p>
+      <p class="validator-hint">{% translate "Equivalent COP for this boiler type" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total energy consumption annually</legend>
+      <legend class="fieldset-legend">{% translate "Total energy consumption annually" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+        <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Power input × No. of equipment × schedule / efficiency level</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power input × No. of equipment × schedule / efficiency level" %}</p>
     </fieldset>
 
   </div>
@@ -273,93 +274,93 @@
 
 <!-- Water Heaters (formerly Solar) -->
 <template id="solar-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">WATER HEATER DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "WATER HEATER DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Fuel type<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Fuel type" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <select class="select w-full" name="fuel_type" required onchange="handleWaterHeaterFuelTypeChange(this.value)">
-        <option value="">Select an option</option>
-        <option value="electricity">Electricity</option>
-        <option value="natural-gas">Natural Gas</option>
+        <option value="">{% translate "Select an option" %}</option>
+        <option value="electricity">{% translate "Electricity" %}</option>
+        <option value="natural-gas">{% translate "Natural Gas" %}</option>
         <option value="lpg">LPG</option>
-        <option value="solar">Solar</option>
+        <option value="solar">{% translate "Solar" %}</option>
       </select>
-      <p id="solar-fuel-tip" class="label-text-alt text-[var(--text--soft-400)] hidden">Solar is zero-carbon. Total energy will be set to 0.</p>
+      <p id="solar-fuel-tip" class="label-text-alt text-[var(--text--soft-400)] hidden">{% translate "Solar is zero-carbon. Total energy will be set to 0." %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Number of hot water equipment<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of hot water equipment" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_equipment" placeholder="e.g. 4" required min="1" />
       </label>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">System operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <legend class="fieldset-legend">{% translate "System operating schedule" %}<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="operating_hours_per_day" placeholder="4" value="4" required min="1" max="24" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "hrs / day" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="operating_days_per_week" placeholder="7" value="7" required min="1" max="7" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="operating_weeks_per_year" placeholder="52" value="52" required min="1" max="52" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
           </label>
         </div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Hot water system power input<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Hot water system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="power_input" placeholder="2–5 (electric), 10–40 (gas)" required min="0" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="validator-hint">Typical: 2–5 kW for electric, 10–40 kW for gas</p>
+      <p class="validator-hint">{% translate "Typical: 2–5 kW for electric, 10–40 kW for gas" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Installation of heat recovery system<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of heat recovery system" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="yes" class="radio radio-xs" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" checked /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="yes" class="radio radio-xs" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="heat_recovery_system" value="no" class="radio radio-xs" checked /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline hot water system equipment efficiency level<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline hot water system equipment efficiency level" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="equipment_efficiency_level" placeholder="75–99" required min="0.01" max="100" step="0.01" oninput="recomputeHWSEnergy()" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">Electric: 95–99%. Gas: 75–85%.</p>
+      <p class="validator-hint">{% translate "Electric: 95–99%. Gas: 75–85%." %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline efficiency (COP)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency (COP)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="e.g. 0.90" required min="0.01" step="0.001" />
       </label>
-      <p class="validator-hint">Equivalent COP for this water heater type</p>
+      <p class="validator-hint">{% translate "Equivalent COP for this water heater type" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total energy consumption annually</legend>
+      <legend class="fieldset-legend">{% translate "Total energy consumption annually" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+        <input type="number" name="total_energy_consumption_kwh_per_year" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Power input × No. of equipment × schedule / efficiency level (0 if Solar)</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power input × No. of equipment × schedule / efficiency level (0 if Solar)" %}</p>
     </fieldset>
 
   </div>

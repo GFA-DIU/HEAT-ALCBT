@@ -1,18 +1,19 @@
+{% load i18n %}
 <form id="form" class="grid grid-cols-3 gap-1">
     {% csrf_token %}
   <fieldset class="fieldset col-span-3">
     <legend class="fieldset-legend">
-      Number of residents (occupants)<span class="text-error">*</span>
+      {% translate "Number of residents (occupants)" %}<span class="text-error">*</span>
     </legend>
     <label class="input validator w-full">
       <input type="number" placeholder="e.g. 10" name="number_of_residents" required min="1" />
     </label>
-    <p class="validator-hint">Enter a valid value </p>
+    <p class="validator-hint">{% translate "Enter a valid value" %}</p>
   </fieldset>
 
   <fieldset class="fieldset col-span-3">
     <legend class="fieldset-legend">
-      Annual operating schedule<span class="text-error">*</span
+      {% translate "Annual operating schedule" %}<span class="text-error">*</span
       ><span
         data-icon="info-custom-fill"
         data-size="20"
@@ -24,28 +25,28 @@
         <label class="input validator w-full">
           <input type="number" placeholder="e.g. 1" name="annual_operating_hours_per_day" required min="1" max="24" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-            >Hours / day</span
+            >{% translate "Hours / day" %}</span
           >
         </label>
-        <p class="validator-hint">Enter a valid value</p>
+        <p class="validator-hint">{% translate "Enter a valid value" %}</p>
       </div>
       <div class="flex-1">
         <label class="input validator w-full">
           <input type="number" placeholder="e.g. 1" name="annual_operating_days_per_week" required min="1" max="7" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-            >days / week</span
+            >{% translate "days / week" %}</span
           >
         </label>
-        <p class="validator-hint">Enter a valid value</p>
+        <p class="validator-hint">{% translate "Enter a valid value" %}</p>
       </div>
       <div class="flex-1">
         <label class="input validator w-full">
           <input type="number" placeholder="e.g. 1" name="annual_operating_weeks_per_year" required min="1" max="52" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]"
-            >weeks / year</span
+            >{% translate "weeks / year" %}</span
           >
         </label>
-        <p class="validator-hint">Enter a valid value</p>
+        <p class="validator-hint">{% translate "Enter a valid value" %}</p>
       </div>
     </div>
   </fieldset>
@@ -53,7 +54,7 @@
   <div class="col-span-3 grid grid-cols-2 gap-1">
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Room heating temperature<span class="text-error">*</span>
+        {% translate "Room heating temperature" %}<span class="text-error">*</span>
       </legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" placeholder="e.g. 18" name="room_heating_temperature" required  />
@@ -61,16 +62,16 @@
           class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[calc(max-content+1rem)]"
           name="heating_temperature_unit"
         >
-          <option value="celsius" selected>°Celsius</option>
-          <option value="fahrenheit">°Fahrenheit</option>
+          <option value="celsius" selected>{% translate "°Celsius" %}</option>
+          <option value="fahrenheit">{% translate "°Fahrenheit" %}</option>
         </select>
       </label>
-      <p class="validator-hint">Enter a valid value </p>
+      <p class="validator-hint">{% translate "Enter a valid value" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        Room cooling temperature<span class="text-error">*</span>
+        {% translate "Room cooling temperature" %}<span class="text-error">*</span>
       </legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" placeholder="e.g. 32" name="room_cooling_temperature" required />
@@ -78,35 +79,35 @@
           class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[calc(max-content+1rem)]"
           name="cooling_temperature_unit"
         >
-          <option value="celsius" selected>°Celsius</option>
-          <option value="fahrenheit">°Fahrenheit</option>
+          <option value="celsius" selected>{% translate "°Celsius" %}</option>
+          <option value="fahrenheit">{% translate "°Fahrenheit" %}</option>
         </select>
       </label>
-      <p class="validator-hint">Enter a valid value </p>
+      <p class="validator-hint">{% translate "Enter a valid value" %}</p>
     </fieldset>
   </div>
 
   <fieldset class="fieldset col-span-3">
     <legend class="fieldset-legend">
-      Renewable energy installation (%)<span class="text-error">*</span>
+      {% translate "Renewable energy installation (%)" %}<span class="text-error">*</span>
     </legend>
     <label class="input validator w-full">
       <input type="number" placeholder="e.g. 15" name="renewable_energy_percent" required min="0.01" max="100" step="0.01" />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
     </label>
-    <p class="validator-hint">Enter a value greater than 0</p>
+    <p class="validator-hint">{% translate "Enter a value greater than 0" %}</p>
   </fieldset>
 
   <fieldset class="fieldset col-span-3">
     <legend class="fieldset-legend">
-      Building smart system installation<span class="text-error">*</span>
+      {% translate "Building smart system installation" %}<span class="text-error">*</span>
     </legend>
     <div class="flex items-center gap-2.5">
       <label class="flex items-center gap-2">
-        <input type="radio" name="building_smart_system" value="yes" class="radio radio-xs" /> Yes
+        <input type="radio" name="building_smart_system" value="yes" class="radio radio-xs" /> {% translate "Yes" %}
       </label>
       <label class="flex items-center gap-2">
-        <input type="radio" name="building_smart_system" value="no" class="radio radio-xs" checked /> No
+        <input type="radio" name="building_smart_system" value="no" class="radio radio-xs" checked /> {% translate "No" %}
       </label>
     </div>
   </fieldset>

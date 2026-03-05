@@ -1,9 +1,10 @@
 {% load static %}
+{% load i18n %}
 <div id="cooling-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button class="btn btn-outline w-fit" onclick="openCoolingSystemModal()">
       <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-      Add a cooling system
+      {% translate "Add a cooling system" %}
     </button>
     <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
     <ul class="grid grid-cols-1 gap-2" id="cooling-systems-list"></ul>
@@ -14,8 +15,8 @@
   <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">Add a cooling system</h3>
-        <p class="text-sm/5 text-[var(--text--sub-600)]">Enter details of the building's cooling system, including type and capacity</p>
+        <h3 class="text-lg/6 font-medium">{% translate "Add a cooling system" %}</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">{% translate "Enter details of the building's cooling system, including type and capacity" %}</p>
       </div>
       <button type="button" onclick="cooling_system_modal.close()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
@@ -25,22 +26,22 @@
       {% csrf_token %}
       <div class="px-5 py-4">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Type of cooling system<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Type of cooling system" %}<span class="text-[var(--state--error--base)]">*</span></legend>
           <select class="select w-full" id="cooling-system-type" name="cooling_system_type"
             hx-get="/select_lists/?cooling_types=1"
             hx-trigger="load"
             hx-target="this"
             hx-swap="innerHTML"
             onchange="handleCoolingSystemTypeChange(this.value)">
-            <option value="">Select a cooling system</option>
+            <option value="">{% translate "Select a cooling system" %}</option>
           </select>
         </fieldset>
       </div>
       <div id="selected-cooling-system"></div>
     </form>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeCoolingSystemModal()">Cancel</button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveCoolingSystem()">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeCoolingSystemModal()">{% translate "Cancel" %}</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveCoolingSystem()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -51,12 +52,12 @@
       <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
         <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)]"></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
-      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">You are about to permanently remove this cooling system.</p>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">{% translate "You are about to permanently remove this cooling system." %}</p>
     </div>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="cooling_system_modal_delete.close()">Cancel</button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteCoolingSystem()">Remove</button>
+      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="cooling_system_modal_delete.close()">{% translate "Cancel" %}</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteCoolingSystem()">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -64,80 +65,80 @@
 <template id="no-cooling-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
     <img src="{% static 'assets/cooling-system.png' %}" alt="Cooling System" />
-    <p class="text-sm/5 font-medium">Click button below to add a cooling system</p>
-    <button class="btn btn-primary" onclick="cooling_system_modal.showModal()">Add a cooling system</button>
+    <p class="text-sm/5 font-medium">{% translate "Click button below to add a cooling system" %}</p>
+    <button class="btn btn-primary" onclick="cooling_system_modal.showModal()">{% translate "Add a cooling system" %}</button>
   </div>
 </template>
 
 <template id="window-ac-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">WINDOW AIR CONDITIONER DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "WINDOW AIR CONDITIONER DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Year of installation" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2021" required min="1900" max="{% now "Y" %}"
           onchange="applyRefrigerantDefault(this.form,'window-ac'); applyLeakageDefault(this.form)" />
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Type of refrigerants" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <select class="select w-full" name="type_of_refrigerants"
         hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
         onchange="clearIfUserChanged(this)">
-        <option disabled selected value="">Select an option</option>
+        <option disabled selected value="">{% translate "Select an option" %}</option>
       </select>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "Auto-suggested based on year of installation" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
+      <legend class="fieldset-legend">{% translate "Refrigerant quantity" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="refrigerant_quantity" placeholder="e.g. 0.5 – 1.5 kg/unit" required min="0" step="0.1" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical = Capacity (Tons) × 0.6 kg</p>
-      <p class="validator-hint">This field is required</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "Tip: typical = Capacity (Tons) × 0.6 kg" %}</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Cooling capacity per unit" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 1.0" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'window-ac'); recalcWindowAcEnergy(this.form)" />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
-          <option value="ton">Ton</option>
+          <option value="ton">{% translate "Ton" %}</option>
           <option value="btu_hr">BTU/hr</option>
           <option value="kw">kW</option>
         </select>
       </label>
       <p class="text-xs text-[var(--text--sub-600)] mt-0.5">1 Ton = 12,000 BTU/hr = 3.516 kW</p>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of units" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_units" placeholder="e.g. 5" required min="1"
           oninput="recalcWindowAcEnergy(this.form)" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
@@ -145,21 +146,21 @@
           <label class="input validator w-full">
             <input type="number" name="hours_per_day" id="window-ac-hours" placeholder="e.g. 8" required min="1" max="24"
               oninput="recalcWindowAcEnergy(this.form)" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="days_per_week" id="window-ac-days" placeholder="e.g. 5" required min="1" max="7"
               oninput="recalcWindowAcEnergy(this.form)" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" name="weeks_per_year" id="window-ac-weeks" placeholder="e.g. 52" required min="1" max="52"
               oninput="recalcWindowAcEnergy(this.form)" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
           </label>
         </div>
       </div>
@@ -171,8 +172,8 @@
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 2.8" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" />
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">From BEE/EGAT/SNI label. Typical EER: 2.3 – 3.5. Cannot be zero.</p>
-      <p class="validator-hint">Value must be greater than zero</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "From BEE/EGAT/SNI label. Typical EER: 2.3 – 3.5. Cannot be zero." %}</p>
+      <p class="validator-hint">{% translate "Value must be greater than zero" %}</p>
     </fieldset>
 
     <!-- OTHER DETAILS -->
@@ -180,40 +181,39 @@
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS
+          {% translate "OTHER DETAILS" %}
           <span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Energy efficiency label" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, A–G)</span></legend>
               <select class="select w-full" name="energy_efficiency_label">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="A">A</option><option value="B">B</option><option value="C">C</option>
                 <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Number of stars" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, 1–5)</span></legend>
               <select class="select w-full" name="number_of_stars">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="1">1</option><option value="2">2</option><option value="3">3</option>
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">Power input per unit <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <legend class="fieldset-legend">{% translate "Power input per unit" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full">
                 <input type="number" name="power_input_per_unit" placeholder="0.8 – 1.8 kW" min="0" step="0.01"
                   oninput="recalcWindowAcEnergy(this.closest('form'))" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
               </label>
-              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: 0.8 – 1.8 kW for 0.75 – 2.0 Ton units</p>
+              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "Tip: 0.8 – 1.8 kW for 0.75 – 2.0 Ton units" %}</p>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
               <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
-                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <input type="number" name="total_energy_consumption_annually" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
               </label>
-              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">If power input given: Power/unit × Units × h/day × d/week × w/year. Otherwise: (Capacity(kW) × Units / EER) × h/day × d/week × w/year</p>
             </fieldset>
           </div>
         </div>
@@ -223,91 +223,91 @@
 </template>
 
 <template id="split-ac-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">SPLIT AIR CONDITIONER DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "SPLIT AIR CONDITIONER DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Year of installation" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2021" required min="1900" max="{% now "Y" %}"
           onchange="applyRefrigerantDefault(this.form,'split-ac'); applyLeakageDefault(this.form)" />
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Type of refrigerants" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <select class="select w-full" name="type_of_refrigerants"
         hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
         onchange="clearIfUserChanged(this)">
-        <option disabled selected value="">Select an option</option>
+        <option disabled selected value="">{% translate "Select an option" %}</option>
       </select>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "Auto-suggested based on year of installation" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
+      <legend class="fieldset-legend">{% translate "Refrigerant quantity" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="refrigerant_quantity" placeholder="Typical: 1.5 – 5 kg/unit" required min="0" step="0.1" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical = Capacity (Tons) × 1.0 kg</p>
-      <p class="validator-hint">This field is required</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "Tip: typical = Capacity (Tons) × 1.0 kg" %}</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Cooling capacity per unit" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 1.5" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'split-ac'); recalcWindowAcEnergy(this.form)" />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
-          <option value="ton">Ton</option>
+          <option value="ton">{% translate "Ton" %}</option>
           <option value="btu_hr">BTU/hr</option>
           <option value="kw">kW</option>
         </select>
       </label>
       <p class="text-xs text-[var(--text--sub-600)] mt-0.5">1 Ton = 12,000 BTU/hr = 3.516 kW</p>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of units" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_units" placeholder="e.g. 25" required min="1"
           oninput="recalcWindowAcEnergy(this.form)" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="hours_per_day" id="split-ac-hours" placeholder="e.g. 8" required min="1" max="24"
             oninput="recalcWindowAcEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="days_per_week" id="split-ac-days" placeholder="e.g. 5" required min="1" max="7"
             oninput="recalcWindowAcEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="weeks_per_year" id="split-ac-weeks" placeholder="e.g. 52" required min="1" max="52"
             oninput="recalcWindowAcEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
         </label></div>
       </div>
     </fieldset>
@@ -318,47 +318,45 @@
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 2.8" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" />
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">From BEE/EGAT/SNI label. Typical EER: 2.3 – 3.5. Cannot be zero.</p>
-      <p class="validator-hint">Value must be greater than zero</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "From BEE/EGAT/SNI label. Typical EER: 2.3 – 3.5. Cannot be zero." %}</p>
+      <p class="validator-hint">{% translate "Value must be greater than zero" %}</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+          {% translate "OTHER DETAILS" %}<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Energy efficiency label" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, A–G)</span></legend>
               <select class="select w-full" name="energy_efficiency_label">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="A">A</option><option value="B">B</option><option value="C">C</option>
                 <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Number of stars" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, 1–5)</span></legend>
               <select class="select w-full" name="number_of_stars">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="1">1</option><option value="2">2</option><option value="3">3</option>
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">Power input per unit <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <legend class="fieldset-legend">{% translate "Power input per unit" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full">
                 <input type="number" name="power_input_per_unit" placeholder="0.8 – 2.5 kW" min="0" step="0.01"
                   oninput="recalcWindowAcEnergy(this.closest('form'))" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
               </label>
-              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: 0.8 – 2.5 kW for 1.0 – 2.0 Ton units</p>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
               <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
-                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <input type="number" name="total_energy_consumption_annually" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
               </label>
-              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">If power input given: Power/unit × Units × h/day × d/week × w/year. Otherwise: (Capacity(kW) × Units / EER) × h/day × d/week × w/year</p>
             </fieldset>
           </div>
         </div>
@@ -368,91 +366,90 @@
 </template>
 
 <template id="vrf-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">VARIABLE REFRIGERANT FLOW (VRF) SYSTEM DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "VARIABLE REFRIGERANT FLOW (VRF) SYSTEM DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Year of installation" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2022" required min="1900" max="{% now "Y" %}"
           onchange="applyRefrigerantDefault(this.form,'vrf-system'); applyLeakageDefault(this.form)" />
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Type of refrigerants" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <select class="select w-full" name="type_of_refrigerants"
         hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
         onchange="clearIfUserChanged(this)">
-        <option disabled selected value="">Select an option</option>
+        <option disabled selected value="">{% translate "Select an option" %}</option>
       </select>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "Auto-suggested based on year of installation" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
+      <legend class="fieldset-legend">{% translate "Refrigerant quantity" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="refrigerant_quantity" placeholder="Typical: 30 – 200 kg" required min="0" step="0.1" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical = (Capacity(Tons) × 0.6) + 30 kg</p>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Cooling capacity per unit" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 10" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'vrf-system'); recalcWindowAcEnergy(this.form)" />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
-          <option value="ton">Ton</option>
+          <option value="ton">{% translate "Ton" %}</option>
           <option value="btu_hr">BTU/hr</option>
           <option value="kw">kW</option>
         </select>
       </label>
       <p class="text-xs text-[var(--text--sub-600)] mt-0.5">1 Ton = 12,000 BTU/hr = 3.516 kW</p>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Number of outdoor units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of outdoor units" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_units" placeholder="e.g. 3" required min="1"
           oninput="recalcWindowAcEnergy(this.form)" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="hours_per_day" id="vrf-hours" placeholder="10 – 16" required min="1" max="24"
             oninput="recalcWindowAcEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="days_per_week" id="vrf-days" placeholder="5 – 7" required min="1" max="7"
             oninput="recalcWindowAcEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="weeks_per_year" id="vrf-weeks" placeholder="50 – 52" required min="1" max="52"
             oninput="recalcWindowAcEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
         </label></div>
       </div>
     </fieldset>
@@ -463,47 +460,45 @@
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 4.0" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" />
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">From BEE/EGAT/SNI label. Typical EER: 3.5 – 5.5. Cannot be zero.</p>
-      <p class="validator-hint">Value must be greater than zero</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "From BEE/EGAT/SNI label. Typical EER: 3.5 – 5.5. Cannot be zero." %}</p>
+      <p class="validator-hint">{% translate "Value must be greater than zero" %}</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+          {% translate "OTHER DETAILS" %}<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Energy efficiency label" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, A–G)</span></legend>
               <select class="select w-full" name="energy_efficiency_label">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="A">A</option><option value="B">B</option><option value="C">C</option>
                 <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Number of stars" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, 1–5)</span></legend>
               <select class="select w-full" name="number_of_stars">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="1">1</option><option value="2">2</option><option value="3">3</option>
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">Power input per unit <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <legend class="fieldset-legend">{% translate "Power input per unit" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full">
                 <input type="number" name="power_input_per_unit" placeholder="5 – 50 kW" min="0" step="0.01"
                   oninput="recalcWindowAcEnergy(this.closest('form'))" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
               </label>
-              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: 5 – 50 kW per outdoor unit</p>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
               <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
-                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <input type="number" name="total_energy_consumption_annually" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
               </label>
-              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">If power input given: Power/unit × Units × h/day × d/week × w/year. Otherwise: (Capacity(kW) × Units / EER) × h/day × d/week × w/year</p>
             </fieldset>
           </div>
         </div>
@@ -513,102 +508,101 @@
 </template>
 
 <template id="packaged-ac-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">PACKAGED / DUCTABLE AIR CONDITIONER DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "PACKAGED / DUCTABLE AIR CONDITIONER DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">System sub-type<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "System sub-type" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <select class="select w-full" name="packaged_subtype" required>
-        <option disabled selected value="">Select sub-type</option>
-        <option value="rooftop">Rooftop Unit</option>
-        <option value="floor_standing">Floor-standing</option>
-        <option value="ductable">Ductable</option>
-        <option value="cassette">Cassette</option>
+        <option disabled selected value="">{% translate "Select sub-type" %}</option>
+        <option value="rooftop">{% translate "Rooftop Unit" %}</option>
+        <option value="floor_standing">{% translate "Floor-standing" %}</option>
+        <option value="ductable">{% translate "Ductable" %}</option>
+        <option value="cassette">{% translate "Cassette" %}</option>
       </select>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Year of installation" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2020" required min="1900" max="{% now "Y" %}"
           onchange="applyRefrigerantDefault(this.form,'packaged-ac'); applyLeakageDefault(this.form)" />
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Type of refrigerants" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <select class="select w-full" name="type_of_refrigerants"
         hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
         onchange="clearIfUserChanged(this)">
-        <option disabled selected value="">Select an option</option>
+        <option disabled selected value="">{% translate "Select an option" %}</option>
       </select>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "Auto-suggested based on year of installation" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
+      <legend class="fieldset-legend">{% translate "Refrigerant quantity" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="refrigerant_quantity" placeholder="Typical: 5 – 100 kg" required min="0" step="0.1" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical quantity = Total cooling capacity (RT) × 0.6</p>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Cooling capacity per unit<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Cooling capacity per unit" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 5" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'packaged-ac'); recalcWindowAcEnergy(this.form)" />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
-          <option value="ton">Ton</option>
+          <option value="ton">{% translate "Ton" %}</option>
           <option value="btu_hr">BTU/hr</option>
           <option value="kw">kW</option>
         </select>
       </label>
       <p class="text-xs text-[var(--text--sub-600)] mt-0.5">1 Ton = 12,000 BTU/hr = 3.516 kW</p>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of units" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_units" placeholder="e.g. 4" required min="1"
           oninput="recalcWindowAcEnergy(this.form)" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="hours_per_day" id="packaged-hours" placeholder="e.g. 10" required min="1" max="24"
             oninput="recalcWindowAcEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="days_per_week" id="packaged-days" placeholder="e.g. 5" required min="1" max="7"
             oninput="recalcWindowAcEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="weeks_per_year" id="packaged-weeks" placeholder="e.g. 50" required min="1" max="52"
             oninput="recalcWindowAcEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
         </label></div>
       </div>
     </fieldset>
@@ -619,47 +613,45 @@
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 3.0" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" />
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">From BEE/EGAT/SNI label. Typical EER: 2.5 – 4.0. Cannot be zero.</p>
-      <p class="validator-hint">Value must be greater than zero</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "From BEE/EGAT/SNI label. Typical EER: 2.5 – 4.0. Cannot be zero." %}</p>
+      <p class="validator-hint">{% translate "Value must be greater than zero" %}</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+          {% translate "OTHER DETAILS" %}<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Energy efficiency label" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, A–G)</span></legend>
               <select class="select w-full" name="energy_efficiency_label">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="A">A</option><option value="B">B</option><option value="C">C</option>
                 <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Number of stars" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, 1–5)</span></legend>
               <select class="select w-full" name="number_of_stars">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="1">1</option><option value="2">2</option><option value="3">3</option>
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
             <fieldset class="fieldset">
-              <legend class="fieldset-legend">Power input per unit <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+              <legend class="fieldset-legend">{% translate "Power input per unit" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full">
                 <input type="number" name="power_input_per_unit" placeholder="3 – 20 kW" min="0" step="0.01"
                   oninput="recalcWindowAcEnergy(this.closest('form'))" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
               </label>
-              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: 3 – 20 kW for 2 – 15 Ton units</p>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
               <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
-                <input type="number" name="total_energy_consumption_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <input type="number" name="total_energy_consumption_annually" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
               </label>
-              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">If power input given: Power/unit × Units × h/day × d/week × w/year. Otherwise: (Capacity(kW) × Units / EER) × h/day × d/week × w/year</p>
             </fieldset>
           </div>
         </div>
@@ -669,113 +661,112 @@
 </template>
 
 <template id="water-cooled-chiller-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">WATER COOLED CHILLER DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "WATER COOLED CHILLER DATA" %}</div>
   <input type="hidden" name="chiller_system" value="water-cooled" />
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Year of installation" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2019" required min="1900" max="{% now "Y" %}"
           onchange="applyRefrigerantDefault(this.form,'water_cooled'); applyLeakageDefault(this.form)" />
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Type of refrigerants" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <select class="select w-full" name="type_of_refrigerants"
         hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
         onchange="clearIfUserChanged(this)">
-        <option disabled selected value="">Select an option</option>
+        <option disabled selected value="">{% translate "Select an option" %}</option>
       </select>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "Auto-suggested based on year of installation" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
+      <legend class="fieldset-legend">{% translate "Refrigerant quantity" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="refrigerant_quantity" placeholder="Typical: 200 – 2,000 kg" required min="0" step="0.1" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical = (RT × 0.6) + 100 kg</p>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total cooling load<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
+      <legend class="fieldset-legend">{% translate "Total cooling load" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_cooling_load" placeholder="e.g. 500" required min="0" step="0.1"
           oninput="applyRefrigerantQtyDefault(this.form,'water_cooled'); recalcChillerEnergy(this.form)" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">RT</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of units" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_chillers" placeholder="e.g. 2" required min="1"
           oninput="recalcChillerEnergy(this.form)" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="annual_operating_hours_per_day" id="water-chiller-hours" placeholder="12 – 24" required min="1" max="24"
             oninput="recalcChillerEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="annual_operating_days_per_week" id="water-chiller-days" placeholder="5 – 7" required min="1" max="7"
             oninput="recalcChillerEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="annual_operating_weeks_per_year" id="water-chiller-weeks" placeholder="50 – 52" required min="1" max="52"
             oninput="recalcChillerEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
         </label></div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline cooling efficiency<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline cooling efficiency" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_cooling_efficiency" placeholder="e.g. 0.70" required min="0" step="0.01"
           oninput="recalcChillerEnergy(this.form)" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/RT</span>
       </label>
-      <p class="validator-hint">Value cannot be negative</p>
+      <p class="validator-hint">{% translate "Value cannot be negative" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Installation of variable speed drives<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of variable speed drives" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Installation of heat recovery systems<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of heat recovery systems" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
@@ -784,42 +775,41 @@
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+          {% translate "OTHER DETAILS" %}<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">IPLV (Integrated Part Load Value) <span class="text-[var(--text--sub-600)]">(Optional, 5.0 – 8.0)</span></legend>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">IPLV (Integrated Part Load Value) <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, 5.0 – 8.0)</span></legend>
               <label class="input w-full"><input type="number" name="ipvl" placeholder="e.g. 6.0" min="0" step="0.01" /></label>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Water-cooled chiller cooling load factor <span class="text-[var(--text--sub-600)]">(Optional, Typical: 10 – 25%)</span></legend>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Water-cooled chiller cooling load factor" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, Typical: 10 – 25%)</span></legend>
               <label class="input w-full"><input type="number" name="water_cooled_chiller_cooling_load_factor" placeholder="e.g. 15" min="0" max="100" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span></label>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Total system power input <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Total system power input" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full"><input type="number" name="total_chiller_system_power_input" placeholder="e.g. 2000" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span></label>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">COP <span class="text-[var(--text--sub-600)]">(Optional, 4.0 – 7.0)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">COP <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, 4.0 – 7.0)</span></legend>
               <label class="input w-full"><input type="number" name="cop" placeholder="e.g. 5.5" min="0" step="0.01" /></label>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Energy efficiency label" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, A–G)</span></legend>
               <select class="select w-full" name="energy_efficiency_label">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="A">A</option><option value="B">B</option><option value="C">C</option>
                 <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Number of stars" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, 1–5)</span></legend>
               <select class="select w-full" name="number_of_stars">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="1">1</option><option value="2">2</option><option value="3">3</option>
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
               <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
-                <input type="number" name="total_energy_consumption_of_chiller_system_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <input type="number" name="total_energy_consumption_of_chiller_system_annually" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
               </label>
-              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Cooling load (RT) × Units × Efficiency (kW/RT) × h/day × d/week × w/year × VSD factor (0.80 if Yes) × HR factor (0.70 if Yes)</p>
             </fieldset>
           </div>
         </div>
@@ -829,113 +819,112 @@
 </template>
 
 <template id="air-cooled-chiller-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">AIR COOLED CHILLER DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "AIR COOLED CHILLER DATA" %}</div>
   <input type="hidden" name="chiller_system" value="air-cooled" />
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Year of installation<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Year of installation" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="year_of_installation" placeholder="e.g. 2020" required min="1900" max="{% now "Y" %}"
           onchange="applyRefrigerantDefault(this.form,'air_cooled'); applyLeakageDefault(this.form)" />
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Type of refrigerants<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Type of refrigerants" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <select class="select w-full" name="type_of_refrigerants"
         hx-get="/select_lists/?refrigerant_types=1" hx-trigger="load" hx-target="this" hx-swap="innerHTML" required
         onchange="clearIfUserChanged(this)">
-        <option disabled selected value="">Select an option</option>
+        <option disabled selected value="">{% translate "Select an option" %}</option>
       </select>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Auto-suggested based on year of installation</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "Auto-suggested based on year of installation" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Refrigerant quantity<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
+      <legend class="fieldset-legend">{% translate "Refrigerant quantity" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kg)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="refrigerant_quantity" placeholder="Typical: 50 – 500 kg" required min="0" step="0.1" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kg</span>
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Tip: typical = (RT × 0.5) + 50 kg</p>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total cooling load<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
+      <legend class="fieldset-legend">{% translate "Total cooling load" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_cooling_load" placeholder="e.g. 200" required min="0" step="0.1"
           oninput="applyRefrigerantQtyDefault(this.form,'air_cooled'); recalcChillerEnergy(this.form)" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">RT</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Number of units<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of units" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_chillers" placeholder="e.g. 3" required min="1"
           oninput="recalcChillerEnergy(this.form)" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline leakage factor<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="annual_operating_hours_per_day" id="air-chiller-hours" placeholder="10 – 24" required min="1" max="24"
             oninput="recalcChillerEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="annual_operating_days_per_week" id="air-chiller-days" placeholder="5 – 7" required min="1" max="7"
             oninput="recalcChillerEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="annual_operating_weeks_per_year" id="air-chiller-weeks" placeholder="50 – 52" required min="1" max="52"
             oninput="recalcChillerEnergy(this.form)" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
         </label></div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline cooling efficiency<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline cooling efficiency" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_cooling_efficiency" placeholder="e.g. 1.00" required min="0" step="0.01"
           oninput="recalcChillerEnergy(this.form)" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/RT</span>
       </label>
-      <p class="validator-hint">Value cannot be negative</p>
+      <p class="validator-hint">{% translate "Value cannot be negative" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Installation of variable speed drives<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of variable speed drives" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Installation of heat recovery systems<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of heat recovery systems" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
@@ -944,39 +933,38 @@
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+          {% translate "OTHER DETAILS" %}<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">IPLV (Integrated Part Load Value) <span class="text-[var(--text--sub-600)]">(Optional, 4.0 – 6.0)</span></legend>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">IPLV (Integrated Part Load Value) <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, 4.0 – 6.0)</span></legend>
               <label class="input w-full"><input type="number" name="ipvl" placeholder="e.g. 5.0" min="0" step="0.01" /></label>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Total system power input <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Total system power input" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full"><input type="number" name="total_chiller_system_power_input" placeholder="e.g. 800" min="0" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span></label>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">COP <span class="text-[var(--text--sub-600)]">(Optional, 3.0 – 4.5)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">COP <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, 3.0 – 4.5)</span></legend>
               <label class="input w-full"><input type="number" name="cop" placeholder="e.g. 3.8" min="0" step="0.01" /></label>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Energy efficiency label <span class="text-[var(--text--sub-600)]">(Optional, A–G)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Energy efficiency label" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, A–G)</span></legend>
               <select class="select w-full" name="energy_efficiency_label">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="A">A</option><option value="B">B</option><option value="C">C</option>
                 <option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Number of stars" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %}, 1–5)</span></legend>
               <select class="select w-full" name="number_of_stars">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="1">1</option><option value="2">2</option><option value="3">3</option>
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
               <label class="input w-full bg-[var(--bg--weak-50)] cursor-not-allowed">
-                <input type="number" name="total_energy_consumption_of_chiller_system_annually" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+                <input type="number" name="total_energy_consumption_of_chiller_system_annually" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
                 <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
               </label>
-              <p class="text-xs text-[var(--text--sub-600)] mt-0.5">Cooling load (RT) × Units × Efficiency (kW/RT) × h/day × d/week × w/year × VSD factor (0.80 if Yes) × HR factor (0.70 if Yes)</p>
             </fieldset>
           </div>
         </div>
@@ -1004,9 +992,6 @@
   };
 
   // ── Default operating hours by climate zone ──────────────────────────────
-  // Hours expressed as total annual hours; we convert to h/day × d/week × w/year
-  // The doc gives total annual hours. We break them into sensible defaults:
-  //   hours_per_day = total / (days_per_week * weeks_per_year)
   var OPERATING_DEFAULTS = {
     // [hours_per_day, days_per_week, weeks_per_year]
     residential: { // Window AC, Split AC
@@ -1048,8 +1033,6 @@
     const defaults = getOperatingDefaults(systemType, BUILDING_CLIMATE_ZONE);
     if (!defaults) return;
     const [h, d, w] = defaults;
-    // AC forms use hours_per_day / days_per_week / weeks_per_year
-    // Chiller forms use annual_operating_hours_per_day etc.
     ['hours_per_day', 'annual_operating_hours_per_day'].forEach(n => {
       const el = form.querySelector(`[name="${n}"]`);
       if (el && !el.value) el.value = h;
@@ -1088,7 +1071,6 @@
     if (!select) return;
     const trySet = () => {
       if (select.options.length > 1) {
-        // Always update if empty or if the current value was auto-suggested (not user-chosen)
         if (!select.value || select.value === '' || select.dataset.autoSet === 'true') {
           select.value = refrigerant;
           select.dataset.autoSet = 'true';
@@ -1100,8 +1082,6 @@
     trySet();
   };
 
-  // Set baseline leakage factor default based on year of installation:
-  // new system (installed < 7 years ago) → 2%, old system (≥ 7 years) → 10%
   window.applyLeakageDefault = function(form) {
     const yearEl = form.querySelector('[name="year_of_installation"]');
     const leakageEl = form.querySelector('[name="baseline_leakage_factor"]');
@@ -1113,20 +1093,17 @@
     leakageEl.value = age >= 7 ? 10 : 2;
   };
 
-  // Mark refrigerant as user-chosen when the user manually changes the dropdown
   window.clearIfUserChanged = function(select) {
     select.dataset.autoSet = 'false';
   };
 
-  // Helper: convert cooling capacity input to kW for JS calculations
   function capacityToKw(value, unit) {
     if (!value || isNaN(value)) return 0;
     if (unit === 'ton') return value * 3.516;
     if (unit === 'btu_hr') return value * 3.516 / 12000;
-    return value; // kw
+    return value;
   }
 
-  // Refrigerant quantity default using cooling_capacity_per_unit field (for window/split/vrf/packaged)
   window.applyRefrigerantQtyDefaultCapacity = function(form, systemType) {
     const capEl  = form.querySelector('[name="cooling_capacity_per_unit"]');
     const unitEl = form.querySelector('[name="cooling_capacity_unit"]');
@@ -1134,18 +1111,16 @@
     if (!capEl || !qtyEl) return;
     const rawVal = parseFloat(capEl.value);
     if (isNaN(rawVal) || rawVal <= 0) return;
-    if (qtyEl.value) return; // don't overwrite user input
+    if (qtyEl.value) return;
     const unit = unitEl ? unitEl.value : 'kw';
-    // Convert to Tons for the formula (formula uses Tons)
     let tons;
     if (unit === 'ton') tons = rawVal;
     else if (unit === 'btu_hr') tons = rawVal / 12000;
-    else tons = rawVal / 3.516; // kw → tons
+    else tons = rawVal / 3.516;
     const formula = QTY_FORMULAS[systemType];
     if (formula) qtyEl.value = Math.round(formula(tons) * 10) / 10;
   };
 
-  // ── Default refrigerant quantity formula ─────────────────────────────────
   var QTY_FORMULAS = {
     'window-ac':   rt => rt * 0.6,
     'split-ac':    rt => rt * 1.0,
@@ -1161,7 +1136,6 @@
     if (!rtEl || !qtyEl) return;
     const rt = parseFloat(rtEl.value);
     if (isNaN(rt) || rt <= 0) return;
-    // Only fill if the user hasn't entered a value yet
     if (qtyEl.value) return;
     const formula = QTY_FORMULAS[systemType];
     if (formula) qtyEl.value = Math.round(formula(rt) * 10) / 10;
@@ -1190,7 +1164,6 @@
     window.editingCoolingSystemType = null;
   };
 
-  // ── Template loading ──────────────────────────────────────────────────────
   function loadTemplate(templateId, targetElement) {
     const tmpl = document.getElementById(templateId);
     if (tmpl) {
@@ -1205,7 +1178,6 @@
     const mapping = COOLING_TYPE_MAP[systemType];
     if (!mapping) { container.innerHTML = ''; return; }
     loadTemplate(mapping.templateId, container);
-    // Apply climate-zone operating defaults after a tick (DOM is ready)
     setTimeout(() => {
       const form = document.getElementById('cooling-system-form');
       applyOperatingDefaults(form, systemType);
@@ -1374,7 +1346,6 @@
           setField(form, 'number_of_stars', system.number_of_stars);
           if (system.packaged_subtype) setField(form, 'packaged_subtype', system.packaged_subtype);
 
-          // window, split, vrv and packaged use cooling_capacity_per_unit + eer_iseer_cop
           if (system.ac_type === 'window' || system.ac_type === 'split' || system.ac_type === 'vrv' || system.ac_type === 'packaged') {
             if (system.cooling_capacity_per_unit_kw) {
               setField(form, 'cooling_capacity_per_unit', system.cooling_capacity_per_unit_kw);
@@ -1455,11 +1426,6 @@
     }
   };
 
-  // ── Auto-calculation: Window AC (new formula) ────────────────────────────
-  //   If power_input_per_unit is given:
-  //     Annual Energy = Power/unit (kW) × Units × h × d × w
-  //   Else:
-  //     Annual Energy = (Capacity/unit (kW) × Units / EER) × h × d × w
   window.recalcWindowAcEnergy = function(form) {
     if (!form) return;
     var capEl    = form.querySelector('[name="cooling_capacity_per_unit"]');
@@ -1482,10 +1448,8 @@
     if (units <= 0 || hrs <= 0 || days <= 0 || weeks <= 0) { energyEl.value = ''; return; }
 
     if (power > 0) {
-      // Use power input per unit path
       energyEl.value = (power * units * hrs * days * weeks).toFixed(3);
     } else {
-      // Use capacity / EER path
       var eer = parseFloat(eerEl && eerEl.value) || 0;
       var unit = unitEl ? unitEl.value : 'kw';
       var cap  = capacityToKw(parseFloat(capEl && capEl.value) || 0, unit);
@@ -1497,8 +1461,6 @@
     }
   };
 
-  // ── Auto-calculation: Total Energy Consumption (legacy simple formula) ───
-  //   Annual Energy (kWh/year) = Cooling_Load (RT) × Units × Efficiency (kW/RT) × h × d × w
   window.recalcCoolingSimpleEnergy = function(form, systemType) {
     if (!form) return;
     var loadEl  = form.querySelector('[name="total_cooling_load"]');
@@ -1522,10 +1484,6 @@
     }
   };
 
-  // Chiller formula (Water/Air cooled):
-  //   Annual Energy = Cooling_Load × Units × Efficiency × h × d × w × VSD_factor × HR_factor
-  //   VSD_factor = 0.80 if VSD=yes else 1.00
-  //   HR_factor  = 0.70 if HR=yes  else 1.00
   window.recalcChillerEnergy = function(form) {
     if (!form) return;
     var loadEl   = form.querySelector('[name="total_cooling_load"]');

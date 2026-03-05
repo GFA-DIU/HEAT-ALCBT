@@ -1,9 +1,10 @@
 {% load static %}
+{% load i18n %}
 <div id="ventilation-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button class="btn btn-outline w-fit" onclick="openVentilationSystemModal()">
       <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-      Add ventilation system
+      {% translate "Add ventilation system" %}
     </button>
     <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
     <ul id="ventilation-systems-list" class="grid grid-cols-1 gap-2"></ul>
@@ -14,8 +15,8 @@
   <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">Add a ventilation system</h3>
-        <p class="text-sm/5 text-[var(--text--sub-600)]">Enter details of the building's ventilation system, including type and capacity</p>
+        <h3 class="text-lg/6 font-medium">{% translate "Add a ventilation system" %}</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">{% translate "Enter details of the building's ventilation system, including type and capacity" %}</p>
       </div>
       <button type="button" onclick="closeVentilationSystemModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
@@ -25,7 +26,7 @@
       {% csrf_token %}
       <div class="px-5 py-4">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Type of ventilation system<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Type of ventilation system" %}<span class="text-[var(--state--error--base)]">*</span></legend>
           <select class="select w-full" id="ventilation-type-select" name="ventilation_type"
             hx-get="/select_lists/?ventilation_types=1"
             hx-trigger="load"
@@ -33,15 +34,15 @@
             hx-swap="innerHTML"
             onchange="handleVentilationTypeChange(this.value)"
             required>
-            <option value="">Select a ventilation system</option>
+            <option value="">{% translate "Select a ventilation system" %}</option>
           </select>
         </fieldset>
       </div>
       <div id="selected-ventilation-system"></div>
     </form>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeVentilationSystemModal()">Cancel</button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveVentilationSystem()">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeVentilationSystemModal()">{% translate "Cancel" %}</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveVentilationSystem()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -52,12 +53,12 @@
       <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
         <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)"></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
-      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">You are about to permanently remove this ventilation system.</p>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">{% translate "You are about to permanently remove this ventilation system." %}</p>
     </div>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="ventilation_system_modal_delete.close()">Cancel</button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteVentilationSystem()">Remove</button>
+      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="ventilation_system_modal_delete.close()">{% translate "Cancel" %}</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteVentilationSystem()">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -65,86 +66,86 @@
 <template id="no-ventilation-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
     <img src="{% static 'assets/ventilation-system.png' %}" alt="Ventilation System" />
-    <p class="text-sm/5 font-medium">Click button below to add a ventilation system</p>
-    <button class="btn btn-primary" onclick="ventilation_system_modal.showModal()">Add ventilation system</button>
+    <p class="text-sm/5 font-medium">{% translate "Click button below to add a ventilation system" %}</p>
+    <button class="btn btn-primary" onclick="ventilation_system_modal.showModal()">{% translate "Add ventilation system" %}</button>
   </div>
 </template>
 
 <template id="ahu-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">AIR HANDLING UNIT (AHU) DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "AIR HANDLING UNIT (AHU) DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_units" placeholder="e.g. 3" required min="1" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
       </label>
-      <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
+      <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Installation of Variable Speed Drives (VSD)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of Variable Speed Drives (VSD)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Installation of Demand Controlled Ventilation (DCV)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of Demand Controlled Ventilation (DCV)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_hours_per_day" id="ahu-hours" placeholder="e.g. 10" required min="1" max="24" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_days_per_week" id="ahu-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_weeks_per_year" id="ahu-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
         </label></div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total ventilation system power input</legend>
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="power_input" placeholder="Auto-calculated" min="0" step="0.01" readonly class="cursor-not-allowed" />
+        <input type="number" name="power_input" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.01" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000" %}</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+          {% translate "OTHER DETAILS" %}<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Air flow rate" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full pr-0 overflow-hidden">
                 <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="0" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
                 <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -152,9 +153,9 @@
                 </select>
               </label>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
-              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
-              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor</p>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor" %}</p>
             </fieldset>
           </div>
         </div>
@@ -164,64 +165,64 @@
 </template>
 
 <template id="fcu-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">FAN COIL UNIT (FCU) DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "FAN COIL UNIT (FCU) DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_units" placeholder="e.g. 50" required min="1" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
       </label>
-      <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
+      <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_hours_per_day" id="fcu-hours" placeholder="e.g. 10" required min="1" max="24" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_days_per_week" id="fcu-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_weeks_per_year" id="fcu-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
         </label></div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="power_input" placeholder="e.g. 8" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+          {% translate "OTHER DETAILS" %}<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Air flow rate" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full pr-0 overflow-hidden">
                 <input type="number" name="airflow_rate" placeholder="e.g. 2000" min="0" />
                 <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -229,9 +230,9 @@
                 </select>
               </label>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
-              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
-              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr</p>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power (kW) × hrs/day × days/wk × wks/yr" %}</p>
             </fieldset>
           </div>
         </div>
@@ -241,80 +242,80 @@
 </template>
 
 <template id="doas-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">DEDICATED OUTDOOR AIR SYSTEM (DOAS) DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "DEDICATED OUTDOOR AIR SYSTEM (DOAS) DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_units" placeholder="e.g. 2" required min="1" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
       </label>
-      <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
+      <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Installation of Variable Speed Drives (VSD)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of Variable Speed Drives (VSD)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Installation of Demand Controlled Ventilation (DCV)<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of Demand Controlled Ventilation (DCV)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="demand_controlled_ventilation" value="no" class="radio radio-xs" checked onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_hours_per_day" id="doas-hours" placeholder="e.g. 12" required min="1" max="24" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_days_per_week" id="doas-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_weeks_per_year" id="doas-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
         </label></div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total ventilation system power input</legend>
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="power_input" placeholder="Auto-calculated" min="0" step="0.01" readonly class="cursor-not-allowed" />
+        <input type="number" name="power_input" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.01" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000" %}</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+          {% translate "OTHER DETAILS" %}<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Air flow rate" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full pr-0 overflow-hidden">
                 <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="0" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
                 <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -322,9 +323,9 @@
                 </select>
               </label>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
-              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
-              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor</p>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor" %}</p>
             </fieldset>
           </div>
         </div>
@@ -334,73 +335,73 @@
 </template>
 
 <template id="cassette-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">CEILING/WALL MOUNTED CASSETTE AC DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "CEILING/WALL MOUNTED CASSETTE AC DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_units" placeholder="e.g. 10" required min="1" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Fresh air ratio<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Fresh air ratio" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="fresh_air_ratio" placeholder="Typical: 10 – 30%" required min="0" max="100" value="20" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
       </label>
-      <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
+      <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_hours_per_day" id="cassette-hours" placeholder="e.g. 10" required min="1" max="24" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_days_per_week" id="cassette-days" placeholder="e.g. 5" required min="1" max="7" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_weeks_per_year" id="cassette-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
         </label></div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="power_input" placeholder="e.g. 12" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+          {% translate "OTHER DETAILS" %}<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Air flow rate" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full pr-0 overflow-hidden">
                 <input type="number" name="airflow_rate" placeholder="e.g. 3000" min="0" />
                 <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -408,9 +409,9 @@
                 </select>
               </label>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
-              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
-              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr</p>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power (kW) × hrs/day × days/wk × wks/yr" %}</p>
             </fieldset>
           </div>
         </div>
@@ -420,64 +421,64 @@
 </template>
 
 <template id="fan-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">CEILING / EXHAUST / WALL FAN DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "CEILING / EXHAUST / WALL FAN DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total number of units installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_units" placeholder="e.g. 15" required min="1" />
       </label>
-      <p class="validator-hint">Must be at least 1</p>
+      <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline efficiency<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
       </label>
-      <p class="validator-hint">Typical: 0.30 – 1.20 W/CMH</p>
+      <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span class="text-[var(--state--error--base)]">*</span>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_hours_per_day" id="fan-hours" placeholder="e.g. 12" required min="1" max="24" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">Hours / day</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "Hours / day" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_days_per_week" id="fan-days" placeholder="e.g. 7" required min="1" max="7" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
         </label></div>
         <div class="flex-1"><label class="input validator w-full">
           <input type="number" name="operating_weeks_per_year" id="fan-weeks" placeholder="e.g. 52" required min="1" max="52" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
         </label></div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Total ventilation system power input<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="power_input" placeholder="e.g. 2" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="validator-hint">This field is required</p>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
     <div class="col-span-2 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
-          OTHER DETAILS<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
+          {% translate "OTHER DETAILS" %}<span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)" class="transition-transform duration-300 ease-in-out group-[peer:checked]:rotate-180"></span>
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">Air flow rate <span class="text-[var(--text--sub-600)]">(Optional)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Air flow rate" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
               <label class="input w-full pr-0 overflow-hidden">
                 <input type="number" name="airflow_rate" placeholder="e.g. 500" min="0" />
                 <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -485,16 +486,16 @@
                 </select>
               </label>
             </fieldset>
-            <fieldset class="fieldset"><legend class="fieldset-legend">Number of stars <span class="text-[var(--text--sub-600)]">(Optional, 1–5)</span></legend>
+            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Number of stars" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional, 1–5" %})</span></legend>
               <select class="select w-full" name="number_of_stars">
-                <option disabled selected value="">Select</option>
+                <option disabled selected value="">{% translate "Select" %}</option>
                 <option value="1">1</option><option value="2">2</option><option value="3">3</option>
                 <option value="4">4</option><option value="5">5</option>
               </select>
             </fieldset>
-            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
-              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
-              <p class="label-text-alt text-[var(--text--soft-400)]">Power (kW) × hrs/day × days/wk × wks/yr</p>
+            <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+              <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
+              <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power (kW) × hrs/day × days/wk × wks/yr" %}</p>
             </fieldset>
           </div>
         </div>

@@ -1,9 +1,10 @@
+{% load i18n %}
 <form id="form" class="grid grid-cols-2 gap-x-2 gap-y-1">
   {% csrf_token %}
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Building type<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Building type" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full">
       <select
@@ -12,18 +13,18 @@
         class="select w-full"
         required
       >
-        <option value="" disabled {% if not selected_building_type %}selected{% endif %}>Pick a building type</option>
+        <option value="" disabled {% if not selected_building_type %}selected{% endif %}>{% translate "Pick a building type" %}</option>
         {% for category in building_categories %}
           <option value="{{ category.id }}" {% if category.id == selected_building_type %}selected{% endif %}>{{ category.name }}</option>
         {% endfor %}
       </select>
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Type of apartments<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Type of apartments" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full">
       <select
@@ -37,18 +38,18 @@
         hx-vals='js:{"building_category": document.getElementById("building-type-select").value, "country": "{{ country_id }}"}'
         required
       >
-        <option value="">Pick a type of apartments</option>
+        <option value="">{% translate "Pick a type of apartments" %}</option>
         {% for apt_type in apartment_types %}
           <option value="{{ apt_type.id }}" {% if apt_type.id == selected_apartment_type %}selected{% endif %}>{{ apt_type.name }}</option>
         {% endfor %}
       </select>
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
 
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
-      Area climate type<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Area climate type" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full flex relative">
       <select
@@ -63,27 +64,27 @@
         {% endif %}
         required
       >
-        <option value="">Select climate type</option>
+        <option value="">{% translate "Select climate type" %}</option>
         {% for zone in climate_zones %}
           <option value="{{ zone.id }}" {% if zone.id == selected_climate_type %}selected{% endif %}>{{ zone.name }}</option>
         {% endfor %}
       </select>
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
-  
+
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Assessment period (years)<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Assessment period (years)" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="input validator w-full">
       <input name="assessment_period" type="number" placeholder="e.g. 10" required min="1" {% if building_data.assessment_period %}value="{{ building_data.assessment_period }}"{% endif %} />
     </label>
-    <p class="validator-hint">This field is required</p>
+    <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
 
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Construction year<span class="text-[var(--state--error--base)]">*</span></legend>
+    <legend class="fieldset-legend">{% translate "Construction year" %}<span class="text-[var(--state--error--base)]">*</span></legend>
     <label class="input w-full validator">
       <input name="construction_year" type="number" placeholder="e.g. 2020" required min="1900" max="2026" {% if building_data.construction_year %}value="{{ building_data.construction_year }}"{% endif %} />
     </label>
@@ -91,7 +92,7 @@
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Total floor area <span class="text-[var(--text--sub-600)]">(m²)</span>
+      {% translate "Total floor area" %} <span class="text-[var(--text--sub-600)]">(m²)</span>
     </legend>
     <label class="input w-full">
       <input name="total_floor_area" type="number" required placeholder="e.g. 340" min="1" {% if building_data.total_floor_area %}value="{{ building_data.total_floor_area }}"{% endif %} />
@@ -101,7 +102,7 @@
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      Conditioned floor area
+      {% translate "Conditioned floor area" %}
       <span class="text-[var(--text--sub-600)]">(m²)</span>
       <span
         data-icon="info-custom-fill"
@@ -116,7 +117,7 @@
   </fieldset>
 
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Number of floors below ground</legend>
+    <legend class="fieldset-legend">{% translate "Number of floors below ground" %}</legend>
     <label class="input w-full">
       <input name="floors_below_ground" type="number" placeholder="e.g. 3" required min="0" {% if building_data.floors_below_ground %}value="{{ building_data.floors_below_ground }}"{% endif %} />
     </label>
@@ -125,36 +126,36 @@
   <!-- Certification -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
-      Has the building's certification process underway/been completed?<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Has the building's certification process underway/been completed?" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <div class="flex items-center gap-2.5">
       <label class="flex items-center gap-2">
         <input type="radio" name="has_certification" value="yes" class="radio radio-xs" id="cert-yes"
           {% if building_data.has_certification %}checked{% endif %}
-          onchange="toggleCertUpload(this.value)" /> Yes
+          onchange="toggleCertUpload(this.value)" /> {% translate "Yes" %}
       </label>
       <label class="flex items-center gap-2">
         <input type="radio" name="has_certification" value="no" class="radio radio-xs" id="cert-no"
           {% if not building_data.has_certification %}checked{% endif %}
-          onchange="toggleCertUpload(this.value)" /> No
+          onchange="toggleCertUpload(this.value)" /> {% translate "No" %}
       </label>
     </div>
   </fieldset>
 
   <div id="cert-upload-section" class="col-span-2 {% if not building_data.has_certification %}hidden{% endif %}">
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Upload certification (image or PDF)</legend>
+      <legend class="fieldset-legend">{% translate "Upload certification (image or PDF)" %}</legend>
       <input type="file" name="certification_file" id="certification_file"
         accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
         class="file-input file-input-bordered w-full" />
-      <p class="text-xs text-[var(--text--sub-600)] mt-1">Accepted: images (JPG, PNG, GIF, WEBP) and PDF. Max 20 MB.</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Accepted: images (JPG, PNG, GIF, WEBP) and PDF. Max 20 MB." %}</p>
       {% if building_data.certification_file %}
       <div id="cert-existing" class="mt-1 flex items-center gap-2 text-sm">
         <span data-icon="file-text" data-size="16"></span>
         <a href="{{ building_data.certification_file.url }}" target="_blank" class="link link-primary truncate max-w-xs">
           {{ building_data.certification_file.name }}
         </a>
-        <span class="text-[var(--text--sub-600)]">(currently uploaded — upload a new file to replace)</span>
+        <span class="text-[var(--text--sub-600)]">({% translate "currently uploaded — upload a new file to replace" %})</span>
       </div>
       {% endif %}
     </fieldset>
@@ -163,30 +164,30 @@
   <!-- BoQ / Design Drawings -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
-      Does the building have design drawings and Bill of Quantities (BoQ) that you can upload?<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Does the building have design drawings and Bill of Quantities (BoQ) that you can upload?" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <div class="flex items-center gap-2.5">
       <label class="flex items-center gap-2">
         <input type="radio" name="has_boq" value="yes" class="radio radio-xs" id="boq-yes"
           {% if building_data.has_boq %}checked{% endif %}
-          onchange="toggleBoqUpload(this.value)" /> Yes
+          onchange="toggleBoqUpload(this.value)" /> {% translate "Yes" %}
       </label>
       <label class="flex items-center gap-2">
         <input type="radio" name="has_boq" value="no" class="radio radio-xs" id="boq-no"
           {% if not building_data.has_boq %}checked{% endif %}
-          onchange="toggleBoqUpload(this.value)" /> No
+          onchange="toggleBoqUpload(this.value)" /> {% translate "No" %}
       </label>
     </div>
   </fieldset>
 
   <div id="boq-upload-section" class="col-span-2 {% if not building_data.has_boq %}hidden{% endif %}">
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Upload design drawings / BoQ (images or PDFs, multiple allowed)</legend>
+      <legend class="fieldset-legend">{% translate "Upload design drawings / BoQ (images or PDFs, multiple allowed)" %}</legend>
       <input type="file" name="boq_files" id="boq_files"
         accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
         multiple
         class="file-input file-input-bordered w-full" />
-      <p class="text-xs text-[var(--text--sub-600)] mt-1">Accepted: images (JPG, PNG, GIF, WEBP) and PDF. Max 20 MB per file. Upload new files to replace existing ones.</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Accepted: images (JPG, PNG, GIF, WEBP) and PDF. Max 20 MB per file. Upload new files to replace existing ones." %}</p>
       {% if building_data.boq_files %}
       <div id="boq-existing" class="mt-1 flex flex-col gap-1">
         {% for boq_file in building_data.boq_files %}
@@ -296,7 +297,7 @@
     if (e.target && e.target.id === 'building-type-select' && !e.target.value) {
       var aptSelect = document.getElementById('apartment-type-select');
       if (aptSelect) {
-        aptSelect.innerHTML = '<option value="" disabled selected>Pick a type of apartments</option>';
+        aptSelect.innerHTML = '<option value="" disabled selected>{% translate "Pick a type of apartments" %}</option>';
       }
     }
   });

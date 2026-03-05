@@ -1,9 +1,10 @@
 {% load static %}
+{% load i18n %}
 <div id="lighting-system-container" class="w-full">
   <div class="w-full flex flex-col">
     <button class="btn btn-outline w-fit" onclick="openLightingSystemModal()">
       <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-      Add lighting system
+      {% translate "Add lighting system" %}
     </button>
     <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
     <ul id="lighting-systems-list" class="grid grid-cols-1 gap-2"></ul>
@@ -14,8 +15,8 @@
   <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[40.375rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full">
       <div class="flex flex-col">
-        <h3 class="text-lg/6 font-medium">Add a lighting system</h3>
-        <p class="text-sm/5 text-[var(--text--sub-600)]">Provide details on lighting types, power use, and controls to assess efficiency.</p>
+        <h3 class="text-lg/6 font-medium">{% translate "Add a lighting system" %}</h3>
+        <p class="text-sm/5 text-[var(--text--sub-600)]">{% translate "Provide details on lighting types, power use, and controls to assess efficiency." %}</p>
       </div>
       <button type="button" onclick="closeLightingSystemModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
@@ -26,7 +27,7 @@
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Room type<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Room type" %}<span class="text-[var(--state--error--base)]">*</span></legend>
           <select class="select w-full" name="room_type"
             hx-get="/select_lists/?room_types=1"
             hx-trigger="load"
@@ -34,12 +35,12 @@
             hx-swap="innerHTML"
             onchange="handleLightingRoomTypeChange(this.value)"
             required>
-            <option disabled selected value="">Select an option</option>
+            <option disabled selected value="">{% translate "Select an option" %}</option>
           </select>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Area of room<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Area of room" %}<span class="text-[var(--state--error--base)]">*</span></legend>
           <label class="input w-full">
             <input type="number" placeholder="e.g. 50" name="area_of_room" required min="0" step="0.01" onchange="recalcLightingLPD()" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">m²</span>
@@ -47,11 +48,11 @@
         </fieldset>
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Type of lighting system<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Type of lighting system" %}<span class="text-[var(--state--error--base)]">*</span></legend>
           <select class="select w-full" id="lighting-type-select" name="lighting_type"
             onchange="handleLightingTypeChange(this.value)"
             required>
-            <option value="">Select a lighting system</option>
+            <option value="">{% translate "Select a lighting system" %}</option>
             <optgroup label="LED">
               <option value="LED_PANEL">LED Panel</option>
               <option value="LED_TUBE">LED Tube</option>
@@ -65,9 +66,9 @@
               <option value="FLUORESCENT_T12">Fluorescent T12</option>
             </optgroup>
             <option value="CFL">CFL</option>
-            <optgroup label="Incandescent / Halogen">
-              <option value="INCANDESCENT">Incandescent</option>
-              <option value="HALOGEN">Halogen</option>
+            <optgroup label="{% translate 'Incandescent / Halogen' %}">
+              <option value="INCANDESCENT">{% translate "Incandescent" %}</option>
+              <option value="HALOGEN">{% translate "Halogen" %}</option>
             </optgroup>
             <optgroup label="HID">
               <option value="METAL_HALIDE">Metal Halide</option>
@@ -80,8 +81,8 @@
       <div id="selected-lighting-system"></div>
     </form>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeLightingSystemModal()">Cancel</button>
-      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLightingSystem()">Save</button>
+      <button type="button" class="btn flex-1 btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)]" onclick="closeLightingSystemModal()">{% translate "Cancel" %}</button>
+      <button type="button" class="btn flex-1 btn-sm btn-primary" onclick="saveLightingSystem()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -92,12 +93,12 @@
       <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
         <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)"></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
-      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">You are about to permanently remove this lighting system.</p>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
+      <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">{% translate "You are about to permanently remove this lighting system." %}</p>
     </div>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="lighting_system_modal_delete.close()">Cancel</button>
-      <button class="btn btn-sm btn-error flex-1" onclick="deleteLightingSystem()">Remove</button>
+      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="lighting_system_modal_delete.close()">{% translate "Cancel" %}</button>
+      <button class="btn btn-sm btn-error flex-1" onclick="deleteLightingSystem()">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -105,8 +106,8 @@
 <template id="no-lighting-system-template">
   <div class="w-full flex flex-col gap-3 items-center justify-center">
     <img src="{% static 'assets/lighting-system.png' %}" alt="Lighting System Image" />
-    <p class="text-sm/5 font-medium">Click button below to add a lighting system</p>
-    <button class="btn btn-primary" onclick="lighting_system_modal.showModal()">Add lighting system</button>
+    <p class="text-sm/5 font-medium">{% translate "Click button below to add a lighting system" %}</p>
+    <button class="btn btn-primary" onclick="lighting_system_modal.showModal()">{% translate "Add lighting system" %}</button>
   </div>
 </template>
 
@@ -116,18 +117,18 @@
 
 <!-- LED Template -->
 <template id="led-lighting-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">LED LIGHTING DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "LED LIGHTING DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total number of fixtures installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total number of fixtures installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_fixtures" placeholder="e.g. 200" required min="0" onchange="recalcLightingPower()" />
       </label>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Wattage per fixture<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Wattage per fixture" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="bulb_power_rating" placeholder="e.g. 20" required min="0" step="0.1" onchange="recalcLightingPower()" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W</span>
@@ -135,52 +136,52 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total lighting power" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" readonly class="cursor-not-allowed" />
+        <input type="number" name="total_lighting_power" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.0001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Fixtures × Wattage ÷ 1000</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Fixtures × Wattage ÷ 1000" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
+      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" readonly class="cursor-not-allowed" />
+        <input type="number" name="baseline_lpd" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Total lighting power ÷ Area of room</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total lighting power ÷ Area of room" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "hrs / day" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
           </label>
         </div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of sensors" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
@@ -189,33 +190,33 @@
   <div class="px-5 pb-4">
     <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
       <input type="checkbox" />
-      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
+      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">{% translate "Other details" %}</div>
       <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+          <legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
           <label class="input w-full bg-[var(--bg--weak-50)]">
-            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+            <input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor</p>
+          <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor" %}</p>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
           <select class="select w-full" name="energy_efficiency_label">
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
             <option value="BEE">BEE Star Rating</option>
             <option value="EGAT">EGAT Label No</option>
             <option value="ESDM">ESDM decree</option>
-            <option value="OTHERS">Others</option>
+            <option value="OTHERS">{% translate "Others" %}</option>
           </select>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Number of stars</legend>
+          <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
           <select class="select w-full" name="number_of_stars">
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -231,25 +232,25 @@
 
 <!-- Fluorescent Template (T5 / T8 / T12) -->
 <template id="fluorescent-lighting-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">FLUORESCENT LIGHTING DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "FLUORESCENT LIGHTING DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total number of fixtures installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total number of fixtures installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_fixtures" placeholder="e.g. 150" required min="0" onchange="recalcLightingPower()" />
       </label>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Number of tubes per fixture<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of tubes per fixture" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="tubes_per_fixture" placeholder="e.g. 2" required min="1" onchange="recalcLightingPower()" />
       </label>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Wattage per tube<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Wattage per tube" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="bulb_power_rating" placeholder="e.g. 28" required min="0" step="0.1" onchange="recalcLightingPower()" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W</span>
@@ -257,52 +258,52 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total lighting power" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" readonly class="cursor-not-allowed" />
+        <input type="number" name="total_lighting_power" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.0001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Fixtures × Tubes × Wattage ÷ 1000</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Fixtures × Tubes × Wattage ÷ 1000" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
+      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" readonly class="cursor-not-allowed" />
+        <input type="number" name="baseline_lpd" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Total lighting power ÷ Area of room</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total lighting power ÷ Area of room" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "hrs / day" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
           </label>
         </div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of sensors" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
@@ -311,33 +312,33 @@
   <div class="px-5 pb-4">
     <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
       <input type="checkbox" />
-      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
+      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">{% translate "Other details" %}</div>
       <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+          <legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
           <label class="input w-full bg-[var(--bg--weak-50)]">
-            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+            <input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor</p>
+          <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor" %}</p>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
           <select class="select w-full" name="energy_efficiency_label">
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
             <option value="BEE">BEE Star Rating</option>
             <option value="EGAT">EGAT Label No</option>
             <option value="ESDM">ESDM decree</option>
-            <option value="OTHERS">Others</option>
+            <option value="OTHERS">{% translate "Others" %}</option>
           </select>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Number of stars</legend>
+          <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
           <select class="select w-full" name="number_of_stars">
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -353,18 +354,18 @@
 
 <!-- CFL Template -->
 <template id="cfl-lighting-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">CFL LIGHTING DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "CFL LIGHTING DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total number of fixtures installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total number of fixtures installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_fixtures" placeholder="e.g. 80" required min="0" onchange="recalcLightingPower()" />
       </label>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Wattage per lamp<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Wattage per lamp" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="bulb_power_rating" placeholder="5–30" required min="0" step="0.1" onchange="recalcLightingPower()" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W</span>
@@ -372,52 +373,52 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total lighting power" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" readonly class="cursor-not-allowed" />
+        <input type="number" name="total_lighting_power" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.0001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Fixtures × Wattage ÷ 1000</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Fixtures × Wattage ÷ 1000" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
+      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" readonly class="cursor-not-allowed" />
+        <input type="number" name="baseline_lpd" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Total lighting power ÷ Area of room</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total lighting power ÷ Area of room" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "hrs / day" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
           </label>
         </div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of sensors" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
@@ -426,33 +427,33 @@
   <div class="px-5 pb-4">
     <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
       <input type="checkbox" />
-      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
+      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">{% translate "Other details" %}</div>
       <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+          <legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
           <label class="input w-full bg-[var(--bg--weak-50)]">
-            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+            <input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor</p>
+          <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor" %}</p>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
           <select class="select w-full" name="energy_efficiency_label">
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
             <option value="BEE">BEE Star Rating</option>
             <option value="EGAT">EGAT Label No</option>
             <option value="ESDM">ESDM decree</option>
-            <option value="OTHERS">Others</option>
+            <option value="OTHERS">{% translate "Others" %}</option>
           </select>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Number of stars</legend>
+          <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
           <select class="select w-full" name="number_of_stars">
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -468,18 +469,18 @@
 
 <!-- Incandescent / Halogen Template -->
 <template id="incandescent-lighting-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">INCANDESCENT / HALOGEN LIGHTING DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "INCANDESCENT / HALOGEN LIGHTING DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total number of fixtures installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total number of fixtures installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_fixtures" placeholder="e.g. 30" required min="0" onchange="recalcLightingPower()" />
       </label>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Wattage per lamp<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Wattage per lamp" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="bulb_power_rating" placeholder="25–150" required min="0" step="0.1" onchange="recalcLightingPower()" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W</span>
@@ -487,52 +488,52 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total lighting power" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" readonly class="cursor-not-allowed" />
+        <input type="number" name="total_lighting_power" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.0001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Fixtures × Wattage ÷ 1000</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Fixtures × Wattage ÷ 1000" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
+      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" readonly class="cursor-not-allowed" />
+        <input type="number" name="baseline_lpd" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Total lighting power ÷ Area of room</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total lighting power ÷ Area of room" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "hrs / day" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
           </label>
         </div>
       </div>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Installation of sensors<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of sensors" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> Yes</label>
-        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> No</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="yes" class="radio radio-xs" onchange="recalcLightingEnergy()" /> {% translate "Yes" %}</label>
+        <label class="flex items-center gap-2"><input type="radio" name="installation_of_sensors" value="no" class="radio radio-xs" checked onchange="recalcLightingEnergy()" /> {% translate "No" %}</label>
       </div>
     </fieldset>
 
@@ -541,33 +542,33 @@
   <div class="px-5 pb-4">
     <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
       <input type="checkbox" />
-      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
+      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">{% translate "Other details" %}</div>
       <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+          <legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
           <label class="input w-full bg-[var(--bg--weak-50)]">
-            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+            <input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor</p>
+          <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total power (kW) × hrs/day × days/wk × wks/yr × sensor factor" %}</p>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
           <select class="select w-full" name="energy_efficiency_label">
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
             <option value="BEE">BEE Star Rating</option>
             <option value="EGAT">EGAT Label No</option>
             <option value="ESDM">ESDM decree</option>
-            <option value="OTHERS">Others</option>
+            <option value="OTHERS">{% translate "Others" %}</option>
           </select>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Number of stars</legend>
+          <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
           <select class="select w-full" name="number_of_stars">
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -583,18 +584,18 @@
 
 <!-- HID Template (Metal Halide / High-Pressure Sodium) — no sensors field -->
 <template id="hid-lighting-template">
-  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">HID LIGHTING DATA</div>
+  <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "HID LIGHTING DATA" %}</div>
   <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total number of fixtures installed<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total number of fixtures installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_fixtures" placeholder="e.g. 20" required min="0" onchange="recalcLightingPower()" />
       </label>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Wattage per fixture<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Wattage per fixture" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="bulb_power_rating" placeholder="70–1000" required min="0" step="0.1" onchange="recalcLightingPower()" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W</span>
@@ -602,42 +603,42 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Total lighting power<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Total lighting power" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="total_lighting_power" placeholder="Auto-calculated" min="0" step="0.0001" readonly class="cursor-not-allowed" />
+        <input type="number" name="total_lighting_power" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.0001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Fixtures × Wattage ÷ 1000</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Fixtures × Wattage ÷ 1000" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">Baseline Lighting Power Density (LPD)</legend>
+      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
-        <input type="number" name="baseline_lpd" placeholder="Auto-calculated" min="0" step="0.000001" readonly class="cursor-not-allowed" />
+        <input type="number" name="baseline_lpd" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
-      <p class="label-text-alt text-[var(--text--soft-400)]">Total lighting power ÷ Area of room</p>
+      <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total lighting power ÷ Area of room" %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">Annual operating schedule<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
+      <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span></legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 10" name="operating_hours_per_day" required min="1" max="24" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">hrs / day</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "hrs / day" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 5" name="operating_days_per_week" required min="1" max="7" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">days / week</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "days / week" %}</span>
           </label>
         </div>
         <div class="flex-1">
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 50" name="operating_weeks_per_year" required min="1" max="52" oninput="recalcLightingEnergy()" />
-            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">weeks / year</span>
+            <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "weeks / year" %}</span>
           </label>
         </div>
       </div>
@@ -648,33 +649,33 @@
   <div class="px-5 pb-4">
     <div class="collapse collapse-arrow border border-[var(--stroke--soft-200)] rounded-[var(--radius-8)]">
       <input type="checkbox" />
-      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">Other details</div>
+      <div class="collapse-title text-sm/5 font-medium px-4 py-3 min-h-0">{% translate "Other details" %}</div>
       <div class="collapse-content px-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">Total energy consumption annually <span class="text-[var(--text--sub-600)]">(Auto-calculated)</span></legend>
+          <legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
           <label class="input w-full bg-[var(--bg--weak-50)]">
-            <input type="number" name="annual_energy_consumption" placeholder="Auto-calculated" min="0" readonly class="cursor-not-allowed" />
+            <input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">Total power (kW) × hrs/day × days/wk × wks/yr</p>
+          <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total power (kW) × hrs/day × days/wk × wks/yr" %}</p>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Energy efficiency label</legend>
+          <legend class="fieldset-legend">{% translate "Energy efficiency label" %}</legend>
           <select class="select w-full" name="energy_efficiency_label">
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
             <option value="BEE">BEE Star Rating</option>
             <option value="EGAT">EGAT Label No</option>
             <option value="ESDM">ESDM decree</option>
-            <option value="OTHERS">Others</option>
+            <option value="OTHERS">{% translate "Others" %}</option>
           </select>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Number of stars</legend>
+          <legend class="fieldset-legend">{% translate "Number of stars" %}</legend>
           <select class="select w-full" name="number_of_stars">
-            <option value="">Select an option</option>
+            <option value="">{% translate "Select an option" %}</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>

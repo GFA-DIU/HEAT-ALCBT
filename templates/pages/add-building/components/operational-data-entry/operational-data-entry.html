@@ -1,5 +1,6 @@
 {% load crispy_forms_tags %}
 {% load static %}
+{% load i18n %}
 <div
   class="flex items-center gap-2 p-2 rounded-lg bg-[var(--state--faded--lighter)]"
   id="select_epd_text"
@@ -10,7 +11,7 @@
     data-size="16"
     data-color="var(--icon--strong-950)"
   ></span>
-  You need to add at least one energy carrier to continue
+  {% translate "You need to add at least one energy carrier to continue" %}
 </div>
 
 <div id="energy_carrier_template_container" class="w-full">
@@ -25,12 +26,12 @@
         data-size="20"
         data-color="var(--icon--strong-950)"
       ></span>
-      Add energy carrier
+      {% translate "Add energy carrier" %}
     </button>
     <div
       class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"
     ></div>
-    
+
     <!-- Selected Products Container -->
     <form id="operational-products-form"
           hx-post="{% url 'building_step_operational' %}"
@@ -49,10 +50,10 @@
               <div class="w-full flex flex-col gap-3 items-center justify-center mt-10">
                 <img src="{% static 'assets/energy-carrier.png' %}" alt="Energy Carrier Image" />
                 <p class="text-sm/5 font-medium">
-                  Click button below to add a energy carrier
+                  {% translate "Click button below to add a energy carrier" %}
                 </p>
                 <button class="btn btn-primary" onclick="energy_carrier_modal.showModal()">
-                  Add an energy carrier
+                  {% translate "Add an energy carrier" %}
                 </button>
               </div>
             </div>
@@ -62,16 +63,16 @@
               <div class="w-full flex flex-col gap-3 items-center justify-center mt-10">
                 <img src="{% static 'assets/energy-carrier.png' %}" alt="Energy Carrier Image" />
                 <p class="text-sm/5 font-medium">
-                  Click button below to add a energy carrier
+                  {% translate "Click button below to add a energy carrier" %}
                 </p>
                 <button class="btn btn-primary" onclick="energy_carrier_modal.showModal()">
-                  Add an energy carrier
+                  {% translate "Add an energy carrier" %}
                 </button>
               </div>
             </div>
         {% endif %}
       </ul>
-      
+
       <div class="flex items-center gap-2 mt-4" id="save_button_container" {% if not selected_products %}hidden{% endif %}>
         <button
           type="submit"
@@ -80,10 +81,10 @@
         >
           <span data-icon="save-line" data-size="16" data-color="currentColor" class="button-icon"></span>
           <span class="loading loading-spinner loading-xs button-loading hidden"></span>
-          <span class="button-text">Save Energy Carriers</span>
+          <span class="button-text">{% translate "Save Energy Carriers" %}</span>
         </button>
         <span class="text-xs text-[var(--text--sub-600)]" id="save_status">
-          <span class="text-warning font-medium unsaved-indicator">⚠ Unsaved changes</span>
+          <span class="text-warning font-medium unsaved-indicator">⚠ {% translate "Unsaved changes" %}</span>
         </span>
       </div>
     </form>
@@ -93,7 +94,7 @@
 <dialog id="energy_carrier_modal" class="modal modal-bottom sm:modal-end">
   <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[44.5rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full border-b border-[var(--stroke--soft-200)]">
-      <h3 class="text-lg/6 font-medium">Energy Carrier Emission Factor</h3>
+      <h3 class="text-lg/6 font-medium">{% translate "Energy Carrier Emission Factor" %}</h3>
       <button
         type="button"
         onclick="energy_carrier_modal.close()"
@@ -106,11 +107,11 @@
         ></span>
       </button>
     </div>
-    
+
     <div class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-2.5 w-full">
         <!-- Filter Form -->
-        <form id="epd-filter-form" 
+        <form id="epd-filter-form"
               hx-post="{% url 'building_step_operational' %}"
               hx-vals='{"action": "filter"}'
               hx-target="#operational-epd-list"
@@ -124,10 +125,10 @@
                 data-size="16"
                 data-color="var(--icon--soft-400)"
               ></span>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="search_query"
-                placeholder="Search energy carriers..." 
+                placeholder="{% translate 'Search energy carriers...' %}"
               />
               <!-- Loading spinner -->
               <div id="energy-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
@@ -135,13 +136,13 @@
               </div>
             </label>
             <select name="country" class="select min-w-[120px]">
-              <option value="">All Countries</option>
+              <option value="">{% translate "All Countries" %}</option>
               {% for country in countries %}
               <option value="{{ country.id }}">{{ country.name }}</option>
               {% endfor %}
             </select>
           </div>
-          
+
           <!-- Advanced Search Collapse -->
           <div class="collapse rounded-none">
             <input type="checkbox" class="peer" id="advanced-search-toggle" />
@@ -152,9 +153,9 @@
                   data-size="20"
                   data-color="var(--icon--strong-950)"
                 ></span>
-                Advanced Search
+                {% translate "Advanced Search" %}
                 <span class="text-xs/5 text-[var(--text--sub-600)]"
-                  >Click here for more advanced filters</span
+                  >{% translate "Click here for more advanced filters" %}</span
                 >
               </span>
               <span
@@ -185,7 +186,7 @@
                   <input type="hidden" name="category" value="{{ epd_filters_form.category.initial.id }}" />
                   {% endif %}
                 </label>
-                
+
                 <!-- Sub-category - Pre-filled and disabled -->
                 <label class="relative col-span-2">
                   <span
@@ -205,7 +206,7 @@
                   <input type="hidden" name="subcategory" value="{{ epd_filters_form.subcategory.initial.id }}" />
                   {% endif %}
                 </label>
-                
+
                 <!-- Child-category - User selectable -->
                 <label class="relative col-span-2">
                   <span
@@ -218,13 +219,13 @@
                     name="childcategory"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option value="">All Types</option>
+                    <option value="">{% translate "All Types" %}</option>
                     {% for child in epd_filters_form.childcategory.field.queryset %}
                     <option value="{{ child.id }}">{{ child.name_en }}</option>
                     {% endfor %}
                   </select>
                 </label>
-                
+
                 <!-- EPD Type -->
                 <label class="relative col-span-2">
                   <span
@@ -237,9 +238,9 @@
                     name="type"
                     class="select py-0 pl-8 h-9 text-sm/5 text-[var(--text--sub-600)] rounded-[var(--radius-8)]"
                   >
-                    <option value="">All EPD Types</option>
-                    <option value="generic">Generic</option>
-                    <option value="official">Official</option>
+                    <option value="">{% translate "All EPD Types" %}</option>
+                    <option value="generic">{% translate "Generic" %}</option>
+                    <option value="official">{% translate "Official" %}</option>
                   </select>
                 </label>
               </div>
@@ -248,16 +249,16 @@
           <div class='flex gap-2 mt-2'>
             <button class="btn btn-outline btn-block  flex-1" type="submit">
               <span data-icon="search-2-line" data-size="16" data-color="currentColor"></span>
-              Search
+              {% translate "Search" %}
             </button>
             <button id="epd-reset-btn" type="button" class="btn btn-ghost" onclick="document.getElementById('epd-filter-form').reset(); htmx.trigger('#epd-filter-form', 'submit');">
-              Reset
+              {% translate "Reset" %}
             </button>
           </div>
         </form>
-        
+
         <!-- EPD List Container -->
-        <div id="operational-epd-list" 
+        <div id="operational-epd-list"
              class="mt-4"
              hx-get="{% url 'building_step_operational' %}"
              hx-trigger="load"
@@ -270,7 +271,7 @@
 
       </div>
     </div>
-    
+
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
       <div id="pagination">
 
@@ -279,7 +280,7 @@
         class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] w-fit"
         onclick="energy_carrier_modal.close()"
         type="button">
-        Close
+        {% translate "Close" %}
       </button>
     </div>
 
@@ -299,9 +300,9 @@
           data-color="var(--state--warning--base)"
         ></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        You are about to remove this energy carrier. This action cannot be undone.
+        {% translate "You are about to remove this energy carrier. This action cannot be undone." %}
       </p>
     </div>
     <div
@@ -312,14 +313,14 @@
         onclick="energy_carrier_modal_delete.close()"
         type="button"
       >
-        Cancel
+        {% translate "Cancel" %}
       </button>
-      <button 
-        class="btn btn-sm btn-error flex-1 remove-epd" 
+      <button
+        class="btn btn-sm btn-error flex-1 remove-epd"
         id="confirm-delete-btn"
         type="button"
       >
-        Remove
+        {% translate "Remove" %}
       </button>
     </div>
   </div>
@@ -336,7 +337,7 @@
   const mainModal = document.getElementById('energy_carrier_modal');
   const saveButton = document.getElementById('save_button');
   let epdToDelete = null;
-  
+
   // Update UI based on selected products count
   function updateUI() {
     // Check for actual EPD items (not just the empty state template)
@@ -360,7 +361,7 @@
       unsavedIndicator.style.display = (hasProducts && !isSaved) ? 'inline' : 'none';
     }
   }
-  
+
   // Handle successful EPD addition
   document.body.addEventListener('htmx:afterSwap', function(event) {
     if (event.detail.target.id === 'selected_op_products') {
@@ -375,7 +376,7 @@
       if (mainModal) mainModal.close();
     }
   });
-  
+
   // Handle Remove EPD button clicks
   if (selectedOpProducts) {
     selectedOpProducts.addEventListener('click', function(event) {
@@ -400,7 +401,7 @@
   } else {
     console.error('[Operational] selectedOpProducts element not found!');
   }
-  
+
   // Handle delete confirmation
   const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
   if (confirmDeleteBtn) {
@@ -465,14 +466,14 @@
         } finally {
           // Reset button
           confirmDeleteBtn.disabled = false;
-          confirmDeleteBtn.innerHTML = 'Remove';
+          confirmDeleteBtn.innerHTML = '{% translate "Remove" %}';
           epdToDelete = null;
           deleteModal.close();
         }
       }
     });
   }
-  
+
   // Handle save button loading state
   document.body.addEventListener('htmx:beforeRequest', function(event) {
     if (event.detail.target.id === 'operational-products-form') {
@@ -500,7 +501,7 @@
         const text = btn.querySelector('.button-text');
         if (icon) icon.classList.remove('hidden');
         if (loading) loading.classList.add('hidden');
-        if (text) text.textContent = 'Save Energy Carriers';
+        if (text) text.textContent = '{% translate "Save Energy Carriers" %}';
       }
 
       if (event.detail.successful) {
@@ -540,4 +541,3 @@
 </script>
 
 <!-- Remove old templates as they're not needed with Django rendering -->
-

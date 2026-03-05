@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 
 <div id="structural_templates_list">
   <ul class="grid grid-cols-1 gap-2.75 mt-3">
@@ -42,7 +43,7 @@
             {% with first_product=assembly.structuralproduct_set.first %}
               {% if first_product %}
                 <span class="badge gap-0 text-xs/4 py-1 px-2 font-medium">
-                  Quantity: {{ first_product.quantity|floatformat:2 }}{{ assembly.get_dimension_display }}
+                  {% translate "Quantity:" %} {{ first_product.quantity|floatformat:2 }}{{ assembly.get_dimension_display }}
                 </span>
               {% endif %}
             {% endwith %}
@@ -55,7 +56,7 @@
                   data-size="16"
                   data-color="var(--icon--soft-400)"
                 ></span>
-                System
+                {% translate "System" %}
               </span>
             {% else %}
               <span class="badge text-xs/4 py-1 px-2 font-medium gap-1">
@@ -64,16 +65,16 @@
                   data-size="16"
                   data-color="var(--icon--soft-400)"
                 ></span>
-                My component
+                {% translate "My component" %}
               </span>
             {% endif %}
             <button
               class="btn btn-sm btn-outline border-[var(--stroke--soft-200)] rounded-[var(--radius-8)] self-end"
               onclick="structuralManager.selectTemplate('{{ assembly.id }}')"
-              title="Select this template"
+              title="{% translate 'Select this template' %}"
             >
               <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-              Add
+              {% translate "Add" %}
             </button>
           </div>
         </li>
@@ -82,8 +83,8 @@
       <section class="flex flex-col flex-1">
         <div class="flex flex-col flex-1 items-center justify-center gap-4 py-8">
           <img src="{% static 'assets/building.png' %}" alt="No templates" class="w-32" />
-          <span class="text-sm/5 font-medium text-center text-[var(--text--sub-600)]">No templates found</span>
-          <p class="text-xs/4 text-center text-[var(--text--sub-600)]">Try adjusting your search criteria</p>
+          <span class="text-sm/5 font-medium text-center text-[var(--text--sub-600)]">{% translate "No templates found" %}</span>
+          <p class="text-xs/4 text-center text-[var(--text--sub-600)]">{% translate "Try adjusting your search criteria" %}</p>
         </div>
       </section>
     {% endfor %}
@@ -106,7 +107,7 @@
         data-size="20"
         data-color="var(--icon--soft-400)"
       ></span>
-      Previous
+      {% translate "Previous" %}
     </button>
     <ul class="flex items-center gap-2">
       {% for num in page_obj.paginator.page_range %}
@@ -140,7 +141,7 @@
         disabled
       {% endif %}
     >
-      Next
+      {% translate "Next" %}
       <span
         data-icon="arrow-right"
         data-size="20"
