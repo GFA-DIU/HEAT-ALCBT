@@ -1,7 +1,11 @@
+from allauth.account.models import EmailAddress
+from allauth.account.utils import send_email_confirmation
+from cities_light.models import Country
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from rest_framework import serializers
 
-from accounts.models import UserProfile
+from accounts.models import CustomCity, CustomRegion, UserProfile
 from pages.models.organisation import Organisation, OrganisationMembership
 
 User = get_user_model()
@@ -24,13 +28,14 @@ class UserListSerializer(serializers.ModelSerializer):
     countries = serializers.SerializerMethodField()
     app_access = serializers.SerializerMethodField()
     is_active = serializers.SerializerMethodField()
+    profile = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
             "id", "email", "username", "first_name", "last_name", "full_name",
             "role", "organisations", "countries", "app_access",
-            "last_login", "is_active", "date_joined",
+            "last_login", "is_active", "date_joined", "profile",
         ]
 
     def get_full_name(self, obj):
@@ -69,15 +74,21 @@ class UserListSerializer(serializers.ModelSerializer):
         if not obj.is_active:
             return False
         try:
-            from allauth.account.models import EmailAddress
             return EmailAddress.objects.filter(user=obj, verified=True).exists()
         except Exception:
             return obj.is_active
 
-
-class UserDetailSerializer(UserListSerializer):
-    class Meta(UserListSerializer.Meta):
-        fields = UserListSerializer.Meta.fields + ["updated_at"] if hasattr(User, "updated_at") else UserListSerializer.Meta.fields
+    def get_profile(self, obj):
+        try:
+            p = obj.userprofile
+            return {
+                "country": {"id": p.country.id, "name": p.country.name} if p.country else None,
+                "region": {"id": p.region.id, "name": p.region.name} if p.region else None,
+                "city": {"id": p.city.id, "name": p.city.name} if p.city else None,
+                "consent_flag": p.consent_flag,
+            }
+        except Exception:
+            return None
 
 
 # ---------------------------------------------------------------------------
@@ -103,9 +114,14 @@ class UserCreateSerializer(serializers.Serializer):
         required=False, default=False,
         help_text="If true, assigns all available countries to this membership.",
     )
+    # UserProfile location fields (user's personal location)
+    profile_country_id = serializers.IntegerField(required=False, allow_null=True)
+    profile_region_id = serializers.IntegerField(required=False, allow_null=True)
+    profile_city_id = serializers.IntegerField(required=False, allow_null=True)
+    consent_flag = serializers.BooleanField(required=False, default=True)
 
     def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
+        if EmailAddress.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError("A user with this email already exists.")
         return value
 
@@ -117,11 +133,6 @@ class UserCreateSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        from django.db import transaction
-        from allauth.account.utils import send_email_confirmation
-        from allauth.account.models import EmailAddress
-        from cities_light.models import Country
-
         email = validated_data["email"]
         role = validated_data["role"]
         org_id = validated_data.get("organisation_id")
@@ -152,13 +163,20 @@ class UserCreateSerializer(serializers.Serializer):
                 password=None,
             )
 
-            # Set role on UserProfile (signal creates the profile, we just update the role)
+            # Set role and location on UserProfile
             profile = user.userprofile
             profile.role = role
-            profile.save(update_fields=["role"])
+            if validated_data.get("profile_country_id"):
+                profile.country_id = validated_data["profile_country_id"]
+            if validated_data.get("profile_region_id"):
+                profile.region_id = validated_data["profile_region_id"]
+            if validated_data.get("profile_city_id"):
+                profile.city_id = validated_data["profile_city_id"]
+            profile.consent_flag = validated_data.get("consent_flag", True)
+            profile.save()
 
             # Allauth EmailAddress (unverified — they'll click link)
-            email_obj = EmailAddress.objects.create(
+            EmailAddress.objects.create(
                 user=user, email=email, primary=True, verified=False
             )
 
@@ -205,18 +223,19 @@ class UserUpdateSerializer(serializers.Serializer):
         child=serializers.IntegerField(), required=False,
     )
     all_countries = serializers.BooleanField(required=False)
+    # UserProfile location fields
+    profile_country_id = serializers.IntegerField(required=False, allow_null=True)
+    profile_region_id = serializers.IntegerField(required=False, allow_null=True)
+    profile_city_id = serializers.IntegerField(required=False, allow_null=True)
+    consent_flag = serializers.BooleanField(required=False)
 
     def validate_email(self, value):
         user = self.context.get("user_instance")
-        if User.objects.filter(email=value).exclude(pk=user.pk).exists():
+        if EmailAddress.objects.filter(email__iexact=value).exclude(user=user).exists():
             raise serializers.ValidationError("A user with this email already exists.")
         return value
 
     def update(self, instance, validated_data):
-        from django.db import transaction
-        from allauth.account.models import EmailAddress
-        from cities_light.models import Country
-
         with transaction.atomic():
             # Basic fields
             for field in ("first_name", "last_name", "is_active"):
@@ -232,12 +251,24 @@ class UserUpdateSerializer(serializers.Serializer):
                 )
 
             new_role = validated_data.get("role")
+            profile_fields = {}
             if new_role:
                 instance.is_staff = new_role in (UserProfile.Role.ADMIN, UserProfile.Role.SUPERADMIN)
                 instance.is_superuser = new_role == UserProfile.Role.SUPERADMIN
+                profile_fields["role"] = new_role
+            if "profile_country_id" in validated_data:
+                profile_fields["country_id"] = validated_data["profile_country_id"]
+            if "profile_region_id" in validated_data:
+                profile_fields["region_id"] = validated_data["profile_region_id"]
+            if "profile_city_id" in validated_data:
+                profile_fields["city_id"] = validated_data["profile_city_id"]
+            if "consent_flag" in validated_data:
+                profile_fields["consent_flag"] = validated_data["consent_flag"]
+            if profile_fields:
                 try:
-                    instance.userprofile.role = new_role
-                    instance.userprofile.save(update_fields=["role"])
+                    for attr, val in profile_fields.items():
+                        setattr(instance.userprofile, attr, val)
+                    instance.userprofile.save()
                 except Exception:
                     pass
 
@@ -286,6 +317,6 @@ class UserImportRowSerializer(serializers.Serializer):
     )
 
     def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
+        if EmailAddress.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError(f"User with email '{value}' already exists.")
         return value

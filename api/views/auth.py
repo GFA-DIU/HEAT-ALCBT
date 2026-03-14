@@ -1,3 +1,6 @@
+from allauth.account.forms import ResetPasswordForm
+from allauth.account.models import EmailAddress as AllauthEmailAddress
+from allauth.account.utils import send_email_confirmation
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -91,25 +94,24 @@ class AdminForgotPasswordView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Check if the email belongs to a staff user
-        user = User.objects.filter(email=email, is_staff=True).first()
-        if user is None:
-            # Check if user exists at all (non-staff)
-            non_staff_user = User.objects.filter(email=email).first()
-            if non_staff_user is not None:
-                # Email exists but user is not staff
-                return Response(
-                    {"detail": "Access restricted to admin users only."},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-            # Non-existent email — return 200 for security (don't reveal existence)
+        # Look up via allauth EmailAddress (plaintext) since CustomUser.email is encrypted
+        email_obj = AllauthEmailAddress.objects.filter(email__iexact=email).select_related("user").first()
+
+        if email_obj is None:
+            # Unknown email — return 200 to avoid revealing whether the account exists
             return Response(
                 {"detail": "If an account with that email exists, a password reset email has been sent."},
                 status=status.HTTP_200_OK,
             )
 
+        user = email_obj.user
+        if not user.is_staff:
+            return Response(
+                {"detail": "Access restricted to admin users only."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         # Trigger allauth password reset
-        from allauth.account.forms import ResetPasswordForm
         form = ResetPasswordForm(data={"email": email})
         if form.is_valid():
             form.save(request)

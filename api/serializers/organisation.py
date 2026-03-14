@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -53,7 +54,7 @@ class InviteUserSerializer(serializers.Serializer):
     role = serializers.ChoiceField(choices=OrganisationMembership.MemberRole.choices)
 
     def validate_email(self, value):
-        if not User.objects.filter(email=value).exists():
+        if not EmailAddress.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError("No user found with this email address.")
         return value
 
@@ -75,7 +76,7 @@ class OrganisationCreateSerializer(serializers.ModelSerializer):
         added_by = self.context.get("request").user if self.context.get("request") else None
 
         for invite in invite_users:
-            user = User.objects.get(email=invite["email"])
+            user = EmailAddress.objects.get(email__iexact=invite["email"]).user
             OrganisationMembership.objects.get_or_create(
                 organisation=organisation,
                 user=user,
@@ -109,7 +110,7 @@ class OrganisationUpdateSerializer(serializers.ModelSerializer):
         instance.save()
 
         for invite in invite_users:
-            user = User.objects.get(email=invite["email"])
+            user = EmailAddress.objects.get(email__iexact=invite["email"]).user
             membership, created = OrganisationMembership.objects.get_or_create(
                 organisation=instance,
                 user=user,

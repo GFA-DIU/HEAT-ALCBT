@@ -1,11 +1,13 @@
 import logging
 
+from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.models import UserProfile
 from api.permissions import IsAdminUser
 from api.serializers.users import (
     UserListSerializer,
@@ -14,8 +16,7 @@ from api.serializers.users import (
     UserImportRowSerializer,
 )
 from api.utils import paginate_queryset, parse_csv, render_csv_response
-from accounts.models import UserProfile
-from pages.models.organisation import OrganisationMembership
+from pages.models.organisation import Organisation, OrganisationMembership
 
 logger = logging.getLogger(__name__)
 
@@ -50,11 +51,15 @@ class UserListCreateView(APIView):
 
         search = request.query_params.get("search", "").strip()
         if search:
+            # email is encrypted — find user IDs by searching plaintext allauth EmailAddress
+            matched_user_ids = EmailAddress.objects.filter(
+                email__icontains=search
+            ).values_list("user_id", flat=True)
             qs = qs.filter(
                 Q(first_name__icontains=search) |
                 Q(last_name__icontains=search) |
-                Q(email__icontains=search) |
-                Q(username__icontains=search)
+                Q(username__icontains=search) |
+                Q(id__in=matched_user_ids)
             ).distinct()
 
         role = request.query_params.get("role", "").strip()
@@ -125,10 +130,13 @@ class UserExportView(APIView):
 
         search = request.query_params.get("search", "").strip()
         if search:
+            matched_user_ids = EmailAddress.objects.filter(
+                email__icontains=search
+            ).values_list("user_id", flat=True)
             qs = qs.filter(
                 Q(first_name__icontains=search) |
                 Q(last_name__icontains=search) |
-                Q(email__icontains=search)
+                Q(id__in=matched_user_ids)
             ).distinct()
 
         rows = [["first_name", "last_name", "email", "role", "organisation", "organisation_role", "last_login", "email_verified"]]
@@ -139,7 +147,6 @@ class UserExportView(APIView):
                 role = UserProfile.Role.VIEWER
 
             try:
-                from allauth.account.models import EmailAddress
                 verified = EmailAddress.objects.filter(user=user, verified=True).exists()
             except Exception:
                 verified = user.is_active
@@ -202,9 +209,9 @@ class UserImportView(APIView):
                 "first_name": row[0].strip() if len(row) > 0 else "",
                 "last_name": row[1].strip() if len(row) > 1 else "",
                 "email": row[2].strip() if len(row) > 2 else "",
-                "role": row[3].strip() if len(row) > 3 else UserProfile.Role.VIEWER,
+                "role": row[3].strip() or UserProfile.Role.VIEWER if len(row) > 3 else UserProfile.Role.VIEWER,
                 "organisation_name": row[4].strip() if len(row) > 4 else "",
-                "organisation_role": row[5].strip() if len(row) > 5 else OrganisationMembership.MemberRole.VIEWER,
+                "organisation_role": row[5].strip() or OrganisationMembership.MemberRole.VIEWER if len(row) > 5 else OrganisationMembership.MemberRole.VIEWER,
             }
 
             row_serializer = UserImportRowSerializer(data=data)
@@ -216,7 +223,6 @@ class UserImportView(APIView):
             org_id = None
             org_name = row_serializer.validated_data.get("organisation_name", "").strip()
             if org_name:
-                from pages.models.organisation import Organisation
                 org = Organisation.objects.filter(name__iexact=org_name).first()
                 if org:
                     org_id = org.id

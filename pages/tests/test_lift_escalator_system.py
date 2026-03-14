@@ -2,6 +2,7 @@ import json
 import pytest
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from allauth.account.models import EmailAddress
 
 from pages.models import Building, LiftEscalatorSystem
 from pages.models.climate_type import ClimateType
@@ -9,14 +10,16 @@ from pages.models.climate_type import ClimateType
 User = get_user_model()
 
 
+def _make_verified_user(username, email, password="testpass123"):
+    u = User.objects.create_user(username=username, email=email, password=password)
+    EmailAddress.objects.create(user=u, email=email, verified=True, primary=True)
+    return u
+
+
 @pytest.fixture
 def user(db):
     """Create a test user."""
-    return User.objects.create_user(
-        username="testuser",
-        email="test@example.com",
-        password="testpass123"
-    )
+    return _make_verified_user("testuser", "test@example.com")
 
 
 @pytest.fixture
@@ -135,7 +138,7 @@ class TestLiftEscalatorSystemViews:
         client.force_login(user)
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             **lift_escalator_system_data
         }
 
@@ -168,14 +171,14 @@ class TestLiftEscalatorSystemViews:
         assert response.status_code == 400
         data = response.json()
         assert data["success"] is False
-        assert "building_id" in data["errors"]
+        assert "building_uuid" in data["errors"]
 
     def test_create_lift_escalator_system_invalid_building_id(self, client, user, lift_escalator_system_data):
         """Test creation fails when building doesn't exist."""
         client.force_login(user)
 
         payload = {
-            "building_id": "00000000-0000-0000-0000-000000000000",
+            "building_uuid": "00000000-0000-0000-0000-000000000000",
             **lift_escalator_system_data
         }
 
@@ -194,7 +197,7 @@ class TestLiftEscalatorSystemViews:
         client.force_login(user)
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             # Missing number_of_lifts which is the only required field
         }
 
@@ -222,7 +225,7 @@ class TestLiftEscalatorSystemViews:
         updated_data["lift_regenerative_features"] = "no"
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             "lift_escalator_system_id": les.id,
             **updated_data
         }
@@ -259,7 +262,7 @@ class TestLiftEscalatorSystemViews:
         )
 
         response = client.get(
-            reverse("lift_escalator_system_list", kwargs={"building_id": building.id})
+            reverse("lift_escalator_system_list", kwargs={"building_uuid": building.uuid})
         )
 
         assert response.status_code == 200
@@ -273,7 +276,7 @@ class TestLiftEscalatorSystemViews:
         client.force_login(user)
 
         response = client.get(
-            reverse("lift_escalator_system_list", kwargs={"building_id": building.id})
+            reverse("lift_escalator_system_list", kwargs={"building_uuid": building.uuid})
         )
 
         assert response.status_code == 200
@@ -314,7 +317,7 @@ class TestLiftEscalatorSystemViews:
         """Test that unauthenticated users cannot access endpoints."""
         # Try to create without login
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             **lift_escalator_system_data
         }
 
@@ -329,16 +332,12 @@ class TestLiftEscalatorSystemViews:
     def test_user_cannot_modify_other_users_building(self, client, building, lift_escalator_system_data):
         """Test that users cannot modify lift & escalator systems for buildings they don't own."""
         # Create another user
-        other_user = User.objects.create_user(
-            username="otheruser",
-            email="other@example.com",
-            password="otherpass123"
-        )
+        other_user = _make_verified_user("otheruser", "other@example.com", "otherpass123")
 
         client.force_login(other_user)
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             **lift_escalator_system_data
         }
 
