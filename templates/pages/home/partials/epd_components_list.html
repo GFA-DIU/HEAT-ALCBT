@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <div id="epd-search-list">
   <ul class="grid grid-cols-1 gap-2.75 mt-6">
     {% for item in epds %}
@@ -24,7 +25,7 @@
       </li>
     {% empty %}
       <li class="py-8 text-center text-[var(--text--sub-600)]">
-        No EPDs found matching your search criteria
+        {% translate "No EPDs found matching your search criteria" %}
       </li>
     {% endfor %}
   </ul>

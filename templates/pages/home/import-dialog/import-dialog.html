@@ -1,3 +1,4 @@
+{% load i18n %}
 <dialog id="import_dialog" class="modal modal-end">
   <div class="modal-box right-side-dialog flex flex-col p-0">
     <div class="w-full p-5 flex items-start justify-between gap-2">
@@ -40,6 +41,20 @@
 </dialog>
 
 <script>
+  var i18n = {
+    stepUpload:         "{% translate 'Upload' %}",
+    stepMapFields:      "{% translate 'Map Fields' %}",
+    stepPreview:        "{% translate 'Preview & Confirm' %}",
+    stepConfirmImport:  "{% translate 'Confirm & Import' %}",
+    stepProcess:        "{% translate 'Process' %}",
+    continue_:          "{% translate 'Continue' %}",
+    readingFile:        "{% translate 'Reading file…' %}",
+    importing:          "{% translate 'Importing…' %}",
+    selectExcelFirst:   "{% translate 'Please select an Excel file first.' %}",
+    couldNotRead:       "{% translate 'Could not read the file.' %}",
+    importFailed:       "{% translate 'Import failed. Please check your data and try again.' %}",
+  };
+
   // ---------------------------------------------------------------------------
   // Shared import state — persists across steps
   // ---------------------------------------------------------------------------
@@ -63,10 +78,10 @@
   window.importStepper = {
     currentStep: 0,
     steps: [
-      { id: 'upload',     label: 'Upload' },
-      { id: 'map-fields', label: 'Map Fields' },
-      { id: 'preview',    label: 'Preview & Confirm', nextLabel: 'Confirm & Import' },
-      { id: 'process',    label: 'Process' },
+      { id: 'upload',     label: i18n.stepUpload },
+      { id: 'map-fields', label: i18n.stepMapFields },
+      { id: 'preview',    label: i18n.stepPreview, nextLabel: i18n.stepConfirmImport },
+      { id: 'process',    label: i18n.stepProcess },
     ],
 
     init() {
@@ -146,7 +161,7 @@
         footer.style.display = 'flex';
         nextBtn.style.display = 'inline-flex';
         nextBtn.disabled = false;
-        nextLabel.textContent = step.nextLabel || 'Continue';
+        nextLabel.textContent = step.nextLabel || i18n.continue_;
 
         // Disable Continue on upload step until a file is chosen
         if (step.id === 'upload' && !window.importState.file) {
@@ -163,18 +178,18 @@
       // --- Upload step: parse the file and extract all tab data ---
       if (step.id === 'upload') {
         if (!window.importState.file) {
-          this._showError('Please select an Excel file first.');
+          this._showError(i18n.selectExcelFirst);
           return;
         }
-        this._setNextLoading(true, 'Reading file…');
+        this._setNextLoading(true, i18n.readingFile);
         try {
           await this._parseFile();
           this.currentStep++;
           this.render();
         } catch (err) {
-          this._showError(err.message || 'Could not read the file.');
+          this._showError(err.message || i18n.couldNotRead);
         } finally {
-          this._setNextLoading(false, step.nextLabel || 'Continue');
+          this._setNextLoading(false, step.nextLabel || i18n.continue_);
         }
         return;
       }
@@ -188,7 +203,7 @@
 
       // --- Preview & Confirm step: submit Tab 1, Tab 2, Tab 3 to the backend ---
       if (step.id === 'preview') {
-        this._setNextLoading(true, 'Importing…');
+        this._setNextLoading(true, i18n.importing);
         try {
           await this._submitTab1();
           await this._submitTab2();
@@ -203,9 +218,9 @@
           this.currentStep++;
           this.render();
         } catch (err) {
-          this._showError(err.message || 'Import failed. Please check your data and try again.');
+          this._showError(err.message || i18n.importFailed);
         } finally {
-          this._setNextLoading(false, step.nextLabel || 'Confirm & Import');
+          this._setNextLoading(false, step.nextLabel || i18n.stepConfirmImport);
         }
         return;
       }
@@ -858,7 +873,7 @@
       const nextLabel = document.getElementById('import-next-label');
       if (!nextBtn) return;
       nextBtn.disabled = loading;
-      if (nextLabel) nextLabel.textContent = loading ? label : (this.steps[this.currentStep].nextLabel || 'Continue');
+      if (nextLabel) nextLabel.textContent = loading ? label : (this.steps[this.currentStep].nextLabel || i18n.continue_);
       // Show/hide spinner
       let spinner = nextBtn.querySelector('.btn-spinner');
       if (loading && !spinner) {

@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 
 <!-- Hidden data for JavaScript restoration -->
 {{ boq_items|json_script:"boq-items-data" }}
@@ -6,8 +7,7 @@
 
 <div class="flex gap-2 p-2 rounded-lg bg-[var(--state--faded--lighter)]">
   <span data-icon="information-2-line" data-size="16" data-color="var(--icon--sub-600)"></span>
-  If data is available as total quantity per material, select "Add from BoQ".
-  For quantities per components (foundation, floor, roof, etc.), use "Add component".
+  {% translate "If data is available as total quantity per material, select \"Add from BoQ\". For quantities per components (foundation, floor, roof, etc.), use \"Add component\"." %}
 </div>
 
 <div id="structural_component_container" class="w-full">
@@ -15,14 +15,14 @@
   <div id="empty-state" class="w-full flex flex-col gap-3 items-center justify-center mt-10">
     <img src="{% static 'assets/structural-component.png' %}" class='h-[117px]' alt="Structural Component" />
     <p class="text-sm/5 font-medium text-[var(--text--sub-600)]">
-      How would you like to add your building structural components?
+      {% translate "How would you like to add your building structural components?" %}
     </p>
     <div class="flex items-center gap-2">
       <button type="button" class="btn btn-outline" id="btn-add-boq">
-        Add from Bill of Quantity
+        {% translate "Add from Bill of Quantity" %}
       </button>
       <button type="button" class="btn btn-outline" id="btn-add-component">
-        Add by Component
+        {% translate "Add by Component" %}
       </button>
     </div>
   </div>
@@ -31,17 +31,17 @@
   <div id="items-container" class="w-full mt-4 hidden">
     <div class="flex items-center gap-2">
       <button type="button" class="btn btn-outline" id="btn-add-boq-2">
-        Add from Bill of Quantity
+        {% translate "Add from Bill of Quantity" %}
       </button>
       <button type="button" class="btn btn-outline" id="btn-add-component-2">
-        Add by Component
+        {% translate "Add by Component" %}
       </button>
     </div>
     <div class="divider"></div>
     <div class="flex items-center justify-between mb-6">
       <div class="flex-1">
-        <h5 class="text-sm/5 font-bold">Components / Materials Added</h5>
-        <p class="text-xs/4 text-[var(--text--sub-600)]">Added components or materials will appear below</p>
+        <h5 class="text-sm/5 font-bold">{% translate "Components / Materials Added" %}</h5>
+        <p class="text-xs/4 text-[var(--text--sub-600)]">{% translate "Added components or materials will appear below" %}</p>
       </div>
     </div>
     <ul id="saved-items-list" class="grid grid-cols-1 gap-2.5"></ul>
@@ -52,7 +52,7 @@
 <dialog id="structural_boq_modal" class="modal modal-bottom sm:modal-end">
   <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full border-b border-[var(--stroke--soft-200)]">
-      <h3 class="text-lg/6 font-medium">Bill of Quantity (BOQ)</h3>
+      <h3 class="text-lg/6 font-medium">{% translate "Bill of Quantity (BOQ)" %}</h3>
       <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick="structuralManager.closeBoqModal()">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
@@ -61,37 +61,37 @@
     <div class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-2.5 grid grid-cols-1 gap-5">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Name <span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Name" %} <span class="text-[var(--state--error--base)]">*</span></legend>
           <label class="input w-full">
             <input type="text" id="boq_name" placeholder="e.g. Main Structure BOQ" required />
           </label>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Comment</legend>
+          <legend class="fieldset-legend">{% translate "Comment" %}</legend>
           <label class="input w-full">
-            <input type="text" id="boq_comment" placeholder="Add a comment" />
+            <input type="text" id="boq_comment" placeholder="{% translate 'Add a comment' %}" />
           </label>
         </fieldset>
         <fieldset class="fieldset">
           <label class="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" id="boq_is_template" class="checkbox checkbox-sm" />
-            <span class="text-sm/5 font-medium">Save as template for future use</span>
+            <span class="text-sm/5 font-medium">{% translate "Save as template for future use" %}</span>
           </label>
-          <p class="text-xs/4 text-[var(--text--sub-600)] mt-1">Templates can be reused across multiple buildings</p>
+          <p class="text-xs/4 text-[var(--text--sub-600)] mt-1">{% translate "Templates can be reused across multiple buildings" %}</p>
         </fieldset>
       </div>
 
       <h2 class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4">
-        MATERIALS
+        {% translate "MATERIALS" %}
       </h2>
 
       <div id="boq_materials_section" class="w-full px-5">
         <!-- Empty materials state -->
         <div id="boq_no_materials" class="flex-1 flex flex-col items-center justify-center pb-4">
           <img src="{% static 'assets/structure-materials.png' %}" alt="Materials" class="w-[12.25rem]" />
-          <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">Add materials from the EPD library</p>
+          <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">{% translate "Add materials from the EPD library" %}</p>
           <button type="button" class="mt-2.5 btn btn-outline" onclick="structuralManager.openEpdModal('boq')">
-            Add from EPD library
+            {% translate "Add from EPD library" %}
           </button>
         </div>
 
@@ -99,12 +99,12 @@
         <div id="boq_has_materials" class="hidden">
           <div class="flex items-end justify-between border-b border-[var(--stroke--soft-200)] pb-4 mb-4">
             <div class="flex-1">
-              <h4 class="text-base/5 font-extrabold mb-1">Added Materials</h4>
-              <p class="text-sm/5 text-[var(--text--sub-600)]">Added from EPD library</p>
+              <h4 class="text-base/5 font-extrabold mb-1">{% translate "Added Materials" %}</h4>
+              <p class="text-sm/5 text-[var(--text--sub-600)]">{% translate "Added from EPD library" %}</p>
             </div>
             <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.openEpdModal('boq')">
               <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-              Add more
+              {% translate "Add more" %}
             </button>
           </div>
           <ul id="structural_materials_list" class="grid grid-cols-1 gap-2.5"></ul>
@@ -113,8 +113,8 @@
     </div>
 
     <div class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]">
-      <button type="button" class="btn btn-outline" onclick="structuralManager.closeBoqModal()">Cancel</button>
-      <button type="button" class="btn btn-primary" id="btn-save-boq" onclick="structuralManager.saveBoq()">Save</button>
+      <button type="button" class="btn btn-outline" onclick="structuralManager.closeBoqModal()">{% translate "Cancel" %}</button>
+      <button type="button" class="btn btn-primary" id="btn-save-boq" onclick="structuralManager.saveBoq()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -123,7 +123,7 @@
 <dialog id="structural_component_modal" class="modal modal-bottom sm:modal-end">
   <div class="modal-box p-0 !h-[97vh] my-auto mr-3.5 !w-full !max-w-[57rem] rounded-[1.25rem] overflow-y-auto flex flex-col justify-between">
     <div class="flex justify-between p-5 w-full border-b border-[var(--stroke--soft-200)]">
-      <h3 class="text-lg/6 font-medium" id="structural_component_modal_title">Create New Component</h3>
+      <h3 class="text-lg/6 font-medium" id="structural_component_modal_title">{% translate "Create New Component" %}</h3>
       <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick="structuralManager.closeComponentModal()">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
@@ -132,81 +132,81 @@
     <div class="flex-1 overflow-y-auto hide-scrollbar">
       <div class="px-5 py-2.5 grid grid-cols-3 gap-4 pb-8">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Title <span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Title" %} <span class="text-[var(--state--error--base)]">*</span></legend>
           <label class="input w-full">
             <input type="text" id="component_title" class='w-full' placeholder="e.g. Foundation" required />
           </label>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Building Component</legend>
+          <legend class="fieldset-legend">{% translate "Building Component" %}</legend>
           <select id="component_category" name="category_id" class="select w-full"
                   hx-get="{% url 'building_step_structural' %}?action=get_techniques"
                   hx-target="#component_technique"
                   hx-trigger="change"
                   hx-vals="js:{category_id: document.getElementById('component_category').value}">
-            <option value="" selected disabled>Select component</option>
+            <option value="" selected disabled>{% translate "Select component" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Construction Technique</legend>
+          <legend class="fieldset-legend">{% translate "Construction Technique" %}</legend>
           <select id="component_technique" class="select w-full">
-            <option value="" selected disabled>Select technique</option>
+            <option value="" selected disabled>{% translate "Select technique" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Dimension</legend>
+          <legend class="fieldset-legend">{% translate "Dimension" %}</legend>
           <select id="component_dimension" class="select w-full">
-            <option value="area" selected>Area (m²)</option>
-            <option value="volume">Volume (m³)</option>
-            <option value="mass">Mass (kg)</option>
-            <option value="length">Length (m)</option>
-            <option value="pcs">Pieces (pcs)</option>
+            <option value="area" selected>{% translate "Area (m²)" %}</option>
+            <option value="volume">{% translate "Volume (m³)" %}</option>
+            <option value="mass">{% translate "Mass (kg)" %}</option>
+            <option value="length">{% translate "Length (m)" %}</option>
+            <option value="pcs">{% translate "Pieces (pcs)" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Quantity</legend>
+          <legend class="fieldset-legend">{% translate "Quantity" %}</legend>
           <label class="input w-full">
-            <input type="number" id="component_quantity" placeholder="Enter quantity" step="0.01" min="0" />
+            <input type="number" id="component_quantity" placeholder="{% translate 'Enter quantity' %}" step="0.01" min="0" />
             <span id="component_unit_display" class="text-xs text-[var(--text--sub-600)]">m²</span>
           </label>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">Comment</legend>
+          <legend class="fieldset-legend">{% translate "Comment" %}</legend>
           <label class="input w-full">
-            <input type="text" id="component_comment" class="w-full" placeholder="Add a comment" />
+            <input type="text" id="component_comment" class="w-full" placeholder="{% translate 'Add a comment' %}" />
           </label>
         </fieldset>
         <fieldset class="fieldset col-span-3">
           <label class="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" id="component_is_template" class="checkbox checkbox-sm" />
-            <span class="text-sm/5 font-medium">Save as template for future use</span>
+            <span class="text-sm/5 font-medium">{% translate "Save as template for future use" %}</span>
           </label>
-          <p class="text-xs/4 text-[var(--text--sub-600)] mt-1">Templates can be reused across multiple buildings</p>
+          <p class="text-xs/4 text-[var(--text--sub-600)] mt-1">{% translate "Templates can be reused across multiple buildings" %}</p>
         </fieldset>
       </div>
 
       <h2 class="bg-[var(--bg--weak-50)] w-full px-5 py-1.5 text-[var(--text--sub-600)] text-xs/4 font-medium mb-4">
-        MATERIALS
+        {% translate "MATERIALS" %}
       </h2>
 
       <div id="component_materials_section" class="w-full px-5">
         <div id="component_no_materials" class="flex-1 flex flex-col items-center justify-center pb-4">
           <img src="{% static 'assets/structure-materials.png' %}" alt="Materials" class="w-[12.25rem]" />
-          <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">Add materials from the EPD library</p>
+          <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-4">{% translate "Add materials from the EPD library" %}</p>
           <button type="button" class="mt-2.5 btn btn-outline" onclick="structuralManager.openEpdModal('component')">
-            Add from EPD library
+            {% translate "Add from EPD library" %}
           </button>
         </div>
 
         <div id="component_has_materials" class="hidden">
           <div class="flex items-end justify-between border-b border-[var(--stroke--soft-200)] pb-4 mb-4">
             <div class="flex-1">
-              <h4 class="text-base/5 font-extrabold mb-1">Added Materials</h4>
-              <p class="text-sm/5 text-[var(--text--sub-600)]">Added from EPD library</p>
+              <h4 class="text-base/5 font-extrabold mb-1">{% translate "Added Materials" %}</h4>
+              <p class="text-sm/5 text-[var(--text--sub-600)]">{% translate "Added from EPD library" %}</p>
             </div>
             <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.openEpdModal('component')">
               <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-              Add more
+              {% translate "Add more" %}
             </button>
           </div>
           <ul id="component_materials_list" class="grid grid-cols-1 gap-2.5"></ul>
@@ -215,8 +215,8 @@
     </div>
 
     <div class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]">
-      <button type="button" class="btn btn-outline" onclick="structuralManager.closeComponentModal()">Cancel</button>
-      <button type="button" class="btn btn-primary" onclick="structuralManager.saveComponent()">Save</button>
+      <button type="button" class="btn btn-outline" onclick="structuralManager.closeComponentModal()">{% translate "Cancel" %}</button>
+      <button type="button" class="btn btn-primary" onclick="structuralManager.saveComponent()">{% translate "Save" %}</button>
     </div>
   </div>
 </dialog>
@@ -227,9 +227,9 @@
     <div class="flex justify-between items-center px-5 w-full border-b border-[var(--stroke--soft-200)]">
       <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.closeEpdModal()">
         <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
-        Go back
+        {% translate "Go back" %}
       </button>
-      <h3 class="text-lg/6 font-medium w-full text-left p-5">Add from EPD Library</h3>
+      <h3 class="text-lg/6 font-medium w-full text-left p-5">{% translate "Add from EPD Library" %}</h3>
       <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick="structuralManager.closeEpdModal()">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
@@ -248,13 +248,13 @@
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
               <span data-icon="search-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
-              <input type="text" name="search_query" placeholder="Search materials..." />
+              <input type="text" name="search_query" placeholder="{% translate 'Search materials...' %}" />
               <div id="epd-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
                 <span class="loading loading-spinner loading-lg text-primary"></span>
               </div>
             </label>
             <select name="country" class="select min-w-[120px]">
-              <option value="">All Countries</option>
+              <option value="">{% translate "All Countries" %}</option>
               {% for country in countries %}
                 <option value="{{ country.id }}"> <span data-country="{{ country.name }}" data-size="16" data-color="var(--icon--soft-400)"></span> {{ country.name }}</option>
               {% endfor %}
@@ -268,8 +268,8 @@
             <div class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between">
               <span class="flex items-center gap-2">
                 <span data-icon="menu-search-line" data-size="20" data-color="var(--icon--strong-950)"></span>
-                Advanced Search
-                <span class="text-xs/5 text-[var(--text--sub-600)]">Click for more filters</span>
+                {% translate "Advanced Search" %}
+                <span class="text-xs/5 text-[var(--text--sub-600)]">{% translate "Click for more filters" %}</span>
               </span>
               <span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)"
                     class="transition-transform duration-300 peer-checked:rotate-180"></span>
@@ -277,10 +277,10 @@
             <div class="collapse-content mt-0 px-0">
               <div class="grid grid-cols-3 gap-2 mb-2">
                 <fieldset class="fieldset m-0 p-0">
-                  <legend class="fieldset-legend text-xs">Category</legend>
+                  <legend class="fieldset-legend text-xs">{% translate "Category" %}</legend>
                   <select name="category" id="epd_category_filter" class="select h-9 text-sm/5 w-full"
                           onchange="loadEpdSubcategories(this.value)">
-                    <option value="">All Categories</option>
+                    <option value="">{% translate "All Categories" %}</option>
                     {% for cat in epd_categories %}
                       {% if cat.id and cat.name_en %}
                         <option value="{{ cat.id }}">{{ cat.name_en }}</option>
@@ -289,26 +289,26 @@
                   </select>
                 </fieldset>
                 <fieldset class="fieldset m-0 p-0">
-                  <legend class="fieldset-legend text-xs">Subcategory</legend>
+                  <legend class="fieldset-legend text-xs">{% translate "Subcategory" %}</legend>
                   <select name="subcategory" id="epd_subcategory_filter" class="select h-9 text-sm/5 w-full"
                           onchange="loadEpdChildCategories(this.value)">
-                    <option value="">All Sub-categories</option>
+                    <option value="">{% translate "All Sub-categories" %}</option>
                   </select>
-                  <p class="fieldset-label text-xs text-[var(--text--sub-600)] mt-1">Select a category first</p>
+                  <p class="fieldset-label text-xs text-[var(--text--sub-600)] mt-1">{% translate "Select a category first" %}</p>
                 </fieldset>
                 <fieldset class="fieldset m-0 p-0">
-                  <legend class="fieldset-legend text-xs">Child Category</legend>
+                  <legend class="fieldset-legend text-xs">{% translate "Child Category" %}</legend>
                   <select name="childcategory" id="epd_childcategory_filter" class="select h-9 text-sm/5 w-full">
-                    <option value="">All Child Categories</option>
+                    <option value="">{% translate "All Child Categories" %}</option>
                   </select>
-                  <p class="fieldset-label text-xs text-[var(--text--sub-600)] mt-1">Select a subcategory first</p>
+                  <p class="fieldset-label text-xs text-[var(--text--sub-600)] mt-1">{% translate "Select a subcategory first" %}</p>
                 </fieldset>
               </div>
               <div class="grid grid-cols-1 gap-2">
                 <fieldset class="fieldset m-0 p-0">
-                  <legend class="fieldset-legend text-xs">EPD Type</legend>
+                  <legend class="fieldset-legend text-xs">{% translate "EPD Type" %}</legend>
                   <select name="type" class="select h-9 text-sm/5 w-full">
-                    <option value="">All Types</option>
+                    <option value="">{% translate "All Types" %}</option>
                     {% for t in epd_types %}
                       <option value="{{ t.value }}">{{ t.label }}</option>
                     {% endfor %}
@@ -320,10 +320,10 @@
           <div class='flex gap-2 mt-2'>
             <button type="submit" class="btn btn-outline flex-1">
               <span data-icon="search-2-line" data-size="16" data-color="currentColor"></span>
-              Search
+              {% translate "Search" %}
             </button>
             <button type="button" class="btn btn-ghost" onclick="document.getElementById('structural_epd_filter_form').reset(); htmx.trigger('#structural_epd_filter_form', 'submit');">
-              Reset
+              {% translate "Reset" %}
             </button>
           </div>
         </form>
@@ -342,7 +342,7 @@
 
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
       <div id="structural_pagination"></div>
-      <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.closeEpdModal()">Close</button>
+      <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.closeEpdModal()">{% translate "Close" %}</button>
     </div>
   </div>
 </dialog>
@@ -354,14 +354,14 @@
       <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
         <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)"></span>
       </div>
-      <h3 class="text-lg/6 font-medium mt-4">Are you sure?</h3>
+      <h3 class="text-lg/6 font-medium mt-4">{% translate "Are you sure?" %}</h3>
       <p class="text-sm/5 text-[var(--text--sub-600)] text-center mt-1">
-        This action will permanently remove this item.
+        {% translate "This action will permanently remove this item." %}
       </p>
     </div>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
-      <button type="button" class="btn btn-sm btn-outline flex-1" onclick="structural_delete_modal.close()">Cancel</button>
-      <button type="button" class="btn btn-sm btn-error flex-1" id="confirm-delete-btn">Remove</button>
+      <button type="button" class="btn btn-sm btn-outline flex-1" onclick="structural_delete_modal.close()">{% translate "Cancel" %}</button>
+      <button type="button" class="btn btn-sm btn-error flex-1" id="confirm-delete-btn">{% translate "Remove" %}</button>
     </div>
   </div>
 </dialog>
@@ -370,7 +370,7 @@
   <div class="modal-box w-full max-w-[42.5rem] p-4.5 pb-9">
     <div class="flex items-center mb-6">
       <h2 class="text-base/6 font-bold flex-1 text-center">
-        What type of component would you like to add?
+        {% translate "What type of component would you like to add?" %}
       </h2>
       <button class="btn btn-sm btn-circle btn-ghost" onclick="structural_component_component_type_modal.close()">
         <span data-icon="close-line" data-size="20" data-color="var(--icon--sub-600)"></span>
@@ -380,36 +380,25 @@
       <li class="flex-1 flex flex-col items-center py-6 px-3 gap-4 rounded-2xl border border-[var(--stroke--soft-200)]">
         <span data-icon="list-settings-fill" data-size="32" data-color="var(--icon--sub-600)"></span>
         <div class="text-center">
-          <h3 class="text-sm/5 font-bold">Select from default</h3>
+          <h3 class="text-sm/5 font-bold">{% translate "Select from default" %}</h3>
           <p class="text-xs/4 text-[var(--text--sub-600)] mt-2">
-            Select an assembly from predefined options for a quick LCA
-            assessment.
+            {% translate "Select an assembly from predefined options for a quick LCA assessment." %}
           </p>
         </div>
         <button class="btn btn-primary w-full" onclick="structural_component_component_type_modal.close(); structuralManager.openTemplatesModal()">
-          Select default
+          {% translate "Select default" %}
         </button>
       </li>
-      <li
-        class="flex-1 flex flex-col items-center py-6 px-3 gap-4 rounded-2xl border border-[var(--stroke--soft-200)]"
-      >
-        <span
-          data-icon="list-settings-fill"
-          data-size="32"
-          data-color="var(--icon--sub-600)"
-        ></span>
+      <li class="flex-1 flex flex-col items-center py-6 px-3 gap-4 rounded-2xl border border-[var(--stroke--soft-200)]">
+        <span data-icon="list-settings-fill" data-size="32" data-color="var(--icon--sub-600)"></span>
         <div class="text-center">
-          <h3 class="text-sm/5 font-bold">Create custom</h3>
+          <h3 class="text-sm/5 font-bold">{% translate "Create custom" %}</h3>
           <p class="text-xs/4 text-[var(--text--sub-600)] mt-2">
-            Create a custom component from the materials list for a detailed
-            LCA.
+            {% translate "Create a custom component from the materials list for a detailed LCA." %}
           </p>
         </div>
-        <button
-          class="btn btn-primary w-full"
-          onclick="structural_component_component_type_modal.close(); structuralManager.openComponentModal()"
-        >
-          Create custom
+        <button class="btn btn-primary w-full" onclick="structural_component_component_type_modal.close(); structuralManager.openComponentModal()">
+          {% translate "Create custom" %}
         </button>
       </li>
     </ul>
@@ -422,9 +411,9 @@
     <div class="flex justify-between items-center px-5 w-full border-b border-[var(--stroke--soft-200)]">
       <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.closeTemplatesModal()">
         <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
-        Go back
+        {% translate "Go back" %}
       </button>
-      <h3 class="text-lg/6 font-medium w-full text-left p-5">Select Template</h3>
+      <h3 class="text-lg/6 font-medium w-full text-left p-5">{% translate "Select Template" %}</h3>
       <button type="button" class="btn btn-sm btn-circle btn-ghost" onclick="structuralManager.closeTemplatesModal()">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
@@ -443,13 +432,13 @@
           <div class="flex items-stretch gap-2">
             <label class="input w-full">
               <span data-icon="search-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
-              <input type="text" name="search_query" placeholder="Search templates..." />
+              <input type="text" name="search_query" placeholder="{% translate 'Search templates...' %}" />
               <div id="templates-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
                 <span class="loading loading-spinner loading-sm text-primary"></span>
               </div>
             </label>
             <select name="country" class="select min-w-[120px]">
-              <option value="">All Countries</option>
+              <option value="">{% translate "All Countries" %}</option>
               {% for country in countries %}
                 <option value="{{ country.id }}"> <span data-country="{{ country.name }}" data-size="16" data-color="var(--icon--soft-400)"></span> {{ country.name }}</option>
               {% endfor %}
@@ -461,8 +450,8 @@
             <div class="group collapse-title p-2.5 px-0 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between">
               <span class="flex items-center gap-2">
                 <span data-icon="menu-search-line" data-size="20" data-color="var(--icon--strong-950)"></span>
-                Advanced Search
-                <span class="text-xs/5 text-[var(--text--sub-600)]">Click for more filters</span>
+                {% translate "Advanced Search" %}
+                <span class="text-xs/5 text-[var(--text--sub-600)]">{% translate "Click for more filters" %}</span>
               </span>
               <span data-icon="caret-down" data-size="16" data-color="var(--icon--soft-400)"
                     class="transition-transform duration-300 peer-checked:rotate-180"></span>
@@ -475,15 +464,15 @@
                         hx-trigger="change"
                         hx-swap="innerHTML"
                         hx-vals="js:{category_id: document.getElementById('template_category_filter').value}">
-                  <option value="">All Categories</option>
+                  <option value="">{% translate "All Categories" %}</option>
                 </select>
                 <select name="technique" id="template_technique_filter" class="select h-9 text-sm/5">
-                  <option value="">All Techniques</option>
+                  <option value="">{% translate "All Techniques" %}</option>
                 </select>
                 <select name="mode" class="select h-9 text-sm/5">
-                  <option value="">All Types</option>
-                  <option value="system">System Component</option>
-                  <option value="custom">My Component</option>
+                  <option value="">{% translate "All Types" %}</option>
+                  <option value="system">{% translate "System Component" %}</option>
+                  <option value="custom">{% translate "My Component" %}</option>
                 </select>
               </div>
             </div>
@@ -491,10 +480,10 @@
           <div class='flex gap-2 mt-2'>
             <button type="submit" class="btn btn-outline flex-1">
               <span data-icon="search-2-line" data-size="16" data-color="currentColor"></span>
-              Search
+              {% translate "Search" %}
             </button>
             <button type="button" class="btn btn-ghost" onclick="document.getElementById('structural_templates_filter_form').reset(); htmx.trigger('#structural_templates_filter_form', 'submit');">
-              Reset
+              {% translate "Reset" %}
             </button>
           </div>
         </form>
@@ -512,13 +501,29 @@
 
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
       <div class="flex-1" id='template-pagination-swap'></div>
-      <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.closeTemplatesModal()">Close</button>
+      <button type="button" class="btn btn-sm btn-outline" onclick="structuralManager.closeTemplatesModal()">{% translate "Close" %}</button>
     </div>
   </div>
 </dialog>
 
 <script>
 (function() {
+  var i18n = {
+    selectCategory:    "{% translate 'Select category' %}",
+    selectTechnique:   "{% translate 'Select technique' %}",
+    editComponent:     "{% translate 'Edit Component' %}",
+    createNewComponent:"{% translate 'Create New Component' %}",
+    addDescription:    "{% translate 'Add description' %}",
+    qty:               "{% translate 'Qty' %}",
+    category:          "{% translate 'Category' %}",
+    boqMaterials:      "{% translate 'BOQ' %}",
+    materials:         "{% translate 'materials' %}",
+    noCategory:        "{% translate 'No category' %}",
+    saving:            "{% translate 'Saving...' %}",
+    allSubcategories:  "{% translate 'All Sub-categories' %}",
+    allChildCategories:"{% translate 'All Child Categories' %}",
+  };
+
   // Use window assignment to avoid const/class re-declaration errors on dynamic reload
   window.StructuralComponentManager = class StructuralComponentManager {
   constructor() {
@@ -614,7 +619,7 @@
       .then(res => res.json())
       .then(data => {
         this.categories = data.categories || [];
-        const options = ['<option value="">Select category</option>',
+        const options = [`<option value="">${i18n.selectCategory}</option>`,
           ...this.categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`)
         ].join('');
         document.getElementById('component_category').innerHTML = options;
@@ -655,7 +660,7 @@
 
     if (index !== null && this.componentItems[index]) {
       const item = this.componentItems[index];
-      document.getElementById('structural_component_modal_title').textContent = 'Edit Component';
+      document.getElementById('structural_component_modal_title').textContent = i18n.editComponent;
       document.getElementById('component_title').value = item.title;
       document.getElementById('component_category').value = item.category || '';
       document.getElementById('component_dimension').value = item.dimension || 'area';
@@ -672,18 +677,18 @@
           document.getElementById('component_technique').value = item.technique || '';
         } catch (error) {
           console.error('Error loading techniques:', error);
-          document.getElementById('component_technique').innerHTML = '<option value="">Select technique</option>';
+          document.getElementById('component_technique').innerHTML = `<option value="">${i18n.selectTechnique}</option>`;
         }
       } else {
-        document.getElementById('component_technique').innerHTML = '<option value="">Select technique</option>';
+        document.getElementById('component_technique').innerHTML = `<option value="">${i18n.selectTechnique}</option>`;
       }
 
       this.renderMaterials(item.materials, 'component');
     } else {
-      document.getElementById('structural_component_modal_title').textContent = 'Create New Component';
+      document.getElementById('structural_component_modal_title').textContent = i18n.createNewComponent;
       document.getElementById('component_title').value = '';
       document.getElementById('component_category').value = '';
-      document.getElementById('component_technique').innerHTML = '<option value="">Select technique</option>';
+      document.getElementById('component_technique').innerHTML = `<option value="">${i18n.selectTechnique}</option>`;
       document.getElementById('component_dimension').value = 'area';
       document.getElementById('component_quantity').value = '';
       document.getElementById('component_comment').value = '';
@@ -783,7 +788,7 @@
         console.error('Error loading techniques:', error);
       }
     } else {
-      document.getElementById('component_technique').innerHTML = '<option value="">Select technique</option>';
+      document.getElementById('component_technique').innerHTML = `<option value="">${i18n.selectTechnique}</option>`;
     }
 
     document.getElementById('component_dimension').value = template.dimension || 'area';
@@ -983,7 +988,7 @@
 
       const categorySelect = mode === 'boq' ? `
         <select class="select material-category" required>
-          <option value="" disabled>Category</option>
+          <option value="" disabled>${i18n.category}</option>
           ${categoryOptions}
         </select>` : '';
 
@@ -995,11 +1000,11 @@
           <div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]">
           </div>
           <label class="input w-full">
-            <input type="text" value="${m.description || ''}" placeholder="Add description" class="material-description w-full" />
+            <input type="text" value="${m.description || ''}" placeholder="${i18n.addDescription}" class="material-description w-full" />
           </label>
           ${categorySelect}
           <label class="input w-full max-w-[140px]">
-            <input type="number" value="${m.quantity || ''}" placeholder="Qty" class="material-quantity w-full" step="0.01" min="0" />
+            <input type="number" value="${m.quantity || ''}" placeholder="${i18n.qty}" class="material-quantity w-full" step="0.01" min="0" />
             <span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="${m.unit}">${m.unit}</span>
             <input type="hidden" class="material-unit-value" value="${m.unit}" />
           </label>
@@ -1066,7 +1071,7 @@
     const saveBtn = document.getElementById('btn-save-boq');
     const originalText = saveBtn.innerHTML;
     saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Saving...';
+    saveBtn.innerHTML = `<span class="loading loading-spinner loading-sm"></span> ${i18n.saving}`;
 
     try {
       const response = await fetch('{% url "building_step_structural" %}', {
@@ -1161,7 +1166,7 @@
     const saveBtn = document.querySelector('#structural_component_modal .btn-primary');
     const originalText = saveBtn.innerHTML;
     saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="loading loading-spinner loading-sm"></span> Saving...';
+    saveBtn.innerHTML = `<span class="loading loading-spinner loading-sm"></span> ${i18n.saving}`;
 
     try {
       const response = await fetch('{% url "building_step_structural" %}', {
@@ -1298,7 +1303,7 @@
             <div class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)] mr-3">
               ${item.total_gwp.toFixed(2)} kgCO2eq
             </div>
-            <p class="text-sm/5 text-[var(--text--sub-600)]">BOQ (${item.materials.length} materials)</p>
+            <p class="text-sm/5 text-[var(--text--sub-600)]">${i18n.boqMaterials} (${item.materials.length} ${i18n.materials})</p>
           </div>
         </div>
         <div class="flex gap-2">
@@ -1329,7 +1334,7 @@
               ${item.total_gwp.toFixed(2)} kgCO2eq
             </div>
             <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
-              ${item.category_name || 'No category'}
+              ${item.category_name || i18n.noCategory}
             </span>
             <p class="text-sm/5 text-[var(--text--sub-600)]">${item.quantity || '-'} ${item.dimension || ''}</p>
           </div>
@@ -1390,8 +1395,8 @@
     const subcatSelect = document.getElementById('epd_subcategory_filter');
     const childSelect = document.getElementById('epd_childcategory_filter');
     // Reset dependent selects
-    subcatSelect.innerHTML = '<option value="">All Sub-categories</option>';
-    childSelect.innerHTML = '<option value="">All Child Categories</option>';
+    subcatSelect.innerHTML = `<option value="">${i18n.allSubcategories}</option>`;
+    childSelect.innerHTML = `<option value="">${i18n.allChildCategories}</option>`;
     if (!categoryId) return;
     const url = '{% url "building_step_structural" %}?action=get_subcategories&category=' + encodeURIComponent(categoryId);
     const resp = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
@@ -1401,7 +1406,7 @@
 
   window.loadEpdChildCategories = async function(subcategoryId) {
     const childSelect = document.getElementById('epd_childcategory_filter');
-    childSelect.innerHTML = '<option value="">All Child Categories</option>';
+    childSelect.innerHTML = `<option value="">${i18n.allChildCategories}</option>`;
     if (!subcategoryId) return;
     const url = '{% url "building_step_structural" %}?action=get_subcategories&parent=subcategory&subcategory=' + encodeURIComponent(subcategoryId);
     const resp = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });

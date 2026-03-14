@@ -1,11 +1,11 @@
 {% extends 'account/_auth.html' %}
 {% load crispy_forms_tags %}
- 
+{% load i18n %}
 {% load static %}
- 
+
 {% block action_content %}
     <a href="{% url 'account_login' %}">
-      <button type="button" class="btn btn-outline btn-sm">Login</button>
+      <button type="button" class="btn btn-outline btn-sm">{% translate "Login" %}</button>
     </a>
 {% endblock action_content %}
 
@@ -13,12 +13,11 @@
 <div class="m-auto flex flex-col w-full max-w-[22.25rem]">
             <h1
               class="text-xl font-bold text-center text-(--text--strong-950)"
-            >  Sign up </h1>
+            >  {% translate "Sign up" %} </h1>
             <p
               class="text-sm text-center mt-2 mb-5 text-(--text--sub-600)"
             >
-              Fill in the details below to create your account and track the
-              carbon mission from your building project.
+              {% translate "Fill in the details below to create your account and track the carbon mission from your building project." %}
             </p>
 
             <form  method="post" class="flex flex-col">
@@ -79,21 +78,21 @@
               </fieldset> {% endcomment %}
 
               <button class="btn btn-primary w-full" type="submit">
-                Create account
+                {% translate "Create account" %}
               </button>
             </form>
-            <div class="divider">OR</div>
+            <div class="divider">{% translate "OR" %}</div>
             <button class="btn btn-accent w-full">
-              <span data-icon="google"></span> Sign up with Google
+              <span data-icon="google"></span> {% translate "Sign up with Google" %}
             </button>
             <span
               class="text-sm/5 text-center mt-5 text-(--text--strong-950)"
-              >I already have an account.
+              >{% translate "I already have an account." %}
               <a href="{% url 'account_login' %}" class="font-bold"
-                >Log me in</a
+                >{% translate "Log me in" %}</a
               ></span
             >
           </div>
- 
+
 
 {% endblock auth_content %}

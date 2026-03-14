@@ -1,3 +1,4 @@
+{% load i18n %}
 <ul class="flex flex-col gap-2">
   {% for epd in epd_list %}
   <li class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]">
@@ -36,14 +37,13 @@
         hx-swap="beforeend"
       >
         <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-        Add
+        {% translate "Add" %}
       </button>
     </div>
   </li>
   {% empty %}
   <li class="text-center py-8 text-[var(--text--sub-600)] flex justify-center items-center gap-2">
-    {% comment %} <span data-icon="inbox-line" data-size="48" data-color="var(--icon--soft-400)" class="mx-auto block mb-2"></span> {% endcomment %}
-    <p>No materials found matching your criteria</p>
+    <p>{% translate "No materials found matching your criteria" %}</p>
   </li>
   {% endfor %}
 </ul>
@@ -58,12 +58,12 @@
             hx-swap="innerHTML"
             hx-include="#epd_filter_dimension, #epd_filter_mode">
       <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
-      Previous
+      {% translate "Previous" %}
     </button>
     {% else %}
     <button class="btn btn-ghost btn-sm" disabled>
       <span data-icon="arrow-left" data-size="16" data-color="var(--icon--soft-400)"></span>
-      Previous
+      {% translate "Previous" %}
     </button>
     {% endif %}
 
@@ -89,12 +89,12 @@
             hx-target="#structural_epd_list"
             hx-swap="innerHTML"
             hx-include="#epd_filter_dimension, #epd_filter_mode">
-      Next
+      {% translate "Next" %}
       <span data-icon="arrow-right" data-size="20" data-color="var(--icon--strong-950)"></span>
     </button>
     {% else %}
     <button class="btn btn-ghost btn-sm" disabled>
-      Next
+      {% translate "Next" %}
       <span data-icon="arrow-right" data-size="16" data-color="var(--icon--strong-950)"></span>
     </button>
     {% endif %}
