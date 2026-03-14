@@ -10,6 +10,7 @@ from cities_light.models import Country
 
 from pages.models import Building, CategorySubcategory
 from pages.models.base import ALCBTCountryManager
+from pages.models.climate_type import ClimateType
 from accounts.models import CustomCity, CustomRegion
 
 
@@ -68,6 +69,11 @@ class BuildingGeneralInformation(forms.ModelForm):
     )
     construction_year = forms.IntegerField(widget=YearInput(), required=False)
     # forms.DateField(input_formats="%y-%m-%d", widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    climate_zone = forms.ModelChoiceField(
+        queryset=ClimateType.objects.order_by("name"),
+        label=_("Climate"),
+        required=False,
+    )
 
     class Meta:
         model = Building

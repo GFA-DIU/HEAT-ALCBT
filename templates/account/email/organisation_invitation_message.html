@@ -1,0 +1,113 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>You've been added to an organisation - BEAT</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; line-height: 1.6; color: #333333; background-color: #f4f7fa; }
+        table { border-collapse: collapse; border-spacing: 0; }
+        .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: #81f28e; padding: 40px 30px; text-align: center; }
+        .content { padding: 40px 30px; }
+        .greeting { font-size: 20px; font-weight: 600; color: #0e121b; margin-bottom: 20px; }
+        .message { font-size: 16px; color: #4a5568; line-height: 1.8; margin-bottom: 20px; }
+        .role-badge { display: inline-block; padding: 6px 16px; background: #81f28e; color: #0e121b; border-radius: 20px; font-weight: 700; font-size: 14px; text-transform: capitalize; }
+        .detail-box { background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 24px 0; }
+        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-size: 15px; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #718096; font-weight: 500; }
+        .detail-value { color: #1a202c; font-weight: 600; }
+        .info-box { background-color: #fef5e7; border-left: 4px solid #f39c12; padding: 16px; margin: 30px 0; border-radius: 4px; }
+        .info-box p { margin: 0; font-size: 14px; color: #7d6608; }
+        .divider { height: 1px; background-color: #e2e8f0; margin: 30px 0; }
+        .footer { background-color: #f7fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0; }
+        .footer p { margin: 8px 0; font-size: 14px; color: #718096; }
+        @media only screen and (max-width: 600px) {
+            .email-container { width: 100% !important; }
+            .content { padding: 30px 20px !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f7fa;">
+    <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f4f7fa;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table role="presentation" class="email-container" style="width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: #81f28e; padding: 40px 30px; text-align: center;">
+                            <h1 style="color: #0e121b; font-size: 28px; font-weight: 700; margin: 0;">BEAT</h1>
+                            <p style="color: #0e121b; margin: 8px 0 0 0; font-size: 14px;">Building Life Cycle Assessment Tool</p>
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px 30px;">
+                            <p class="greeting" style="font-size: 20px; font-weight: 600; color: #0e121b; margin-bottom: 20px;">
+                                Hi {{ user_name }},
+                            </p>
+
+                            <p class="message" style="font-size: 16px; color: #4a5568; line-height: 1.8; margin-bottom: 20px;">
+                                You have been added to an organisation on <strong>BEAT</strong> by <strong>{{ added_by }}</strong>.
+                            </p>
+
+                            <!-- Detail box -->
+                            <table role="presentation" style="width: 100%; background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 4px; margin: 24px 0;">
+                                <tr>
+                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e2e8f0;">
+                                        <span style="color: #718096; font-size: 14px;">Organisation</span><br>
+                                        <strong style="color: #1a202c; font-size: 16px;">{{ organisation_name }}</strong>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 20px; border-bottom: 1px solid #e2e8f0;">
+                                        <span style="color: #718096; font-size: 14px;">Your Role</span><br>
+                                        <span style="display: inline-block; margin-top: 4px; padding: 4px 14px; background: #81f28e; color: #0e121b; border-radius: 20px; font-weight: 700; font-size: 13px; text-transform: capitalize;">{{ role }}</span>
+                                    </td>
+                                </tr>
+                                {% if industry %}
+                                <tr>
+                                    <td style="padding: 12px 20px;">
+                                        <span style="color: #718096; font-size: 14px;">Industry</span><br>
+                                        <strong style="color: #1a202c; font-size: 15px;">{{ industry }}</strong>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </table>
+
+                            {% if role == "admin" %}
+                            <div class="info-box" style="background-color: #fef5e7; border-left: 4px solid #f39c12; padding: 16px; margin: 24px 0; border-radius: 4px;">
+                                <p style="margin: 0; font-size: 14px; color: #7d6608;">
+                                    <strong>Admin access:</strong> You now have access to the BEAT Admin Tool where you can manage your organisation's buildings, users, and data.
+                                </p>
+                            </div>
+                            {% endif %}
+
+                            <div style="height: 1px; background-color: #e2e8f0; margin: 30px 0;"></div>
+
+                            <p style="font-size: 16px; color: #4a5568; line-height: 1.8;">
+                                Best regards,<br>
+                                <strong>The BEAT Team</strong>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f7fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+                            <p style="margin: 8px 0; font-size: 14px; color: #718096;">BEAT - Building Life Cycle Assessment Tool</p>
+                            <p style="margin: 8px 0; font-size: 13px; color: #a0aec0;">You received this email because you were added to an organisation on BEAT.</p>
+                            <p style="margin: 16px 0 8px 0; font-size: 12px; color: #cbd5e0;">© {{ current_year|default:"2026" }} BEAT. All rights reserved.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

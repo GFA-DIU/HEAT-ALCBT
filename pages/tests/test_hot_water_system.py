@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 from pages.models import Building, HotWaterSystem
-from pages.models.building import ClimateZone
+from pages.models.climate_type import ClimateType
 
 User = get_user_model()
 
@@ -22,9 +22,10 @@ def user(db):
 @pytest.fixture
 def building(db, user):
     """Create a test building."""
+    climate, _ = ClimateType.objects.get_or_create(name="tropical-wet")
     return Building.objects.create(
         name="Test Building",
-        climate_zone=ClimateZone.TROPICAL_WET,
+        climate_zone=climate,
         total_floor_area=1000.00,
         reference_period=50,
         created_by=user

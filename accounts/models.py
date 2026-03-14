@@ -35,9 +35,20 @@ class CustomRegion(Region):
 
 
 class UserProfile(models.Model):
+    class Role(models.TextChoices):
+        VIEWER = "viewer", "Viewer"
+        DATA_MANAGER = "data_manager", "Data Manager"
+        ADMIN = "admin", "Admin"
+        SUPERADMIN = "superadmin", "Superadmin"
+
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
+    )
+    role = models.CharField(
+        max_length=20,
+        choices=Role.choices,
+        default=Role.VIEWER,
     )
     country = models.ForeignKey(
         Country, on_delete=models.SET_NULL, null=True, blank=True
@@ -47,7 +58,7 @@ class UserProfile(models.Model):
     )
     city = models.ForeignKey(
         CustomCity, on_delete=models.SET_NULL, null=True, blank=True
-    )    
+    )
     consent_flag = models.BooleanField(
         default=True,
         verbose_name="Share with BEAT tool maintainers",
@@ -71,4 +82,13 @@ class UserProfile(models.Model):
 
 @receiver(post_save, sender=CustomUser)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
-    UserProfile.objects.get_or_create(user=instance)
+    profile, _ = UserProfile.objects.get_or_create(user=instance)
+    # Keep role in sync with Django's superuser/staff flags
+    if instance.is_superuser and profile.role != UserProfile.Role.SUPERADMIN:
+        profile.role = UserProfile.Role.SUPERADMIN
+        profile.save(update_fields=["role"])
+    elif instance.is_staff and not instance.is_superuser and profile.role not in (
+        UserProfile.Role.ADMIN, UserProfile.Role.SUPERADMIN
+    ):
+        profile.role = UserProfile.Role.ADMIN
+        profile.save(update_fields=["role"])
