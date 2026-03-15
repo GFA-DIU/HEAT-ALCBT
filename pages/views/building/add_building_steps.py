@@ -18,7 +18,8 @@ from cities_light.models import Country
 
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
-from pages.models.building import Building, BuildingAssembly, BuildingCategory, OperationalProduct,CategorySubcategory, ClimateZone
+from pages.models.building import Building, BuildingAssembly, BuildingCategory, OperationalProduct, CategorySubcategory, ClimateZone
+from pages.models.climate_type import ClimateType
 from pages.models.epd import EPD, EPDType, MaterialCategory
 from accounts.models import CustomCity, CustomRegion
 from pages.models.assembly import Assembly, StructuralProduct
@@ -149,7 +150,7 @@ def handle_details_step(request):
     context = {
         "building_categories": _get_building_categories_for_country(country_id),
         "apartment_types": [],
-        "climate_zones": [{"id": c[0], "name": c[1]} for c in ClimateZone.choices],
+        "climate_zones": [{"id": ct.name, "name": ct.name} for ct in ClimateType.objects.order_by("name")],
         "selected_building_type": None,
         "selected_apartment_type": None,
         "selected_climate_type": None,
@@ -193,7 +194,7 @@ def handle_details_step(request):
 
             # Pre-populate climate_type
             if building.climate_zone:
-                context["selected_climate_type"] = building.climate_zone
+                context["selected_climate_type"] = building.climate_zone.name
 
             if building.country_id:
                 context["country_id"] = building.country_id
@@ -246,7 +247,7 @@ def handle_cooling_system_step(request):
         try:
 
             building = Building.objects.get(uuid=uuid_lib.UUID(building_uuid), created_by=request.user)
-            climate_zone = building.climate_zone
+            climate_zone = building.climate_zone.name if building.climate_zone else ''
         except Exception:
             pass
     context = {
@@ -269,7 +270,7 @@ def handle_ventilation_system_step(request):
         try:
             building = Building.objects.get(uuid=uuid_lib.UUID(building_uuid), created_by=request.user)
             if building.climate_zone:
-                climate_zone = building.climate_zone
+                climate_zone = building.climate_zone.name
         except Exception:
             pass
     context = {
@@ -757,7 +758,7 @@ def get_building_data(request):
             # Step 1.2 fields (use form field names)
             'building_type': building_type_id,
             'apartment_type': apartment_type_id,
-            'climate_type': building.climate_zone,
+            'climate_type': building.climate_zone.name if building.climate_zone else '',
             'assessment_period': building.reference_period,
             'construction_year': building.construction_year,
             'total_floor_area': str(building.total_floor_area) if building.total_floor_area else '',

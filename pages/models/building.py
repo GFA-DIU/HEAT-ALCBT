@@ -325,13 +325,25 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
     category = models.ForeignKey(
         CategorySubcategory, on_delete=models.SET_NULL, null=True, blank=True
     )
+    organisation = models.ForeignKey(
+        "pages.Organisation",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="buildings",
+    )
     construction_year = models.IntegerField(
         _("Year of Construction"),
         null=True,
         blank=True,
     )
-    climate_zone = models.CharField(
-        _("Climate"), choices=ClimateZone.choices, max_length=50
+    climate_zone = models.ForeignKey(
+        "pages.ClimateType",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="buildings",
+        verbose_name=_("Climate"),
     )
     total_floor_area = models.DecimalField(
         _("Total floor area"),

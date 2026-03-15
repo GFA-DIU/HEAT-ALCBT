@@ -44,17 +44,18 @@ logger = logging.getLogger(__name__)
 # ALCBT-supported country codes (same as ALCBTCountryManager)
 ALCBT_COUNTRY_CODES = {"ID", "TH", "VN", "KH", "IN"}
 
-# Map Excel climate type display labels → ClimateZone values
+# Map Excel climate type display labels → canonical ClimateType names
+# Keys are normalised display labels; values are the ClimateType.name values
 CLIMATE_LABEL_MAP = {
-    "hot-dry": ClimateZone.HOT_DRY,
-    "hot dry": ClimateZone.HOT_DRY,
-    "warm-humid": ClimateZone.WARM_HUMID,
-    "warm humid": ClimateZone.WARM_HUMID,
-    "composite": ClimateZone.COMPOSITE,
-    "temperate": ClimateZone.TEMPERATE,
-    "cold": ClimateZone.COLD,
-    "tropical-wet": ClimateZone.TROPICAL_WET,
-    "tropical wet": ClimateZone.TROPICAL_WET,
+    "hot-dry": "hot-dry",
+    "hot dry": "hot-dry",
+    "warm-humid": "warm-humid",
+    "warm humid": "warm-humid",
+    "composite": "composite",
+    "temperate": "temperate",
+    "cold": "cold",
+    "tropical-wet": "tropical-wet",
+    "tropical wet": "tropical-wet",
 }
 
 
@@ -180,16 +181,25 @@ def _resolve_building_type(combined_name):
 
 def _resolve_climate(value):
     """
-    Map a climate display string to a ClimateZone value.
-    Returns (climate_zone_value, error_string).
+    Map a climate display string to a ClimateType instance.
+    Returns (climate_type_instance, error_string).
     """
+    from pages.models.climate_type import ClimateType
     value = _str(value)
     if not value:
         return None, "Area climate type is required."
 
-    zone = CLIMATE_LABEL_MAP.get(value.lower())
-    if zone:
-        return zone, None
+    name = CLIMATE_LABEL_MAP.get(value.lower())
+    if name:
+        try:
+            return ClimateType.objects.get(name=name), None
+        except ClimateType.DoesNotExist:
+            pass
+
+    # Fallback: try direct name match against DB (handles admin-added types)
+    ct = ClimateType.objects.filter(name__iexact=value).first()
+    if ct:
+        return ct, None
 
     valid = ", ".join(sorted(set(CLIMATE_LABEL_MAP.keys())))
     return None, (
@@ -2655,7 +2665,7 @@ def import_building_name_location(request):
             latitude=latitude,
             created_by=request.user,
             # Defaults — will be updated in Tab 2
-            climate_zone=ClimateZone.TROPICAL_WET,
+            climate_zone=None,
             total_floor_area=100,
             reference_period=50,
         )

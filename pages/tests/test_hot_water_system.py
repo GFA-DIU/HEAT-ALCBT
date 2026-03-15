@@ -2,29 +2,33 @@ import json
 import pytest
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from allauth.account.models import EmailAddress
 
 from pages.models import Building, HotWaterSystem
-from pages.models.building import ClimateZone
+from pages.models.climate_type import ClimateType
 
 User = get_user_model()
+
+
+def _make_verified_user(username, email, password="testpass123"):
+    u = User.objects.create_user(username=username, email=email, password=password)
+    EmailAddress.objects.create(user=u, email=email, verified=True, primary=True)
+    return u
 
 
 @pytest.fixture
 def user(db):
     """Create a test user."""
-    return User.objects.create_user(
-        username="testuser",
-        email="test@example.com",
-        password="testpass123"
-    )
+    return _make_verified_user("testuser", "test@example.com")
 
 
 @pytest.fixture
 def building(db, user):
     """Create a test building."""
+    climate, _ = ClimateType.objects.get_or_create(name="tropical-wet")
     return Building.objects.create(
         name="Test Building",
-        climate_zone=ClimateZone.TROPICAL_WET,
+        climate_zone=climate,
         total_floor_area=1000.00,
         reference_period=50,
         created_by=user
@@ -40,14 +44,12 @@ def hot_water_system_data():
         "operating_hours_per_day": 8.5,
         "operating_days_per_week": 5,
         "operating_weeks_per_year": 52,
-        "fuel_consumption": 343.50,
+        "total_fuel_consumption": 343.50,
         "power_input": 400.00,
         "baseline_efficiency": 0.85,
         "equipment_efficiency_level": 40.00,
         "heat_recovery_system": "yes",
         "number_of_equipment": 5,
-        "energy_efficiency_label": "bee",
-        "number_of_stars": 5
     }
 
 
@@ -60,14 +62,12 @@ def hot_water_system_model_data():
         "operating_hours_per_day": 8.5,
         "operating_days_per_week": 5,
         "operating_weeks_per_year": 52,
-        "fuel_consumption": 343.50,
+        "total_fuel_consumption": 343.50,
         "power_input": 400.00,
         "baseline_efficiency": 0.85,
         "equipment_efficiency_level": 40.00,
         "heat_recovery_system": True,
         "number_of_equipment": 5,
-        "energy_efficiency_label": "bee",
-        "number_of_stars": 5
     }
 
 
@@ -89,14 +89,12 @@ class TestHotWaterSystemModel:
         assert float(hws.operating_hours_per_day) == 8.5
         assert hws.operating_days_per_week == 5
         assert hws.operating_weeks_per_year == 52
-        assert float(hws.fuel_consumption) == 343.50
+        assert float(hws.total_fuel_consumption) == 343.50
         assert float(hws.power_input) == 400.00
         assert float(hws.baseline_efficiency) == 0.85
         assert float(hws.equipment_efficiency_level) == 40.00
         assert hws.heat_recovery_system is True
         assert hws.number_of_equipment == 5
-        assert hws.energy_efficiency_label == "bee"
-        assert hws.number_of_stars == 5
 
     def test_hot_water_system_str(self, building, hot_water_system_model_data):
         """Test __str__ method."""
@@ -116,7 +114,7 @@ class TestHotWaterSystemModel:
             operating_hours_per_day=8,
             operating_days_per_week=5,
             operating_weeks_per_year=52,
-            fuel_consumption=100,
+            total_fuel_consumption=100,
             power_input=200,
             baseline_efficiency=0.85,
             equipment_efficiency_level=40,
@@ -131,7 +129,7 @@ class TestHotWaterSystemModel:
             operating_hours_per_day=10,
             operating_days_per_week=7,
             operating_weeks_per_year=52,
-            fuel_consumption=200,
+            total_fuel_consumption=200,
             power_input=300,
             baseline_efficiency=0.75,
             equipment_efficiency_level=35,
@@ -155,7 +153,7 @@ class TestHotWaterSystemModel:
             operating_hours_per_day=5,
             operating_days_per_week=3,
             operating_weeks_per_year=48,
-            fuel_consumption=150,
+            total_fuel_consumption=150,
             power_input=250,
             baseline_efficiency=0.70,
             equipment_efficiency_level=30,
@@ -179,7 +177,7 @@ class TestHotWaterSystemViews:
         client.force_login(user)
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             **hot_water_system_data
         }
 
@@ -212,14 +210,14 @@ class TestHotWaterSystemViews:
         assert response.status_code == 400
         data = response.json()
         assert data["success"] is False
-        assert "building_id" in data["errors"]
+        assert "building_uuid" in data["errors"]
 
     def test_create_hot_water_system_invalid_building_id(self, client, user, hot_water_system_data):
         """Test creation fails when building doesn't exist."""
         client.force_login(user)
 
         payload = {
-            "building_id": "00000000-0000-0000-0000-000000000000",
+            "building_uuid": "00000000-0000-0000-0000-000000000000",
             **hot_water_system_data
         }
 
@@ -238,7 +236,7 @@ class TestHotWaterSystemViews:
         client.force_login(user)
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             "type_of_hot_water_system": "heat-pump"
             # Missing other required fields
         }
@@ -260,7 +258,7 @@ class TestHotWaterSystemViews:
 
         hot_water_system_data["operating_hours_per_day"] = 25  # Invalid: > 24
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             **hot_water_system_data
         }
 
@@ -287,7 +285,7 @@ class TestHotWaterSystemViews:
         updated_data["number_of_equipment"] = 10
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             "hot_water_system_id": hws.id,
             **updated_data
         }
@@ -322,7 +320,7 @@ class TestHotWaterSystemViews:
             operating_hours_per_day=6,
             operating_days_per_week=4,
             operating_weeks_per_year=50,
-            fuel_consumption=200,
+            total_fuel_consumption=200,
             power_input=300,
             baseline_efficiency=0.70,
             equipment_efficiency_level=30,
@@ -331,7 +329,7 @@ class TestHotWaterSystemViews:
         )
 
         response = client.get(
-            reverse("hot_water_system_list", kwargs={"building_id": building.id})
+            reverse("hot_water_system_list", kwargs={"building_uuid": building.uuid})
         )
 
         assert response.status_code == 200
@@ -345,7 +343,7 @@ class TestHotWaterSystemViews:
         client.force_login(user)
 
         response = client.get(
-            reverse("hot_water_system_list", kwargs={"building_id": building.id})
+            reverse("hot_water_system_list", kwargs={"building_uuid": building.uuid})
         )
 
         assert response.status_code == 200
@@ -386,7 +384,7 @@ class TestHotWaterSystemViews:
         """Test that unauthenticated users cannot access endpoints."""
         # Try to create without login
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             **hot_water_system_data
         }
 
@@ -401,16 +399,12 @@ class TestHotWaterSystemViews:
     def test_user_cannot_modify_other_users_building(self, client, building, hot_water_system_data):
         """Test that users cannot modify hot water systems for buildings they don't own."""
         # Create another user
-        other_user = User.objects.create_user(
-            username="otheruser",
-            email="other@example.com",
-            password="otherpass123"
-        )
+        other_user = _make_verified_user("otheruser", "other@example.com", "otherpass123")
 
         client.force_login(other_user)
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             **hot_water_system_data
         }
 
@@ -460,113 +454,63 @@ class TestHotWaterSystemForm:
         assert form.is_valid()
         assert form.cleaned_data["heat_recovery_system"] is False
 
-    def test_form_validation_energy_label_requires_stars(self, hot_water_system_data):
-        """Test that providing energy label without stars produces validation error."""
+    def test_form_valid_without_optional_fuel_consumption(self, hot_water_system_data):
+        """Test that form is valid without optional total_fuel_consumption field."""
         from pages.forms.hot_water_system_form import HotWaterSystemForm
 
-        hot_water_system_data["energy_efficiency_label"] = "bee"
-        hot_water_system_data["number_of_stars"] = None
+        hot_water_system_data.pop("total_fuel_consumption", None)
 
         form = HotWaterSystemForm(data=hot_water_system_data)
-        assert not form.is_valid()
-        assert "number_of_stars" in form.errors
+        assert form.is_valid()
 
 
 @pytest.mark.django_db
 class TestBuildingSetupIntegration:
     """Test integration of HWS with building setup flow."""
 
-    def test_complete_building_setup_creates_hot_water_systems(self, client, user, building, hot_water_system_data):
-        """Test that completing building setup creates HWS records from session data."""
+    def test_complete_building_setup_success(self, client, user, building, hot_water_system_model_data):
+        """Test completing building setup after HWS records exist."""
         client.force_login(user)
 
-        # Simulate the frontend saving HWS data to session
-        session = client.session
-        session["building_id"] = str(building.id)
-        session["building_form_data"] = {
-            "operational-details/hot-water-system": [
-                hot_water_system_data,
-                {
-                    "type_of_hot_water_system": "boiler",
-                    "fuel_type": "diesel",
-                    "operating_hours_per_day": 10.0,
-                    "operating_days_per_week": 7,
-                    "operating_weeks_per_year": 52,
-                    "fuel_consumption": 500.0,
-                    "power_input": 600.0,
-                    "baseline_efficiency": 0.75,
-                    "equipment_efficiency_level": 35.0,
-                    "heat_recovery_system": "no",
-                    "number_of_equipment": 2,
-                }
-            ]
-        }
-        session.save()
+        # Pre-create HWS records (as the API would have done during setup)
+        HotWaterSystem.objects.create(building=building, **hot_water_system_model_data)
+        assert HotWaterSystem.objects.filter(building=building).count() == 1
 
-        # Complete the building setup
-        response = client.post(reverse("complete_building_setup"))
+        # Complete the building setup by posting the building UUID
+        response = client.post(
+            reverse("complete_building_setup"),
+            data=json.dumps({"building_uuid": str(building.uuid)}),
+            content_type="application/json"
+        )
 
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
 
-        # Verify HWS records were created
-        assert HotWaterSystem.objects.filter(building=building).count() == 2
-
-        # Verify session was cleared
-        assert "building_form_data" not in client.session
-
-    def test_complete_building_setup_validates_hws_data(self, client, user, building):
-        """Test that invalid HWS data returns validation errors."""
+    def test_complete_building_setup_invalid_uuid(self, client, user):
+        """Test that setup fails with an invalid/missing building UUID."""
         client.force_login(user)
 
-        # Set up session with invalid HWS data
-        session = client.session
-        session["building_id"] = str(building.id)
-        session["building_form_data"] = {
-            "operational-details/hot-water-system": [
-                {
-                    "type_of_hot_water_system": "heat-pump",
-                    "fuel_type": "electricity",
-                    "operating_hours_per_day": 30,  # Invalid: > 24
-                    "operating_days_per_week": 5,
-                    "operating_weeks_per_year": 52,
-                    "fuel_consumption": 100.0,
-                    "power_input": 200.0,
-                    "baseline_efficiency": 0.85,
-                    "equipment_efficiency_level": 40.0,
-                    "heat_recovery_system": "yes",
-                    "number_of_equipment": 1,
-                }
-            ]
-        }
-        session.save()
-
-        # Attempt to complete building setup
-        response = client.post(reverse("complete_building_setup"))
+        response = client.post(
+            reverse("complete_building_setup"),
+            data=json.dumps({}),
+            content_type="application/json"
+        )
 
         assert response.status_code == 400
         data = response.json()
         assert data["success"] is False
-        assert "errors" in data
 
-        # Verify no HWS records were created
-        assert HotWaterSystem.objects.filter(building=building).count() == 0
-
-    def test_complete_building_setup_without_building_id(self, client, user):
-        """Test that setup fails if no building_id in session."""
+    def test_complete_building_setup_without_building_uuid(self, client, user):
+        """Test that setup fails if no building_uuid is provided."""
         client.force_login(user)
 
-        # Set up session without building_id
-        session = client.session
-        session["building_form_data"] = {
-            "operational-details/hot-water-system": []
-        }
-        session.save()
+        response = client.post(
+            reverse("complete_building_setup"),
+            data=json.dumps({"building_uuid": "00000000-0000-0000-0000-000000000000"}),
+            content_type="application/json"
+        )
 
-        response = client.post(reverse("complete_building_setup"))
-
-        assert response.status_code == 400
+        assert response.status_code == 404
         data = response.json()
         assert data["success"] is False
-        assert "must be created before" in data["error"].lower()
