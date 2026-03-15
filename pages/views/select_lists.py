@@ -203,10 +203,10 @@ def select_lists(request):
         )
 
     
-    # Climate and System Choices (TextChoices)
+    # Climate and System Choices
     elif request.GET.get("climate_zones"):
-        # Convert TextChoices to objects with id and name for template compatibility
-        items = [{"id": choice[0], "name": choice[1]} for choice in ClimateZone.choices]
+        from pages.models.climate_type import ClimateType
+        items = [{"id": ct.name, "name": ct.name} for ct in ClimateType.objects.order_by("name")]
         return render(
             request,
             "pages/utils/select_list.html",

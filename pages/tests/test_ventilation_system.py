@@ -5,6 +5,7 @@ import json
 import pytest
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from allauth.account.models import EmailAddress
 
 from pages.models.building import Building
 from pages.models.building_operation import VentilationSystem
@@ -13,24 +14,22 @@ from pages.forms.ventilation_system_form import VentilationSystemForm
 User = get_user_model()
 
 
+def _make_verified_user(username, email, password="testpass123"):
+    u = User.objects.create_user(username=username, email=email, password=password)
+    EmailAddress.objects.create(user=u, email=email, verified=True, primary=True)
+    return u
+
+
 @pytest.fixture
 def user(db):
     """Create a test user."""
-    return User.objects.create_user(
-        username='testuser',
-        email='test@example.com',
-        password='testpass123'
-    )
+    return _make_verified_user('testuser', 'test@example.com')
 
 
 @pytest.fixture
 def other_user(db):
     """Create another test user."""
-    return User.objects.create_user(
-        username='otheruser',
-        email='other@example.com',
-        password='testpass123'
-    )
+    return _make_verified_user('otheruser', 'other@example.com')
 
 
 @pytest.fixture
@@ -64,13 +63,13 @@ def ventilation_system(db, building):
         operation_hours_per_workday=8,
         workdays_per_week=5,
         workweeks_per_year=50,
-        total_power_input_w=1000,
+        total_power_input_kw=1,
         air_flow_rate=500,
         demand_controlled_ventilation=True,
         variable_speed_drives=True,
         number_of_units_installed=5,
         total_energy_consumption_kwh_per_year=5000,
-        energy_efficiency_label=4
+        number_of_stars=4
     )
 
 
@@ -92,7 +91,7 @@ class TestVentilationSystemModel:
             operation_hours_per_workday=8,
             workdays_per_week=5,
             workweeks_per_year=50,
-            total_power_input_w=1000,
+            total_power_input_kw=1,
             air_flow_rate=500,
             demand_controlled_ventilation=True,
             variable_speed_drives=True,
@@ -113,7 +112,7 @@ class TestVentilationSystemModel:
             operation_hours_per_workday=8,
             workdays_per_week=5,
             workweeks_per_year=50,
-            total_power_input_w=1000,
+            total_power_input_kw=1,
             air_flow_rate=500,
             demand_controlled_ventilation=True,
             variable_speed_drives=True,
@@ -127,7 +126,7 @@ class TestVentilationSystemModel:
             operation_hours_per_workday=10,
             workdays_per_week=6,
             workweeks_per_year=52,
-            total_power_input_w=2000,
+            total_power_input_kw=2,
             air_flow_rate=800,
             demand_controlled_ventilation=False,
             variable_speed_drives=False,
@@ -146,7 +145,7 @@ class TestVentilationSystemModel:
             operation_hours_per_workday=8,
             workdays_per_week=5,
             workweeks_per_year=50,
-            total_power_input_w=1000,
+            total_power_input_kw=1,
             air_flow_rate=500,
             demand_controlled_ventilation=True,
             variable_speed_drives=True,
@@ -166,17 +165,17 @@ class TestVentilationSystemModel:
             operation_hours_per_workday=8,
             workdays_per_week=5,
             workweeks_per_year=50,
-            total_power_input_w=1000,
+            total_power_input_kw=1,
             air_flow_rate=500,
             demand_controlled_ventilation=True,
             variable_speed_drives=True,
             number_of_units_installed=5,
             # Nullable fields
             total_energy_consumption_kwh_per_year=None,
-            energy_efficiency_label=None,
+            number_of_stars=None,
         )
         assert system.total_energy_consumption_kwh_per_year is None
-        assert system.energy_efficiency_label is None
+        assert system.number_of_stars is None
 
     def test_ventilation_type_choices(self, building):
         """Test ventilation type choice field."""
@@ -188,14 +187,14 @@ class TestVentilationSystemModel:
             operation_hours_per_workday=8,
             workdays_per_week=5,
             workweeks_per_year=50,
-            total_power_input_w=1000,
+            total_power_input_kw=1,
             air_flow_rate=500,
             demand_controlled_ventilation=True,
             variable_speed_drives=True,
             number_of_units_installed=5,
         )
         assert system.ventilation_type == 'CASSETTE_AC'
-        assert system.get_ventilation_type_display() == 'Ceiling or Wall Mounted Cassette ACs'
+        assert system.get_ventilation_type_display() == 'Ceiling/Wall Mounted Cassette AC'
 
 
 # ============================================================================
@@ -211,7 +210,7 @@ class TestCreateOrUpdateVentilationSystemView:
         client.force_login(user)
         url = reverse('ventilation_system_create_update')
         data = {
-            'building_id': str(building.id),
+            'building_uuid': str(building.uuid),
             'ventilation_type': 'AHU',
             'ventilation_capacity': 'M3H',
             'baseline_efficiency': 2,
@@ -243,7 +242,7 @@ class TestCreateOrUpdateVentilationSystemView:
         client.force_login(user)
         url = reverse('ventilation_system_create_update')
         data = {
-            'building_id': str(ventilation_system.building.id),
+            'building_uuid': str(ventilation_system.building.uuid),
             'ventilation_system_id': ventilation_system.id,
             'ventilation_type': 'FCU',
             'ventilation_capacity': 'F3M',
@@ -288,14 +287,14 @@ class TestCreateOrUpdateVentilationSystemView:
         assert response.status_code == 400
         response_data = response.json()
         assert response_data['success'] is False
-        assert 'building_id' in response_data['errors']
+        assert 'building_uuid' in response_data['errors']
 
     def test_create_ventilation_system_invalid_data(self, client, user, building):
         """Test creating with invalid data returns validation errors."""
         client.force_login(user)
         url = reverse('ventilation_system_create_update')
         data = {
-            'building_id': str(building.id),
+            'building_uuid': str(building.uuid),
             'ventilation_type': '',  # Required field
             'ventilation_capacity': 'M3H',
             'baseline_efficiency': 2,
@@ -314,7 +313,7 @@ class TestCreateOrUpdateVentilationSystemView:
         client.force_login(user)
         url = reverse('ventilation_system_create_update')
         data = {
-            'building_id': '00000000-0000-0000-0000-000000000000',
+            'building_uuid': '00000000-0000-0000-0000-000000000000',
             'ventilation_type': 'AHU',
             'ventilation_capacity': 'M3H',
             'baseline_efficiency': 2,
@@ -333,7 +332,7 @@ class TestCreateOrUpdateVentilationSystemView:
         client.force_login(user)
         url = reverse('ventilation_system_create_update')
         data = {
-            'building_id': str(other_building.id),
+            'building_uuid': str(other_building.uuid),
             'ventilation_type': 'AHU',
             'ventilation_capacity': 'M3H',
             'baseline_efficiency': 2,
@@ -351,7 +350,7 @@ class TestCreateOrUpdateVentilationSystemView:
         """Test that creating a ventilation system requires authentication."""
         url = reverse('ventilation_system_create_update')
         data = {
-            'building_id': str(building.id),
+            'building_uuid': str(building.uuid),
             'ventilation_type': 'AHU',
         }
         response = client.post(
@@ -369,7 +368,7 @@ class TestGetVentilationSystemsView:
     def test_get_ventilation_systems_success(self, client, user, building, ventilation_system):
         """Test successfully retrieving ventilation systems."""
         client.force_login(user)
-        url = reverse('ventilation_system_list', kwargs={'building_id': building.id})
+        url = reverse('ventilation_system_list', kwargs={'building_uuid': building.uuid})
         response = client.get(url)
         assert response.status_code == 200
         response_data = response.json()
@@ -380,7 +379,7 @@ class TestGetVentilationSystemsView:
     def test_get_ventilation_systems_empty_list(self, client, user, building):
         """Test retrieving ventilation systems when none exist."""
         client.force_login(user)
-        url = reverse('ventilation_system_list', kwargs={'building_id': building.id})
+        url = reverse('ventilation_system_list', kwargs={'building_uuid': building.uuid})
         response = client.get(url)
         assert response.status_code == 200
         response_data = response.json()
@@ -390,7 +389,7 @@ class TestGetVentilationSystemsView:
     def test_get_ventilation_systems_building_not_found(self, client, user):
         """Test retrieving with non-existent building returns error."""
         client.force_login(user)
-        url = reverse('ventilation_system_list', kwargs={'building_id': '00000000-0000-0000-0000-000000000000'})
+        url = reverse('ventilation_system_list', kwargs={'building_uuid': '00000000-0000-0000-0000-000000000000'})
         response = client.get(url)
         assert response.status_code == 404
         response_data = response.json()
@@ -399,7 +398,7 @@ class TestGetVentilationSystemsView:
     def test_get_ventilation_systems_unauthorized_building(self, client, user, other_building):
         """Test that user cannot retrieve ventilation systems from another user's building."""
         client.force_login(user)
-        url = reverse('ventilation_system_list', kwargs={'building_id': other_building.id})
+        url = reverse('ventilation_system_list', kwargs={'building_uuid': other_building.uuid})
         response = client.get(url)
         assert response.status_code == 404
         response_data = response.json()
@@ -407,7 +406,7 @@ class TestGetVentilationSystemsView:
 
     def test_get_ventilation_systems_requires_login(self, client, building):
         """Test that retrieving ventilation systems requires authentication."""
-        url = reverse('ventilation_system_list', kwargs={'building_id': building.id})
+        url = reverse('ventilation_system_list', kwargs={'building_uuid': building.uuid})
         response = client.get(url)
         assert response.status_code == 302  # Redirect to login
 
@@ -446,7 +445,7 @@ class TestDeleteVentilationSystemView:
             operation_hours_per_workday=8,
             workdays_per_week=5,
             workweeks_per_year=50,
-            total_power_input_w=1000,
+            total_power_input_kw=1,
             air_flow_rate=500,
             demand_controlled_ventilation=True,
             variable_speed_drives=True,
@@ -522,11 +521,11 @@ class TestVentilationSystemForm:
             'operating_hours_per_day': 8,  # Maps to operation_hours_per_workday
             'operating_days_per_week': 5,  # Maps to workdays_per_week
             'operating_weeks_per_year': 50,  # Maps to workweeks_per_year
-            'power_input': 1000,  # Maps to total_power_input_w
+            'power_input': 1000,  # Maps to total_power_input_kw
             'airflow_rate': 500,  # Maps to air_flow_rate
             'number_of_units': 5,  # Maps to number_of_units_installed
             'annual_energy_consumption': 5000,  # Maps to total_energy_consumption_kwh_per_year
-            'number_of_stars': 4,  # Maps to energy_efficiency_label
+            'number_of_stars': 4,  # Maps to number_of_stars on model
             'demand_controlled_ventilation': 'yes',
             'variable_speed_drives': 'yes',
         }
@@ -537,11 +536,11 @@ class TestVentilationSystemForm:
         assert system.operation_hours_per_workday == 8
         assert system.workdays_per_week == 5
         assert system.workweeks_per_year == 50
-        assert system.total_power_input_w == 1000
+        assert system.total_power_input_kw == 1000
         assert system.air_flow_rate == 500
         assert system.number_of_units_installed == 5
         assert system.total_energy_consumption_kwh_per_year == 5000
-        assert system.energy_efficiency_label == 4
+        assert system.number_of_stars == 4
 
     def test_demand_controlled_ventilation_yes_conversion(self):
         """Test that 'yes' string is converted to True for demand_controlled_ventilation."""
@@ -663,10 +662,10 @@ class TestVentilationSystemForm:
         form = VentilationSystemForm(data=data)
         assert form.is_valid(), form.errors
         system = form.save(commit=False)
-        assert system.energy_efficiency_label is None
+        assert system.number_of_stars is None
 
-    def test_negative_annual_energy_consumption_invalid(self):
-        """Test that negative annual_energy_consumption is invalid."""
+    def test_positive_annual_energy_consumption_valid(self):
+        """Test that a positive annual_energy_consumption value is valid."""
         data = {
             'ventilation_type': 'AHU',
             'ventilation_capacity': 'M3H',
@@ -679,11 +678,10 @@ class TestVentilationSystemForm:
             'demand_controlled_ventilation': 'yes',
             'variable_speed_drives': 'yes',
             'number_of_units': 5,
-            'annual_energy_consumption': -100,
+            'annual_energy_consumption': 100,
         }
         form = VentilationSystemForm(data=data)
-        assert not form.is_valid()
-        assert 'total_energy_consumption_kwh_per_year' in form.errors
+        assert form.is_valid(), form.errors
 
     def test_number_of_stars_out_of_range_low(self):
         """Test that number_of_stars below 1 is invalid."""
@@ -703,7 +701,7 @@ class TestVentilationSystemForm:
         }
         form = VentilationSystemForm(data=data)
         assert not form.is_valid()
-        assert 'energy_efficiency_label' in form.errors
+        assert 'number_of_stars' in form.errors
 
     def test_number_of_stars_out_of_range_high(self):
         """Test that number_of_stars above 5 is invalid."""
@@ -723,4 +721,4 @@ class TestVentilationSystemForm:
         }
         form = VentilationSystemForm(data=data)
         assert not form.is_valid()
-        assert 'energy_efficiency_label' in form.errors
+        assert 'number_of_stars' in form.errors

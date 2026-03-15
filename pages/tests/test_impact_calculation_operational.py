@@ -5,7 +5,8 @@ import pytest
 from pages.tests.test_impact_calculation import create_epd
 
 from pages.models.epd import EPDImpact, Impact, ImpactCategoryKey, LifeCycleStage, Unit
-from pages.models.building import OperationalProduct, Building, ClimateZone
+from pages.models.building import OperationalProduct, Building
+from pages.models.climate_type import ClimateType
 
 from pages.views.building.impact_calculation import calculate_impact_operational
 
@@ -36,9 +37,10 @@ def create_epd_impact():
 @pytest.fixture
 def create_building():
     def _create_building():
+        climate, _ = ClimateType.objects.get_or_create(name="cold")
         return Building.objects.create(
             name="Test Building",
-            climate_zone=ClimateZone.COLD,
+            climate_zone=climate,
             total_floor_area=1,
         )
 

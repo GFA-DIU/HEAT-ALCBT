@@ -16,7 +16,7 @@ urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),  # Language switching
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),  # JavaScript i18n
     path("", include("pages.urls")),
-
+    path("api/", include("api.urls")),
 
     # IMPORTANT that the redirect path is at the end of the urlpatterns.
     # The regex r"^.*$" will match any string and therefore, if this pattern is added at the beginning of the urlpatterns array, the app will not reach any other url as it would always match this pattern first.

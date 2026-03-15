@@ -2,29 +2,33 @@ import json
 import pytest
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from allauth.account.models import EmailAddress
 
 from pages.models import Building, LightingSystem
-from pages.models.building import ClimateZone
+from pages.models.climate_type import ClimateType
 
 User = get_user_model()
+
+
+def _make_verified_user(username, email, password="testpass123"):
+    u = User.objects.create_user(username=username, email=email, password=password)
+    EmailAddress.objects.create(user=u, email=email, verified=True, primary=True)
+    return u
 
 
 @pytest.fixture
 def user(db):
     """Create a test user."""
-    return User.objects.create_user(
-        username="testuser",
-        email="test@example.com",
-        password="testpass123"
-    )
+    return _make_verified_user("testuser", "test@example.com")
 
 
 @pytest.fixture
 def building(db, user):
     """Create a test building."""
+    climate, _ = ClimateType.objects.get_or_create(name="tropical-wet")
     return Building.objects.create(
         name="Test Building",
-        climate_zone=ClimateZone.TROPICAL_WET,
+        climate_zone=climate,
         total_floor_area=1000.00,
         reference_period=50,
         created_by=user
@@ -37,7 +41,7 @@ def lighting_system_data():
     return {
         "room_type": "OFFICE_CONFERENCE",
         "area_of_room": 50,
-        "lighting_type": "LED",
+        "lighting_type": "LED_PANEL",
         "number_of_bulbs": 10,
         "operating_hours_per_day": 8,
         "operating_days_per_week": 5,
@@ -56,7 +60,7 @@ def lighting_system_model_data():
     return {
         "room_type": "OFFICE_CONFERENCE",
         "area_of_room": 50,
-        "lighting_bulb_type": "LED",
+        "lighting_bulb_type": "LED_PANEL",
         "number_of_bulbs": 10,
         "operation_hours_per_workday": 8,
         "workdays_per_week": 5,
@@ -65,7 +69,8 @@ def lighting_system_model_data():
         "baseline_lighting_power_density": 10,
         "sensors_installed": True,
         "total_energy_consumption_kwh_per_year": 3120,
-        "energy_efficiency_label": 4
+        "energy_efficiency_label": "BEE",
+        "number_of_stars": 4
     }
 
 
@@ -84,7 +89,7 @@ class TestLightingSystemModel:
         assert ls.building == building
         assert ls.room_type == "OFFICE_CONFERENCE"
         assert ls.area_of_room == 50
-        assert ls.lighting_bulb_type == "LED"
+        assert ls.lighting_bulb_type == "LED_PANEL"
         assert ls.number_of_bulbs == 10
         assert ls.sensors_installed is True
 
@@ -94,7 +99,7 @@ class TestLightingSystemModel:
             building=building,
             room_type="OFFICE_CONFERENCE",
             area_of_room=50,
-            lighting_bulb_type="LED",
+            lighting_bulb_type="LED_PANEL",
             number_of_bulbs=10,
             operation_hours_per_workday=8,
             workdays_per_week=5,
@@ -150,7 +155,7 @@ class TestLightingSystemModel:
             building=building,
             room_type="OFFICE_CONFERENCE",
             area_of_room=50,
-            lighting_bulb_type="LED",
+            lighting_bulb_type="LED_PANEL",
             number_of_bulbs=10,
             operation_hours_per_workday=8,
             workdays_per_week=5,
@@ -176,7 +181,7 @@ class TestLightingSystemViews:
         client.force_login(user)
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             **lighting_system_data
         }
 
@@ -209,14 +214,14 @@ class TestLightingSystemViews:
         assert response.status_code == 400
         data = response.json()
         assert data["success"] is False
-        assert "building_id" in data["errors"]
+        assert "building_uuid" in data["errors"]
 
     def test_create_lighting_system_invalid_building_id(self, client, user, lighting_system_data):
         """Test creation fails when building doesn't exist."""
         client.force_login(user)
 
         payload = {
-            "building_id": "00000000-0000-0000-0000-000000000000",
+            "building_uuid": "00000000-0000-0000-0000-000000000000",
             **lighting_system_data
         }
 
@@ -235,7 +240,7 @@ class TestLightingSystemViews:
         client.force_login(user)
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             # Missing all required fields
         }
 
@@ -263,7 +268,7 @@ class TestLightingSystemViews:
         updated_data["installation_of_sensors"] = "no"
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             "lighting_system_id": ls.id,
             **updated_data
         }
@@ -305,7 +310,7 @@ class TestLightingSystemViews:
         )
 
         response = client.get(
-            reverse("lighting_system_list", kwargs={"building_id": building.id})
+            reverse("lighting_system_list", kwargs={"building_uuid": building.uuid})
         )
 
         assert response.status_code == 200
@@ -319,7 +324,7 @@ class TestLightingSystemViews:
         client.force_login(user)
 
         response = client.get(
-            reverse("lighting_system_list", kwargs={"building_id": building.id})
+            reverse("lighting_system_list", kwargs={"building_uuid": building.uuid})
         )
 
         assert response.status_code == 200
@@ -360,7 +365,7 @@ class TestLightingSystemViews:
         """Test that unauthenticated users cannot access endpoints."""
         # Try to create without login
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             **lighting_system_data
         }
 
@@ -375,16 +380,12 @@ class TestLightingSystemViews:
     def test_user_cannot_modify_other_users_building(self, client, building, lighting_system_data):
         """Test that users cannot modify lighting systems for buildings they don't own."""
         # Create another user
-        other_user = User.objects.create_user(
-            username="otheruser",
-            email="other@example.com",
-            password="otherpass123"
-        )
+        other_user = _make_verified_user("otheruser", "other@example.com", "otherpass123")
 
         client.force_login(other_user)
 
         payload = {
-            "building_id": str(building.id),
+            "building_uuid": str(building.uuid),
             **lighting_system_data
         }
 
@@ -443,7 +444,7 @@ class TestLightingSystemForm:
         data = {
             "room_type": "OFFICE_CONFERENCE",
             "area_of_room": 50,
-            "lighting_type": "LED",  # Frontend field name
+            "lighting_type": "LED_PANEL",  # Frontend field name
             "number_of_bulbs": 10,
             "operating_hours_per_day": 8,  # Frontend field name
             "operating_days_per_week": 5,  # Frontend field name
@@ -454,7 +455,7 @@ class TestLightingSystemForm:
 
         form = LightingSystemForm(data=data)
         assert form.is_valid()
-        assert form.cleaned_data["lighting_bulb_type"] == "LED"
+        assert form.cleaned_data["lighting_bulb_type"] == "LED_PANEL"  # mapped from lighting_type
         assert form.cleaned_data["operation_hours_per_workday"] == 8
         assert form.cleaned_data["workdays_per_week"] == 5
         assert form.cleaned_data["workweeks_per_year"] == 52
@@ -468,7 +469,7 @@ class TestLightingSystemForm:
         data = {
             "room_type": "OFFICE_CONFERENCE",
             "area_of_room": 50,
-            "lighting_type": "LED",
+            "lighting_type": "LED_PANEL",
             "number_of_bulbs": 10,
             "operating_hours_per_day": 8,
             "operating_days_per_week": 5,
@@ -493,7 +494,7 @@ class TestLightingSystemForm:
         data = {
             "room_type": "OFFICE_CONFERENCE",
             "area_of_room": 50,
-            "lighting_type": "LED",
+            "lighting_type": "LED_PANEL",
             "number_of_bulbs": 10,
             "operating_hours_per_day": 8,
             "operating_days_per_week": 5,
@@ -514,7 +515,7 @@ class TestLightingSystemForm:
         data = {
             "room_type": "OFFICE_CONFERENCE",
             "area_of_room": 50,
-            "lighting_type": "LED",
+            "lighting_type": "LED_PANEL",
             "number_of_bulbs": 10,
             "operating_hours_per_day": 8,
             "operating_days_per_week": 5,
@@ -526,4 +527,4 @@ class TestLightingSystemForm:
 
         form = LightingSystemForm(data=data)
         assert not form.is_valid()
-        assert "energy_efficiency_label" in form.errors
+        assert "number_of_stars" in form.errors

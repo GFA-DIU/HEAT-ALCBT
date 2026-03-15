@@ -1,5 +1,6 @@
 import os
 import secrets
+from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -80,10 +81,14 @@ INSTALLED_APPS = [
     "encrypted_json_fields",
     "cookie_consent",
     "newrelic.extras.framework_django",
+    # DRF
+    "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",
     # Local
     "accounts",
     "pages",
     "cookie_management",
+    "api",
 ]
 
 
@@ -167,6 +172,11 @@ else:
             "PASSWORD": "postgres",
             "HOST": "localhost",  # set in docker-compose.yml
             "PORT": 5432,  # default postgres port
+            "TEST": {
+                # Don't serialize the live DB into JSON before creating the test
+                # DB — avoids errors when live DB schema differs from ORM state.
+                "SERIALIZE": False,
+            },
         }
     }
 
@@ -359,6 +369,25 @@ CITIES_LIGHT_INCLUDE_CITY_TYPES = [
 
 
 
+## Django REST Framework
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+
 ## Honeybadger
 # https://docs.honeybadger.io/lib/python/#django
 HONEYBADGER = {
@@ -440,3 +469,22 @@ else:
             },
         },
     }
+
+# Django REST Framework
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+}
+
+# Simple JWT
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
