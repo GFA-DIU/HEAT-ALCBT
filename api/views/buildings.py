@@ -66,9 +66,7 @@ def _buildings_queryset(request):
         "created_by", "organisation", "climate_zone",
     )
 
-    if request.user.is_superuser:
-        qs = qs.filter(organisation__isnull=False)
-    else:
+    if not request.user.is_superuser:
         orgs = Organisation.objects.filter(memberships__user=request.user)
         qs = qs.filter(organisation__in=orgs)
 
@@ -585,7 +583,14 @@ class BuildingCompleteView(APIView):
 
 
 def _get_building_or_error(request, building_uuid_str):
-    """Helper: resolve building UUID and return (building, error_response)."""
+    """
+    Helper: resolve building UUID and return (building, error_response).
+
+    Access rules:
+    - Superadmin: any building
+    - Regular admin: buildings in their orgs OR buildings they created (draft,
+      no org yet — e.g. mid add-building flow)
+    """
     if not building_uuid_str:
         return None, Response(
             {"success": False, "errors": {"__all__": ["building_uuid is required."]}},
@@ -593,9 +598,33 @@ def _get_building_or_error(request, building_uuid_str):
         )
     try:
         uuid_obj = uuid_lib.UUID(building_uuid_str)
-        building = _buildings_queryset(request).get(uuid=uuid_obj)
+    except ValueError:
+        return None, Response(
+            {"success": False, "errors": {"__all__": ["Invalid building UUID."]}},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if request.user.is_superuser:
+        qs = Building.objects.select_related(
+            "country", "city", "region",
+            "category__category", "category__subcategory",
+            "created_by", "organisation", "climate_zone",
+        )
+    else:
+        from pages.models.organisation import Organisation as Org
+        orgs = Org.objects.filter(memberships__user=request.user)
+        qs = Building.objects.select_related(
+            "country", "city", "region",
+            "category__category", "category__subcategory",
+            "created_by", "organisation", "climate_zone",
+        ).filter(
+            Q(organisation__in=orgs) | Q(created_by=request.user)
+        )
+
+    try:
+        building = qs.get(uuid=uuid_obj)
         return building, None
-    except (ValueError, Building.DoesNotExist):
+    except Building.DoesNotExist:
         return None, Response(
             {"success": False, "errors": {"__all__": ["Building not found."]}},
             status=status.HTTP_404_NOT_FOUND,

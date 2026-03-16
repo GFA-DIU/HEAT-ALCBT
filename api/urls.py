@@ -52,6 +52,8 @@ from api.views.users import (
 from api.views.system_settings import (
     CountryListCreateView,
     CountryDetailView,
+    CountryRegionsView,
+    CountryCitiesView,
     CountryImportView,
     CountryExportView,
     ClimateTypeListCreateView,
@@ -123,6 +125,8 @@ urlpatterns = [
     path("system-settings/countries/import/", CountryImportView.as_view(), name="api_countries_import"),
     path("system-settings/countries/export/", CountryExportView.as_view(), name="api_countries_export"),
     path("system-settings/countries/<int:pk>/", CountryDetailView.as_view(), name="api_country_detail"),
+    path("system-settings/countries/<int:pk>/regions/", CountryRegionsView.as_view(), name="api_country_regions"),
+    path("system-settings/countries/<int:pk>/cities/", CountryCitiesView.as_view(), name="api_country_cities"),
 
     # System Settings — Climate Types
     path("system-settings/climate-types/", ClimateTypeListCreateView.as_view(), name="api_climate_types"),
