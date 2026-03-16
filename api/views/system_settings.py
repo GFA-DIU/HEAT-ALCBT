@@ -1,6 +1,6 @@
 import logging
 
-from cities_light.models import Country
+from cities_light.models import Country, Region
 from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
@@ -66,6 +66,53 @@ class CountryListCreateView(APIView):
                     CustomCity.objects.get_or_create(name=name, country=country)
 
         return Response(CountryDetailSerializer(country).data, status=status.HTTP_201_CREATED)
+
+
+class CountryRegionsView(APIView):
+    """
+    GET /api/system-settings/countries/<pk>/regions/
+    Returns all regions (states/provinces) for a given country.
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, pk):
+        try:
+            country = Country.objects.get(pk=pk)
+        except Country.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        qs = Region.objects.filter(country=country).order_by("name")
+        search = request.query_params.get("search", "").strip()
+        if search:
+            qs = qs.filter(name__icontains=search)
+
+        data = [{"id": r.id, "name": r.name} for r in qs]
+        return Response({"results": data})
+
+
+class CountryCitiesView(APIView):
+    """
+    GET /api/system-settings/countries/<pk>/cities/
+    Returns all cities for a given country (id + name), optionally filtered by ?search=.
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, pk):
+        try:
+            country = Country.objects.get(pk=pk)
+        except Country.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        qs = CustomCity.objects.filter(country=country).order_by("name")
+        region_id = request.query_params.get("region_id", "").strip()
+        if region_id:
+            qs = qs.filter(region_id=region_id)
+        search = request.query_params.get("search", "").strip()
+        if search:
+            qs = qs.filter(name__icontains=search)
+
+        from api.serializers.system_settings import CitySerializer
+        return Response({"results": CitySerializer(qs, many=True).data})
 
 
 class CountryDetailView(APIView):
