@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 migrations.RunSQL(
                     sql="""
                         ALTER TABLE pages_assembly
-                        ADD COLUMN IF NOT EXISTS from_template_id integer
+                        ADD COLUMN IF NOT EXISTS from_template_id uuid
                             REFERENCES pages_assembly(id)
                             ON DELETE SET NULL
                             DEFERRABLE INITIALLY DEFERRED;
