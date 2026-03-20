@@ -5,180 +5,346 @@ from pages.models.assembly import AssemblyDimension, StructuralProduct
 from pages.models.epd import Unit
 
 if TYPE_CHECKING:
-    # Use a forward reference to avoid circular import at runtime
     from pages.models.building import OperationalProduct
 
 
-# TODO: Add Try/Catch when trying to fetch a non-existing conversion and handle and display error
+class ImpactCalculationError(ValueError):
+    """Raised when a factor cannot be resolved due to missing EPD conversion data."""
+    pass
+
+
 def calculate_impacts(
     dimension: AssemblyDimension,
     assembly_quantity: int,
     total_floor_area: int,
     p: StructuralProduct,
 ):
-    """Calculate EPDs using the dimension approach.
+    """Calculate embodied carbon emissions using the Factor resolution logic from the PDF spec.
 
-    # Each AssembyDimension implies a set of allowed `declared_unit`s of EPDs. This is summarized
-    in the table below.
-    | **    Declared unit   ** | **    Area Assembly   ** | **    Volume Assembly   ** | **    Mass Assembly   ** | **    Length Assembly   ** |
-    |--------------------------|--------------------------|----------------------------|--------------------------|----------------------------|
-    |     m3                   |     Yes                  |     Yes                    |     w. Volume density    |     Yes                    |
-    |     m2                   |     Yes                  |     No                     |     No                   |     No                     |
-    |     m                    |     No                   |     No                     |     No                   |     Yes                    |
-    |     kg                   |     w. Volume density    |     w. Volume density      |     Yes                  |     w. Volume density      |
-    |     pieces               |     Set a quantity       |     Set a quantity         |     Set a quantity       |     Set a quantity         |
+    Formula:
+        Emissions [kgCO₂e] = Factor × (EPDImpact.value / EPD.declared_amount)
+        Emissions per m²   = Total Emissions / floor_area
 
-    # Notes
-     - Some EPDs do not have a base unit of 1 (e.g. 1 kg). That is why we normalize by 'declared_amount'
+    Factor resolution:
+        Step 1 — pcs check
+        Step 2 — direct unit match
+        Step 3 — conversion paths per assembly dimension
 
+    Field mapping (StructuralProduct.quantity + input_unit → PDF concept):
+        input_unit=cm       → thickness          (÷100 → metres)
+        input_unit=percent  → share_of_mass / share_of_volume
+        input_unit=cm2      → cross_section       (÷10000 → m²)
+        input_unit=pcs      → product_quantity    (pieces per assembly unit)
+        input_unit=unknown  → layer count (area/m² direct match)
+        input_unit=m/m2/m3/kg → BoQ direct quantity
     """
 
-    def fetch_conversion(unit: str) -> str | None:
-        """Fetch conversion factor based on the unit."""
+    # ------------------------------------------------------------------
+    # Helpers — EPD conversion lookup
+    # ------------------------------------------------------------------
+
+    def _epd_conversion(name: str) -> Decimal | None:
+        """Return a conversion value from EPD.conversions by name.
+
+        Lookup order:
+          1. Match by 'name' key (PDF spec: "volume density", "area density", etc.)
+          2. Fallback: match by 'unit' string for legacy data without 'name' key.
+        """
         try:
-            return next(
-                (c["value"] for c in p.epd.conversions if c["unit"] == unit), None
-            )
-        except:
+            conversions = p.epd.conversions or []
+            for c in conversions:
+                if c.get("name") == name:
+                    return Decimal(str(c["value"]))
+            # Legacy fallback: unit-string map
+            unit_map = {
+                "volume density": "kg/m^3",
+                "area density": "kg/m^2",
+                "linear density": "kg/m",
+                "conversion factor to 1 kg": "-",
+            }
+            unit_str = unit_map.get(name)
+            if unit_str:
+                for c in conversions:
+                    if c.get("unit") == unit_str:
+                        return Decimal(str(c["value"]))
+            return None
+        except Exception:
             return None
 
-    def fetch_dimension_for_boq(input_unit):
-        """Assign dimension based on 'input_unit'."""
-        boq_dim_map = {
-            Unit.PCS: None,  # pieces doesn't rely on dimension
-            Unit.M: AssemblyDimension.LENGTH,
-            Unit.M2: AssemblyDimension.AREA,
-            Unit.M3: AssemblyDimension.VOLUME,
-            Unit.KG: AssemblyDimension.MASS,
-        }
-        return boq_dim_map[input_unit]
+    def _resolve_thickness_m() -> Decimal:
+        """Resolve layer thickness in metres.
 
-    def calculate_impact(factor=1):
-        """Calculate impacts using a given factor and normalized by EPD base amount and reporting life_cycle."""
-        impacts_list = getattr(p.epd, "all_impacts", None)
-        if not impacts_list:
-            impacts_list = p.epd.epdimpact_set.all()
-        
-        container = []
-        for epdimpact in impacts_list:
-            container.append(
-                {
-                    "assembly_id": p.assembly.pk,
-                    "epd_id": p.epd.pk,
-                    "assembly_category": (
-                        p.classification.category if p.classification else ""
-                    ),
-                    "material_category": p.epd.category,
-                    "impact_type": epdimpact.impact,
-                    "impact_value": Decimal(factor)
-                    * Decimal(epdimpact.value)
-                    / Decimal(p.epd.declared_amount)  # Normalise by base amount
-                    / Decimal(total_floor_area),  # Normalise by total floor area
-                }
-            )
-        return container
+        Priority 1: user-entered thickness (input_unit == cm, stored in cm).
+        Priority 2: derive from EPD — area_density / volume_density.
+        """
+        if p.input_unit == Unit.CM and p.quantity is not None:
+            return Decimal(str(p.quantity)) / Decimal("100")
+
+        area_density = _epd_conversion("area density")
+        volume_density = _epd_conversion("volume density")
+        if area_density is not None and volume_density is not None and volume_density != 0:
+            return area_density / volume_density
+
+        raise ImpactCalculationError(
+            f"Layer thickness required but not available for '{p.epd.name}'. "
+            "Not set on product and cannot be derived from EPD conversions "
+            "(both area density and volume density must exist to derive it)."
+        )
+
+    def _cross_section_m2() -> Decimal:
+        """Return cross-section in m² (stored in cm² on product, ÷ 10,000)."""
+        if p.input_unit == Unit.CM2 and p.quantity is not None:
+            return Decimal(str(p.quantity)) / Decimal("10000")
+        raise ImpactCalculationError(
+            f"Cross section (cm²) required but not set on product for '{p.epd.name}'."
+        )
+
+    # ------------------------------------------------------------------
+    # BoQ: infer dimension from input_unit
+    # ------------------------------------------------------------------
+
+    def _fetch_dimension_for_boq() -> AssemblyDimension | None:
+        boq_dim_map = {
+            Unit.PCS: None,
+            Unit.M:   AssemblyDimension.LENGTH,
+            Unit.M2:  AssemblyDimension.AREA,
+            Unit.M3:  AssemblyDimension.VOLUME,
+            Unit.KG:  AssemblyDimension.MASS,
+        }
+        return boq_dim_map[p.input_unit]
+
+    # ------------------------------------------------------------------
+    # Resolve effective dimension
+    # ------------------------------------------------------------------
+
+    eff_dim = _fetch_dimension_for_boq() if p.assembly.is_boq else dimension
+
+    # ------------------------------------------------------------------
+    # Composite validation: mass assembly shares must sum to 100%
+    # ------------------------------------------------------------------
+
+    if eff_dim == AssemblyDimension.MASS:
+        products = getattr(p.assembly, "prefetched_products", None)
+        if products is None:
+            products = list(p.assembly.structuralproduct_set.all())
+        percent_products = [sp for sp in products if sp.input_unit == Unit.PERCENT]
+        if percent_products:
+            total_share = sum(Decimal(str(sp.quantity)) for sp in percent_products)
+            if round(total_share, 4) != Decimal("100"):
+                raise ImpactCalculationError(
+                    f"Share of mass must sum to 100% for assembly '{p.assembly.name}'. "
+                    f"Current total: {total_share}%."
+                )
+
+    # ------------------------------------------------------------------
+    # Factor resolution
+    # ------------------------------------------------------------------
 
     declared_unit = p.epd.declared_unit
+    assembly_qty = Decimal(str(assembly_quantity))
 
-    if p.assembly.is_boq:
-        # For BoQs assembly-level dimension is irrelevant as assembly quantity is fixed to 1.
-        dimension = fetch_dimension_for_boq(p.input_unit)
-
-    quantity = p.quantity / 100 if p.input_unit == Unit.PERCENT else p.quantity
-
-    cm_to_m = 100
-
-    match (dimension, declared_unit):
-        case (_, Unit.PCS):
-            # impact = impact_per_unit * number of pieces / epd_base_amount
-            impacts = calculate_impact(quantity)
-
-        case (AssemblyDimension.AREA, Unit.M2):
-            # impact = impact_per_unit * total_m2 * num_layers / epd_base_amount
-            impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(quantity))
-        case (AssemblyDimension.AREA, Unit.M3):
-            # impact = impact_per_unit * total_m2 * thickness_in_cm * unit_conversion_cm_to_m / epd_base_amount
-            impacts = calculate_impact(
-                Decimal(assembly_quantity) * Decimal(quantity) / Decimal(cm_to_m)
+    # Step 1 — pcs EPD: assembly_quantity always ignored
+    if declared_unit == Unit.PCS:
+        if p.quantity is None:
+            raise ImpactCalculationError(
+                f"Pieces per assembly unit not entered for '{p.epd.name}'. "
+                "Required for pcs EPDs."
             )
-        case (AssemblyDimension.AREA, Unit.KG):
-            # impact = impact_per_unit * conversion_kg_per_m2 * total_m2 * thickness_in_cm * unit_conversion_cm_to_m / epd_base_amount
-            conversion_f = fetch_conversion("kg/m^3")
-            impacts = calculate_impact(
-                Decimal(assembly_quantity)
-                * Decimal(quantity)
-                * Decimal(conversion_f)
-                / Decimal(cm_to_m)
-            )
+        factor = Decimal(str(p.quantity))
 
-        case (AssemblyDimension.VOLUME, Unit.M3):
-            # impact = impact_per_unit * total_m3 / epd_base_amount
-            impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(quantity))
-        case (AssemblyDimension.VOLUME, Unit.KG):
-            # impact = impact_per_unit * conversion_kg_per_m3 * total_m3 * percentage / epd_base_amount
-            conversion_f = fetch_conversion("kg/m^3")
-            impacts = calculate_impact(
-                Decimal(assembly_quantity) * Decimal(quantity) * Decimal(conversion_f)
+    else:
+        # Step 2 — direct unit match
+        direct_match = {
+            AssemblyDimension.AREA:   Unit.M2,
+            AssemblyDimension.VOLUME: Unit.M3,
+            AssemblyDimension.MASS:   Unit.KG,
+            AssemblyDimension.LENGTH: Unit.M,
+        }
+        if direct_match.get(eff_dim) == declared_unit:
+            qty = (
+                Decimal(str(p.quantity)) / Decimal("100")
+                if p.input_unit == Unit.PERCENT
+                else Decimal(str(p.quantity))
+            )
+            factor = assembly_qty * qty
+
+        else:
+            # Step 3 — conversion required
+            factor = _resolve_conversion_factor(
+                eff_dim, declared_unit, assembly_qty,
+                _epd_conversion, _resolve_thickness_m, _cross_section_m2, p,
             )
 
-        case (AssemblyDimension.MASS, Unit.KG):
-            # impact = impact_per_unit * total_kg / epd_base_amount
-            impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(quantity))
-        case (AssemblyDimension.MASS, Unit.M3):
-            # impact = impact_per_unit / conversion_kg_per_m3 * total_kg * percentage / epd_base_amount
-            conversion_f = fetch_conversion("kg/m^3")
-            impacts = calculate_impact(
-                Decimal(assembly_quantity) * Decimal(quantity) / Decimal(conversion_f)
+    # ------------------------------------------------------------------
+    # Build impact list
+    # ------------------------------------------------------------------
+
+    impacts_list = getattr(p.epd, "all_impacts", None)
+    if not impacts_list:
+        impacts_list = p.epd.epdimpact_set.all()
+
+    result = []
+    for epdimpact in impacts_list:
+        result.append(
+            {
+                "assembly_id": p.assembly.pk,
+                "epd_id": p.epd.pk,
+                "assembly_category": (
+                    p.classification.category if p.classification else ""
+                ),
+                "material_category": p.epd.category,
+                "impact_type": epdimpact.impact,
+                "impact_value": (
+                    Decimal(str(factor))
+                    * Decimal(str(epdimpact.value))
+                    / Decimal(str(p.epd.declared_amount))
+                    / Decimal(str(total_floor_area))
+                ),
+            }
+        )
+    return result
+
+
+def _resolve_conversion_factor(
+    eff_dim, declared_unit, assembly_qty,
+    _epd_conversion, _resolve_thickness_m, _cross_section_m2, p,
+) -> Decimal:
+    """Step 3: resolve Factor when no direct unit match exists.
+
+    Implements the full conversion paths from the PDF Developer Edition spec.
+    """
+
+    qty_raw = Decimal(str(p.quantity))
+    qty = qty_raw / Decimal("100") if p.input_unit == Unit.PERCENT else qty_raw
+
+    # ---- AREA assembly (m²) ------------------------------------------
+    if eff_dim == AssemblyDimension.AREA:
+
+        if declared_unit == Unit.M3:
+            # Factor = assembly_qty × thickness_m
+            return assembly_qty * _resolve_thickness_m()
+
+        if declared_unit == Unit.KG:
+            # Option B — preferred: area density
+            area_density = _epd_conversion("area density")
+            if area_density is not None:
+                return assembly_qty * area_density
+
+            # Option A — fallback: thickness × volume density
+            volume_density = _epd_conversion("volume density")
+            if volume_density is not None:
+                return assembly_qty * _resolve_thickness_m() * volume_density
+
+            # Option C — last resort: conversion factor to 1 kg
+            conv_factor = _epd_conversion("conversion factor to 1 kg")
+            if conv_factor is not None:
+                return assembly_qty * conv_factor
+
+            raise ImpactCalculationError(
+                f"Cannot convert area assembly to kg for '{p.epd.name}' — "
+                "no area density, volume density, or conversion factor found in EPD conversions."
             )
 
-        case (AssemblyDimension.LENGTH, Unit.M):
-            # impact = impact_per_unit * total_length * num_elements / epd_base_amount
-            impacts = calculate_impact(Decimal(assembly_quantity) * Decimal(quantity))
-        case (AssemblyDimension.LENGTH, Unit.M3):
-            # impact = impact_per_unit * total_length * surface_cross-section_to_m2 / unit_conversion_cm2_to_m2 / epd_base_amount
-            impacts = calculate_impact(
-                Decimal(assembly_quantity) * Decimal(quantity) / Decimal(cm_to_m**2)
-            )
-        case (AssemblyDimension.LENGTH, Unit.KG):
-            # impact = impact_per_unit * conversion_kg_per_m * total_length * surface_cross-section_to_m2 / unit_conversion_cm2_to_m2 / epd_base_amount
-            conversion_f = fetch_conversion("kg/m^3")
-            impacts = calculate_impact(
-                Decimal(assembly_quantity)
-                * Decimal(quantity)
-                * Decimal(conversion_f)
-                / Decimal(cm_to_m**2)
+    # ---- VOLUME assembly (m³) ----------------------------------------
+    if eff_dim == AssemblyDimension.VOLUME:
+
+        if declared_unit == Unit.KG:
+            volume_density = _epd_conversion("volume density")
+            if volume_density is not None:
+                return assembly_qty * qty * volume_density
+
+            conv_factor = _epd_conversion("conversion factor to 1 kg")
+            if conv_factor is not None:
+                return assembly_qty * qty * conv_factor
+
+            raise ImpactCalculationError(
+                f"Cannot convert volume assembly to kg for '{p.epd.name}' — "
+                "volume density and conversion factor both missing from EPD conversions."
             )
 
-        case _:
-            raise ValueError(
-                f"Unsupported combination: dimension '{dimension}', declared_unit '{declared_unit}'"
+        if declared_unit == Unit.M2:
+            # Factor = assembly_qty × qty / thickness_m
+            return assembly_qty * qty / _resolve_thickness_m()
+
+    # ---- MASS assembly (kg) ------------------------------------------
+    if eff_dim == AssemblyDimension.MASS:
+        # constituent_mass = assembly_qty × share_of_mass
+        constituent_mass = assembly_qty * qty
+
+        if declared_unit == Unit.M3:
+            volume_density = _epd_conversion("volume density")
+            if volume_density is not None and volume_density != 0:
+                return constituent_mass / volume_density
+            raise ImpactCalculationError(
+                f"Cannot convert mass assembly to m³ for '{p.epd.name}' — "
+                "volume density missing from EPD conversions. No safe fallback."
             )
 
-    return impacts
+        if declared_unit == Unit.M2:
+            area_density = _epd_conversion("area density")
+            if area_density is not None and area_density != 0:
+                return constituent_mass / area_density
+            raise ImpactCalculationError(
+                f"Cannot convert mass assembly to m² for '{p.epd.name}' — "
+                "area density missing from EPD conversions. No safe fallback."
+            )
+
+    # ---- LENGTH assembly (m) -----------------------------------------
+    if eff_dim == AssemblyDimension.LENGTH:
+
+        if declared_unit == Unit.M3:
+            return assembly_qty * _cross_section_m2()
+
+        if declared_unit == Unit.KG:
+            # Option A — preferred: linear density
+            linear_density = _epd_conversion("linear density")
+            if linear_density is not None:
+                return assembly_qty * linear_density
+
+            # Option B — fallback: cross_section × volume density
+            volume_density = _epd_conversion("volume density")
+            if volume_density is not None:
+                return assembly_qty * _cross_section_m2() * volume_density
+
+            raise ImpactCalculationError(
+                f"Cannot convert length assembly to kg for '{p.epd.name}' — "
+                "linear density missing and cross section or volume density not available."
+            )
+
+    raise ImpactCalculationError(
+        f"Unsupported combination: dimension='{eff_dim}', "
+        f"declared_unit='{declared_unit}' for EPD '{p.epd.name}'."
+    )
 
 
 def calculate_impact_operational(
     p: "OperationalProduct",
 ) -> dict[Literal["gwp_b6", "penrt_b6"], Decimal]:
-    def fetch_conversion(unit) -> Decimal|None:
-        """Fetch conversion factor based on the unit."""
+    """Calculate operational carbon (GWP B6 and PENRT B6)."""
+
+    def fetch_conversion(unit) -> Decimal | None:
         try:
             return next(
-                (c["value"] for c in p.epd.conversions if c["unit"] == unit), None
+                (Decimal(str(c["value"])) for c in p.epd.conversions if c["unit"] == unit),
+                None,
             )
-        except:
+        except Exception:
             return None
 
     def calculate_impact(factor, gwp_impact, penrt_impact):
         return {
-            "gwp_b6": Decimal(factor)
-            * Decimal(gwp_impact)
-            / Decimal(p.epd.declared_amount)  # Normalise by base amount
-            / Decimal(p.building.total_floor_area),  # Normalise by floor area,
-            "penrt_b6": Decimal(factor)
-            * Decimal(penrt_impact)
-            / Decimal(p.epd.declared_amount)  # Normalise by base amount
-            / Decimal(p.building.total_floor_area),  # Normalise by floor area,
+            "gwp_b6": (
+                Decimal(str(factor))
+                * Decimal(str(gwp_impact))
+                / Decimal(str(p.epd.declared_amount))
+                / Decimal(str(p.building.total_floor_area))
+            ),
+            "penrt_b6": (
+                Decimal(str(factor))
+                * Decimal(str(penrt_impact))
+                / Decimal(str(p.epd.declared_amount))
+                / Decimal(str(p.building.total_floor_area))
+            ),
         }
 
     impact_set = p.epd.epdimpact_set.filter(impact__life_cycle_stage="b6")
@@ -189,40 +355,41 @@ def calculate_impact_operational(
         (i.value for i in impact_set if i.impact.impact_category == "penrt"), None
     )
 
-    # TODO: Flexibilise to other declared_units
     match (p.epd.declared_unit, p.input_unit):
 
         case (Unit.KWH, Unit.KWH):
-            impacts = calculate_impact(Decimal(p.quantity), gwp_b6, penrt_b6)
+            impacts = calculate_impact(Decimal(str(p.quantity)), gwp_b6, penrt_b6)
+
         case (Unit.KWH, Unit.M3):
-            kwh_per_kg = fetch_conversion("kg") or fetch_conversion(
-                "-"
-            )  # "-" is used by Ökobdauat for name:'conversion
+            kwh_per_kg = fetch_conversion("kg") or fetch_conversion("-")
             kg_per_m3 = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
-                Decimal(p.quantity) * Decimal(kwh_per_kg) * Decimal(kg_per_m3),
+                Decimal(str(p.quantity)) * Decimal(str(kwh_per_kg)) * Decimal(str(kg_per_m3)),
                 gwp_b6,
                 penrt_b6,
             )
+
         case (Unit.KWH, Unit.LITER):
-            kwh_per_kg = fetch_conversion("kg") or fetch_conversion(
-                "-"
-            )  # "-" is used by Ökobdauat for name:'conversion
+            kwh_per_kg = fetch_conversion("kg") or fetch_conversion("-")
             kg_per_m3 = fetch_conversion("kg/m^3")
             impacts = calculate_impact(
-                Decimal(p.quantity) * Decimal(kwh_per_kg) * Decimal(kg_per_m3) / 1000,
+                Decimal(str(p.quantity)) * Decimal(str(kwh_per_kg)) * Decimal(str(kg_per_m3)) / Decimal("1000"),
                 gwp_b6,
                 penrt_b6,
             )
+
         case (Unit.KWH, Unit.KG):
-            kwh_per_kg = fetch_conversion("kg") or fetch_conversion("-")  # "-" is used by Ökobdauat for name:'conversion factor to 1 kg'
+            kwh_per_kg = fetch_conversion("kg") or fetch_conversion("-")
             impacts = calculate_impact(
-                Decimal(p.quantity) * Decimal(kwh_per_kg), gwp_b6, penrt_b6
+                Decimal(str(p.quantity)) * Decimal(str(kwh_per_kg)),
+                gwp_b6,
+                penrt_b6,
             )
 
         case _:
             raise ValueError(
-                f"Unsupported combination: declared_unit '{p.epd.declared_unit}', input_unit '{p.input_unit}'"
+                f"Unsupported combination: declared_unit '{p.epd.declared_unit}', "
+                f"input_unit '{p.input_unit}'"
             )
 
     return impacts

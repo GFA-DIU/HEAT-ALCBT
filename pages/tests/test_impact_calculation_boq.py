@@ -1,11 +1,16 @@
+"""
+Tests for calculate_impacts() with BoQ assemblies.
+
+In BoQ assemblies (is_boq=True), the assembly-level dimension is ignored.
+Dimension is inferred from the product's input_unit instead.
+"""
 from decimal import Decimal
 
 import pytest
-from django.core.exceptions import ValidationError
 
 from pages.models.epd import Unit
 from pages.models.assembly import Assembly, AssemblyMode, AssemblyDimension
-from pages.views.building.impact_calculation import calculate_impacts
+from pages.views.building.impact_calculation import calculate_impacts, ImpactCalculationError
 
 from pages.tests.test_impact_calculation import (
     create_epd,
@@ -21,165 +26,119 @@ def create_boq_assembly():
     def _create_assembly():
         return Assembly.objects.create(
             mode=AssemblyMode.CUSTOM,
-            dimension=AssemblyDimension.AREA,
-            is_boq=True
+            dimension=AssemblyDimension.AREA,  # irrelevant for BoQ
+            is_boq=True,
         )
-
     return _create_assembly
 
 
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    "epd_name, declared_unit, conversions, epdimpact_value, product_quantity, product_unit, expected_impact",
-    [
-        ( # Test Pieces
-            "Test PCS",                                  # epd_name
-            Unit.PCS,                                    # declared_unit
-            [],                                          # conversions
-            Decimal("3"),                                # epdimpact value
-            Decimal("4"),                                # product_quantity
-            Unit.PCS,                                    # product unit  
-            Decimal("12"),   # 3 * 4                     # expected impact
-        ),
-        ( # Test M
-            "Test M",
-            Unit.M,
-            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m", "value": "300"}],
-            Decimal("3"),
-            Decimal("4"),
-            Unit.M,
-            Decimal("12"),  # 3 * 4
-        ),
-        ( # Test M2
-            "Test M2",
-            Unit.M2,
-            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m", "value": "300"}],
-            Decimal("3"),
-            Decimal("4"),
-            Unit.M2,
-            Decimal("12"),  # 3 * 4
-        ),
-        ( # Test M3
-            "Test M3",
-            Unit.M3,
-            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m", "value": "300"}],
-            Decimal("3"),
-            Decimal("4"),
-            Unit.M3,
-            Decimal("12"),  # 3 * 4
-        ),
-        ( # Test KG
-            "Test KG",
-            Unit.KG,
-            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m", "value": "300"}],
-            Decimal("3"),
-            Decimal("4"),
-            Unit.KG,
-            Decimal("12"),  # 3 * 4
-        ),
-    ],
-)
-def test_calculate_impacts_boq(
-    epd_name,
-    declared_unit,
-    conversions,
-    epdimpact_value,
-    product_quantity,
-    product_unit,
-    expected_impact,
-    ### Functions
-    create_impact,
-    create_epd,
-    create_epd_impact,
-    create_boq_assembly,
-    create_product,
-):
-    """Test if calculate impact works for BoQs.
-    
-    In BoQs the assembly Dimension plays no role. Currently conversions are not touched.
-
-    ARRANGE: Create simple EPD and Product for an assembly with is_boq=True
-    ACT: Calculate impact of product.
-    ASSERT: Matches expected values.
-    """
-    #TODO if conversions are used for BoQs, extend test.
-    # Arrange: Set up test data
-    impact = create_impact
-    epd = create_epd(epd_name, declared_unit, conversions)
-    create_epd_impact(epd, epdimpact_value)
-    assembly = create_boq_assembly()
-    product = create_product(assembly, epd, product_quantity, product_unit)
-
-    # Act: Perform the calculation
-    impacts = calculate_impacts(
+def _calc_boq(p):
+    """Run calculate_impacts for a BoQ product (dimension=None, assembly_quantity=1, floor_area=1)."""
+    return calculate_impacts(
         dimension=None,
         assembly_quantity=1,
         total_floor_area=1,
-        p=product,
+        p=p,
     )
 
-    # Assert: Verify the results
-    assert len(impacts) == 1
-    for impact in impacts:
-        assert impact["impact_type"].__str__() == "gwp a1a3"
-        assert isinstance(impact["impact_value"], Decimal)
-        assert impact["impact_value"] == pytest.approx(
-            expected_impact, rel=Decimal("1e-15")
-        )
+
+def _gwp(impacts):
+    for i in impacts:
+        if i["impact_type"].__str__() == "gwp a1a3":
+            return i["impact_value"]
+    raise AssertionError("No gwp a1a3 impact found")
 
 
+# ---------------------------------------------------------------------------
+# BoQ: direct unit matches — dimension inferred from input_unit
+# ---------------------------------------------------------------------------
 
-# Parametrized test with fixtures
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    "epd_name, declared_unit, conversions, epdimpact_value, product_quantity, product_unit",
-    [
-        ( # conversions are not used
-            "Test M3",
-            Unit.M3,
-            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m^2", "value": "20"}],
-            Decimal("3"),
-            Decimal("4"),
-            Unit.KG,
-        ),
-        ( # conversions are not used
-            "Test KG",
-            Unit.KG,
-            [{"unit": "kg/m^3", "value": "2"}, {"unit": "kg/m^2", "value": "20"}],
-            Decimal("3"),
-            Decimal("4"),
-            Unit.M3,
-        ),
-    ],
-)
-def test_calculate_impacts_boq_errors(
-    epd_name,
-    declared_unit,
-    conversions,
-    epdimpact_value,
-    product_quantity,
-    product_unit,
-    ### Functions
-    create_epd,
-    create_epd_impact,
-    create_boq_assembly,
-    create_product,
-):
-    """Test if calculate impact satisfies dimension logic.
-    
-    Note
-     - currently BoQs do not use conversions.
-
-    ARRANGE: Create simple EPD and set input unit for matching conversion.
-    ACT: Create product.
-    ASSERT: Raises validation error.
-    """
-
-    # Arrange: Set up test data
-    epd = create_epd(epd_name, declared_unit, conversions)
-    create_epd_impact(epd, epdimpact_value)
+def test_boq_pcs(create_epd, create_epd_impact, create_boq_assembly, create_product):
+    """BoQ + pcs EPD → Factor = product_quantity."""
+    epd = create_epd("Tile", Unit.PCS, [])
+    create_epd_impact(epd, Decimal("3"))
     assembly = create_boq_assembly()
-    
-    product = create_product(assembly, epd, product_quantity, product_unit)
-    
-    assert product is not None
+    p = create_product(assembly, epd, Decimal("4"), Unit.PCS)
+    assert _gwp(_calc_boq(p)) == pytest.approx(Decimal("12"))
+
+
+@pytest.mark.django_db
+def test_boq_m(create_epd, create_epd_impact, create_boq_assembly, create_product):
+    """BoQ + m EPD with input_unit=m → direct match, Factor = 1 × 4 = 4."""
+    epd = create_epd("Pipe", Unit.M, [])
+    create_epd_impact(epd, Decimal("3"))
+    assembly = create_boq_assembly()
+    p = create_product(assembly, epd, Decimal("4"), Unit.M)
+    assert _gwp(_calc_boq(p)) == pytest.approx(Decimal("12"))
+
+
+@pytest.mark.django_db
+def test_boq_m2(create_epd, create_epd_impact, create_boq_assembly, create_product):
+    """BoQ + m² EPD with input_unit=m2 → direct match, Factor = 1 × 4 = 4."""
+    epd = create_epd("Slab", Unit.M2, [])
+    create_epd_impact(epd, Decimal("3"))
+    assembly = create_boq_assembly()
+    p = create_product(assembly, epd, Decimal("4"), Unit.M2)
+    assert _gwp(_calc_boq(p)) == pytest.approx(Decimal("12"))
+
+
+@pytest.mark.django_db
+def test_boq_m3(create_epd, create_epd_impact, create_boq_assembly, create_product):
+    """BoQ + m³ EPD with input_unit=m3 → direct match, Factor = 1 × 4 = 4."""
+    epd = create_epd("Concrete", Unit.M3, [])
+    create_epd_impact(epd, Decimal("3"))
+    assembly = create_boq_assembly()
+    p = create_product(assembly, epd, Decimal("4"), Unit.M3)
+    assert _gwp(_calc_boq(p)) == pytest.approx(Decimal("12"))
+
+
+@pytest.mark.django_db
+def test_boq_kg(create_epd, create_epd_impact, create_boq_assembly, create_product):
+    """BoQ + kg EPD with input_unit=kg → direct match, Factor = 1 × 4 = 4."""
+    epd = create_epd("Steel", Unit.KG, [])
+    create_epd_impact(epd, Decimal("3"))
+    assembly = create_boq_assembly()
+    p = create_product(assembly, epd, Decimal("4"), Unit.KG)
+    assert _gwp(_calc_boq(p)) == pytest.approx(Decimal("12"))
+
+
+# ---------------------------------------------------------------------------
+# BoQ: conversions used when input_unit ≠ declared_unit
+# ---------------------------------------------------------------------------
+
+@pytest.mark.django_db
+def test_boq_kg_epd_with_m3_input_uses_volume_density(
+    create_epd, create_epd_impact, create_boq_assembly, create_product
+):
+    """BoQ + kg EPD but input_unit=m3 → inferred VOLUME dimension.
+    Volume→kg: Factor = assembly_qty × share × volume_density.
+    product_quantity stored as m3 directly (not percent for BoQ).
+    Factor = 1 × 4 × 2 = 8  →  impact = 3 × 8 = 24.
+    """
+    epd = create_epd("BoQ Dense", Unit.KG, [
+        {"name": "volume density", "value": "2", "unit": "kg/m^3"},
+    ])
+    create_epd_impact(epd, Decimal("3"))
+    assembly = create_boq_assembly()
+    p = create_product(assembly, epd, Decimal("4"), Unit.M3)
+    # input_unit=M3 → dimension inferred as VOLUME
+    # Volume+KG: Factor = 1 × 4 × 2 = 8
+    assert _gwp(_calc_boq(p)) == pytest.approx(Decimal("24"))
+
+
+@pytest.mark.django_db
+def test_boq_m3_epd_with_kg_input_raises(
+    create_epd, create_epd_impact, create_boq_assembly, create_product
+):
+    """BoQ + m³ EPD with input_unit=kg → inferred MASS dimension.
+    Mass→m³ requires volume density. If missing, raise ImpactCalculationError.
+    """
+    epd = create_epd("BoQ No density", Unit.M3, [])
+    create_epd_impact(epd, Decimal("3"))
+    assembly = create_boq_assembly()
+    # Create with M3 (valid for M3 EPD), then override to KG at runtime
+    p = create_product(assembly, epd, Decimal("4"), Unit.M3)
+    p.input_unit = Unit.KG  # simulate KG input without re-triggering model validation
+    with pytest.raises(ImpactCalculationError):
+        _calc_boq(p)
