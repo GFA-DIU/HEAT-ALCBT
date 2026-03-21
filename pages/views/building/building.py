@@ -348,14 +348,17 @@ def get_assemblies(assembly_list: list[BuildingAssembly]):
     for b_assembly in assembly_list:
         assembly_impact_list = []
         for p in getattr(b_assembly.assembly, "prefetched_products", []):
-            assembly_impact_list.extend(
-                calculate_impacts(
-                    b_assembly.assembly.dimension,
-                    b_assembly.quantity,
-                    b_assembly.building.total_floor_area,
-                    p,
+            try:
+                assembly_impact_list.extend(
+                    calculate_impacts(
+                        b_assembly.assembly.dimension,
+                        b_assembly.quantity,
+                        b_assembly.building.total_floor_area,
+                        p,
+                    )
                 )
-            )
+            except (ValueError, AttributeError, ZeroDivisionError):
+                continue
 
         # get GWP impact for each assembly to display in list
         gwpa1a3 = [
