@@ -34,6 +34,9 @@ from pages.models.epd import (
     MaterialCategory,
     Unit,
 )
+from pages.models.building import Building, BuildingAssembly
+from pages.models.climate_type import ClimateType
+from pages.views.building.building import get_assemblies
 from pages.views.building.impact_calculation import calculate_impacts, ImpactCalculationError
 
 
@@ -549,3 +552,86 @@ def test_model_validation_rejects_invalid_units(
     assembly = create_assembly(dimension=dimension)
     with pytest.raises(ValidationError):
         create_product(assembly, epd, quantity, product_unit)
+
+
+# ---------------------------------------------------------------------------
+# Regression: get_assemblies() must not crash on ImpactCalculationError
+# ---------------------------------------------------------------------------
+
+@pytest.fixture
+def building():
+    climate, _ = ClimateType.objects.get_or_create(name="cold")
+    return Building.objects.create(
+        name="Test Building",
+        climate_zone=climate,
+        total_floor_area=100,
+    )
+
+
+@pytest.mark.django_db
+def test_get_assemblies_skips_product_with_missing_thickness(
+    building, create_epd, create_epd_impact, create_assembly, create_product
+):
+    """Regression: AREA+m³ EPD with no thickness and no EPD conversions raises
+    ImpactCalculationError. get_assemblies() must catch it and return the assembly
+    with impacts=0 rather than propagating a 500 error to the building page.
+    """
+    # AREA assembly + m³ EPD with no conversions → _resolve_thickness_m() will raise
+    epd = create_epd("AAC (autoclaved aerated concrete) block", Unit.M3, [])
+    create_epd_impact(epd, Decimal("0.35"))
+    assembly = create_assembly(AssemblyDimension.AREA)
+    # Save product with CM unit (valid), then clear quantity to force EPD-derived path
+    p = create_product(assembly, epd, Decimal("5"), Unit.CM)
+    p.input_unit = Unit.UNKNOWN  # override at runtime so no user thickness is available
+    assembly.prefetched_products = [p]
+
+    b_assembly = BuildingAssembly.objects.create(
+        assembly=assembly,
+        building=building,
+        quantity=50,
+        reporting_life_cycle=50,
+    )
+    b_assembly.assembly = assembly  # ensure prefetched_products is attached
+
+    structural_components, impact_list = get_assemblies([b_assembly])
+
+    # Page must not crash — assembly appears with zero impact
+    assert len(structural_components) == 1
+    assert structural_components[0]["impacts"] == 0
+    assert impact_list == []
+
+
+@pytest.mark.django_db
+def test_get_assemblies_keeps_good_product_when_one_fails(
+    building, create_epd, create_epd_impact, create_assembly, create_product
+):
+    """When one product in an assembly raises ImpactCalculationError and another
+    succeeds, only the good product's impacts are included.
+    """
+    # Good product: AREA + m² → direct match, no conversion needed
+    epd_good = create_epd("Good slab", Unit.M2, [])
+    create_epd_impact(epd_good, Decimal("4"))
+    # Bad product: AREA + m³, no conversions → thickness missing → raises
+    epd_bad = create_epd("Bad AAC block", Unit.M3, [])
+    create_epd_impact(epd_bad, Decimal("0.35"))
+
+    assembly = create_assembly(AssemblyDimension.AREA)
+    p_good = create_product(assembly, epd_good, Decimal("1"), Unit.UNKNOWN)
+    p_bad = create_product(assembly, epd_bad, Decimal("5"), Unit.CM)
+    p_bad.input_unit = Unit.UNKNOWN  # force EPD-derived thickness path
+    assembly.prefetched_products = [p_good, p_bad]
+
+    b_assembly = BuildingAssembly.objects.create(
+        assembly=assembly,
+        building=building,
+        quantity=1,
+        reporting_life_cycle=50,
+    )
+    b_assembly.assembly = assembly
+
+    structural_components, impact_list = get_assemblies([b_assembly])
+
+    assert len(structural_components) == 1
+    # Only p_good's impact: Factor=1×1=1, impact=4×1/1/100=0.04
+    assert structural_components[0]["impacts"] > 0
+    assert len(impact_list) == 1
