@@ -14,7 +14,7 @@ from pages.models.assembly import (
     Assembly, AssemblyCategory, AssemblyDimension, AssemblyMode,
     AssemblyCategoryTechnique, StructuralProduct,
 )
-from pages.models.building import Building, BuildingBoQFile, CategorySubcategory, OperationalProduct
+from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated, BuildingBoQFile, CategorySubcategory, OperationalProduct
 from pages.models.epd import EPD, EPDType, Unit
 from pages.models.organisation import Organisation
 from pages.views.building.building_stats import (
@@ -162,6 +162,41 @@ class BuildingDetailView(APIView):
             stats = {}
         serializer = AdminBuildingSerializer(building, context={"stats": stats})
         return Response(serializer.data)
+
+    @transaction.atomic
+    def delete(self, request, pk):
+        building = self._get_building(pk, request)
+        if building is None:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            # Delete custom assemblies linked to this building
+            assemblies_list = (
+                BuildingAssembly.objects.filter(building=building)
+                .values_list("assembly_id", flat=True)
+                .union(
+                    BuildingAssemblySimulated.objects.filter(building=building)
+                    .values_list("assembly_id", flat=True)
+                )
+            )
+            Assembly.objects.filter(id__in=assemblies_list, mode=AssemblyMode.CUSTOM).delete()
+
+            # Delete certification file from storage
+            if building.certification_file:
+                building.certification_file.delete(save=False)
+
+            # Delete BoQ files from storage
+            for boq in building.boq_files.all():
+                boq.file.delete(save=False)
+
+            building_name = str(building)
+            building.delete()
+            logger.info("Successfully deleted building '%s'", building_name)
+        except Exception:
+            logger.exception("Error occurred when trying to delete building: %s", pk)
+            return Response({"detail": "Failed to delete building."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # ---------------------------------------------------------------------------
