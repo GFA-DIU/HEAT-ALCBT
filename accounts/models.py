@@ -19,7 +19,7 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
-     def to_json(self):
+    def to_json(self):
         json_data = model_to_dict(self)
         return json_data
 
