@@ -8,6 +8,8 @@ from django.dispatch import receiver
 
 from cities_light.models import Country, Region, City
 from encrypted_json_fields.fields import EncryptedEmailField
+from django.forms.models import model_to_dict
+
 
 
 class CustomUser(AbstractUser):
@@ -16,6 +18,10 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+
+     def to_json(self):
+        json_data = model_to_dict(self)
+        return json_data
 
 
 class CustomCity(City):
