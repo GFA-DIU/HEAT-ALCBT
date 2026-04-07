@@ -24,11 +24,124 @@ from pages.models.assembly import (
 )
 from pages.models.base import ALCBTCountryManager
 from pages.models.building import Building, BuildingAssembly
-from pages.models.epd import EPD, MaterialCategory
+from pages.models.epd import EPD, MaterialCategory, Unit
 from pages.views.assembly.epd_filtering import get_filtered_epd_list
 from pages.views.assembly.epd_processing import get_epd_list
 
 logger = logging.getLogger(__name__)
+
+
+def _epd_has_conversion(epd, name):
+    """Return the conversion value by name from the EPD's conversions field, or None."""
+    if not epd.conversions:
+        return None
+    for item in epd.conversions:
+        if item.get("name") == name:
+            try:
+                return float(item.get("value", 0)) or None
+            except (TypeError, ValueError):
+                return None
+    return None
+
+
+def _can_epd_be_used(dimension: str, epd) -> tuple[bool, str]:
+    """
+    Check whether the EPD can be converted for the given assembly dimension.
+    Returns (True, "") if usable, or (False, reason_message) if not.
+
+    Mirrors the logic in _resolve_conversion_factor so we catch mismatches
+    before the user adds the EPD rather than only at calculation time.
+    """
+    declared = epd.declared_unit
+
+    # PCS dimension only accepts PCS epds (and vice-versa)
+    if dimension == AssemblyDimension.PCS:
+        if declared == Unit.PCS:
+            return True, ""
+        return False, (
+            f"This EPD is declared in '{declared}'. "
+            f"A Pieces (pcs) component only accepts EPDs declared in pcs."
+        )
+
+    if declared == Unit.PCS:
+        if dimension == AssemblyDimension.PCS:
+            return True, ""
+        return False, (
+            f"This EPD is declared in pieces (pcs) and cannot be used in a "
+            f"'{dimension}' component without a conversion factor."
+        )
+
+    # Direct unit match — always fine
+    direct_match = {
+        AssemblyDimension.AREA: Unit.M2,
+        AssemblyDimension.VOLUME: Unit.M3,
+        AssemblyDimension.MASS: Unit.KG,
+        AssemblyDimension.LENGTH: Unit.M,
+    }
+    if declared == direct_match.get(dimension):
+        return True, ""
+
+    # AREA assembly
+    if dimension == AssemblyDimension.AREA:
+        if declared == Unit.M3:
+            return True, ""  # needs thickness — entered by user
+        if declared == Unit.KG:
+            if (_epd_has_conversion(epd, "area density") or
+                    _epd_has_conversion(epd, "volume density") or
+                    _epd_has_conversion(epd, "conversion factor to 1 kg")):
+                return True, ""
+            return False, (
+                f"Cannot add this EPD (declared in kg) to an area (m²) component: "
+                "no area density, volume density, or conversion factor is available for this EPD."
+            )
+
+    # VOLUME assembly
+    if dimension == AssemblyDimension.VOLUME:
+        if declared == Unit.KG:
+            if (_epd_has_conversion(epd, "volume density") or
+                    _epd_has_conversion(epd, "conversion factor to 1 kg")):
+                return True, ""
+            return False, (
+                f"Cannot add this EPD (declared in kg) to a volume (m³) component: "
+                "no volume density or conversion factor is available for this EPD."
+            )
+        if declared == Unit.M2:
+            return True, ""  # needs thickness
+
+    # MASS assembly
+    if dimension == AssemblyDimension.MASS:
+        if declared == Unit.M3:
+            if _epd_has_conversion(epd, "volume density"):
+                return True, ""
+            return False, (
+                f"Cannot add this EPD (declared in m³) to a mass (kg) component: "
+                "no volume density is available for this EPD."
+            )
+        if declared == Unit.M2:
+            if _epd_has_conversion(epd, "area density"):
+                return True, ""
+            return False, (
+                f"Cannot add this EPD (declared in m²) to a mass (kg) component: "
+                "no area density is available for this EPD."
+            )
+
+    # LENGTH assembly
+    if dimension == AssemblyDimension.LENGTH:
+        if declared == Unit.M3:
+            return True, ""  # needs cross-section
+        if declared == Unit.KG:
+            if (_epd_has_conversion(epd, "linear density") or
+                    _epd_has_conversion(epd, "volume density")):
+                return True, ""
+            return False, (
+                f"Cannot add this EPD (declared in kg) to a length (m) component: "
+                "no linear density or volume density is available for this EPD."
+            )
+
+    return False, (
+        f"This EPD (declared in '{declared}') is not compatible with a "
+        f"'{dimension}' component and no conversion factor exists to bridge the unit mismatch."
+    )
 
 
 @login_required
@@ -121,6 +234,12 @@ def handle_select_product(request):
             available_units = [epd.declared_unit]
         elif isinstance(available_units, set):
             available_units = sorted(list(available_units))
+
+        # For component mode, block the add if no valid conversion path exists.
+        if mode == "component":
+            ok, reason = _can_epd_be_used(dimension, epd)
+            if not ok:
+                return HttpResponse(reason, status=422)
 
         # For BoQ mode, always use the EPD's declared unit — the user selects
         # from available_units via a dropdown so dimension logic doesn't apply.
