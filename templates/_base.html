@@ -371,7 +371,7 @@
   </dialog>
 
   <script>
-    var i18n = {
+    var cookieI18n = {
       cookieSaveFailed: "{% translate 'Failed to save cookie preferences. Please try again.' %}",
       alwaysActive:     "{% translate 'Always Active' %}",
     };
@@ -473,7 +473,7 @@
                   </div>
                   <div class="flex items-center gap-2 shrink-0">
                     ${group.required
-                      ? `<span class="badge badge-sm badge-neutral">${i18n.alwaysActive}</span>
+                      ? `<span class="badge badge-sm badge-neutral">${cookieI18n.alwaysActive}</span>
                          <input type="checkbox" class="toggle toggle-sm toggle-primary" id="cookie-${group.id}" checked disabled>`
                       : `<input type="checkbox" class="toggle toggle-sm toggle-primary" id="cookie-${group.id}" ${group.enabled ? 'checked' : ''}>`
                     }
@@ -513,27 +513,23 @@
                     console.error(`Failed to save ${group.id} cookie setting:`, response.status);
                     throw new Error(`Failed to save ${group.id} cookie setting`);
                   }
-                  return [...results, response];
-                });
-              }
-              return results;
-            });
-          }, Promise.resolve([]));
+                  return response;
+                })
+              );
+            }
+          });
+
+          return Promise.all(promises);
         })
-        .then(responses => {
-          const allOk = responses.every(response => response.ok);
-          if (allOk) {
-            setBannerShownCookie();
-            hideCookieBanner();
-            cookieSettingsModal.close();
-            setTimeout(() => location.reload(), 300);
-          } else {
-            console.error('Some cookie settings failed to save');
-          }
+        .then(() => {
+          setBannerShownCookie();
+          hideCookieBanner();
+          cookieSettingsModal.close();
+          setTimeout(() => location.reload(), 300);
         })
         .catch(error => {
           console.error('Error saving cookie settings:', error);
-          alert(i18n.cookieSaveFailed);
+          alert(cookieI18n.cookieSaveFailed);
         });
     }
 
