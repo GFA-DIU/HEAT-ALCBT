@@ -22,14 +22,15 @@ class ToastNotification {
 
     /**
      * Initialize the toast container if it doesn't exist
-     * Handles native HTML dialogs by appending inside open dialogs
+     * Always appends to document.body so toasts render above any open
+     * <dialog> stacking context.
      */
     initContainer(position) {
         const containerId = `toast-stack-${position}`;
 
-        // Check for open native dialog (top layer)
-        const openDialog = document.querySelector('dialog[open]');
-        const parent = openDialog || document.body;
+        // Always use body as parent — dialogs create their own stacking context
+        // which would clip toasts rendered inside them.
+        const parent = document.body;
 
         // Look for existing container in the correct parent
         let container = parent.querySelector(`#${containerId}`);
