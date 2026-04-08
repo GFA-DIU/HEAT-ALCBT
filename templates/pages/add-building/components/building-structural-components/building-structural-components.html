@@ -1434,13 +1434,14 @@
 })();
 
 // Show a toast error when the server rejects an EPD add (e.g. unit mismatch)
-document.body.addEventListener('htmx:responseError', function(evt) {
+document.body.addEventListener('htmx:afterRequest', function(evt) {
+  if (evt.detail.successful) return;
   var xhr = evt.detail.xhr;
   if (!xhr) return;
   var target = evt.detail.target;
   // Only handle errors aimed at the component or structural materials lists
   if (target && (target.id === 'component_materials_list' || target.id === 'structural_materials_list')) {
-    var msg = xhr.responseText || 'This EPD cannot be added due to a unit mismatch.';
+    var msg = (xhr.responseText || '').trim() || 'This EPD cannot be added due to a unit mismatch.';
     if (window.Toast) Toast.error(msg, { duration: 6000 });
   }
 });
