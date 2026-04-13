@@ -1336,7 +1336,7 @@
             <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
               ${item.category_name || i18n.noCategory}
             </span>
-            <p class="text-sm/5 text-[var(--text--sub-600)]">${item.quantity || '-'} ${item.dimension || ''}</p>
+            <p class="text-sm/5 text-[var(--text--sub-600)]">${item.quantity || '-'} ${{ area: 'm²', volume: 'm³', mass: 'kg', length: 'm', pcs: 'pcs' }[item.dimension] || item.dimension || ''}</p>
           </div>
         </div>
         <div class="flex gap-2">
@@ -1433,16 +1433,42 @@
   {% endif %}
 })();
 
-// Show a toast error when the server rejects an EPD add (e.g. unit mismatch)
+// Show an inline error on the EPD list item when the server rejects an add (e.g. unit mismatch)
 document.body.addEventListener('htmx:afterRequest', function(evt) {
+  var target = evt.detail.target;
+  var isEpdTarget = target && (target.id === 'component_materials_list' || target.id === 'structural_materials_list');
+  if (!isEpdTarget) return;
+
+  // Clear any existing inline errors in the EPD list
+  var epdList = document.getElementById('structural_epd_list');
+  if (epdList) {
+    epdList.querySelectorAll('.epd-inline-error').forEach(function(el) { el.remove(); });
+  }
+
   if (evt.detail.successful) return;
+
   var xhr = evt.detail.xhr;
   if (!xhr) return;
-  var target = evt.detail.target;
-  // Only handle errors aimed at the component or structural materials lists
-  if (target && (target.id === 'component_materials_list' || target.id === 'structural_materials_list')) {
-    var msg = (xhr.responseText || '').trim() || 'This EPD cannot be added due to a unit mismatch.';
-    if (window.Toast) Toast.error(msg, { duration: 6000 });
+
+  var msg = (xhr.responseText || '').trim() || '{% translate "This EPD cannot be added due to a unit mismatch." %}';
+
+  // Find the <li> containing the Add button that was clicked
+  var triggerBtn = evt.detail.elt;
+  var listItem = triggerBtn ? triggerBtn.closest('li') : null;
+  if (!listItem) return;
+
+  var errorEl = document.createElement('p');
+  errorEl.className = 'epd-inline-error text-xs text-[var(--state--error-base)] mt-1.5 flex items-center gap-1';
+  errorEl.innerHTML = '<span data-icon="error-warning-line" data-size="14"></span><span>' + msg + '</span>';
+
+  // Append inside the info column (alongside name and badges)
+  var infoDiv = listItem.querySelector('.flex.flex-col');
+  if (infoDiv) {
+    infoDiv.appendChild(errorEl);
+  } else {
+    listItem.appendChild(errorEl);
   }
+
+  if (window.IconComponent) window.IconComponent.initialize(errorEl);
 });
 </script>

@@ -448,7 +448,7 @@ def handle_structural_components_step(request):
                         'quantity': float(sp.quantity),
                         'unit': sp.input_unit,
                         'description': sp.description or '',
-                        'gwp': float(sp.epd.get_gwp_impact_sum("A1-A3") or 0),
+                        'gwp': float(sp.epd.get_gwp_impact_sum("a1a3") or 0),
                         'country': sp.epd.country.name if sp.epd.country else 'Unknown',
                     }
 
@@ -579,7 +579,7 @@ def save_building_step(request):
                     latitude=step_data.get('latitude') if step_data.get('latitude') else None,
                     created_by=request.user,
                     # Add minimal defaults for required fields
-                    climate_zone='tropical-wet',  # Default, will be updated in step 1.2
+                    climate_zone=None,  # Will be updated in step 1.2
                     total_floor_area=100,  # Will be updated in step 1.2
                     reference_period=50,    # Will be updated in step 1.2
                 )
