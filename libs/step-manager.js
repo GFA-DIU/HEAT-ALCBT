@@ -455,7 +455,32 @@ class StepManager {
     const contentArea = document.getElementById("dynamic-content");
 
     if (!contentArea) return;
-  
+
+    // In add mode, guard any step beyond step 1 substep 1 when there is no building UUID.
+    // This prevents accessing later steps without completing Name & Location first.
+    // Check both URL and formData — after saving step 1 the UUID is stored in formData
+    // before updateUrl() has had a chance to put it in the URL.
+    const hasUuid = this.getBuildingId()
+      || this.formData['building-information/building-name-location']?.building_uuid;
+    const isNameLocationStep = this.currentStep === 1 && this.currentSubStep === 1;
+    if (!this.editMode && !hasUuid && !isNameLocationStep) {
+      contentArea.innerHTML = `
+        <div class="flex flex-col items-center justify-center h-64 text-center gap-4">
+          <div class="alert alert-warning max-w-md">
+            <div>
+              <p class="font-semibold">${gettext("No building found.")}</p>
+              <p class="text-sm mt-1">${gettext("Please start by filling in the Building Name & Location, or go to an existing building to edit it.")}</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <a href="/building/_new" class="btn btn-primary btn-sm">${gettext("Create New Building")}</a>
+            <a href="/" class="btn btn-outline btn-sm">${gettext("Go to Dashboard")}</a>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
     // Show loading state
     contentArea.innerHTML = `
       <div class="flex items-center justify-center h-64">
@@ -586,6 +611,7 @@ class StepManager {
     const subStep = step.subSteps[this.currentSubStep - 1];
     const saveBtn = document.getElementById("save-and-continue");
     const goBackBtn = document.getElementById("go-back");
+    const skipBtn = document.getElementById("skip");
 
     if (saveBtn) {
       const isValid = this.validateCurrentStep();
@@ -603,8 +629,25 @@ class StepManager {
     }
 
     if (goBackBtn) {
-      const isFirstStep = this.currentStep === 1 && this.currentSubStep === 1;
-      goBackBtn.disabled = isFirstStep;
+      const isFirstSubStep = this.currentStep === 1 && this.currentSubStep === 1;
+      // In add mode, disable Go Back on step 1 substep 2 (Building Details) —
+      // once a building is created the user cannot go back to Name & Location.
+      const hasUuid = this.getBuildingId()
+        || this.formData['building-information/building-name-location']?.building_uuid;
+      const isLockedOnBuildingDetails = !this.editMode && hasUuid &&
+        this.currentStep === 1 && this.currentSubStep === 2;
+      goBackBtn.disabled = isFirstSubStep || !!isLockedOnBuildingDetails;
+    }
+
+    if (skipBtn) {
+      // In add mode: hide skip on step 1 substep 1 (Name & Location) and
+      // step 1 substep 2 (Building Details) — both are unskippable.
+      if (!this.editMode) {
+        const isUnskippable = this.currentStep === 1;
+        skipBtn.style.display = isUnskippable ? 'none' : '';
+      } else {
+        skipBtn.style.display = '';
+      }
     }
   }
 
@@ -1163,7 +1206,15 @@ class StepManager {
 
   
   goToStep(step) {
-    this.currentStep = parseInt(step);
+    const targetStep = parseInt(step);
+    // In add mode, once a building is created, step 1 substep 1 (Name & Location) is locked.
+    // Clicking step 1 in the nav would land on substep 1, so block it entirely.
+    const hasUuid = this.getBuildingId()
+      || this.formData['building-information/building-name-location']?.building_uuid;
+    if (!this.editMode && hasUuid && targetStep === 1) {
+      return;
+    }
+    this.currentStep = targetStep;
     this.currentSubStep = 1;
     this.renderStepNavigation();
     this.updateCurrentStepInfo();
@@ -1173,8 +1224,16 @@ class StepManager {
   }
 
   goToSubStep(step, subStep) {
-    this.currentStep = parseInt(step);
-    this.currentSubStep = parseInt(subStep);
+    const targetStep = parseInt(step);
+    const targetSubStep = parseInt(subStep);
+    // In add mode, once a building is created, step 1 substep 1 (Name & Location) is locked.
+    const hasUuid = this.getBuildingId()
+      || this.formData['building-information/building-name-location']?.building_uuid;
+    if (!this.editMode && hasUuid && targetStep === 1 && targetSubStep === 1) {
+      return;
+    }
+    this.currentStep = targetStep;
+    this.currentSubStep = targetSubStep;
     this.renderStepNavigation();
     this.updateCurrentStepInfo();
     this.loadCurrentStep();
