@@ -163,10 +163,12 @@ def calculate_total_operational_carbon(building: Building, simulated: bool = Fal
     else:
         operational_products = building.operational_products.all()
 
+    reference_period = Decimal(str(building.reference_period))
+
     for op in operational_products:
         try:
             impacts = calculate_impact_operational(op)
-            total_gwp_b6 += impacts.get('gwp_b6', Decimal('0.0'))
+            total_gwp_b6 += impacts.get('gwp_b6', Decimal('0.0')) * reference_period
         except (ValueError, AttributeError, ZeroDivisionError) as e:
             # Skip products with calculation errors
             continue
@@ -428,6 +430,8 @@ def get_operational_carbon_by_system(building: Building, simulated: bool = False
     else:
         operational_products = building.operational_products.all()
 
+    reference_period = Decimal(str(building.reference_period))
+
     for op in operational_products:
         try:
             # Categorize by EPD category or use a default
@@ -451,7 +455,7 @@ def get_operational_carbon_by_system(building: Building, simulated: bool = False
                     system_type = "Gas/Fuel"
 
             impacts = calculate_impact_operational(op)
-            gwp_b6 = impacts.get('gwp_b6', Decimal('0.0'))
+            gwp_b6 = impacts.get('gwp_b6', Decimal('0.0')) * reference_period
             carbon_by_system[system_type] += gwp_b6
 
         except (ValueError, AttributeError, ZeroDivisionError):
