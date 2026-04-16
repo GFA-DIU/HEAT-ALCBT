@@ -142,11 +142,13 @@ def calculate_total_embodied_carbon(building: Building, simulated: bool = False)
                     p=structural_product
                 )
 
-                # Sum up GWP impacts (A1-A3)
+                # Sum up positive GWP impacts (A1-A3) only — matches old dashboard behaviour
                 for impact in impacts:
                     if impact['impact_type'].impact_category == 'gwp' and \
-                       impact['impact_type'].life_cycle_stage in ['a1a3', 'a1-a3']:
-                        total_gwp += Decimal(str(impact['impact_value']))
+                       impact['impact_type'].life_cycle_stage == 'a1a3':
+                        value = Decimal(str(impact['impact_value']))
+                        if value > 0:
+                            total_gwp += value
 
             except (ValueError, AttributeError, ZeroDivisionError) as e:
                 # Skip products with calculation errors
@@ -330,15 +332,17 @@ def get_embodied_carbon_by_assembly(building: Building, simulated: bool = False)
 
                 for impact in impacts:
                     if impact['impact_type'].impact_category == 'gwp' and \
-                       impact['impact_type'].life_cycle_stage in ['a1a3', 'a1-a3']:
-                        # Use per-product classification (same source as old dashboard)
-                        assembly_category = impact.get('assembly_category', '')
-                        if assembly_category:
-                            full_label = str(assembly_category)
-                            label = full_label.split("- ", 1)[1] if "- " in full_label else full_label
-                        else:
-                            label = assembly_name
-                        carbon_by_assembly[label] += Decimal(str(impact['impact_value']))
+                       impact['impact_type'].life_cycle_stage == 'a1a3':
+                        value = Decimal(str(impact['impact_value']))
+                        if value > 0:
+                            # Use per-product classification (same source as old dashboard)
+                            assembly_category = impact.get('assembly_category', '')
+                            if assembly_category:
+                                full_label = str(assembly_category)
+                                label = full_label.split("- ", 1)[1] if "- " in full_label else full_label
+                            else:
+                                label = assembly_name
+                            carbon_by_assembly[label] += value
 
             except (ValueError, AttributeError, ZeroDivisionError):
                 continue
@@ -402,8 +406,10 @@ def get_embodied_carbon_by_material(building: Building, simulated: bool = False)
 
                 for impact in impacts:
                     if impact['impact_type'].impact_category == 'gwp' and \
-                       impact['impact_type'].life_cycle_stage in ['a1a3', 'a1-a3']:
-                        carbon_by_material[material_category] += Decimal(str(impact['impact_value']))
+                       impact['impact_type'].life_cycle_stage == 'a1a3':
+                        value = Decimal(str(impact['impact_value']))
+                        if value > 0:
+                            carbon_by_material[material_category] += value
 
             except (ValueError, AttributeError, ZeroDivisionError):
                 continue
