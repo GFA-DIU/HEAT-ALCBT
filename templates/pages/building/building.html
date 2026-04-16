@@ -434,150 +434,112 @@
                     },
                   },
                 },
+                datalabels: {
+                  display: true,
+                  color: "white",
+                  font: { size: 13, weight: "bold" },
+                  formatter: function (value, context) {
+                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    if (total === 0) return "";
+                    const pct = (value / total * 100).toFixed(0);
+                    return pct + "%";
+                  },
+                },
               },
             },
+            plugins: [ChartDataLabels],
           });
         }
 
-        const barChartDefaults = {
-          type: "bar",
-          options: {
-            indexAxis: "y",
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-              padding: {
-                left: 0,
-                right: 48,
-                top: 16,
-                bottom: 10,
-              },
+        function makeBarChart(chartLabels, percentData, absoluteData, barColor) {
+          const afterBarText = chartLabels.map((lbl, i) => percentData[i] + "% - " + lbl);
+
+          return {
+            type: "bar",
+            data: {
+              labels: chartLabels,
+              datasets: [
+                {
+                  data: percentData,
+                  backgroundColor: barColor,
+                  borderRadius: 8,
+                  barPercentage: 0.6,
+                  categoryPercentage: 0.8,
+                  datalabels: {
+                    display: true,
+                    anchor: "end",
+                    align: "right",
+                    clip: false,
+                    offset: 4,
+                    color: strongTextColor,
+                    font: { size: 12 },
+                    formatter: function (value, context) {
+                      return afterBarText[context.dataIndex];
+                    },
+                  },
+                },
+              ],
             },
-            scales: {
-              x: {
-                beginAtZero: true,
-                max: 100,
-                grid: {
-                  color: gridLineColor,
-                  drawTicks: false,
-                },
-                border: {
-                  display: false,
-                  dash: [4, 4],
-                },
-                ticks: {
-                  color: softTextColor,
-                  font: {
-                    size: 11,
+            options: {
+              indexAxis: "y",
+              responsive: true,
+              maintainAspectRatio: false,
+              layout: {
+                padding: { left: 0, right: 220, top: 16, bottom: 10 },
+              },
+              scales: {
+                x: {
+                  beginAtZero: true,
+                  max: 100,
+                  grid: { color: gridLineColor, drawTicks: false },
+                  border: { display: false, dash: [4, 4] },
+                  ticks: {
+                    color: softTextColor,
+                    font: { size: 11 },
+                    callback: function (value) { return value + "%"; },
+                    padding: 8,
                   },
-                  callback: function (value) {
-                    return value + "%";
-                  },
-                  padding: 8,
+                },
+                y: {
+                  grid: { display: false },
+                  border: { display: false },
+                  ticks: { display: false },
                 },
               },
-              y: {
-                grid: {
-                  display: false,
-                  drawBorder: false,
-                },
-                border: {
-                  display: false,
-                },
-                afterFit: function(scaleInstance) {
-                  scaleInstance.width = 160;
-                },
-                ticks: {
-                  color: strongTextColor,
-                  font: {
-                    size: 12,
-                  },
-                  padding: 12,
-                  crossAlign: "far",
-                  autoSkip: false,
-                  callback: function (value, index, ticks) {
-                    const label = this.getLabelForValue(value);
-                    const maxWidth = 140;
-                    const ctx = this.chart.ctx;
-                    ctx.font = "12px sans-serif";
-
-                    const textWidth = ctx.measureText(label).width;
-
-                    if (textWidth > maxWidth) {
-                      // Truncate with ellipsis instead of wrapping — keeps row height consistent
-                      let truncated = label;
-                      while (ctx.measureText(truncated + "…").width > maxWidth && truncated.length > 0) {
-                        truncated = truncated.slice(0, -1);
-                      }
-                      return truncated + "…";
-                    }
-
-                    return label;
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  enabled: true,
+                  backgroundColor: "rgba(0,0,0,0.8)",
+                  padding: 10,
+                  displayColors: false,
+                  callbacks: {
+                    title: function () { return ""; },
+                    label: function (context) {
+                      const abs = absoluteData[context.dataIndex];
+                      return abs.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " kgCO₂eq/m²";
+                    },
                   },
                 },
               },
             },
-            plugins: {
-              legend: {
-                display: false,
-              },
-              tooltip: {
-                enabled: true,
-                backgroundColor: "rgba(0, 0, 0, 0.8)",
-                padding: 10,
-                displayColors: false,
-                callbacks: {
-                  title: function () {
-                    return "";
-                  },
-                  label: function (context) {
-                    return context.parsed.x + "%";
-                  },
-                },
-              },
-              datalabels: {
-                display: true,
-                anchor: "end",
-                align: "right",
-                offset: 4,
-                clip: false,
-                color: strongTextColor,
-                font: {
-                  size: 11,
-                  weight: "500",
-                },
-                formatter: function (value) {
-                  return value + "%";
-                },
-              },
-            },
-          },
-          plugins: [],
-        };
+            plugins: [ChartDataLabels],
+          };
+        }
 
         // Initialize the Embodied Carbon by Assembly bar chart
         const embodiedCtx = document.getElementById("emboided-carbon-chart");
 
         if (embodiedCtx) {
-          const assemblyData = chartData.embodied_by_assembly || { labels: [], data: [] };
-
+          const assemblyData = chartData.embodied_by_assembly || { labels: [], data: [], absolute: [] };
           const embodiedLabels = assemblyData.labels.length > 0 ? assemblyData.labels : [i18n.noData];
           embodiedCtx.style.height = Math.max(180, embodiedLabels.length * 52) + "px";
-          new Chart(embodiedCtx, {
-            ...barChartDefaults,
-            data: {
-              labels: embodiedLabels,
-              datasets: [
-                {
-                  data: assemblyData.data.length > 0 ? assemblyData.data : [0],
-                  backgroundColor: primaryColor,
-                  borderRadius: 2,
-                  barPercentage: 0.6,
-                  categoryPercentage: 0.8,
-                },
-              ],
-            },
-          });
+          new Chart(embodiedCtx, makeBarChart(
+            embodiedLabels,
+            assemblyData.data.length > 0 ? assemblyData.data : [0],
+            assemblyData.absolute.length > 0 ? assemblyData.absolute : [0],
+            primaryColor
+          ));
         }
 
         // Initialize the Embodied Carbon by Material bar chart
@@ -586,25 +548,15 @@
         );
 
         if (embodiedCarbonByMaterialChart) {
-          const materialData = chartData.embodied_by_material || { labels: [], data: [] };
+          const materialData = chartData.embodied_by_material || { labels: [], data: [], absolute: [] };
           const materialLabels = materialData.labels.length > 0 ? materialData.labels : [i18n.noData];
           embodiedCarbonByMaterialChart.style.height = Math.max(180, materialLabels.length * 52) + "px";
-
-          new Chart(embodiedCarbonByMaterialChart, {
-            ...barChartDefaults,
-            data: {
-              labels: materialLabels,
-              datasets: [
-                {
-                  data: materialData.data.length > 0 ? materialData.data : [0],
-                  backgroundColor: stateFeatureBaseColor,
-                  borderRadius: 2,
-                  barPercentage: 0.6,
-                  categoryPercentage: 0.8,
-                },
-              ],
-            },
-          });
+          new Chart(embodiedCarbonByMaterialChart, makeBarChart(
+            materialLabels,
+            materialData.data.length > 0 ? materialData.data : [0],
+            materialData.absolute.length > 0 ? materialData.absolute : [0],
+            stateFeatureBaseColor
+          ));
         }
 
         // Initialize the Operational Carbon by System/Appliances bar chart
@@ -613,25 +565,15 @@
         );
 
         if (embodiedCarbonByAppliancesChart) {
-          const systemData = chartData.operational_by_system || { labels: [], data: [] };
+          const systemData = chartData.operational_by_system || { labels: [], data: [], absolute: [] };
           const systemLabels = systemData.labels.length > 0 ? systemData.labels : [i18n.noData];
           embodiedCarbonByAppliancesChart.style.height = Math.max(180, systemLabels.length * 52) + "px";
-
-          new Chart(embodiedCarbonByAppliancesChart, {
-            ...barChartDefaults,
-            data: {
-              labels: systemLabels,
-              datasets: [
-                {
-                  data: systemData.data.length > 0 ? systemData.data : [0],
-                  backgroundColor: primaryColor,
-                  borderRadius: 2,
-                  barPercentage: 0.6,
-                  categoryPercentage: 0.8,
-                },
-              ],
-            },
-          });
+          new Chart(embodiedCarbonByAppliancesChart, makeBarChart(
+            systemLabels,
+            systemData.data.length > 0 ? systemData.data : [0],
+            systemData.absolute.length > 0 ? systemData.absolute : [0],
+            primaryColor
+          ));
         }
       }
     });
