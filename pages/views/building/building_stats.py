@@ -319,13 +319,6 @@ def get_embodied_carbon_by_assembly(building: Building, simulated: bool = False)
         assembly_quantity = ba.quantity
         assembly_name = assembly.name or "Unknown"
 
-        # If assembly has a classification, use that; strip the code prefix (e.g. "MEM05 - ")
-        if assembly.classification and assembly.classification.category:
-            full_label = str(assembly.classification.category)
-            label = full_label.split("- ", 1)[1] if "- " in full_label else full_label
-        else:
-            label = assembly_name
-
         for structural_product in assembly.structuralproduct_set.all():
             try:
                 impacts = calculate_impacts(
@@ -338,6 +331,13 @@ def get_embodied_carbon_by_assembly(building: Building, simulated: bool = False)
                 for impact in impacts:
                     if impact['impact_type'].impact_category == 'gwp' and \
                        impact['impact_type'].life_cycle_stage in ['a1a3', 'a1-a3']:
+                        # Use per-product classification (same source as old dashboard)
+                        assembly_category = impact.get('assembly_category', '')
+                        if assembly_category:
+                            full_label = str(assembly_category)
+                            label = full_label.split("- ", 1)[1] if "- " in full_label else full_label
+                        else:
+                            label = assembly_name
                         carbon_by_assembly[label] += Decimal(str(impact['impact_value']))
 
             except (ValueError, AttributeError, ZeroDivisionError):
@@ -351,12 +351,14 @@ def get_embodied_carbon_by_assembly(building: Building, simulated: bool = False)
 
     labels = []
     data = []
+    absolute = []
     for label, value in sorted_items[:10]:  # Top 10 items
         labels.append(label)
         percentage = float((value / total) * 100)
         data.append(round(percentage, 1))
+        absolute.append(round(float(value), 2))
 
-    return {'labels': labels, 'data': data}
+    return {'labels': labels, 'data': data, 'absolute': absolute}
 
 
 def get_embodied_carbon_by_material(building: Building, simulated: bool = False) -> Dict[str, Any]:
@@ -414,12 +416,14 @@ def get_embodied_carbon_by_material(building: Building, simulated: bool = False)
 
     labels = []
     data = []
+    absolute = []
     for label, value in sorted_items[:10]:  # Top 10 items
         labels.append(label)
         percentage = float((value / total) * 100)
         data.append(round(percentage, 1))
+        absolute.append(round(float(value), 2))
 
-    return {'labels': labels, 'data': data}
+    return {'labels': labels, 'data': data, 'absolute': absolute}
 
 
 def get_operational_carbon_by_system(building: Building, simulated: bool = False) -> Dict[str, Any]:
@@ -479,12 +483,14 @@ def get_operational_carbon_by_system(building: Building, simulated: bool = False
 
     labels = []
     data = []
+    absolute = []
     for label, value in sorted_items:
         labels.append(label)
         percentage = float((value / total) * 100)
         data.append(round(percentage, 1))
+        absolute.append(round(float(value), 2))
 
-    return {'labels': labels, 'data': data}
+    return {'labels': labels, 'data': data, 'absolute': absolute}
 
 
 def get_building_chart_data(building: Building) -> Dict[str, Any]:
