@@ -10,6 +10,8 @@ This module provides functions to calculate dynamic statistics for buildings:
 - Chart data for visualizations (by assembly, material, system)
 """
 
+import json
+import os
 from collections import defaultdict
 from decimal import Decimal
 from typing import Dict, Any, List
@@ -19,6 +21,14 @@ from pages.models.building import Building
 from pages.models.building_operation.chilling import CoolingSystemChiller
 from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
 from pages.views.building.impact_calculation import calculate_impacts, calculate_impact_operational
+
+_MAPPING_PATH = os.path.join(
+    os.path.dirname(__file__),
+    "building_dashboard",
+    "material_category_mapping.json",
+)
+with open(_MAPPING_PATH, "r") as _f:
+    _MATERIAL_CATEGORY_MAPPING = json.load(_f)
 
 
 def calculate_progress_percentage(building: Building) -> int:
@@ -309,9 +319,10 @@ def get_embodied_carbon_by_assembly(building: Building, simulated: bool = False)
         assembly_quantity = ba.quantity
         assembly_name = assembly.name or "Unknown"
 
-        # If assembly has a classification, use that; otherwise use assembly name
+        # If assembly has a classification, use that; strip the code prefix (e.g. "MEM05 - ")
         if assembly.classification and assembly.classification.category:
-            label = str(assembly.classification.category)
+            full_label = str(assembly.classification.category)
+            label = full_label.split("- ", 1)[1] if "- " in full_label else full_label
         else:
             label = assembly_name
 
@@ -372,14 +383,13 @@ def get_embodied_carbon_by_material(building: Building, simulated: bool = False)
 
         for structural_product in assembly.structuralproduct_set.all():
             try:
-                # Get material category from EPD
-                material_category = "Others"
-                if structural_product.epd and structural_product.epd.category:
-                    # Get the top-level category name
-                    cat = structural_product.epd.category
-                    while cat.parent:
-                        cat = cat.parent
-                    material_category = cat.name_en or "Others"
+                # Map EPD category name using the same mapping as the old dashboard
+                original_category = (
+                    str(structural_product.epd.category)
+                    if structural_product.epd and structural_product.epd.category
+                    else "Others"
+                )
+                material_category = _MATERIAL_CATEGORY_MAPPING.get(original_category, "Others")
 
                 impacts = calculate_impacts(
                     dimension=assembly.dimension,
