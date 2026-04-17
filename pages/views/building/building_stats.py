@@ -335,13 +335,12 @@ def get_embodied_carbon_by_assembly(building: Building, simulated: bool = False)
                        impact['impact_type'].life_cycle_stage == 'a1a3':
                         value = Decimal(str(impact['impact_value']))
                         if value > 0:
-                            # Use per-product classification (same source as old dashboard)
+                            # Use per-product classification — skip if no category
                             assembly_category = impact.get('assembly_category', '')
-                            if assembly_category:
-                                full_label = str(assembly_category)
-                                label = full_label.split("- ", 1)[1] if "- " in full_label else full_label
-                            else:
-                                label = assembly_name
+                            if not assembly_category:
+                                continue
+                            full_label = str(assembly_category)
+                            label = full_label.split("- ", 1)[1] if "- " in full_label else full_label
                             carbon_by_assembly[label] += value
 
             except (ValueError, AttributeError, ZeroDivisionError):
