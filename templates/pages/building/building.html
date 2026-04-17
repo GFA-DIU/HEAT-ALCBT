@@ -174,25 +174,8 @@
         <div class="grid place-items-center mt-6 w-[16.5rem] mx-auto">
           <canvas id="whole-life-carbon-cycle"></canvas>
         </div>
-        <div class="flex items-center mt-6 gap-3 justify-center">
-          <div class="flex items-center gap-2">
-            <div
-              class="size-2 rounded-full"
-              style="background-color: var(--state--feature--base)"
-            ></div>
-            <span class="text-sm text-[var(--text--sub-600)]"
-              >{% translate "Operational carbon:" %}</span
-            >
-          </div>
-          <div class="flex items-center gap-2">
-            <div
-              class="size-2 rounded-full"
-              style="background-color: var(--bg--surface-800)"
-            ></div>
-            <span class="text-sm text-[var(--text--sub-600)]"
-              >{% translate "Embodied carbon:" %}</span
-            >
-          </div>
+        <div class="flex justify-center mt-6">
+          <div id="whole-life-legend" class="flex flex-col gap-2"></div>
         </div>
       </div>
       <div
@@ -449,6 +432,23 @@
             },
             plugins: [ChartDataLabels],
           });
+
+          // Build legend: colour dot + label name + carbon value
+          const legendEl = document.getElementById("whole-life-legend");
+          if (legendEl) {
+            const colors = [operationalColor, embodiedColor];
+            wholeLifeData.labels.forEach(function (lbl, i) {
+              const value = wholeLifeData.data[i];
+              const formatted = value.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+              const row = document.createElement("div");
+              row.className = "flex items-center gap-2";
+              row.innerHTML = `
+                <div class="size-2 rounded-full flex-shrink-0" style="background-color:${colors[i]}"></div>
+                <span class="text-sm text-[var(--text--sub-600)]">${lbl}: ${formatted} kgCO₂eq/m²</span>
+              `;
+              legendEl.appendChild(row);
+            });
+          }
         }
 
         function makeBarChart(chartLabels, percentData, absoluteData, barColor) {
