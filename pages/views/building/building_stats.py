@@ -14,13 +14,12 @@ import json
 import os
 from collections import defaultdict
 from decimal import Decimal
-from typing import Dict, Any, List
-from django.db.models import Sum, Q
+from typing import Dict, Any, List, Optional
 
 from pages.models.building import Building
 from pages.models.building_operation.chilling import CoolingSystemChiller
 from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
-from pages.views.building.impact_calculation import calculate_impacts, calculate_impact_operational
+from pages.views.building.impact_calculation import calculate_impacts, calculate_impact_operational, ImpactCalculationError
 
 _MAPPING_PATH = os.path.join(
     os.path.dirname(__file__),
@@ -107,34 +106,42 @@ def calculate_progress_percentage(building: Building) -> int:
     return min(progress, 100)  # Cap at 100%
 
 
-def calculate_total_embodied_carbon(building: Building, simulated: bool = False) -> Decimal:
+def calculate_total_embodied_carbon(
+    building: Building,
+    simulated: bool = False,
+    prefetched_assemblies=None,
+    calculation_errors: Optional[list] = None,
+) -> Decimal:
     """
     Calculate total embodied carbon (GWP A1-A3) from structural components.
 
     Args:
         building: Building instance to calculate for
         simulated: If True, calculate for simulated components; if False, for actual components
+        prefetched_assemblies: Optional pre-fetched BuildingAssembly queryset/list to avoid re-querying
+        calculation_errors: Optional list to append (assembly_name, epd_name, reason) tuples for skipped products
 
     Returns:
         Total embodied carbon in kgCO2e/m² (normalized by floor area)
     """
     total_gwp = Decimal('0.0')
 
-    if simulated:
-        # Get simulated assemblies
+    if prefetched_assemblies is not None:
+        building_assemblies = prefetched_assemblies
+    elif simulated:
         building_assemblies = building.buildingassemblysimulated_set.all()
     else:
-        # Get actual assemblies
         building_assemblies = building.buildingassembly_set.all()
 
     for ba in building_assemblies:
         assembly = ba.assembly
         assembly_quantity = ba.quantity
+        products = getattr(assembly, "prefetched_products", None)
+        if products is None:
+            products = assembly.structuralproduct_set.all()
 
-        # Get all structural products in this assembly
-        for structural_product in assembly.structuralproduct_set.all():
+        for structural_product in products:
             try:
-                # Calculate impacts for this product
                 impacts = calculate_impacts(
                     dimension=assembly.dimension,
                     assembly_quantity=assembly_quantity,
@@ -142,7 +149,6 @@ def calculate_total_embodied_carbon(building: Building, simulated: bool = False)
                     p=structural_product
                 )
 
-                # Sum up positive GWP impacts (A1-A3) only — matches old dashboard behaviour
                 for impact in impacts:
                     if impact['impact_type'].impact_category == 'gwp' and \
                        impact['impact_type'].life_cycle_stage == 'a1a3':
@@ -150,27 +156,40 @@ def calculate_total_embodied_carbon(building: Building, simulated: bool = False)
                         if value > 0:
                             total_gwp += value
 
-            except (ValueError, AttributeError, ZeroDivisionError) as e:
-                # Skip products with calculation errors
+            except (ImpactCalculationError, ValueError, AttributeError, ZeroDivisionError) as e:
+                if calculation_errors is not None:
+                    epd_name = getattr(getattr(structural_product, 'epd', None), 'name', 'Unknown EPD')
+                    calculation_errors.append({
+                        'assembly': assembly.name or 'Unknown assembly',
+                        'epd': epd_name,
+                        'reason': str(e),
+                    })
                 continue
 
     return total_gwp
 
 
-def calculate_total_operational_carbon(building: Building, simulated: bool = False) -> Decimal:
+def calculate_total_operational_carbon(
+    building: Building,
+    simulated: bool = False,
+    prefetched_operational=None,
+) -> Decimal:
     """
     Calculate total operational carbon (GWP B6) from operational products.
 
     Args:
         building: Building instance to calculate for
         simulated: If True, calculate for simulated products; if False, for actual products
+        prefetched_operational: Optional pre-fetched operational product list to avoid re-querying
 
     Returns:
         Total operational carbon in kgCO2e/m² (normalized by floor area)
     """
     total_gwp_b6 = Decimal('0.0')
 
-    if simulated:
+    if prefetched_operational is not None:
+        operational_products = prefetched_operational
+    elif simulated:
         operational_products = building.simulated_operational_products.all()
     else:
         operational_products = building.operational_products.all()
@@ -181,27 +200,36 @@ def calculate_total_operational_carbon(building: Building, simulated: bool = Fal
         try:
             impacts = calculate_impact_operational(op)
             total_gwp_b6 += impacts.get('gwp_b6', Decimal('0.0')) * reference_period
-        except (ValueError, AttributeError, ZeroDivisionError) as e:
-            # Skip products with calculation errors
+        except (ValueError, AttributeError, ZeroDivisionError):
             continue
 
     return total_gwp_b6
 
 
-def calculate_total_carbon_footprint(building: Building, simulated: bool = False) -> Decimal:
+def calculate_total_carbon_footprint(
+    building: Building,
+    simulated: bool = False,
+    prefetched_assemblies=None,
+    prefetched_operational=None,
+) -> Decimal:
     """
     Calculate total carbon footprint (embodied + operational).
 
     Args:
         building: Building instance to calculate for
         simulated: If True, calculate for simulated components; if False, for actual components
+        prefetched_assemblies: Optional pre-fetched assembly list
+        prefetched_operational: Optional pre-fetched operational product list
 
     Returns:
         Total carbon footprint in kgCO2e/m²
     """
-    embodied = calculate_total_embodied_carbon(building, simulated=simulated)
-    operational = calculate_total_operational_carbon(building, simulated=simulated)
-
+    embodied = calculate_total_embodied_carbon(
+        building, simulated=simulated, prefetched_assemblies=prefetched_assemblies
+    )
+    operational = calculate_total_operational_carbon(
+        building, simulated=simulated, prefetched_operational=prefetched_operational
+    )
     return embodied + operational
 
 
@@ -270,15 +298,18 @@ def get_building_statistics(building: Building) -> Dict[str, Any]:
 # Building Detail Page Statistics and Chart Data
 # ============================================================================
 
-def get_building_detail_statistics(building: Building) -> Dict[str, Any]:
+def get_building_detail_statistics(
+    building: Building,
+    prefetched_assemblies=None,
+    prefetched_operational=None,
+) -> Dict[str, Any]:
     """
     Get all statistics for a building detail page.
 
-    This includes all the statistics from get_building_statistics plus
-    operational carbon which is displayed on the detail page.
-
     Args:
         building: Building instance to calculate statistics for
+        prefetched_assemblies: Optional pre-fetched assembly list (avoids re-querying)
+        prefetched_operational: Optional pre-fetched operational product list
 
     Returns:
         Dictionary containing all building statistics for detail page:
@@ -286,32 +317,51 @@ def get_building_detail_statistics(building: Building) -> Dict[str, Any]:
         - total_embodied_carbon: Decimal (kgCO2e/m²)
         - total_operational_carbon: Decimal (kgCO2e/m²)
         - carbon_savings_percentage: Decimal (%)
+        - calculation_errors: list of dicts with assembly/epd/reason for skipped products
     """
-    embodied = calculate_total_embodied_carbon(building, simulated=False)
-    operational = calculate_total_operational_carbon(building, simulated=False)
+    calculation_errors = []
+    embodied = calculate_total_embodied_carbon(
+        building,
+        simulated=False,
+        prefetched_assemblies=prefetched_assemblies,
+        calculation_errors=calculation_errors,
+    )
+    operational = calculate_total_operational_carbon(
+        building,
+        simulated=False,
+        prefetched_operational=prefetched_operational,
+    )
 
     return {
         'total_carbon_footprint': embodied + operational,
         'total_embodied_carbon': embodied,
         'total_operational_carbon': operational,
         'carbon_savings_percentage': calculate_carbon_savings_percentage(building),
+        'calculation_errors': calculation_errors,
     }
 
 
-def get_embodied_carbon_by_assembly(building: Building, simulated: bool = False) -> Dict[str, Any]:
+def get_embodied_carbon_by_assembly(
+    building: Building,
+    simulated: bool = False,
+    prefetched_assemblies=None,
+) -> Dict[str, Any]:
     """
     Calculate embodied carbon grouped by assembly classification.
 
     Args:
         building: Building instance to calculate for
         simulated: If True, calculate for simulated components
+        prefetched_assemblies: Optional pre-fetched assembly list
 
     Returns:
-        Dictionary with 'labels' and 'data' for chart rendering
+        Dictionary with 'labels', 'data', 'absolute', and 'total' for chart rendering
     """
     carbon_by_assembly = defaultdict(Decimal)
 
-    if simulated:
+    if prefetched_assemblies is not None:
+        building_assemblies = prefetched_assemblies
+    elif simulated:
         building_assemblies = building.buildingassemblysimulated_set.all()
     else:
         building_assemblies = building.buildingassembly_set.all()
@@ -319,9 +369,11 @@ def get_embodied_carbon_by_assembly(building: Building, simulated: bool = False)
     for ba in building_assemblies:
         assembly = ba.assembly
         assembly_quantity = ba.quantity
-        assembly_name = assembly.name or "Unknown"
+        products = getattr(assembly, "prefetched_products", None)
+        if products is None:
+            products = assembly.structuralproduct_set.all()
 
-        for structural_product in assembly.structuralproduct_set.all():
+        for structural_product in products:
             try:
                 impacts = calculate_impacts(
                     dimension=assembly.dimension,
@@ -335,7 +387,6 @@ def get_embodied_carbon_by_assembly(building: Building, simulated: bool = False)
                        impact['impact_type'].life_cycle_stage == 'a1a3':
                         value = Decimal(str(impact['impact_value']))
                         if value > 0:
-                            # Use per-product classification — skip if no category
                             assembly_category = impact.get('assembly_category', '')
                             if not assembly_category:
                                 continue
@@ -343,41 +394,46 @@ def get_embodied_carbon_by_assembly(building: Building, simulated: bool = False)
                             label = full_label.split("- ", 1)[1] if "- " in full_label else full_label
                             carbon_by_assembly[label] += value
 
-            except (ValueError, AttributeError, ZeroDivisionError):
+            except (ImpactCalculationError, ValueError, AttributeError, ZeroDivisionError):
                 continue
 
-    # Sort by value descending and take top items
     sorted_items = sorted(carbon_by_assembly.items(), key=lambda x: x[1], reverse=True)
-
-    # Calculate total for percentage
     total = sum(v for _, v in sorted_items) or Decimal('1')
 
     labels = []
     data = []
     absolute = []
-    for label, value in sorted_items[:10]:  # Top 10 items
+    for label, value in sorted_items[:10]:
         labels.append(label)
         percentage = float((value / total) * 100)
         data.append(round(percentage, 1))
         absolute.append(round(float(value), 2))
 
-    return {'labels': labels, 'data': data, 'absolute': absolute}
+    chart_total = round(float(sum(v for _, v in sorted_items)), 2)
+    return {'labels': labels, 'data': data, 'absolute': absolute, 'total': chart_total}
 
 
-def get_embodied_carbon_by_material(building: Building, simulated: bool = False) -> Dict[str, Any]:
+def get_embodied_carbon_by_material(
+    building: Building,
+    simulated: bool = False,
+    prefetched_assemblies=None,
+) -> Dict[str, Any]:
     """
     Calculate embodied carbon grouped by material category.
 
     Args:
         building: Building instance to calculate for
         simulated: If True, calculate for simulated components
+        prefetched_assemblies: Optional pre-fetched assembly list
 
     Returns:
-        Dictionary with 'labels' and 'data' for chart rendering
+        Dictionary with 'labels', 'data', 'absolute', and 'total' for chart rendering
     """
     carbon_by_material = defaultdict(Decimal)
 
-    if simulated:
+    if prefetched_assemblies is not None:
+        building_assemblies = prefetched_assemblies
+    elif simulated:
         building_assemblies = building.buildingassemblysimulated_set.all()
     else:
         building_assemblies = building.buildingassembly_set.all()
@@ -385,10 +441,12 @@ def get_embodied_carbon_by_material(building: Building, simulated: bool = False)
     for ba in building_assemblies:
         assembly = ba.assembly
         assembly_quantity = ba.quantity
+        products = getattr(assembly, "prefetched_products", None)
+        if products is None:
+            products = assembly.structuralproduct_set.all()
 
-        for structural_product in assembly.structuralproduct_set.all():
+        for structural_product in products:
             try:
-                # Map EPD category name using the same mapping as the old dashboard
                 original_category = (
                     str(structural_product.epd.category)
                     if structural_product.epd and structural_product.epd.category
@@ -410,41 +468,46 @@ def get_embodied_carbon_by_material(building: Building, simulated: bool = False)
                         if value > 0:
                             carbon_by_material[material_category] += value
 
-            except (ValueError, AttributeError, ZeroDivisionError):
+            except (ImpactCalculationError, ValueError, AttributeError, ZeroDivisionError):
                 continue
 
-    # Sort by value descending
     sorted_items = sorted(carbon_by_material.items(), key=lambda x: x[1], reverse=True)
-
-    # Calculate total for percentage
     total = sum(v for _, v in sorted_items) or Decimal('1')
 
     labels = []
     data = []
     absolute = []
-    for label, value in sorted_items[:10]:  # Top 10 items
+    for label, value in sorted_items[:10]:
         labels.append(label)
         percentage = float((value / total) * 100)
         data.append(round(percentage, 1))
         absolute.append(round(float(value), 2))
 
-    return {'labels': labels, 'data': data, 'absolute': absolute}
+    chart_total = round(float(sum(v for _, v in sorted_items)), 2)
+    return {'labels': labels, 'data': data, 'absolute': absolute, 'total': chart_total}
 
 
-def get_operational_carbon_by_system(building: Building, simulated: bool = False) -> Dict[str, Any]:
+def get_operational_carbon_by_system(
+    building: Building,
+    simulated: bool = False,
+    prefetched_operational=None,
+) -> Dict[str, Any]:
     """
     Calculate operational carbon grouped by system type (cooling, ventilation, etc.).
 
     Args:
         building: Building instance to calculate for
         simulated: If True, calculate for simulated components
+        prefetched_operational: Optional pre-fetched operational product list
 
     Returns:
-        Dictionary with 'labels' and 'data' for chart rendering
+        Dictionary with 'labels', 'data', 'absolute', and 'total' for chart rendering
     """
     carbon_by_system = defaultdict(Decimal)
 
-    if simulated:
+    if prefetched_operational is not None:
+        operational_products = prefetched_operational
+    elif simulated:
         operational_products = building.simulated_operational_products.all()
     else:
         operational_products = building.operational_products.all()
@@ -453,7 +516,6 @@ def get_operational_carbon_by_system(building: Building, simulated: bool = False
 
     for op in operational_products:
         try:
-            # Categorize by EPD category or use a default
             system_type = "Other Systems"
             if op.epd and op.epd.category:
                 category_name = op.epd.category.name_en.lower() if op.epd.category.name_en else ""
@@ -480,10 +542,7 @@ def get_operational_carbon_by_system(building: Building, simulated: bool = False
         except (ValueError, AttributeError, ZeroDivisionError):
             continue
 
-    # Sort by value descending
     sorted_items = sorted(carbon_by_system.items(), key=lambda x: x[1], reverse=True)
-
-    # Calculate total for percentage
     total = sum(v for _, v in sorted_items) or Decimal('1')
 
     labels = []
@@ -495,15 +554,22 @@ def get_operational_carbon_by_system(building: Building, simulated: bool = False
         data.append(round(percentage, 1))
         absolute.append(round(float(value), 2))
 
-    return {'labels': labels, 'data': data, 'absolute': absolute}
+    chart_total = round(float(sum(v for _, v in sorted_items)), 2)
+    return {'labels': labels, 'data': data, 'absolute': absolute, 'total': chart_total}
 
 
-def get_building_chart_data(building: Building) -> Dict[str, Any]:
+def get_building_chart_data(
+    building: Building,
+    prefetched_assemblies=None,
+    prefetched_operational=None,
+) -> Dict[str, Any]:
     """
     Get all chart data for a building detail page.
 
     Args:
         building: Building instance to get chart data for
+        prefetched_assemblies: Optional pre-fetched assembly list (avoids re-querying)
+        prefetched_operational: Optional pre-fetched operational product list
 
     Returns:
         Dictionary containing chart data for:
@@ -512,15 +578,25 @@ def get_building_chart_data(building: Building) -> Dict[str, Any]:
         - embodied_by_material: data for bar chart by material
         - operational_by_system: data for bar chart by system/appliance
     """
-    embodied = calculate_total_embodied_carbon(building, simulated=False)
-    operational = calculate_total_operational_carbon(building, simulated=False)
+    embodied = calculate_total_embodied_carbon(
+        building, simulated=False, prefetched_assemblies=prefetched_assemblies
+    )
+    operational = calculate_total_operational_carbon(
+        building, simulated=False, prefetched_operational=prefetched_operational
+    )
 
     return {
         'whole_life_carbon': {
             'labels': ['Operational carbon', 'Embodied carbon'],
             'data': [float(operational), float(embodied)],
         },
-        'embodied_by_assembly': get_embodied_carbon_by_assembly(building),
-        'embodied_by_material': get_embodied_carbon_by_material(building),
-        'operational_by_system': get_operational_carbon_by_system(building),
+        'embodied_by_assembly': get_embodied_carbon_by_assembly(
+            building, prefetched_assemblies=prefetched_assemblies
+        ),
+        'embodied_by_material': get_embodied_carbon_by_material(
+            building, prefetched_assemblies=prefetched_assemblies
+        ),
+        'operational_by_system': get_operational_carbon_by_system(
+            building, prefetched_operational=prefetched_operational
+        ),
     }

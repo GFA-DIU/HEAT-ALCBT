@@ -937,6 +937,15 @@
       }
     });
 
+    // Cross-material validation: percentage-unit materials must sum to 100%
+    const percentMaterials = materials.filter(m => m.unit === 'percent');
+    if (percentMaterials.length > 0) {
+      const total = percentMaterials.reduce((sum, m) => sum + (parseFloat(m.quantity) || 0), 0);
+      if (Math.round(total * 10000) !== 1000000) {
+        errors.push(`Share percentages must sum to 100% (current total: ${total.toFixed(2)}%)`);
+      }
+    }
+
     return errors;
   }
 
@@ -1005,7 +1014,7 @@
           ${categorySelect}
           <label class="input w-full max-w-[140px]">
             <input type="number" value="${m.quantity || ''}" placeholder="${i18n.qty}" class="material-quantity w-full" step="0.01" min="0" />
-            <span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="${m.unit}">${m.unit}</span>
+            <span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="${m.unit}">${m.unit === 'unknown' ? '#' : m.unit}</span>
             <input type="hidden" class="material-unit-value" value="${m.unit}" />
           </label>
           <div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"></div>
@@ -1049,15 +1058,13 @@
       return;
     }
 
-    const totalGwp = materials.reduce((sum, m) => sum + (m.gwp * m.quantity), 0);
-
     const existingItem = this.editingIndex !== null ? this.boqItems[this.editingIndex] : null;
 
     const item = {
       name: name,
       comment: document.getElementById('boq_comment').value,
       materials: materials,
-      total_gwp: totalGwp,
+      total_gwp: existingItem?.total_gwp || 0,
       is_template: document.getElementById('boq_is_template').checked
     };
 
@@ -1092,8 +1099,9 @@
       const result = await response.json();
 
       if (result.success) {
-        // Store assembly ID for editing
+        // Store assembly ID and server-computed GWP
         item.id = result.assembly.id;
+        item.total_gwp = result.assembly.total_gwp ?? item.total_gwp;
 
         if (this.editingIndex !== null) {
           this.boqItems[this.editingIndex] = item;
@@ -1138,7 +1146,6 @@
       return;
     }
 
-    const totalGwp = materials.reduce((sum, m) => sum + (m.gwp * m.quantity), 0);
     const categorySelect = document.getElementById('component_category');
 
     const existingComponentItem = this.editingIndex !== null ? this.componentItems[this.editingIndex] : null;
@@ -1152,7 +1159,7 @@
       quantity: document.getElementById('component_quantity').value,
       comment: document.getElementById('component_comment').value,
       materials: materials,
-      total_gwp: totalGwp,
+      total_gwp: existingComponentItem?.total_gwp || 0,
       is_template: document.getElementById('component_is_template').checked
     };
 
@@ -1187,8 +1194,9 @@
       const result = await response.json();
 
       if (result.success) {
-        // Store assembly ID for editing
+        // Store assembly ID and server-computed GWP
         item.id = result.assembly.id;
+        item.total_gwp = result.assembly.total_gwp ?? item.total_gwp;
 
         if (this.editingIndex !== null) {
           this.componentItems[this.editingIndex] = item;
