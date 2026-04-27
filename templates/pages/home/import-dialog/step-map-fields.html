@@ -7,7 +7,7 @@
     </p>
   </div>
 
-  <!-- Status Alert -->
+  <!-- Status Alert (updated by JS below) -->
   <div id="map-status-alert"
     class="w-full flex items-center justify-center gap-3 px-12 py-3 rounded-md text-[var(--state--success--base)] bg-[var(--state--success--lighter)]">
     <span data-icon="select-box-circle-fill" data-size="20"></span>
@@ -82,32 +82,32 @@
     const t3 = state.tab3 || {};
 
     const rows = [
-      { tab: i18n.tabNameLocation,    header: "{% translate 'Building name or Code' %}",              value: t1.building_name },
-      { tab: i18n.tabNameLocation,    header: "{% translate 'Address' %}",                            value: t1.address },
-      { tab: i18n.tabNameLocation,    header: "{% translate 'Country' %}",                            value: t1.country },
-      { tab: i18n.tabNameLocation,    header: "{% translate 'Region or State' %}",                    value: t1.region },
-      { tab: i18n.tabNameLocation,    header: "{% translate 'City' %}",                               value: t1.city },
-      { tab: i18n.tabNameLocation,    header: "{% translate 'Longitude' %}",                          value: t1.longitude },
-      { tab: i18n.tabNameLocation,    header: "{% translate 'Latitude' %}",                           value: t1.latitude },
-      { tab: i18n.tabBuildingDetails, header: "{% translate 'Building type' %}",                      value: t2.building_type },
-      { tab: i18n.tabBuildingDetails, header: "{% translate 'Area climate type' %}",                  value: t2.climate_type },
-      { tab: i18n.tabBuildingDetails, header: "{% translate 'Assessment period (years)' %}",          value: t2.assessment_period },
-      { tab: i18n.tabBuildingDetails, header: "{% translate 'Total floor area (m²)' %}",              value: t2.total_floor_area },
-      { tab: i18n.tabBuildingDetails, header: "{% translate 'Conditioned floor area (m²)' %}",        value: t2.conditioned_floor_area },
-      { tab: i18n.tabBuildingDetails, header: "{% translate 'Construction year' %}",                  value: t2.construction_year },
-      { tab: i18n.tabBuildingDetails, header: "{% translate 'Floors below ground' %}",                value: t2.floors_below_ground },
-      { tab: i18n.tabBuildingDetails, header: "{% translate 'Has certification' %}",                  value: t2.has_certification },
-      { tab: i18n.tabBuildingDetails, header: "{% translate 'Has BoQ / design drawings' %}",          value: t2.has_boq },
-      { tab: i18n.tabOpSchedule,      header: "{% translate 'Number of residents' %}",                value: t3.num_residents },
-      { tab: i18n.tabOpSchedule,      header: "{% translate 'Annual operating schedule (Hours/Day)' %}", value: t3.hours_per_workday },
-      { tab: i18n.tabOpSchedule,      header: "{% translate 'Annual operating schedule (Days/Week)' %}", value: t3.workdays_per_week },
-      { tab: i18n.tabOpSchedule,      header: "{% translate 'Annual operating schedule (Weeks/Year)' %}", value: t3.weeks_per_year },
-      { tab: i18n.tabOpSchedule,      header: "{% translate 'Room heating temperature' %}",           value: t3.heating_temp },
-      { tab: i18n.tabOpSchedule,      header: "{% translate 'Room heating temperature unit' %}",      value: t3.heating_temp_unit },
-      { tab: i18n.tabOpSchedule,      header: "{% translate 'Room cooling temperature' %}",           value: t3.cooling_temp },
-      { tab: i18n.tabOpSchedule,      header: "{% translate 'Room cooling temperature unit' %}",      value: t3.cooling_temp_unit },
-      { tab: i18n.tabOpSchedule,      header: "{% translate 'Renewable energy installation (%)' %}",  value: t3.renewable_energy_percent },
-      { tab: i18n.tabOpSchedule,      header: "{% translate 'Building smart system installation' %}", value: t3.building_smart_system },
+      { tab: i18n.tabNameLocation,    header: "{% translate 'Building name or Code' %}",              value: t1.building_name,             required: true },
+      { tab: i18n.tabNameLocation,    header: "{% translate 'Address' %}",                            value: t1.address,                   required: true },
+      { tab: i18n.tabNameLocation,    header: "{% translate 'Country' %}",                            value: t1.country,                   required: true },
+      { tab: i18n.tabNameLocation,    header: "{% translate 'Region or State' %}",                    value: t1.region,                    required: true },
+      { tab: i18n.tabNameLocation,    header: "{% translate 'City' %}",                               value: t1.city,                      required: true },
+      { tab: i18n.tabNameLocation,    header: "{% translate 'Longitude' %}",                          value: t1.longitude,                 required: false },
+      { tab: i18n.tabNameLocation,    header: "{% translate 'Latitude' %}",                           value: t1.latitude,                  required: false },
+      { tab: i18n.tabBuildingDetails, header: "{% translate 'Building type' %}",                      value: t2.building_type,             required: true },
+      { tab: i18n.tabBuildingDetails, header: "{% translate 'Area climate type' %}",                  value: t2.climate_type,              required: true },
+      { tab: i18n.tabBuildingDetails, header: "{% translate 'Assessment period (years)' %}",          value: t2.assessment_period,         required: true },
+      { tab: i18n.tabBuildingDetails, header: "{% translate 'Total floor area (m²)' %}",              value: t2.total_floor_area,          required: true },
+      { tab: i18n.tabBuildingDetails, header: "{% translate 'Conditioned floor area (m²)' %}",        value: t2.conditioned_floor_area,    required: true },
+      { tab: i18n.tabBuildingDetails, header: "{% translate 'Construction year' %}",                  value: t2.construction_year,         required: true },
+      { tab: i18n.tabBuildingDetails, header: "{% translate 'Floors below ground' %}",                value: t2.floors_below_ground,       required: false },
+      { tab: i18n.tabBuildingDetails, header: "{% translate 'Has certification' %}",                  value: t2.has_certification,         required: false },
+      { tab: i18n.tabBuildingDetails, header: "{% translate 'Has BoQ / design drawings' %}",          value: t2.has_boq,                   required: false },
+      { tab: i18n.tabOpSchedule,      header: "{% translate 'Number of residents' %}",                value: t3.num_residents,             required: true },
+      { tab: i18n.tabOpSchedule,      header: "{% translate 'Annual operating schedule (Hours/Day)' %}", value: t3.hours_per_workday,      required: true },
+      { tab: i18n.tabOpSchedule,      header: "{% translate 'Annual operating schedule (Days/Week)' %}", value: t3.workdays_per_week,      required: true },
+      { tab: i18n.tabOpSchedule,      header: "{% translate 'Annual operating schedule (Weeks/Year)' %}", value: t3.weeks_per_year,        required: true },
+      { tab: i18n.tabOpSchedule,      header: "{% translate 'Room heating temperature' %}",           value: t3.heating_temp,              required: true },
+      { tab: i18n.tabOpSchedule,      header: "{% translate 'Room heating temperature unit' %}",      value: t3.heating_temp_unit,         required: false },
+      { tab: i18n.tabOpSchedule,      header: "{% translate 'Room cooling temperature' %}",           value: t3.cooling_temp,              required: true },
+      { tab: i18n.tabOpSchedule,      header: "{% translate 'Room cooling temperature unit' %}",      value: t3.cooling_temp_unit,         required: false },
+      { tab: i18n.tabOpSchedule,      header: "{% translate 'Renewable energy installation (%)' %}",  value: t3.renewable_energy_percent,  required: true },
+      { tab: i18n.tabOpSchedule,      header: "{% translate 'Building smart system installation' %}", value: t3.building_smart_system,     required: true },
     ];
 
     const tbody = document.getElementById('map-fields-body');
@@ -120,10 +120,27 @@
 
       // Render tab1/2/3 rows
       rows.forEach(row => {
+        const isMissing = row.required && !row.value;
         const clone = template.content.cloneNode(true);
+        const tr = clone.querySelector('tr');
         clone.querySelector('.col-tab').textContent = row.tab;
-        clone.querySelector('.col-header').textContent = row.header;
-        clone.querySelector('.col-value').textContent = row.value || '—';
+
+        const headerCell = clone.querySelector('.col-header');
+        headerCell.textContent = row.header;
+        if (row.required) {
+          const star = document.createElement('span');
+          star.textContent = ' *';
+          star.style.color = 'var(--state--error--base)';
+          headerCell.appendChild(star);
+        }
+
+        const valueCell = clone.querySelector('.col-value');
+        if (isMissing) {
+          valueCell.innerHTML = '<span style="color:var(--state--error--base)" class="label-small">{% translate "Missing — required" %}</span>';
+          if (tr) tr.style.background = 'var(--state--error--lighter)';
+        } else {
+          valueCell.textContent = row.value || '—';
+        }
         tbody.appendChild(clone);
       });
 
@@ -205,6 +222,19 @@
       if (sc.length > 0) {
         addSection(i18n.secStructural);
         addCountRow(i18n.secStructural, i18n.byComponent, sc.length);
+      }
+
+      // Update status alert based on whether any required fields are missing
+      const missingCount = rows.filter(r => r.required && !r.value).length;
+      const alertEl = document.getElementById('map-status-alert');
+      if (alertEl && missingCount > 0) {
+        alertEl.className = 'w-full flex items-center justify-center gap-3 px-12 py-3 rounded-md bg-[var(--state--error--lighter)]';
+        alertEl.innerHTML = `
+          <span data-icon="error-warning-fill" data-size="20" style="color:var(--state--error--base);flex-shrink:0"></span>
+          <span class="label-small text-[var(--text--strong-950)]">
+            ${missingCount} {% translate "required field(s) are missing — fix your template before continuing" %}
+          </span>
+        `;
       }
     }
 

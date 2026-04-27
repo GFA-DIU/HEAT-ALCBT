@@ -194,8 +194,46 @@
         return;
       }
 
-      // --- Map Fields step: just advance (mapping is saved in importState) ---
+      // --- Map Fields step: validate required fields before advancing ---
       if (step.id === 'map-fields') {
+        const t1 = window.importState.tab1 || {};
+        const t2 = window.importState.tab2 || {};
+        const t3 = window.importState.tab3 || {};
+        const missing = [];
+
+        // Tab 1 — Name & Location
+        if (!t1.building_name) missing.push('{% translate "Building name or Code" %} ({% translate "Name & Location" %})');
+        if (!t1.address)       missing.push('{% translate "Address" %} ({% translate "Name & Location" %})');
+        if (!t1.country)       missing.push('{% translate "Country" %} ({% translate "Name & Location" %})');
+        if (!t1.region)        missing.push('{% translate "Region or State" %} ({% translate "Name & Location" %})');
+        if (!t1.city)          missing.push('{% translate "City" %} ({% translate "Name & Location" %})');
+
+        // Tab 2 — Building Details
+        if (!t2.building_type)     missing.push('{% translate "Building type" %} ({% translate "Building Details" %})');
+        if (!t2.climate_type)      missing.push('{% translate "Area climate type" %} ({% translate "Building Details" %})');
+        if (!t2.assessment_period) missing.push('{% translate "Assessment period (years)" %} ({% translate "Building Details" %})');
+        if (!t2.total_floor_area)  missing.push('{% translate "Total floor area (m²)" %} ({% translate "Building Details" %})');
+        if (!t2.construction_year) missing.push('{% translate "Construction year" %} ({% translate "Building Details" %})');
+        if (!t2.conditioned_floor_area) missing.push('{% translate "Conditioned floor area (m²)" %} ({% translate "Building Details" %})');
+
+        // Tab 3 — Operational Schedule
+        if (!t3.num_residents)            missing.push('{% translate "Number of residents" %} ({% translate "Operational Schedule & Temp" %})');
+        if (!t3.hours_per_workday)        missing.push('{% translate "Annual operating schedule (Hours/Day)" %} ({% translate "Operational Schedule & Temp" %})');
+        if (!t3.workdays_per_week)        missing.push('{% translate "Annual operating schedule (Days/Week)" %} ({% translate "Operational Schedule & Temp" %})');
+        if (!t3.weeks_per_year)           missing.push('{% translate "Annual operating schedule (Weeks/Year)" %} ({% translate "Operational Schedule & Temp" %})');
+        if (!t3.heating_temp)             missing.push('{% translate "Room heating temperature" %} ({% translate "Operational Schedule & Temp" %})');
+        if (!t3.cooling_temp)             missing.push('{% translate "Room cooling temperature" %} ({% translate "Operational Schedule & Temp" %})');
+        if (!t3.renewable_energy_percent) missing.push('{% translate "Renewable energy installation (%)" %} ({% translate "Operational Schedule & Temp" %})');
+        if (!t3.building_smart_system)    missing.push('{% translate "Building smart system installation" %} ({% translate "Operational Schedule & Temp" %})');
+
+        if (missing.length > 0) {
+          this._showError(
+            '{% translate "The following required fields are missing from your template:" %}\n• ' +
+            missing.join('\n• ')
+          );
+          return;
+        }
+
         this.currentStep++;
         this.render();
         return;

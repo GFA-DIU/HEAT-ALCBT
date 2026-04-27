@@ -105,7 +105,7 @@ def calculate_impacts(
 
     def _fetch_dimension_for_boq() -> AssemblyDimension | None:
         boq_dim_map = {
-            Unit.PCS: None,
+            Unit.PCS: AssemblyDimension.PCS,
             Unit.M:   AssemblyDimension.LENGTH,
             Unit.M2:  AssemblyDimension.AREA,
             Unit.M3:  AssemblyDimension.VOLUME,
@@ -221,21 +221,17 @@ def _resolve_conversion_factor(
     if eff_dim == AssemblyDimension.AREA:
 
         if declared_unit == Unit.M3:
-            # Factor = assembly_qty × thickness_m
             return assembly_qty * _resolve_thickness_m()
 
         if declared_unit == Unit.KG:
-            # Option B — preferred: area density
             area_density = _epd_conversion("area density")
             if area_density is not None:
                 return assembly_qty * area_density
 
-            # Option A — fallback: thickness × volume density
             volume_density = _epd_conversion("volume density")
             if volume_density is not None:
                 return assembly_qty * _resolve_thickness_m() * volume_density
 
-            # Option C — last resort: conversion factor to 1 kg
             conv_factor = _epd_conversion("conversion factor to 1 kg")
             if conv_factor is not None:
                 return assembly_qty * conv_factor
@@ -244,6 +240,14 @@ def _resolve_conversion_factor(
                 f"Cannot convert area assembly to kg for '{p.epd.name}' — "
                 "no area density, volume density, or conversion factor found in EPD conversions."
             )
+
+        if declared_unit == Unit.PCS:
+            # pieces_factor = pieces per m² — user-entered, stored as p.quantity with input_unit=pcs
+            if p.quantity is None:
+                raise ImpactCalculationError(
+                    f"Pieces per m² required for '{p.epd.name}' but not entered."
+                )
+            return assembly_qty * Decimal(str(p.quantity))
 
     # ---- VOLUME assembly (m³) ----------------------------------------
     if eff_dim == AssemblyDimension.VOLUME:
@@ -263,12 +267,18 @@ def _resolve_conversion_factor(
             )
 
         if declared_unit == Unit.M2:
-            # Factor = assembly_qty × qty / thickness_m
             return assembly_qty * qty / _resolve_thickness_m()
+
+        if declared_unit == Unit.PCS:
+            # pieces_factor = pieces per m³ — user-entered
+            if p.quantity is None:
+                raise ImpactCalculationError(
+                    f"Pieces per m³ required for '{p.epd.name}' but not entered."
+                )
+            return assembly_qty * Decimal(str(p.quantity))
 
     # ---- MASS assembly (kg) ------------------------------------------
     if eff_dim == AssemblyDimension.MASS:
-        # constituent_mass = assembly_qty × share_of_mass
         constituent_mass = assembly_qty * qty
 
         if declared_unit == Unit.M3:
@@ -289,6 +299,14 @@ def _resolve_conversion_factor(
                 "area density missing from EPD conversions. No safe fallback."
             )
 
+        if declared_unit == Unit.PCS:
+            # pieces_factor = pieces per kg — user-entered
+            if p.quantity is None:
+                raise ImpactCalculationError(
+                    f"Pieces per kg required for '{p.epd.name}' but not entered."
+                )
+            return constituent_mass * Decimal(str(p.quantity))
+
     # ---- LENGTH assembly (m) -----------------------------------------
     if eff_dim == AssemblyDimension.LENGTH:
 
@@ -296,12 +314,10 @@ def _resolve_conversion_factor(
             return assembly_qty * _cross_section_m2()
 
         if declared_unit == Unit.KG:
-            # Option A — preferred: linear density
             linear_density = _epd_conversion("linear density")
             if linear_density is not None:
                 return assembly_qty * linear_density
 
-            # Option B — fallback: cross_section × volume density
             volume_density = _epd_conversion("volume density")
             if volume_density is not None:
                 return assembly_qty * _cross_section_m2() * volume_density
@@ -309,6 +325,47 @@ def _resolve_conversion_factor(
             raise ImpactCalculationError(
                 f"Cannot convert length assembly to kg for '{p.epd.name}' — "
                 "linear density missing and cross section or volume density not available."
+            )
+
+        if declared_unit == Unit.PCS:
+            # pieces_factor = pieces per m — user-entered
+            if p.quantity is None:
+                raise ImpactCalculationError(
+                    f"Pieces per m required for '{p.epd.name}' but not entered."
+                )
+            return assembly_qty * Decimal(str(p.quantity))
+
+    # ---- PCS assembly (pcs) — pcs→other conversions from DB ----------
+    if eff_dim == AssemblyDimension.PCS:
+
+        if declared_unit == Unit.KG:
+            # pieces per kg from DB: mass = pieces ÷ (pcs/kg)
+            pieces_per_kg = _epd_conversion("conversion factor to 1 kg")
+            if pieces_per_kg is not None and pieces_per_kg != 0:
+                return assembly_qty / pieces_per_kg
+            raise ImpactCalculationError(
+                f"Cannot convert pcs assembly to kg for '{p.epd.name}' — "
+                "conversion factor to 1 kg missing from EPD conversions."
+            )
+
+        if declared_unit == Unit.M2:
+            # pieces per m² from DB: area = pieces ÷ (pcs/m²)
+            pieces_per_m2 = _epd_conversion("area density")
+            if pieces_per_m2 is not None and pieces_per_m2 != 0:
+                return assembly_qty / pieces_per_m2
+            raise ImpactCalculationError(
+                f"Cannot convert pcs assembly to m² for '{p.epd.name}' — "
+                "area density (pcs/m²) missing from EPD conversions."
+            )
+
+        if declared_unit == Unit.M3:
+            # pieces per m³ from DB: volume = pieces ÷ (pcs/m³)
+            pieces_per_m3 = _epd_conversion("volume density")
+            if pieces_per_m3 is not None and pieces_per_m3 != 0:
+                return assembly_qty / pieces_per_m3
+            raise ImpactCalculationError(
+                f"Cannot convert pcs assembly to m³ for '{p.epd.name}' — "
+                "volume density (pcs/m³) missing from EPD conversions."
             )
 
     raise ImpactCalculationError(

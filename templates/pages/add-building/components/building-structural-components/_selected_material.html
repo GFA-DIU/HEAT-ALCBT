@@ -37,12 +37,12 @@
 
     <label class="input w-full max-w-[140px]">
       <input type="number"
-            placeholder="{% translate 'Qty' %}"
+            placeholder="{% if epd.selection_text %}{{ epd.selection_text }}{% else %}{% translate 'Qty' %}{% endif %}"
             step="0.01"
             min="0"
             class="material-quantity"
             required />
-      <span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="{{ epd.selection_unit }}">{{ epd.selection_unit }}</span>
+      <span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="{{ epd.selection_unit }}">{% if epd.selection_unit == 'unknown' %}#{% else %}{{ epd.selection_unit }}{% endif %}</span>
       <input type="hidden" class="material-unit-value" value="{{ epd.selection_unit }}" />
     </label>
 
