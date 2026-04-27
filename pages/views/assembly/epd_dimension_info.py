@@ -26,7 +26,7 @@ def get_epd_dimension_info(dimension: AssemblyDimension, declared_unit: Unit):
             selection_text = "Share of mass"
             selection_unit = Unit.PERCENT
         case (AssemblyDimension.LENGTH, Unit.M):
-            selection_text = "Number of full-lengt elements"
+            selection_text = "Number of full-length elements"
             selection_unit = Unit.UNKNOWN
         case (AssemblyDimension.LENGTH, _):
             selection_text = "Share of cross-section"

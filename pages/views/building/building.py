@@ -190,9 +190,17 @@ def handle_building_load(request, building_id, simulation):
         parent=initial
     )
 
-    # Calculate statistics and chart data for building detail page
-    building_stats = get_building_detail_statistics(building)
-    chart_data = get_building_chart_data(building)
+    # Calculate statistics and chart data for building detail page using already-prefetched data
+    building_stats = get_building_detail_statistics(
+        building,
+        prefetched_assemblies=building.prefetched_components,
+        prefetched_operational=building.prefetched_operational_products,
+    )
+    chart_data = get_building_chart_data(
+        building,
+        prefetched_assemblies=building.prefetched_components,
+        prefetched_operational=building.prefetched_operational_products,
+    )
 
     context = {
         "building_id": building.id,
@@ -207,6 +215,7 @@ def handle_building_load(request, building_id, simulation):
         "simulation": simulation,
         # Statistics for building detail page
         "stats": building_stats,
+        "calculation_errors": building_stats.get('calculation_errors', []),
         "chart_data": json.dumps(chart_data),  # Convert to JSON for JavaScript
     }
 

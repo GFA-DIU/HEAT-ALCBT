@@ -18,7 +18,7 @@
           {{ epd.declared_unit }}
         </span>
         <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
-          {{ epd.impact_gwp|floatformat:2 }} kgCO2eq
+          {{ epd.impact_gwp|floatformat:2 }} kgCO2eq/{{ epd.declared_unit }}
         </span>
       </div>
     </div>

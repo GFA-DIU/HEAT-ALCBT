@@ -25,8 +25,10 @@ from pages.models.assembly import (
 from pages.models.base import ALCBTCountryManager
 from pages.models.building import Building, BuildingAssembly
 from pages.models.epd import EPD, MaterialCategory, Unit
+from pages.views.assembly.epd_dimension_info import get_epd_dimension_info
 from pages.views.assembly.epd_filtering import get_filtered_epd_list
 from pages.views.assembly.epd_processing import get_epd_list
+from pages.views.building.impact_calculation import calculate_impacts, ImpactCalculationError
 
 logger = logging.getLogger(__name__)
 
@@ -54,22 +56,38 @@ def _can_epd_be_used(dimension: str, epd) -> tuple[bool, str]:
     """
     declared = epd.declared_unit
 
-    # PCS dimension only accepts PCS epds (and vice-versa)
+    # PCS dimension: accepts pcs EPDs directly; also accepts kg/m²/m³ EPDs if DB has ratio
     if dimension == AssemblyDimension.PCS:
         if declared == Unit.PCS:
             return True, ""
+        if declared == Unit.KG:
+            if _epd_has_conversion(epd, "conversion factor to 1 kg"):
+                return True, ""
+            return False, (
+                f"Cannot add this EPD (declared in kg) to a pcs component: "
+                "conversion factor to 1 kg missing from EPD conversions."
+            )
+        if declared == Unit.M2:
+            if _epd_has_conversion(epd, "area density"):
+                return True, ""
+            return False, (
+                f"Cannot add this EPD (declared in m²) to a pcs component: "
+                "area density (pcs/m²) missing from EPD conversions."
+            )
+        if declared == Unit.M3:
+            if _epd_has_conversion(epd, "volume density"):
+                return True, ""
+            return False, (
+                f"Cannot add this EPD (declared in m³) to a pcs component: "
+                "volume density (pcs/m³) missing from EPD conversions."
+            )
         return False, (
-            f"This EPD is declared in '{declared}'. "
-            f"A Pieces (pcs) component only accepts EPDs declared in pcs."
+            f"This EPD is declared in '{declared}' and cannot be used in a pcs component."
         )
 
+    # EPD declared in pcs: user enters pieces-per-unit factor — always allowed for any dimension
     if declared == Unit.PCS:
-        if dimension == AssemblyDimension.PCS:
-            return True, ""
-        return False, (
-            f"This EPD is declared in pieces (pcs) and cannot be used in a "
-            f"'{dimension}' component without a conversion factor."
-        )
+        return True, ""
 
     # Direct unit match — always fine
     direct_match = {
@@ -94,6 +112,8 @@ def _can_epd_be_used(dimension: str, epd) -> tuple[bool, str]:
                 f"Cannot add this EPD (declared in kg) to an area (m²) component: "
                 "no area density, volume density, or conversion factor is available for this EPD."
             )
+        if declared == Unit.PCS:
+            return True, ""  # user enters pieces per m²
 
     # VOLUME assembly
     if dimension == AssemblyDimension.VOLUME:
@@ -107,6 +127,8 @@ def _can_epd_be_used(dimension: str, epd) -> tuple[bool, str]:
             )
         if declared == Unit.M2:
             return True, ""  # needs thickness
+        if declared == Unit.PCS:
+            return True, ""  # user enters pieces per m³
 
     # MASS assembly
     if dimension == AssemblyDimension.MASS:
@@ -124,6 +146,8 @@ def _can_epd_be_used(dimension: str, epd) -> tuple[bool, str]:
                 f"Cannot add this EPD (declared in m²) to a mass (kg) component: "
                 "no area density is available for this EPD."
             )
+        if declared == Unit.PCS:
+            return True, ""  # user enters pieces per kg
 
     # LENGTH assembly
     if dimension == AssemblyDimension.LENGTH:
@@ -137,6 +161,8 @@ def _can_epd_be_used(dimension: str, epd) -> tuple[bool, str]:
                 f"Cannot add this EPD (declared in kg) to a length (m) component: "
                 "no linear density or volume density is available for this EPD."
             )
+        if declared == Unit.PCS:
+            return True, ""  # user enters pieces per m
 
     return False, (
         f"This EPD (declared in '{declared}') is not compatible with a "
@@ -241,16 +267,31 @@ def handle_select_product(request):
             if not ok:
                 return HttpResponse(reason, status=422)
 
-        # For BoQ mode, always use the EPD's declared unit — the user selects
-        # from available_units via a dropdown so dimension logic doesn't apply.
-        # For component mode, derive the unit from the assembly dimension.
+        # Derive the correct input label and unit for the quantity field.
+        # For component mode: use the assembly dimension via get_epd_dimension_info.
+        # For BoQ mode: the user always enters a direct quantity in the EPD's declared unit
+        #   (each row is its own material line, not a share of a mixed assembly).
+        #   The only exception is pcs EPDs which use a pieces count.
         selection_text = ""
         selection_unit = epd.declared_unit
-        if mode != "boq":
-            epd_info = epd.get_epd_info(dimension)
-            if epd_info and isinstance(epd_info, (list, tuple)) and len(epd_info) >= 2:
-                selection_text = epd_info[0] or ""
-                selection_unit = epd_info[1] or epd.declared_unit
+        if mode == "boq":
+            # In BoQ mode the quantity is always the raw quantity in the declared unit.
+            # Map the declared unit to a human-readable label for the input placeholder.
+            _boq_unit_labels = {
+                Unit.M2:  ("Area (m²)", Unit.M2),
+                Unit.M3:  ("Volume (m³)", Unit.M3),
+                Unit.KG:  ("Mass (kg)", Unit.KG),
+                Unit.M:   ("Length (m)", Unit.M),
+                Unit.PCS: ("Quantity (pcs)", Unit.PCS),
+            }
+            label_pair = _boq_unit_labels.get(epd.declared_unit)
+            if label_pair:
+                selection_text, selection_unit = label_pair
+        else:
+            try:
+                selection_text, selection_unit = get_epd_dimension_info(dimension, epd.declared_unit)
+            except (ValueError, KeyError):
+                selection_unit = epd.declared_unit
 
         epd_data = {
             "id": str(epd.id),
@@ -531,7 +572,33 @@ def handle_save_assembly(request):
 
         logger.info(f"Saved assembly {assembly.id} ({mode}) for building {building.id}")
 
-        # Return success with assembly data
+        # Compute server-side GWP preview (A1-A3) for the saved assembly
+        total_gwp = 0.0
+        try:
+            floor_area = float(building.total_floor_area) if building.total_floor_area else 1.0
+            products = assembly.structuralproduct_set.select_related("epd").prefetch_related(
+                "epd__epdimpact_set__impact"
+            )
+            for sp in products:
+                try:
+                    impacts = calculate_impacts(
+                        dimension=assembly.dimension,
+                        assembly_quantity=building_assembly.quantity,
+                        total_floor_area=floor_area,
+                        p=sp,
+                    )
+                    for impact in impacts:
+                        if (impact["impact_type"].impact_category == "gwp" and
+                                impact["impact_type"].life_cycle_stage == "a1a3"):
+                            val = float(impact["impact_value"])
+                            if val > 0:
+                                total_gwp += val
+                except (ImpactCalculationError, ValueError, ZeroDivisionError):
+                    pass
+        except Exception:
+            pass
+
+        # Return success with assembly data including server-computed GWP
         return JsonResponse({
             "success": True,
             "message": f"{'BOQ' if mode == 'boq' else 'Component'} saved successfully",
@@ -539,7 +606,8 @@ def handle_save_assembly(request):
                 "id": assembly.id,
                 "name": assembly.name,
                 "mode": mode,
-                "materials_count": materials.__len__()
+                "materials_count": len(materials),
+                "total_gwp": round(total_gwp, 4),
             }
         })
 
