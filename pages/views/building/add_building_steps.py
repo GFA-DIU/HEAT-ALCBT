@@ -626,12 +626,17 @@ def save_building_step(request):
                     uuid_obj = uuid_lib.UUID(building_uuid)
                     building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
 
-                    # Map form field names to model field names
+                    # Resolve climate_zone FK before generic field mapping
+                    if step_data.get('climate_type'):
+                        try:
+                            building.climate_zone = ClimateType.objects.get(name=step_data['climate_type'])
+                        except ClimateType.DoesNotExist:
+                            pass
+
+                    # Map remaining form field names to model field names
                     field_mapping = {
-                        'climate_type': 'climate_zone',
                         'assessment_period': 'reference_period',
                         'conditioned_floor_area': 'cond_floor_area',
-                        # Direct mappings (same name)
                         'construction_year': 'construction_year',
                         'total_floor_area': 'total_floor_area',
                         'floors_below_ground': 'floors_below_ground',
@@ -660,8 +665,11 @@ def save_building_step(request):
                     building.save()
                     building_uuid = str(building.uuid)
 
-                except (ValueError, Building.DoesNotExist):
-                    return JsonResponse({"error": "Invalid building UUID"}, status=400)
+                except Building.DoesNotExist:
+                    return JsonResponse({"error": "Building not found"}, status=404)
+                except ValueError as e:
+                    logger.exception(f"Error updating building details: {e}")
+                    return JsonResponse({"error": str(e)}, status=400)
             else:
                 return JsonResponse({"error": "Building must be created in step 1.1 first"}, status=400)
 
