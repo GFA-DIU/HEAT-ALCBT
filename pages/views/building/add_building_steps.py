@@ -10,6 +10,7 @@ import uuid as uuid_lib
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
@@ -20,9 +21,10 @@ from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
 from pages.models.building import Building, BuildingAssembly, BuildingCategory, OperationalProduct, CategorySubcategory, ClimateZone
 from pages.models.climate_type import ClimateType
-from pages.models.epd import EPD, EPDType, MaterialCategory
+from pages.models.epd import EPD, EPDImpact, EPDType, MaterialCategory
 from accounts.models import CustomCity, CustomRegion
 from pages.models.assembly import Assembly, StructuralProduct
+from pages.views.building.impact_calculation import calculate_impacts, ImpactCalculationError
 
 logger = logging.getLogger(__name__)
 
@@ -430,18 +432,33 @@ def handle_structural_components_step(request):
             ).select_related(
                 'assembly'
             ).prefetch_related(
-                'assembly__structuralproduct_set__epd',
-                'assembly__structuralproduct_set__epd__country',
-                'assembly__structuralproduct_set__epd__category',
-                'assembly__structuralproduct_set__classification__category'
+                Prefetch(
+                    'assembly__structuralproduct_set',
+                    queryset=StructuralProduct.objects
+                        .select_related('epd', 'classification')
+                        .prefetch_related(
+                            Prefetch(
+                                'epd__epdimpact_set',
+                                queryset=EPDImpact.objects.select_related('impact'),
+                                to_attr='all_impacts',
+                            ),
+                            'epd__country',
+                            'epd__category',
+                            'classification__category',
+                        ),
+                    to_attr='prefetched_products',
+                ),
             )
+
+            floor_area = float(building.total_floor_area) if building.total_floor_area else 1.0
 
             for ba in building_assemblies:
                 assembly = ba.assembly
+                products = getattr(assembly, 'prefetched_products', None) or list(assembly.structuralproduct_set.all())
 
                 # Get materials for this assembly
                 materials = []
-                for sp in assembly.structuralproduct_set.all():
+                for sp in products:
                     material = {
                         'epd_id': sp.epd.id,
                         'name': sp.epd.name,
@@ -459,8 +476,24 @@ def handle_structural_components_step(request):
 
                     materials.append(material)
 
-                # Calculate total GWP
-                total_gwp = sum(m['gwp'] * m['quantity'] for m in materials)
+                # Calculate total GWP using proper formula (matches dashboard)
+                total_gwp = 0.0
+                for sp in products:
+                    try:
+                        impacts = calculate_impacts(
+                            dimension=assembly.dimension,
+                            assembly_quantity=ba.quantity,
+                            total_floor_area=floor_area,
+                            p=sp,
+                        )
+                        for impact in impacts:
+                            if (impact["impact_type"].impact_category == "gwp" and
+                                    impact["impact_type"].life_cycle_stage == "a1a3"):
+                                val = float(impact["impact_value"])
+                                if val > 0:
+                                    total_gwp += val
+                    except (ImpactCalculationError, ValueError, ZeroDivisionError):
+                        pass
 
                 if assembly.is_boq:
                     # BOQ item
