@@ -54,11 +54,124 @@
             class="btn btn-outline p-2 border-[var(--stroke--soft-200)]">
             <span data-icon="delete-bin-5-line" data-size="20"></span>
           </button>
+          <!-- Export dropdown -->
+          <div class="relative" id="export-dropdown-wrapper">
+            <button
+              onclick="document.getElementById('export-menu').classList.toggle('hidden')"
+              class="btn btn-outline border-[var(--stroke--soft-200)] flex items-center gap-1">
+              <span data-icon="download-2-line" data-size="20"></span>
+              <span>{% translate "Export" %}</span>
+            </button>
+            <div id="export-menu"
+              class="hidden absolute right-0 mt-1 w-40 bg-white rounded-xl shadow-lg border border-[var(--stroke--soft-200)] z-50 overflow-hidden">
+              <button onclick="triggerExport('pdf')"
+                class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text--strong-950)] hover:bg-[var(--bg--weak-50)] transition-colors">
+                <span data-icon="file-chart-fill" data-size="16"></span>
+                PDF
+              </button>
+              <button onclick="triggerExport('word')"
+                class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text--strong-950)] hover:bg-[var(--bg--weak-50)] transition-colors">
+                <span data-icon="file-paper-2-fill" data-size="16"></span>
+                Word
+              </button>
+            </div>
+          </div>
           <a href="{% url 'edit_building' %}?building_uuid={{ building.uuid }}"  class="btn btn-primary">
             <span data-icon="edit-fill" data-size="20"></span>
             <span>{% translate "Edit" %}</span>
           </a>
         </div>
+        <form id="export-form" method="POST" action="{% url 'building_export' building.id %}" style="display:none;">
+          {% csrf_token %}
+          <input type="hidden" name="format" id="export-format"/>
+          <input type="hidden" name="card_donut" id="export-card-donut"/>
+          <input type="hidden" name="card_assembly" id="export-card-assembly-img"/>
+          <input type="hidden" name="card_material" id="export-card-material-img"/>
+          <input type="hidden" name="card_savings" id="export-card-savings-img"/>
+        </form>
+        <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+        <script>
+          document.addEventListener('click', function(e) {
+            const wrapper = document.getElementById('export-dropdown-wrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+              document.getElementById('export-menu').classList.add('hidden');
+            }
+          });
+
+          // ── Export loading overlay ─────────────────────────────────────────
+          (function() {
+            const overlay = document.createElement('div');
+            overlay.id = 'export-overlay';
+            overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(15,39,68,0.55);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
+            overlay.innerHTML = `
+              <div style="background:#ffffff;border-radius:16px;padding:32px 40px;display:flex;flex-direction:column;align-items:center;gap:16px;min-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <p id="export-overlay-label" style="font-family:sans-serif;font-size:15px;font-weight:600;color:#0f2744;margin:0;">Preparing export…</p>
+                <div style="width:100%;background:#e5e7eb;border-radius:9999px;height:8px;overflow:hidden;">
+                  <div id="export-progress-bar" style="height:100%;width:0%;background:#16a34a;border-radius:9999px;transition:width 0.3s ease;"></div>
+                </div>
+                <p id="export-overlay-step" style="font-family:sans-serif;font-size:12px;color:#6b7280;margin:0;">Starting…</p>
+              </div>`;
+            document.body.appendChild(overlay);
+          })();
+
+          function setExportProgress(pct, step) {
+            document.getElementById('export-progress-bar').style.width = pct + '%';
+            document.getElementById('export-overlay-step').textContent = step;
+          }
+
+          function showExportOverlay(fmt) {
+            const overlay = document.getElementById('export-overlay');
+            overlay.style.display = 'flex';
+            document.getElementById('export-overlay-label').textContent =
+              'Preparing ' + (fmt === 'pdf' ? 'PDF' : 'Word') + ' export…';
+            setExportProgress(0, 'Starting…');
+          }
+
+          function hideExportOverlay() {
+            document.getElementById('export-overlay').style.display = 'none';
+          }
+
+          function triggerExport(fmt) {
+            document.getElementById('export-format').value = fmt;
+            document.getElementById('export-menu').classList.add('hidden');
+            showExportOverlay(fmt);
+
+            const opts = { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false };
+            const captureCard = (id) => {
+              const el = document.getElementById(id);
+              return el ? html2canvas(el, opts).then(c => c.toDataURL('image/png')) : Promise.resolve('');
+            };
+
+            setExportProgress(10, 'Capturing carbon cycle chart…');
+            captureCard('hidden-card-donut').then(function(donut) {
+              document.getElementById('export-card-donut').value = donut;
+              setExportProgress(35, 'Capturing embodied carbon by assembly…');
+              return captureCard('export-card-assembly');
+            }).then(function(assembly) {
+              document.getElementById('export-card-assembly-img').value = assembly;
+              setExportProgress(60, 'Capturing embodied carbon by material…');
+              return captureCard('export-card-material');
+            }).then(function(material) {
+              document.getElementById('export-card-material-img').value = material;
+              setExportProgress(80, 'Capturing savings benchmark…');
+              return captureCard('export-card-savings');
+            }).then(function(savings) {
+              document.getElementById('export-card-savings-img').value = savings;
+              setExportProgress(100, 'Generating document…');
+              setTimeout(function() {
+                document.getElementById('export-form').submit();
+                // Close overlay after browser has received the file download
+                setTimeout(hideExportOverlay, 2500);
+              }, 300);
+            }).catch(function(err) {
+              hideExportOverlay();
+              alert('Export failed: ' + err.message);
+            });
+          }
+        </script>
       </div>
 
   {% if calculation_errors %}
@@ -140,6 +253,230 @@
             </li>
           </ul>
           <div id="tab-content-container-top" class="w-full py-6 max-w-[68.75rem] hidden"></div>
+          <!-- Hidden off-screen cards for export capture — always rendered on page load, never visible -->
+          <div id="export-cards-hidden" style="position:absolute;left:-9999px;top:0;pointer-events:none;" aria-hidden="true">
+            <!-- Donut card -->
+            <div id="hidden-card-donut" class="border border-[var(--stroke--soft-200)] flex flex-col rounded-2xl bg-white p-4" style="width:320px;">
+              <div class="flex items-center gap-2">
+                <span data-icon="leaf-line" data-size="24" data-color="var(--icon--sub-600)"></span>
+                <span class="text-base/6 font-medium">{% translate "Whole Life Carbon Cycle" %}</span>
+              </div>
+              <div class="grid place-items-center mt-6" style="width:264px;height:264px;margin:24px auto 0;">
+                <canvas id="whole-life-carbon-cycle-export" width="264" height="264"></canvas>
+              </div>
+              <div class="flex justify-center mt-6">
+                <div id="whole-life-legend-export" class="flex flex-col gap-2"></div>
+              </div>
+            </div>
+            <!-- Embodied by assembly card -->
+            <div id="export-card-assembly" class="flex w-full flex-col border border-[var(--stroke--soft-200)] rounded-2xl bg-white p-4 mt-4" style="width:560px;">
+              <div class="flex items-center gap-2 pb-4 border-b border-[var(--stroke--soft-200)]">
+                <span data-icon="bar-chart-box-line" data-size="24" data-color="var(--icon--sub-600)"></span>
+                <span class="text-base/6 font-medium">{% translate "Embodied Carbon" %}</span>
+              </div>
+              <div class="w-full" id="export-assembly-chart-wrap">
+                <canvas id="emboided-carbon-chart-export"></canvas>
+              </div>
+            </div>
+            <!-- Embodied by material card -->
+            <div id="export-card-material" class="flex w-full flex-col border border-[var(--stroke--soft-200)] rounded-2xl bg-white p-4 mt-4" style="width:560px;">
+              <div class="flex items-center gap-2 pb-4 border-b border-[var(--stroke--soft-200)]">
+                <span data-icon="bar-chart-box-line" data-size="24" data-color="var(--icon--sub-600)"></span>
+                <span class="text-base/6 font-medium">{% translate "Embodied Carbon by Material" %}</span>
+              </div>
+              <div class="w-full" id="export-material-chart-wrap">
+                <canvas id="emboided-carbon-by-material-chart-export"></canvas>
+              </div>
+            </div>
+            <!-- Savings tab card — rebuilt with plain hex only, no CSS variables -->
+            <div id="export-card-savings" style="width:1100px;background:#ffffff;padding:24px 32px;font-family:ui-sans-serif,system-ui,sans-serif;font-size:14px;line-height:1.5;color:#0f172a;box-sizing:border-box;">
+
+              <!-- Benchmark header -->
+              <div style="margin-bottom:8px;">
+                <h6 style="font-size:20px;font-weight:700;color:#0f172a;margin:0 0 4px;">Project Performance Benchmark</h6>
+                <p style="font-size:14px;color:#0f172a;margin:0;">
+                  Your project is performing better than <strong>78%</strong> of peer projects in Germany.
+                  <span style="background:#D5EDCD;font-size:12px;font-weight:800;border-radius:9999px;padding:2px 10px;margin-left:6px;">Top 25% tier</span>
+                </p>
+              </div>
+
+              <!-- Gauge bar — matches live layout -->
+              <div style="position:relative;height:110px;margin-top:16px;margin-bottom:8px;">
+                <div style="position:absolute;top:28px;left:0;right:0;height:16px;border-radius:4px;background:linear-gradient(90deg,#81F28E 0%,#FEEA93 50%,#FFCFC2 100%);"></div>
+
+                <!-- Best practice -->
+                <div style="position:absolute;top:28px;left:10%;display:flex;align-items:flex-end;gap:6px;">
+                  <div style="display:flex;flex-direction:column;align-items:center;">
+                    <div style="width:8px;height:8px;background:#41B84E;border-radius:50%;margin-bottom:-1px;"></div>
+                    <div style="width:2px;height:54px;background:#41B84E;"></div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <span style="font-size:13px;font-weight:500;color:#0f172a;white-space:nowrap;">Best Practice</span>
+                    <span style="font-size:13px;font-weight:700;color:#0f172a;background:#4EDF81;padding:2px 6px;white-space:nowrap;">320 kgCO<sub>2</sub>e/m<sup>2</sup></span>
+                  </div>
+                </div>
+
+                <!-- Your building -->
+                <div style="position:absolute;top:0;left:45%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;">
+                  <div style="font-size:13px;font-weight:500;color:#0f172a;white-space:nowrap;">Your Building</div>
+                  <div style="background:#0f172a;color:#ffffff;font-size:11px;font-weight:800;padding:2px 6px;white-space:nowrap;">463 kgCO<sub>2</sub>e/m<sup>2</sup></div>
+                  <div style="width:2px;height:13px;background:#000;"></div>
+                  <div style="width:8px;height:8px;background:#000;border-radius:50%;"></div>
+                </div>
+
+                <!-- National avg -->
+                <div style="position:absolute;top:28px;right:10%;display:flex;align-items:flex-end;gap:6px;">
+                  <div style="display:flex;flex-direction:column;align-items:center;">
+                    <div style="width:8px;height:8px;background:#E99C96;border-radius:50%;margin-bottom:-1px;"></div>
+                    <div style="width:2px;height:54px;background:#E99C96;"></div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <span style="font-size:13px;font-weight:500;color:#0f172a;white-space:nowrap;">National Avg</span>
+                    <span style="font-size:13px;font-weight:700;color:#0f172a;background:#FECBC9;padding:2px 6px;white-space:nowrap;">640 kgCO<sub>2</sub>e/m<sup>2</sup></span>
+                  </div>
+                </div>
+              </div>
+
+              <p style="font-size:12px;color:#64748b;text-align:center;margin:0 0 16px;">● Benchmark based on 452 residential projects in Baden-Württemberg region (2024-2025).</p>
+
+              <!-- Tabs -->
+              <div style="background:#f1f5f9;padding:4px;border-radius:8px;display:flex;gap:4px;margin-bottom:20px;">
+                <div style="padding:6px 16px;border-radius:6px;font-size:13px;font-weight:600;color:#0f172a;background:#86EFAC;box-shadow:0 1px 2px rgba(0,0,0,0.08);">Embodied Carbon Savings</div>
+                <div style="padding:6px 16px;border-radius:6px;font-size:13px;font-weight:500;color:#64748b;">Operational Carbon Savings</div>
+              </div>
+
+              <!-- Grid: left 320px + right fills rest -->
+              <div style="display:flex;gap:24px;align-items:flex-start;">
+
+                <!-- Left column — 320px matching live 20rem -->
+                <div style="width:320px;flex-shrink:0;display:flex;flex-direction:column;gap:20px;">
+
+                  <!-- Carbon Reduction card -->
+                  <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px;">
+                    <div style="font-size:14px;font-weight:600;color:#0f172a;">Carbon Reduction</div>
+
+                    <div style="background:#f8fafc;border-radius:8px;padding:14px;">
+                      <div style="font-size:12px;color:#64748b;margin-bottom:4px;">Material focus</div>
+                      <div style="font-size:30px;font-weight:700;color:#16A34A;line-height:1.1;">-85<span style="font-size:18px;font-weight:500;margin-left:2px;">kg CO<sub>2</sub>eq/m<sup>2</sup></span></div>
+                      <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;margin-top:4px;">
+                        <span style="color:#0f172a;">12.5%</span>
+                        <span style="color:#16A34A;">●</span>
+                        <span style="color:#64748b;">Reduction</span>
+                      </div>
+                    </div>
+
+                    <!-- Bar chart static replica -->
+                    <div style="height:180px;display:flex;align-items:flex-end;justify-content:center;gap:20px;padding:0 10px;">
+                      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
+                        <div style="width:100%;height:150px;background:#FFA468;border-radius:4px;"></div>
+                        <span style="font-size:12px;color:#64748b;">Baseline</span>
+                      </div>
+                      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
+                        <div style="width:100%;height:120px;background:#86EFAC;border-radius:4px;"></div>
+                        <span style="font-size:12px;color:#64748b;">Optimized</span>
+                      </div>
+                    </div>
+
+                    <!-- Stat boxes -->
+                    <div style="display:flex;gap:8px;">
+                      <div style="flex:1;background:#f8fafc;padding:10px;border-radius:8px;">
+                        <div><span style="font-size:22px;font-weight:700;color:#FFA468;">330</span> <span style="font-size:11px;color:#0f172a;">co<sub>2</sub>eq/m<sup>2</sup></span></div>
+                        <div style="font-size:12px;font-weight:600;color:#0f172a;margin-top:2px;">Baseline</div>
+                      </div>
+                      <div style="flex:1;background:#f8fafc;padding:10px;border-radius:8px;">
+                        <div><span style="font-size:22px;font-weight:700;color:#FFA468;">246</span> <span style="font-size:11px;color:#0f172a;">co<sub>2</sub>eq/m<sup>2</sup></span></div>
+                        <div style="font-size:12px;font-weight:600;color:#0f172a;margin-top:2px;">Optimized</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Savings by Category card -->
+                  <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+                    <div style="font-size:15px;font-weight:500;color:#0f172a;">Savings by Category</div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                      <div>
+                        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:500;color:#64748b;text-transform:uppercase;margin-bottom:4px;"><span>Ready-mix Concrete &amp; Cement</span><span style="color:#4ADE80;">-35</span></div>
+                        <div style="height:10px;background:#e2e8f0;border-radius:4px;overflow:hidden;"><div style="height:100%;width:35%;background:#4ADE80;border-radius:4px;"></div></div>
+                      </div>
+                      <div>
+                        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:500;color:#64748b;text-transform:uppercase;margin-bottom:4px;"><span>Steel</span><span style="color:#4ADE80;">-14</span></div>
+                        <div style="height:10px;background:#e2e8f0;border-radius:4px;overflow:hidden;"><div style="height:100%;width:14%;background:#4ADE80;border-radius:4px;"></div></div>
+                      </div>
+                      <div>
+                        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:500;color:#64748b;text-transform:uppercase;margin-bottom:4px;"><span>Rebar</span><span style="color:#4ADE80;">-14</span></div>
+                        <div style="height:10px;background:#e2e8f0;border-radius:4px;overflow:hidden;"><div style="height:100%;width:14%;background:#4ADE80;border-radius:4px;"></div></div>
+                      </div>
+                      <div>
+                        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:500;color:#64748b;text-transform:uppercase;margin-bottom:4px;"><span>Pre-cast Concrete</span><span style="color:#4ADE80;">-7</span></div>
+                        <div style="height:10px;background:#e2e8f0;border-radius:4px;overflow:hidden;"><div style="height:100%;width:7%;background:#4ADE80;border-radius:4px;"></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right column -->
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:20px;">
+
+                  <!-- Optimization Strategies card -->
+                  <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;">
+                    <div style="display:flex;align-items:center;gap:8px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #e2e8f0;">
+                      <span style="font-size:15px;font-weight:600;color:#0f172a;">Optimization Strategies</span>
+                    </div>
+                    <div style="display:flex;gap:16px;margin-bottom:20px;font-size:13px;">
+                      <div style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#FFA468;display:inline-block;flex-shrink:0;"></span><span style="color:#64748b;">Baseline</span></div>
+                      <div style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#4ADE80;display:inline-block;flex-shrink:0;"></span><span style="color:#64748b;">Potential savings</span></div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:24px;">
+
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                          <span style="font-size:13px;font-weight:700;color:#0f172a;">Ready-mix concrete &amp; cement</span>
+                          <span style="font-size:12px;color:#64748b;white-space:nowrap;margin-left:8px;">30% of total</span>
+                        </div>
+                        <div style="display:flex;height:32px;width:100%;border-radius:6px;overflow:hidden;font-size:11px;font-weight:500;color:#0f172a;background:#f1f5f9;">
+                          <div style="background:#FFA468;width:60%;display:flex;align-items:center;padding:0 10px;white-space:nowrap;">104 kg CO<sub>2</sub>e/m<sup>2</sup></div>
+                          <div style="background:#86EFAC;width:20%;display:flex;align-items:center;justify-content:center;white-space:nowrap;">-40 kgCO₂e/m²</div>
+                        </div>
+                        <p style="font-size:12px;color:#0f172a;margin:0;line-height:1.5;"><span style="font-weight:700;color:#16A34A;">25%</span> replace with GGBS/Fly Ash blend <span style="color:#64748b;">• 139 kg CO<sub>2</sub>e/m<sup>2</sup> → 104 kg CO<sub>2</sub>e/m<sup>2</sup> (-35 kg CO<sub>2</sub>e/m<sup>2</sup>)</span></p>
+                      </div>
+
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                          <span style="font-size:13px;font-weight:700;color:#0f172a;">Steel</span>
+                          <span style="font-size:12px;color:#64748b;white-space:nowrap;margin-left:8px;">15% of total</span>
+                        </div>
+                        <div style="display:flex;height:32px;width:100%;border-radius:6px;overflow:hidden;font-size:11px;font-weight:500;color:#0f172a;background:#f1f5f9;">
+                          <div style="background:#FFA468;width:30%;display:flex;align-items:center;padding:0 10px;white-space:nowrap;">55 kg CO<sub>2</sub>e/m<sup>2</sup></div>
+                          <div style="background:#86EFAC;width:20%;display:flex;align-items:center;justify-content:center;white-space:nowrap;">-20 kgCO₂e/m²</div>
+                        </div>
+                        <p style="font-size:12px;color:#0f172a;margin:0;line-height:1.5;"><span style="font-weight:700;color:#16A34A;">20%</span> with recycled content <span style="color:#64748b;">• 69 kg CO<sub>2</sub>e/m<sup>2</sup> → 55 kg CO<sub>2</sub>e/m<sup>2</sup> (-35 kg CO<sub>2</sub>e/m<sup>2</sup>)</span></p>
+                      </div>
+
+                      <div style="display:flex;flex-direction:column;gap:8px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                          <span style="font-size:13px;font-weight:700;color:#0f172a;">Reinforcement bar (rebar)</span>
+                          <span style="font-size:12px;color:#64748b;white-space:nowrap;margin-left:8px;">15% of total</span>
+                        </div>
+                        <div style="display:flex;height:32px;width:100%;border-radius:6px;overflow:hidden;font-size:11px;font-weight:500;color:#0f172a;background:#f1f5f9;">
+                          <div style="background:#FFA468;width:18%;display:flex;align-items:center;padding:0 10px;white-space:nowrap;">32 kg CO<sub>2</sub>e/m<sup>2</sup></div>
+                          <div style="background:#86EFAC;width:8%;display:flex;align-items:center;justify-content:center;">-7</div>
+                        </div>
+                        <p style="font-size:12px;color:#0f172a;margin:0;line-height:1.5;"><span style="font-weight:700;color:#16A34A;">20%</span> with recycled content <span style="color:#64748b;">• 69 kg CO<sub>2</sub>e/m<sup>2</sup> → 55 kg CO<sub>2</sub>e/m<sup>2</sup> (-35 kg CO<sub>2</sub>e/m<sup>2</sup>)</span></p>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <!-- Material Insight dark card -->
+                  <div style="background:#0f172a;color:#ffffff;padding:20px;border-radius:16px;display:flex;flex-direction:column;gap:10px;">
+                    <div style="font-size:15px;font-weight:500;">Material Insight</div>
+                    <p style="font-size:13px;line-height:1.6;margin:0;">Replacing standard cement with supplementary cementitious materials (SCMs) is often the most cost-effective reduction strategy.</p>
+                    <div style="display:inline-block;margin-top:4px;background:#3b82f6;color:#ffffff;font-size:12px;font-weight:600;padding:7px 16px;border-radius:6px;">Read LCA Guidelines</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div id="building-tabs" class="tabs tabs-primary tabs-border">
             <input
               type="radio"
@@ -368,6 +705,104 @@
           loadTabContent(tabLabel);
         }
       }
+
+      // Render all hidden export cards once on page load
+      (function initExportCharts() {
+        const styles = getComputedStyle(document.documentElement);
+        const operationalColor = styles.getPropertyValue("--state--feature--base").trim();
+        const embodiedColor = styles.getPropertyValue("--bg--surface-800").trim();
+        const primaryColor = styles.getPropertyValue("--color-primary").trim();
+        const strongTextColor = styles.getPropertyValue("--text--strong-950").trim();
+        const gridLineColor = styles.getPropertyValue("--neutral--slate--200").trim();
+        const softTextColor = styles.getPropertyValue("--text--soft-400").trim();
+
+        // 1. Donut card
+        const exportCtx = document.getElementById("whole-life-carbon-cycle-export");
+        if (exportCtx) {
+          const wholeLifeData = chartData.whole_life_carbon || { labels: [], data: [0, 0] };
+          new Chart(exportCtx, {
+            type: "doughnut",
+            data: {
+              labels: wholeLifeData.labels,
+              datasets: [{ data: wholeLifeData.data, backgroundColor: [operationalColor, embodiedColor], borderWidth: 0, cutout: "50%" }],
+            },
+            options: {
+              responsive: false, animation: false,
+              plugins: {
+                legend: { display: false }, tooltip: { enabled: false },
+                datalabels: {
+                  display: true, color: "white", font: { size: 18, weight: "bold" },
+                  formatter: function(value, context) {
+                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    if (total === 0) return "";
+                    return (value / total * 100).toFixed(0) + "%";
+                  },
+                },
+              },
+            },
+            plugins: [ChartDataLabels],
+          });
+          // Build legend
+          const legendEl = document.getElementById("whole-life-legend-export");
+          if (legendEl) {
+            const colors = [operationalColor, embodiedColor];
+            wholeLifeData.labels.forEach(function(lbl, i) {
+              const value = wholeLifeData.data[i];
+              const formatted = value.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+              const row = document.createElement("div");
+              row.className = "flex items-center gap-2";
+              row.innerHTML = `<div class="size-2 rounded-full flex-shrink-0" style="background-color:${colors[i]}"></div><span class="text-sm text-[var(--text--sub-600)]">${lbl}: ${formatted} kgCO₂eq/m²</span>`;
+              legendEl.appendChild(row);
+            });
+          }
+        }
+
+        // Helper for bar charts
+        function makeExportBarChart(canvasId, wrapId, data, barColor) {
+          const canvas = document.getElementById(canvasId);
+          const wrap = document.getElementById(wrapId);
+          if (!canvas || !data) return;
+          const labels = data.labels.length > 0 ? data.labels : [i18n.noData];
+          const h = Math.max(180, labels.length * 52);
+          canvas.style.height = h + "px";
+          if (wrap) wrap.style.height = h + "px";
+          const afterBarText = labels.map((lbl, i) => (data.data[i] || 0) + "% - " + lbl);
+          new Chart(canvas, {
+            type: "bar",
+            data: {
+              labels: labels,
+              datasets: [{
+                data: data.data.length > 0 ? data.data : [0],
+                backgroundColor: barColor,
+                borderRadius: 8, barPercentage: 0.6, categoryPercentage: 0.8,
+                datalabels: {
+                  display: true, anchor: "end", align: "right", clip: false, offset: 4,
+                  color: strongTextColor, font: { size: 12 },
+                  formatter: function(value, context) { return afterBarText[context.dataIndex]; },
+                },
+              }],
+            },
+            options: {
+              indexAxis: "y", responsive: true, maintainAspectRatio: false, animation: false,
+              layout: { padding: { left: 0, right: 220, top: 16, bottom: 10 } },
+              scales: {
+                x: { beginAtZero: true, max: 100, grid: { color: gridLineColor, drawTicks: false }, border: { display: false, dash: [4, 4] }, ticks: { color: softTextColor, font: { size: 11 }, callback: function(v) { return v + "%"; }, padding: 8 } },
+                y: { grid: { display: false }, border: { display: false }, ticks: { display: false } },
+              },
+              plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            },
+            plugins: [ChartDataLabels],
+          });
+        }
+
+        // 2. Embodied by assembly
+        makeExportBarChart("emboided-carbon-chart-export", "export-assembly-chart-wrap",
+          chartData.embodied_by_assembly || { labels: [], data: [], absolute: [] }, primaryColor);
+
+        // 3. Embodied by material
+        makeExportBarChart("emboided-carbon-by-material-chart-export", "export-material-chart-wrap",
+          chartData.embodied_by_material || { labels: [], data: [], absolute: [] }, operationalColor);
+      })();
 
       function initializeCharts() {
         const ctx = document.getElementById("whole-life-carbon-cycle");
