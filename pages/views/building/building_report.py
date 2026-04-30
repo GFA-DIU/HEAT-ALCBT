@@ -125,7 +125,7 @@ def _build_context(building, request, card_donut="", card_assembly="", card_mate
         "report_date": date.today().strftime("%-d %B %Y") if os.name != "nt" else date.today().strftime("%#d %B %Y"),
         "alcbt_logo": _get_logo_b64("ALCBT_logo.png"),
         "sponsor_logo": _get_logo_b64("sponsor-2.png"),
-        "assessor_name": f"{request.user.first_name} {request.user.last_name}".strip() or "[Assessor Name]",
+        "assessor_name": request.user.get_full_name() or request.user.username,
         "organisation": str(building.organisation) if building.organisation else "[Organisation Name]",
         "total_carbon": fmt(total),
         "embodied_carbon": fmt(embodied),
