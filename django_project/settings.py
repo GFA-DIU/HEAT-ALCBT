@@ -171,7 +171,7 @@ else:
             "USER": "postgres",
             "PASSWORD": "postgres",
             "HOST": "localhost",  # set in docker-compose.yml
-            "PORT": 5430,  # default postgres port
+            "PORT": 5432,  # default postgres port
             "TEST": {
                 # Don't serialize the live DB into JSON before creating the test
                 # DB — avoids errors when live DB schema differs from ORM state.
