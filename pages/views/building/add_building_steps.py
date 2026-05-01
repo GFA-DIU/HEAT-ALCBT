@@ -54,7 +54,7 @@ def building_step_view(request):
         "operational-details/lighting-system.html": handle_lighting_system_step,
         "operational-details/lift-escalator-system.html": handle_lift_escalator_step,
         "operational-details/hot-water-system.html": handle_hot_water_step,
-        
+        "operational-details/energy-consumption-summary.html": handle_energy_consumption_summary_step,  # Placeholder for energy summary step
         # Operational Data Entry
         "operational-data-entry/operational-data-entry.html": handle_operational_data_step,
         
@@ -321,6 +321,18 @@ def handle_hot_water_step(request):
     return render(
         request,
         "pages/add-building/components/operational-details/hot-water-system.html",
+        context
+    )
+
+# Step 2.7: Energy Consumption Summary
+def handle_energy_consumption_summary_step(request):
+    """Handle energy consumption summary step."""
+    context = {
+        "building_uuid": request.GET.get('building_uuid', '')
+    }
+    return render(
+        request,
+        "pages/add-building/components/operational-details/energy-consumption-summary.html",
         context
     )
 
