@@ -58,6 +58,7 @@ from .views.building.lift_escalator_system import (
 from .views.building.lighting_system import (create_or_update_lighting_system,
                                              delete_lighting_system,
                                              get_lighting_systems)
+from .views.building.energy_summary import get_energy_summary, save_energy_summary
 from .views.building.ventilation_system import (
     create_or_update_ventilation_system, delete_ventilation_system,
     get_ventilation_systems)
@@ -101,6 +102,8 @@ urlpatterns = [
     path("building/files/serve/", serve_building_file, name="building_files_serve"),
     path("building/files/", get_building_files, name="building_files_get"),
     path("building/<uuid:building_uuid>/total-kwh/", get_building_total_kwh, name="building_total_kwh"),
+    path("building/energy-summary/", get_energy_summary, name="energy_summary_get"),
+    path("building/energy-summary/save/", save_energy_summary, name="energy_summary_save"),
     path("building/step/structural", building_step_structural_products, name="building_step_structural"),
     path("building/complete", complete_building_setup, name="complete_building_setup"),
     path("building/<uuid:building_id>/", building, name="building"),

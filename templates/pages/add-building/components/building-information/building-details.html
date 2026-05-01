@@ -123,6 +123,31 @@
     </label>
   </fieldset>
 
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">
+      {% translate "Total annual energy consumption" %}
+      <span class="text-[var(--text--sub-600)]">(kWh/yr)</span>
+    </legend>
+    <label class="input w-full {% if building_data.energy_summary_any_components %}bg-[var(--bg--weak-50)]{% endif %}">
+      <input
+        name="total_annual_energy_consumption"
+        type="number"
+        min="0"
+        step="0.001"
+        placeholder="{% translate 'e.g. 250000' %}"
+        {% if building_data.energy_summary_any_components %}
+          readonly
+          title="{% translate 'Auto-calculated from operational system records' %}"
+        {% endif %}
+        {% if building_data.total_annual_energy_consumption is not None %}value="{{ building_data.total_annual_energy_consumption }}"{% endif %}
+      />
+      <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/yr</span>
+    </label>
+    {% if building_data.energy_summary_any_components %}
+      <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Calculated from operational system sheets. Edit there to change this value." %}</p>
+    {% endif %}
+  </fieldset>
+
   <!-- Certification -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
