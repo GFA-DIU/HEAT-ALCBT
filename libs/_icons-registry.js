@@ -1,5 +1,5 @@
 // Auto-generated file - do not edit manually
-// Generated on: 2026-02-12T16:40:36.438Z
+// Generated on: 2026-04-28T20:47:30.356Z
 // Total icons: 89
 
 export const ICONS_REGISTRY = {
@@ -188,10 +188,7 @@ export const ICON_NAMES = [
 ];
 
 export const EXCLUDED_FROM_CURRENT_COLOR = [
-  'google',
-  'file-csv',
-  'file-xls',
-  'file-xlsx'
+  'google'
 ];
 
 // Helper function to check if an icon exists
