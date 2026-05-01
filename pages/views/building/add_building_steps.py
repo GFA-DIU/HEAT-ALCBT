@@ -8,6 +8,7 @@ import json
 import logging
 import uuid as uuid_lib
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
@@ -17,13 +18,14 @@ from django.views.decorators.http import require_http_methods
 
 from cities_light.models import Country
 
+from accounts.models import CustomCity, CustomRegion
 from pages.forms.epds_filter_form import EPDsFilterForm
+from pages.models.assembly import Assembly, StructuralProduct
 from pages.models.base import ALCBTCountryManager
 from pages.models.building import Building, BuildingAssembly, BuildingCategory, OperationalProduct, CategorySubcategory, ClimateZone
+from pages.models.building_operation.energy_summary import EnergySummary
 from pages.models.climate_type import ClimateType
 from pages.models.epd import EPD, EPDImpact, EPDType, MaterialCategory
-from accounts.models import CustomCity, CustomRegion
-from pages.models.assembly import Assembly, StructuralProduct
 from pages.views.building.impact_calculation import calculate_impacts, ImpactCalculationError
 
 logger = logging.getLogger(__name__)
@@ -182,6 +184,12 @@ def handle_details_step(request):
             ]
 
             # Pre-fill text fields
+            energy_summary = None
+            try:
+                energy_summary = building.energy_summary
+            except EnergySummary.DoesNotExist:
+                pass
+
             context["building_data"] = {
                 "assessment_period": building.reference_period,
                 "construction_year": building.construction_year,
@@ -192,6 +200,9 @@ def handle_details_step(request):
                 "certification_file": cert_info,
                 "has_boq": building.has_boq,
                 "boq_files": boq_info,
+                "total_annual_energy_consumption": energy_summary.total_kwh if energy_summary and energy_summary.total_kwh is not None else None,
+                "energy_summary_any_components": energy_summary.any_components if energy_summary else False,
+                "energy_summary_exists": energy_summary is not None,
             }
 
             # Pre-populate climate_type
@@ -327,8 +338,22 @@ def handle_hot_water_step(request):
 # Step 2.7: Energy Consumption Summary
 def handle_energy_consumption_summary_step(request):
     """Handle energy consumption summary step."""
+    building_uuid = request.GET.get('building_uuid', '')
+    summary = None
+
+    if building_uuid:
+        try:
+            building = Building.objects.get(uuid=building_uuid, created_by=request.user)
+            summary, created = EnergySummary.objects.get_or_create(building=building)
+            if created:
+                summary.recalculate()
+                summary.save()
+        except Building.DoesNotExist:
+            pass
+
     context = {
-        "building_uuid": request.GET.get('building_uuid', '')
+        "building_uuid": building_uuid,
+        "summary": summary,
     }
     return render(
         request,
@@ -676,6 +701,17 @@ def save_building_step(request):
 
                     building.save()
                     building_uuid = str(building.uuid)
+
+                    # Save manual total energy if no system-derived data exists
+                    raw_total = step_data.get('total_annual_energy_consumption')
+                    if raw_total not in (None, ''):
+                        try:
+                            summary, _ = EnergySummary.objects.get_or_create(building=building)
+                            if not summary.any_components:
+                                summary.total_override_kwh = Decimal(str(raw_total))
+                                summary.save(update_fields=['total_override_kwh'])
+                        except (InvalidOperation, ValueError):
+                            pass
 
                 except Building.DoesNotExist:
                     return JsonResponse({"error": "Building not found"}, status=404)
