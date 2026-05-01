@@ -73,7 +73,7 @@
 
 <template id="ahu-template">
   <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "AIR HANDLING UNIT (AHU) DATA" %}</div>
-  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+  <div class="px-5 py-4 grid grid-cols-3 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
@@ -93,6 +93,17 @@
     </fieldset>
 
     <fieldset class="fieldset">
+      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+          <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
+        </select>
+      </label>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
       <legend class="fieldset-legend">{% translate "Installation of Variable Speed Drives (VSD)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
         <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" /> {% translate "Yes" %}</label>
@@ -108,7 +119,7 @@
       </div>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
+    <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
@@ -128,7 +139,7 @@
       </div>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
+    <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
         <input type="number" name="power_input" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.01" readonly class="cursor-not-allowed" />
@@ -137,7 +148,7 @@
       <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000" %}</p>
     </fieldset>
 
-    <div class="col-span-2 mt-3">
+    <div class="col-span-3 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
@@ -145,14 +156,6 @@
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Air flow rate" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
-              <label class="input w-full pr-0 overflow-hidden">
-                <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="0" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
-                <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
-                  <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
-                </select>
-              </label>
-            </fieldset>
             <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
               <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
               <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor" %}</p>
@@ -166,7 +169,7 @@
 
 <template id="fcu-template">
   <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "FAN COIL UNIT (FCU) DATA" %}</div>
-  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+  <div class="px-5 py-4 grid grid-cols-3 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
@@ -185,7 +188,18 @@
       <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="airflow_rate" placeholder="e.g. 2000" min="1" required />
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+          <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
+        </select>
+      </label>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
@@ -205,7 +219,7 @@
       </div>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
+    <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="power_input" placeholder="e.g. 8" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
@@ -214,7 +228,7 @@
       <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
-    <div class="col-span-2 mt-3">
+    <div class="col-span-3 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
@@ -222,14 +236,6 @@
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Air flow rate" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
-              <label class="input w-full pr-0 overflow-hidden">
-                <input type="number" name="airflow_rate" placeholder="e.g. 2000" min="0" />
-                <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
-                  <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
-                </select>
-              </label>
-            </fieldset>
             <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
               <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
               <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power (kW) × hrs/day × days/wk × wks/yr" %}</p>
@@ -243,7 +249,7 @@
 
 <template id="doas-template">
   <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "DEDICATED OUTDOOR AIR SYSTEM (DOAS) DATA" %}</div>
-  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+  <div class="px-5 py-4 grid grid-cols-3 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
@@ -263,6 +269,17 @@
     </fieldset>
 
     <fieldset class="fieldset">
+      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+          <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
+        </select>
+      </label>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset">
       <legend class="fieldset-legend">{% translate "Installation of Variable Speed Drives (VSD)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <div class="flex items-center gap-2.5 mt-1">
         <label class="flex items-center gap-2"><input type="radio" name="variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')" /> {% translate "Yes" %}</label>
@@ -278,7 +295,7 @@
       </div>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
+    <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
@@ -298,7 +315,7 @@
       </div>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
+    <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}</legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
         <input type="number" name="power_input" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.01" readonly class="cursor-not-allowed" />
@@ -307,7 +324,7 @@
       <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000" %}</p>
     </fieldset>
 
-    <div class="col-span-2 mt-3">
+    <div class="col-span-3 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
@@ -315,14 +332,6 @@
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Air flow rate" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
-              <label class="input w-full pr-0 overflow-hidden">
-                <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="0" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
-                <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
-                  <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
-                </select>
-              </label>
-            </fieldset>
             <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
               <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
               <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor" %}</p>
@@ -336,7 +345,7 @@
 
 <template id="cassette-template">
   <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "CEILING/WALL MOUNTED CASSETTE AC DATA" %}</div>
-  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+  <div class="px-5 py-4 grid grid-cols-3 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
@@ -364,7 +373,18 @@
       <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="airflow_rate" placeholder="e.g. 3000" min="1" required />
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+          <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
+        </select>
+      </label>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
@@ -384,7 +404,7 @@
       </div>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
+    <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="power_input" placeholder="e.g. 12" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
@@ -393,7 +413,7 @@
       <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
-    <div class="col-span-2 mt-3">
+    <div class="col-span-3 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
@@ -401,14 +421,6 @@
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Air flow rate" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
-              <label class="input w-full pr-0 overflow-hidden">
-                <input type="number" name="airflow_rate" placeholder="e.g. 3000" min="0" />
-                <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
-                  <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
-                </select>
-              </label>
-            </fieldset>
             <fieldset class="fieldset col-span-2"><legend class="fieldset-legend">{% translate "Total energy consumption annually" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
               <label class="input w-full bg-[var(--bg--weak-50)]"><input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" /><span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span></label>
               <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Power (kW) × hrs/day × days/wk × wks/yr" %}</p>
@@ -422,7 +434,7 @@
 
 <template id="fan-template">
   <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "CEILING / EXHAUST / WALL FAN DATA" %}</div>
-  <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
+  <div class="px-5 py-4 grid grid-cols-3 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
@@ -441,7 +453,18 @@
       <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="airflow_rate" placeholder="e.g. 500" min="1" required />
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+          <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
+        </select>
+      </label>
+      <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
         <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
       </legend>
@@ -461,7 +484,7 @@
       </div>
     </fieldset>
 
-    <fieldset class="fieldset col-span-2">
+    <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
         <input type="number" name="power_input" placeholder="e.g. 2" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
@@ -470,7 +493,7 @@
       <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
 
-    <div class="col-span-2 mt-3">
+    <div class="col-span-3 mt-3">
       <div class="collapse rounded-none">
         <input type="checkbox" class="peer" />
         <div class="group collapse-title p-2.5 bg-[var(--bg--weak-50)] text-[0.813rem]/5 font-semibold flex items-center justify-between rounded-[var(--radius-4)]">
@@ -478,14 +501,6 @@
         </div>
         <div class="collapse-content mt-4 px-0">
           <div class="grid grid-cols-2 gap-2">
-            <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Air flow rate" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span></legend>
-              <label class="input w-full pr-0 overflow-hidden">
-                <input type="number" name="airflow_rate" placeholder="e.g. 500" min="0" />
-                <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
-                  <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
-                </select>
-              </label>
-            </fieldset>
             <fieldset class="fieldset"><legend class="fieldset-legend">{% translate "Number of stars" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional, 1–5" %})</span></legend>
               <select class="select w-full" name="number_of_stars">
                 <option disabled selected value="">{% translate "Select" %}</option>

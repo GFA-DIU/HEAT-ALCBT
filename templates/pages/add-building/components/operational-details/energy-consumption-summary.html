@@ -1,184 +1,324 @@
-<div id="energy-consumption-summary-container" class="w-full">
+{% load i18n %}
+<div id="energy-consumption-summary-container" class="w-full" data-building-uuid="{{ building_uuid }}">
   <div class="flex flex-col gap-2">
+
     <!-- Cooling system -->
-    <div class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
+    <div id="summary-row-cooling" class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
       <div class="flex items-center gap-1.5">
         <span data-icon="snowflake-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-        <span class="text-sm font-normal">Cooling system</span>
+        <span class="text-sm font-normal">{% translate "Cooling system" %}</span>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-bold text-[var(--text--sub-600)]">112,000
-          <span class="font-normal">kWh/yr</span></span>
-        <button class=" btn btn-ghost size-6 p-0" onclick="override_consumption_modal.showModal()">
-          <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
-        </button>
+      <div class="flex items-center gap-2" data-summary-right>
+        {% if summary and summary.cooling_kwh is not None %}
+          <span class="text-sm font-bold text-[var(--text--sub-600)]">
+            {{ summary.cooling_kwh|floatformat:-3 }} <span class="font-normal">kWh/yr</span>
+          </span>
+          {% if summary.is_manual_cooling %}
+            <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('cooling', {{ summary.cooling_kwh|floatformat:3 }})">
+              <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
+            </button>
+          {% endif %}
+        {% else %}
+          <div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
+            <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
+            <span class="text-[0.625rem] font-medium uppercase tracking-widest">{% translate "No data" %}</span>
+          </div>
+          <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('cooling', null)">
+            <span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
+        {% endif %}
       </div>
     </div>
 
     <!-- Ventilation system -->
-    <div class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
+    <div id="summary-row-ventilation" class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
       <div class="flex items-center gap-1.5">
         <span data-icon="windy-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-        <span class="text-sm font-normal">Ventilation system</span>
+        <span class="text-sm font-normal">{% translate "Ventilation system" %}</span>
       </div>
-      <div class="flex items-center gap-2">
-        <div class="flex items-center gap-1.5 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
-          <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
-          <span class="text-[0.625rem] font-medium uppercase tracking-widest">No data for ventilation system</span>
-        </div>
-        <button class="btn btn-ghost size-6 p-0" onclick="add_consumption_modal.showModal()">
-          <span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-        </button>
+      <div class="flex items-center gap-2" data-summary-right>
+        {% if summary and summary.ventilation_kwh is not None %}
+          <span class="text-sm font-bold text-[var(--text--sub-600)]">
+            {{ summary.ventilation_kwh|floatformat:-3 }} <span class="font-normal">kWh/yr</span>
+          </span>
+          {% if summary.is_manual_ventilation %}
+            <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('ventilation', {{ summary.ventilation_kwh|floatformat:3 }})">
+              <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
+            </button>
+          {% endif %}
+        {% else %}
+          <div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
+            <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
+            <span class="text-[0.625rem] font-medium uppercase tracking-widest">{% translate "No data" %}</span>
+          </div>
+          <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('ventilation', null)">
+            <span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
+        {% endif %}
       </div>
     </div>
 
     <!-- Lighting system -->
-    <div class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
+    <div id="summary-row-lighting" class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
       <div class="flex items-center gap-1.5">
         <span data-icon="lightbulb-line" data-size="20" data-color="var(--icon--strong-950)"></span>
-        <span class="text-sm font-normal">Lighting system</span>
+        <span class="text-sm font-normal">{% translate "Lighting system" %}</span>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-bold text-[var(--text--sub-600)]">87,400
-          <span class="font-normal">kWh/yr</span></span>
-        <button class="btn btn-ghost size-6 p-0">
-          <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
-        </button>
+      <div class="flex items-center gap-2" data-summary-right>
+        {% if summary and summary.lighting_kwh is not None %}
+          <span class="text-sm font-bold text-[var(--text--sub-600)]">
+            {{ summary.lighting_kwh|floatformat:-3 }} <span class="font-normal">kWh/yr</span>
+          </span>
+          {% if summary.is_manual_lighting %}
+            <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('lighting', {{ summary.lighting_kwh|floatformat:3 }})">
+              <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
+            </button>
+          {% endif %}
+        {% else %}
+          <div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
+            <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
+            <span class="text-[0.625rem] font-medium uppercase tracking-widest">{% translate "No data" %}</span>
+          </div>
+          <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('lighting', null)">
+            <span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
+        {% endif %}
       </div>
     </div>
 
     <!-- Lift & Escalator system -->
-    <div class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
+    <div id="summary-row-lift-escalator" class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
       <div class="flex items-center gap-1.5">
         <span data-icon="stairs-line" data-size="20" data-color="var(--icon--strong-950)"></span>
-        <span class="text-sm font-normal">Lift & Escalator system</span>
+        <span class="text-sm font-normal">{% translate "Lift & Escalator system" %}</span>
       </div>
-      <div class="flex items-center gap-2">
-        <div class="flex items-center gap-1.5 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
-          <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
-          <span class="text-[0.625rem] font-medium uppercase tracking-widest">No data for lift & escalator
-            system</span>
-        </div>
-        <button class="btn btn-ghost size-6 p-0">
-          <span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-        </button>
+      <div class="flex items-center gap-2" data-summary-right>
+        {% if summary and summary.lift_escalator_kwh is not None %}
+          <span class="text-sm font-bold text-[var(--text--sub-600)]">
+            {{ summary.lift_escalator_kwh|floatformat:-3 }} <span class="font-normal">kWh/yr</span>
+          </span>
+          {% if summary.is_manual_lift_escalator %}
+            <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('lift_escalator', {{ summary.lift_escalator_kwh|floatformat:3 }})">
+              <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
+            </button>
+          {% endif %}
+        {% else %}
+          <div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
+            <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
+            <span class="text-[0.625rem] font-medium uppercase tracking-widest">{% translate "No data" %}</span>
+          </div>
+          <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('lift_escalator', null)">
+            <span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
+        {% endif %}
       </div>
     </div>
 
-    <!-- Hot water system Manual -->
-    <div class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
+    <!-- Hot water system -->
+    <div id="summary-row-hot-water" class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
       <div class="flex items-center gap-1.5">
         <span data-icon="temp-cold-line" data-size="20" data-color="var(--icon--strong-950)"></span>
-        <span class="text-sm font-normal">Hot water system Manual</span>
+        <span class="text-sm font-normal">{% translate "Hot water system" %}</span>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-bold text-[var(--text--sub-600)]">34,200
-          <span class="font-normal">kWh/yr</span></span>
-        <button class="btn btn-ghost size-6 p-0">
-          <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
-        </button>
+      <div class="flex items-center gap-2" data-summary-right>
+        {% if summary and summary.hot_water_kwh is not None %}
+          <span class="text-sm font-bold text-[var(--text--sub-600)]">
+            {{ summary.hot_water_kwh|floatformat:-3 }} <span class="font-normal">kWh/yr</span>
+          </span>
+          {% if summary.is_manual_hot_water %}
+            <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('hot_water', {{ summary.hot_water_kwh|floatformat:3 }})">
+              <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
+            </button>
+          {% endif %}
+        {% else %}
+          <div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
+            <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
+            <span class="text-[0.625rem] font-medium uppercase tracking-widest">{% translate "No data" %}</span>
+          </div>
+          <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('hot_water', null)">
+            <span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
+        {% endif %}
       </div>
     </div>
 
     <!-- Total row -->
-    <div
-      class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] border border-[var(--stroke--soft-200)] mt-2">
-      <span class="text-sm font-medium">Total annual energy consumption</span>
-      <span class="text-sm font-bold text-[var(--text--sub-600)]">233,600
-        <span class="font-normal">kWh/yr</span></span>
+    <div class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] border border-[var(--stroke--soft-200)] mt-2">
+      <span class="text-sm font-medium">{% translate "Total annual energy consumption" %}</span>
+      {% if summary and summary.total_kwh is not None %}
+        <span id="summary-total-value" class="text-sm font-bold text-[var(--text--sub-600)]">
+          {{ summary.total_kwh|floatformat:-3 }} <span class="font-normal">kWh/yr</span>
+        </span>
+      {% else %}
+        <span id="summary-total-value" class="text-sm text-[var(--text--sub-600)]">—</span>
+      {% endif %}
     </div>
+
   </div>
 </div>
 
-<!-- Override Modal -->
-<dialog id="override_consumption_modal" class="modal modal-middle">
+<!-- Energy Summary Modal -->
+<dialog id="energy_summary_modal" class="modal modal-middle">
   <div class="modal-box w-full max-w-[32.5rem] p-0 rounded-[1.25rem]">
     <div class="flex justify-between p-4 pb-2 items-end w-full">
-      <h3 class="text-base font-bold">Override cooling system consumption</h3>
-      <button type="button" onclick="override_consumption_modal.close()" class="btn btn-sm btn-circle btn-ghost mb-2">
+      <h3 class="text-base font-bold" id="energy-modal-title">{% translate "Annual energy consumption" %}</h3>
+      <button type="button" onclick="energy_summary_modal.close()" class="btn btn-sm btn-circle btn-ghost">
         <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
       </button>
     </div>
     <div class="px-5 pb-5 flex flex-col gap-4">
       <p class="text-xs text-[var(--text--sub-600)]">
-        Enter the known annual energy consumption for this system. This will
-        replace the auto-calculated value.
+        {% translate "Enter the annual energy consumption for this system. Leave blank if it does not apply to this building." %}
       </p>
-
-      <div class="flex flex-col gap-1">
-        <span class="text-xs font-medium uppercase text-[var(--text--sub-600)]">System Type</span>
-        <span class="text-sm font-bold">Cooling System</span>
-      </div>
-
       <fieldset class="fieldset p-0">
         <legend class="fieldset-legend mb-1">
-          Annual energy consumption<span class="text-[var(--state--error--base)]">*</span>
+          {% translate "Annual energy consumption" %}<span class="text-[var(--state--error--base)]">*</span>
         </legend>
         <label class="input w-full">
-          <input type="number" value="112000" />
-          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/yr</span>
-        </label>
-      </fieldset>
-
-      <div class="flex items-start gap-3 p-3.5 rounded-[var(--radius-12)] bg-[var(--state--information--lighter)]">
-        <span data-icon="information-fill" data-size="20" data-color="var(--state--information--base)"
-          class="mt-0.5"></span>
-        <p class="text-sm/5 text-[var(--text--strong-950)]">
-          Overriding this value replaces the system sheet figure. The original
-          value won't be used in the carbon calculation.
-        </p>
-      </div>
-    </div>
-    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-end w-full">
-      <button class="btn btn-sm btn-outline p-2 border-[var(--stroke--soft-200)] leading-5"
-        onclick="override_consumption_modal.close()">
-        Cancel
-      </button>
-      <button class="btn btn-sm btn-primary p-2 leading-5">
-        Save value
-      </button>
-    </div>
-  </div>
-</dialog>
-
-<!-- Add Modal -->
-<dialog id="add_consumption_modal" class="modal modal-middle">
-  <div class="modal-box w-full max-w-[32.5rem] p-0 rounded-[1.25rem]">
-    <div class="flex justify-between p-4 pb-2 items-end w-full">
-      <h3 class="text-base font-bold">Add annual energy consumption</h3>
-      <button type="button" onclick="add_consumption_modal.close()" class="btn btn-sm btn-circle btn-ghost">
-        <span data-icon="close-line" data-size="16" data-color="var(--icon--sub-600)"></span>
-      </button>
-    </div>
-    <div class="px-5 pb-5 flex flex-col gap-4">
-      <p class="text-xs text-[var(--text--sub-600)]">
-        Enter the annual energy consumption for this system. Leave blank if it
-        does not apply to this building.
-      </p>
-
-      <div class="flex flex-col gap-1">
-        <span class="text-xs font-medium uppercase text-[var(--text--sub-600)]">System Type</span>
-        <span class="text-sm font-bold">Ventilation System</span>
-      </div>
-
-      <fieldset class="fieldset p-0">
-        <legend class="fieldset-legend mb-1">
-          Annual energy consumption<span class="text-[var(--state--error--base)]">*</span>
-        </legend>
-        <label class="input w-full">
-          <input type="number" placeholder="enter annual consumptions here." />
+          <input type="number" id="energy-modal-input" min="0" step="0.001" placeholder="{% translate 'Enter value' %}" />
           <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/yr</span>
         </label>
       </fieldset>
     </div>
     <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-end w-full">
-      <button class="btn btn-sm btn-outline p-2 leading-5 border-[var(--stroke--soft-200)]"
-        onclick="add_consumption_modal.close()">
-        Cancel
+      <button class="btn btn-sm btn-outline p-2 border-[var(--stroke--soft-200)] leading-5" onclick="energy_summary_modal.close()">
+        {% translate "Cancel" %}
       </button>
-      <button class="btn btn-sm btn-primary p-2 leading-5 border-none">
-        Save value
+      <button class="btn btn-sm btn-primary p-2 leading-5" onclick="saveSummaryValue()">
+        {% translate "Save value" %}
       </button>
     </div>
   </div>
 </dialog>
+
+<script>
+(function () {
+  var _currentCategory = null;
+
+  var CATEGORY_LABELS = {
+    cooling: "{% translate 'Cooling system' %}",
+    ventilation: "{% translate 'Ventilation system' %}",
+    lighting: "{% translate 'Lighting system' %}",
+    lift_escalator: "{% translate 'Lift & Escalator system' %}",
+    hot_water: "{% translate 'Hot water system' %}",
+  };
+
+  window.openSummaryModal = function (category, currentValue) {
+    _currentCategory = category;
+    document.getElementById('energy-modal-title').textContent = CATEGORY_LABELS[category] || category;
+    var input = document.getElementById('energy-modal-input');
+    input.value = currentValue !== null ? currentValue : '';
+    energy_summary_modal.showModal();
+  };
+
+  var CATEGORY_ROW_ID = {
+    cooling: 'summary-row-cooling',
+    ventilation: 'summary-row-ventilation',
+    lighting: 'summary-row-lighting',
+    lift_escalator: 'summary-row-lift-escalator',
+    hot_water: 'summary-row-hot-water',
+  };
+
+  function fmt(val) {
+    var n = parseFloat(val);
+    return Number.isInteger(n) ? n.toLocaleString() : n.toLocaleString(undefined, { maximumFractionDigits: 3 });
+  }
+
+  var IS_MANUAL_KEY = {
+    cooling: 'is_manual_cooling',
+    ventilation: 'is_manual_ventilation',
+    lighting: 'is_manual_lighting',
+    lift_escalator: 'is_manual_lift_escalator',
+    hot_water: 'is_manual_hot_water',
+  };
+
+  var KWH_KEY = {
+    cooling: 'cooling_kwh',
+    ventilation: 'ventilation_kwh',
+    lighting: 'lighting_kwh',
+    lift_escalator: 'lift_escalator_kwh',
+    hot_water: 'hot_water_kwh',
+  };
+
+  function updateRow(category, summary) {
+    var rowId = CATEGORY_ROW_ID[category];
+    if (!rowId) return;
+    var row = document.getElementById(rowId);
+    if (!row) return;
+    var right = row.querySelector('[data-summary-right]');
+    if (!right) return;
+
+    var kwh = summary[KWH_KEY[category]];
+    var isManual = summary[IS_MANUAL_KEY[category]];
+
+    if (kwh === null || kwh === undefined) {
+      right.innerHTML =
+        '<div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">' +
+          '<span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>' +
+          '<span class="text-[0.625rem] font-medium uppercase tracking-widest">No data</span>' +
+        '</div>' +
+        '<button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal(\'' + category + '\', null)">' +
+          '<span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>' +
+        '</button>';
+    } else {
+      right.innerHTML =
+        '<span class="text-sm font-bold text-[var(--text--sub-600)]">' +
+          fmt(kwh) + ' <span class="font-normal">kWh/yr</span>' +
+        '</span>' +
+        (isManual
+          ? '<button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal(\'' + category + '\', ' + kwh + ')">' +
+              '<span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>' +
+            '</button>'
+          : '');
+    }
+    if (window.IconsRegistry && typeof window.IconsRegistry.render === 'function') {
+      window.IconsRegistry.render(right);
+    }
+  }
+
+  function updateTotal(totalKwh) {
+    var el = document.getElementById('summary-total-value');
+    if (!el) return;
+    if (totalKwh !== null && totalKwh !== undefined) {
+      el.textContent = fmt(totalKwh) + ' kWh/yr';
+      el.className = 'text-sm font-bold text-[var(--text--sub-600)]';
+    } else {
+      el.textContent = '—';
+      el.className = 'text-sm text-[var(--text--sub-600)]';
+    }
+  }
+
+  window.saveSummaryValue = function () {
+    if (!_currentCategory) return;
+    var buildingUuid = document.getElementById('energy-consumption-summary-container').dataset.buildingUuid;
+    var value = document.getElementById('energy-modal-input').value;
+    var payload = { building_uuid: buildingUuid };
+    payload[_currentCategory + '_kwh'] = value !== '' ? parseFloat(value) : null;
+
+    fetch('{% url "energy_summary_save" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value,
+      },
+      body: JSON.stringify(payload),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.success) {
+          energy_summary_modal.close();
+          var s = data.summary;
+          updateRow('cooling', s);
+          updateRow('ventilation', s);
+          updateRow('lighting', s);
+          updateRow('lift_escalator', s);
+          updateRow('hot_water', s);
+          updateTotal(s.total_kwh);
+        } else {
+          console.error('Failed to save energy summary', data);
+        }
+      })
+      .catch(function (err) { console.error('Error saving energy summary', err); });
+  };
+})();
+</script>
