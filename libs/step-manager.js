@@ -94,6 +94,16 @@ class StepManager {
             title: gettext("Hot Water System"),
             description: gettext("Defines the building's method of producing and distributing hot water, including equipment type, energy source, and usage patterns."),
           },
+          {
+            id: "energy-consumption-summary",
+            name: gettext("Energy Consumption Summary"),
+            component: "operational-details/energy-consumption-summary.html",
+            requiredFields: [],
+            title: gettext("Energy Consumption Summary"),
+            description: gettext(
+              "Review annual energy consumed by each building system. Values auto-calculated from system sheets above. If only energy bill data is available, enter values manually here."
+            ),
+          },
         ],
       },
       3: {
