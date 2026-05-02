@@ -1,6 +1,7 @@
 from django import template
 from django.template.defaultfilters import stringfilter
 import re
+from decimal import Decimal, ROUND_HALF_UP
 
 from pages.models.epd import Unit
 
