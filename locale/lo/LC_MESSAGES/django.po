@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-23 23:22+0200\n"
+"POT-Creation-Date: 2026-05-03 01:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -269,7 +269,7 @@ msgid "Year of Construction"
 msgstr ""
 
 #: .\pages\models\building.py:349
-#: .\templates\pages\add-building\components\building-information\building-details.html:95
+#: .\templates\pages\add-building\components\building-information\building-details.html:117
 #: .\templates\pages\home\partials\buildings_list.html:93
 msgid "Total floor area"
 msgstr ""
@@ -279,7 +279,7 @@ msgid "Gross floor area [m²]"
 msgstr ""
 
 #: .\pages\models\building.py:357
-#: .\templates\pages\add-building\components\building-information\building-details.html:105
+#: .\templates\pages\add-building\components\building-information\building-details.html:127
 msgid "Conditioned floor area"
 msgstr ""
 
@@ -310,7 +310,12 @@ msgstr ""
 msgid "Years of building use"
 msgstr ""
 
-#: .\pages\models\building.py:395 .\pages\models\building.py:418
+#: .\pages\models\building.py:386
+#: .\templates\pages\add-building\components\building-information\building-details.html:52
+msgid "Seismic Zone / Risk Level"
+msgstr ""
+
+#: .\pages\models\building.py:401 .\pages\models\building.py:424
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:167
 #: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:35
 #: .\templates\pages\assembly\selected_epd.html:53
@@ -319,31 +324,31 @@ msgstr ""
 msgid "Quantity"
 msgstr ""
 
-#: .\pages\models\building.py:396
+#: .\pages\models\building.py:402
 msgid "How much of this component"
 msgstr ""
 
-#: .\pages\models\building.py:404 .\pages\models\building.py:429
+#: .\pages\models\building.py:410 .\pages\models\building.py:435
 msgid "Reporting life-cycle"
 msgstr ""
 
-#: .\pages\models\building.py:405 .\pages\models\building.py:430
+#: .\pages\models\building.py:411 .\pages\models\building.py:436
 msgid "Reporting life-cycle for assembly"
 msgstr ""
 
-#: .\pages\models\building.py:419
+#: .\pages\models\building.py:425
 msgid "How many of components"
 msgstr ""
 
-#: .\pages\models\building.py:426
+#: .\pages\models\building.py:432
 msgid "Unit of Quantity"
 msgstr ""
 
-#: .\pages\models\building.py:473
+#: .\pages\models\building.py:479
 msgid "BoQ / Design File"
 msgstr ""
 
-#: .\pages\models\building.py:476
+#: .\pages\models\building.py:482
 msgid "Original Filename"
 msgstr ""
 
@@ -369,6 +374,7 @@ msgstr ""
 
 #: .\pages\models\building_operation\air_conditioning.py:20
 #: .\pages\models\building_operation\chilling.py:138
+#: .\pages\models\building_operation\energy_summary.py:32
 #: .\pages\models\building_operation\general_systems.py:12
 #: .\pages\models\building_operation\hot_water.py:48
 #: .\pages\models\building_operation\lighting.py:44
@@ -939,6 +945,38 @@ msgstr ""
 msgid "IPLV"
 msgstr ""
 
+#: .\pages\models\building_operation\energy_summary.py:37
+msgid "Cooling System (kWh/yr)"
+msgstr ""
+
+#: .\pages\models\building_operation\energy_summary.py:43
+msgid "Ventilation System (kWh/yr)"
+msgstr ""
+
+#: .\pages\models\building_operation\energy_summary.py:49
+msgid "Lighting System (kWh/yr)"
+msgstr ""
+
+#: .\pages\models\building_operation\energy_summary.py:55
+msgid "Lift & Escalator System (kWh/yr)"
+msgstr ""
+
+#: .\pages\models\building_operation\energy_summary.py:61
+msgid "Hot Water System (kWh/yr)"
+msgstr ""
+
+#: .\pages\models\building_operation\energy_summary.py:67
+msgid "Total Annual Energy Consumption Override (kWh/yr)"
+msgstr ""
+
+#: .\pages\models\building_operation\energy_summary.py:71
+msgid "Energy Consumption Summary"
+msgstr ""
+
+#: .\pages\models\building_operation\energy_summary.py:72
+msgid "Energy Consumption Summaries"
+msgstr ""
+
 #: .\pages\models\building_operation\general_systems.py:15
 msgid "Number of Lifts"
 msgstr ""
@@ -1312,8 +1350,8 @@ msgid "Air Flow Rate (CMH/CFM)"
 msgstr ""
 
 #: .\pages\models\building_operation\ventilation.py:67
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:104
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:274
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:115
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:291
 msgid "Installation of Demand Controlled Ventilation (DCV)"
 msgstr ""
 
@@ -1478,6 +1516,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:316
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:43
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:59
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:185
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:44
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:60
 #: .\templates\pages\add-building\components\operational-details\lift-escalator-system.html:65
@@ -1837,7 +1876,7 @@ msgstr ""
 #: .\templates\account\update_profile.html:52
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:50
 #: .\templates\pages\home\home.html:146
-#: .\templates\pages\home\import-dialog\import-dialog.html:207
+#: .\templates\pages\home\import-dialog\import-dialog.html:212
 #: .\templates\pages\home\import-dialog\step-map-fields.html:87
 #: .\templates\pages\home\import-dialog\step-preview.html:113
 #: .\templates\pages\home\import-dialog\step-preview.html:191
@@ -1855,7 +1894,7 @@ msgstr ""
 #: .\templates\account\update_profile.html:105
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:86
 #: .\templates\pages\home\home.html:164
-#: .\templates\pages\home\import-dialog\import-dialog.html:208
+#: .\templates\pages\home\import-dialog\import-dialog.html:213
 #: .\templates\pages\home\import-dialog\step-map-fields.html:88
 #: .\templates\pages\profile\profile.html:171
 msgid "Region or State"
@@ -1876,7 +1915,7 @@ msgstr ""
 #: .\templates\account\update_profile.html:147
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:119
 #: .\templates\pages\home\home.html:182
-#: .\templates\pages\home\import-dialog\import-dialog.html:209
+#: .\templates\pages\home\import-dialog\import-dialog.html:214
 #: .\templates\pages\home\import-dialog\step-map-fields.html:89
 #: .\templates\pages\home\import-dialog\step-preview.html:115
 #: .\templates\pages\profile\profile.html:187
@@ -2499,7 +2538,7 @@ msgid "Save & continue"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:7
-#: .\templates\pages\home\import-dialog\import-dialog.html:212
+#: .\templates\pages\home\import-dialog\import-dialog.html:217
 #: .\templates\pages\home\import-dialog\step-building-details.html:68
 #: .\templates\pages\home\import-dialog\step-map-fields.html:92
 #: .\templates\pages\home\import-dialog\step-preview.html:121
@@ -2512,8 +2551,8 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:22
 #: .\templates\pages\add-building\components\building-information\building-details.html:47
-#: .\templates\pages\add-building\components\building-information\building-details.html:73
-#: .\templates\pages\add-building\components\building-information\building-details.html:83
+#: .\templates\pages\add-building\components\building-information\building-details.html:95
+#: .\templates\pages\add-building\components\building-information\building-details.html:105
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:83
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:103
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:119
@@ -2538,58 +2577,116 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:851
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:861
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:879
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:214
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:355
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:393
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:470
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:103
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:199
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:228
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:279
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:364
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:384
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:413
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:464
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:493
 msgid "This field is required"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:27
-msgid "Type of apartments"
+msgid "Building Sub-type"
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-information\building-details.html:41
-#: .\templates\pages\add-building\components\building-information\building-details.html:304
-msgid "Pick a type of apartments"
+msgid "Pick a building sub-type"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:52
-#: .\templates\pages\home\import-dialog\import-dialog.html:213
+#: .\templates\pages\add-building\components\building-information\building-details.html:56
+msgid "Select seismic zone"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:58
+msgid "Zone II"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:59
+msgid "Zone III"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:60
+msgid "Zone IV"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:61
+msgid "Zone V"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:63
+msgid "Low"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:64
+msgid "Moderate"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:65
+msgid "High"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:66
+msgid "Very High"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:74
+#: .\templates\pages\home\import-dialog\import-dialog.html:218
 #: .\templates\pages\home\import-dialog\step-map-fields.html:93
 msgid "Area climate type"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:67
+#: .\templates\pages\add-building\components\building-information\building-details.html:89
 msgid "Select climate type"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:78
-#: .\templates\pages\home\import-dialog\import-dialog.html:214
+#: .\templates\pages\add-building\components\building-information\building-details.html:100
+#: .\templates\pages\home\import-dialog\import-dialog.html:219
 #: .\templates\pages\home\import-dialog\step-building-details.html:70
 #: .\templates\pages\home\import-dialog\step-map-fields.html:94
 #: .\templates\pages\home\import-dialog\step-preview.html:123
 msgid "Assessment period (years)"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:87
-#: .\templates\pages\home\import-dialog\import-dialog.html:216
+#: .\templates\pages\add-building\components\building-information\building-details.html:109
+#: .\templates\pages\home\import-dialog\import-dialog.html:221
 #: .\templates\pages\home\import-dialog\step-building-details.html:73
 #: .\templates\pages\home\import-dialog\step-map-fields.html:97
 #: .\templates\pages\home\import-dialog\step-preview.html:126
 msgid "Construction year"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:120
+#: .\templates\pages\add-building\components\building-information\building-details.html:142
 msgid "Number of floors below ground"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:129
+#: .\templates\pages\add-building\components\building-information\building-details.html:150
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:147
+msgid "Total annual energy consumption"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:159
+msgid "e.g. 250000"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:162
+msgid "Auto-calculated from operational system records"
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:169
+msgid ""
+"Calculated from operational system sheets. Edit there to change this value."
+msgstr ""
+
+#: .\templates\pages\add-building\components\building-information\building-details.html:176
 msgid "Has the building's certification process underway/been completed?"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:135
-#: .\templates\pages\add-building\components\building-information\building-details.html:173
+#: .\templates\pages\add-building\components\building-information\building-details.html:182
+#: .\templates\pages\add-building\components\building-information\building-details.html:220
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:760
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:768
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:918
@@ -2605,15 +2702,15 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:420
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:535
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:107
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:98
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:106
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:268
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:276
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:109
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:117
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:285
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:293
 msgid "Yes"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:140
-#: .\templates\pages\add-building\components\building-information\building-details.html:178
+#: .\templates\pages\add-building\components\building-information\building-details.html:187
+#: .\templates\pages\add-building\components\building-information\building-details.html:225
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:761
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:769
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:919
@@ -2629,54 +2726,58 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:421
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:536
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:110
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:99
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:107
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:269
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:277
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:110
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:118
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:286
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:294
 msgid "No"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:147
+#: .\templates\pages\add-building\components\building-information\building-details.html:194
 msgid "Upload certification (image or PDF)"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:151
+#: .\templates\pages\add-building\components\building-information\building-details.html:198
 msgid "Accepted: images (JPG, PNG, GIF, WEBP) and PDF. Max 20 MB."
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:158
+#: .\templates\pages\add-building\components\building-information\building-details.html:205
 msgid "currently uploaded — upload a new file to replace"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:167
+#: .\templates\pages\add-building\components\building-information\building-details.html:214
 msgid ""
 "Does the building have design drawings and Bill of Quantities (BoQ) that you "
 "can upload?"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:185
+#: .\templates\pages\add-building\components\building-information\building-details.html:232
 msgid "Upload design drawings / BoQ (images or PDFs, multiple allowed)"
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:190
+#: .\templates\pages\add-building\components\building-information\building-details.html:237
 msgid ""
 "Accepted: images (JPG, PNG, GIF, WEBP) and PDF. Max 20 MB per file. Upload "
 "new files to replace existing ones."
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:211
+#: .\templates\pages\add-building\components\building-information\building-details.html:258
 msgid ""
 "Please upload a certification file, or select \\\"No\\\" if not applicable."
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-information\building-details.html:212
+#: .\templates\pages\add-building\components\building-information\building-details.html:259
 msgid ""
 "Please upload at least one BoQ / design drawing file, or select \\\"No\\\" "
 "if not applicable."
 msgstr ""
 
+#: .\templates\pages\add-building\components\building-information\building-details.html:351
+msgid "Pick a type of apartments"
+msgstr ""
+
 #: .\templates\pages\add-building\components\building-information\building-name-location.html:10
-#: .\templates\pages\home\import-dialog\import-dialog.html:205
+#: .\templates\pages\home\import-dialog\import-dialog.html:210
 #: .\templates\pages\home\import-dialog\step-map-fields.html:85
 msgid "Building name or Code"
 msgstr ""
@@ -2744,11 +2845,6 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:946
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:949
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:956
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:148
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:225
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:318
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:404
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:481
 msgid "Optional"
 msgstr ""
 
@@ -3204,7 +3300,7 @@ msgstr ""
 msgid "Saving..."
 msgstr ""
 
-#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:1453
+#: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:1461
 msgid "This EPD cannot be added due to a unit mismatch."
 msgstr ""
 
@@ -3250,6 +3346,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-data-entry\_form_section.html:24
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:84
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:511
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:532
 msgid "Save Energy Carriers"
 msgstr ""
 
@@ -3257,7 +3354,11 @@ msgstr ""
 msgid "Add a description"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:55
+#: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:50
+msgid "Please enter a valid quantity"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-data-entry\_selected_product.html:63
 msgid "Remove energy carrier"
 msgstr ""
 
@@ -3316,6 +3417,14 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:334
 msgid "✓ Saved successfully!"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:518
+msgid "Energy carriers saved successfully"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-data-entry\operational-data-entry.html:534
+msgid "Failed to save energy carriers"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:7
@@ -3441,10 +3550,10 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:712
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:870
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:83
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:176
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:253
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:346
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:432
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:179
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:259
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:355
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:444
 msgid "Must be at least 1"
 msgstr ""
 
@@ -3469,11 +3578,11 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:509
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:624
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:16
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:112
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:189
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:282
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:368
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:445
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:123
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:203
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:299
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:388
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:468
 msgid "Annual operating schedule"
 msgstr ""
 
@@ -3484,11 +3593,11 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:732
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:890
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:28
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:118
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:195
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:288
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:374
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:451
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:129
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:209
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:305
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:394
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:474
 msgid "Hours / day"
 msgstr ""
 
@@ -3507,11 +3616,11 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:520
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:635
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:37
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:122
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:199
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:292
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:378
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:455
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:133
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:213
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:309
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:398
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:478
 msgid "days / week"
 msgstr ""
 
@@ -3530,11 +3639,11 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:526
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:641
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:46
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:126
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:203
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:296
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:382
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:459
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:137
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:217
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:313
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:402
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:482
 msgid "weeks / year"
 msgstr ""
 
@@ -3556,11 +3665,11 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:624
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:778
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:936
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:144
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:221
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:314
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:400
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:477
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:155
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:235
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:331
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:420
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:500
 msgid "OTHER DETAILS"
 msgstr ""
 
@@ -3590,7 +3699,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:803
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:951
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:958
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:491
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:506
 msgid "Select"
 msgstr ""
 
@@ -3605,7 +3714,7 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:454
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:569
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:676
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:489
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:504
 msgid "Number of stars"
 msgstr ""
 
@@ -3634,11 +3743,11 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:434
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:549
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:656
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:156
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:233
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:326
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:412
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:496
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:159
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:239
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:335
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:424
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:511
 msgid "Total energy consumption annually"
 msgstr ""
 
@@ -3678,18 +3787,18 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:617
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:656
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:658
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:134
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:156
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:157
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:233
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:234
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:304
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:326
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:327
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:412
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:413
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:496
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:497
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:145
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:159
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:160
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:239
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:240
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:321
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:335
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:336
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:424
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:425
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:511
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:512
 msgid "Auto-calculated"
 msgstr ""
 
@@ -3806,8 +3915,61 @@ msgstr ""
 #: .\templates\pages\add-building\components\operational-details\cooling-system.html:982
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:373
 #: .\templates\pages\add-building\components\operational-details\lighting-system.html:695
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:511
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:526
 msgid "N/A"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:9
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:199
+msgid "Cooling system"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:24
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:52
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:80
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:108
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:136
+#: .\templates\pages\building\building.html:599
+msgid "No data"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:37
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:200
+msgid "Ventilation system"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:65
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:201
+msgid "Lighting system"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:93
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:202
+msgid "Lift & Escalator system"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:121
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:203
+msgid "Hot water system"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:164
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:175
+msgid "Annual energy consumption"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:171
+msgid ""
+"Enter the annual energy consumption for this system. Leave blank if it does "
+"not apply to this building."
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:178
+msgid "Enter value"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\energy-consumption-summary.html:188
+msgid "Save value"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\hot-water-system.html:7
@@ -4202,7 +4364,7 @@ msgid "Enter a valid value"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:57
-#: .\templates\pages\home\import-dialog\import-dialog.html:224
+#: .\templates\pages\home\import-dialog\import-dialog.html:229
 #: .\templates\pages\home\import-dialog\step-map-fields.html:105
 #: .\templates\pages\home\import-dialog\step-preview.html:137
 msgid "Room heating temperature"
@@ -4219,14 +4381,14 @@ msgid "°Fahrenheit"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:74
-#: .\templates\pages\home\import-dialog\import-dialog.html:225
+#: .\templates\pages\home\import-dialog\import-dialog.html:230
 #: .\templates\pages\home\import-dialog\step-map-fields.html:107
 #: .\templates\pages\home\import-dialog\step-preview.html:139
 msgid "Room cooling temperature"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:92
-#: .\templates\pages\home\import-dialog\import-dialog.html:226
+#: .\templates\pages\home\import-dialog\import-dialog.html:231
 #: .\templates\pages\home\import-dialog\step-map-fields.html:109
 #: .\templates\pages\home\import-dialog\step-preview.html:141
 #, python-format
@@ -4238,7 +4400,7 @@ msgid "Enter a value greater than 0"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\operational-schedule-temperature.html:103
-#: .\templates\pages\home\import-dialog\import-dialog.html:227
+#: .\templates\pages\home\import-dialog\import-dialog.html:232
 #: .\templates\pages\home\import-dialog\step-map-fields.html:110
 #: .\templates\pages\home\import-dialog\step-preview.html:142
 msgid "Building smart system installation"
@@ -4280,107 +4442,107 @@ msgid "AIR HANDLING UNIT (AHU) DATA"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:79
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:172
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:249
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:342
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:428
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:175
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:255
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:351
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:440
 msgid "Total number of units installed"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:87
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:180
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:257
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:359
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:436
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:183
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:263
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:368
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:448
 msgid "Baseline efficiency"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:92
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:185
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:262
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:364
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:441
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:188
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:268
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:373
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:453
 msgid "Typical: 0.30 – 1.20 W/CMH"
 msgstr ""
 
 #: .\templates\pages\add-building\components\operational-details\ventilation-system.html:96
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:266
-msgid "Installation of Variable Speed Drives (VSD)"
-msgstr ""
-
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:132
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:209
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:302
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:388
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:465
-msgid "Total ventilation system power input"
-msgstr ""
-
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:137
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:307
-msgid "Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000"
-msgstr ""
-
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:148
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:225
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:318
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:404
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:481
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:192
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:272
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:377
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:457
 msgid "Air flow rate"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:158
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:328
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:107
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:283
+msgid "Installation of Variable Speed Drives (VSD)"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:143
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:223
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:319
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:408
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:488
+msgid "Total ventilation system power input"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:148
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:324
+msgid "Airflow (CMH) × Baseline efficiency (W/CMH) × Units ÷ 1000"
+msgstr ""
+
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:161
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:337
 msgid "Power (kW) × hrs/day × days/wk × wks/yr × VSD factor × DCV factor"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:168
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:171
 msgid "FAN COIL UNIT (FCU) DATA"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:235
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:414
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:498
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:241
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:426
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:513
 msgid "Power (kW) × hrs/day × days/wk × wks/yr"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:245
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:251
 msgid "DEDICATED OUTDOOR AIR SYSTEM (DOAS) DATA"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:338
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:347
 msgid "CEILING/WALL MOUNTED CASSETTE AC DATA"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:350
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:359
 msgid "Fresh air ratio"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:352
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:361
 #, python-format
 msgid "Typical: 10 – 30%%"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:424
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:436
 msgid "CEILING / EXHAUST / WALL FAN DATA"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:489
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:504
 msgid "Optional, 1–5"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:509
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:524
 msgid "Units"
 msgstr ""
 
-#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:510
+#: .\templates\pages\add-building\components\operational-details\ventilation-system.html:525
 msgid "Airflow"
 msgstr ""
 
 #: .\templates\pages\assembly\assembly.html:68
-#: .\templates\pages\building\building.html:140
-#: .\templates\pages\building\building.html:290
-#: .\templates\pages\building\building.html:337
+#: .\templates\pages\building\building.html:492
+#: .\templates\pages\building\building.html:642
+#: .\templates\pages\building\building.html:689
 msgid "Materials"
 msgstr ""
 
@@ -4399,73 +4561,80 @@ msgstr ""
 msgid "Add description ..."
 msgstr ""
 
-#: .\templates\pages\building\building.html:59
+#: .\templates\pages\building\building.html:63
+msgid "Export"
+msgstr ""
+
+#: .\templates\pages\building\building.html:81
 #: .\templates\pages\building\operational_info\operational_products.html:37
 msgid "Edit"
 msgstr ""
 
-#: .\templates\pages\building\building.html:72
+#: .\templates\pages\building\building.html:181
+msgid "Some materials could not be included in the carbon calculation:"
+msgstr ""
+
+#: .\templates\pages\building\building.html:200
 msgid "Carbon Footprint"
 msgstr ""
 
-#: .\templates\pages\building\building.html:84
+#: .\templates\pages\building\building.html:212
 msgid "Total Floor Area"
 msgstr ""
 
-#: .\templates\pages\building\building.html:96
-#: .\templates\pages\building\building.html:192
+#: .\templates\pages\building\building.html:224
+#: .\templates\pages\building\building.html:275
+#: .\templates\pages\building\building.html:544
 msgid "Embodied Carbon"
 msgstr ""
 
-#: .\templates\pages\building\building.html:108
+#: .\templates\pages\building\building.html:236
 msgid "Operational Carbon"
 msgstr ""
 
-#: .\templates\pages\building\building.html:120
+#: .\templates\pages\building\building.html:248
 #: .\templates\pages\home\partials\buildings_list.html:117
 msgid "Carbon Savings"
 msgstr ""
 
-#: .\templates\pages\building\building.html:133
-#: .\templates\pages\building\building.html:289
-#: .\templates\pages\building\building.html:337
-msgid "Assembly"
-msgstr ""
-
-#: .\templates\pages\building\building.html:146
-#: .\templates\pages\building\building.html:291
-#: .\templates\pages\building\building.html:337
-msgid "Energy"
-msgstr ""
-
-#: .\templates\pages\building\building.html:148
-#: .\templates\pages\building\building.html:296
-#: .\templates\pages\building\building.html:337
-msgid "Savings"
-msgstr ""
-
-#: .\templates\pages\building\building.html:172
+#: .\templates\pages\building\building.html:262
+#: .\templates\pages\building\building.html:524
 msgid "Whole Life Carbon Cycle"
 msgstr ""
 
-#: .\templates\pages\building\building.html:213
+#: .\templates\pages\building\building.html:285
+#: .\templates\pages\building\building.html:565
 msgid "Embodied Carbon by Material"
 msgstr ""
 
-#: .\templates\pages\building\building.html:235
+#: .\templates\pages\building\building.html:485
+#: .\templates\pages\building\building.html:641
+#: .\templates\pages\building\building.html:689
+msgid "Assembly"
+msgstr ""
+
+#: .\templates\pages\building\building.html:498
+#: .\templates\pages\building\building.html:643
+#: .\templates\pages\building\building.html:689
+msgid "Energy"
+msgstr ""
+
+#: .\templates\pages\building\building.html:500
+#: .\templates\pages\building\building.html:648
+#: .\templates\pages\building\building.html:689
+msgid "Savings"
+msgstr ""
+
+#: .\templates\pages\building\building.html:587
 msgid "Embodied Carbon by Appliances"
 msgstr ""
 
-#: .\templates\pages\building\building.html:247
-msgid "No data"
-msgstr ""
-
-#: .\templates\pages\building\building.html:255
+#: .\templates\pages\building\building.html:607
 #: .\templates\pages\home\partials\buildings_list.html:188
 msgid "This will permanently delete the building and all associated data."
 msgstr ""
 
-#: .\templates\pages\building\building.html:256
+#: .\templates\pages\building\building.html:608
 #: .\templates\pages\home\partials\buildings_list.html:189
 msgid "Delete Building?"
 msgstr ""
@@ -4812,81 +4981,81 @@ msgstr ""
 msgid "Import failed. Please check your data and try again."
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:205
-#: .\templates\pages\home\import-dialog\import-dialog.html:206
-#: .\templates\pages\home\import-dialog\import-dialog.html:207
-#: .\templates\pages\home\import-dialog\import-dialog.html:208
-#: .\templates\pages\home\import-dialog\import-dialog.html:209
+#: .\templates\pages\home\import-dialog\import-dialog.html:210
+#: .\templates\pages\home\import-dialog\import-dialog.html:211
+#: .\templates\pages\home\import-dialog\import-dialog.html:212
+#: .\templates\pages\home\import-dialog\import-dialog.html:213
+#: .\templates\pages\home\import-dialog\import-dialog.html:214
 #: .\templates\pages\home\import-dialog\step-map-fields.html:63
 msgid "Name & Location"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:206
+#: .\templates\pages\home\import-dialog\import-dialog.html:211
 #: .\templates\pages\home\import-dialog\step-map-fields.html:86
 #: .\templates\pages\home\import-dialog\step-preview.html:112
 msgid "Address"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:212
-#: .\templates\pages\home\import-dialog\import-dialog.html:213
-#: .\templates\pages\home\import-dialog\import-dialog.html:214
-#: .\templates\pages\home\import-dialog\import-dialog.html:215
-#: .\templates\pages\home\import-dialog\import-dialog.html:216
 #: .\templates\pages\home\import-dialog\import-dialog.html:217
+#: .\templates\pages\home\import-dialog\import-dialog.html:218
+#: .\templates\pages\home\import-dialog\import-dialog.html:219
+#: .\templates\pages\home\import-dialog\import-dialog.html:220
+#: .\templates\pages\home\import-dialog\import-dialog.html:221
+#: .\templates\pages\home\import-dialog\import-dialog.html:222
 #: .\templates\pages\home\import-dialog\step-building-details.html:4
 #: .\templates\pages\home\import-dialog\step-map-fields.html:64
 #: .\templates\pages\home\import-dialog\step-preview.html:23
 msgid "Building Details"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:215
+#: .\templates\pages\home\import-dialog\import-dialog.html:220
 #: .\templates\pages\home\import-dialog\step-building-details.html:71
 #: .\templates\pages\home\import-dialog\step-map-fields.html:95
 #: .\templates\pages\home\import-dialog\step-preview.html:124
 msgid "Total floor area (m²)"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:217
+#: .\templates\pages\home\import-dialog\import-dialog.html:222
 #: .\templates\pages\home\import-dialog\step-building-details.html:72
 #: .\templates\pages\home\import-dialog\step-map-fields.html:96
 #: .\templates\pages\home\import-dialog\step-preview.html:125
 msgid "Conditioned floor area (m²)"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:220
+#: .\templates\pages\home\import-dialog\import-dialog.html:225
 #: .\templates\pages\home\import-dialog\step-map-fields.html:101
 #: .\templates\pages\home\import-dialog\step-preview.html:133
 msgid "Number of residents"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:220
-#: .\templates\pages\home\import-dialog\import-dialog.html:221
-#: .\templates\pages\home\import-dialog\import-dialog.html:222
-#: .\templates\pages\home\import-dialog\import-dialog.html:223
-#: .\templates\pages\home\import-dialog\import-dialog.html:224
 #: .\templates\pages\home\import-dialog\import-dialog.html:225
 #: .\templates\pages\home\import-dialog\import-dialog.html:226
 #: .\templates\pages\home\import-dialog\import-dialog.html:227
+#: .\templates\pages\home\import-dialog\import-dialog.html:228
+#: .\templates\pages\home\import-dialog\import-dialog.html:229
+#: .\templates\pages\home\import-dialog\import-dialog.html:230
+#: .\templates\pages\home\import-dialog\import-dialog.html:231
+#: .\templates\pages\home\import-dialog\import-dialog.html:232
 #: .\templates\pages\home\import-dialog\step-map-fields.html:65
 msgid "Operational Schedule & Temp"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:221
+#: .\templates\pages\home\import-dialog\import-dialog.html:226
 #: .\templates\pages\home\import-dialog\step-map-fields.html:102
 msgid "Annual operating schedule (Hours/Day)"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:222
+#: .\templates\pages\home\import-dialog\import-dialog.html:227
 #: .\templates\pages\home\import-dialog\step-map-fields.html:103
 msgid "Annual operating schedule (Days/Week)"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:223
+#: .\templates\pages\home\import-dialog\import-dialog.html:228
 #: .\templates\pages\home\import-dialog\step-map-fields.html:104
 msgid "Annual operating schedule (Weeks/Year)"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\import-dialog.html:231
+#: .\templates\pages\home\import-dialog\import-dialog.html:236
 msgid "The following required fields are missing from your template:"
 msgstr ""
 
@@ -5031,7 +5200,7 @@ msgstr ""
 msgid "Missing — required"
 msgstr ""
 
-#: .\templates\pages\home\import-dialog\step-map-fields.html:235
+#: .\templates\pages\home\import-dialog\step-map-fields.html:241
 msgid "required field(s) are missing — fix your template before continuing"
 msgstr ""
 

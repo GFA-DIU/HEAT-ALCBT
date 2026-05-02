@@ -16,8 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 #: .\pages\forms\building_general_info.py:92 .\pages\models\building.py:346
 msgid "Climate"
 msgstr ""
@@ -1438,23 +1437,23 @@ msgstr ""
 
 #: .\templates\_base.html:74 .\templates\pages\home\home.html:7
 msgid "Dashboard"
-msgstr "แดชบอร์ด"
+msgstr ""
 
 #: .\templates\_base.html:89 .\templates\pages\home\datasets.html:13
 #: .\templates\pages\home\resources.html:20 .\templates\pages\resources.html:13
 #: .\templates\pages\resources.html:15
 msgid "Resources"
-msgstr "ทรัพยากร"
+msgstr ""
 
 #: .\templates\_base.html:103
 msgid "Templates"
-msgstr "เทมเพลต"
+msgstr ""
 
 #: .\templates\_base.html:151
 #: .\templates\pages\add-building\add-building.html:45
 #: .\templates\pages\profile\profile.html:6
 msgid "Profile"
-msgstr "โปรไฟล์"
+msgstr ""
 
 #: .\templates\_base.html:152 .\templates\_base.html:347
 #: .\templates\pages\profile\profile.html:88
@@ -1468,7 +1467,7 @@ msgstr ""
 #: .\templates\_base.html:171 .\templates\_base.html:332
 #: .\templates\pages\add-building\add-building.html:48
 msgid "Logout"
-msgstr "ออกจากระบบ"
+msgstr ""
 
 #: .\templates\_base.html:286
 msgid "We Value Your Privacy"
@@ -1553,7 +1552,7 @@ msgstr ""
 #: .\templates\account\_auth.html:5 .\templates\account\login.html:75
 #: .\templates\account\signup.html:16
 msgid "Sign up"
-msgstr "สมัครสมาชิก"
+msgstr ""
 
 #: .\templates\account\_auth.html:33
 msgid "Terms of use"
@@ -1561,7 +1560,7 @@ msgstr ""
 
 #: .\templates\account\_auth.html:33
 msgid "and"
-msgstr "และ"
+msgstr ""
 
 #: .\templates\account\_auth.html:33
 msgid "Privacy policy"
@@ -1569,7 +1568,7 @@ msgstr ""
 
 #: .\templates\account\_auth.html:50
 msgid "Building Emission Assessment Tool"
-msgstr "เครื่องมือประเมินการปล่อยก๊าซเรือนกระจกของอาคาร"
+msgstr ""
 
 #: .\templates\account\_auth.html:53
 msgid ""
@@ -1583,10 +1582,8 @@ msgid "Hi %(username)s,"
 msgstr ""
 
 #: .\templates\account\email\email_confirmation_signup_message.html:188
-#, fuzzy
-#| msgid "Welcome to the"
 msgid "Welcome to"
-msgstr "ยินดีต้อนรับสู่"
+msgstr ""
 
 #: .\templates\account\email\email_confirmation_signup_message.html:188
 msgid "We're excited to have you on board."
@@ -1627,10 +1624,8 @@ msgid "The BEAT Team"
 msgstr ""
 
 #: .\templates\account\email\email_confirmation_signup_message.html:231
-#, fuzzy
-#| msgid "Building Emission Assessment Tool"
 msgid "BEAT - Building Life Cycle Assessment Tool"
-msgstr "เครื่องมือประเมินการปล่อยก๊าซเรือนกระจกของอาคาร"
+msgstr ""
 
 #: .\templates\account\email\email_confirmation_signup_message.html:234
 msgid "This email was sent to you as part of your account registration."
@@ -1678,10 +1673,8 @@ msgid "Otherwise, click the button below to reset your password:"
 msgstr ""
 
 #: .\templates\account\email\password_reset_key_message.txt:232
-#, fuzzy
-#| msgid "Reset Password"
 msgid "Reset My Password"
-msgstr "รีเซ็ตรหัสผ่าน"
+msgstr ""
 
 #: .\templates\account\email\password_reset_key_message.txt:249
 msgid ""
@@ -1739,36 +1732,32 @@ msgstr ""
 
 #: .\templates\account\login.html:7
 msgid "Sign Up"
-msgstr "สมัครสมาชิก"
+msgstr ""
 
 #: .\templates\account\login.html:17 .\templates\account\login.html:64
 #: .\templates\account\signup.html:8
 msgid "Login"
-msgstr "เข้าสู่ระบบ"
+msgstr ""
 
 #: .\templates\account\login.html:67 .\templates\account\signup.html:85
 msgid "OR"
-msgstr "หรือ"
+msgstr ""
 
 #: .\templates\account\login.html:69 .\templates\account\signup.html:87
 msgid "Sign up with Google"
-msgstr "สมัครด้วย Google"
+msgstr ""
 
 #: .\templates\account\login.html:73
 msgid "Don't have an account."
-msgstr "ยังไม่มีบัญชี"
+msgstr ""
 
 #: .\templates\account\logout.html:4 .\templates\account\logout.html:16
-#, fuzzy
-#| msgid "Sign up"
 msgid "Sign Out"
-msgstr "สมัครสมาชิก"
+msgstr ""
 
 #: .\templates\account\logout.html:10 .\templates\account\verify_email.html:33
-#, fuzzy
-#| msgid "Sign up"
 msgid "Sign out"
-msgstr "สมัครสมาชิก"
+msgstr ""
 
 #: .\templates\account\logout.html:11
 msgid "Are you sure you want to sign out?"
@@ -1783,26 +1772,24 @@ msgstr ""
 #: .\templates\account\password_set.html:12
 #: .\templates\pages\profile\profile.html:84
 msgid "Change Password"
-msgstr "เปลี่ยนรหัสผ่าน"
+msgstr ""
 
 #: .\templates\account\password_reset.html:5
 #: .\templates\account\password_reset_done.html:8
 msgid "Password Reset"
-msgstr "รีเซ็ตรหัสผ่าน"
+msgstr ""
 
 #: .\templates\account\password_reset.html:8
 msgid "Forgot your password?"
-msgstr "ลืมรหัสผ่าน?"
+msgstr ""
 
 #: .\templates\account\password_reset.html:12
 msgid "Reset Password"
-msgstr "รีเซ็ตรหัสผ่าน"
+msgstr ""
 
 #: .\templates\account\password_reset_done.html:5
-#, fuzzy
-#| msgid "Password Reset"
 msgid "Password Reset Done"
-msgstr "รีเซ็ตรหัสผ่าน"
+msgstr ""
 
 #: .\templates\account\password_reset_done.html:9
 msgid ""
@@ -1826,37 +1813,30 @@ msgid "Your password is now changed."
 msgstr ""
 
 #: .\templates\account\password_reset_from_key_done.html:5
-#, fuzzy
-#| msgid "Change Password"
 msgid "Change Password Done"
-msgstr "เปลี่ยนรหัสผ่าน"
+msgstr ""
 
 #: .\templates\account\password_reset_from_key_done.html:8
-#, fuzzy
-#| msgid "Password Reset"
 msgid "Password Change Done"
-msgstr "รีเซ็ตรหัสผ่าน"
+msgstr ""
 
 #: .\templates\account\password_reset_from_key_done.html:9
 msgid "Your password has been changed."
 msgstr ""
 
 #: .\templates\account\password_set.html:5
-#, fuzzy
-#| msgid "Reset Password"
 msgid "Set Password"
-msgstr "รีเซ็ตรหัสผ่าน"
+msgstr ""
 
 #: .\templates\account\signup.html:20
 msgid ""
 "Fill in the details below to create your account and track the carbon "
 "mission from your building project."
 msgstr ""
-"กรอกรายละเอียดด้านล่างเพื่อสร้างบัญชีของคุณและติดตามภารกิจคาร์บอน จากโครงการอาคารของคุณ"
 
 #: .\templates\account\signup.html:82
 msgid "Create account"
-msgstr "สร้างบัญชี"
+msgstr ""
 
 #: .\templates\account\signup.html:91
 msgid "I already have an account."
@@ -1868,10 +1848,8 @@ msgstr ""
 
 #: .\templates\account\update_profile.html:6
 #: .\templates\account\update_profile.html:178
-#, fuzzy
-#| msgid "Profile"
 msgid "Update Profile"
-msgstr "โปรไฟล์"
+msgstr ""
 
 #: .\templates\account\update_profile.html:13
 #: .\templates\pages\profile\profile.html:108
@@ -1976,10 +1954,8 @@ msgid ""
 msgstr ""
 
 #: .\templates\account\update_profile.html:186
-#, fuzzy
-#| msgid "Create account"
 msgid "Delete Account"
-msgstr "สร้างบัญชี"
+msgstr ""
 
 #: .\templates\account\verify_email.html:4
 msgid "Verify Your Email"
@@ -2119,10 +2095,8 @@ msgid ""
 msgstr ""
 
 #: .\templates\compliance\privacy_policy.html:125
-#, fuzzy
-#| msgid "Copyright"
 msgid "Your Rights"
-msgstr "ลิขสิทธิ์"
+msgstr ""
 
 #: .\templates\compliance\privacy_policy.html:128
 msgid ""
@@ -2508,20 +2482,20 @@ msgstr ""
 
 #: .\templates\footer.html:16
 msgid "Copyright"
-msgstr "ลิขสิทธิ์"
+msgstr ""
 
 #: .\templates\pages\add-building\_base.html:40
 msgid "Add New Building"
-msgstr "เพิ่มอาคารใหม่"
+msgstr ""
 
 #: .\templates\pages\add-building\_base.html:42
 msgid "Complete the following steps to add a new building"
-msgstr "ทำตามขั้นตอนต่อไปนี้เพื่อเพิ่มอาคารใหม่"
+msgstr ""
 
 #: .\templates\pages\add-building\_base.html:48
 #, python-format
 msgid "0%% completed"
-msgstr "0%% เสร็จสมบูรณ์"
+msgstr ""
 
 #: .\templates\pages\add-building\add-building.html:5
 msgid "Add Building"
@@ -3270,20 +3244,16 @@ msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:395
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:401
-#, fuzzy
-#| msgid "Create account"
 msgid "Create custom"
-msgstr "สร้างบัญชี"
+msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:397
 msgid "Create a custom component from the materials list for a detailed LCA."
 msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:416
-#, fuzzy
-#| msgid "Templates"
 msgid "Select Template"
-msgstr "เทมเพลต"
+msgstr ""
 
 #: .\templates\pages\add-building\components\building-structural-components\building-structural-components.html:435
 #: .\templates\pages\home\templates.html:39
@@ -4703,10 +4673,8 @@ msgid "Best Practice"
 msgstr ""
 
 #: .\templates\pages\building\savings_tab.html:38
-#, fuzzy
-#| msgid "Add New Building"
 msgid "Your Building"
-msgstr "เพิ่มอาคารใหม่"
+msgstr ""
 
 #: .\templates\pages\building\savings_tab.html:55
 msgid "National Avg"
@@ -4805,7 +4773,7 @@ msgstr ""
 #: .\templates\pages\home\datasets.html:10
 #: .\templates\pages\home\resources.html:10 .\templates\pages\resources.html:10
 msgid "Resource page"
-msgstr "หน้าทรัพยากร"
+msgstr ""
 
 #: .\templates\pages\home\datasets.html:15
 msgid ""
@@ -4818,7 +4786,7 @@ msgstr ""
 #: .\templates\pages\home\datasets.html:22
 #: .\templates\pages\home\resources.html:31 .\templates\pages\resources.html:22
 msgid "Introduction video"
-msgstr "วิดีโอแนะนำ"
+msgstr ""
 
 #: .\templates\pages\home\datasets.html:24
 msgid ""
@@ -4840,7 +4808,7 @@ msgstr ""
 #: .\templates\pages\home\datasets.html:57
 #: .\templates\pages\home\resources.html:72 .\templates\pages\resources.html:57
 msgid "User Handbook"
-msgstr "คู่มือผู้ใช้"
+msgstr ""
 
 #: .\templates\pages\home\datasets.html:59
 msgid ""
@@ -4890,19 +4858,19 @@ msgstr ""
 #: .\templates\pages\home\resources.html:100
 #: .\templates\pages\resources.html:79
 msgid "Host"
-msgstr "เจ้าภาพ"
+msgstr ""
 
 #: .\templates\pages\home\datasets.html:92
 #: .\templates\pages\home\resources.html:113
 #: .\templates\pages\resources.html:92
 msgid "Lead partners"
-msgstr "พันธมิตรหลัก"
+msgstr ""
 
 #: .\templates\pages\home\datasets.html:109
 #: .\templates\pages\home\resources.html:130
 #: .\templates\pages\resources.html:109
 msgid "Development partners"
-msgstr "พันธมิตรพัฒนา"
+msgstr ""
 
 #: .\templates\pages\home\datasets.html:128
 msgid "Interested in contributing or partnering? We’d love to"
@@ -4912,7 +4880,7 @@ msgstr ""
 #: .\templates\pages\home\resources.html:151
 #: .\templates\pages\resources.html:129
 msgid "hear from you"
-msgstr "ได้ยินจากคุณ"
+msgstr ""
 
 #: .\templates\pages\home\home.html:26
 #, python-format
@@ -5102,10 +5070,8 @@ msgid "Field"
 msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-building-details.html:16
-#, fuzzy
-#| msgid "Profile"
 msgid "Value from file"
-msgstr "โปรไฟล์"
+msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-building-details.html:28
 #: .\templates\pages\home\import-dialog\step-preview.html:49
@@ -5409,10 +5375,8 @@ msgid "Please wait while we process your file. Do not close this window"
 msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-process.html:27
-#, fuzzy
-#| msgid "0%% completed"
 msgid "Import complete!"
-msgstr "0%% เสร็จสมบูรณ์"
+msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-process.html:30
 msgid "Building have been successfully added to your database"
@@ -5431,10 +5395,8 @@ msgid "Supported format: Excel (.xlsx, .xls)"
 msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-upload.html:16
-#, fuzzy
-#| msgid "Templates"
 msgid "Need a template?"
-msgstr "เทมเพลต"
+msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-upload.html:18
 msgid "Download sample template"
@@ -5449,10 +5411,8 @@ msgid "Excel (.xlsx, .xls) up to 50 MB."
 msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-upload.html:42
-#, fuzzy
-#| msgid "Profile"
 msgid "Browse file"
-msgstr "โปรไฟล์"
+msgstr ""
 
 #: .\templates\pages\home\import-dialog\step-upload.html:61
 msgid "Ready"
@@ -5576,7 +5536,7 @@ msgstr ""
 
 #: .\templates\pages\home\resources.html:74 .\templates\pages\resources.html:59
 msgid "Download the official"
-msgstr "ดาวน์โหลดเอกสารอย่างเป็นทางการ"
+msgstr ""
 
 #: .\templates\pages\home\resources.html:74 .\templates\pages\resources.html:59
 msgid ""
@@ -5586,11 +5546,11 @@ msgstr ""
 
 #: .\templates\pages\home\resources.html:92 .\templates\pages\resources.html:74
 msgid "The"
-msgstr "การ"
+msgstr ""
 
 #: .\templates\pages\home\resources.html:92 .\templates\pages\resources.html:74
 msgid "Community"
-msgstr "ชุมชน"
+msgstr ""
 
 #: .\templates\pages\home\resources.html:105
 msgid "Host logo"
@@ -5722,10 +5682,8 @@ msgid "Failed to load template"
 msgstr ""
 
 #: .\templates\pages\home\templates.html:400
-#, fuzzy
-#| msgid "Profile"
 msgid "Update failed"
-msgstr "โปรไฟล์"
+msgstr ""
 
 #: .\templates\pages\home\templates.html:401
 msgid "Duplication failed"
@@ -5777,7 +5735,7 @@ msgstr ""
 
 #: .\templates\pages\resources.html:15
 msgid "Welcome to the"
-msgstr "ยินดีต้อนรับสู่"
+msgstr ""
 
 #: .\templates\pages\resources.html:15
 msgid "section of the"
@@ -5794,10 +5752,3 @@ msgid ""
 "— what it does, how it works, and how it can support your low-carbon "
 "building strategies."
 msgstr ""
-
-#~ msgid "Variable Refrigerant Volume (VRV) / Variable Refrigerant Flow (VRF)"
-#~ msgstr ""
-#~ "ปริมาณสารทำความเย็นแบบแปรผัน (VRV) / การไหลของสารทำความเย็นแบบแปรผัน (VRF)"
-
-#~ msgid "Home"
-#~ msgstr "หน้าแรก"
