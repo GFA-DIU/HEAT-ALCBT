@@ -664,6 +664,7 @@
       document.getElementById('component_title').value = item.title;
       document.getElementById('component_category').value = item.category || '';
       document.getElementById('component_dimension').value = item.dimension || 'area';
+      document.getElementById('component_unit_display').textContent = ({ area: 'm²', volume: 'm³', mass: 'kg', length: 'm', pcs: 'pcs' })[item.dimension || 'area'] || 'm²';
       document.getElementById('component_quantity').value = item.quantity || '';
       document.getElementById('component_comment').value = item.comment || '';
       document.getElementById('component_is_template').checked = item.is_template || false;
@@ -1106,7 +1107,7 @@
         if (this.editingIndex !== null) {
           this.boqItems[this.editingIndex] = item;
         } else {
-          this.boqItems.push(item);
+          this.boqItems.unshift(item);
         }
 
         this.closeBoqModal();
@@ -1201,7 +1202,7 @@
         if (this.editingIndex !== null) {
           this.componentItems[this.editingIndex] = item;
         } else {
-          this.componentItems.push(item);
+          this.componentItems.unshift(item);
         }
 
         this.closeComponentModal();
@@ -1299,7 +1300,7 @@
 
     this.boqItems.forEach((item, index) => {
       const li = document.createElement('li');
-      li.className = 'bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2';
+      li.className = `${index === 0 ? 'bg-[var(--bg--soft-200)]' : 'bg-[var(--bg--weak-50)]'} rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2`;
       li.innerHTML = `
         <span data-icon="building-3-line" data-size="20" data-color="var(--icon--strong-950)"></span>
         <div class="flex-1 flex flex-col gap-2.5">
@@ -1309,7 +1310,7 @@
               <span data-icon="leaf-line" data-size="14" data-color="var(--bg--strong-950)"></span>
             </div>
             <div class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)] mr-3">
-              ${item.total_gwp.toFixed(2)} kgCO2eq
+              ${item.total_gwp.toFixed(2)} kgCO₂eq/m²
             </div>
             <p class="text-sm/5 text-[var(--text--sub-600)]">${i18n.boqMaterials} (${item.materials.length} ${i18n.materials})</p>
           </div>
@@ -1327,9 +1328,8 @@
     });
 
     this.componentItems.forEach((item, index) => {
-
       const li = document.createElement('li');
-      li.className = 'bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2';
+      li.className = `${index === 0 ? 'bg-[var(--bg--soft-200)]' : 'bg-[var(--bg--weak-50)]'} rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2`;
       li.innerHTML = `
         <span data-icon="building-3-line" data-size="20" data-color="var(--icon--strong-950)"></span>
         <div class="flex-1 flex flex-col gap-2.5">
@@ -1338,8 +1338,8 @@
             <div class="bg-[var(--color-primary)] size-5 rounded-full flex items-center justify-center">
               <span data-icon="leaf-line" data-size="14" data-color="var(--bg--strong-950)"></span>
             </div>
-            <div class="text-sm/5 font-medium border-r border-[var(--stroke--soft-200)]">
-              ${item.total_gwp.toFixed(2)} kgCO2eq
+            <div class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)]">
+              ${item.total_gwp.toFixed(2)} kgCO₂eq/m²
             </div>
             <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
               ${item.category_name || i18n.noCategory}

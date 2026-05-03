@@ -93,7 +93,7 @@ def select_lists(request):
         return render(
             request,
             "pages/utils/select_list.html",
-            {"items": items, "default_text": "Select apartment type"},
+            {"items": items, "default_text": "Pick a building sub-type"},
         )
     elif m := request.GET.get("country"):
         # Handle empty or invalid country values

@@ -608,7 +608,7 @@ class StepManager {
     const progressBar = document.getElementById("progress-bar");
 
     if (progressText) {
-      progressText.textContent = interpolate(gettext("%s%% completed"), [percentage]);
+      progressText.textContent = interpolate(gettext("%s% completed"), [percentage]);
     }
 
     if (progressBar) {
@@ -1263,6 +1263,14 @@ class StepManager {
         return; // Don't proceed to next step
       }
 
+      if (saveResult && saveResult.success) {
+        const isFirstStep = this.currentStep === 1 && this.currentSubStep === 1;
+        if (!this.editMode && isFirstStep) {
+          Toast.success(gettext('Building created successfully!'));
+        } else {
+          Toast.success(gettext('Building updated successfully!'));
+        }
+      }
     }
     const step = this.stepConfig[this.currentStep];
 

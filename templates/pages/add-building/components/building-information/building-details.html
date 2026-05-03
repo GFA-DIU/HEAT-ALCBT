@@ -24,7 +24,7 @@
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      {% translate "Type of apartments" %}<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Building Sub-type" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <label class="w-full">
       <select
@@ -38,7 +38,7 @@
         hx-vals='js:{"building_category": document.getElementById("building-type-select").value, "country": "{{ country_id }}"}'
         required
       >
-        <option value="">{% translate "Pick a type of apartments" %}</option>
+        <option value="">{% translate "Pick a building sub-type" %}</option>
         {% for apt_type in apartment_types %}
           <option value="{{ apt_type.id }}" {% if apt_type.id == selected_apartment_type %}selected{% endif %}>{{ apt_type.name }}</option>
         {% endfor %}
@@ -47,7 +47,29 @@
     <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
 
-  <fieldset class="fieldset col-span-2">
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">
+      {% translate "Seismic Zone / Risk Level" %}
+    </legend>
+    <label class="w-full">
+      <select id="seismic-zone-select" name="seismic_zone" class="select w-full">
+        <option value="">{% translate "Select seismic zone" %}</option>
+        {% if is_india %}
+        <option value="zone_ii"   {% if building_data.seismic_zone == "zone_ii"   %}selected{% endif %}>{% translate "Zone II" %}</option>
+        <option value="zone_iii"  {% if building_data.seismic_zone == "zone_iii"  %}selected{% endif %}>{% translate "Zone III" %}</option>
+        <option value="zone_iv"   {% if building_data.seismic_zone == "zone_iv"   %}selected{% endif %}>{% translate "Zone IV" %}</option>
+        <option value="zone_v"    {% if building_data.seismic_zone == "zone_v"    %}selected{% endif %}>{% translate "Zone V" %}</option>
+        {% else %}
+        <option value="low"       {% if building_data.seismic_zone == "low"       %}selected{% endif %}>{% translate "Low" %}</option>
+        <option value="moderate"  {% if building_data.seismic_zone == "moderate"  %}selected{% endif %}>{% translate "Moderate" %}</option>
+        <option value="high"      {% if building_data.seismic_zone == "high"      %}selected{% endif %}>{% translate "High" %}</option>
+        <option value="very_high" {% if building_data.seismic_zone == "very_high" %}selected{% endif %}>{% translate "Very High" %}</option>
+        {% endif %}
+      </select>
+    </label>
+  </fieldset>
+
+  <fieldset class="fieldset">
     <legend class="fieldset-legend">
       {% translate "Area climate type" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>

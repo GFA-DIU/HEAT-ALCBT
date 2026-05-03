@@ -135,8 +135,8 @@
                 <span class="loading loading-spinner loading-lg text-primary"></span>
               </div>
             </label>
-            <select name="country" class="select min-w-[120px]">
-              <option value="">{% translate "All Countries" %}</option>
+            <select name="country" class="select min-w-[120px]" autocomplete="off">
+              <option value="" selected>{% translate "All Countries" %}</option>
               {% for country in countries %}
               <option value="{{ country.id }}">{{ country.name }}</option>
               {% endfor %}
@@ -497,9 +497,30 @@
     }
   });
 
-  // Handle successful save
+  // Handle successful save — use the HX-Trigger event fired by the server
+  document.body.addEventListener('operationalProductsSaved', function() {
+    // Restore save button (new form is already in DOM after outerHTML swap)
+    const btn = document.getElementById('save_button');
+    if (btn) {
+      btn.disabled = false;
+      const icon = btn.querySelector('.button-icon');
+      const loading = btn.querySelector('.button-loading');
+      const text = btn.querySelector('.button-text');
+      if (icon) icon.classList.remove('hidden');
+      if (loading) loading.classList.add('hidden');
+      if (text) text.textContent = '{% translate "Save Energy Carriers" %}';
+    }
+    const saveStatus = document.getElementById('save_status');
+    if (saveStatus) {
+      saveStatus.innerHTML = `<span class="text-success font-medium">${i18n.savedSuccess}</span>`;
+      setTimeout(() => { saveStatus.innerHTML = ''; }, 3000);
+    }
+    Toast.success('{% translate "Energy carriers saved successfully" %}');
+  });
+
+  // Handle save request failure
   document.body.addEventListener('htmx:afterRequest', function(event) {
-    if (event.detail.target.id === 'operational-products-form') {
+    if (event.detail.target.id === 'operational-products-form' && !event.detail.successful) {
       const btn = document.getElementById('save_button');
       if (btn) {
         btn.disabled = false;
@@ -510,19 +531,7 @@
         if (loading) loading.classList.add('hidden');
         if (text) text.textContent = '{% translate "Save Energy Carriers" %}';
       }
-
-      if (event.detail.successful) {
-        // Form already has data-saved="true" from server response
-        // Just show success message
-        const saveStatus = document.getElementById('save_status');
-        if (saveStatus) {
-          saveStatus.innerHTML = `<span class="text-success font-medium">${i18n.savedSuccess}</span>`;
-          setTimeout(() => {
-            saveStatus.innerHTML = '';
-          }, 3000);
-        }
-        Toast.success('Energy carriers saved successfully');
-      }
+      Toast.error('{% translate "Failed to save energy carriers" %}');
     }
   });
 
@@ -538,6 +547,16 @@
           saveStatus.classList.remove('text-success');
           saveStatus.classList.add('text-warning');
         }
+      }
+    });
+  }
+
+  // Reset country filter to "All Countries" each time modal opens
+  if (mainModal) {
+    mainModal.addEventListener('toggle', function(e) {
+      if (e.newState === 'open') {
+        const countrySelect = document.querySelector('#epd-filter-form select[name="country"]');
+        if (countrySelect) countrySelect.value = '';
       }
     });
   }
