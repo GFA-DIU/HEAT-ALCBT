@@ -382,6 +382,12 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
         blank=False,
         default=50,
     )
+    seismic_zone = models.CharField(
+        _("Seismic Zone / Risk Level"),
+        max_length=20,
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         verbose_name = "Building"

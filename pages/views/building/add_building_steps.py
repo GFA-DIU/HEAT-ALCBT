@@ -151,6 +151,13 @@ def handle_details_step(request):
     except (ValueError, TypeError):
         country_id = None
 
+    is_india = False
+    if country_id:
+        try:
+            is_india = Country.objects.filter(pk=country_id, code2="IN").exists()
+        except Exception:
+            pass
+
     context = {
         "building_categories": _get_building_categories_for_country(country_id),
         "apartment_types": [],
@@ -160,6 +167,7 @@ def handle_details_step(request):
         "selected_climate_type": None,
         "building_data": None,
         "country_id": country_id,
+        "is_india": is_india,
     }
 
     # Edit mode: pre-populate dependent selects from existing building
@@ -203,6 +211,7 @@ def handle_details_step(request):
                 "total_annual_energy_consumption": energy_summary.total_kwh if energy_summary and energy_summary.total_kwh is not None else None,
                 "energy_summary_any_components": energy_summary.any_components if energy_summary else False,
                 "energy_summary_exists": energy_summary is not None,
+                "seismic_zone": building.seismic_zone,
             }
 
             # Pre-populate climate_type
@@ -211,6 +220,7 @@ def handle_details_step(request):
 
             if building.country_id:
                 context["country_id"] = building.country_id
+                context["is_india"] = Country.objects.filter(pk=building.country_id, code2="IN").exists()
                 filtered_categories = _get_building_categories_for_country(building.country_id)
                 context["building_categories"] = filtered_categories
                 filtered_ids = set(filtered_categories.values_list('id', flat=True))
@@ -463,10 +473,10 @@ def handle_structural_components_step(request):
             uuid_obj = uuid_lib.UUID(building_uuid)
             building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
 
-            # Get saved assemblies with their structural products
+            # Get saved assemblies with their structural products, newest first
             building_assemblies = BuildingAssembly.objects.filter(
                 building=building
-            ).select_related(
+            ).order_by('-assembly__created_at').select_related(
                 'assembly'
             ).prefetch_related(
                 Prefetch(
@@ -489,7 +499,10 @@ def handle_structural_components_step(request):
 
             floor_area = float(building.total_floor_area) if building.total_floor_area else 1.0
 
-            for ba in building_assemblies:
+            building_assemblies_list = list(building_assemblies)
+            newest_assembly_id = building_assemblies_list[0].assembly.id if building_assemblies_list else None
+
+            for ba in building_assemblies_list:
                 assembly = ba.assembly
                 products = getattr(assembly, 'prefetched_products', None) or list(assembly.structuralproduct_set.all())
 
@@ -532,6 +545,7 @@ def handle_structural_components_step(request):
                     except (ImpactCalculationError, ValueError, ZeroDivisionError):
                         pass
 
+                is_newest = (assembly.id == newest_assembly_id)
                 if assembly.is_boq:
                     # BOQ item
                     boq_items.append({
@@ -540,7 +554,8 @@ def handle_structural_components_step(request):
                         'comment': assembly.comment or '',
                         'materials': materials,
                         'total_gwp': total_gwp,
-                        'is_template': assembly.is_template
+                        'is_template': assembly.is_template,
+                        'is_newest': is_newest,
                     })
                 else:
                     # Component item
@@ -556,7 +571,8 @@ def handle_structural_components_step(request):
                         'comment': assembly.comment or '',
                         'materials': materials,
                         'total_gwp': total_gwp,
-                        'is_template': assembly.is_template
+                        'is_template': assembly.is_template,
+                        'is_newest': is_newest,
                     })
 
         except (ValueError, Building.DoesNotExist):
@@ -677,6 +693,7 @@ def save_building_step(request):
                         'construction_year': 'construction_year',
                         'total_floor_area': 'total_floor_area',
                         'floors_below_ground': 'floors_below_ground',
+                        'seismic_zone': 'seismic_zone',
                     }
 
                     # Update building with mapped fields

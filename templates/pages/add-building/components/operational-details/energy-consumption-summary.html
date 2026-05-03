@@ -221,8 +221,23 @@
 
   function fmt(val) {
     var n = parseFloat(val);
-    return Number.isInteger(n) ? n.toLocaleString() : n.toLocaleString(undefined, { maximumFractionDigits: 3 });
+    if (isNaN(n)) return val;
+    return n.toLocaleString(undefined, { maximumFractionDigits: 3 });
   }
+
+  // Reformat server-rendered values with thousand separators on load
+  function reformatValueSpan(el) {
+    for (var i = 0; i < el.childNodes.length; i++) {
+      var node = el.childNodes[i];
+      if (node.nodeType === 3) {
+        var raw = parseFloat(node.nodeValue);
+        if (!isNaN(raw)) { node.nodeValue = fmt(raw) + ' '; break; }
+      }
+    }
+  }
+  document.querySelectorAll('[data-summary-right] .text-sm.font-bold').forEach(reformatValueSpan);
+  var totalEl = document.getElementById('summary-total-value');
+  if (totalEl) reformatValueSpan(totalEl);
 
   var IS_MANUAL_KEY = {
     cooling: 'is_manual_cooling',

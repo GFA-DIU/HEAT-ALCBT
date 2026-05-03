@@ -1,5 +1,5 @@
 {% load i18n %}
-<li class="bg-[var(--bg--weak-50)] rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2"
+<li class="{% if item.is_newest %}bg-[var(--bg--soft-200)]{% else %}bg-[var(--bg--weak-50)]{% endif %} rounded-lg p-2.5 border border-[var(--stroke--soft-200)] flex justify-between gap-2"
     data-item-type="boq"
     data-item-index="{{ index }}">
   <span data-icon="building-3-line" data-size="20" data-color="var(--icon--strong-950)"></span>
@@ -10,7 +10,7 @@
         <span data-icon="leaf-line" data-size="14" data-color="var(--bg--strong-950)"></span>
       </div>
       <div class="text-sm/5 font-medium pl-2 pr-2.5 border-r border-[var(--stroke--soft-200)] mr-3">
-        {{ item.total_gwp|floatformat:2 }} kgCO2eq
+        {{ item.total_gwp|floatformat:2 }} kgCO₂eq/m²
       </div>
       <p class="text-sm/5 text-[var(--text--sub-600)]">
         {% blocktranslate with count=item.materials|length %}Bill of Quantities ({{ count }} materials){% endblocktranslate %}
