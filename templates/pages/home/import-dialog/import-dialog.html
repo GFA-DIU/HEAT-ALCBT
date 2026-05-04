@@ -167,6 +167,11 @@
         if (step.id === 'upload' && !window.importState.file) {
           nextBtn.disabled = true;
         }
+
+        // Disable Continue on map-fields step when required fields are missing
+        if (step.id === 'map-fields' && window.importState.mapFieldsMissingCount > 0) {
+          nextBtn.disabled = true;
+        }
       }
     },
 
