@@ -1,6 +1,7 @@
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
+from pages.models.building import Building
 from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
 from pages.models.building_operation.chilling import CoolingSystemChiller
 from pages.models.building_operation.energy_summary import EnergySummary
@@ -20,6 +21,12 @@ _SYSTEM_MODELS = (
 
 
 def _refresh_summary(building):
+    # Guard: if the building is being cascade-deleted, its PK may no longer
+    # exist in the DB. Attempting get_or_create in that case causes a FK
+    # violation. Skip the refresh — the EnergySummary will be removed by
+    # CASCADE anyway.
+    if not Building.objects.filter(pk=building.pk).exists():
+        return
     summary, _ = EnergySummary.objects.get_or_create(building=building)
     summary.recalculate()
     summary.save()
