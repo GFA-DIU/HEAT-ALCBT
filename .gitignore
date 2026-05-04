@@ -27,6 +27,8 @@ secrets
 
 # Keep csv files in data folder
 !/pages/data/*.csv
+# Keep import template xlsx in static/docs
+!/static/docs/import-template.xlsx
 # Keep Thailand TGO source data
 !/docs/TH_CFP-TGO_Data_final(18Feb2026).xlsx
 

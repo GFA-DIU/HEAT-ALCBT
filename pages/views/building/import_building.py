@@ -2164,20 +2164,16 @@ def import_operational_energy_carriers(request):
 # Structural Components import (By Component)
 # ---------------------------------------------------------------------------
 
-# Maps Excel "Building Component" column (lower/stripped) → AssemblyCategory id
-STRUCTURAL_CATEGORY_MAP = {}  # populated lazily in _get_structural_category_map()
-
 def _get_structural_category_map():
-    """Build a lower-cased name → AssemblyCategory lookup (cached in module dict)."""
-    if not STRUCTURAL_CATEGORY_MAP:
-        for cat in AssemblyCategory.objects.all():
-            STRUCTURAL_CATEGORY_MAP[cat.name.lower().strip()] = cat
-            # Also add singular/plural variants
-            if cat.name.endswith('s'):
-                STRUCTURAL_CATEGORY_MAP[cat.name[:-1].lower().strip()] = cat
-            else:
-                STRUCTURAL_CATEGORY_MAP[(cat.name + 's').lower().strip()] = cat
-    return STRUCTURAL_CATEGORY_MAP
+    """Build a lower-cased name → AssemblyCategory lookup, queried fresh each call."""
+    cat_map = {}
+    for cat in AssemblyCategory.objects.all():
+        cat_map[cat.name.lower().strip()] = cat
+        if cat.name.endswith('s'):
+            cat_map[cat.name[:-1].lower().strip()] = cat
+        else:
+            cat_map[(cat.name + 's').lower().strip()] = cat
+    return cat_map
 
 
 # Maps Excel "Dimension" column (lower) → AssemblyDimension value

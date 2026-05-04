@@ -226,6 +226,12 @@
 
       // Update status alert based on whether any required fields are missing
       const missingCount = rows.filter(r => r.required && !r.value).length;
+      window.importState.mapFieldsMissingCount = missingCount;
+
+      // Reflect missing state on the Continue button immediately
+      const nextBtn = document.getElementById('import-next-btn');
+      if (nextBtn) nextBtn.disabled = missingCount > 0;
+
       const alertEl = document.getElementById('map-status-alert');
       if (alertEl && missingCount > 0) {
         alertEl.className = 'w-full flex items-center justify-center gap-3 px-12 py-3 rounded-md bg-[var(--state--error--lighter)]';
