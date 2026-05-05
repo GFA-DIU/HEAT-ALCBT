@@ -1,5 +1,7 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
+{% load static %}
+{% load custom_filters %}
 
 <ul class="flex flex-col gap-2">
     {% for epd in epd_list %}
@@ -45,6 +47,18 @@
                   class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
                   >{{ epd.impact_gwp|floatformat:"-2" }}  kgO₂eq</span
                 >
+                {% with label=epd.labels|get_item:"GCCA Global Reference Threshold Low Carbon and Near Zero Emissions Concrete" %}
+                  {% if label %}
+                    {% with image_path='images/svg/GCCA_label_'|add:label|add:'.svg' %}
+                      <img
+                        src="{% static image_path %}"
+                        alt="GCCA label {{ label }}"
+                        title="GCCA label {{ label }}"
+                        height="30"
+                      >
+                    {% endwith %}
+                  {% endif %}
+                {% endwith %}
               </div>
             </div>
             <button
