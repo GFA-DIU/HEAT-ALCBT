@@ -21,27 +21,32 @@ class ToastNotification {
     }
 
     /**
-     * Initialize the toast container if it doesn't exist
-     * Always appends to document.body so toasts render above any open
-     * <dialog> stacking context.
+     * Initialize the toast container if it doesn't exist.
+     * Uses the Popover API (popover="manual") so the container is promoted
+     * into the browser's top layer, which sits above open <dialog> elements
+     * regardless of z-index. Falls back to a high z-index for older browsers.
      */
     initContainer(position) {
         const containerId = `toast-stack-${position}`;
-
-        // Always use body as parent — dialogs create their own stacking context
-        // which would clip toasts rendered inside them.
         const parent = document.body;
-
-        // Look for existing container in the correct parent
         let container = parent.querySelector(`#${containerId}`);
 
         if (!container) {
             container = document.createElement('div');
             container.id = containerId;
             container.className = `toast toast-${position}`;
-            container.style.zIndex = '999999';
-            container.style.pointerEvents = 'none'; // Allow clicks through container
-            parent.appendChild(container);
+            container.style.pointerEvents = 'none';
+
+            if ('popover' in HTMLElement.prototype) {
+                // Top-layer promotion: appears above showModal() dialogs
+                container.popover = 'manual';
+                parent.appendChild(container);
+                container.showPopover();
+            } else {
+                // Fallback for browsers without Popover API
+                container.style.zIndex = '999999';
+                parent.appendChild(container);
+            }
         }
 
         return container;
@@ -200,6 +205,16 @@ if (!document.getElementById('toast-animations')) {
 
         .animate-slide-out {
             animation: slideOut 0.3s ease-in;
+        }
+
+        /* Reset browser defaults applied to popover elements */
+        [popover].toast {
+            margin: 0;
+            padding: 0;
+            border: none;
+            background: transparent;
+            overflow: visible;
+            color: inherit;
         }
 
         .toast {
