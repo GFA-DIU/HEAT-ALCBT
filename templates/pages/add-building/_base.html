@@ -70,7 +70,7 @@
           top: 0;
           height: 100%;
           z-index: 40;
-          width: 4.375rem;          /* icon-strip width */
+          width: 0rem;          /* icon-strip width */
           overflow: hidden;
           overflow-y: auto;
           transition: width 0.3s ease;
@@ -137,18 +137,22 @@
         }
       }
 
-      /* ─── Toggle-button icon / text variants ─────── */
-      /* Desktop: show text span, hide icon spans */
-      .sidebar-btn-icon-open,
-      .sidebar-btn-icon-close { display: none; }
+      /* ─── Toggle-button icon variants ───────────── */
+      /* Desktop default: sidebar is open → show the "close/hide" icon */
+      .sidebar-btn-icon-open  { display: none; }
+      .sidebar-btn-icon-close { display: inline-flex; }
 
-      /* Mobile: hide text, show appropriate icon */
+      /* Desktop collapsed: sidebar is closed → show the "open" icon */
+      body.sidebar-desktop-is-collapsed .sidebar-btn-icon-close { display: none; }
+      body.sidebar-desktop-is-collapsed .sidebar-btn-icon-open  { display: inline-flex; }
+
+      /* Mobile: always icon-driven by mobile body class */
       @media (max-width: 767px) {
-        .sidebar-btn-text       { display: none !important; }
+        /* Narrow by default → show open icon */
         .sidebar-btn-icon-open  { display: inline-flex; }
         .sidebar-btn-icon-close { display: none; }
 
-        /* When sidebar is expanded on mobile, swap icons */
+        /* Expanded → show close icon */
         body.sidebar-mobile-is-open .sidebar-btn-icon-open  { display: none; }
         body.sidebar-mobile-is-open .sidebar-btn-icon-close { display: inline-flex; }
       }
@@ -247,7 +251,7 @@
         sidebar.classList.remove('sidebar-collapsed');
         sidebar.setAttribute('aria-hidden', 'false');
         reopenTab.style.display = 'none';
-        updateDesktopBtnText(false);
+        document.body.classList.remove('sidebar-desktop-is-collapsed');
         localStorage.setItem('sidebarOpen', 'true');
       }
 
@@ -255,14 +259,8 @@
         sidebar.classList.add('sidebar-collapsed');
         sidebar.setAttribute('aria-hidden', 'true');
         reopenTab.style.display = '';   /* CSS shows it via #sidebar-reopen-tab rule */
-        updateDesktopBtnText(true);
+        document.body.classList.add('sidebar-desktop-is-collapsed');
         localStorage.setItem('sidebarOpen', 'false');
-      }
-
-      function updateDesktopBtnText(collapsed) {
-        document.querySelectorAll('[data-sidebar-toggle] .sidebar-btn-text').forEach(function (el) {
-          el.textContent = collapsed ? '{% translate "Show" %}' : '{% translate "Hide" %}';
-        });
       }
 
       /* ── init ───────────────────────────────────── */
