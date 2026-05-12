@@ -37,7 +37,7 @@
                 min="1"
                 step="0.01" />
               {% if epd.op_units|length > 1 %}
-              <select name="material_{{ epd.id }}_unit_{{ epd.timestamp }}" class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[calc(max-content+1rem)]">
+              <select name="material_{{ epd.id }}_unit_{{ epd.timestamp }}" class="select focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)]">
                 {% for unit in epd.op_units %}
                 <option value="{{ unit }}" {% if unit == epd.selection_unit %}selected{% endif %}>{{ unit|display_unit }}</option>
                 {% endfor %}

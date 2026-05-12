@@ -9,7 +9,7 @@
         <span class="text-sm/5 font-medium truncate flex-1">{{ epd.name|truncatechars:50 }}</span>
         <div class="flex items-center gap-2">
           <span data-country="{{ epd.country }}" data-width="16"></span>
-          {% if epd.source %}
+          {% if epd.source and epd.source|slice:":4" == "http" %}
           <a href="{{ epd.source }}" target="_blank" rel="noopener">
             <span data-icon="external-link-line" data-size="20" data-color="var(--icon--sub-600)"></span>
           </a>

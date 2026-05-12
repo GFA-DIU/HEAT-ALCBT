@@ -20,7 +20,7 @@
                     data-color="var(--icon--soft-400)"
                   ></span>
                   <span class="text-[var(--text--sub-600)]">
-                    {% if epd.type == "official" %}
+                    {% if epd.type == "official" and epd.source|slice:":4" == "http" %}
                     <a href="{{ epd.source }}"
                        target="_blank"
                        rel="noopener noreferrer"
