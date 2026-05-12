@@ -305,6 +305,7 @@ def handle_select_product(request):
             "timestamp": datetime.now().strftime("%Y%m%d%H%M%S%f"),
             "available_units": available_units,
             "gwp": epd.get_gwp_impact_sum("a1a3") or 0,
+            "source": epd.source or "",
         }
 
         # Get assembly categories for BOQ mode
