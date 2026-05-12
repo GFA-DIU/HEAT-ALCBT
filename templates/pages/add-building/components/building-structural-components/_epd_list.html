@@ -29,7 +29,8 @@
                 src="{% static image_path %}"
                 alt="GCCA label {{ label }}"
                 title="GCCA label {{ label }}"
-                height="10"
+                height="25"
+                width="54"
               >
             {% endwith %}
           {% endif %}
@@ -37,8 +38,8 @@
       </div>
     </div>
     <div class="flex flex-col items-end gap-2.5 shrink-0">
-      {% if epd.source %}
-      <a class='hidden' href="{{ epd.source }}" target="_blank" rel="noopener">
+      {% if epd.source and epd.source|slice:":4" == "http" %}
+      <a href="{{ epd.source }}" target="_blank" rel="noopener">
         <span data-icon="external-link-line" data-size="20" data-color="var(--icon--sub-600)"></span>
       </a>
       {% endif %}

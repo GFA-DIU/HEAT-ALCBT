@@ -30,3 +30,13 @@ def get_step(selection_unit):
 def get_item(dictionary, key):
     return dictionary.get(key)
 
+
+_UNIT_DISPLAY = {
+    "kwh": "kWh",
+}
+
+@register.filter(is_safe=True)
+@stringfilter
+def display_unit(value):
+    return _UNIT_DISPLAY.get(value, value)
+
