@@ -45,7 +45,7 @@
                 >
                 <span
                   class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]"
-                  >{{ epd.impact_gwp|floatformat:"-2" }}  kgO₂eq</span
+                  >{{ epd.impact_gwp|floatformat:"-2" }} kgCO₂eq</span
                 >
                 {% with label=epd.labels|get_item:"GCCA Global Reference Threshold Low Carbon and Near Zero Emissions Concrete" %}
                   {% if label %}
@@ -54,7 +54,8 @@
                         src="{% static image_path %}"
                         alt="GCCA label {{ label }}"
                         title="GCCA label {{ label }}"
-                        height="10"
+                        height="25"
+                        width="54"
                       >
                     {% endwith %}
                   {% endif %}
