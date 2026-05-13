@@ -22,56 +22,332 @@
     ></script>
 
     <style>
-      ul[id*='list'] {
-        margin-bottom: 4px;
+      ul[id*='list'] { margin-bottom: 4px; }
+
+      /* ─── Desktop sidebar ─────────────────────────── */
+      #add-building-sidebar {
+        flex-shrink: 0;
+        overflow: hidden;
+        /* Width equals px-14*2 (3.5rem each) + max-content (18.125rem) */
+        width: 25.125rem;
+        transition: width 0.3s ease, opacity 0.2s ease;
+      }
+
+      @media (min-width: 768px) {
+        #add-building-sidebar.sidebar-collapsed {
+          width: 0;
+          opacity: 0;
+          pointer-events: none;
+        }
+      }
+
+      /* Desktop re-open tab */
+      #sidebar-reopen-tab {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 30;
+        background: var(--bg--white-0, #fff);
+        border: 1px solid var(--stroke--soft-200);
+        border-left: none;
+        border-radius: 0 0.5rem 0.5rem 0;
+        padding: 0.875rem 0.375rem;
+        cursor: pointer;
+        box-shadow: 2px 0 8px rgba(14,18,27,.08);
+      }
+      @media (max-width: 767px) {
+        #sidebar-reopen-tab { display: none !important; }
+      }
+
+      /* ─── Mobile sidebar ──────────────────────────── */
+      @media (max-width: 767px) {
+        /* Always fixed-positioned; narrow by default */
+        #add-building-sidebar {
+          position: fixed !important;
+          left: 0;
+          top: 0;
+          height: 100%;
+          z-index: 40;
+          width: 0rem;          /* icon-strip width */
+          overflow: hidden;
+          overflow-y: auto;
+          transition: width 0.3s ease;
+          cursor: pointer;
+          opacity: 1 !important;
+          pointer-events: auto !important;
+        }
+
+        /* Full overlay when expanded */
+        #add-building-sidebar.sidebar-mobile-expanded {
+          width: min(20rem, 85vw);
+          cursor: default;
+          box-shadow: 4px 0 20px rgba(14,18,27,.14);
+        }
+
+        /* Narrow strip: hide all text, close btn; keep icons */
+        #add-building-sidebar:not(.sidebar-mobile-expanded) #page-title,
+        #add-building-sidebar:not(.sidebar-mobile-expanded) #page-description,
+        #add-building-sidebar:not(.sidebar-mobile-expanded) #progress-text,
+        #add-building-sidebar:not(.sidebar-mobile-expanded) #progress-bar,
+        #add-building-sidebar:not(.sidebar-mobile-expanded) .stepper-item-content,
+        #add-building-sidebar:not(.sidebar-mobile-expanded) .sidebar-close-btn {
+          display: none;
+        }
+
+        /* Narrow strip: compact padding */
+        #add-building-sidebar:not(.sidebar-mobile-expanded) #sidebar-header,
+        #add-building-sidebar:not(.sidebar-mobile-expanded) #sidebar-nav {
+          padding-left: 0.875rem;
+          padding-right: 0.875rem;
+        }
+
+        /* Narrow strip: smaller logo */
+        #add-building-sidebar:not(.sidebar-mobile-expanded) .sidebar-logo {
+          width: 2rem;
+        }
+
+        /* Narrow strip: centre the step-icon circles */
+        #add-building-sidebar:not(.sidebar-mobile-expanded) .stepper-item {
+          justify-content: center;
+        }
+        #add-building-sidebar:not(.sidebar-mobile-expanded) .stepper-item-icon-container {
+          width: auto;
+        }
+
+        /* CSS counter so each circle shows its step number */
+        #add-building-sidebar:not(.sidebar-mobile-expanded) .stepper {
+          counter-reset: step-num;
+        }
+        #add-building-sidebar:not(.sidebar-mobile-expanded) .stepper-item {
+          counter-increment: step-num;
+        }
+        #add-building-sidebar:not(.sidebar-mobile-expanded) .stepper-item-icon::after {
+          content: counter(step-num);
+          font-size: 0.5rem;
+          font-weight: 700;
+          color: var(--text--sub-600);
+          line-height: 1;
+        }
+        #add-building-sidebar:not(.sidebar-mobile-expanded) .stepper-item-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      /* ─── Toggle-button icon variants ───────────── */
+      /* Desktop default: sidebar is open → show the "close/hide" icon */
+      .sidebar-btn-icon-open  { display: none; }
+      .sidebar-btn-icon-close { display: inline-flex; }
+
+      /* Desktop collapsed: sidebar is closed → show the "open" icon */
+      body.sidebar-desktop-is-collapsed .sidebar-btn-icon-close { display: none; }
+      body.sidebar-desktop-is-collapsed .sidebar-btn-icon-open  { display: inline-flex; }
+
+      /* Mobile: always icon-driven by mobile body class */
+      @media (max-width: 767px) {
+        /* Narrow by default → show open icon */
+        .sidebar-btn-icon-open  { display: inline-flex; }
+        .sidebar-btn-icon-close { display: none; }
+
+        /* Expanded → show close icon */
+        body.sidebar-mobile-is-open .sidebar-btn-icon-open  { display: none; }
+        body.sidebar-mobile-is-open .sidebar-btn-icon-close { display: inline-flex; }
       }
     </style>
 {% endblock extra_head %}
 {% block content %}
 
-  <section class="flex flex-col">
-      <div class="flex pt-8 pb-5 px-14 border-b border-[var(--bg--soft-200)]">
-        <div class="flex flex-col w-full max-w-[18.125rem]">
+  <!-- Mobile backdrop (tap to collapse sidebar back to strip) -->
+  <div id="sidebar-mobile-backdrop"
+       style="display:none; position:fixed; inset:0; background:rgba(14,18,27,.45); z-index:39;"></div>
+
+  <!-- Desktop re-open tab (visible only when sidebar is collapsed on desktop) -->
+  <button id="sidebar-reopen-tab" aria-label="{% translate 'Open sidebar' %}">
+    <span data-icon="arrow-right-s-line" data-size="16"></span>
+  </button>
+
+  <section id="add-building-sidebar" class="flex flex-col bg-[var(--bg--base-500)] z-[99999]" aria-hidden="false">
+
+    <div id="sidebar-header" class="flex pt-8 pb-5 px-4 md:px-14 border-b border-[var(--bg--soft-200)]">
+      <div class="flex flex-col w-full max-w-[18.125rem]">
+        <div class="flex items-start justify-between">
           <img
             src="{% static 'assets/logo.svg' %}"
             alt="logo image"
-            class="w-[3.25rem]"
+            class="sidebar-logo w-[3.25rem]"
           />
-          <h1 id="page-title" class="text-base font-extrabold mt-6">{% translate "Add New Building" %}</h1>
-          <p id="page-description" class="text-sm font-medium mt-1 text-[var(--text--sub-600)]">
-            {% translate "Complete the following steps to add a new building" %}
-          </p>
-          <div class="flex flex-col gap-1.5 mt-4">
-            <span
-              class="text-xs font-medium text-[var(--text--sub-600)]"
-              id="progress-text"
-              >{% translate "0% completed" %}</span
-            >
-            <progress
-              class="progress progress-primary w-full"
-              value="0"
-              max="100"
-              id="progress-bar"
-            ></progress>
-          </div>
+          <!-- Close button: visible only when mobile sidebar is fully expanded -->
+          <button class="sidebar-close-btn btn btn-ghost btn-xs p-0 w-7 h-7 flex items-center justify-center mt-0.5 md:hidden"
+                  aria-label="{% translate 'Close sidebar' %}">
+            <span data-icon="close-line" data-size="18"></span>
+          </button>
+        </div>
+        <h1 id="page-title" class="text-base font-extrabold mt-6">{% translate "Add New Building" %}</h1>
+        <p id="page-description" class="text-sm font-medium mt-1 text-[var(--text--sub-600)]">
+          {% translate "Complete the following steps to add a new building" %}
+        </p>
+        <div class="flex flex-col gap-1.5 mt-4">
+          <span
+            class="text-xs font-medium text-[var(--text--sub-600)]"
+            id="progress-text"
+            >{% translate "0% completed" %}</span
+          >
+          <progress
+            class="progress progress-primary w-full"
+            value="0"
+            max="100"
+            id="progress-bar"
+          ></progress>
         </div>
       </div>
+    </div>
 
-      <div class="flex pt-8 pb-5 px-14 flex-1">
-        <div class="flex flex-col w-full max-w-[18.125rem]">
-          <div class="space-y-4" id="step-navigation"></div>
-        </div>
+    <div id="sidebar-nav" class="flex pt-8 pb-5 px-4 md:px-14  flex-1">
+      <div class="flex flex-col w-full max-w-[18.125rem]">
+        <div class="space-y-4" id="step-navigation"></div>
       </div>
+    </div>
+
   </section>
-  
 
-{% block new-building %}
 
-{% endblock new-building %}
+{% block new-building %}{% endblock new-building %}
+
   <script src="{% url 'javascript-catalog' %}"></script>
   <script src="{% static 'js/form-validator.js' %}"></script>
   <script src="{% static 'js/step-manager.js' %}"></script>
   <script src="{% static 'js/geo-location.js' %}"></script>
+
+  <script>
+    (function () {
+      var sidebar  = document.getElementById('add-building-sidebar');
+      var backdrop = document.getElementById('sidebar-mobile-backdrop');
+      var reopenTab = document.getElementById('sidebar-reopen-tab');
+
+      function isMobile() { return window.innerWidth < 768; }
+
+      /* ── core state setters ─────────────────────── */
+
+      function expandMobile() {
+        sidebar.classList.add('sidebar-mobile-expanded');
+        sidebar.setAttribute('aria-hidden', 'false');
+        backdrop.style.display = 'block';
+        document.body.classList.add('sidebar-mobile-is-open');
+        localStorage.setItem('sidebarOpen', 'true');
+      }
+
+      function collapseMobile() {
+        sidebar.classList.remove('sidebar-mobile-expanded');
+        sidebar.setAttribute('aria-hidden', 'true');
+        backdrop.style.display = 'none';
+        document.body.classList.remove('sidebar-mobile-is-open');
+        localStorage.setItem('sidebarOpen', 'false');
+      }
+
+      function expandDesktop() {
+        sidebar.classList.remove('sidebar-collapsed');
+        sidebar.setAttribute('aria-hidden', 'false');
+        reopenTab.style.display = 'none';
+        document.body.classList.remove('sidebar-desktop-is-collapsed');
+        localStorage.setItem('sidebarOpen', 'true');
+      }
+
+      function collapseDesktop() {
+        sidebar.classList.add('sidebar-collapsed');
+        sidebar.setAttribute('aria-hidden', 'true');
+        reopenTab.style.display = '';   /* CSS shows it via #sidebar-reopen-tab rule */
+        document.body.classList.add('sidebar-desktop-is-collapsed');
+        localStorage.setItem('sidebarOpen', 'false');
+      }
+
+      /* ── init ───────────────────────────────────── */
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var mobile = isMobile();
+        var saved  = localStorage.getItem('sidebarOpen');
+
+        if (mobile) {
+          /* Default mobile: narrow (not expanded). Restore only if explicitly saved open. */
+          if (saved === 'true') expandMobile();
+          /* else stay narrow — no class needed */
+        } else {
+          /* Default desktop: open. Collapse only if explicitly saved closed. */
+          if (saved === 'false') {
+            sidebar.style.transition = 'none';
+            collapseDesktop();
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () { sidebar.style.transition = ''; });
+            });
+          }
+        }
+
+        /* Wire data-sidebar-toggle buttons (desktop + mobile header btn) */
+        document.querySelectorAll('[data-sidebar-toggle]').forEach(function (btn) {
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (isMobile()) {
+              sidebar.classList.contains('sidebar-mobile-expanded') ? collapseMobile() : expandMobile();
+            } else {
+              sidebar.classList.contains('sidebar-collapsed') ? expandDesktop() : collapseDesktop();
+            }
+          });
+        });
+
+        /* Sidebar close button (inside sidebar, mobile only) */
+        var closeBtn = sidebar.querySelector('.sidebar-close-btn');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            collapseMobile();
+          });
+        }
+
+        /* Tap the narrow strip to expand (mobile) */
+        sidebar.addEventListener('click', function () {
+          if (isMobile() && !sidebar.classList.contains('sidebar-mobile-expanded')) {
+            expandMobile();
+          }
+        });
+
+        /* Backdrop tap → collapse to narrow */
+        backdrop.addEventListener('click', collapseMobile);
+
+        /* Desktop re-open tab */
+        reopenTab.addEventListener('click', expandDesktop);
+
+        /* Step icon click delegation (mobile narrow mode → navigate to step) */
+        var stepNav = document.getElementById('step-navigation');
+        if (stepNav) {
+          stepNav.addEventListener('click', function (e) {
+            if (!isMobile() || sidebar.classList.contains('sidebar-mobile-expanded')) return;
+            var li = e.target.closest('li.stepper-item');
+            if (!li) return;
+            e.stopPropagation();
+            var h3 = li.querySelector('.stepper-item-title');
+            if (h3) h3.click();
+          });
+        }
+      });
+
+      /* ── resize ─────────────────────────────────── */
+      window.addEventListener('resize', function () {
+        var mobile    = isMobile();
+        var collapsed = sidebar.classList.contains('sidebar-collapsed');
+        var mobileExp = sidebar.classList.contains('sidebar-mobile-expanded');
+
+        backdrop.style.display   = (mobile && mobileExp) ? 'block' : 'none';
+        document.body.classList.toggle('sidebar-mobile-is-open', mobile && mobileExp);
+
+        /* Keep re-open tab in sync on desktop */
+        if (!mobile) {
+          reopenTab.style.display = collapsed ? '' : 'none';
+        }
+      });
+    })();
+  </script>
 {% endblock content %}
 
 {% block footer %}{% endblock footer %}
