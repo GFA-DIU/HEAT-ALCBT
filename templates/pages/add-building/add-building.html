@@ -12,12 +12,32 @@
         class="card-body border-x-2 border-[var(--stroke--soft-200)] bg-[var(--bg--white-0)] rounded-l-[var(--radius-16)] p-0 gap-0"
       >
         <div
-          class="px-14 pt-6 pb-4 flex items-center justify-between border-b border-[var(--stroke--soft-200)]"
+          class="md:px-14 pt-6 pb-4 px-2 flex items-center justify-between border-b border-[var(--stroke--soft-200)]"
         >
+          <div class="flex items-center gap-2 md:justify-start justify-between w-full">
+            <div class="flex items-center gap-2">
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm flex items-center gap-1"
+              data-sidebar-toggle
+              aria-controls="add-building-sidebar"
+              aria-expanded="true"
+            >
+              <span class="sidebar-btn-icon-open"  data-icon="list-indefinite" data-size="20"></span>
+              <span class="sidebar-btn-icon-close" data-icon="arrow-left-s-line" data-size="20"></span>
+            </button>
+
+              <img
+                src="{% static 'assets/logo.svg' %}"
+                alt="logo image"
+                class="sidebar-logo w-[3.25rem] block md:hidden"
+              />
+            </div>
           <a class="btn btn-sm" href="{% url 'home' %}">
             <span data-icon="logout-box-line"></span>
             <span>{% translate "Exit" %}</span>
           </a>
+          </div>
 
           <div class="flex items-center gap-4">
             {% comment %} <button class="btn btn-ghost size-6 p-0">
@@ -45,12 +65,10 @@
             {% comment %} <li class='w-full'><button class='w-full' onclick="showCookieSettings()">Cookie Settings</button></li> {% endcomment %}
             <li class='w-full'><button onclick="logout_modal.showModal()" class='w-full'>{% translate "Logout" %}</button></li>
           </ul>
-            <button
-              class="btn btn-ghost btn-sm flex items-center gap-1 md:hidden"
-            ></button>
+            
           </div>
         </div>
-        <div class="flex-1 p-14">
+        <div class="flex-1 p-4 md:p-14">
           <div class="mx-auto w-full max-w-[31.625rem]">
             <div class="w-full">
               <div
@@ -82,7 +100,7 @@
           </div>
         </div>
         <div
-          class="card-actions px-14 py-7 border-t border-[var(--stroke--soft-200)] justify-between"
+          class="card-actions px-4 md:px-14 py-7 border-t border-[var(--stroke--soft-200)] justify-between"
         >
           <button class="btn btn-outline" id="go-back">
             <span data-icon="arrow-left-s-line"></span>
