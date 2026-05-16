@@ -683,9 +683,9 @@ def handle_search_templates(request):
     Search and filter templates (assemblies) for selection in building structural components.
     Reuses logic from templates view with same filters.
     """
-    # Start with base queryset - show public assemblies and user's custom assemblies
+    # Show public assemblies from staff/superusers (system defaults) and user's own assemblies
     assemblies = Assembly.objects.filter(
-        Q(public=True) | Q(created_by=request.user),
+        Q(public=True, created_by__is_staff=True) | Q(public=True, created_by__is_superuser=True) | Q(created_by=request.user),
         draft=False,
         is_boq=False,  # Exclude Bill of Quantities
     )
