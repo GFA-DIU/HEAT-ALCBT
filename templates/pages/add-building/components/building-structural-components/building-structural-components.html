@@ -214,6 +214,11 @@
       </div>
     </div>
 
+    <div id="component_pcs_banner" class="hidden mx-5 mb-0 mt-2 w-full flex items-center justify-center gap-3 px-12 py-3 rounded-md bg-[var(--state--error--lighter)]">
+      <span data-icon="error-warning-fill" data-size="20" style="color:var(--state--error--base);flex-shrink:0"></span>
+      <span id="component_pcs_banner_msg" class="label-small text-[var(--text--strong-950)] flex-1"></span>
+      <button type="button" class="shrink-0 ml-2 opacity-60 hover:opacity-100" onclick="document.getElementById('component_pcs_banner').classList.add('hidden')" aria-label="Close" style="color:var(--state--error--base)">&#x2715;</button>
+    </div>
     <div class="p-5 flex items-center justify-end gap-4 border-t border-[var(--stroke--soft-200)]">
       <button type="button" class="btn btn-outline" onclick="structuralManager.closeComponentModal()">{% translate "Cancel" %}</button>
       <button type="button" class="btn btn-primary" onclick="structuralManager.saveComponent()">{% translate "Save" %}</button>
@@ -703,6 +708,7 @@
 
   closeComponentModal() {
     structural_component_modal.close();
+    document.getElementById('component_pcs_banner').classList.add('hidden');
     this.resetModalState();
   }
 
@@ -1147,6 +1153,22 @@
       return;
     }
 
+    // Validate pcs: sum of material quantities must equal the component quantity
+    const dimension = document.getElementById('component_dimension').value;
+    const componentQty = parseFloat(document.getElementById('component_quantity').value) || 0;
+    const pcsBanner = document.getElementById('component_pcs_banner');
+    const pcsBannerMsg = document.getElementById('component_pcs_banner_msg');
+    if (dimension === 'pcs') {
+      const qtySum = materials.reduce((sum, m) => sum + (parseFloat(m.quantity) || 0), 0);
+      const rounded = Math.round(qtySum * 1000) / 1000;
+      if (rounded !== componentQty) {
+        pcsBannerMsg.textContent = `The sum of EPD quantities (${rounded} pcs) must equal the component quantity (${componentQty} pcs).`;
+        pcsBanner.classList.remove('hidden');
+        return;
+      }
+    }
+    pcsBanner.classList.add('hidden');
+
     const categorySelect = document.getElementById('component_category');
 
     const existingComponentItem = this.editingIndex !== null ? this.componentItems[this.editingIndex] : null;
@@ -1210,7 +1232,10 @@
         this.emitFormStatus();
         Toast.success('Component saved to database successfully');
       } else {
-        Toast.error(result.error || 'Failed to save component');
+        const pcsBanner = document.getElementById('component_pcs_banner');
+        const pcsBannerMsg = document.getElementById('component_pcs_banner_msg');
+        pcsBannerMsg.textContent = result.error || 'Failed to save component';
+        pcsBanner.classList.remove('hidden');
       }
     } catch (error) {
       console.error('Error saving component:', error);
