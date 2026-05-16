@@ -33,6 +33,12 @@ def get_item(dictionary, key):
 
 _UNIT_DISPLAY = {
     "kwh": "kWh",
+    "m3": "m³",
+    "m2": "m²",
+    "kg": "kg",
+    "m": "m",
+    "pcs": "pcs",
+    "l": "L",
 }
 
 @register.filter(is_safe=True)

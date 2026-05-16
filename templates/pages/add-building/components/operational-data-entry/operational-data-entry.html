@@ -345,22 +345,21 @@
   const saveButton = document.getElementById('save_button');
   let epdToDelete = null;
 
-  // Update UI based on selected products count
+  // Update UI based on selected products count — always re-query from DOM
+  // so it works after HTMX outerHTML swaps replace the form
   function updateUI() {
-    // Check for actual EPD items (not just the empty state template)
-    const actualProducts = selectedOpProducts?.querySelectorAll('li[id^="epd-"]');
+    const list = document.getElementById('selected_op_products');
+    const actualProducts = list?.querySelectorAll('li[id^="epd-"]');
     const hasProducts = actualProducts && actualProducts.length > 0;
 
-    if (selectEpdText) selectEpdText.hidden = hasProducts;
-    if (saveButtonContainer) saveButtonContainer.hidden = !hasProducts;
+    const selectText = document.getElementById('select_epd_text');
+    const saveBtnContainer = document.getElementById('save_button_container');
+    if (selectText) selectText.hidden = hasProducts;
+    if (saveBtnContainer) saveBtnContainer.hidden = !hasProducts;
 
-    // Also hide/show the empty state template
     const emptyTemplate = document.getElementById('no-energy-carrier-template');
-    if (emptyTemplate) {
-      emptyTemplate.style.display = hasProducts ? 'none' : 'block';
-    }
+    if (emptyTemplate) emptyTemplate.style.display = hasProducts ? 'none' : 'block';
 
-    // Show unsaved indicator if there are products but not saved
     const form = document.getElementById('operational-products-form');
     const isSaved = form && form.dataset.saved === 'true';
     const unsavedIndicator = document.querySelector('.unsaved-indicator');
@@ -384,102 +383,83 @@
     }
   });
 
-  // Handle Remove EPD button clicks
-  if (selectedOpProducts) {
-    selectedOpProducts.addEventListener('click', function(event) {
-      console.log('[Operational] Click event detected', event.target);
-      const removeBtn = event.target.closest('.remove-epd');
-      console.log('[Operational] Remove button found:', removeBtn);
-      if (removeBtn) {
-        epdToDelete = {
-          id: removeBtn.dataset.epdId,
-          timestamp: removeBtn.dataset.timestamp,
-          elementId: removeBtn.dataset.elementId
-        };
-        console.log('[Operational] EPD to delete:', epdToDelete);
-        console.log('[Operational] Delete modal:', deleteModal);
-        if (deleteModal) {
-          deleteModal.showModal();
-        } else {
-          console.error('[Operational] Delete modal not found!');
-        }
+  // Handle Remove EPD button clicks — use document-level delegation so it
+  // survives HTMX outerHTML swaps of the form
+  document.addEventListener('click', function(event) {
+    const removeBtn = event.target.closest('.remove-epd');
+    if (!removeBtn) return;
+    // Only handle buttons inside the operational products list
+    if (!removeBtn.closest('#selected_op_products')) return;
+    epdToDelete = {
+      id: removeBtn.dataset.epdId,
+      timestamp: removeBtn.dataset.timestamp,
+      elementId: removeBtn.dataset.elementId
+    };
+    const modal = document.getElementById('energy_carrier_modal_delete');
+    if (modal) modal.showModal();
+  });
+
+  // Handle delete confirmation — button lives outside the swapped form so no re-binding needed
+  document.addEventListener('click', async function(event) {
+    const confirmDeleteBtn = event.target.closest('#confirm-delete-btn');
+    if (!confirmDeleteBtn || !epdToDelete) return;
+
+    const modal = document.getElementById('energy_carrier_modal_delete');
+    const form = document.getElementById('operational-products-form');
+    const isSaved = form && form.dataset.saved === 'true';
+
+    // If the form hasn't been saved yet, just remove from DOM — nothing in DB to delete
+    if (!isSaved) {
+      const epdElement = document.getElementById(epdToDelete.elementId);
+      if (epdElement) { epdElement.remove(); updateUI(); }
+      epdToDelete = null;
+      if (modal) modal.close();
+      return;
+    }
+
+    const buildingUuid = new URLSearchParams(window.location.search).get('building_uuid');
+    if (!buildingUuid) {
+      Toast.error('Building UUID not found');
+      if (modal) modal.close();
+      return;
+    }
+
+    confirmDeleteBtn.disabled = true;
+    confirmDeleteBtn.innerHTML = `<span class="loading loading-spinner loading-sm"></span> ${i18n.removing}`;
+
+    try {
+      const response = await fetch('{% url "building_step_operational" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                         document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || ''
+        },
+        body: JSON.stringify({
+          action: 'delete_op_product',
+          building_uuid: buildingUuid,
+          epd_id: epdToDelete.id
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const epdElement = document.getElementById(epdToDelete.elementId);
+        if (epdElement) { epdElement.remove(); updateUI(); }
+        Toast.success('Energy carrier removed successfully');
+      } else {
+        Toast.error(result.error || 'Failed to remove energy carrier');
       }
-    });
-  } else {
-    console.error('[Operational] selectedOpProducts element not found!');
-  }
-
-  // Handle delete confirmation
-  const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-  if (confirmDeleteBtn) {
-    confirmDeleteBtn.addEventListener('click', async function() {
-      if (epdToDelete) {
-        const buildingUuid = new URLSearchParams(window.location.search).get('building_uuid');
-
-        if (!buildingUuid) {
-          Toast.error('Building UUID not found');
-          deleteModal.close();
-          return;
-        }
-
-        // Disable button during request
-        confirmDeleteBtn.disabled = true;
-        confirmDeleteBtn.innerHTML = `<span class="loading loading-spinner loading-sm"></span> ${i18n.removing}`;
-
-        try {
-          const response = await fetch('{% url "building_step_operational" %}', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
-                             document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || ''
-            },
-            body: JSON.stringify({
-              action: 'delete_op_product',
-              building_uuid: buildingUuid,
-              epd_id: epdToDelete.id
-            })
-          });
-
-          console.log('[Operational] Response status:', response.status);
-          console.log('[Operational] Response content-type:', response.headers.get('content-type'));
-
-          // Check if response is JSON
-          const contentType = response.headers.get('content-type');
-          if (!contentType || !contentType.includes('application/json')) {
-            const text = await response.text();
-            console.error('[Operational] Server returned non-JSON response:', text.substring(0, 500));
-            Toast.error('Server error: Expected JSON response');
-            return;
-          }
-
-          const result = await response.json();
-          console.log('[Operational] Delete result:', result);
-
-          if (result.success) {
-            // Remove element from DOM
-            const epdElement = document.getElementById(epdToDelete.elementId);
-            if (epdElement) {
-              epdElement.remove();
-              updateUI();
-            }
-            Toast.success('Energy carrier removed successfully');
-          } else {
-            Toast.error(result.error || 'Failed to remove energy carrier');
-          }
-        } catch (error) {
-          console.error('Error removing energy carrier:', error);
-          Toast.error('Failed to remove energy carrier: ' + error.message);
-        } finally {
-          // Reset button
-          confirmDeleteBtn.disabled = false;
-          confirmDeleteBtn.innerHTML = '{% translate "Remove" %}';
-          epdToDelete = null;
-          deleteModal.close();
-        }
-      }
-    });
-  }
+    } catch (error) {
+      Toast.error('Failed to remove energy carrier: ' + error.message);
+    } finally {
+      confirmDeleteBtn.disabled = false;
+      confirmDeleteBtn.innerHTML = '{% translate "Remove" %}';
+      epdToDelete = null;
+      if (modal) modal.close();
+    }
+  });
 
   // Handle save button loading state
   document.body.addEventListener('htmx:beforeRequest', function(event) {
@@ -535,21 +515,21 @@
     }
   });
 
-  // Mark form as unsaved when any field changes
-  if (selectedOpProducts) {
-    selectedOpProducts.addEventListener('input', function(event) {
-      const form = document.getElementById('operational-products-form');
-      if (form && form.dataset.saved === 'true') {
-        form.removeAttribute('data-saved');
-        const saveStatus = document.getElementById('save_status');
-        if (saveStatus) {
-          saveStatus.textContent = i18n.unsavedChanges;
-          saveStatus.classList.remove('text-success');
-          saveStatus.classList.add('text-warning');
-        }
+  // Mark form as unsaved when any field changes — delegated to document
+  // so it works after HTMX outerHTML swaps
+  document.addEventListener('input', function(event) {
+    if (!event.target.closest('#selected_op_products')) return;
+    const form = document.getElementById('operational-products-form');
+    if (form && form.dataset.saved === 'true') {
+      form.removeAttribute('data-saved');
+      const saveStatus = document.getElementById('save_status');
+      if (saveStatus) {
+        saveStatus.textContent = i18n.unsavedChanges;
+        saveStatus.classList.remove('text-success');
+        saveStatus.classList.add('text-warning');
       }
-    });
-  }
+    }
+  });
 
   // Reset country filter to "All Countries" each time modal opens
   if (mainModal) {
