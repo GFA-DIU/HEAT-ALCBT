@@ -88,6 +88,7 @@
           <input type="hidden" name="card_assembly" id="export-card-assembly-img"/>
           <input type="hidden" name="card_material" id="export-card-material-img"/>
           <input type="hidden" name="card_savings" id="export-card-savings-img"/>
+          <input type="hidden" name="export_token" id="export-token"/>
         </form>
         <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
         <script>
@@ -160,11 +161,24 @@
               return captureCard('export-card-savings');
             }).then(function(savings) {
               document.getElementById('export-card-savings-img').value = savings;
-              setExportProgress(100, 'Generating document…');
+              setExportProgress(90, 'Generating document…');
               setTimeout(function() {
+                setExportProgress(100, 'Generating AI insights…');
+                // Generate a unique token so we know which download to wait for
+                var token = Date.now().toString();
+                document.getElementById('export-token').value = token;
+                // Delete any old export_done cookie first
+                document.cookie = 'export_done=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
                 document.getElementById('export-form').submit();
-                // Close overlay after browser has received the file download
-                setTimeout(hideExportOverlay, 2500);
+                // Poll for the export_done cookie the server sets when file is ready
+                var poller = setInterval(function() {
+                  var match = document.cookie.match(/export_done=([^;]+)/);
+                  if (match && match[1] === token) {
+                    clearInterval(poller);
+                    document.cookie = 'export_done=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+                    hideExportOverlay();
+                  }
+                }, 500);
               }, 300);
             }).catch(function(err) {
               hideExportOverlay();

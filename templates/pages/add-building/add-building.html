@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load static  %}
 
-{% block title %}{% translate "Add Building" %}{% endblock title %}
+{% block title %}{% if edit_mode %}{% translate "Edit Building" %}{% else %}{% translate "Add Building" %}{% endif %}{% endblock title %}
 
 
 {% block new-building %}

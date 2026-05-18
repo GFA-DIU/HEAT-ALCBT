@@ -1,8 +1,11 @@
 import base64
 import io
+import json
+import logging
 import os
 from datetime import date
 
+from openai import OpenAI
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -10,7 +13,104 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods
 
 from pages.models.building import Building
-from pages.views.building.building_stats import get_building_detail_statistics, get_building_chart_data
+from pages.views.building.building_stats import (
+    get_building_detail_statistics,
+    get_building_chart_data,
+    get_embodied_carbon_by_assembly,
+    get_embodied_carbon_by_material,
+    get_operational_carbon_by_system,
+)
+
+logger = logging.getLogger(__name__)
+
+
+def _generate_ai_narratives(building, stats, assembly_data, material_data, operational_data):
+    """
+    Call GPT-4o-mini once with all building data and return a dict of AI-generated
+    narrative sections for the report. Returns None if the API call fails.
+    """
+    api_key = os.environ.get("REPORT_API_KEY", "")
+    if not api_key:
+        return None
+
+    total = float(stats["total_carbon_footprint"])
+    embodied = float(stats["total_embodied_carbon"])
+    operational = float(stats["total_operational_carbon"])
+    op_pct = round(operational / total * 100) if total else 0
+    em_pct = round(embodied / total * 100) if total else 0
+
+    # Build readable breakdowns
+    assembly_lines = ", ".join(
+        f"{l}: {p}% ({a} kgCO₂eq/m²)"
+        for l, p, a in zip(assembly_data["labels"], assembly_data["data"], assembly_data["absolute"])
+    ) or "No assembly data"
+
+    material_lines = ", ".join(
+        f"{l}: {p}% ({a} kgCO₂eq/m²)"
+        for l, p, a in zip(material_data["labels"], material_data["data"], material_data["absolute"])
+    ) or "No material data"
+
+    operational_lines = ", ".join(
+        f"{l}: {p}% ({a} kgCO₂eq/m²)"
+        for l, p, a in zip(operational_data["labels"], operational_data["data"], operational_data["absolute"])
+    ) or "No operational data"
+
+    cat = subcat = ""
+    if building.category:
+        cat = str(building.category.category) if building.category.category else ""
+        subcat = str(building.category.subcategory) if building.category.subcategory else ""
+
+    prompt = f"""You are a sustainability analyst writing a Whole Life Carbon Assessment Report for a building.
+Generate concise, professional narrative text for 5 specific report sections based on the real building data below.
+
+BUILDING DATA:
+- Name: {building.name}
+- Country: {building.country}
+- Region: {building.region or "N/A"}
+- Building type: {cat} / {subcat}
+- Climate zone: {building.climate_zone or "N/A"}
+- Total floor area: {building.total_floor_area} m²
+- Assessment period: {building.reference_period} years
+- Construction year: {building.construction_year or "N/A"}
+
+CARBON DATA:
+- Total carbon footprint: {total:.1f} kgCO₂eq/m²
+- Embodied carbon: {embodied:.1f} kgCO₂eq/m² ({em_pct}% of total)
+- Operational carbon: {operational:.1f} kgCO₂eq/m² ({op_pct}% of total)
+
+EMBODIED CARBON BY ASSEMBLY: {assembly_lines}
+EMBODIED CARBON BY MATERIAL: {material_lines}
+OPERATIONAL CARBON BY SYSTEM: {operational_lines}
+
+Return ONLY a valid JSON object with exactly these 5 keys. No markdown, no code blocks, just raw JSON:
+
+{{
+  "section_2_narrative": "2-3 sentence paragraph interpreting the operational vs embodied carbon split for this specific building. Reference the actual percentages and values.",
+  "section_3_material_insight": "2-3 sentence paragraph identifying the dominant materials driving embodied carbon for this building and recommending specific reduction strategies based on the actual material breakdown.",
+  "section_4_operational_insight": "1-2 sentence paragraph identifying the dominant operational carbon system(s) for this building based on the actual system breakdown.",
+  "section_5_benchmark_callout": "1-2 sentence callout noting the building's total carbon footprint and what it means relative to typical buildings of this type in this region. Be specific to the building's country and type.",
+  "section_5_strategies": [
+    {{"material": "material name", "saving": "estimated saving description with numbers"}},
+    {{"material": "material name", "saving": "estimated saving description with numbers"}},
+    {{"material": "Total potential saving", "saving": "total summary"}}
+  ]
+}}
+
+For section_5_strategies, generate 2-3 rows based on the top materials from the actual material breakdown, plus a totals row. Use realistic saving estimates (10-30% reduction) based on the actual values."""
+
+    try:
+        client = OpenAI(api_key=api_key)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            response_format={"type": "json_object"},
+            timeout=30,
+        )
+        return json.loads(response.choices[0].message.content)
+    except Exception as exc:
+        logger.warning("AI narrative generation failed: %s", exc)
+        return None
 
 
 def _get_logo_b64(filename):
@@ -113,6 +213,12 @@ def _build_context(building, request, card_donut="", card_assembly="", card_mate
     leaf_icon = _get_icon_b64("leaf-line.svg")
     donut_card = _donut_card_html(operational, embodied, leaf_icon, card_donut)
 
+    assembly_data = get_embodied_carbon_by_assembly(building)
+    material_data = get_embodied_carbon_by_material(building)
+    operational_data = get_operational_carbon_by_system(building)
+
+    ai = _generate_ai_narratives(building, stats, assembly_data, material_data, operational_data) or {}
+
     def fmt(val):
         return f"{val:,.1f}"
 
@@ -138,6 +244,12 @@ def _build_context(building, request, card_donut="", card_assembly="", card_mate
         "card_assembly": card_assembly,
         "card_material": card_material,
         "card_savings": card_savings,
+        # AI-generated narratives (fall back to None if generation failed)
+        "ai_section_2_narrative": ai.get("section_2_narrative"),
+        "ai_section_3_material_insight": ai.get("section_3_material_insight"),
+        "ai_section_4_operational_insight": ai.get("section_4_operational_insight"),
+        "ai_section_5_benchmark_callout": ai.get("section_5_benchmark_callout"),
+        "ai_section_5_strategies": ai.get("section_5_strategies"),
     }
 
 
@@ -383,6 +495,36 @@ body {
 """
 
 
+def _pdf_strategy_rows(ctx):
+    ai = ctx.get("ai_section_5_strategies") or []
+    if ai:
+        rows = [(s["material"], s["saving"]) for s in ai]
+    else:
+        rows = [
+            ("Ready-mix concrete &amp; cement",
+             "&#8722;40 kgCO<sub>2</sub>eq/m&#178; &nbsp;(30% of total) &nbsp;25% GGBS/Fly Ash blend &#8594; 139 &#8594; 104 kgCO<sub>2</sub>eq/m&#178;"),
+            ("Steel",
+             "&#8722;20 kgCO<sub>2</sub>eq/m&#178; &nbsp;(15% of total) &nbsp;20% recycled content &#8594; 69 &#8594; 55 kgCO<sub>2</sub>eq/m&#178;"),
+            ("Reinforcement bar (rebar)",
+             "&#8722;35 kgCO<sub>2</sub>eq/m&#178; &nbsp;(15% of total) &nbsp;Low-carbon rebar specification"),
+            ("Total potential embodied saving",
+             "&#8722;85 kgCO<sub>2</sub>eq/m&#178; &nbsp;(12.5% reduction from baseline)"),
+        ]
+
+    html_rows = []
+    for i, (material, saving) in enumerate(rows):
+        is_total = material.lower().startswith("total")
+        odd_class = ' class="odd"' if i % 2 == 0 else ''
+        bold_style = ' style="font-weight:bold;"' if is_total else ''
+        html_rows.append(
+            f'  <tr{odd_class}>\n'
+            f'    <td class="label-col"{bold_style}>{material}</td>\n'
+            f'    <td{bold_style}>{saving}</td>\n'
+            f'  </tr>'
+        )
+    return "\n".join(html_rows)
+
+
 def _pdf_html(ctx):
     b = ctx["building"]
     loc = ctx["location"]
@@ -537,7 +679,7 @@ def _pdf_html(ctx):
 {ctx["donut_card"]}
 <p class="fig-caption">Figure 1 &#8212; Whole life carbon cycle of the building</p>
 
-<p class="body-text">Operational carbon accounts for <span class="highlight">{ctx["op_pct"]}%</span> of the total carbon footprint (<span class="highlight">{ctx["operational_carbon"]} kgCO<sub>2</sub>eq/m&#178;</span>), reflecting the dominant role of building energy systems over a <span class="highlight">{b.reference_period}-year</span> assessment period. Embodied carbon contributes the remaining <span class="highlight">{ctx["em_pct"]}%</span> (<span class="highlight">{ctx["embodied_carbon"]} kgCO<sub>2</sub>eq/m&#178;</span>) which underscores the importance of reducing embodied carbon, which carries significant weight in overall emissions&#8212;particularly those generated during the construction and renovation phases of a building. It is important to note that, unlike operational carbon, embodied carbon is released upfront, resulting in substantial emissions at the time a building is constructed or renovated.</p>
+<p class="body-text">{ctx["ai_section_2_narrative"] or f'Operational carbon accounts for <span class="highlight">{ctx["op_pct"]}%</span> of the total carbon footprint (<span class="highlight">{ctx["operational_carbon"]} kgCO<sub>2</sub>eq/m&#178;</span>), reflecting the dominant role of building energy systems over a <span class="highlight">{b.reference_period}-year</span> assessment period. Embodied carbon contributes the remaining <span class="highlight">{ctx["em_pct"]}%</span> (<span class="highlight">{ctx["embodied_carbon"]} kgCO<sub>2</sub>eq/m&#178;</span>) which underscores the importance of reducing embodied carbon, which carries significant weight in overall emissions&#8212;particularly those generated during the construction and renovation phases of a building. It is important to note that, unlike operational carbon, embodied carbon is released upfront, resulting in substantial emissions at the time a building is constructed or renovated.'}</p>
 
 <!-- ===== PAGE 4: SECTION 3 ===== -->
 <div class="page-break"></div>
@@ -560,7 +702,7 @@ def _pdf_html(ctx):
 {_chart_img(ctx["card_material"], "88%")}
 <p class="fig-caption">Figure 3 &#8212; Embodied carbon by material (Materials tab)</p>
 
-<p class="body-text">Rebar and ready-mix concrete together account for over <span class="highlight">81%</span> of total embodied carbon &#8212; a pattern typical of reinforced concrete-frame office buildings. Strategies to reduce this share include specifying low-carbon concrete mixes (<span class="highlight">GGBS</span> or fly ash blends), using <span class="highlight">recycled-content</span> reinforcement, and minimising structural over-design.</p>
+<p class="body-text">{ctx["ai_section_3_material_insight"] or "Rebar and ready-mix concrete together account for over <span class=\"highlight\">81%</span> of total embodied carbon &#8212; a pattern typical of reinforced concrete-frame office buildings. Strategies to reduce this share include specifying low-carbon concrete mixes (<span class=\"highlight\">GGBS</span> or fly ash blends), using <span class=\"highlight\">recycled-content</span> reinforcement, and minimising structural over-design."}</p>
 
 <!-- ===== PAGE 5: SECTION 4 — OPERATIONAL CARBON ===== -->
 <div class="page-break"></div>
@@ -577,7 +719,7 @@ def _pdf_html(ctx):
 
 <p class="fig-caption" style="margin-top:80pt;">Figure 4 &#8212; Operational carbon by system and appliance (Energy tab)</p>
 
-<p class="body-text"><span class="highlight">Cooling</span> is the dominant operational carbon contributor at <span class="highlight">43%</span>, driven primarily by split AC units (<span class="highlight">28%</span> of building total) and VRF systems (<span class="highlight">13%</span>).</p>
+<p class="body-text">{ctx["ai_section_4_operational_insight"] or '<span class="highlight">Cooling</span> is the dominant operational carbon contributor at <span class="highlight">43%</span>, driven primarily by split AC units (<span class="highlight">28%</span> of building total) and VRF systems (<span class="highlight">13%</span>).'}</p>
 
 <!-- ===== PAGE 6: SECTION 5 — BENCHMARKING ===== -->
 <div class="page-break"></div>
@@ -615,7 +757,7 @@ def _pdf_html(ctx):
   </tr>
 </table>
 
-<div class="callout">This building performs better than 78% of peer projects in Germany (452 residential projects, Baden-W&#252;rttemberg, 2024&#8211;2025). It is rated in the Top 25% tier. Benchmark data is region- and building-type specific.</div>
+<div class="callout">{ctx["ai_section_5_benchmark_callout"] or "This building performs better than 78% of peer projects in Germany (452 residential projects, Baden-W&#252;rttemberg, 2024&#8211;2025). It is rated in the Top 25% tier. Benchmark data is region- and building-type specific."}</div>
 
 <p class="subsection-heading">5.3 &nbsp; Optimisation Strategies</p>
 
@@ -626,22 +768,7 @@ def _pdf_html(ctx):
     <td class="label-col" style="font-weight:bold; color:#374151;">Strategy</td>
     <td style="font-weight:bold; color:#374151;">Potential saving / Notes</td>
   </tr>
-  <tr>
-    <td class="label-col">Ready-mix concrete &amp; cement</td>
-    <td>&#8722;40 kgCO<sub>2</sub>eq/m&#178; &nbsp;(30% of total) &nbsp;25% GGBS/Fly Ash blend &#8594; 139 &#8594; 104 kgCO<sub>2</sub>eq/m&#178;</td>
-  </tr>
-  <tr class="odd">
-    <td class="label-col">Steel</td>
-    <td>&#8722;20 kgCO<sub>2</sub>eq/m&#178; &nbsp;(15% of total) &nbsp;20% recycled content &#8594; 69 &#8594; 55 kgCO<sub>2</sub>eq/m&#178;</td>
-  </tr>
-  <tr>
-    <td class="label-col">Reinforcement bar (rebar)</td>
-    <td>&#8722;35 kgCO<sub>2</sub>eq/m&#178; &nbsp;(15% of total) &nbsp;Low-carbon rebar specification</td>
-  </tr>
-  <tr class="odd">
-    <td class="label-col" style="font-weight:bold;">Total potential embodied saving</td>
-    <td style="font-weight:bold;">&#8722;85 kgCO<sub>2</sub>eq/m&#178; &nbsp;(12.5% reduction from baseline)</td>
-  </tr>
+  {_pdf_strategy_rows(ctx)}
 </table>
 
 <p class="body-text">Operational carbon savings are not yet modelled for this project. Recommended next steps include specifying higher-efficiency cooling equipment, exploring on-site renewable generation, and re-assessing the grid emission factor annually as the national grid decarbonises.</p>
@@ -1025,23 +1152,27 @@ def _build_docx(ctx):
     # Narrative
     narrative = doc.add_paragraph()
     narrative.paragraph_format.space_before = Pt(8)
-    for text, highlight in [
-        (f"Operational carbon accounts for ", False),
-        (f"{ctx['op_pct']}%", True),
-        (f" of the total carbon footprint (", False),
-        (f"{ctx['operational_carbon']} kgCO₂eq/m²", True),
-        (f"), reflecting the dominant role of building energy systems over a ", False),
-        (f"{bldg.reference_period}-year", True),
-        (f" assessment period. Embodied carbon contributes the remaining ", False),
-        (f"{ctx['em_pct']}%", True),
-        (f" (", False),
-        (f"{ctx['embodied_carbon']} kgCO₂eq/m²", True),
-        (f") which underscores the importance of reducing embodied carbon, which carries significant weight in overall emissions—particularly those generated during the construction and renovation phases of a building. It is important to note that, unlike operational carbon, embodied carbon is released upfront, resulting in substantial emissions at the time a building is constructed or renovated.", False),
-    ]:
-        r = narrative.add_run(text)
+    if ctx.get("ai_section_2_narrative"):
+        r = narrative.add_run(ctx["ai_section_2_narrative"])
         r.font.size = Pt(10)
-        if highlight:
-            r.font.highlight_color = 7  # yellow
+    else:
+        for text, highlight in [
+            (f"Operational carbon accounts for ", False),
+            (f"{ctx['op_pct']}%", True),
+            (f" of the total carbon footprint (", False),
+            (f"{ctx['operational_carbon']} kgCO₂eq/m²", True),
+            (f"), reflecting the dominant role of building energy systems over a ", False),
+            (f"{bldg.reference_period}-year", True),
+            (f" assessment period. Embodied carbon contributes the remaining ", False),
+            (f"{ctx['em_pct']}%", True),
+            (f" (", False),
+            (f"{ctx['embodied_carbon']} kgCO₂eq/m²", True),
+            (f") which underscores the importance of reducing embodied carbon, which carries significant weight in overall emissions—particularly those generated during the construction and renovation phases of a building. It is important to note that, unlike operational carbon, embodied carbon is released upfront, resulting in substantial emissions at the time a building is constructed or renovated.", False),
+        ]:
+            r = narrative.add_run(text)
+            r.font.size = Pt(10)
+            if highlight:
+                r.font.highlight_color = 7  # yellow
 
     # ── Section 3: Embodied Carbon ────────────────────────────────────────────
     doc.add_page_break()
@@ -1093,18 +1224,21 @@ def _build_docx(ctx):
     p3close = doc.add_paragraph()
     p3close.paragraph_format.space_before = Pt(10)
     p3close.paragraph_format.space_after = Pt(12)
-    for text, highlight in [
-        ("Rebar and ready-mix concrete together account for over ", False),
-        ("81%", True),
-        (" of total embodied carbon — a pattern typical of reinforced concrete-frame office buildings. "
-         "Strategies to reduce this share include specifying low-carbon concrete mixes (", False),
-        ("GGBS", True),
-        (" or fly ash blends), using ", False),
-        ("recycled-content", True),
-        (" reinforcement, and minimising structural over-design.", False),
-    ]:
-        r = p3close.add_run(text); r.font.size = Pt(10)
-        if highlight: r.font.highlight_color = 7
+    if ctx.get("ai_section_3_material_insight"):
+        r = p3close.add_run(ctx["ai_section_3_material_insight"]); r.font.size = Pt(10)
+    else:
+        for text, highlight in [
+            ("Rebar and ready-mix concrete together account for over ", False),
+            ("81%", True),
+            (" of total embodied carbon — a pattern typical of reinforced concrete-frame office buildings. "
+             "Strategies to reduce this share include specifying low-carbon concrete mixes (", False),
+            ("GGBS", True),
+            (" or fly ash blends), using ", False),
+            ("recycled-content", True),
+            (" reinforcement, and minimising structural over-design.", False),
+        ]:
+            r = p3close.add_run(text); r.font.size = Pt(10)
+            if highlight: r.font.highlight_color = 7
 
     # ── Section 4: Operational Carbon ────────────────────────────────────────
     doc.add_page_break()
@@ -1137,18 +1271,21 @@ def _build_docx(ctx):
 
     p41 = doc.add_paragraph()
     p41.paragraph_format.space_before = Pt(10)
-    for text, highlight in [
-        ("Cooling", True),
-        (" is the dominant operational carbon contributor at ", False),
-        ("43%", True),
-        (", driven primarily by split AC units (", False),
-        ("28%", True),
-        (" of building total) and VRF systems (", False),
-        ("13%", True),
-        (").", False),
-    ]:
-        r = p41.add_run(text); r.font.size = Pt(10)
-        if highlight: r.font.highlight_color = 7
+    if ctx.get("ai_section_4_operational_insight"):
+        r = p41.add_run(ctx["ai_section_4_operational_insight"]); r.font.size = Pt(10)
+    else:
+        for text, highlight in [
+            ("Cooling", True),
+            (" is the dominant operational carbon contributor at ", False),
+            ("43%", True),
+            (", driven primarily by split AC units (", False),
+            ("28%", True),
+            (" of building total) and VRF systems (", False),
+            ("13%", True),
+            (").", False),
+        ]:
+            r = p41.add_run(text); r.font.size = Pt(10)
+            if highlight: r.font.highlight_color = 7
 
     # ── Section 5: Benchmarking & Carbon Savings ──────────────────────────────
     doc.add_page_break()
@@ -1199,6 +1336,7 @@ def _build_docx(ctx):
     pPr5 = callout5._p.get_or_add_pPr()
     shd5 = OxmlElement("w:shd"); shd5.set(qn("w:val"), "clear"); shd5.set(qn("w:color"), "auto"); shd5.set(qn("w:fill"), "EFF6FF"); pPr5.append(shd5)
     cr5 = callout5.add_run(
+        ctx.get("ai_section_5_benchmark_callout") or
         "This building performs better than 78% of peer projects in Germany (452 residential projects, "
         "Baden-Württemberg, 2024–2025). It is rated in the Top 25% tier. Benchmark data is "
         "region- and building-type specific."
@@ -1212,17 +1350,21 @@ def _build_docx(ctx):
         "carbon, ordered by percentage of total footprint:"
     ).paragraph_format.space_after = Pt(8)
 
-    opt_rows = [
-        ("Strategy", "Potential saving / Notes", True),
-        ("Ready-mix concrete & cement",
-         "−40 kgCO₂eq/m²  (30% of total)  25% GGBS/Fly Ash blend → 139 → 104 kgCO₂eq/m²", False),
-        ("Steel",
-         "−20 kgCO₂eq/m²  (15% of total)  20% recycled content → 69 → 55 kgCO₂eq/m²", False),
-        ("Reinforcement bar (rebar)",
-         "−35 kgCO₂eq/m²  (15% of total)  Low-carbon rebar specification", False),
-        ("Total potential embodied saving",
-         "−85 kgCO₂eq/m²  (12.5% reduction from baseline)", True),
-    ]
+    ai_strategies = ctx.get("ai_section_5_strategies") or []
+    if ai_strategies:
+        strategy_data = [(s["material"], s["saving"], s["material"].lower().startswith("total")) for s in ai_strategies]
+    else:
+        strategy_data = [
+            ("Ready-mix concrete & cement",
+             "−40 kgCO₂eq/m²  (30% of total)  25% GGBS/Fly Ash blend → 139 → 104 kgCO₂eq/m²", False),
+            ("Steel",
+             "−20 kgCO₂eq/m²  (15% of total)  20% recycled content → 69 → 55 kgCO₂eq/m²", False),
+            ("Reinforcement bar (rebar)",
+             "−35 kgCO₂eq/m²  (15% of total)  Low-carbon rebar specification", False),
+            ("Total potential embodied saving",
+             "−85 kgCO₂eq/m²  (12.5% reduction from baseline)", True),
+        ]
+    opt_rows = [("Strategy", "Potential saving / Notes", True)] + strategy_data
     opt_table = doc.add_table(rows=len(opt_rows), cols=2)
     opt_table.style = "Table Grid"
     fill_opt = ["F3F4F6", "FFFFFF", "F3F4F6", "FFFFFF", "F3F4F6"]
@@ -1265,6 +1407,8 @@ def export_building(request, building_id):
     )
     filename_base = building.name.replace(" ", "_")
 
+    token = request.POST.get("export_token", "")
+
     if fmt == "word":
         doc = _build_docx(ctx)
         buffer = io.BytesIO()
@@ -1275,6 +1419,8 @@ def export_building(request, building_id):
             content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         )
         response["Content-Disposition"] = f'attachment; filename="BEAT_Report_{filename_base}.docx"'
+        if token:
+            response.set_cookie("export_done", token, max_age=60, samesite="Lax")
         return response
 
     from xhtml2pdf import pisa
@@ -1284,4 +1430,6 @@ def export_building(request, building_id):
     buffer.seek(0)
     response = HttpResponse(buffer.getvalue(), content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="BEAT_Report_{filename_base}.pdf"'
+    if token:
+        response.set_cookie("export_done", token, max_age=60, samesite="Lax")
     return response
