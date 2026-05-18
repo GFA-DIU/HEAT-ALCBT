@@ -174,9 +174,12 @@
 
       <!-- Right Column -->
       <div class="space-y-6">
+
+        <!-- Embodied Carbon Strategies (default view) -->
+        <div id="savings-embodied-strategies" class="space-y-6">
         <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-6 rounded-2xl">
           <div class="flex items-center gap-2 pb-4 mb-4 border-b border-border">
-            <span data-icon="bar-chart-box-line" data-size="20"></span> <!-- Just a generic icon -->
+            <span data-icon="bar-chart-box-line" data-size="20"></span>
             <h6 class="text-base font-semibold">{% translate "Optimization Strategies" %}</h6>
           </div>
 
@@ -298,6 +301,338 @@
             {% translate "Read LCA Guidelines" %}
           </button>
         </div>
+        </div><!-- end #savings-embodied-strategies -->
+
+        <!-- Operational Carbon Strategies (energy focus, shown when operational tab is active) -->
+        <div id="savings-operational-strategies" class="space-y-6 hidden">
+          <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-6 rounded-2xl">
+            <div class="flex items-center gap-2 pb-4 mb-4 border-b border-[var(--stroke--soft-200)]">
+              <span data-icon="bar-chart-box-line" data-size="20"></span>
+              <h6 class="text-base font-semibold">{% translate "Optimization Strategies — Energy Focus" %}</h6>
+            </div>
+
+            <div class="divide-y divide-[var(--stroke--soft-200)]">
+
+              <!-- ── Cooling System ── -->
+              <div class="py-5 space-y-3 first:pt-0">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span data-icon="snowflake-fill" data-size="16" class="text-[#3B82F6]"></span>
+                    <span class="size-2 rounded-full bg-[#3B82F6] inline-block shrink-0"></span>
+                    <span class="text-sm font-bold text-[var(--text--strong-950)]">{% translate "Cooling System" %}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-[var(--text--sub-600)]">18.4 kgCO<sub>2</sub>eq/m²/yr</span>
+                    <span class="text-[10px] font-bold text-[#1E40AF] bg-[#DBEAFE] px-1.5 py-0.5 rounded">43.0%</span>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="flex items-center gap-1.5 text-[var(--text--sub-600)]"><span class="size-1 rounded-full bg-[var(--text--sub-600)] inline-block"></span>Split ACs</span>
+                      <span class="flex items-center gap-3 text-[var(--text--sub-600)]">
+                        <span>12.0 kgCO<sub>2</sub>eq/m²/yr</span>
+                        <span class="text-[var(--text--strong-950)] font-medium w-12 text-right">28.04%</span>
+                      </span>
+                    </div>
+                    <div class="w-full bg-[var(--bg--weak-100)] rounded-full h-1.5">
+                      <div class="bg-[#3B82F6] h-full rounded-full" style="width:65%"></div>
+                    </div>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="flex items-center gap-1.5 text-[var(--text--sub-600)]"><span class="size-1 rounded-full bg-[var(--text--sub-600)] inline-block"></span>VRF systems</span>
+                      <span class="flex items-center gap-3 text-[var(--text--sub-600)]">
+                        <span>5.4 kgCO<sub>2</sub>eq/m²/yr</span>
+                        <span class="text-[var(--text--strong-950)] font-medium w-12 text-right">12.61%</span>
+                      </span>
+                    </div>
+                    <div class="w-full bg-[var(--bg--weak-100)] rounded-full h-1.5">
+                      <div class="bg-[#3B82F6] h-full rounded-full" style="width:29%"></div>
+                    </div>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="flex items-center gap-1.5 text-[var(--text--sub-600)]"><span class="size-1 rounded-full bg-[var(--text--sub-600)] inline-block"></span>Chiller – air cooled</span>
+                      <span class="flex items-center gap-3 text-[var(--text--sub-600)]">
+                        <span>1.0 kgCO<sub>2</sub>eq/m²/yr</span>
+                        <span class="text-[var(--text--strong-950)] font-medium w-12 text-right">2.33%</span>
+                      </span>
+                    </div>
+                    <div class="w-full bg-[var(--bg--weak-100)] rounded-full h-1.5">
+                      <div class="bg-[#3B82F6] h-full rounded-full" style="width:5%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="space-y-2.5">
+                  <p class="text-[10px] uppercase tracking-wider font-semibold text-[var(--text--sub-600)]">{% translate "Optimization Potential" %}</p>
+                  <div class="space-y-3">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "VSD on compressors & fans" %}</p>
+                        <p class="text-[11px] text-[var(--text--sub-600)] mt-0.5">{% translate "Apply where VSD not already installed" %}</p>
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-[var(--text--sub-600)] whitespace-nowrap">{% translate "Saves (~2.2 kgCO₂eq/m²/yr)" %}</span>
+                        <input type="checkbox" class="toggle toggle-xs" />
+                      </div>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Heat recovery system" %}</p>
+                        <p class="text-[11px] text-[var(--text--sub-600)] mt-0.5">{% translate "Reclaim waste heat from cooling plant" %}</p>
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-[var(--text--sub-600)] whitespace-nowrap">{% translate "Saves (~1.8 kgCO₂eq/m²/yr)" %}</span>
+                        <input type="checkbox" class="toggle toggle-xs" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Ventilation ── -->
+              <div class="py-5 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span data-icon="windy-fill" data-size="16" class="text-[#22C55E]"></span>
+                    <span class="size-2 rounded-full bg-[#22C55E] inline-block shrink-0"></span>
+                    <span class="text-sm font-bold text-[var(--text--strong-950)]">{% translate "Ventilation" %}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-[var(--text--sub-600)]">11.2 kgCO<sub>2</sub>eq/m²/yr</span>
+                    <span class="text-[10px] font-bold text-[#15803D] bg-[#DCFCE7] px-1.5 py-0.5 rounded">26.0%</span>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="flex items-center gap-1.5 text-[var(--text--sub-600)]"><span class="size-1 rounded-full bg-[var(--text--sub-600)] inline-block"></span>AHU</span>
+                      <span class="flex items-center gap-3 text-[var(--text--sub-600)]">
+                        <span>7.8 kgCO<sub>2</sub>eq/m²/yr</span>
+                        <span class="text-[var(--text--strong-950)] font-medium w-12 text-right">28.04%</span>
+                      </span>
+                    </div>
+                    <div class="w-full bg-[var(--bg--weak-100)] rounded-full h-1.5">
+                      <div class="bg-[#22C55E] h-full rounded-full" style="width:70%"></div>
+                    </div>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="flex items-center gap-1.5 text-[var(--text--sub-600)]"><span class="size-1 rounded-full bg-[var(--text--sub-600)] inline-block"></span>FCU</span>
+                      <span class="flex items-center gap-3 text-[var(--text--sub-600)]">
+                        <span>3.0 kgCO<sub>2</sub>eq/m²/yr</span>
+                        <span class="text-[var(--text--strong-950)] font-medium w-12 text-right">12.61%</span>
+                      </span>
+                    </div>
+                    <div class="w-full bg-[var(--bg--weak-100)] rounded-full h-1.5">
+                      <div class="bg-[#22C55E] h-full rounded-full" style="width:27%"></div>
+                    </div>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="flex items-center gap-1.5 text-[var(--text--sub-600)]"><span class="size-1 rounded-full bg-[var(--text--sub-600)] inline-block"></span>Ceiling / exhaust fan</span>
+                      <span class="flex items-center gap-3 text-[var(--text--sub-600)]">
+                        <span>0.4 kgCO<sub>2</sub>eq/m²/yr</span>
+                        <span class="text-[var(--text--strong-950)] font-medium w-12 text-right">2.33%</span>
+                      </span>
+                    </div>
+                    <div class="w-full bg-[var(--bg--weak-100)] rounded-full h-1.5">
+                      <div class="bg-[#22C55E] h-full rounded-full" style="width:4%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="space-y-2.5">
+                  <p class="text-[10px] uppercase tracking-wider font-semibold text-[var(--text--sub-600)]">{% translate "Optimization Potential" %}</p>
+                  <div class="space-y-3">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "DCV – demand-controlled ventilation" %}</p>
+                        <p class="text-[11px] text-[var(--text--sub-600)] mt-0.5">{% translate "Modulate airflow via occupancy & CO₂ sensors" %}</p>
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-[var(--text--sub-600)] whitespace-nowrap">{% translate "Saves (~1.9 kgCO₂eq/m²/yr)" %}</span>
+                        <input type="checkbox" class="toggle toggle-xs" />
+                      </div>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "VSD on AHU & FCU fans" %}</p>
+                        <p class="text-[11px] text-[var(--text--sub-600)] mt-0.5">{% translate "Variable speed drives on air handling units" %}</p>
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-[var(--text--sub-600)] whitespace-nowrap">{% translate "Saves (~1.4 kgCO₂eq/m²/yr)" %}</span>
+                        <input type="checkbox" class="toggle toggle-xs" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Lighting ── -->
+              <div class="py-5 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span data-icon="lightbulb-line" data-size="16" class="text-[#EAB308]"></span>
+                    <span class="size-2 rounded-full bg-[#EAB308] inline-block shrink-0"></span>
+                    <span class="text-sm font-bold text-[var(--text--strong-950)]">{% translate "Lighting" %}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-[var(--text--sub-600)]">7.8 kgCO<sub>2</sub>eq/m²/yr</span>
+                    <span class="text-[10px] font-bold text-[#854D0E] bg-[#FEF9C3] px-1.5 py-0.5 rounded">18.0%</span>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="flex items-center gap-1.5 text-[var(--text--sub-600)]"><span class="size-1 rounded-full bg-[var(--text--sub-600)] inline-block"></span>LED</span>
+                      <span class="flex items-center gap-3 text-[var(--text--sub-600)]">
+                        <span>6.0 kgCO<sub>2</sub>eq/m²/yr</span>
+                        <span class="text-[var(--text--strong-950)] font-medium w-12 text-right">28.04%</span>
+                      </span>
+                    </div>
+                    <div class="w-full bg-[var(--bg--weak-100)] rounded-full h-1.5">
+                      <div class="bg-[#EAB308] h-full rounded-full" style="width:77%"></div>
+                    </div>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="flex items-center gap-1.5 text-[var(--text--sub-600)]"><span class="size-1 rounded-full bg-[var(--text--sub-600)] inline-block"></span>Fluorescent</span>
+                      <span class="flex items-center gap-3 text-[var(--text--sub-600)]">
+                        <span>1.8 kgCO<sub>2</sub>eq/m²/yr</span>
+                        <span class="text-[var(--text--strong-950)] font-medium w-12 text-right">12.61%</span>
+                      </span>
+                    </div>
+                    <div class="w-full bg-[var(--bg--weak-100)] rounded-full h-1.5">
+                      <div class="bg-[#EAB308] h-full rounded-full" style="width:23%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="space-y-2.5">
+                  <p class="text-[10px] uppercase tracking-wider font-semibold text-[var(--text--sub-600)]">{% translate "Optimization Potential" %}</p>
+                  <div class="space-y-3">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "LED retrofit on fluorescent zones" %}</p>
+                        <p class="text-[11px] text-[var(--text--sub-600)] mt-0.5">{% translate "Replace remaining fluorescent fixtures with LED equivalents" %}</p>
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-[var(--text--sub-600)] whitespace-nowrap">{% translate "Saves (~1.1 kgCO₂eq/m²/yr)" %}</span>
+                        <input type="checkbox" class="toggle toggle-xs" />
+                      </div>
+                    </div>
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Occupancy & daylight sensors" %}</p>
+                        <p class="text-[11px] text-[var(--text--sub-600)] mt-0.5">{% translate "Auto-switch lighting based on presence and natural light" %}</p>
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-[var(--text--sub-600)] whitespace-nowrap">{% translate "Saves (~1.4 kgCO₂eq/m²/yr)" %}</span>
+                        <input type="checkbox" class="toggle toggle-xs" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Hot water ── -->
+              <div class="py-5 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span data-icon="fire-line" data-size="16" class="text-[#EF4444]"></span>
+                    <span class="size-2 rounded-full bg-[#EF4444] inline-block shrink-0"></span>
+                    <span class="text-sm font-bold text-[var(--text--strong-950)]">{% translate "Hot water" %}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-[var(--text--sub-600)]">3.8 kgCO<sub>2</sub>eq/m²/yr</span>
+                    <span class="text-[10px] font-bold text-[#991B1B] bg-[#FEE2E2] px-1.5 py-0.5 rounded">9.0%</span>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="flex items-center gap-1.5 text-[var(--text--sub-600)]"><span class="size-1 rounded-full bg-[var(--text--sub-600)] inline-block"></span>Electric water heater</span>
+                      <span class="flex items-center gap-3 text-[var(--text--sub-600)]">
+                        <span>3.8 kgCO<sub>2</sub>eq/m²/yr</span>
+                        <span class="text-[var(--text--strong-950)] font-medium w-12 text-right">28.04%</span>
+                      </span>
+                    </div>
+                    <div class="w-full bg-[var(--bg--weak-100)] rounded-full h-1.5">
+                      <div class="bg-[#EF4444] h-full rounded-full" style="width:28%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="space-y-2.5">
+                  <p class="text-[10px] uppercase tracking-wider font-semibold text-[var(--text--sub-600)]">{% translate "Optimization Potential" %}</p>
+                  <div class="space-y-3">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Heat pump water heater" %}</p>
+                        <p class="text-[11px] text-[var(--text--sub-600)] mt-0.5">{% translate "Replace electric resistance with air-source heat pump" %}</p>
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-[var(--text--sub-600)] whitespace-nowrap">{% translate "Saves (~0.9 kgCO₂eq/m²/yr)" %}</span>
+                        <input type="checkbox" class="toggle toggle-xs" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Lifts & escalators ── -->
+              <div class="py-5 space-y-3 last:pb-0">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span data-icon="stairs-line" data-size="16" class="text-[#818CF8]"></span>
+                    <span class="size-2 rounded-full bg-[#818CF8] inline-block shrink-0"></span>
+                    <span class="text-sm font-bold text-[var(--text--strong-950)]">{% translate "Lifts & escalators" %}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-[var(--text--sub-600)]">1.5 kgCO<sub>2</sub>eq/m²/yr</span>
+                    <span class="text-[10px] font-bold text-[#3730A3] bg-[#E0E7FF] px-1.5 py-0.5 rounded">4.0%</span>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="flex items-center gap-1.5 text-[var(--text--sub-600)]"><span class="size-1 rounded-full bg-[var(--text--sub-600)] inline-block"></span>Lifts</span>
+                      <span class="flex items-center gap-3 text-[var(--text--sub-600)]">
+                        <span>1.5 kgCO<sub>2</sub>eq/m²/yr</span>
+                        <span class="text-[var(--text--strong-950)] font-medium w-12 text-right">28.04%</span>
+                      </span>
+                    </div>
+                    <div class="w-full bg-[var(--bg--weak-100)] rounded-full h-1.5">
+                      <div class="bg-[#818CF8] h-full rounded-full" style="width:28%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="space-y-2.5">
+                  <p class="text-[10px] uppercase tracking-wider font-semibold text-[var(--text--sub-600)]">{% translate "Optimization Potential" %}</p>
+                  <div class="space-y-3">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Regenerative drives on lifts" %}</p>
+                        <p class="text-[11px] text-[var(--text--sub-600)] mt-0.5">{% translate "Capture energy from braking and return to the grid" %}</p>
+                      </div>
+                      <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-[var(--text--sub-600)] whitespace-nowrap">{% translate "Saves (~0.5 kgCO₂eq/m²/yr)" %}</span>
+                        <input type="checkbox" class="toggle toggle-xs" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Energy Insight Card -->
+          <div class="bg-[var(--bg--strong-950)] text-white py-5 px-4 rounded-2xl flex flex-col gap-2">
+            <h6 class="text-base font-medium">{% translate "Energy Insight" %}</h6>
+            <p class="text-xs leading-5">{% translate "Installing variable speed drives (VSDs) on cooling and ventilation equipment typically yields 20–35% energy savings with payback periods under 3 years." %}</p>
+            <button class="btn btn-primary btn-sm border-none w-fit mt-1.5 shadow-none">{% translate "Read Energy Guidelines" %}</button>
+          </div>
+        </div><!-- end #savings-operational-strategies -->
 
       </div>
     </div>
@@ -369,6 +704,19 @@
 
       // Active button
       btn.className = "px-4 py-1.5 rounded-md text-sm font-semibold text-[var(--text--strong-950)] bg-[#86EFAC] shadow-sm transition-all cursor-default text-[#0f172a]";
+
+      // Swap right-column content
+      const embodied = document.getElementById('savings-embodied-strategies');
+      const operational = document.getElementById('savings-operational-strategies');
+      if (embodied && operational) {
+        if (view === 'operational') {
+          embodied.classList.add('hidden');
+          operational.classList.remove('hidden');
+        } else {
+          embodied.classList.remove('hidden');
+          operational.classList.add('hidden');
+        }
+      }
 
       // Toggle CSS Variable
       const wrapper = document.getElementById('savings-main-wrapper');
