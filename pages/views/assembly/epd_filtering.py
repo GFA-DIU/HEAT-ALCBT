@@ -77,7 +77,9 @@ def get_filtered_epd_list(request, dimension=None, operational=False):
         req = request.POST if request.method == "POST" else request.GET
         # Add filters conditionally
         dimension = req.get("dimension")
-        if dimension and dimension != "None":
+        # Only filter by dimension for operational EPDs — for structural, all EPDs
+        # are shown regardless of unit; compatibility is checked per-EPD on Add.
+        if operational and dimension and dimension != "None":
             filtered_epds = filter_by_dimension(filtered_epds, dimension)
 
         if childcategory := req.get("childcategory"):
