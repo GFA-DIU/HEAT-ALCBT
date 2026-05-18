@@ -24,11 +24,12 @@ def building_components(request):
     return render(request, "pages/add-building/components/"+template, context)
 
 def new_building(request):
+    building_uuid = request.GET.get('building_uuid')
     context = {
                 "building_id": None,
                 "building": None,
                 "structural_components": [],
-                "edit_mode": False,
+                "edit_mode": bool(building_uuid),
             }
     form = BuildingGeneralInformation()
     detailedForm = BuildingDetailedInformation()
