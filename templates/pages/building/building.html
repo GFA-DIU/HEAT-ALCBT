@@ -105,14 +105,15 @@
             overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(15,39,68,0.55);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
             overlay.innerHTML = `
               <div style="background:#ffffff;border-radius:16px;padding:32px 40px;display:flex;flex-direction:column;align-items:center;gap:16px;min-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.18);">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg id="export-overlay-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
                 <p id="export-overlay-label" style="font-family:sans-serif;font-size:15px;font-weight:600;color:#0f2744;margin:0;">Preparing export…</p>
-                <div style="width:100%;background:#e5e7eb;border-radius:9999px;height:8px;overflow:hidden;">
+                <div id="export-progress-wrap" style="width:100%;background:#e5e7eb;border-radius:9999px;height:8px;overflow:hidden;">
                   <div id="export-progress-bar" style="height:100%;width:0%;background:#16a34a;border-radius:9999px;transition:width 0.3s ease;"></div>
                 </div>
                 <p id="export-overlay-step" style="font-family:sans-serif;font-size:12px;color:#6b7280;margin:0;">Starting…</p>
+                <button id="export-overlay-close" onclick="hideExportOverlay()" style="display:none;margin-top:4px;padding:8px 20px;background:#0f2744;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;">Close</button>
               </div>`;
             document.body.appendChild(overlay);
           })();
@@ -131,7 +132,22 @@
           }
 
           function hideExportOverlay() {
-            document.getElementById('export-overlay').style.display = 'none';
+            const overlay = document.getElementById('export-overlay');
+            overlay.style.display = 'none';
+            // Reset error state for next time
+            document.getElementById('export-overlay-icon').setAttribute('stroke', '#16a34a');
+            document.getElementById('export-overlay-icon').innerHTML = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>';
+            document.getElementById('export-progress-wrap').style.display = '';
+            document.getElementById('export-overlay-close').style.display = 'none';
+          }
+
+          function showExportError(message) {
+            document.getElementById('export-overlay-icon').setAttribute('stroke', '#dc2626');
+            document.getElementById('export-overlay-icon').innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+            document.getElementById('export-overlay-label').textContent = 'Export failed';
+            document.getElementById('export-progress-wrap').style.display = 'none';
+            document.getElementById('export-overlay-step').textContent = message;
+            document.getElementById('export-overlay-close').style.display = '';
           }
 
           function triggerExport(fmt) {
@@ -160,15 +176,40 @@
               return captureCard('export-card-savings');
             }).then(function(savings) {
               document.getElementById('export-card-savings-img').value = savings;
-              setExportProgress(100, 'Generating document…');
+              setExportProgress(90, 'Generating document…');
               setTimeout(function() {
-                document.getElementById('export-form').submit();
-                // Close overlay after browser has received the file download
-                setTimeout(hideExportOverlay, 2500);
+                setExportProgress(100, 'Generating AI insights…');
+                var form = document.getElementById('export-form');
+                var formData = new FormData(form);
+                fetch(form.action, { method: 'POST', body: formData })
+                  .then(function(response) {
+                    var contentType = response.headers.get('content-type') || '';
+                    if (!response.ok || contentType.includes('application/json')) {
+                      return response.json().then(function(data) {
+                        showExportError(data.error || 'Something went wrong. Please try again later.');
+                      });
+                    }
+                    return response.blob().then(function(blob) {
+                      var disposition = response.headers.get('content-disposition') || '';
+                      var match = disposition.match(/filename="([^"]+)"/);
+                      var filename = match ? match[1] : 'BEAT_Report.pdf';
+                      var url = URL.createObjectURL(blob);
+                      var a = document.createElement('a');
+                      a.href = url;
+                      a.download = filename;
+                      document.body.appendChild(a);
+                      a.click();
+                      a.remove();
+                      URL.revokeObjectURL(url);
+                      hideExportOverlay();
+                    });
+                  })
+                  .catch(function() {
+                    showExportError('Something went wrong. Please try again later.');
+                  });
               }, 300);
             }).catch(function(err) {
-              hideExportOverlay();
-              alert('Export failed: ' + err.message);
+              showExportError('Something went wrong. Please try again later.');
             });
           }
         </script>
