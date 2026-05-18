@@ -538,6 +538,12 @@
               class="tab"
               aria-label="{% translate 'Energy' %}"
             />
+            <input
+              type="radio"
+              name="building-tabs"
+              class="tab"
+              aria-label="{% translate 'Systems' %}"
+            />
             <input type="radio" name="building-tabs" class="tab" aria-label="{% translate 'Savings' %}" />
           </div>
         </div>
@@ -549,7 +555,63 @@
         ></div>
       </div>
 </section>
+ 
+  <template id="system-template">
+      <div id="system-template-tab" class="flex w-full flex-col border border-[var(--stroke--soft-200)] rounded-2xl bg-white p-4 mt-4 w-full">
+        <div class="flex items-center gap-2 pb-4 border-b border-[var(--stroke--soft-200)]">
+          <span data-icon="bar-chart-box-line" data-size="24" data-color="var(--icon--sub-600)"></span>
+          <div>
+            <span class="text-sm  block">{% translate "Operational carbon" %}</span>
+            <span class="text-base/6 font-medium block">{% translate "Emissions by building systems" %}</span>
+          </div>
+        </div>
+        <div class="w-full" id="export-system-chart-wrap">
+          <!-- Stats summary row -->
+          <div class="bg-[#fafafa] border-t border-[#f1f1f1] flex flex-wrap gap-4 px-6 py-[18px] mt-4 w-full">
+            <div class="flex flex-col flex-1 min-w-0">
+              <div class="border-l-2 border-[#d5edcd] pl-2.5">
+                <p class="text-[13px] font-medium text-[var(--text--sub-600)] leading-5">{% translate "Total Operational Carbon Intensity" %}</p>
+              </div>
+              <div class="pl-2.5 flex items-baseline mt-1">
+                <span class="text-2xl font-medium">{{ stats.total_operational_carbon|floatformat:2|default:"0" }}</span>
+                <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">kgCO<sub>2</sub>eq/m²</span>
+              </div>
+            </div>
+            <div class="flex flex-col flex-1 min-w-0">
+              <div class="border-l-2 border-[#e1d1b9] pl-2.5">
+                <p class="text-[13px] font-medium text-[var(--text--sub-600)] leading-5">{% translate "Floor Area Used in Calculation" %}</p>
+              </div>
+              <div class="pl-2.5 flex items-baseline mt-1">
+                <span class="text-2xl font-medium">{{ building.total_floor_area|floatformat:0|default:"0" }}</span>
+                <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">m<sup>2</sup></span>
+              </div>
+            </div>
+              <div class="flex flex-col flex-1 min-w-0">
+              <div class="border-l-2 border-[#e1d1b9] pl-2.5">
+                <p class="text-[13px] font-medium text-[var(--text--sub-600)] leading-5">{% translate "Grid Emission Factor" %}</p>
+              </div>
+              <div class="pl-2.5 flex items-baseline mt-1">
+                <span class="text-2xl font-medium">{{ building.grid_emission_factor|floatformat:2|default:"0" }}</span>
+                <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">kgCO<sub>2</sub>eq/kWh electricity factor</span>
+              </div>
+            </div>
+          </div>
 
+          <!-- Divider -->
+          <hr class="border-[var(--stroke--soft-200)] my-3" />
+
+          <!-- System bar rows populated by JS -->
+          <div id="system-bars-container" class="flex flex-col gap-6 w-full pb-2"></div>
+          <p id="system-bars-empty" class="hidden text-sm text-[var(--text--sub-600)] py-6 text-center w-full">{% translate "No operational system data available" %}</p>
+
+          <!-- Footer total -->
+          <div class="bg-[#fafafa] flex items-center justify-between rounded-lg p-4 mt-3 w-full">
+            <span class="text-xs text-[var(--text--strong-950)]">{% translate "Total annual operational intensity" %}</span>
+            <span id="system-total-value" class="text-xs font-bold text-[var(--text--strong-950)]">—</span>
+          </div>
+        </div>
+      </div>
+  </template>
 
 
   <template id="assembly-template">
@@ -682,6 +744,7 @@
         "{% translate 'Assembly' %}": "assembly-template",
         "{% translate 'Materials' %}": "materials-template",
         "{% translate 'Energy' %}": "energy-template",
+        "{% translate 'Systems' %}": "system-template",
       };
       const tabContentContainerTop = document.getElementById("tab-content-container-top");
 
@@ -1065,6 +1128,70 @@
             systemData.absolute.length > 0 ? systemData.absolute : [0],
             primaryColor
           ));
+        }
+
+        // Build operational-by-system horizontal bar rows (Systems tab)
+        const systemBarsContainer = document.getElementById("system-bars-container");
+        if (systemBarsContainer) {
+          const systemData = {
+            labels:   ["Cooling systems", "Cooling systems", "Ventilation systems", "Lighting systems", "Hot Water Systems", "Lift & escalator"],
+            data:     [52.0, 23.3, 15.1, 8.3, 3.6, 1.4],
+            absolute: [42.74, 19.16, 13.05, 7.21, 3.16, 1.24],
+            total:    86.55,
+          };
+          // TODO: replace hardcoded data above with: chartData.operational_by_system || { labels: [], data: [], absolute: [], total: 0 }
+
+          const systemStyleMap = [
+            { match: (l) => l.includes("cool") || l.includes("refriger"), icon: "snowflake-fill", color: "#97baff" },
+            { match: (l) => l.includes("ventil") || l.includes("air"), icon: "windy-fill", color: "#81f28e" },
+            { match: (l) => l.includes("light") || l.includes("lamp"), icon: "lightbulb-line", color: "#f2ec81" },
+            { match: (l) => l.includes("water") || l.includes("heat"), icon: "temp-cold-line", color: "#f28e81" },
+            { match: (l) => l.includes("lift") || l.includes("elevator") || l.includes("escalator"), icon: "stairs-line", color: "#8198f2" },
+          ];
+
+          function getSystemStyle(label) {
+            const l = label.toLowerCase();
+            for (const style of systemStyleMap) {
+              if (style.match(l)) return style;
+            }
+            return { icon: "bar-chart-box-line", color: "#c4c4c4" };
+          }
+
+          const emptyEl = document.getElementById("system-bars-empty");
+          if (systemData.labels.length === 0) {
+            if (emptyEl) emptyEl.classList.remove("hidden");
+          } else {
+            systemData.labels.forEach(function (label, i) {
+              const pct = systemData.data[i] || 0;
+              const abs = systemData.absolute[i] || 0;
+              const style = getSystemStyle(label);
+              const absFormatted = abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+              const row = document.createElement("div");
+              row.className = "flex gap-2 items-center w-full";
+              row.innerHTML = `
+                <div class="flex items-center shrink-0 w-36 gap-1">
+                  <span data-icon="${style.icon}" data-size="20" class="shrink-0"></span>
+                  <span class="text-[12px] font-bold leading-4 truncate">${label}</span>
+                </div>
+                <div class="flex flex-1 gap-2 items-center min-w-0">
+                  <div class="relative flex-1 h-[34px] rounded-sm bg-[#f2f2f2] overflow-visible">
+                    <div class="absolute inset-y-0 left-0 rounded-l-sm flex items-center" style="width:${Math.max(pct, 0)}%;background:${style.color}">
+                      <span class="text-[12px] font-semibold ml-2 text-[var(--text--strong-950)] whitespace-nowrap">${pct}%</span>
+                    </div>
+                  </div>
+                  <span class="text-[13px] font-semibold text-[var(--text--sub-600)] whitespace-nowrap shrink-0">${absFormatted} kgCO₂eq/m²/yr</span>
+                </div>
+              `;
+              systemBarsContainer.appendChild(row);
+            });
+          }
+
+          const totalEl = document.getElementById("system-total-value");
+          if (totalEl) {
+            const total = systemData.total || 0;
+            totalEl.textContent = total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kgCO₂eq/m²/yr";
+          }
         }
       }
     });
