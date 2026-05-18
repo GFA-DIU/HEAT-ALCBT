@@ -471,6 +471,16 @@ def handle_save_assembly(request):
         if not materials:
             return JsonResponse({"success": False, "error": "At least one material is required"}, status=400)
 
+        # For pcs dimension, sum of material quantities must equal component quantity
+        if mode == "component" and assembly_data.get("dimension") == "pcs":
+            component_qty = float(assembly_data.get("quantity") or 0)
+            qty_sum = sum(float(m.get("quantity") or 0) for m in materials)
+            if round(qty_sum, 3) != round(component_qty, 3):
+                return JsonResponse({
+                    "success": False,
+                    "error": f"The sum of EPD quantities ({round(qty_sum, 3)} pcs) must equal the component quantity ({round(component_qty, 3)} pcs)."
+                }, status=400)
+
         # Create or update Assembly
         if assembly_id:
             # Update existing assembly
@@ -722,9 +732,13 @@ def handle_search_templates(request):
             structuralproduct__classification__technique_id=technique_id
         ).distinct()
 
-    # Apply mode filter (System Component vs My Component)
-    if mode:
-        assemblies = assemblies.filter(mode=mode)
+    # Apply mode filter (System Component = generic mode OR staff/superuser created, My Component = own)
+    if mode == "system":
+        assemblies = assemblies.filter(
+            Q(mode="generic") | Q(created_by__is_staff=True) | Q(created_by__is_superuser=True)
+        )
+    elif mode == "custom":
+        assemblies = assemblies.filter(created_by=request.user)
 
     # Optimize queries with prefetch_related and select_related
     assemblies = assemblies.select_related("country", "city", "created_by").prefetch_related(
