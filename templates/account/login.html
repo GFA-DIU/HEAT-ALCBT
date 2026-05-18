@@ -2,6 +2,8 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 
+{% block title %}{% translate "Sign In" %}{% endblock %}
+
  {% block action_content  %}
     <a href="{% url 'account_signup' %}">
       <button type="button" class="btn btn-outline btn-sm">{% translate "Sign Up" %}</button>
