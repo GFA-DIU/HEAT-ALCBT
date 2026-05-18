@@ -7,7 +7,7 @@ from datetime import date
 
 from openai import OpenAI
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
@@ -217,7 +217,9 @@ def _build_context(building, request, card_donut="", card_assembly="", card_mate
     material_data = get_embodied_carbon_by_material(building)
     operational_data = get_operational_carbon_by_system(building)
 
-    ai = _generate_ai_narratives(building, stats, assembly_data, material_data, operational_data) or {}
+    ai = _generate_ai_narratives(building, stats, assembly_data, material_data, operational_data)
+    if ai is None:
+        raise RuntimeError("AI narrative generation failed")
 
     def fmt(val):
         return f"{val:,.1f}"
@@ -245,11 +247,11 @@ def _build_context(building, request, card_donut="", card_assembly="", card_mate
         "card_material": card_material,
         "card_savings": card_savings,
         # AI-generated narratives (fall back to None if generation failed)
-        "ai_section_2_narrative": ai.get("section_2_narrative"),
-        "ai_section_3_material_insight": ai.get("section_3_material_insight"),
-        "ai_section_4_operational_insight": ai.get("section_4_operational_insight"),
-        "ai_section_5_benchmark_callout": ai.get("section_5_benchmark_callout"),
-        "ai_section_5_strategies": ai.get("section_5_strategies"),
+        "ai_section_2_narrative": ai["section_2_narrative"],
+        "ai_section_3_material_insight": ai["section_3_material_insight"],
+        "ai_section_4_operational_insight": ai["section_4_operational_insight"],
+        "ai_section_5_benchmark_callout": ai["section_5_benchmark_callout"],
+        "ai_section_5_strategies": ai["section_5_strategies"],
     }
 
 
@@ -1398,16 +1400,19 @@ def _build_docx(ctx):
 def export_building(request, building_id):
     building = get_object_or_404(Building, pk=building_id, created_by=request.user)
     fmt = request.POST.get("format", "pdf")
-    ctx = _build_context(
-        building, request,
-        card_donut=request.POST.get("card_donut", ""),
-        card_assembly=request.POST.get("card_assembly", ""),
-        card_material=request.POST.get("card_material", ""),
-        card_savings=request.POST.get("card_savings", ""),
-    )
-    filename_base = building.name.replace(" ", "_")
+    try:
+        ctx = _build_context(
+            building, request,
+            card_donut=request.POST.get("card_donut", ""),
+            card_assembly=request.POST.get("card_assembly", ""),
+            card_material=request.POST.get("card_material", ""),
+            card_savings=request.POST.get("card_savings", ""),
+        )
+    except Exception as exc:
+        logger.warning("Report generation failed for building %s: %s", building_id, exc)
+        return JsonResponse({"error": "Something went wrong — we couldn't generate the report at the moment. Please try again later."}, status=500)
 
-    token = request.POST.get("export_token", "")
+    filename_base = building.name.replace(" ", "_")
 
     if fmt == "word":
         doc = _build_docx(ctx)
@@ -1419,8 +1424,6 @@ def export_building(request, building_id):
             content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         )
         response["Content-Disposition"] = f'attachment; filename="BEAT_Report_{filename_base}.docx"'
-        if token:
-            response.set_cookie("export_done", token, max_age=60, samesite="Lax")
         return response
 
     from xhtml2pdf import pisa
@@ -1430,6 +1433,4 @@ def export_building(request, building_id):
     buffer.seek(0)
     response = HttpResponse(buffer.getvalue(), content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="BEAT_Report_{filename_base}.pdf"'
-    if token:
-        response.set_cookie("export_done", token, max_age=60, samesite="Lax")
     return response
