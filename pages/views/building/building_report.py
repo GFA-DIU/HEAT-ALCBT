@@ -681,7 +681,7 @@ def _pdf_html(ctx):
 {ctx["donut_card"]}
 <p class="fig-caption">Figure 1 &#8212; Whole life carbon cycle of the building</p>
 
-<p class="body-text">{ctx["ai_section_2_narrative"] or f'Operational carbon accounts for <span class="highlight">{ctx["op_pct"]}%</span> of the total carbon footprint (<span class="highlight">{ctx["operational_carbon"]} kgCO<sub>2</sub>eq/m&#178;</span>), reflecting the dominant role of building energy systems over a <span class="highlight">{b.reference_period}-year</span> assessment period. Embodied carbon contributes the remaining <span class="highlight">{ctx["em_pct"]}%</span> (<span class="highlight">{ctx["embodied_carbon"]} kgCO<sub>2</sub>eq/m&#178;</span>) which underscores the importance of reducing embodied carbon, which carries significant weight in overall emissions&#8212;particularly those generated during the construction and renovation phases of a building. It is important to note that, unlike operational carbon, embodied carbon is released upfront, resulting in substantial emissions at the time a building is constructed or renovated.'}</p>
+<p class="body-text">{ctx["ai_section_2_narrative"]}</p>
 
 <!-- ===== PAGE 4: SECTION 3 ===== -->
 <div class="page-break"></div>
@@ -704,7 +704,7 @@ def _pdf_html(ctx):
 {_chart_img(ctx["card_material"], "88%")}
 <p class="fig-caption">Figure 3 &#8212; Embodied carbon by material (Materials tab)</p>
 
-<p class="body-text">{ctx["ai_section_3_material_insight"] or "Rebar and ready-mix concrete together account for over <span class=\"highlight\">81%</span> of total embodied carbon &#8212; a pattern typical of reinforced concrete-frame office buildings. Strategies to reduce this share include specifying low-carbon concrete mixes (<span class=\"highlight\">GGBS</span> or fly ash blends), using <span class=\"highlight\">recycled-content</span> reinforcement, and minimising structural over-design."}</p>
+<p class="body-text">{ctx["ai_section_3_material_insight"]}</p>
 
 <!-- ===== PAGE 5: SECTION 4 — OPERATIONAL CARBON ===== -->
 <div class="page-break"></div>
@@ -721,7 +721,7 @@ def _pdf_html(ctx):
 
 <p class="fig-caption" style="margin-top:80pt;">Figure 4 &#8212; Operational carbon by system and appliance (Energy tab)</p>
 
-<p class="body-text">{ctx["ai_section_4_operational_insight"] or '<span class="highlight">Cooling</span> is the dominant operational carbon contributor at <span class="highlight">43%</span>, driven primarily by split AC units (<span class="highlight">28%</span> of building total) and VRF systems (<span class="highlight">13%</span>).'}</p>
+<p class="body-text">{ctx["ai_section_4_operational_insight"]}</p>
 
 <!-- ===== PAGE 6: SECTION 5 — BENCHMARKING ===== -->
 <div class="page-break"></div>
@@ -759,7 +759,7 @@ def _pdf_html(ctx):
   </tr>
 </table>
 
-<div class="callout">{ctx["ai_section_5_benchmark_callout"] or "This building performs better than 78% of peer projects in Germany (452 residential projects, Baden-W&#252;rttemberg, 2024&#8211;2025). It is rated in the Top 25% tier. Benchmark data is region- and building-type specific."}</div>
+<div class="callout">{ctx["ai_section_5_benchmark_callout"]}</div>
 
 <p class="subsection-heading">5.3 &nbsp; Optimisation Strategies</p>
 
@@ -1337,12 +1337,7 @@ def _build_docx(ctx):
     callout5.paragraph_format.space_after = Pt(14)
     pPr5 = callout5._p.get_or_add_pPr()
     shd5 = OxmlElement("w:shd"); shd5.set(qn("w:val"), "clear"); shd5.set(qn("w:color"), "auto"); shd5.set(qn("w:fill"), "EFF6FF"); pPr5.append(shd5)
-    cr5 = callout5.add_run(
-        ctx.get("ai_section_5_benchmark_callout") or
-        "This building performs better than 78% of peer projects in Germany (452 residential projects, "
-        "Baden-Württemberg, 2024–2025). It is rated in the Top 25% tier. Benchmark data is "
-        "region- and building-type specific."
-    )
+    cr5 = callout5.add_run(ctx["ai_section_5_benchmark_callout"])
     cr5.font.size = Pt(9); cr5.font.color.rgb = RGBColor(0x1D, 0x6F, 0xA8)
 
     # ── Section 5.3: Optimisation Strategies ─────────────────────────────────
