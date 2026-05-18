@@ -12,7 +12,7 @@
   <title class="title">{% block title %}BEAT{% endblock title %}</title>
   <meta name="description" content="Begin assessing your building’s whole life cycle emissions – from embodied to operational">
   <meta name="author" content="">
-  <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}"/>
+  <link rel="icon" type="image/png" href="{% static 'images/favicons/favicon.png' %}"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
@@ -48,7 +48,7 @@
         class="relative flex items-center lg:justify-center justify-between w-full max-w-[78.563rem] mx-auto"
       >
         <div class="lg:absolute left-0 lg:top-1/2 lg:-translate-y-1/2">
-          <a href="{% url 'home' %}"><img src="{% static 'assets/logo.svg' %}" alt="logo" class="w-[4.688rem]" /></a>
+          <a href="{% url 'home' %}"><img src="{% static 'images/logos/logo-transparent.png' %}" alt="logo" class="h-8" /></a>
         </div>
         <div
           class="navbar-radio-group flex h-full w-fit relative gap-6"
