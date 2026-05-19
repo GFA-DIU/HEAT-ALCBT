@@ -240,7 +240,7 @@
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
                 >{% translate "Carbon Footprint" %}</span
               >
-              <div class="flex px-2.5 items-end">
+              <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
                 <span class="text-2xl/8 font-medium">{{ stats.total_carbon_footprint|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
@@ -252,7 +252,7 @@
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
                 >{% translate "Total Floor Area" %}</span
               >
-              <div class="flex px-2.5 items-end">
+              <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
                 <span class="text-2xl/8 font-medium">{{ building.total_floor_area|floatformat:0|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >m<sup>2</sup></span
@@ -264,7 +264,7 @@
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
                 >{% translate "Embodied Carbon" %}</span
               >
-              <div class="flex px-2.5 items-end">
+              <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
                 <span class="text-2xl/8 font-medium">{{ stats.total_embodied_carbon|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
@@ -276,7 +276,7 @@
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
                 >{% translate "Operational Carbon" %}</span
               >
-              <div class="flex px-2.5 items-end">
+              <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
                 <span class="text-2xl/8 font-medium">{{ stats.total_operational_carbon|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
@@ -288,7 +288,7 @@
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
                 >{% translate "Carbon Savings" %}</span
               >
-              <div class="flex px-2.5 items-end">
+              <div class="flex px-2.5 items-end bg-[#81F28E] w-fit">
                 <span class="text-2xl/8 font-medium">{{ stats.carbon_savings_percentage|floatformat:1|default:"0" }}%</span>
               </div>
             </li>
