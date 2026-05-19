@@ -240,7 +240,7 @@
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
                 >{% translate "Carbon Footprint" %}</span
               >
-              <div class="flex px-2.5 items-end">
+              <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
                 <span class="text-2xl/8 font-medium">{{ stats.total_carbon_footprint|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
@@ -252,7 +252,7 @@
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
                 >{% translate "Total Floor Area" %}</span
               >
-              <div class="flex px-2.5 items-end">
+              <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
                 <span class="text-2xl/8 font-medium">{{ building.total_floor_area|floatformat:0|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >m<sup>2</sup></span
@@ -264,7 +264,7 @@
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
                 >{% translate "Embodied Carbon" %}</span
               >
-              <div class="flex px-2.5 items-end">
+              <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
                 <span class="text-2xl/8 font-medium">{{ stats.total_embodied_carbon|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
@@ -276,7 +276,7 @@
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
                 >{% translate "Operational Carbon" %}</span
               >
-              <div class="flex px-2.5 items-end">
+              <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
                 <span class="text-2xl/8 font-medium">{{ stats.total_operational_carbon|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
@@ -288,7 +288,7 @@
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
                 >{% translate "Carbon Savings" %}</span
               >
-              <div class="flex px-2.5 items-end">
+              <div class="flex px-2.5 items-end bg-[#81F28E] w-fit">
                 <span class="text-2xl/8 font-medium">{{ stats.carbon_savings_percentage|floatformat:1|default:"0" }}%</span>
               </div>
             </li>
@@ -563,10 +563,23 @@
       <div id="system-template-tab" class="flex w-full flex-col border border-[var(--stroke--soft-200)] rounded-2xl bg-white p-4 mt-4 w-full">
         <div class="flex items-center gap-2 pb-4 border-b border-[var(--stroke--soft-200)]">
           <span data-icon="bar-chart-box-line" data-size="24" data-color="var(--icon--sub-600)"></span>
-          <div>
+          <div class="flex-grow-1">
             <span class="text-sm  block">{% translate "Operational carbon" %}</span>
-            <span class="text-base/6 font-medium block">{% translate "Emissions by building systems" %}</span>
+            <span id="system-tab-subtitle" class="text-base/6 font-medium block">{% translate "Emissions by appliance" %}</span>
           </div>
+        
+              {% comment %} <div class="w-fit bg-[var(--bg--weak-50)] p-1 rounded-lg flex gap-1">
+                <button
+                  class="btn btn-primary btn-sm text-[var(--text--strong-950)] bg-[#86EFAC] shadow-sm transition-all"
+                  onclick="toggleSystem('appliances', this)">
+                  {% translate "By appliances" %}
+                </button>
+                <button
+                  class="btn btn-ghost btn-sm text-[var(--text--sub-600)] hover:bg-white/50 transition-all"
+                  onclick="toggleSystem('systems', this)">
+                  {% translate "By system" %}
+                </button>
+              </div> {% endcomment %}
         </div>
         <div class="w-full" id="export-system-chart-wrap">
           <!-- Stats summary row -->
@@ -603,8 +616,9 @@
           <!-- Divider -->
           <hr class="border-[var(--stroke--soft-200)] my-3" />
 
-          <!-- System bar rows populated by JS -->
-          <div id="system-bars-container" class="flex flex-col gap-6 w-full pb-2"></div>
+          <!-- Bar rows populated by JS — one container per view -->
+          <div id="system-bars-container" class="flex flex-col gap-6 w-full pb-2 hidden"></div>
+          <div id="appliances-bars-container" class="flex flex-col gap-6 w-full pb-2"></div>
           <p id="system-bars-empty" class="hidden text-sm text-[var(--text--sub-600)] py-6 text-center w-full">{% translate "No operational system data available" %}</p>
 
           <!-- Footer total -->
@@ -1195,7 +1209,90 @@
             const total = systemData.total || 0;
             totalEl.textContent = total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kgCO₂eq/m²/yr";
           }
+
+          // Build appliance-level bar rows
+          const applianceData = {
+            labels:      ["Split AC", "VRF system", "AHU", "LED lighting", "Electric water heater", "Lift"],
+            systemNames: ["Cooling system", "Cooling system", "Ventilation system", "Lighting system", "Hot water system", "Lifts & Escalators"],
+            data:        [52.0, 23.3, 15.1, 8.3, 3.6, 1.4],
+            absolute:    [42.74, 19.16, 13.05, 7.21, 3.16, 1.24],
+            total:       86.55,
+          };
+
+          const applianceStyleMap = [
+            { match: (s) => s.includes("cool"),   icon: "snowflake-fill", color: "#97baff" },
+            { match: (s) => s.includes("ventil"), icon: "windy-fill",     color: "#81f28e" },
+            { match: (s) => s.includes("light"),  icon: "lightbulb-line", color: "#f2ec81" },
+            { match: (s) => s.includes("water") || s.includes("hot"), icon: "fire-line",   color: "#f28e81" },
+            { match: (s) => s.includes("lift") || s.includes("escalator"), icon: "stairs-line", color: "#8198f2" },
+          ];
+
+          function getApplianceStyle(systemName) {
+            const s = systemName.toLowerCase();
+            for (const style of applianceStyleMap) {
+              if (style.match(s)) return style;
+            }
+            return { icon: "bar-chart-box-line", color: "#c4c4c4" };
+          }
+
+          const appliancesContainer = document.getElementById("appliances-bars-container");
+          if (appliancesContainer) {
+            applianceData.labels.forEach(function (label, i) {
+              const pct = applianceData.data[i] || 0;
+              const abs = applianceData.absolute[i] || 0;
+              const systemName = applianceData.systemNames[i] || "";
+              const style = getApplianceStyle(systemName);
+              const absFormatted = abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+              const row = document.createElement("div");
+              row.className = "flex gap-2 items-center w-full";
+              row.innerHTML = `
+                <div class="flex items-center shrink-0 w-36 gap-1">
+                  <span data-icon="${style.icon}" data-size="20" class="shrink-0"></span>
+                  <div class="flex flex-col min-w-0">
+                    <span class="text-[12px] font-bold leading-4 truncate">${label}</span>
+                    <span class="text-[11px] text-[var(--text--sub-600)] leading-4 truncate">${systemName}</span>
+                  </div>
+                </div>
+                <div class="flex flex-1 gap-2 items-center min-w-0">
+                  <div class="relative flex-1 h-[34px] rounded-sm bg-[#f2f2f2] overflow-visible">
+                    <div class="absolute inset-y-0 left-0 rounded-l-sm flex items-center" style="width:${Math.max(pct, 0)}%;background:${style.color}">
+                      <span class="text-[12px] font-semibold ml-2 text-[var(--text--strong-950)] whitespace-nowrap">${pct}%</span>
+                    </div>
+                  </div>
+                  <span class="text-[13px] font-semibold text-[var(--text--sub-600)] whitespace-nowrap shrink-0">${absFormatted} kgCO₂eq/m²/yr</span>
+                </div>
+              `;
+              appliancesContainer.appendChild(row);
+            });
+          }
         }
+
+        // Toggle between "By appliances" and "By system" views
+        window.toggleSystem = function (view, btn) {
+          const parent = btn.closest('.w-fit.bg-\\[var\\(--bg--weak-50\\)\\]') || btn.parentElement;
+          Array.from(parent.children).forEach(function (b) {
+            b.className = "btn btn-ghost btn-sm text-[var(--text--sub-600)] hover:bg-white/50 transition-all";
+          });
+          btn.className = "btn btn-primary btn-sm text-[var(--text--strong-950)] bg-[#86EFAC] shadow-sm transition-all";
+
+          const systemContainer = document.getElementById("system-bars-container");
+          const appliancesContainer = document.getElementById("appliances-bars-container");
+          const subtitle = document.getElementById("system-tab-subtitle");
+
+          if (view === "appliances") {
+            if (systemContainer) systemContainer.classList.add("hidden");
+            if (appliancesContainer) appliancesContainer.classList.remove("hidden");
+            if (subtitle) subtitle.textContent = "{% translate 'Emissions by appliance' %}";
+          } else {
+            if (appliancesContainer) appliancesContainer.classList.add("hidden");
+            if (systemContainer) systemContainer.classList.remove("hidden");
+            if (subtitle) subtitle.textContent = "{% translate 'Emissions by building systems' %}";
+          }
+
+          // Re-render icons in newly shown rows
+          if (typeof renderIcons === "function") renderIcons();
+        };
       }
     });
   </script>
