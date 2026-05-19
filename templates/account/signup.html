@@ -3,6 +3,8 @@
 {% load i18n %}
 {% load static %}
 
+{% block title %}{% translate "Sign Up" %}{% endblock %}
+
 {% block action_content %}
     <a href="{% url 'account_login' %}">
       <button type="button" class="btn btn-outline btn-sm">{% translate "Login" %}</button>
