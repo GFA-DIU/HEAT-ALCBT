@@ -336,7 +336,7 @@
               <div style="margin-bottom:8px;">
                 <h6 style="font-size:20px;font-weight:700;color:#0f172a;margin:0 0 4px;">Project Performance Benchmark</h6>
                 <p style="font-size:14px;color:#0f172a;margin:0;">
-                  Your project is performing better than <strong>78%</strong> of peer projects in Germany.
+                  Your project is performing better than <strong>78%</strong> of peer projects in {{ building.country }}.
                   <span style="background:#D5EDCD;font-size:12px;font-weight:800;border-radius:9999px;padding:2px 10px;margin-left:6px;">Top 25% tier</span>
                 </p>
               </div>
@@ -378,7 +378,7 @@
                 </div>
               </div>
 
-              <p style="font-size:12px;color:#64748b;text-align:center;margin:0 0 16px;">● Benchmark based on 452 residential projects in Baden-Württemberg region (2024-2025).</p>
+              <p style="font-size:12px;color:#64748b;text-align:center;margin:0 0 16px;">● Benchmark based on 452 residential projects in {% if building.region %}{{ building.region }} region{% else %}{{ building.country }}{% endif %} (2024-2025).</p>
 
               <!-- Tabs -->
               <div style="background:#f1f5f9;padding:4px;border-radius:8px;display:flex;gap:4px;margin-bottom:20px;">
@@ -421,11 +421,11 @@
                     <!-- Stat boxes -->
                     <div style="display:flex;gap:8px;">
                       <div style="flex:1;background:#f8fafc;padding:10px;border-radius:8px;">
-                        <div><span style="font-size:22px;font-weight:700;color:#FFA468;">330</span> <span style="font-size:11px;color:#0f172a;">co<sub>2</sub>eq/m<sup>2</sup></span></div>
+                        <div><span style="font-size:22px;font-weight:700;color:#FFA468;">330</span> <span style="font-size:11px;color:#0f172a;">kgCO<sub>2</sub>eq/m<sup>2</sup></span></div>
                         <div style="font-size:12px;font-weight:600;color:#0f172a;margin-top:2px;">Baseline</div>
                       </div>
                       <div style="flex:1;background:#f8fafc;padding:10px;border-radius:8px;">
-                        <div><span style="font-size:22px;font-weight:700;color:#FFA468;">246</span> <span style="font-size:11px;color:#0f172a;">co<sub>2</sub>eq/m<sup>2</sup></span></div>
+                        <div><span style="font-size:22px;font-weight:700;color:#FFA468;">246</span> <span style="font-size:11px;color:#0f172a;">kgCO<sub>2</sub>eq/m<sup>2</sup></span></div>
                         <div style="font-size:12px;font-weight:600;color:#0f172a;margin-top:2px;">Optimized</div>
                       </div>
                     </div>

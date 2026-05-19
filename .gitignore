@@ -31,6 +31,9 @@ secrets
 !/static/docs/import-template.xlsx
 # Keep Thailand TGO source data
 !/docs/TH_CFP-TGO_Data_final(18Feb2026).xlsx
+# Keep generic EPD source data
+!/docs/2026-02-19 - Template_Generic_EPD_CORRECTED.xlsx
+!/docs/ALL EPDs.xlsx
 
 # django
 staticfiles
