@@ -125,6 +125,7 @@ def handle_building_load(request, building_id, simulation):
     building = get_object_or_404(
         Building.objects
             .filter(created_by=request.user)
+            .select_related("energy_summary")
             .prefetch_related(
                 # 1) grab each BuildingAssemblyModel …
                 Prefetch(
