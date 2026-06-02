@@ -576,8 +576,8 @@
                 <p class="text-[13px] font-medium text-[var(--text--sub-600)] leading-5">{% translate "Total Operational Carbon Intensity" %}</p>
               </div>
               <div class="pl-2.5 flex items-baseline mt-1">
-                <span class="text-2xl font-medium">{{ stats.total_operational_carbon|floatformat:2|default:"0" }}</span>
-                <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">kgCO<sub>2</sub>eq/m²</span>
+                <span class="text-2xl font-medium">{{ stats.operational_carbon_per_year|floatformat:2|default:"0" }}</span>
+                <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">kgCO<sub>2</sub>eq/m²/yr</span>
               </div>
             </div>
             <div class="flex flex-col flex-1 min-w-0">
@@ -594,7 +594,7 @@
                 <p class="text-[13px] font-medium text-[var(--text--sub-600)] leading-5">{% translate "Grid Emission Factor" %}</p>
               </div>
               <div class="pl-2.5 flex items-baseline mt-1">
-                <span class="text-2xl font-medium">{{ building.grid_emission_factor|floatformat:2|default:"0" }}</span>
+                <span class="text-2xl font-medium">{{ stats.grid_emission_factor|floatformat:2|default:"0" }}</span>
                 <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">kgCO<sub>2</sub>eq/kWh electricity factor</span>
               </div>
             </div>
@@ -1136,13 +1136,7 @@
         // Build operational-by-system horizontal bar rows (Systems tab)
         const systemBarsContainer = document.getElementById("system-bars-container");
         if (systemBarsContainer) {
-          const systemData = {
-            labels:   ["Cooling systems", "Ventilation systems", "Lighting systems", "Hot Water Systems", "Lift & escalator"],
-            data:     [23.3, 15.1, 8.3, 3.6, 1.4],
-            absolute: [19.16, 13.05, 7.21, 3.16, 1.24],
-            total:    86.55,
-          };
-          // TODO: replace hardcoded data above with: chartData.operational_by_system || { labels: [], data: [], absolute: [], total: 0 }
+          const systemData = chartData.operational_by_system || { labels: [], data: [], absolute: [], total: 0 };
 
           const systemStyleMap = [
             { match: (l) => l.includes("cool") || l.includes("refriger"), icon: "snowflake-fill", color: "#97baff" },
@@ -1164,9 +1158,13 @@
           if (systemData.labels.length === 0) {
             if (emptyEl) emptyEl.classList.remove("hidden");
           } else {
+            // Bar width is relative to the largest system (so the biggest bar fills
+            // the track), while the label shows each system's share of the total.
+            const maxAbs = Math.max(...(systemData.absolute.length ? systemData.absolute : [0]), 0) || 1;
             systemData.labels.forEach(function (label, i) {
               const pct = systemData.data[i] || 0;
               const abs = systemData.absolute[i] || 0;
+              const widthPct = (abs / maxAbs) * 100;
               const style = getSystemStyle(label);
               const absFormatted = abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -1179,7 +1177,7 @@
                 </div>
                 <div class="flex flex-1 gap-2 items-center min-w-0">
                   <div class="relative flex-1 h-[34px] rounded-sm bg-[#f2f2f2] overflow-visible">
-                    <div class="absolute inset-y-0 left-0 rounded-l-sm flex items-center" style="width:${Math.max(pct, 0)}%;background:${style.color}">
+                    <div class="absolute inset-y-0 left-0 rounded-l-sm flex items-center" style="width:${Math.max(widthPct, 0)}%;background:${style.color}">
                       <span class="text-[12px] font-semibold ml-2 text-[var(--text--strong-950)] whitespace-nowrap">${pct}%</span>
                     </div>
                   </div>

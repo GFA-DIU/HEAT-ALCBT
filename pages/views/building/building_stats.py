@@ -19,6 +19,7 @@ from typing import Dict, Any, List, Optional
 from pages.models.building import Building
 from pages.models.building_operation.chilling import CoolingSystemChiller
 from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
+from pages.models.epd import Unit
 from pages.views.building.impact_calculation import calculate_impacts, calculate_impact_operational, ImpactCalculationError
 
 _MAPPING_PATH = os.path.join(
@@ -332,10 +333,20 @@ def get_building_detail_statistics(
         prefetched_operational=prefetched_operational,
     )
 
+    # Per-year operational carbon intensity by system (matches the Systems-tab chart).
+    operational_by_system = get_operational_carbon_by_system(
+        building, prefetched_operational=prefetched_operational
+    )
+
     return {
         'total_carbon_footprint': embodied + operational,
         'total_embodied_carbon': embodied,
         'total_operational_carbon': operational,
+        # Per-year intensity (sum of Systems-tab bars), so the stat card matches the chart.
+        'operational_carbon_per_year': operational_by_system.get('total', 0),
+        'grid_emission_factor': _derive_grid_emission_factor(
+            building, prefetched_operational=prefetched_operational
+        ),
         'carbon_savings_percentage': calculate_carbon_savings_percentage(building),
         'calculation_errors': calculation_errors,
     }
@@ -487,75 +498,143 @@ def get_embodied_carbon_by_material(
     return {'labels': labels, 'data': data, 'absolute': absolute, 'total': chart_total}
 
 
+def _derive_grid_emission_factor(building: Building, prefetched_operational=None) -> Decimal:
+    """
+    Derive the grid emission factor (kgCO2eq/kWh) from the building's electricity EPD.
+
+    The factor equals the electricity EPD's B6 GWP value divided by its declared
+    amount (i.e. the per-kWh carbon intensity used internally by
+    ``calculate_impact_operational`` for the (kWh, kWh) case).
+
+    No dedicated DB field exists for the grid factor; it is computed on the fly.
+
+    Args:
+        building: Building instance to derive the factor for
+        prefetched_operational: Optional pre-fetched operational product list
+
+    Returns:
+        Grid emission factor as a Decimal (kgCO2eq/kWh), or Decimal('0') if no
+        suitable electricity EPD is found.
+    """
+    if prefetched_operational is not None:
+        operational_products = prefetched_operational
+    else:
+        operational_products = building.operational_products.all()
+
+    def _is_electricity(op) -> bool:
+        try:
+            epd = op.epd
+            if epd is None:
+                return False
+            # Primary: kWh-declared electricity entered in kWh
+            if epd.declared_unit == Unit.KWH and op.input_unit == Unit.KWH:
+                return True
+            # Fallback: category name suggests electricity/energy/power
+            category = getattr(epd, "category", None)
+            name = (category.name_en or "").lower() if category else ""
+            return any(token in name for token in ("electr", "energy", "power"))
+        except AttributeError:
+            return False
+
+    electricity_product = next(
+        (op for op in operational_products if _is_electricity(op)), None
+    )
+    if electricity_product is None:
+        return Decimal("0")
+
+    try:
+        epd = electricity_product.epd
+        impact_set = epd.epdimpact_set.filter(impact__life_cycle_stage="b6")
+        gwp_b6 = next(
+            (i.value for i in impact_set if i.impact.impact_category == "gwp"), None
+        )
+        if gwp_b6 is None or not epd.declared_amount:
+            return Decimal("0")
+        return Decimal(str(gwp_b6)) / Decimal(str(epd.declared_amount))
+    except (AttributeError, ZeroDivisionError):
+        return Decimal("0")
+
+
 def get_operational_carbon_by_system(
     building: Building,
     simulated: bool = False,
     prefetched_operational=None,
 ) -> Dict[str, Any]:
     """
-    Calculate operational carbon grouped by system type (cooling, ventilation, etc.).
+    Calculate operational carbon intensity (kgCO2eq/m²/yr) grouped by building system.
+
+    Uses the structured per-system annual energy (EnergySummary) multiplied by the
+    derived grid emission factor and normalised by gross floor area:
+
+        Carbon_intensity_system = system_kWh * Grid_factor / Floor_area
+
+    The result is a per-YEAR intensity (no reference-period multiplier). Systems
+    with no entered (zero/blank) energy are excluded so their chart bar is hidden.
 
     Args:
         building: Building instance to calculate for
-        simulated: If True, calculate for simulated components
-        prefetched_operational: Optional pre-fetched operational product list
+        simulated: Unused (kept for signature compatibility)
+        prefetched_operational: Optional pre-fetched operational product list,
+            used to derive the grid emission factor
 
     Returns:
-        Dictionary with 'labels', 'data', 'absolute', and 'total' for chart rendering
+        Dictionary with 'labels', 'data' (% share of total), 'absolute'
+        (kgCO2eq/m²/yr) and 'total'. May include 'blocked' (floor area missing)
+        or 'warning' (grid factor is zero).
     """
-    carbon_by_system = defaultdict(Decimal)
+    empty = {'labels': [], 'data': [], 'absolute': [], 'total': 0}
 
-    if prefetched_operational is not None:
-        operational_products = prefetched_operational
-    elif simulated:
-        operational_products = building.simulated_operational_products.all()
-    else:
-        operational_products = building.operational_products.all()
+    summary = getattr(building, 'energy_summary', None)
+    if summary is None:
+        return empty
 
-    reference_period = Decimal(str(building.reference_period))
+    floor_area = building.total_floor_area
+    if not floor_area or Decimal(str(floor_area)) == 0:
+        return {**empty, 'blocked': True}
 
-    for op in operational_products:
-        try:
-            system_type = "Other Systems"
-            if op.epd and op.epd.category:
-                category_name = op.epd.category.name_en.lower() if op.epd.category.name_en else ""
+    grid_factor = _derive_grid_emission_factor(building, prefetched_operational)
+    floor_area = Decimal(str(floor_area))
 
-                if 'cool' in category_name or 'refriger' in category_name:
-                    system_type = "Cooling systems"
-                elif 'ventil' in category_name or 'air' in category_name:
-                    system_type = "Ventilation systems"
-                elif 'light' in category_name or 'lamp' in category_name:
-                    system_type = "Lighting systems"
-                elif 'lift' in category_name or 'elevator' in category_name or 'escalator' in category_name:
-                    system_type = "Lift & escalator"
-                elif 'water' in category_name or 'heat' in category_name:
-                    system_type = "Hot Water Systems"
-                elif 'electr' in category_name or 'energy' in category_name or 'power' in category_name:
-                    system_type = "Electricity"
-                elif 'gas' in category_name or 'fuel' in category_name:
-                    system_type = "Gas/Fuel"
+    # Labels must match the substrings used by the Systems-tab JS systemStyleMap.
+    systems = [
+        ("Cooling systems", summary.cooling_kwh),
+        ("Ventilation systems", summary.ventilation_kwh),
+        ("Lighting systems", summary.lighting_kwh),
+        ("Lift & escalator", summary.lift_escalator_kwh),
+        ("Hot Water Systems", summary.hot_water_kwh),
+    ]
 
-            impacts = calculate_impact_operational(op)
-            gwp_b6 = impacts.get('gwp_b6', Decimal('0.0')) * reference_period
-            carbon_by_system[system_type] += gwp_b6
-
-        except (ValueError, AttributeError, ZeroDivisionError):
+    intensity_by_system = []
+    for label, kwh in systems:
+        if kwh is None or Decimal(str(kwh)) <= 0:
             continue
+        intensity = Decimal(str(kwh)) * grid_factor / floor_area
+        intensity_by_system.append((label, intensity))
 
-    sorted_items = sorted(carbon_by_system.items(), key=lambda x: x[1], reverse=True)
-    total = sum(v for _, v in sorted_items) or Decimal('1')
+    if not intensity_by_system:
+        return empty
+
+    intensity_by_system.sort(key=lambda x: x[1], reverse=True)
+    total = sum(value for _, value in intensity_by_system)
 
     labels = []
     data = []
     absolute = []
-    for label, value in sorted_items:
+    for label, value in intensity_by_system:
         labels.append(label)
-        percentage = float((value / total) * 100)
+        percentage = float((value / total) * 100) if total > 0 else 0.0
         data.append(round(percentage, 1))
         absolute.append(round(float(value), 2))
 
-    chart_total = round(float(sum(v for _, v in sorted_items)), 2)
-    return {'labels': labels, 'data': data, 'absolute': absolute, 'total': chart_total}
+    result = {
+        'labels': labels,
+        'data': data,
+        'absolute': absolute,
+        'total': round(float(total), 2),
+    }
+    if grid_factor == 0:
+        result['warning'] = 'grid_factor_zero'
+    return result
 
 
 def get_building_chart_data(
