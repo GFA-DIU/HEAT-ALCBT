@@ -17,8 +17,6 @@ from decimal import Decimal
 from typing import Dict, Any, List, Optional
 
 from pages.models.building import Building
-from pages.models.building_operation.chilling import CoolingSystemChiller
-from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
 from pages.models.epd import Unit
 from pages.views.building.impact_calculation import calculate_impacts, calculate_impact_operational, ImpactCalculationError
 
@@ -69,11 +67,7 @@ def calculate_progress_percentage(building: Building) -> int:
         progress += 10
 
     # Step 2.2: Cooling System (10%)
-    has_cooling = (
-        CoolingSystemChiller.objects.filter(building=building).exists() or
-        CoolingSystemAirConditioner.objects.filter(building=building).exists()
-    )
-    if has_cooling:
+    if building.air_conditioners.exists() or building.chillers.exists():
         progress += 10
 
     # Step 2.3: Ventilation System (10%)
@@ -635,6 +629,7 @@ def get_operational_carbon_by_system(
     if grid_factor == 0:
         result['warning'] = 'grid_factor_zero'
     return result
+
 
 
 def get_building_chart_data(
