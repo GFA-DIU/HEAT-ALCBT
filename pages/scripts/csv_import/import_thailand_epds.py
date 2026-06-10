@@ -78,8 +78,12 @@ def import_thailand_epds():
     imported_no_gwp = 0     # EPD created, CF Volume null so no impact
     failure = 0
     failure_rows = []
+    no_gwp_rows = []        # raw rows without GWP, for Excel export
 
-    for row_idx, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+    all_rows = list(ws.iter_rows(min_row=1, values_only=True))
+    headers = list(all_rows[0])
+
+    for row_idx, row in enumerate(all_rows[1:], start=2):
         if all(v is None for v in row):
             break
         if len(row) < 26:
@@ -140,6 +144,7 @@ def import_thailand_epds():
                 imported_with_gwp += 1
             else:
                 imported_no_gwp += 1
+                no_gwp_rows.append(row)
                 logger.info(
                     "Row %d: '%s' imported without GWP impact — CF Volume null/unparseable: %r",
                     row_idx, name, cf_volume_raw,
@@ -151,6 +156,18 @@ def import_thailand_epds():
             failure_rows.append(row_idx)
 
     wb.close()
+
+    # Export rows without GWP impact to Excel, mirroring the source Data tab structure
+    if no_gwp_rows:
+        out_path = "docs/TH_TGO_EPDs_without_GWP.xlsx"
+        out_wb = openpyxl.Workbook()
+        out_ws = out_wb.active
+        out_ws.title = "Data"
+        out_ws.append(list(headers))
+        for row in no_gwp_rows:
+            out_ws.append(list(row))
+        out_wb.save(out_path)
+        print(f"  Exported {len(no_gwp_rows)} rows without GWP to: {out_path}")
 
     total_imported = imported_with_gwp + imported_no_gwp
     print(f"\n{'='*60}")
