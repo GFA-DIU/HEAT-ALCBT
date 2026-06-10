@@ -12,7 +12,6 @@ views but:
 Step layout (matches the HTMX wizard):
   POST /api/buildings/add/name-location/         Step 1 — create/update name & location
   POST /api/buildings/add/details/               Step 2 — building type, climate, areas
-  GET  /api/buildings/add/data/                  Restore form data by UUID
   POST /api/buildings/add/operational-schedule/  Step 3 — schedule & temperatures
   POST /api/buildings/add/cooling-systems/       Step 4 — add/update/delete cooling
   DELETE /api/buildings/add/cooling-systems/     Delete single cooling system
@@ -31,6 +30,7 @@ Step layout (matches the HTMX wizard):
 """
 
 import logging
+import os
 import uuid as uuid_lib
 
 from django.db import transaction
@@ -49,7 +49,7 @@ from pages.models.assembly import (
     Assembly, AssemblyCategoryTechnique, AssemblyDimension, AssemblyMode,
     AssemblyTechnique, StructuralProduct,
 )
-from pages.models.building import Building, BuildingAssembly, CategorySubcategory, OperationalProduct
+from pages.models.building import Building, BuildingAssembly, BuildingBoQFile, CategorySubcategory, OperationalProduct
 from pages.models.building_operation import (
     CoolingSystemAirConditioner, CoolingSystemChiller,
     LiftEscalatorSystem, HotWaterSystem,
@@ -63,6 +63,12 @@ from pages.views.building.import_building import (
     _bool_from_excel,
     _resolve_building_type,
     _resolve_climate,
+)
+from api.views.building_files import (
+    ALLOWED_EXTENSIONS,
+    ALLOWED_MIME_TYPES,
+    MAX_FILE_SIZE_BYTES,
+    _validate_file,
 )
 
 logger = logging.getLogger(__name__)
@@ -210,18 +216,17 @@ class BuildingAddDetailsView(APIView):
         apartment_type_id = data.get("apartment_type_id") or data.get("apartment_type")
         cat_subcat = None
         if building_type_id and apartment_type_id:
-            try:
-                cat_subcat = CategorySubcategory.objects.filter(
-                    category_id=building_type_id,
-                    subcategory_id=apartment_type_id,
-                ).first()
-            except Exception:
-                pass
+            cat_subcat = CategorySubcategory.objects.filter(
+                category_id=building_type_id,
+                subcategory_id=apartment_type_id,
+            ).first()
+            if not cat_subcat:
+                errors["building_type"] = "Invalid building type / apartment type combination."
         elif building_type_id:
-            # Try string-based resolution as fallback
-            cat_subcat, bt_err = _resolve_building_type(_str(building_type_id))
-            if bt_err:
-                errors["building_type"] = bt_err
+            # Building type with no subtypes — look up any CategorySubcategory for this category
+            cat_subcat = CategorySubcategory.objects.filter(
+                category_id=building_type_id,
+            ).first()
 
         # Climate zone
         climate_value = None
@@ -296,6 +301,21 @@ class BuildingAddDetailsView(APIView):
         if floors_below_ground is not None:
             building.floors_below_ground = floors_below_ground
 
+        # has_certification / has_boq flags
+        has_cert_raw = data.get("has_certification")
+        if has_cert_raw is not None:
+            if isinstance(has_cert_raw, str):
+                building.has_certification = has_cert_raw.lower() in ("yes", "true", "1")
+            else:
+                building.has_certification = bool(has_cert_raw)
+
+        has_boq_raw = data.get("has_boq")
+        if has_boq_raw is not None:
+            if isinstance(has_boq_raw, str):
+                building.has_boq = has_boq_raw.lower() in ("yes", "true", "1")
+            else:
+                building.has_boq = bool(has_boq_raw)
+
         building.save()
 
         logger.info("API Add Step 2: building %s details saved by %s", building.uuid, request.user)
@@ -305,62 +325,6 @@ class BuildingAddDetailsView(APIView):
 # ---------------------------------------------------------------------------
 # Restore form data (GET)
 # ---------------------------------------------------------------------------
-
-class BuildingAddDataView(APIView):
-    """
-    GET /api/buildings/add/data/?building_uuid=<uuid>
-
-    Returns building data formatted for form field restoration.
-    """
-    permission_classes = [IsAdminUser]
-
-    def get(self, request):
-        building_uuid_str = request.query_params.get("building_uuid", "")
-        building, err = _get_building_or_error(request, building_uuid_str)
-        if err:
-            return err
-
-        building_type_id = None
-        apartment_type_id = None
-        if building.category:
-            building_type_id = building.category.category_id
-            apartment_type_id = building.category.subcategory_id
-
-        return Response({
-            "success": True,
-            "data": {
-                # Step 1
-                "building_name": building.name,
-                "address": building.street or "",
-                "country": building.country_id,
-                "region": building.region_id,
-                "city": building.city_id,
-                "longitude": building.longitude,
-                "latitude": building.latitude,
-                "organisation_id": str(building.organisation_id) if building.organisation_id else None,
-                # Step 2
-                "building_type_id": building_type_id,
-                "apartment_type_id": apartment_type_id,
-                "climate_type": building.climate_zone.name if building.climate_zone else "",
-                "assessment_period": building.reference_period,
-                "construction_year": building.construction_year,
-                "total_floor_area": str(building.total_floor_area) if building.total_floor_area else "",
-                "conditioned_floor_area": str(building.cond_floor_area) if building.cond_floor_area else "",
-                "floors_below_ground": building.floors_below_ground,
-                # Step 3
-                "num_residents": building.num_residents,
-                "hours_per_workday": building.hours_per_workday,
-                "workdays_per_week": building.workdays_per_week,
-                "weeks_per_year": building.weeks_per_year,
-                "heating_temp": float(building.heating_temp) if building.heating_temp else None,
-                "heating_temp_unit": building.heating_temp_unit,
-                "cooling_temp": float(building.cooling_temp) if building.cooling_temp else None,
-                "cooling_temp_unit": building.cooling_temp_unit,
-                "renewable_energy_percent": float(building.renewable_energy_percent) if building.renewable_energy_percent else None,
-                "building_smart_system": building.building_smart_system,
-            }
-        })
-
 
 # ---------------------------------------------------------------------------
 # Step 3 — Operational Schedule

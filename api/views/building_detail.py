@@ -14,6 +14,7 @@ Returns everything the HTMX building detail page shows:
 """
 
 import logging
+import os
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -232,7 +233,7 @@ class BuildingFullDetailView(APIView):
 
     def get(self, request, pk):
         try:
-            building = _buildings_queryset(request).get(pk=pk)
+            building = _buildings_queryset(request).get(uuid=pk)
         except Building.DoesNotExist:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -272,6 +273,18 @@ class BuildingFullDetailView(APIView):
             "public": building.public,
             "has_certification": building.has_certification,
             "has_boq": building.has_boq,
+            "certification_file": {
+                "name": os.path.basename(building.certification_file.name),
+                "url": f"/api/buildings/files/?building_uuid={building.uuid}&type=certification",
+            } if building.certification_file else None,
+            "boq_files": [
+                {
+                    "id": bf.id,
+                    "name": bf.original_filename or os.path.basename(bf.file.name),
+                    "url": f"/api/buildings/files/?building_uuid={building.uuid}&type=boq&file_id={bf.id}",
+                }
+                for bf in building.boq_files.all()
+            ],
         }
 
         # Operational schedule

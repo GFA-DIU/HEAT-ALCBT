@@ -255,7 +255,9 @@ class AdminBuildingSerializer(serializers.Serializer):
     def get_category(self, obj):
         if obj.category:
             return {
+                "category_id": obj.category.category.id if obj.category.category else None,
                 "category": obj.category.category.name if obj.category.category else None,
+                "subcategory_id": obj.category.subcategory.id if obj.category.subcategory else None,
                 "subcategory": obj.category.subcategory.name if obj.category.subcategory else None,
             }
         return None
