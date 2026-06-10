@@ -30,7 +30,6 @@ from api.views.buildings import (
 from api.views.building_add import (
     BuildingAddNameLocationView,
     BuildingAddDetailsView,
-    BuildingAddDataView,
     BuildingAddOperationalScheduleView,
     BuildingAddCoolingSystemView,
     BuildingAddVentilationSystemView,
@@ -43,6 +42,7 @@ from api.views.building_add import (
 )
 from api.views.building_detail import BuildingFullDetailView
 from api.views.building_export import BuildingExportView
+from api.views.building_files import BuildingFilesView
 from api.views.users import (
     UserListCreateView,
     UserDetailView,
@@ -60,10 +60,12 @@ from api.views.system_settings import (
     ClimateTypeDetailView,
     ClimateTypeImportView,
     ClimateTypeExportView,
+    ApartmentTypeListView,
     BuildingTypeListCreateView,
     BuildingTypeDetailView,
     BuildingTypeImportView,
     BuildingTypeExportView,
+    SelectListsView,
 )
 
 urlpatterns = [
@@ -78,9 +80,12 @@ urlpatterns = [
     path("buildings/", BuildingListView.as_view(), name="api_buildings"),
     path("buildings/export/", BuildingExportView.as_view(), name="api_buildings_export"),
 
-    # Buildings — detail & full-detail
-    path("buildings/<uuid:pk>/", BuildingDetailView.as_view(), name="api_building_detail"),
-    path("buildings/<uuid:pk>/detail/", BuildingFullDetailView.as_view(), name="api_building_full_detail"),
+    # Buildings — file upload/serve (must be before <str:pk> to avoid conflict)
+    path("buildings/files/", BuildingFilesView.as_view(), name="api_building_files"),
+
+    # Buildings — detail & full-detail (pk = uuid field, not the pk/id)
+    path("buildings/<str:pk>/", BuildingDetailView.as_view(), name="api_building_detail"),
+    path("buildings/<str:pk>/detail/", BuildingFullDetailView.as_view(), name="api_building_full_detail"),
 
     # Buildings — Excel import (step-by-step)
     path("buildings/import/name-location/", BuildingImportNameLocationView.as_view(), name="api_building_import_name_location"),
@@ -98,7 +103,6 @@ urlpatterns = [
     # Buildings — manual add (multi-step form)
     path("buildings/add/name-location/", BuildingAddNameLocationView.as_view(), name="api_building_add_name_location"),
     path("buildings/add/details/", BuildingAddDetailsView.as_view(), name="api_building_add_details"),
-    path("buildings/add/data/", BuildingAddDataView.as_view(), name="api_building_add_data"),
     path("buildings/add/operational-schedule/", BuildingAddOperationalScheduleView.as_view(), name="api_building_add_operational_schedule"),
     path("buildings/add/cooling-systems/", BuildingAddCoolingSystemView.as_view(), name="api_building_add_cooling_systems"),
     path("buildings/add/ventilation-systems/", BuildingAddVentilationSystemView.as_view(), name="api_building_add_ventilation_systems"),
@@ -133,6 +137,12 @@ urlpatterns = [
     path("system-settings/climate-types/import/", ClimateTypeImportView.as_view(), name="api_climate_types_import"),
     path("system-settings/climate-types/export/", ClimateTypeExportView.as_view(), name="api_climate_types_export"),
     path("system-settings/climate-types/<int:pk>/", ClimateTypeDetailView.as_view(), name="api_climate_type_detail"),
+
+    # System Settings — Apartment Types
+    path("system-settings/apartment-types/", ApartmentTypeListView.as_view(), name="api_apartment_types"),
+
+    # System Settings — Select Lists (JSON equivalents of HTMX select_lists)
+    path("system-settings/select-lists/", SelectListsView.as_view(), name="api_select_lists"),
 
     # System Settings — Building Types
     path("system-settings/building-types/", BuildingTypeListCreateView.as_view(), name="api_building_types"),

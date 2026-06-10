@@ -1130,21 +1130,6 @@
           ));
         }
 
-        // DEBUG: log raw chart data from backend
-        console.log('[Systems tab] full chartData:', chartData);
-        console.log('[Systems tab] operational_by_system:', chartData.operational_by_system);
-        if (!chartData.operational_by_system || chartData.operational_by_system.labels.length === 0) {
-          console.warn('[Systems tab] operational_by_system is empty or missing — check EnergySummary and grid factor for this building');
-        } else {
-          console.log('[Systems tab] labels:', chartData.operational_by_system.labels);
-          console.log('[Systems tab] absolute (kgCO2eq/m2/yr):', chartData.operational_by_system.absolute);
-          console.log('[Systems tab] data (%):', chartData.operational_by_system.data);
-          console.log('[Systems tab] total:', chartData.operational_by_system.total);
-          if (chartData.operational_by_system.warning === 'grid_factor_zero') {
-            console.warn('[Systems tab] WARNING: grid factor is zero — no electricity EPD found or GWP is 0');
-          }
-        }
-
         // Initialize the Operational Carbon by System/Appliances bar chart
         const embodiedCarbonByAppliancesChart = document.getElementById(
           "emboided-carbon-by-appliances-chart"
@@ -1223,14 +1208,8 @@
             totalEl.textContent = total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kgCO₂eq/m²/yr";
           }
 
-          // Build appliance-level bar rows
-          const applianceData = {
-            labels:      ["Split AC", "VRF system", "AHU", "LED lighting", "Electric water heater", "Lift"],
-            systemNames: ["Cooling system", "Cooling system", "Ventilation system", "Lighting system", "Hot water system", "Lifts & Escalators"],
-            data:        [52.0, 23.3, 15.1, 8.3, 3.6, 1.4],
-            absolute:    [42.74, 19.16, 13.05, 7.21, 3.16, 1.24],
-            total:       86.55,
-          };
+          // Build appliance-level bar rows from real backend data
+          const applianceData = chartData.operational_by_appliance || { labels: [], systemNames: [], data: [], absolute: [], total: 0 };
 
           const applianceStyleMap = [
             { match: (s) => s.includes("cool"),   icon: "snowflake-fill", color: "#97baff" },
@@ -1253,7 +1232,7 @@
             applianceData.labels.forEach(function (label, i) {
               const pct = applianceData.data[i] || 0;
               const abs = applianceData.absolute[i] || 0;
-              const systemName = applianceData.systemNames[i] || "";
+              const systemName = (applianceData.systemNames && applianceData.systemNames[i]) || label;
               const style = getApplianceStyle(systemName);
               const absFormatted = abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 

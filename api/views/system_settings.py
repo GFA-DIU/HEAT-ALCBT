@@ -21,6 +21,7 @@ from api.serializers.system_settings import (
     ClimateTypeCreateSerializer,
     ClimateTypeUpdateSerializer,
     # Building types
+    BuildingSubcategorySerializer,
     BuildingTypeListSerializer,
     BuildingTypeDetailSerializer,
     BuildingTypeCreateSerializer,
@@ -28,6 +29,11 @@ from api.serializers.system_settings import (
 )
 from pages.models.building import Building, BuildingCategory, BuildingSubcategory, CategorySubcategory
 from pages.models.climate_type import ClimateType
+from pages.models.building_operation.chilling import RefrigerantType
+from pages.models.building_operation.hot_water import HotWaterSystemType, FuelType, EnergyEfficiencyLabelType
+from pages.models.building_operation.lighting import RoomType, LightingBulbType
+from pages.models.building_operation.ventilation import VentilationType, VentilationCapacity
+from pages.models.building import CoolingType, LightingType
 
 logger = logging.getLogger(__name__)
 
@@ -458,6 +464,23 @@ class BuildingTypeImportView(APIView):
         }, status=status.HTTP_201_CREATED)
 
 
+class ApartmentTypeListView(APIView):
+    """
+    GET /api/system-settings/apartment-types/?building_type_id=<id>
+    Returns the subtypes (apartment types) for a given building type (BuildingCategory).
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        building_type_id = request.query_params.get("building_type_id")
+        if not building_type_id:
+            return Response({"results": []})
+        subcategories = BuildingSubcategory.objects.filter(
+            categorysubcategory__category_id=building_type_id
+        ).order_by("name")
+        return Response({"results": BuildingSubcategorySerializer(subcategories, many=True).data})
+
+
 class BuildingTypeExportView(APIView):
     """
     GET /api/system-settings/building-types/export/
@@ -470,3 +493,63 @@ class BuildingTypeExportView(APIView):
             subtypes = list(category.subcategories.order_by("name").values_list("name", flat=True))
             rows.append([category.name] + subtypes)
         return render_csv_response(rows, "building_types_export.csv")
+
+
+# ===========================================================================
+# Select Lists — JSON equivalents of the HTMX /select_lists/ page endpoint
+# ===========================================================================
+
+def _choices_to_list(choices):
+    return [{"id": c[0], "name": c[1]} for c in choices]
+
+
+class SelectListsView(APIView):
+    """
+    GET /api/system-settings/select-lists/?type=<list_type>
+
+    Returns JSON { "results": [{"id": ..., "name": ...}, ...] } for the
+    requested list type.  Supported types:
+
+      refrigerant_types         — all RefrigerantType choices
+      cooling_types             — CoolingType choices
+      ventilation_types         — VentilationType choices
+      ventilation_capacity_types — VentilationCapacity choices
+      lighting_types            — LightingType choices
+      hot_water_system_types    — HotWaterSystemType choices
+      fuel_types                — FuelType choices
+      energy_efficiency_label_types — EnergyEfficiencyLabelType choices
+      room_types                — RoomType choices
+      lighting_bulb_types       — LightingBulbType choices
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        list_type = request.query_params.get("type", "").strip()
+
+        if list_type == "refrigerant_types":
+            items = _choices_to_list(RefrigerantType.choices)
+        elif list_type == "cooling_types":
+            items = _choices_to_list(CoolingType.choices)
+        elif list_type == "ventilation_types":
+            items = _choices_to_list(VentilationType.choices)
+        elif list_type == "ventilation_capacity_types":
+            items = _choices_to_list(VentilationCapacity.choices)
+        elif list_type == "lighting_types":
+            items = _choices_to_list(LightingType.choices)
+        elif list_type == "hot_water_system_types":
+            items = _choices_to_list(HotWaterSystemType.choices)
+        elif list_type == "fuel_types":
+            items = _choices_to_list(FuelType.choices)
+        elif list_type == "energy_efficiency_label_types":
+            items = _choices_to_list(EnergyEfficiencyLabelType.choices)
+        elif list_type == "room_types":
+            items = _choices_to_list(RoomType.choices)
+        elif list_type == "lighting_bulb_types":
+            items = _choices_to_list(LightingBulbType.choices)
+        else:
+            return Response(
+                {"detail": f"Unknown list type '{list_type}'. See endpoint docs for supported types."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response({"results": items})

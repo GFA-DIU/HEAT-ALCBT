@@ -139,7 +139,14 @@ class BuildingDetailView(APIView):
     """
     permission_classes = [IsAdminUser]
 
-    def _get_building(self, pk, request):
+    def _get_building_by_uuid(self, uuid_str, request):
+        try:
+            qs = _buildings_queryset(request)
+            return qs.get(uuid=uuid_str)
+        except Building.DoesNotExist:
+            return None
+
+    def _get_building_by_id(self, pk, request):
         try:
             qs = _buildings_queryset(request)
             return qs.get(pk=pk)
@@ -147,7 +154,7 @@ class BuildingDetailView(APIView):
             return None
 
     def get(self, request, pk):
-        building = self._get_building(pk, request)
+        building = self._get_building_by_uuid(pk, request)
         if building is None:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         try:
@@ -165,7 +172,7 @@ class BuildingDetailView(APIView):
 
     @transaction.atomic
     def delete(self, request, pk):
-        building = self._get_building(pk, request)
+        building = self._get_building_by_id(pk, request)
         if building is None:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -400,7 +407,7 @@ class BuildingImportDetailsView(APIView):
         has_certification = _bool_from_excel(request.data.get("has_certification", "no"))
         has_boq = _bool_from_excel(request.data.get("has_boq", "no"))
 
-        from pages.views.building.building_step_files import _validate_file
+        from api.views.building_files import _validate_file
 
         if has_certification:
             cert_file = request.FILES.get("certification_file")
