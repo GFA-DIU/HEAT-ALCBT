@@ -1209,7 +1209,7 @@
           }
 
           // Build appliance-level bar rows from real backend data
-          const applianceData = chartData.operational_by_system || { labels: [], data: [], absolute: [], total: 0 };
+          const applianceData = chartData.operational_by_appliance || { labels: [], systemNames: [], data: [], absolute: [], total: 0 };
 
           const applianceStyleMap = [
             { match: (s) => s.includes("cool"),   icon: "snowflake-fill", color: "#97baff" },
@@ -1232,7 +1232,7 @@
             applianceData.labels.forEach(function (label, i) {
               const pct = applianceData.data[i] || 0;
               const abs = applianceData.absolute[i] || 0;
-              const systemName = label;
+              const systemName = (applianceData.systemNames && applianceData.systemNames[i]) || label;
               const style = getApplianceStyle(systemName);
               const absFormatted = abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 

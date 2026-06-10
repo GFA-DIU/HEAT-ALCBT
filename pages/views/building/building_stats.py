@@ -18,6 +18,12 @@ from typing import Dict, Any, List, Optional
 
 from pages.models.building import Building
 from pages.models.epd import Unit
+from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
+from pages.models.building_operation.chilling import CoolingSystemChiller
+from pages.models.building_operation.ventilation import VentilationSystem
+from pages.models.building_operation.lighting import LightingSystem
+from pages.models.building_operation.general_systems import LiftEscalatorSystem
+from pages.models.building_operation.hot_water import HotWaterSystem
 from pages.views.building.impact_calculation import calculate_impacts, calculate_impact_operational, ImpactCalculationError
 
 _MAPPING_PATH = os.path.join(
@@ -631,6 +637,105 @@ def get_operational_carbon_by_system(
     return result
 
 
+def get_operational_carbon_by_appliance(
+    building: Building,
+    prefetched_operational=None,
+) -> Dict[str, Any]:
+    """
+    Calculate operational carbon intensity (kgCO2eq/m²/yr) per individual appliance record.
+
+    Same formula as get_operational_carbon_by_system but broken down to individual
+    system records (e.g. each AC unit, each lighting zone) rather than category totals.
+
+    Returns dict with 'labels' (appliance display name), 'systemNames' (parent system),
+    'data' (% share), 'absolute' (kgCO2eq/m²/yr), 'total'.
+    """
+    empty = {'labels': [], 'systemNames': [], 'data': [], 'absolute': [], 'total': 0}
+
+    floor_area = building.total_floor_area
+    if not floor_area or Decimal(str(floor_area)) == 0:
+        return empty
+
+    grid_factor = _derive_grid_emission_factor(building, prefetched_operational)
+    floor_area = Decimal(str(floor_area))
+
+    AC_LABEL = {
+        'window': 'Window AC',
+        'split': 'Split AC',
+        'vrv': 'VRF system',
+        'packaged': 'Packaged AC',
+    }
+    VENT_LABEL = {
+        'AHU': 'AHU',
+        'FCU': 'FCU',
+        'CASSETTE_AC': 'Cassette AC',
+        'DOAS': 'DOAS',
+        'FAN': 'Fan',
+    }
+    HW_LABEL = {
+        'heat-pump': 'Heat pump water heater',
+        'boiler': 'Boiler',
+        'solar': 'Solar water heater',
+    }
+
+    def _is_led(bulb):
+        return str(bulb).upper().startswith('LED')
+
+    appliances = []
+
+    for ac in CoolingSystemAirConditioner.objects.filter(building=building):
+        kwh = ac.total_energy_consumption_kwh_per_year
+        if kwh and Decimal(str(kwh)) > 0:
+            appliances.append((AC_LABEL.get(ac.ac_type, 'AC unit'), 'Cooling system', Decimal(str(kwh))))
+
+    for ch in CoolingSystemChiller.objects.filter(building=building):
+        kwh = ch.total_energy_consumption_kwh_per_year
+        if kwh and Decimal(str(kwh)) > 0:
+            appliances.append(('Chiller', 'Cooling system', Decimal(str(kwh))))
+
+    for v in VentilationSystem.objects.filter(building=building):
+        kwh = v.total_energy_consumption_kwh_per_year
+        if kwh and Decimal(str(kwh)) > 0:
+            appliances.append((VENT_LABEL.get(v.ventilation_type, 'Ventilation'), 'Ventilation system', Decimal(str(kwh))))
+
+    for lt in LightingSystem.objects.filter(building=building):
+        kwh = lt.total_energy_consumption_kwh_per_year
+        if kwh and Decimal(str(kwh)) > 0:
+            label = 'LED lighting' if _is_led(lt.lighting_bulb_type) else 'Fluorescent lighting'
+            appliances.append((label, 'Lighting system', Decimal(str(kwh))))
+
+    for lft in LiftEscalatorSystem.objects.filter(building=building):
+        kwh = lft.annual_energy_consumption_kwh
+        if kwh and Decimal(str(kwh)) > 0:
+            appliances.append(('Lift', 'Lifts & Escalators', Decimal(str(kwh))))
+
+    for hw in HotWaterSystem.objects.filter(building=building):
+        kwh = hw.total_energy_consumption_kwh_per_year
+        if kwh and Decimal(str(kwh)) > 0:
+            appliances.append((HW_LABEL.get(hw.type_of_hot_water_system, 'Water heater'), 'Hot water system', Decimal(str(kwh))))
+
+    if not appliances:
+        return empty
+
+    intensities = [(label, sys_name, kwh * grid_factor / floor_area) for label, sys_name, kwh in appliances]
+    intensities.sort(key=lambda x: x[2], reverse=True)
+    total = sum(v for _, _, v in intensities)
+
+    labels, system_names, data, absolute = [], [], [], []
+    for label, sys_name, value in intensities:
+        labels.append(label)
+        system_names.append(sys_name)
+        data.append(round(float((value / total) * 100) if total > 0 else 0.0, 1))
+        absolute.append(round(float(value), 2))
+
+    return {
+        'labels': labels,
+        'systemNames': system_names,
+        'data': data,
+        'absolute': absolute,
+        'total': round(float(total), 2),
+    }
+
 
 def get_building_chart_data(
     building: Building,
@@ -671,6 +776,9 @@ def get_building_chart_data(
             building, prefetched_assemblies=prefetched_assemblies
         ),
         'operational_by_system': get_operational_carbon_by_system(
+            building, prefetched_operational=prefetched_operational
+        ),
+        'operational_by_appliance': get_operational_carbon_by_appliance(
             building, prefetched_operational=prefetched_operational
         ),
     }
