@@ -1130,6 +1130,21 @@
           ));
         }
 
+        // DEBUG: log raw chart data from backend
+        console.log('[Systems tab] full chartData:', chartData);
+        console.log('[Systems tab] operational_by_system:', chartData.operational_by_system);
+        if (!chartData.operational_by_system || chartData.operational_by_system.labels.length === 0) {
+          console.warn('[Systems tab] operational_by_system is empty or missing — check EnergySummary and grid factor for this building');
+        } else {
+          console.log('[Systems tab] labels:', chartData.operational_by_system.labels);
+          console.log('[Systems tab] absolute (kgCO2eq/m2/yr):', chartData.operational_by_system.absolute);
+          console.log('[Systems tab] data (%):', chartData.operational_by_system.data);
+          console.log('[Systems tab] total:', chartData.operational_by_system.total);
+          if (chartData.operational_by_system.warning === 'grid_factor_zero') {
+            console.warn('[Systems tab] WARNING: grid factor is zero — no electricity EPD found or GWP is 0');
+          }
+        }
+
         // Initialize the Operational Carbon by System/Appliances bar chart
         const embodiedCarbonByAppliancesChart = document.getElementById(
           "emboided-carbon-by-appliances-chart"
