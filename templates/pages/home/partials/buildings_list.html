@@ -25,9 +25,9 @@
                   <li
                     class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]"
                   >
-                    <span data-country="{{building.country}}" data-width="16"></span>
+                    <span data-country="{{building.country.code2|lower}}" data-width="16"></span>
                     <span
-                      data-country="{{building.country}}"
+                      data-country="{{building.country.code2|lower}}"
                       data-flag="false"
                       data-class="text-xs/4 font-medium text-[var(--text--sub-600)]"
                     ></span>

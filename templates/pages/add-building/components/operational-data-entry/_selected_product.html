@@ -17,13 +17,12 @@
 
           <div class="grid grid-cols-2 items-stretch gap-2 mt-1">
             <fieldset>
-              <label class="input w-full validator">
+              <label class="input w-full">
               <input
                 name="material_{{ epd.id }}_description_{{ epd.timestamp }}"
                 value="{% if epd.description %}{{ epd.description }}{% endif %}"
-                type="text" placeholder="{% translate 'Add a description' %}"  required class="block w-full" />
+                type="text" placeholder="{% translate 'Add a description (optional)' %}" class="block w-full" />
               </label>
-              <p class="validator-hint hidden">required</p>
             </fieldset>
 
             <fieldset>
@@ -38,10 +37,10 @@
                 step="0.01" />
               <select name="material_{{ epd.id }}_unit_{{ epd.timestamp }}" class="select focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)]">
                 {% for unit in epd.op_units %}
-                <option value="{{ unit }}" {% if unit == epd.selection_unit %}selected{% endif %}>{{ unit|display_unit }}</option>
+                <option value="{{ unit }}" {% if unit == epd.selection_unit %}selected{% endif %}>{{ unit|display_unit_op }}</option>
                 {% endfor %}
                 {% if not epd.op_units %}
-                <option value="{{ epd.selection_unit }}" selected>{{ epd.selection_unit|display_unit }}</option>
+                <option value="{{ epd.selection_unit }}" selected>{{ epd.selection_unit|display_unit_op }}</option>
                 {% endif %}
               </select>
             </label>
