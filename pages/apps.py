@@ -8,8 +8,9 @@ def update_site_domain(sender, **kwargs):
     try:
         from django.contrib.sites.models import Site
         site = Site.objects.filter(pk=settings.SITE_ID).first()
-        if site and (site.domain != settings.SITE_DOMAIN or site.name != settings.SITE_NAME):
-            site.domain = settings.SITE_DOMAIN
+        raw = settings.SITE_DOMAIN.strip().lstrip("https://").lstrip("http://").rstrip("/")
+        if site and (site.domain != raw or site.name != settings.SITE_NAME):
+            site.domain = raw
             site.name = settings.SITE_NAME
             site.save()
     except Exception:
