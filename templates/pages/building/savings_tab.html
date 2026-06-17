@@ -72,9 +72,9 @@
       <div class="flex items-center justify-center gap-1.5 text-center">
         <span data-icon="information-fill" data-size="16" class="text-[var(--icon--sub-600)]"></span>
         <span class="text-xs text-[var(--text--sub-600)]">
-          {% blocktranslate trimmed with n=benchmark_position.num_buildings btype=benchmark_position.building_type state=building.region|default:building.country country=building.country climate=benchmark_position.climate_zone seismic=benchmark_position.seismic_zone year_range=benchmark_position.year_range %}
-            ⓘ Benchmark based on {{ n }} {{ btype }} projects in {{ state }}, {{ country }}{% if climate %} ({{ climate }} climate{% if seismic %}, {{ seismic }}{% endif %}){% endif %} ({{ year_range }})
-          {% endblocktranslate %}
+          {% with state=building.region|default:building.country %}
+          ⓘ {% translate "Benchmark based on" %} {{ benchmark_position.num_buildings }} {{ benchmark_position.building_type }} {% translate "projects in" %} {{ state }}, {{ building.country }}{% if benchmark_position.climate_zone %} ({{ benchmark_position.climate_zone }} {% translate "climate" %}{% if benchmark_position.seismic_zone %}, {{ benchmark_position.seismic_zone }}{% endif %}){% endif %} ({{ benchmark_position.year_range }})
+          {% endwith %}
         </span>
       </div>
       {% endif %}

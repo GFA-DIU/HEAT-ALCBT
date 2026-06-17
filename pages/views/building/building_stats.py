@@ -38,74 +38,43 @@ with open(_MAPPING_PATH, "r") as _f:
 
 def calculate_progress_percentage(building: Building) -> int:
     """
-    Calculate the percentage of building data completion based on the 10-step creation flow.
+    Calculate weighted building data completion percentage.
 
-    Progress is calculated based on which steps have been completed:
-    - Step 1.1 (Building Name & Location): 10%
-    - Step 1.2 (Building Details): 10%
-    - Step 2.1 (Operational Schedule): 10%
-    - Step 2.2-2.6 (Systems: Cooling, Ventilation, Lighting, Lift, Hot Water): 10% each (50% total)
-    - Step 3 (Operational Data Entry): 10%
-    - Step 4 (Structural Components): 10%
+    Weights:
+    - Building Name & Location + Building Details: 20% (10% each)
+    - Operational Data Entry (energy carriers):    30%
+    - Structural Components:                       40%
+    - Operational Systems (5 systems × 2%):        10%
+      Each system is complete if it has data OR the user confirmed N/A.
 
-    Args:
-        building: Building instance to calculate progress for
-
-    Returns:
-        Integer percentage from 0 to 100
+    Returns integer 0–100.
     """
     progress = 0
 
-    # Step 1.1: Building Name & Location (10%)
     if building.name and building.address and building.country:
         progress += 10
-
-    # Step 1.2: Building Details (10%)
     if building.category and building.total_floor_area:
         progress += 10
 
-    # Step 2.1: Operational Schedule & Temperature (10%)
-    if (building.num_residents is not None and
-        building.hours_per_workday is not None and
-        building.workdays_per_week is not None and
-        building.weeks_per_year is not None and
-        building.heating_temp is not None and
-        building.cooling_temp is not None):
-        progress += 10
+    if building.operational_products.count() > 0:
+        progress += 30
 
-    # Step 2.2: Cooling System (10%)
-    if building.air_conditioners.exists() or building.chillers.exists():
-        progress += 10
+    if building.buildingassembly_set.count() > 0:
+        progress += 40
 
-    # Step 2.3: Ventilation System (10%)
-    if building.ventilation_systems.exists():
-        progress += 10
+    # Each system counts 2% — complete if it has data or user confirmed N/A
+    if building.air_conditioners.exists() or building.chillers.exists() or building.cooling_not_applicable:
+        progress += 2
+    if building.ventilation_systems.exists() or building.ventilation_not_applicable:
+        progress += 2
+    if building.lighting_systems.exists() or building.lighting_not_applicable:
+        progress += 2
+    if building.lift_escalator_systems.exists() or building.lift_not_applicable:
+        progress += 2
+    if building.hot_water_systems.exists() or building.hot_water_not_applicable:
+        progress += 2
 
-    # Step 2.4: Lighting System (10%)
-    if building.lighting_systems.exists():
-        progress += 10
-
-    # Step 2.5: Lift & Escalator System (10%)
-    if building.lift_escalator_systems.exists():
-        progress += 10
-
-    # Step 2.6: Hot Water System (10%)
-    if building.hot_water_systems.exists():
-        progress += 10
-
-    # Step 3: Operational Data Entry (10%)
-    # Check if at least one operational product (energy carrier) has been added
-    operational_count = building.operational_products.count()
-    if operational_count > 0:
-        progress += 10
-
-    # Step 4: Structural Components (10%)
-    # Check if at least one structural assembly has been added
-    structural_count = building.buildingassembly_set.count()
-    if structural_count > 0:
-        progress += 10
-
-    return min(progress, 100)  # Cap at 100%
+    return min(progress, 100)
 
 
 def calculate_total_embodied_carbon(
