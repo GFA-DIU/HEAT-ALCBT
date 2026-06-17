@@ -2,12 +2,14 @@
 {% load i18n %}
 <div id="cooling-system-container" class="w-full">
   <div class="w-full flex flex-col">
-    <button class="btn btn-outline w-fit" onclick="openCoolingSystemModal()">
-      <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-      {% translate "Add a cooling system" %}
-    </button>
-    <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
-    <ul class="grid grid-cols-1 gap-2" id="cooling-systems-list"></ul>
+    <div id="cooling-system-inputs">
+      <button class="btn btn-outline w-fit" onclick="openCoolingSystemModal()">
+        <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+        {% translate "Add a cooling system" %}
+      </button>
+      <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
+      <ul class="grid grid-cols-1 gap-2" id="cooling-systems-list"></ul>
+    </div>
   </div>
 </div>
 
@@ -67,6 +69,10 @@
     <img src="{% static 'assets/cooling-system.png' %}" alt="Cooling System" />
     <p class="text-sm/5 font-medium">{% translate "Click button below to add a cooling system" %}</p>
     <button class="btn btn-primary" onclick="cooling_system_modal.showModal()">{% translate "Add a cooling system" %}</button>
+    <label class="flex items-center gap-2 cursor-pointer w-fit mt-1">
+      <input type="checkbox" id="cooling-not-applicable" class="checkbox checkbox-sm" onchange="toggleCoolingNA(this.checked)" />
+      <span class="text-sm text-[var(--text--sub-600)]">{% translate "This building does not have a cooling system" %}</span>
+    </label>
   </div>
 </template>
 
@@ -1254,6 +1260,8 @@
         const systems = result.cooling_systems;
         if (!systems.length) {
           list.innerHTML = document.getElementById('no-cooling-system-template').innerHTML;
+          const naCheckbox = document.getElementById('cooling-not-applicable');
+          if (naCheckbox && result.not_applicable !== undefined) naCheckbox.checked = result.not_applicable;
           return;
         }
         list.innerHTML = systems.map(system => {
@@ -1287,6 +1295,8 @@
         if (typeof window.initIcons === 'function') window.initIcons();
       } else {
         list.innerHTML = document.getElementById('no-cooling-system-template').innerHTML;
+        const naCheckbox = document.getElementById('cooling-not-applicable');
+        if (naCheckbox && result.not_applicable !== undefined) naCheckbox.checked = result.not_applicable;
       }
     } catch (e) {
       console.error(e);
@@ -1517,6 +1527,18 @@
     } else {
       energyEl.value = '';
     }
+  };
+
+  window.toggleCoolingNA = async function(checked) {
+    const buildingId = getBuildingId();
+    if (!buildingId) return;
+    try {
+      await fetch('/building/step/system-na', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value },
+        body: JSON.stringify({ building_uuid: buildingId, system: 'cooling', value: checked }),
+      });
+    } catch(e) { console.error('Failed to save cooling N/A:', e); }
   };
 
   // ── Init ──────────────────────────────────────────────────────────────────

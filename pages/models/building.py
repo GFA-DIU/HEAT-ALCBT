@@ -211,6 +211,12 @@ class BuildingOperationalInfo(models.Model):
         _("Has Bill of Quantities (BoQ)"),
         default=False,
     )
+    ### Operational system N/A confirmations (user confirms system is not present)
+    cooling_not_applicable = models.BooleanField(default=False)
+    ventilation_not_applicable = models.BooleanField(default=False)
+    lighting_not_applicable = models.BooleanField(default=False)
+    lift_not_applicable = models.BooleanField(default=False)
+    hot_water_not_applicable = models.BooleanField(default=False)
     ### Building Services
     heating_type = models.CharField(
         _("Heating Type"),

@@ -101,7 +101,7 @@ def get_ventilation_systems(request, building_uuid):
             return JsonResponse({'success': False, 'errors': {'building_uuid': ['Building not found.']}}, status=404)
 
         systems = VentilationSystem.objects.filter(building=building).order_by('-id')
-        return JsonResponse({'success': True, 'ventilation_systems': [_serialize(s) for s in systems]}, status=200)
+        return JsonResponse({'success': True, 'ventilation_systems': [_serialize(s) for s in systems], 'not_applicable': building.ventilation_not_applicable}, status=200)
 
     except Exception as e:
         return JsonResponse({'success': False, 'errors': {'server': [f'An unexpected error occurred: {str(e)}']}}, status=500)

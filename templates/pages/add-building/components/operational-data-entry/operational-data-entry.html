@@ -498,21 +498,26 @@
     Toast.success('{% translate "Energy carriers saved successfully" %}');
   });
 
-  // Handle save request failure
-  document.body.addEventListener('htmx:afterRequest', function(event) {
-    if (event.detail.target.id === 'operational-products-form' && !event.detail.successful) {
-      const btn = document.getElementById('save_button');
-      if (btn) {
-        btn.disabled = false;
-        const icon = btn.querySelector('.button-icon');
-        const loading = btn.querySelector('.button-loading');
-        const text = btn.querySelector('.button-text');
-        if (icon) icon.classList.remove('hidden');
-        if (loading) loading.classList.add('hidden');
-        if (text) text.textContent = '{% translate "Save Energy Carriers" %}';
-      }
-      Toast.error('{% translate "Failed to save energy carriers" %}');
+  document.addEventListener('htmx:responseError', function(event) {
+    const elt = event.detail.elt || event.detail.target;
+    if (!elt) return;
+    const form = elt.closest('#operational-products-form') || (elt.id === 'operational-products-form' ? elt : null);
+    if (!form) return;
+    const btn = document.getElementById('save_button');
+    if (btn) {
+      btn.disabled = false;
+      const icon = btn.querySelector('.button-icon');
+      const loading = btn.querySelector('.button-loading');
+      const text = btn.querySelector('.button-text');
+      if (icon) icon.classList.remove('hidden');
+      if (loading) loading.classList.add('hidden');
+      if (text) text.textContent = '{% translate "Save Energy Carriers" %}';
     }
+    try {
+      const data = JSON.parse(event.detail.xhr.responseText);
+      if (data.error) { Toast.error(data.error); return; }
+    } catch(e) {}
+    Toast.error('{% translate "Failed to save energy carriers" %}');
   });
 
   // Mark form as unsaved when any field changes — delegated to document

@@ -216,12 +216,52 @@
 
 {% block new-building %}{% endblock new-building %}
 
+<dialog id="systems-check-modal" class="modal modal-middle">
+  <div class="modal-box w-full max-w-[30rem] p-0">
+    <div class="flex flex-col p-5 gap-3">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center p-2 justify-center rounded-[var(--radius-8)] bg-[var(--state--warning--lighter)]">
+          <span data-icon="alert-fill" data-size="24" data-color="var(--state--warning--base)"></span>
+        </div>
+        <div>
+          <h3 class="text-lg/6 font-medium">{% translate "Confirm system status" %}</h3>
+          <p class="text-sm/5 text-[var(--text--sub-600)]">{% translate "The following systems have no data. Confirm each is not applicable to proceed." %}</p>
+        </div>
+      </div>
+      <ul id="systems-check-list" class="flex flex-col gap-2 mt-1"></ul>
+    </div>
+    <div class="p-5 border-t border-[var(--stroke--soft-200)] flex gap-4 items-center justify-between w-full">
+      <button class="btn btn-sm btn-outline text-[var(--text--sub-600)] border-[var(--stroke--soft-200)] flex-1" onclick="systems_check_modal.close()">{% translate "Go back" %}</button>
+      <button id="systems-check-confirm-btn" class="btn btn-sm btn-primary flex-1" onclick="window.confirmSystemsAndComplete()">{% translate "Confirm & Complete" %}</button>
+    </div>
+  </div>
+</dialog>
+
   <script src="{% url 'javascript-catalog' %}"></script>
   <script src="{% static 'js/form-validator.js' %}"></script>
   <script src="{% static 'js/step-manager.js' %}"></script>
   <script src="{% static 'js/geo-location.js' %}"></script>
 
   <script>
+    window.confirmSystemsAndComplete = async function() {
+      const systems = window._pendingSystemsComplete || [];
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+      for (const s of systems) {
+        const cb = document.getElementById('sys-check-' + s.key);
+        if (cb && cb.checked) {
+          await fetch('/building/step/system-na', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken || '' },
+            body: JSON.stringify({ building_uuid: window._stepManagerInstance?.getBuildingId(), system: s.key, value: true }),
+          });
+        }
+      }
+      document.getElementById('systems-check-modal').close();
+      if (window._stepManagerInstance) {
+        await window._stepManagerInstance._doCompleteSetup();
+      }
+    };
+
     (function () {
       var sidebar  = document.getElementById('add-building-sidebar');
       var backdrop = document.getElementById('sidebar-mobile-backdrop');

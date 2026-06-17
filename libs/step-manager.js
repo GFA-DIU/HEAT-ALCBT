@@ -1336,6 +1336,39 @@ class StepManager {
   }
 
   async completeSetup() {
+    const buildingId = this.getBuildingId();
+    if (buildingId) {
+      try {
+        const resp = await fetch(`/building/step/systems-status?building_uuid=${buildingId}`);
+        const data = await resp.json();
+        if (data.success) {
+          const incomplete = data.systems.filter(s => !s.has_data && !s.not_applicable);
+          if (incomplete.length > 0) {
+            window._pendingSystemsComplete = incomplete;
+            window._stepManagerInstance = this;
+            const list = document.getElementById('systems-check-list');
+            if (list) {
+              list.innerHTML = incomplete.map(s => `
+                <li class="flex items-center gap-2">
+                  <input type="checkbox" id="sys-check-${s.key}" class="checkbox checkbox-sm"
+                    onchange="document.getElementById('systems-check-confirm-btn').disabled = !Array.from(document.querySelectorAll('#systems-check-list input[type=checkbox]')).every(c=>c.checked)" />
+                  <label for="sys-check-${s.key}" class="text-sm cursor-pointer">${s.label}</label>
+                </li>`).join('');
+              document.getElementById('systems-check-confirm-btn').disabled = true;
+            }
+            const modal = document.getElementById('systems-check-modal');
+            if (modal) modal.showModal();
+            return;
+          }
+        }
+      } catch(e) {
+        console.error('Systems status check failed:', e);
+      }
+    }
+    await this._doCompleteSetup();
+  }
+
+  async _doCompleteSetup() {
     // Save final data
     await this.saveFormData();
 

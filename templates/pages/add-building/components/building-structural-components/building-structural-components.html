@@ -1478,7 +1478,10 @@ document.body.addEventListener('htmx:afterRequest', function(evt) {
     epdList.querySelectorAll('.epd-inline-error').forEach(function(el) { el.remove(); });
   }
 
-  if (evt.detail.successful) return;
+  if (evt.detail.successful) {
+    Toast.success('{% translate "EPD added successfully" %}');
+    return;
+  }
 
   var xhr = evt.detail.xhr;
   if (!xhr) return;
