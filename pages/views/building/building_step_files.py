@@ -78,9 +78,11 @@ def upload_building_files(request):
         return err
 
     has_certification = request.POST.get("has_certification", "no") in ("yes", "true", "1")
+    has_design_drawings = request.POST.get("has_design_drawings", "no") in ("yes", "true", "1")
     has_boq = request.POST.get("has_boq", "no") in ("yes", "true", "1")
 
     building.has_certification = has_certification
+    building.has_design_drawings = has_design_drawings
     building.has_boq = has_boq
 
     # --- Certification file ---
@@ -113,6 +115,39 @@ def upload_building_files(request):
 
     building.save()
 
+    # --- Design drawing files ---
+    if has_design_drawings:
+        new_drawing_files = request.FILES.getlist("design_drawing_files")
+        if new_drawing_files:
+            for f in new_drawing_files:
+                err_msg = _validate_file(f)
+                if err_msg:
+                    return JsonResponse({"success": False, "error": f"Design drawing '{f.name}': {err_msg}"}, status=400)
+            # Delete previous drawing files
+            for old_file in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_DRAWING):
+                try:
+                    if os.path.isfile(old_file.file.path):
+                        os.remove(old_file.file.path)
+                except Exception:
+                    pass
+                old_file.delete()
+            for f in new_drawing_files:
+                BuildingBoQFile.objects.create(
+                    building=building,
+                    file=f,
+                    original_filename=f.name,
+                    file_type=BuildingBoQFile.FILE_TYPE_DRAWING,
+                )
+    else:
+        # has_design_drawings=no — remove all existing drawing files
+        for old_file in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_DRAWING):
+            try:
+                if os.path.isfile(old_file.file.path):
+                    os.remove(old_file.file.path)
+            except Exception:
+                pass
+            old_file.delete()
+
     # --- BoQ files ---
     if has_boq:
         new_boq_files = request.FILES.getlist("boq_files")
@@ -123,7 +158,7 @@ def upload_building_files(request):
                 if err_msg:
                     return JsonResponse({"success": False, "error": f"BoQ file '{f.name}': {err_msg}"}, status=400)
             # Delete previous BoQ files
-            for old_file in building.boq_files.all():
+            for old_file in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_BOQ):
                 try:
                     if os.path.isfile(old_file.file.path):
                         os.remove(old_file.file.path)
@@ -136,11 +171,12 @@ def upload_building_files(request):
                     building=building,
                     file=f,
                     original_filename=f.name,
+                    file_type=BuildingBoQFile.FILE_TYPE_BOQ,
                 )
         # If no new files submitted but has_boq=yes, keep existing files
     else:
         # has_boq=no — remove all existing BoQ files
-        for old_file in building.boq_files.all():
+        for old_file in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_BOQ):
             try:
                 if os.path.isfile(old_file.file.path):
                     os.remove(old_file.file.path)
@@ -156,22 +192,33 @@ def upload_building_files(request):
             "url": f"/building/files/serve/?building_uuid={building.uuid}&type=certification",
         }
 
+    drawing_info = [
+        {
+            "id": bf.id,
+            "name": bf.original_filename or os.path.basename(bf.file.name),
+            "url": f"/building/files/serve/?building_uuid={building.uuid}&type=boq&file_id={bf.id}",
+        }
+        for bf in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_DRAWING)
+    ]
+
     boq_info = [
         {
             "id": bf.id,
             "name": bf.original_filename or os.path.basename(bf.file.name),
             "url": f"/building/files/serve/?building_uuid={building.uuid}&type=boq&file_id={bf.id}",
         }
-        for bf in building.boq_files.all()
+        for bf in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_BOQ)
     ]
 
-    logger.info(f"Files uploaded for building {building.id}: cert={has_certification}, boq={has_boq}")
+    logger.info(f"Files uploaded for building {building.id}: cert={has_certification}, drawings={has_design_drawings}, boq={has_boq}")
 
     return JsonResponse({
         "success": True,
         "has_certification": building.has_certification,
+        "has_design_drawings": building.has_design_drawings,
         "has_boq": building.has_boq,
         "certification_file": cert_info,
+        "design_drawing_files": drawing_info,
         "boq_files": boq_info,
     })
 
@@ -249,19 +296,30 @@ def get_building_files(request):
             "url": f"/building/files/serve/?building_uuid={building.uuid}&type=certification",
         }
 
+    drawing_info = [
+        {
+            "id": bf.id,
+            "name": bf.original_filename or os.path.basename(bf.file.name),
+            "url": f"/building/files/serve/?building_uuid={building.uuid}&type=boq&file_id={bf.id}",
+        }
+        for bf in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_DRAWING)
+    ]
+
     boq_info = [
         {
             "id": bf.id,
             "name": bf.original_filename or os.path.basename(bf.file.name),
             "url": f"/building/files/serve/?building_uuid={building.uuid}&type=boq&file_id={bf.id}",
         }
-        for bf in building.boq_files.all()
+        for bf in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_BOQ)
     ]
 
     return JsonResponse({
         "success": True,
         "has_certification": building.has_certification,
+        "has_design_drawings": building.has_design_drawings,
         "has_boq": building.has_boq,
         "certification_file": cert_info,
+        "design_drawing_files": drawing_info,
         "boq_files": boq_info,
     })

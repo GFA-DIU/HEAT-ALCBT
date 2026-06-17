@@ -7,6 +7,37 @@ class GeoLocationPicker {
     this.country = "";
     this.city = "";
     this.state = "";
+    // Ordered lists of candidate names so we can try several keys when
+    // matching against the region / city dropdowns (Nominatim is inconsistent:
+    // city-states like Bangkok expose the region only under `city`).
+    this.stateCandidates = [];
+    this.cityCandidates = [];
+  }
+
+  _extractCandidates(addr) {
+    addr = addr || {};
+    // Region/state candidates, most-specific first
+    this.stateCandidates = [
+      addr.state,
+      addr.region,
+      addr.province,
+      addr.state_district,
+      addr.county,
+      // City-states (Bangkok, Singapore, etc.) expose the region as `city`
+      addr.city,
+    ].filter(Boolean);
+    // City candidates
+    this.cityCandidates = [
+      addr.city,
+      addr.town,
+      addr.village,
+      addr.municipality,
+      addr.suburb,
+      addr.city_district,
+    ].filter(Boolean);
+    this.state = this.stateCandidates[0] || "";
+    this.city = this.cityCandidates[0] || "";
+    this.country = addr.country || "";
   }
 
   init() {
@@ -72,7 +103,7 @@ class GeoLocationPicker {
   async searchLocation(query) {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&accept-language=en&q=${encodeURIComponent(
           query
         )}&limit=1`
       );
@@ -82,9 +113,7 @@ class GeoLocationPicker {
         const { lat, lon, display_name, address } = results[0];
         this.map.setView([parseFloat(lat), parseFloat(lon)], 15);
         this.selectedAddress = display_name;
-        this.city = address.city
-        this.state = address.state || "";
-        this.country = address.country || "";
+        this._extractCandidates(address);
       }
     } catch (error) {
       console.error("Search failed:", error);
@@ -94,13 +123,11 @@ class GeoLocationPicker {
   async reverseGeocode(lat, lng) {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        `https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&accept-language=en&lat=${lat}&lon=${lng}`
       );
       const data = await response.json();
       this.selectedAddress = data.display_name || "";
-      this.city = data.address.city
-      this.state = data.address.state || "";
-      this.country = data.address.country || "";
+      this._extractCandidates(data.address);
     } catch (error) {
       console.error("Reverse geocoding failed:", error);
     }
@@ -128,7 +155,9 @@ class GeoLocationPicker {
       address: this.selectedAddress,
       country: this.country,
       city: this.city,
-      state: this.state
+      state: this.state,
+      stateCandidates: this.stateCandidates.slice(),
+      cityCandidates: this.cityCandidates.slice(),
     };
   }
 }
@@ -163,44 +192,117 @@ function getOptionNameAndValue(option) {
   };
 }
 
-function selectCurrentLocation() {
-  if (window.geoLocationPicker) {
-    const location = window.geoLocationPicker.getSelectedLocation();
-    // Fill the form fields
-    const addressInput = document.querySelector(
-      'input[placeholder*="1885 L Street"]'
+// Find a <select> option whose visible text matches one of the candidate names.
+// Tries exact (case-insensitive) match first, then a contains/startsWith fallback.
+function findOptionByNames(selectEl, candidates) {
+  if (!selectEl || !candidates || !candidates.length) return null;
+  const options = Array.from(selectEl.options).filter((o) => o.value);
+  const norm = (s) => (s || "").toString().trim().toLowerCase();
+  // Exact match pass
+  for (const name of candidates) {
+    const target = norm(name);
+    if (!target) continue;
+    const exact = options.find((o) => norm(o.text) === target);
+    if (exact) return exact;
+  }
+  // Loose match pass (handles "Bangkok Metropolis" vs "Bangkok", etc.)
+  for (const name of candidates) {
+    const target = norm(name);
+    if (!target) continue;
+    const loose = options.find(
+      (o) => norm(o.text).includes(target) || target.includes(norm(o.text))
     );
-    const latInput = document.querySelector('input[placeholder*="5.603722"]');
-    const lngInput = document.querySelector('input[placeholder*="-7.946232"]');
+    if (loose) return loose;
+  }
+  return null;
+}
 
-    if (addressInput && location.address) {
-      addressInput.value = location.address;
-    }
-    if (latInput) {
-      latInput.value = location.latitude.toFixed(6);
-    }
-    if (lngInput) {
-      lngInput.value = location.longitude.toFixed(6);
-    }
-    if(location.country){
-      const countrySelect = document.querySelector('select#country-select');
-      /// get all countries datalist options
-      let countryOptions = countrySelect.querySelectorAll('option');
-      
-      if (countrySelect) {
-        const opts = Array.from(countryOptions).map(getOptionNameAndValue);
-        const matchedCountry = opts.find(
-          (opt) => opt.name?.toLowerCase() === location.country.toLowerCase()
-        );
-        countrySelect.value = matchedCountry ? matchedCountry.value : "";
-        htmx.trigger(countrySelect, 'change');
-      }
-    }
+// Fire a native change event so the form-validator clears the "required" error.
+function notifyChange(el) {
+  if (el) el.dispatchEvent(new Event("change", { bubbles: true }));
+}
 
-    closeGeoLocationModal();
+async function selectCurrentLocation() {
+  if (!window.geoLocationPicker) return;
+
+  const location = window.geoLocationPicker.getSelectedLocation();
+  console.log("[GeoLocation] Selected location:", location);
+
+  // Fill the form fields
+  const addressInput = document.querySelector('input[placeholder*="1885 L Street"]');
+  const latInput = document.querySelector('input[placeholder*="5.603722"]');
+  const lngInput = document.querySelector('input[placeholder*="-7.946232"]');
+
+  if (addressInput && location.address) {
+    addressInput.value = location.address;
+    notifyChange(addressInput);
+  }
+  if (latInput) {
+    latInput.value = location.latitude.toFixed(6);
+    notifyChange(latInput);
+  }
+  if (lngInput) {
+    lngInput.value = location.longitude.toFixed(6);
+    notifyChange(lngInput);
   }
 
+  // Close the modal immediately; the cascade runs asynchronously.
+  closeGeoLocationModal();
 
+  if (!location.country) return;
+
+  const countrySelect = document.querySelector("select#country-select");
+  if (!countrySelect) return;
+
+  const opts = Array.from(countrySelect.querySelectorAll("option")).map(getOptionNameAndValue);
+  const matchedCountry = opts.find(
+    (opt) => opt.name && opt.name.toLowerCase() === location.country.toLowerCase()
+  );
+
+  if (!matchedCountry) {
+    console.warn("[GeoLocation] No country match for:", location.country);
+    return;
+  }
+
+  // Set the value WITHOUT dispatching change: dispatching would trigger the
+  // country select's own hx-trigger and race a second region load against ours.
+  countrySelect.value = matchedCountry.value;
+
+  try {
+    // 1. Load regions for the matched country into #region-select
+    await htmx.ajax("GET", "/select_lists/?country=" + matchedCountry.value, {
+      target: "#region-select",
+      swap: "innerHTML",
+    });
+
+    const regionSelect = document.getElementById("region-select");
+    const regionMatch = findOptionByNames(regionSelect, location.stateCandidates);
+    if (!regionMatch) {
+      console.warn("[GeoLocation] No region match for candidates:", location.stateCandidates);
+      return;
+    }
+    regionSelect.value = regionMatch.value;
+    notifyChange(regionSelect);
+    console.log("[GeoLocation] Matched region:", regionMatch.text);
+
+    // 2. Load cities for the matched region into #city-select
+    await htmx.ajax("GET", "/select_lists/?region=" + regionMatch.value, {
+      target: "#city-select",
+      swap: "innerHTML",
+    });
+
+    const citySelect = document.getElementById("city-select");
+    const cityMatch = findOptionByNames(citySelect, location.cityCandidates);
+    if (!cityMatch) {
+      console.warn("[GeoLocation] No city match for candidates:", location.cityCandidates);
+      return;
+    }
+    citySelect.value = cityMatch.value;
+    notifyChange(citySelect);
+    console.log("[GeoLocation] Matched city:", cityMatch.text);
+  } catch (err) {
+    console.error("[GeoLocation] Cascade failed:", err);
+  }
 }
 
 // Attach to window for global access (needed for onclick handlers)

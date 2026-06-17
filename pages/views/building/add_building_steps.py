@@ -22,7 +22,7 @@ from accounts.models import CustomCity, CustomRegion
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.assembly import Assembly, StructuralProduct
 from pages.models.base import ALCBTCountryManager
-from pages.models.building import Building, BuildingAssembly, BuildingCategory, OperationalProduct, CategorySubcategory, ClimateZone
+from pages.models.building import Building, BuildingAssembly, BuildingBoQFile, BuildingCategory, OperationalProduct, CategorySubcategory, ClimateZone
 from pages.models.building_operation.energy_summary import EnergySummary
 from pages.models.climate_type import ClimateType
 from pages.models.epd import EPD, EPDImpact, EPDType, MaterialCategory
@@ -182,13 +182,21 @@ def handle_details_step(request):
                     "name": _os.path.basename(building.certification_file.name),
                     "url": f"/building/files/serve/?building_uuid={building.uuid}&type=certification",
                 }
+            drawing_info = [
+                {
+                    "id": bf.id,
+                    "name": bf.original_filename or _os.path.basename(bf.file.name),
+                    "url": f"/building/files/serve/?building_uuid={building.uuid}&type=boq&file_id={bf.id}",
+                }
+                for bf in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_DRAWING)
+            ]
             boq_info = [
                 {
                     "id": bf.id,
                     "name": bf.original_filename or _os.path.basename(bf.file.name),
                     "url": f"/building/files/serve/?building_uuid={building.uuid}&type=boq&file_id={bf.id}",
                 }
-                for bf in building.boq_files.all()
+                for bf in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_BOQ)
             ]
 
             # Pre-fill text fields
@@ -203,9 +211,12 @@ def handle_details_step(request):
                 "construction_year": building.construction_year,
                 "total_floor_area": building.total_floor_area,
                 "conditioned_floor_area": building.cond_floor_area,
+                "floors_above_ground": building.floors_above_ground,
                 "floors_below_ground": building.floors_below_ground,
                 "has_certification": building.has_certification,
                 "certification_file": cert_info,
+                "has_design_drawings": building.has_design_drawings,
+                "design_drawing_files": drawing_info,
                 "has_boq": building.has_boq,
                 "boq_files": boq_info,
                 "total_annual_energy_consumption": energy_summary.total_kwh if energy_summary and energy_summary.total_kwh is not None else None,
@@ -237,7 +248,13 @@ def handle_details_step(request):
                     subcategories = CategorySubcategory.objects.filter(
                         category=building.category.category
                     ).select_related('subcategory').order_by('subcategory__name')
-                    context["apartment_types"] = [cs.subcategory for cs in subcategories]
+                    seen_ids = set()
+                    unique_subcats = []
+                    for cs in subcategories:
+                        if cs.subcategory_id not in seen_ids:
+                            seen_ids.add(cs.subcategory_id)
+                            unique_subcats.append(cs.subcategory)
+                    context["apartment_types"] = unique_subcats
                 # else: saved category not valid for this country — leave selects empty
 
         except Building.DoesNotExist:
@@ -692,6 +709,7 @@ def save_building_step(request):
                         'conditioned_floor_area': 'cond_floor_area',
                         'construction_year': 'construction_year',
                         'total_floor_area': 'total_floor_area',
+                        'floors_above_ground': 'floors_above_ground',
                         'floors_below_ground': 'floors_below_ground',
                         'seismic_zone': 'seismic_zone',
                     }
@@ -863,13 +881,17 @@ def get_building_data(request):
 
             # Step 1.2 fields (use form field names)
             'building_type': building_type_id,
+            'building_type_name': building.category.category.name if building.category else '',
             'apartment_type': apartment_type_id,
             'climate_type': building.climate_zone.name if building.climate_zone else '',
             'assessment_period': building.reference_period,
             'construction_year': building.construction_year,
             'total_floor_area': str(building.total_floor_area) if building.total_floor_area else '',
             'conditioned_floor_area': str(building.cond_floor_area) if building.cond_floor_area else '',
+            'floors_above_ground': building.floors_above_ground,
             'floors_below_ground': building.floors_below_ground,
+            'has_design_drawings': building.has_design_drawings,
+            'seismic_zone': building.seismic_zone or '',
         }
 
         return JsonResponse({
