@@ -949,3 +949,84 @@ def complete_building_setup(request):
     except Exception as e:
         logging.error(f"Error completing building setup: {str(e)}")
         return JsonResponse({"error": str(e)}, status=500)
+
+
+_SYSTEM_NA_FIELDS = {
+    "cooling": "cooling_not_applicable",
+    "ventilation": "ventilation_not_applicable",
+    "lighting": "lighting_not_applicable",
+    "lift": "lift_not_applicable",
+    "hot_water": "hot_water_not_applicable",
+}
+
+
+@login_required
+@require_http_methods(["POST"])
+def toggle_system_not_applicable(request):
+    """Toggle a system's not-applicable flag on the building."""
+    try:
+        data = json.loads(request.body)
+        building_uuid = data.get("building_uuid")
+        system = data.get("system")
+        value = data.get("value", False)
+
+        field = _SYSTEM_NA_FIELDS.get(system)
+        if not field:
+            return JsonResponse({"success": False, "error": "Unknown system"}, status=400)
+
+        uuid_obj = uuid_lib.UUID(building_uuid)
+        building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+        setattr(building, field, bool(value))
+        building.save(update_fields=[field])
+        return JsonResponse({"success": True, "system": system, "value": bool(value)})
+    except (ValueError, Building.DoesNotExist):
+        return JsonResponse({"success": False, "error": "Building not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_systems_status(request):
+    """Return completion status for all 5 operational systems."""
+    building_uuid = request.GET.get("building_uuid")
+    try:
+        uuid_obj = uuid_lib.UUID(building_uuid)
+        building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+        systems = [
+            {
+                "key": "cooling",
+                "label": "Cooling system",
+                "has_data": building.air_conditioners.exists() or building.chillers.exists(),
+                "not_applicable": building.cooling_not_applicable,
+            },
+            {
+                "key": "ventilation",
+                "label": "Ventilation system",
+                "has_data": building.ventilation_systems.exists(),
+                "not_applicable": building.ventilation_not_applicable,
+            },
+            {
+                "key": "lighting",
+                "label": "Lighting system",
+                "has_data": building.lighting_systems.exists(),
+                "not_applicable": building.lighting_not_applicable,
+            },
+            {
+                "key": "lift",
+                "label": "Lift & escalator system",
+                "has_data": building.lift_escalator_systems.exists(),
+                "not_applicable": building.lift_not_applicable,
+            },
+            {
+                "key": "hot_water",
+                "label": "Hot water system",
+                "has_data": building.hot_water_systems.exists(),
+                "not_applicable": building.hot_water_not_applicable,
+            },
+        ]
+        return JsonResponse({"success": True, "systems": systems})
+    except (ValueError, Building.DoesNotExist):
+        return JsonResponse({"success": False, "error": "Building not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=500)

@@ -16,7 +16,9 @@ from .views.assembly.assembly import component_edit
 from .views.building.add_building_steps import (building_step_view,
                                                 complete_building_setup,
                                                 get_building_data,
-                                                save_building_step)
+                                                get_systems_status,
+                                                save_building_step,
+                                                toggle_system_not_applicable)
 from .views.building.building import building, savings_tab
 from .views.building.building_report import export_building
 from .views.building.building_simulation import building_simulation
@@ -106,6 +108,8 @@ urlpatterns = [
     path("building/energy-summary/save/", save_energy_summary, name="energy_summary_save"),
     path("building/step/structural", building_step_structural_products, name="building_step_structural"),
     path("building/complete", complete_building_setup, name="complete_building_setup"),
+    path("building/step/system-na", toggle_system_not_applicable, name="toggle_system_not_applicable"),
+    path("building/step/systems-status", get_systems_status, name="get_systems_status"),
     path("building/<uuid:building_id>/", building, name="building"),
     path("building/<uuid:building_id>/savings/", savings_tab, name="savings_tab"),
     path("building/<uuid:building_id>/export/", export_building, name="building_export"),

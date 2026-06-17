@@ -6,6 +6,7 @@ This provides HTMX endpoints for filtering, selecting, and saving operational pr
 import logging
 import json
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 import uuid as uuid_lib
 
 from django.contrib.auth.decorators import login_required
@@ -18,11 +19,50 @@ from django.db.models import Sum
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
 from pages.models.building import Building, OperationalProduct
-from pages.models.epd import EPD, MaterialCategory
+from pages.models.building_operation.energy_summary import EnergySummary
+from pages.models.epd import EPD, MaterialCategory, Unit
 from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.operational_products.operational_products import handle_op_products_save
 
 logger = logging.getLogger(__name__)
+
+
+def _to_kwh(prod):
+    """Convert an OperationalProduct's quantity to kWh using EPD conversion factors.
+
+    Returns None if conversion is not possible (missing data or unsupported unit pair).
+    Only meaningful when the EPD's declared_unit is kWh (i.e. it represents an energy carrier).
+    """
+    try:
+        qty = Decimal(str(prod.quantity))
+        declared = prod.epd.declared_unit
+        input_unit = (prod.input_unit or '').lower().strip()
+
+        def get_conv(key):
+            convs = prod.epd.conversions or []
+            v = next((c['value'] for c in convs if c['unit'] == key), None)
+            return Decimal(str(v)) if v is not None else None
+
+        if declared == Unit.KWH:
+            if input_unit == Unit.KWH:
+                return qty
+            if input_unit == Unit.M3:
+                kwh_per_kg = get_conv('kg') or get_conv('-')
+                kg_per_m3 = get_conv('kg/m^3')
+                if kwh_per_kg and kg_per_m3:
+                    return qty * kwh_per_kg * kg_per_m3
+            if input_unit == Unit.LITER:
+                kwh_per_kg = get_conv('kg') or get_conv('-')
+                kg_per_m3 = get_conv('kg/m^3')
+                if kwh_per_kg and kg_per_m3:
+                    return qty * kwh_per_kg * kg_per_m3 / Decimal('1000')
+            if input_unit == Unit.KG:
+                kwh_per_kg = get_conv('kg') or get_conv('-')
+                if kwh_per_kg:
+                    return qty * kwh_per_kg
+    except Exception:
+        pass
+    return None
 
 
 @login_required
@@ -156,36 +196,85 @@ def handle_select_product(request):
 def handle_save_products(request):
     """
     Save selected operational products directly to database.
-    Uses the existing handle_op_products_save() function.
+    Validates total kWh of all carriers against EnergySummary before saving.
     """
-    # Get building UUID from POST data
     building_uuid = request.POST.get("building_uuid")
-
     if not building_uuid:
         return JsonResponse({"error": "Building UUID is required"}, status=400)
 
     try:
-        # Get the building instance
         uuid_obj = uuid_lib.UUID(building_uuid)
         building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
     except (ValueError, Building.DoesNotExist):
         logger.error(f"Invalid building UUID or building not found: {building_uuid}")
         return JsonResponse({"error": "Invalid building UUID or building not found"}, status=400)
 
-    # Use the existing save handler to save directly to database
-    # This function deletes existing operational products and creates new ones
-    handle_op_products_save(request, building.id, simulation=False)
+    # Pre-save validation: sum all carriers' kWh and compare against total annual energy
+    try:
+        energy_summary = EnergySummary.objects.filter(building=building).first()
+        if energy_summary and energy_summary.total_kwh:
+            total_limit = energy_summary.total_kwh
 
+            # Parse submitted carriers from POST data (mirrors handle_op_products_save logic)
+            submitted = {}
+            for key, value in request.POST.items():
+                if key.startswith("material_") and "_quantity" in key:
+                    parts = key.split("_")
+                    epd_id = parts[1]
+                    timestamp = parts[-1]
+                    submitted[epd_id + timestamp] = {
+                        "epd_id": epd_id,
+                        "quantity": value,
+                        "unit": request.POST.get(f"material_{epd_id}_unit_{timestamp}", ""),
+                    }
+
+            epd_ids = [v["epd_id"] for v in submitted.values()]
+            epds_by_id = {str(e.id): e for e in EPD.objects.filter(id__in=epd_ids)}
+
+            total_kwh = Decimal("0")
+            for item in submitted.values():
+                epd = epds_by_id.get(item["epd_id"])
+                if not epd:
+                    continue
+                try:
+                    qty = Decimal(str(item["quantity"]))
+                except (InvalidOperation, ValueError):
+                    continue
+
+                class _FakeProd:
+                    pass
+
+                prod = _FakeProd()
+                prod.epd = epd
+                prod.quantity = qty
+                prod.input_unit = item["unit"]
+
+                kwh = _to_kwh(prod)
+                if kwh is not None:
+                    total_kwh += kwh
+
+            if total_kwh > total_limit:
+                response = JsonResponse({
+                    "error": (
+                        f"The total energy of all carriers ({round(total_kwh, 1)} kWh) "
+                        f"exceeds the total annual energy consumption ({total_limit} kWh). "
+                        f"Please reduce your carrier quantities."
+                    )
+                }, status=400)
+                response['HX-Reswap'] = 'none'
+                return response
+    except Exception as e:
+        logger.error(f"Energy carrier validation error: {e}")
+
+    handle_op_products_save(request, building.id, simulation=False)
     logger.info(f"Saved operational products to database for building {building.id}")
 
-    # Retrieve the saved products from database to display
     saved_products = OperationalProduct.objects.filter(
         building=building
     ).select_related('epd', 'epd__country', 'epd__category')
 
     selected_products = []
     for op_product in saved_products:
-        # Get available units and ensure it's a list
         available_units = op_product.epd.get_available_units()
         if available_units is None:
             available_units = [op_product.epd.declared_unit]
@@ -206,20 +295,14 @@ def handle_save_products(request):
             "op_units": available_units,
         })
 
-    context = {
-        "selected_products": selected_products,
-    }
+    context = {"selected_products": selected_products}
 
-    # Return just the form for HTMX swap
     response = render(
         request,
         "pages/add-building/components/operational-data-entry/_form_section.html",
         context
     )
-
-    # Add success header for HTMX
     response['HX-Trigger'] = 'operationalProductsSaved'
-
     return response
 
 

@@ -138,6 +138,7 @@ def get_lighting_systems(request, building_uuid):
         return JsonResponse({
             'success': True,
             'lighting_systems': [_serialize(s) for s in lighting_systems],
+            'not_applicable': building.lighting_not_applicable,
         }, status=200)
 
     except Exception as e:

@@ -193,7 +193,8 @@ def get_lift_escalator_systems(request, building_uuid):
 
         return JsonResponse({
             'success': True,
-            'lift_escalator_systems': systems_data
+            'lift_escalator_systems': systems_data,
+            'not_applicable': building.lift_not_applicable,
         }, status=200)
 
     except Exception as e:

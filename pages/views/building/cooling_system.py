@@ -359,7 +359,8 @@ def get_cooling_systems(request, building_uuid):
 
         return JsonResponse({
             'success': True,
-            'cooling_systems': systems_data
+            'cooling_systems': systems_data,
+            'not_applicable': building.cooling_not_applicable,
         }, status=200)
 
     except Exception as e:

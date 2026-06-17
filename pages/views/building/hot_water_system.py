@@ -135,6 +135,7 @@ def get_hot_water_systems(request, building_uuid):
         return JsonResponse({
             'success': True,
             'hot_water_systems': [_serialize(s) for s in hot_water_systems],
+            'not_applicable': building.hot_water_not_applicable,
         }, status=200)
 
     except Exception as e:
