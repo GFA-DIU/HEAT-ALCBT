@@ -18,6 +18,7 @@ from typing import Dict, Any, List, Optional
 
 from pages.models.building import Building
 from pages.models.epd import Unit
+from pages.views.building.embodied_benchmark_data import get_embodied_savings_data
 from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
 from pages.models.building_operation.chilling import CoolingSystemChiller
 from pages.models.building_operation.ventilation import VentilationSystem
@@ -764,6 +765,10 @@ def get_building_chart_data(
         building, simulated=False, prefetched_operational=prefetched_operational
     )
 
+    embodied_by_material = get_embodied_carbon_by_material(
+        building, prefetched_assemblies=prefetched_assemblies
+    )
+
     return {
         'whole_life_carbon': {
             'labels': ['Operational carbon', 'Embodied carbon'],
@@ -772,9 +777,8 @@ def get_building_chart_data(
         'embodied_by_assembly': get_embodied_carbon_by_assembly(
             building, prefetched_assemblies=prefetched_assemblies
         ),
-        'embodied_by_material': get_embodied_carbon_by_material(
-            building, prefetched_assemblies=prefetched_assemblies
-        ),
+        'embodied_by_material': embodied_by_material,
+        'embodied_savings': get_embodied_savings_data(embodied_by_material),
         'operational_by_system': get_operational_carbon_by_system(
             building, prefetched_operational=prefetched_operational
         ),

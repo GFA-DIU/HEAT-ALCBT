@@ -46,3 +46,17 @@ _UNIT_DISPLAY = {
 def display_unit(value):
     return _UNIT_DISPLAY.get(value, value)
 
+
+_UNIT_DISPLAY_OP = {
+    "kwh": "kWh/yr",
+    "m3": "m³/yr",
+    "kg": "kg/yr",
+    "liter": "liter/yr",
+    "l": "liter/yr",
+}
+
+@register.filter(is_safe=True)
+@stringfilter
+def display_unit_op(value):
+    return _UNIT_DISPLAY_OP.get(value, value)
+

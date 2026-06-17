@@ -115,8 +115,8 @@ class StepManager {
             name: gettext("Data Entry"),
             component: "operational-data-entry/operational-data-entry.html",
             requiredFields: ["energy_consumption"],
-            title: gettext("Operational Energy carrier"),
-            description: gettext("Tell us what fuels or energy sources your building runs on."),
+            title: gettext("Annual Operational Energy Carriers"),
+            description: gettext("Tell us what fuels or energy sources your building runs on annually."),
           },
         ],
       },
@@ -414,7 +414,7 @@ class StepManager {
             <span class="stepper-sub-item-text ${
               isSubActive ? "text-[var(--text--strong-950)]" : ""
             } ${
-            isSubCompleted ? "text-[var(--text--strong-950)] line-through" : ""
+            isSubCompleted ? "text-[var(--text--strong-950)]" : ""
           }">${subStep.name}</span>
             <span data-icon="arrow-right-up-line" data-size="12"></span>
           </div>
@@ -1372,7 +1372,7 @@ class StepManager {
           Toast.success("Building setup completed successfully!");
           
           setTimeout(() => {
-            window.location.href = `/building/${result.building_uuid}/dashboard`;
+            window.location.href = result.redirect_url;
           }, 1000);
 
         // Clear localStorage

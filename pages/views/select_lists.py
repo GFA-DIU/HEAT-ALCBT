@@ -89,7 +89,12 @@ def select_lists(request):
                 category_id=category_id
             ).select_related('subcategory').order_by('subcategory__name')
 
-        items = [cs.subcategory for cs in subcategories]
+        seen_ids = set()
+        items = []
+        for cs in subcategories:
+            if cs.subcategory_id not in seen_ids:
+                seen_ids.add(cs.subcategory_id)
+                items.append(cs.subcategory)
         return render(
             request,
             "pages/utils/select_list.html",

@@ -21,6 +21,8 @@ from pages.models.epd import EPDImpact, MaterialCategory
 from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.building_stats import (
     get_building_chart_data, get_building_detail_statistics)
+from pages.views.building.embodied_benchmark_data import (
+    get_benchmark_for_building, calculate_benchmark_position)
 from pages.views.building.impact_calculation import calculate_impacts
 from pages.views.building.operational_products.operational_products import (
     get_op_product, get_op_product_list, handle_op_products_save,
@@ -203,6 +205,11 @@ def handle_building_load(request, building_id, simulation):
         prefetched_operational=building.prefetched_operational_products,
     )
 
+    benchmark = get_benchmark_for_building(building)
+    benchmark_position = calculate_benchmark_position(
+        building_stats.get('total_embodied_carbon', 0), benchmark
+    )
+
     context = {
         "building_id": building.id,
         "building": building,
@@ -218,6 +225,10 @@ def handle_building_load(request, building_id, simulation):
         "stats": building_stats,
         "calculation_errors": building_stats.get('calculation_errors', []),
         "chart_data": json.dumps(chart_data),  # Convert to JSON for JavaScript
+        # Benchmark and savings data for export card and savings tab
+        "benchmark": benchmark,
+        "benchmark_position": benchmark_position,
+        "embodied_savings": chart_data.get("embodied_savings", {}),
     }
 
     form = BuildingGeneralInformation(instance=building)

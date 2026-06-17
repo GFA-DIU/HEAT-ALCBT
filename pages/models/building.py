@@ -203,8 +203,12 @@ class BuildingOperationalInfo(models.Model):
         null=True,
         blank=True,
     )
+    has_design_drawings = models.BooleanField(
+        _("Has Design Drawings"),
+        default=False,
+    )
     has_boq = models.BooleanField(
-        _("Has Design Drawings / BoQ"),
+        _("Has Bill of Quantities (BoQ)"),
         default=False,
     )
     ### Building Services
@@ -470,6 +474,13 @@ class SimulatedOperationalProduct(BaseProduct):
 class BuildingBoQFile(models.Model):
     """Stores design drawings and BoQ files uploaded for a building."""
 
+    FILE_TYPE_BOQ = "boq"
+    FILE_TYPE_DRAWING = "drawing"
+    FILE_TYPE_CHOICES = [
+        (FILE_TYPE_BOQ, "Bill of Quantities"),
+        (FILE_TYPE_DRAWING, "Design Drawing"),
+    ]
+
     building = models.ForeignKey(
         Building,
         on_delete=models.CASCADE,
@@ -480,6 +491,12 @@ class BuildingBoQFile(models.Model):
         upload_to=boq_file_upload_path,
     )
     original_filename = models.CharField(_("Original Filename"), max_length=255, blank=True)
+    file_type = models.CharField(
+        _("File Type"),
+        max_length=10,
+        choices=FILE_TYPE_CHOICES,
+        default=FILE_TYPE_BOQ,
+    )
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -54,10 +54,10 @@
   <div class="col-span-3 grid grid-cols-2 gap-1">
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        {% translate "Room heating temperature" %}<span class="text-error">*</span>
+        {% translate "Room heating temperature" %}
       </legend>
-      <label class="input validator w-full pr-0 overflow-hidden">
-        <input type="number" placeholder="e.g. 18" name="room_heating_temperature" required  />
+      <label class="input w-full pr-0 overflow-hidden">
+        <input type="number" placeholder="e.g. 18" name="room_heating_temperature" />
         <select
           class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[calc(max-content+1rem)]"
           name="heating_temperature_unit"
@@ -66,15 +66,14 @@
           <option value="fahrenheit">{% translate "°Fahrenheit" %}</option>
         </select>
       </label>
-      <p class="validator-hint">{% translate "Enter a valid value" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
       <legend class="fieldset-legend">
-        {% translate "Room cooling temperature" %}<span class="text-error">*</span>
+        {% translate "Room cooling temperature" %}
       </legend>
-      <label class="input validator w-full pr-0 overflow-hidden">
-        <input type="number" placeholder="e.g. 32" name="room_cooling_temperature" required />
+      <label class="input w-full pr-0 overflow-hidden">
+        <input type="number" placeholder="e.g. 32" name="room_cooling_temperature" />
         <select
           class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[calc(max-content+1rem)]"
           name="cooling_temperature_unit"
@@ -83,19 +82,17 @@
           <option value="fahrenheit">{% translate "°Fahrenheit" %}</option>
         </select>
       </label>
-      <p class="validator-hint">{% translate "Enter a valid value" %}</p>
     </fieldset>
   </div>
 
   <fieldset class="fieldset col-span-3">
     <legend class="fieldset-legend">
-      {% translate "Renewable energy installation (%)" %}<span class="text-error">*</span>
+      {% translate "Renewable energy installation (%)" %}
     </legend>
-    <label class="input validator w-full">
-      <input type="number" placeholder="e.g. 15" name="renewable_energy_percent" required min="0.01" max="100" step="0.01" />
+    <label class="input w-full">
+      <input type="number" placeholder="e.g. 15" name="renewable_energy_percent" min="0.01" max="100" step="0.01" />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
     </label>
-    <p class="validator-hint">{% translate "Enter a value greater than 0" %}</p>
   </fieldset>
 
   <fieldset class="fieldset col-span-3">
@@ -180,7 +177,45 @@
     }
   }
 
-  // Load existing data when page loads
-  loadExistingData();
+  // Industry-typical defaults per building type (subject to ALCBT methodology review)
+  const SCHEDULE_DEFAULTS = {
+    'homes':      { hrs: 16, days: 7, weeks: 52 },
+    'apartments': { hrs: 16, days: 7, weeks: 52 },
+    'office':     { hrs:  9, days: 5, weeks: 50 },
+    'retail':     { hrs: 10, days: 6, weeks: 50 },
+    'hotels':     { hrs: 24, days: 7, weeks: 52 },
+    'resorts':    { hrs: 24, days: 7, weeks: 52 },
+    'healthcare': { hrs: 24, days: 7, weeks: 52 },
+    'education':  { hrs:  8, days: 5, weeks: 40 },
+    'industrial': { hrs:  8, days: 6, weeks: 50 },
+    'mixed use':  { hrs: 12, days: 6, weeks: 50 },
+  };
+
+  async function applyScheduleDefaults() {
+    if (!buildingUuid) return;
+    const hrsField  = form.querySelector('[name="annual_operating_hours_per_day"]');
+    const daysField = form.querySelector('[name="annual_operating_days_per_week"]');
+    const wksField  = form.querySelector('[name="annual_operating_weeks_per_year"]');
+    if (!hrsField || !daysField || !wksField) return;
+    // Only apply if all three are still empty (don't overwrite user/saved data)
+    if (hrsField.value || daysField.value || wksField.value) return;
+    try {
+      const resp = await fetch(`/building/step/data?building_uuid=${buildingUuid}`);
+      if (!resp.ok) return;
+      const result = await resp.json();
+      const typeName = (result.data && result.data.building_type_name) ? result.data.building_type_name.toLowerCase().trim() : '';
+      const defaults = SCHEDULE_DEFAULTS[typeName];
+      if (defaults) {
+        if (!hrsField.value)  hrsField.value  = defaults.hrs;
+        if (!daysField.value) daysField.value = defaults.days;
+        if (!wksField.value)  wksField.value  = defaults.weeks;
+      }
+    } catch (e) {
+      // Non-fatal — user can fill in manually
+    }
+  }
+
+  // Load existing data when page loads, then apply defaults for empty fields
+  Promise.resolve(loadExistingData()).then(applyScheduleDefaults);
 })();
 </script>

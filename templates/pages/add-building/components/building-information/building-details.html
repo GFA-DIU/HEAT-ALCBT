@@ -106,20 +106,21 @@
   </fieldset>
 
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">{% translate "Construction year" %}<span class="text-[var(--state--error--base)]">*</span></legend>
-    <label class="input w-full validator">
-      <input name="construction_year" type="number" placeholder="e.g. 2020" required min="1900" max="2026" {% if building_data.construction_year %}value="{{ building_data.construction_year }}"{% endif %} />
+    <legend class="fieldset-legend">{% translate "Construction year" %}</legend>
+    <label class="input w-full">
+      <input name="construction_year" type="number" placeholder="e.g. 2020" min="1900" max="2026" {% if building_data.construction_year %}value="{{ building_data.construction_year }}"{% endif %} />
     </label>
   </fieldset>
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">
-      {% translate "Total floor area" %} <span class="text-[var(--text--sub-600)]">(m²)</span>
+      {% translate "Total floor area" %} <span class="text-[var(--text--sub-600)]">(m²)</span><span class="text-[var(--state--error--base)]">*</span>
     </legend>
-    <label class="input w-full">
+    <label class="input validator w-full">
       <input name="total_floor_area" type="number" required placeholder="e.g. 340" min="1" {% if building_data.total_floor_area %}value="{{ building_data.total_floor_area }}"{% endif %} />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">m²</span>
     </label>
+    <p class="validator-hint">{% translate "This field is required" %}</p>
   </fieldset>
 
   <fieldset class="fieldset">
@@ -139,9 +140,16 @@
   </fieldset>
 
   <fieldset class="fieldset">
+    <legend class="fieldset-legend">{% translate "Number of floors above ground" %}</legend>
+    <label class="input w-full">
+      <input name="floors_above_ground" type="number" placeholder="e.g. 5" min="0" {% if building_data.floors_above_ground %}value="{{ building_data.floors_above_ground }}"{% endif %} />
+    </label>
+  </fieldset>
+
+  <fieldset class="fieldset">
     <legend class="fieldset-legend">{% translate "Number of floors below ground" %}</legend>
     <label class="input w-full">
-      <input name="floors_below_ground" type="number" placeholder="e.g. 3" required min="0" {% if building_data.floors_below_ground %}value="{{ building_data.floors_below_ground }}"{% endif %} />
+      <input name="floors_below_ground" type="number" placeholder="e.g. 3" min="0" {% if building_data.floors_below_ground %}value="{{ building_data.floors_below_ground }}"{% endif %} />
     </label>
   </fieldset>
 
@@ -173,7 +181,7 @@
   <!-- Certification -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
-      {% translate "Has the building's certification process underway/been completed?" %}<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Has the green building certification process been completed?" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <div class="flex items-center gap-2.5">
       <label class="flex items-center gap-2">
@@ -208,10 +216,52 @@
     </fieldset>
   </div>
 
-  <!-- BoQ / Design Drawings -->
+  <!-- Design Drawings -->
   <fieldset class="fieldset col-span-2">
     <legend class="fieldset-legend">
-      {% translate "Does the building have design drawings and Bill of Quantities (BoQ) that you can upload?" %}<span class="text-[var(--state--error--base)]">*</span>
+      {% translate "Do you have design drawings available to upload?" %}<span class="text-[var(--state--error--base)]">*</span>
+    </legend>
+    <div class="flex items-center gap-2.5">
+      <label class="flex items-center gap-2">
+        <input type="radio" name="has_design_drawings" value="yes" class="radio radio-xs" id="drawings-yes"
+          {% if building_data.has_design_drawings %}checked{% endif %}
+          onchange="toggleDrawingsUpload(this.value)" /> {% translate "Yes" %}
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="radio" name="has_design_drawings" value="no" class="radio radio-xs" id="drawings-no"
+          {% if not building_data.has_design_drawings %}checked{% endif %}
+          onchange="toggleDrawingsUpload(this.value)" /> {% translate "No" %}
+      </label>
+    </div>
+  </fieldset>
+
+  <div id="drawings-upload-section" class="col-span-2 {% if not building_data.has_design_drawings %}hidden{% endif %}">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">{% translate "Upload design drawings (images or PDFs, multiple allowed)" %}</legend>
+      <input type="file" name="design_drawing_files" id="design_drawing_files"
+        accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
+        multiple
+        class="file-input file-input-bordered w-full" />
+      <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Accepted: images (JPG, PNG, GIF, WEBP) and PDF. Max 20 MB per file. Upload new files to replace existing ones." %}</p>
+      {% if building_data.design_drawing_files %}
+      <div id="drawings-existing" class="mt-1 flex flex-col gap-1">
+        {% for df in building_data.design_drawing_files %}
+        <div class="flex items-center gap-2 text-sm">
+          <span data-icon="file-text" data-size="16"></span>
+          <a href="{{ df.url }}" target="_blank" class="link link-primary truncate max-w-xs">
+            {{ df.name }}
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </fieldset>
+  </div>
+
+  <!-- Bill of Quantities -->
+  <fieldset class="fieldset col-span-2">
+    <legend class="fieldset-legend">
+      {% translate "Do you have a Bill of Quantities (BoQ) available to upload?" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
     <div class="flex items-center gap-2.5">
       <label class="flex items-center gap-2">
@@ -229,7 +279,7 @@
 
   <div id="boq-upload-section" class="col-span-2 {% if not building_data.has_boq %}hidden{% endif %}">
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Upload design drawings / BoQ (images or PDFs, multiple allowed)" %}</legend>
+      <legend class="fieldset-legend">{% translate "Upload Bill of Quantities (images or PDFs, multiple allowed)" %}</legend>
       <input type="file" name="boq_files" id="boq_files"
         accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
         multiple
@@ -255,11 +305,16 @@
 <script>
 (function () {
   var i18n = {
-    uploadCertError: "{% translate 'Please upload a certification file, or select \"No\" if not applicable.' %}",
-    uploadBoqError:  "{% translate 'Please upload at least one BoQ / design drawing file, or select \"No\" if not applicable.' %}",
+    uploadCertError:     "{% translate 'Please upload a certification file, or select \"No\" if not applicable.' %}",
+    uploadDrawingsError: "{% translate 'Please upload at least one design drawing file, or select \"No\" if not applicable.' %}",
+    uploadBoqError:      "{% translate 'Please upload at least one BoQ file, or select \"No\" if not applicable.' %}",
   };
   function toggleCertUpload(val) {
     var section = document.getElementById('cert-upload-section');
+    if (section) section.classList.toggle('hidden', val !== 'yes');
+  }
+  function toggleDrawingsUpload(val) {
+    var section = document.getElementById('drawings-upload-section');
     if (section) section.classList.toggle('hidden', val !== 'yes');
   }
   function toggleBoqUpload(val) {
@@ -267,12 +322,14 @@
     if (section) section.classList.toggle('hidden', val !== 'yes');
   }
   window.toggleCertUpload = toggleCertUpload;
+  window.toggleDrawingsUpload = toggleDrawingsUpload;
   window.toggleBoqUpload = toggleBoqUpload;
 
   // Upload files to the dedicated endpoint before the step-manager saves step data
   window.validateBuildingFiles = function () {
-    var hasCert = document.querySelector('[name="has_certification"]:checked');
-    var hasBoq  = document.querySelector('[name="has_boq"]:checked');
+    var hasCert     = document.querySelector('[name="has_certification"]:checked');
+    var hasDrawings = document.querySelector('[name="has_design_drawings"]:checked');
+    var hasBoq      = document.querySelector('[name="has_boq"]:checked');
 
     if (hasCert && hasCert.value === 'yes') {
       var certFile = document.getElementById('certification_file');
@@ -281,6 +338,17 @@
       var hasNew = certFile && certFile.files.length > 0;
       if (!hasExisting && !hasNew) {
         Toast.error(i18n.uploadCertError);
+        return false;
+      }
+    }
+
+    if (hasDrawings && hasDrawings.value === 'yes') {
+      var drawingFiles = document.getElementById('design_drawing_files');
+      var drawingsExisting = document.getElementById('drawings-existing');
+      var hasExistingDrawings = drawingsExisting && drawingsExisting.children.length > 0;
+      var hasNewDrawings = drawingFiles && drawingFiles.files.length > 0;
+      if (!hasExistingDrawings && !hasNewDrawings) {
+        Toast.error(i18n.uploadDrawingsError);
         return false;
       }
     }
@@ -300,21 +368,30 @@
   };
 
   window.uploadBuildingFiles = async function (buildingUuid) {
-    var hasCert = document.querySelector('[name="has_certification"]:checked');
-    var hasBoq  = document.querySelector('[name="has_boq"]:checked');
+    var hasCert     = document.querySelector('[name="has_certification"]:checked');
+    var hasDrawings = document.querySelector('[name="has_design_drawings"]:checked');
+    var hasBoq      = document.querySelector('[name="has_boq"]:checked');
 
-    var hasCertVal = hasCert ? hasCert.value : 'no';
-    var hasBoqVal  = hasBoq  ? hasBoq.value  : 'no';
+    var hasCertVal     = hasCert     ? hasCert.value     : 'no';
+    var hasDrawingsVal = hasDrawings ? hasDrawings.value : 'no';
+    var hasBoqVal      = hasBoq      ? hasBoq.value      : 'no';
 
-    // Only POST if the user actually made selections (always send to persist yes/no flags)
     var formData = new FormData();
     formData.append('building_uuid', buildingUuid);
     formData.append('has_certification', hasCertVal);
+    formData.append('has_design_drawings', hasDrawingsVal);
     formData.append('has_boq', hasBoqVal);
 
     var certFile = document.getElementById('certification_file');
     if (certFile && certFile.files.length > 0 && hasCertVal === 'yes') {
       formData.append('certification_file', certFile.files[0]);
+    }
+
+    var drawingFiles = document.getElementById('design_drawing_files');
+    if (drawingFiles && drawingFiles.files.length > 0 && hasDrawingsVal === 'yes') {
+      for (var i = 0; i < drawingFiles.files.length; i++) {
+        formData.append('design_drawing_files', drawingFiles.files[i]);
+      }
     }
 
     var boqFiles = document.getElementById('boq_files');
