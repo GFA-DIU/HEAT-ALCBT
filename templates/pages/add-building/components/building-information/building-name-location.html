@@ -189,13 +189,26 @@
     if (!countrySelect || !regionSelect || !citySelect) return;
 
     // Reset dependent dropdowns when country is cleared or changed
+    var _prevCountryValue = countrySelect.value;
     countrySelect.addEventListener('change', function() {
+      var hadRegion = regionSelect.value;
       if (!this.value) {
         regionSelect.innerHTML = '<option value="">{% translate "Select a region or state" %}</option>';
         citySelect.innerHTML = '<option value="">{% translate "Select a city" %}</option>';
       } else {
-        // When country changes, also reset city (region will be loaded by HTMX)
-        citySelect.innerHTML = '<option value="">{% translate "Select a city" %}</option>';
+        // When country changes and a region was already selected, reset both and warn
+        if (hadRegion && this.value !== _prevCountryValue) {
+          regionSelect.innerHTML = '<option value="">{% translate "Select a region or state" %}</option>';
+          citySelect.innerHTML = '<option value="">{% translate "Select a city" %}</option>';
+          if (typeof Toast !== 'undefined') Toast.info(i18n.countryChanged);
+        } else {
+          citySelect.innerHTML = '<option value="">{% translate "Select a city" %}</option>';
+        }
+      }
+      _prevCountryValue = this.value;
+      // Re-validate coordinate fields against new country bbox
+      if (validator) {
+        setTimeout(function() { validator.validate(); validator.updateFormStatus(); }, 50);
       }
     });
 
@@ -286,6 +299,14 @@
 <!-- Validation Script -->
 <script>
 (function() {
+  var ALCBT_BBOXES = {
+    "India":     { latMin: 6.5,   latMax: 37.1, lonMin: 68.1,  lonMax: 97.4  },
+    "Indonesia": { latMin: -11.0, latMax: 6.2,  lonMin: 95.0,  lonMax: 141.0 },
+    "Cambodia":  { latMin: 10.4,  latMax: 14.7, lonMin: 102.3, lonMax: 107.6 },
+    "Thailand":  { latMin: 5.6,   latMax: 20.5, lonMin: 97.3,  lonMax: 105.7 },
+    "Vietnam":   { latMin: 8.4,   latMax: 23.4, lonMin: 102.1, lonMax: 109.5 },
+  };
+
   var i18n = {
     buildingNameMinLength:   "{% translate 'Building name must be at least 2 characters' %}",
     buildingNameInvalidChars:"{% translate 'Building name cannot contain < or > characters' %}",
@@ -297,6 +318,9 @@
     longitudeRange:          "{% translate 'Longitude must be between -180 and 180' %}",
     latitudeInvalid:         "{% translate 'Latitude must be a valid number' %}",
     latitudeRange:           "{% translate 'Latitude must be between -90 and 90' %}",
+    coordsOutOfBounds:       "{% translate 'The coordinates entered do not fall within %s. Please re-enter the address or adjust the coordinates.' %}",
+    addressCountryMismatch:  "{% translate 'The address location does not match the selected country. Please correct the address or the country before continuing.' %}",
+    countryChanged:          "{% translate 'Country has been changed. Please re-select your region and city.' %}",
   };
 
   // Wait for form to be available
@@ -311,6 +335,42 @@
   if (!window.FormValidator) {
     console.error('FormValidator not loaded. Please include form-validator.js');
     return;
+  }
+
+  // Helper: validate lat/lon against selected country bounding box
+  function _getSelectedCountryName() {
+    var sel = document.getElementById('country-select');
+    if (!sel || !sel.value) return null;
+    var opt = sel.options[sel.selectedIndex];
+    return opt ? opt.getAttribute('data-name') : null;
+  }
+
+  function _validateCoordBbox(form, lat, lon) {
+    var latInput = form.querySelector('[name="latitude"]');
+    var lonInput = form.querySelector('[name="longitude"]');
+    var latVal = lat !== null ? lat : (latInput ? parseFloat(latInput.value) : NaN);
+    var lonVal = lon !== null ? lon : (lonInput ? parseFloat(lonInput.value) : NaN);
+    if (isNaN(latVal) || isNaN(lonVal)) return null; // Only validate when both present
+    var countryName = _getSelectedCountryName();
+    if (!countryName || !ALCBT_BBOXES[countryName]) return null;
+    var bb = ALCBT_BBOXES[countryName];
+    if (latVal < bb.latMin || latVal > bb.latMax || lonVal < bb.lonMin || lonVal > bb.lonMax) {
+      return i18n.coordsOutOfBounds.replace('%s', countryName);
+    }
+    return null;
+  }
+
+  // Inline warning element for address/country mismatch
+  var _mismatchWarning = null;
+  function _showAddressMismatchWarning(show) {
+    if (!_mismatchWarning) {
+      _mismatchWarning = document.createElement('p');
+      _mismatchWarning.className = 'text-xs text-warning mt-1 col-span-2';
+      var addressFieldset = form.querySelector('[name="address"]').closest('fieldset');
+      addressFieldset.parentNode.insertBefore(_mismatchWarning, addressFieldset.nextSibling);
+    }
+    _mismatchWarning.textContent = show ? i18n.addressCountryMismatch : '';
+    _mismatchWarning.style.display = show ? '' : 'none';
   }
 
   // Initialize form validator
@@ -372,35 +432,23 @@
         return null;
       },
 
-      // Validate longitude (optional, but if provided must be valid)
-      longitude: (value) => {
-        if (!value || value === '') return null; // Optional field
-
+      // Validate longitude (optional, but if provided must be valid and within country bbox)
+      longitude: (value, field, form) => {
+        if (!value || value === '') return null;
         const lng = parseFloat(value);
-        if (isNaN(lng)) {
-          return i18n.longitudeInvalid;
-        }
-        if (lng < -180 || lng > 180) {
-          return i18n.longitudeRange;
-        }
-
-        return null;
+        if (isNaN(lng)) return i18n.longitudeInvalid;
+        if (lng < -180 || lng > 180) return i18n.longitudeRange;
+        return _validateCoordBbox(form, null, lng);
       },
 
-      // Validate latitude (optional, but if provided must be valid)
-      latitude: (value) => {
-        if (!value || value === '') return null; // Optional field
-
+      // Validate latitude (optional, but if provided must be valid and within country bbox)
+      latitude: (value, field, form) => {
+        if (!value || value === '') return null;
         const lat = parseFloat(value);
-        if (isNaN(lat)) {
-          return i18n.latitudeInvalid;
-        }
-        if (lat < -90 || lat > 90) {
-          return i18n.latitudeRange;
-        }
-
-        return null;
-      }
+        if (isNaN(lat)) return i18n.latitudeInvalid;
+        if (lat < -90 || lat > 90) return i18n.latitudeRange;
+        return _validateCoordBbox(form, lat, null);
+      },
     },
 
     // Callback when validation status changes
@@ -418,6 +466,9 @@
 
   // Store validator instance globally for debugging
   window.currentFormValidator = validator;
+
+  // Expose address mismatch warning for geo-location.js to call
+  window._showGeoAddressMismatch = _showAddressMismatchWarning;
 
   // Handle HTMX responses for country/region/city selects
   // Re-validate dependent fields when selections change

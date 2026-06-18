@@ -261,7 +261,7 @@ class BuildingAddDetailsView(APIView):
         # Optional fields
         conditioned_floor_area = None
         cfa_raw = _str(data.get("conditioned_floor_area"))
-        if cfa_raw:
+        if cfa_raw is not None and cfa_raw != "":
             try:
                 conditioned_floor_area = float(cfa_raw)
             except (ValueError, TypeError):
@@ -311,10 +311,14 @@ class BuildingAddDetailsView(APIView):
 
         has_boq_raw = data.get("has_boq")
         if has_boq_raw is not None:
-            if isinstance(has_boq_raw, str):
-                building.has_boq = has_boq_raw.lower() in ("yes", "true", "1")
+            from pages.models.building import BuildingOperationalInfo
+            DocStatus = BuildingOperationalInfo.DocumentStatus
+            if isinstance(has_boq_raw, str) and has_boq_raw.lower() in ("yes", "true", "1"):
+                building.boq_status = DocStatus.UPLOADED
+            elif isinstance(has_boq_raw, bool) and has_boq_raw:
+                building.boq_status = DocStatus.UPLOADED
             else:
-                building.has_boq = bool(has_boq_raw)
+                building.boq_status = DocStatus.NOT_AVAILABLE
 
         building.save()
 

@@ -222,6 +222,17 @@ function notifyChange(el) {
   if (el) el.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
+// Re-validate geo fields via FormValidator directly, without dispatching DOM events
+// that would re-trigger HTMX cascades and wipe freshly-loaded dropdown values.
+function _revalidateGeoFields(countryEl, regionEl, cityEl) {
+  const fv = window.currentFormValidator;
+  if (!fv) return;
+  if (countryEl) fv.validateField(countryEl);
+  if (regionEl) fv.validateField(regionEl);
+  if (cityEl) fv.validateField(cityEl);
+  fv.updateFormStatus();
+}
+
 async function selectCurrentLocation() {
   if (!window.geoLocationPicker) return;
 
@@ -261,6 +272,10 @@ async function selectCurrentLocation() {
 
   if (!matchedCountry) {
     console.warn("[GeoLocation] No country match for:", location.country);
+    // OSM detected a country that isn't in the ALCBT list — warn user
+    if (typeof window._showGeoAddressMismatch === "function") {
+      window._showGeoAddressMismatch(true);
+    }
     return;
   }
 
@@ -268,38 +283,50 @@ async function selectCurrentLocation() {
   // country select's own hx-trigger and race a second region load against ours.
   countrySelect.value = matchedCountry.value;
 
+  // Country matched — clear any previous mismatch warning
+  if (typeof window._showGeoAddressMismatch === "function") {
+    window._showGeoAddressMismatch(false);
+  }
+
   try {
     // 1. Load regions for the matched country into #region-select
     await htmx.ajax("GET", "/select_lists/?country=" + matchedCountry.value, {
       target: "#region-select",
       swap: "innerHTML",
     });
+    // Yield to let HTMX finish the DOM swap before we read options
+    await new Promise(r => setTimeout(r, 0));
 
     const regionSelect = document.getElementById("region-select");
     const regionMatch = findOptionByNames(regionSelect, location.stateCandidates);
     if (!regionMatch) {
       console.warn("[GeoLocation] No region match for candidates:", location.stateCandidates);
+      _revalidateGeoFields(countrySelect, regionSelect, null);
       return;
     }
     regionSelect.value = regionMatch.value;
-    notifyChange(regionSelect);
     console.log("[GeoLocation] Matched region:", regionMatch.text);
 
-    // 2. Load cities for the matched region into #city-select
+    // 2. Load cities for the matched region into #city-select.
+    // We use our own htmx.ajax call — do NOT fire notifyChange(regionSelect) here
+    // because the region select's own hx-trigger="change" would race against us.
     await htmx.ajax("GET", "/select_lists/?region=" + regionMatch.value, {
       target: "#city-select",
       swap: "innerHTML",
     });
+    // Yield to let HTMX finish the DOM swap before we read options
+    await new Promise(r => setTimeout(r, 0));
 
     const citySelect = document.getElementById("city-select");
     const cityMatch = findOptionByNames(citySelect, location.cityCandidates);
     if (!cityMatch) {
       console.warn("[GeoLocation] No city match for candidates:", location.cityCandidates);
+      _revalidateGeoFields(countrySelect, regionSelect, citySelect);
       return;
     }
     citySelect.value = cityMatch.value;
-    notifyChange(citySelect);
     console.log("[GeoLocation] Matched city:", cityMatch.text);
+    _revalidateGeoFields(countrySelect, regionSelect, citySelect);
   } catch (err) {
     console.error("[GeoLocation] Cascade failed:", err);
   }

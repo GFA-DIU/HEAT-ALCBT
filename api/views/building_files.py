@@ -146,7 +146,9 @@ class BuildingFilesView(APIView):
         has_boq = request.data.get("has_boq", "no") in ("yes", "true", "1")
 
         building.has_certification = has_certification
-        building.has_boq = has_boq
+        from pages.models.building import Building as _Building
+        _DocStatus = _Building.DocumentStatus
+        building.boq_status = _DocStatus.UPLOADED if has_boq else _DocStatus.NOT_AVAILABLE
 
         # --- Certification file ---
         if has_certification:
@@ -278,9 +280,10 @@ class BuildingFilesView(APIView):
                 except Exception:
                     pass
                 boq_file.delete()
-                # If no more BoQ files, clear the flag
+                # If no more BoQ files, revert to not_available
                 if not building.boq_files.exists():
-                    building.has_boq = False
+                    from pages.models.building import Building as _Bld
+                    building.boq_status = _Bld.DocumentStatus.NOT_AVAILABLE
                     building.save()
                 return Response({"success": True})
             except (ValueError, BuildingBoQFile.DoesNotExist):

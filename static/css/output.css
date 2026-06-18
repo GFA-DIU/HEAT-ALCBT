@@ -2711,9 +2711,6 @@
   .left-\[10\%\] {
     left: 10%;
   }
-  .left-\[45\%\] {
-    left: 45%;
-  }
   .file-input {
     @layer daisyui.component {
       cursor: pointer;
@@ -4056,29 +4053,17 @@
   .w-\[4\.688rem\] {
     width: 4.688rem;
   }
-  .w-\[8\%\] {
-    width: 8%;
-  }
   .w-\[12\.25rem\] {
     width: 12.25rem;
   }
   .w-\[16\.5rem\] {
     width: 16.5rem;
   }
-  .w-\[18\%\] {
-    width: 18%;
-  }
-  .w-\[20\%\] {
-    width: 20%;
-  }
   .w-\[30\%\] {
     width: 30%;
   }
   .w-\[40\%\] {
     width: 40%;
-  }
-  .w-\[60\%\] {
-    width: 60%;
   }
   .w-\[calc\(max-content\+1rem\)\] {
     width: calc(max-content + 1rem);
@@ -4164,8 +4149,8 @@
   .max-w-\[78\.563rem\] {
     max-width: 78.563rem;
   }
-  .max-w-\[80\%\] {
-    max-width: 80%;
+  .max-w-\[85\%\] {
+    max-width: 85%;
   }
   .max-w-\[140px\] {
     max-width: 140px;
@@ -4327,9 +4312,6 @@
   }
   .gap-0 {
     gap: 0;
-  }
-  .gap-0\.5 {
-    gap: calc(var(--spacing) * 0.5);
   }
   .gap-1 {
     gap: var(--spacing);
@@ -5258,9 +5240,6 @@
   }
   .break-words {
     overflow-wrap: break-word;
-  }
-  .text-ellipsis {
-    text-overflow: ellipsis;
   }
   .whitespace-nowrap {
     white-space: nowrap;
@@ -6214,14 +6193,29 @@ body {
   .stepper-item-icon {
     border: 0.125rem solid var(--stroke--strong-950);
   }
+  .stepper-item-icon--active {
+    background-color: var(--state--warning--base);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .stepper-item-title {
     color: var(--text--strong-950);
+  }
+}
+.stepper-sub-item.active {
+  .stepper-sub-item-active-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background-color: var(--state--warning--base);
+    flex-shrink: 0;
   }
 }
 .stepper .stepper-item.completed {
   .stepper-item-title {
     color: var(--text--strong-950);
-    text-decoration: line-through;
   }
 }
 .fieldset {

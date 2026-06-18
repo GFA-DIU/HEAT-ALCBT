@@ -193,6 +193,18 @@ def handle_building_load(request, building_id, simulation):
         parent=initial
     )
 
+    # Check energy mismatch between energy summary and carrier totals
+    from decimal import Decimal as _D
+    from django.db.models import Sum as _Sum
+    energy_summary = getattr(building, 'energy_summary', None)
+    systems_total_kwh = _D(str(energy_summary.total_kwh)) if energy_summary and energy_summary.total_kwh else _D('0')
+    carriers_total_kwh = _D(str(
+        OperationalProduct.objects.filter(building=building, input_unit='kwh')
+        .aggregate(t=_Sum('quantity'))['t'] or 0
+    ))
+    _tol = max(_D('2000'), systems_total_kwh * _D('0.05'))
+    energy_mismatch = (systems_total_kwh > 0 or carriers_total_kwh > 0) and abs(systems_total_kwh - carriers_total_kwh) > _tol
+
     # Calculate statistics and chart data for building detail page using already-prefetched data
     building_stats = get_building_detail_statistics(
         building,
@@ -229,6 +241,11 @@ def handle_building_load(request, building_id, simulation):
         "benchmark": benchmark,
         "benchmark_position": benchmark_position,
         "embodied_savings": chart_data.get("embodied_savings", {}),
+        "energy_mismatch": energy_mismatch,
+        "energy_mismatch_systems_kwh": float(systems_total_kwh),
+        "energy_mismatch_carriers_kwh": float(carriers_total_kwh),
+        "design_drawings_status": building.design_drawings_status,
+        "boq_status": building.boq_status,
     }
 
     form = BuildingGeneralInformation(instance=building)
