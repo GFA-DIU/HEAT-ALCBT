@@ -25,7 +25,7 @@ from .views.building.building_simulation import building_simulation
 from .views.building.building_step_operational import \
     building_step_operational_products, get_building_total_kwh
 from .views.building.building_step_operational_schedule import \
-    building_step_operational_schedule
+    building_step_operational_schedule, get_schedule_defaults_view
 from .views.building.building_step_files import (
     upload_building_files,
     serve_building_file,
@@ -100,6 +100,7 @@ urlpatterns = [
     path("building/step/data", get_building_data, name="get_building_data"),
     path("building/step/operational", building_step_operational_products, name="building_step_operational"),
     path("building/step/operational-schedule", building_step_operational_schedule, name="building_step_operational_schedule"),
+    path("building/step/schedule-defaults", get_schedule_defaults_view, name="schedule_defaults"),
     path("building/files/upload", upload_building_files, name="building_files_upload"),
     path("building/files/serve/", serve_building_file, name="building_files_serve"),
     path("building/files/", get_building_files, name="building_files_get"),

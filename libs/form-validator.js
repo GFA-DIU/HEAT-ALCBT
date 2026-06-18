@@ -47,6 +47,7 @@ class FormValidator {
     const field = event.target;
     if (field.name) {
       this.validateField(field);
+      this.displayFieldError(field);
       this.updateFormStatus();
     }
   }

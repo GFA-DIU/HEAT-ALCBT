@@ -72,21 +72,19 @@ class UserProfileUpdateForm(forms.ModelForm):
         queryset=CustomRegion.objects.all(),
         widget=forms.Select(attrs={
             "id": "region-dropdown",
-            "hx-get": "/select_lists/",  # HTMX request to the root URL
-            "hx-trigger": "change",  # Trigger HTMX on change event
-            "hx-target": "#city-dropdown",  # Update the City dropdown
+            "hx-get": "/select_lists/",
+            "hx-trigger": "change",
+            "hx-target": "#city-dropdown",
             "class": "select select-with-icon w-full validator",
-            "required": True,
         }),
         label="Region",
         required=False,
     )
     city = forms.ModelChoiceField(
-        queryset=CustomCity.objects.none(),  # Start with an empty queryset
+        queryset=CustomCity.objects.none(),
         widget=forms.Select(attrs={
             'id': 'city-dropdown',
             'class': 'select select-with-icon w-full validator',
-            'required': True,
         }),
         label="City",
         required=False

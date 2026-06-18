@@ -446,7 +446,9 @@ class BuildingImportDetailsView(APIView):
             building.floors_below_ground = floors_below_ground
 
         building.has_certification = has_certification
-        building.has_boq = has_boq
+        from pages.models.building import Building as _Bld
+        _DS = _Bld.DocumentStatus
+        building.boq_status = _DS.UPLOADED if has_boq else _DS.NOT_AVAILABLE
 
         if has_certification:
             cert_file = request.FILES.get("certification_file")

@@ -17,6 +17,11 @@ class StepManager {
     }
 
 
+    // Weighted progress: Building Info 20%, Operational Data 30%, Structural 40%, Systems 10%
+    // System sub-steps (cooling/ventilation/lighting/lift/hot-water) each carry 2% (5×2=10%)
+    // Schedule + energy-summary + data-entry each carry 10% (3×10=30%)
+    // Building info sub-steps each carry 10% (2×10=20%)
+    // Structural carries 40%
     this.stepConfig = {
       1: {
         name: gettext("Building Information"),
@@ -25,6 +30,7 @@ class StepManager {
           {
             id: "building-name-location",
             name: gettext("Building Name & Location"),
+            weight: 10,
             component: "building-information/building-name-location.html",
             requiredFields: ["building_name", "address", "country"],
             title: gettext("Building Name & Location"),
@@ -33,6 +39,7 @@ class StepManager {
           {
             id: "building-details",
             name: gettext("Building Details"),
+            weight: 10,
             component: "building-information/building-details.html",
             requiredFields: ["building_type", "assessment_period", "total_floor_area"],
             title: gettext("Building Details"),
@@ -47,6 +54,7 @@ class StepManager {
           {
             id: "operational-schedule-temperature",
             name: gettext("Operational Schedule & Temperature"),
+            weight: 10,
             component:
               "operational-details/operational-schedule-temperature.html",
             requiredFields: ["operating_hours", "default_temperature"],
@@ -56,6 +64,7 @@ class StepManager {
           {
             id: "cooling-system",
             name: gettext("Cooling System"),
+            weight: 2,
             component: "operational-details/cooling-system.html",
             requiredFields: ["cooling_system_type"],
             title: gettext("Cooling System"),
@@ -64,6 +73,7 @@ class StepManager {
           {
             id: "ventilation-system",
             name: gettext("Ventilation System"),
+            weight: 2,
             component: "operational-details/ventilation-system.html",
             requiredFields: ["ventilation_type"],
             title: gettext("Ventilation System"),
@@ -72,6 +82,7 @@ class StepManager {
           {
             id: "lighting-system",
             name: gettext("Lighting System"),
+            weight: 2,
             component: "operational-details/lighting-system.html",
             requiredFields: ["lighting_type"],
             title: gettext("Lighting System"),
@@ -80,6 +91,7 @@ class StepManager {
           {
             id: "lift-escalator-system",
             name: gettext("Lift & Escalator System"),
+            weight: 2,
             component: "operational-details/lift-escalator-system.html",
             requiredFields: [],
             title: gettext("Lift & Escalator System"),
@@ -89,6 +101,7 @@ class StepManager {
             id: "hot-water-system",
             formId: "hot-water-system",
             name: gettext("Hot Water System"),
+            weight: 2,
             component: "operational-details/hot-water-system.html",
             requiredFields: ["hot_water_type"],
             title: gettext("Hot Water System"),
@@ -97,6 +110,7 @@ class StepManager {
           {
             id: "energy-consumption-summary",
             name: gettext("Energy Consumption Summary"),
+            weight: 10,
             component: "operational-details/energy-consumption-summary.html",
             requiredFields: [],
             title: gettext("Energy Consumption Summary"),
@@ -113,6 +127,7 @@ class StepManager {
           {
             id: "operational-data-entry",
             name: gettext("Data Entry"),
+            weight: 10,
             component: "operational-data-entry/operational-data-entry.html",
             requiredFields: ["energy_consumption"],
             title: gettext("Annual Operational Energy Carriers"),
@@ -127,6 +142,7 @@ class StepManager {
           {
             id: "building-structural-components",
             name: gettext("Structural Components"),
+            weight: 40,
             component:
               "building-structural-components/building-structural-components.html",
             requiredFields: ["foundation_type", "structure_type"],
@@ -406,10 +422,12 @@ class StepManager {
               type="checkbox"
               class="checkbox checkbox-primary checkbox-xs rounded-full pointer-events-none"
               checked/>`
+            : isSubActive
+            ? `<span class="stepper-sub-item-active-dot"></span>`
             : "";
 
           return `
-          <div class="stepper-sub-item" onclick="stepManager.goToSubStep(${stepNum}, ${subStepNum})">  
+          <div class="stepper-sub-item${isSubActive ? " active" : ""}" onclick="stepManager.goToSubStep(${stepNum}, ${subStepNum})">
             ${icon}
             <span class="stepper-sub-item-text ${
               isSubActive ? "text-[var(--text--strong-950)]" : ""
@@ -430,15 +448,15 @@ class StepManager {
           <div class="stepper-item-icon-container">
             ${
               isCompleted
-                ? `
-              <input
+                ? `<input
                 type="checkbox"
                 class="checkbox checkbox-primary checkbox-sm rounded-full pointer-events-none"
-                checked/>
-            `
-                : `
-              <div class="stepper-item-icon"></div>
-            `
+                checked/>`
+                : isActive
+                ? `<div class="stepper-item-icon stepper-item-icon--active">
+                <span data-icon="alert-fill" data-size="12" data-color="var(--color-warning-content)"></span>
+              </div>`
+                : `<div class="stepper-item-icon"></div>`
             }
             <div class="stepper-item-line"></div>
           </div>
@@ -590,19 +608,21 @@ class StepManager {
   }
   
   updateProgress() {
-    const totalSubSteps = Object.values(this.stepConfig).reduce(
-      (total, step) => total + step.subSteps.length,
-      0
-    );
-    let completedSubSteps = 0;
+    // Weighted progress: sum weights of completed sub-steps
+    let completedWeight = 0;
 
-    // Calculate completed substeps
     for (let i = 1; i < this.currentStep; i++) {
-      completedSubSteps += this.stepConfig[i].subSteps.length;
+      for (const ss of this.stepConfig[i].subSteps) {
+        completedWeight += (ss.weight || 0);
+      }
     }
-    completedSubSteps += this.currentSubStep - 1;
+    // Count completed sub-steps within the current step (not including the active one)
+    const currentStepSubSteps = this.stepConfig[this.currentStep].subSteps;
+    for (let j = 0; j < this.currentSubStep - 1; j++) {
+      completedWeight += (currentStepSubSteps[j].weight || 0);
+    }
 
-    const percentage = Math.round((completedSubSteps / totalSubSteps) * 100);
+    const percentage = Math.min(100, completedWeight);
 
     const progressText = document.getElementById("progress-text");
     const progressBar = document.getElementById("progress-bar");
@@ -1251,7 +1271,57 @@ class StepManager {
     this.updateUrl({ pushState: true });
   }
 
+  async _checkEnergyMismatch() {
+    const buildingUuid = this.getBuildingId();
+    if (!buildingUuid) return null;
+    try {
+      const [summaryResp, carrierResp] = await Promise.all([
+        fetch(`/building/energy-summary/?building_uuid=${buildingUuid}`),
+        fetch(`/building/${buildingUuid}/total-kwh/`)
+      ]);
+      const summaryData = await summaryResp.json();
+      const carrierData = await carrierResp.json();
+      const systemsTotal = parseFloat(summaryData?.summary?.total_kwh) || 0;
+      const carriersTotal = parseFloat(carrierData?.total_kwh) || 0;
+      if (systemsTotal === 0 && carriersTotal === 0) return null;
+      const diff = Math.abs(systemsTotal - carriersTotal);
+      const tolerance = Math.max(2000, systemsTotal * 0.05);
+      if (diff > tolerance) {
+        return { systemsTotal, carriersTotal, diff };
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   async saveAndContinue(skipSave = false) {
+    // Energy mismatch check before saving Operational Data Entry
+    const stepKey = this.getCurrentStepKey();
+    if (stepKey === 'operational-data-entry/operational-data-entry') {
+      const mismatch = await this._checkEnergyMismatch();
+      if (mismatch) {
+        const sysKwh = Math.round(mismatch.systemsTotal).toLocaleString();
+        const carKwh = Math.round(mismatch.carriersTotal).toLocaleString();
+        let errorEl = document.getElementById('energy-mismatch-error');
+        if (!errorEl) {
+          errorEl = document.createElement('div');
+          errorEl.id = 'energy-mismatch-error';
+          errorEl.className = 'flex items-start gap-2 p-3 rounded-lg bg-[var(--state--error--lighter)] text-sm text-[var(--state--error--base)] mt-3';
+          const content = document.getElementById('energy_carrier_template_container');
+          if (content) content.parentNode.insertBefore(errorEl, content.nextSibling);
+        }
+        errorEl.innerHTML = `<span data-icon="alert-fill" data-size="16" data-color="var(--state--error--base)"></span>
+          <span>${gettext("The total energy from your building systems")} (${sysKwh} kWh) ${gettext("does not match the total from your energy carriers")} (${carKwh} kWh). ${gettext("Please reconcile both before continuing.")}</span>`;
+        if (typeof window.Icons !== 'undefined') window.Icons.render(errorEl);
+        errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      } else {
+        const errorEl = document.getElementById('energy-mismatch-error');
+        if (errorEl) errorEl.remove();
+      }
+    }
+
     // Save current form data and wait for completion
     if(!skipSave){
       const saveResult = await this.saveFormData();

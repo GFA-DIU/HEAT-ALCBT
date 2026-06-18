@@ -90,7 +90,7 @@
       {% translate "Renewable energy installation (%)" %}
     </legend>
     <label class="input w-full">
-      <input type="number" placeholder="e.g. 15" name="renewable_energy_percent" min="0.01" max="100" step="0.01" />
+      <input type="number" placeholder="e.g. 15" name="renewable_energy_percent" min="0" max="100" step="0.01" />
       <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
     </label>
   </fieldset>
@@ -177,19 +177,23 @@
     }
   }
 
-  // Industry-typical defaults per building type (subject to ALCBT methodology review)
-  const SCHEDULE_DEFAULTS = {
-    'homes':      { hrs: 16, days: 7, weeks: 52 },
-    'apartments': { hrs: 16, days: 7, weeks: 52 },
-    'office':     { hrs:  9, days: 5, weeks: 50 },
-    'retail':     { hrs: 10, days: 6, weeks: 50 },
-    'hotels':     { hrs: 24, days: 7, weeks: 52 },
-    'resorts':    { hrs: 24, days: 7, weeks: 52 },
-    'healthcare': { hrs: 24, days: 7, weeks: 52 },
-    'education':  { hrs:  8, days: 5, weeks: 40 },
-    'industrial': { hrs:  8, days: 6, weeks: 50 },
-    'mixed use':  { hrs: 12, days: 6, weeks: 50 },
-  };
+  const DEFAULT_STYLE = 'color: var(--text--disabled-300); font-style: italic;';
+
+  function markAsDefault(input) {
+    input.setAttribute('style', DEFAULT_STYLE);
+    input.dataset.isDefault = 'true';
+  }
+
+  function markAsUserValue(input) {
+    input.removeAttribute('style');
+    delete input.dataset.isDefault;
+  }
+
+  function onScheduleFieldInput(e) {
+    if (e.target.dataset.isDefault) {
+      markAsUserValue(e.target);
+    }
+  }
 
   async function applyScheduleDefaults() {
     if (!buildingUuid) return;
@@ -199,16 +203,36 @@
     if (!hrsField || !daysField || !wksField) return;
     // Only apply if all three are still empty (don't overwrite user/saved data)
     if (hrsField.value || daysField.value || wksField.value) return;
+
+    // Find or create the inline no-default hint
+    let noDefaultHint = form.querySelector('#schedule-no-default-hint');
+    if (!noDefaultHint) {
+      noDefaultHint = document.createElement('p');
+      noDefaultHint.id = 'schedule-no-default-hint';
+      noDefaultHint.className = 'col-span-3 text-xs text-[var(--text--sub-600)] mt-1';
+      noDefaultHint.style.display = 'none';
+      const scheduleFieldset = hrsField.closest('fieldset');
+      if (scheduleFieldset) scheduleFieldset.appendChild(noDefaultHint);
+    }
+
     try {
-      const resp = await fetch(`/building/step/data?building_uuid=${buildingUuid}`);
+      const resp = await fetch(`{% url 'schedule_defaults' %}?building_uuid=${buildingUuid}`);
       if (!resp.ok) return;
       const result = await resp.json();
-      const typeName = (result.data && result.data.building_type_name) ? result.data.building_type_name.toLowerCase().trim() : '';
-      const defaults = SCHEDULE_DEFAULTS[typeName];
-      if (defaults) {
-        if (!hrsField.value)  hrsField.value  = defaults.hrs;
-        if (!daysField.value) daysField.value = defaults.days;
-        if (!wksField.value)  wksField.value  = defaults.weeks;
+      if (result.success && result.defaults) {
+        const d = result.defaults;
+        hrsField.value  = d.hrs;
+        daysField.value = d.days;
+        wksField.value  = d.weeks;
+        markAsDefault(hrsField);
+        markAsDefault(daysField);
+        markAsDefault(wksField);
+        noDefaultHint.style.display = 'none';
+        // When user edits, revert to normal style
+        [hrsField, daysField, wksField].forEach(f => f.addEventListener('input', onScheduleFieldInput, { once: false }));
+      } else {
+        noDefaultHint.textContent = '{% translate "No default schedule found for this building type. Please enter values manually." %}';
+        noDefaultHint.style.display = '';
       }
     } catch (e) {
       // Non-fatal — user can fill in manually
