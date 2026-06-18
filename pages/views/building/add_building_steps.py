@@ -215,8 +215,10 @@ def handle_details_step(request):
                 "floors_below_ground": building.floors_below_ground,
                 "has_certification": building.has_certification,
                 "certification_file": cert_info,
+                "design_drawings_status": building.design_drawings_status,
                 "has_design_drawings": building.has_design_drawings,
                 "design_drawing_files": drawing_info,
+                "boq_status": building.boq_status,
                 "has_boq": building.has_boq,
                 "boq_files": boq_info,
                 "total_annual_energy_consumption": energy_summary.total_kwh if energy_summary and energy_summary.total_kwh is not None else None,
@@ -716,7 +718,7 @@ def save_building_step(request):
 
                     # Update building with mapped fields
                     for form_field, model_field in field_mapping.items():
-                        if form_field in step_data and step_data[form_field]:
+                        if form_field in step_data and step_data[form_field] not in (None, ""):
                             setattr(building, model_field, step_data[form_field])
 
                     # Resolve building_type (BuildingCategory.id) + apartment_type
@@ -882,6 +884,7 @@ def get_building_data(request):
             # Step 1.2 fields (use form field names)
             'building_type': building_type_id,
             'building_type_name': building.category.category.name if building.category else '',
+            'building_sub_type_name': building.category.subcategory.name if building.category else '',
             'apartment_type': apartment_type_id,
             'climate_type': building.climate_zone.name if building.climate_zone else '',
             'assessment_period': building.reference_period,
@@ -891,6 +894,9 @@ def get_building_data(request):
             'floors_above_ground': building.floors_above_ground,
             'floors_below_ground': building.floors_below_ground,
             'has_design_drawings': building.has_design_drawings,
+            'design_drawings_status': building.design_drawings_status,
+            'boq_status': building.boq_status,
+            'has_boq': building.has_boq,
             'seismic_zone': building.seismic_zone or '',
         }
 

@@ -292,15 +292,31 @@ body {
   .stepper-item-icon {
     border: 0.125rem solid var(--stroke--strong-950);
   }
+  .stepper-item-icon--active {
+    background-color: var(--state--warning--base);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .stepper-item-title {
     color: var(--text--strong-950);
+  }
+}
+
+.stepper-sub-item.active {
+  .stepper-sub-item-active-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background-color: var(--state--warning--base);
+    flex-shrink: 0;
   }
 }
 
 .stepper .stepper-item.completed {
   .stepper-item-title {
     color: var(--text--strong-950);
-    text-decoration: line-through;
   }
 }
 

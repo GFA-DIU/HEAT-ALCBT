@@ -144,7 +144,7 @@
 
     <!-- Total row -->
     <div class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] border border-[var(--stroke--soft-200)] mt-2">
-      <span class="text-sm font-medium">{% translate "Total annual energy consumption" %}</span>
+      <span class="text-sm font-medium">{% translate "Total annual energy consumption from building systems" %}</span>
       {% if summary and summary.total_kwh is not None %}
         <span id="summary-total-value" class="text-sm font-bold text-[var(--text--sub-600)]">
           {{ summary.total_kwh|floatformat:-3 }} <span class="font-normal">kWh/yr</span>

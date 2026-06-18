@@ -77,13 +77,27 @@ def upload_building_files(request):
     if err:
         return err
 
-    has_certification = request.POST.get("has_certification", "no") in ("yes", "true", "1")
-    has_design_drawings = request.POST.get("has_design_drawings", "no") in ("yes", "true", "1")
-    has_boq = request.POST.get("has_boq", "no") in ("yes", "true", "1")
+    DocStatus = Building.DocumentStatus
 
+    has_certification = request.POST.get("has_certification", "no") in ("yes", "true", "1")
     building.has_certification = has_certification
-    building.has_design_drawings = has_design_drawings
-    building.has_boq = has_boq
+
+    # Design drawings: "no" | "available_pending" | "uploaded" (legacy "yes" treated as uploaded)
+    drawings_raw = request.POST.get("design_drawings_status", request.POST.get("has_design_drawings", "no"))
+    if drawings_raw in ("yes", "uploaded"):
+        drawings_intent = "uploaded"
+    elif drawings_raw == "available_pending":
+        drawings_intent = "available_pending"
+    else:
+        drawings_intent = "no"
+
+    boq_raw = request.POST.get("boq_status", request.POST.get("has_boq", "no"))
+    if boq_raw in ("yes", "uploaded"):
+        boq_intent = "uploaded"
+    elif boq_raw == "available_pending":
+        boq_intent = "available_pending"
+    else:
+        boq_intent = "no"
 
     # --- Certification file ---
     if has_certification:
@@ -92,7 +106,6 @@ def upload_building_files(request):
             err_msg = _validate_file(cert_file)
             if err_msg:
                 return JsonResponse({"success": False, "error": f"Certification file: {err_msg}"}, status=400)
-            # Delete previous certification file if present
             if building.certification_file:
                 try:
                     old_path = building.certification_file.path
@@ -101,9 +114,7 @@ def upload_building_files(request):
                 except Exception:
                     pass
             building.certification_file = cert_file
-        # If no new file submitted but has_certification=yes, keep existing file
     else:
-        # has_certification=no — clear any existing file
         if building.certification_file:
             try:
                 old_path = building.certification_file.path
@@ -116,14 +127,13 @@ def upload_building_files(request):
     building.save()
 
     # --- Design drawing files ---
-    if has_design_drawings:
+    if drawings_intent == "uploaded":
         new_drawing_files = request.FILES.getlist("design_drawing_files")
         if new_drawing_files:
             for f in new_drawing_files:
                 err_msg = _validate_file(f)
                 if err_msg:
                     return JsonResponse({"success": False, "error": f"Design drawing '{f.name}': {err_msg}"}, status=400)
-            # Delete previous drawing files
             for old_file in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_DRAWING):
                 try:
                     if os.path.isfile(old_file.file.path):
@@ -133,13 +143,17 @@ def upload_building_files(request):
                 old_file.delete()
             for f in new_drawing_files:
                 BuildingBoQFile.objects.create(
-                    building=building,
-                    file=f,
+                    building=building, file=f,
                     original_filename=f.name,
                     file_type=BuildingBoQFile.FILE_TYPE_DRAWING,
                 )
+        # Determine final status: uploaded if files exist, else available_pending
+        has_files = building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_DRAWING).exists()
+        building.design_drawings_status = DocStatus.UPLOADED if has_files else DocStatus.AVAILABLE_PENDING
+    elif drawings_intent == "available_pending":
+        building.design_drawings_status = DocStatus.AVAILABLE_PENDING
     else:
-        # has_design_drawings=no — remove all existing drawing files
+        # not_available — remove any existing drawing files
         for old_file in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_DRAWING):
             try:
                 if os.path.isfile(old_file.file.path):
@@ -147,17 +161,16 @@ def upload_building_files(request):
             except Exception:
                 pass
             old_file.delete()
+        building.design_drawings_status = DocStatus.NOT_AVAILABLE
 
     # --- BoQ files ---
-    if has_boq:
+    if boq_intent == "uploaded":
         new_boq_files = request.FILES.getlist("boq_files")
         if new_boq_files:
-            # Validate all files first
             for f in new_boq_files:
                 err_msg = _validate_file(f)
                 if err_msg:
                     return JsonResponse({"success": False, "error": f"BoQ file '{f.name}': {err_msg}"}, status=400)
-            # Delete previous BoQ files
             for old_file in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_BOQ):
                 try:
                     if os.path.isfile(old_file.file.path):
@@ -165,17 +178,17 @@ def upload_building_files(request):
                 except Exception:
                     pass
                 old_file.delete()
-            # Save new ones
             for f in new_boq_files:
                 BuildingBoQFile.objects.create(
-                    building=building,
-                    file=f,
+                    building=building, file=f,
                     original_filename=f.name,
                     file_type=BuildingBoQFile.FILE_TYPE_BOQ,
                 )
-        # If no new files submitted but has_boq=yes, keep existing files
+        has_files = building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_BOQ).exists()
+        building.boq_status = DocStatus.UPLOADED if has_files else DocStatus.AVAILABLE_PENDING
+    elif boq_intent == "available_pending":
+        building.boq_status = DocStatus.AVAILABLE_PENDING
     else:
-        # has_boq=no — remove all existing BoQ files
         for old_file in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_BOQ):
             try:
                 if os.path.isfile(old_file.file.path):
@@ -183,8 +196,10 @@ def upload_building_files(request):
             except Exception:
                 pass
             old_file.delete()
+        building.boq_status = DocStatus.NOT_AVAILABLE
 
-    # Build response with current state
+    building.save()
+
     cert_info = None
     if building.certification_file:
         cert_info = {
@@ -210,13 +225,15 @@ def upload_building_files(request):
         for bf in building.boq_files.filter(file_type=BuildingBoQFile.FILE_TYPE_BOQ)
     ]
 
-    logger.info(f"Files uploaded for building {building.id}: cert={has_certification}, drawings={has_design_drawings}, boq={has_boq}")
+    logger.info(
+        f"Files updated for building {building.id}: drawings={building.design_drawings_status}, boq={building.boq_status}"
+    )
 
     return JsonResponse({
         "success": True,
         "has_certification": building.has_certification,
-        "has_design_drawings": building.has_design_drawings,
-        "has_boq": building.has_boq,
+        "design_drawings_status": building.design_drawings_status,
+        "boq_status": building.boq_status,
         "certification_file": cert_info,
         "design_drawing_files": drawing_info,
         "boq_files": boq_info,
@@ -317,6 +334,8 @@ def get_building_files(request):
     return JsonResponse({
         "success": True,
         "has_certification": building.has_certification,
+        "design_drawings_status": building.design_drawings_status,
+        "boq_status": building.boq_status,
         "has_design_drawings": building.has_design_drawings,
         "has_boq": building.has_boq,
         "certification_file": cert_info,

@@ -184,7 +184,7 @@ class BuildingOperationalInfo(models.Model):
         _("Renewable Energy Installation (%)"),
         max_digits=5,
         decimal_places=2,
-        validators=[MinValueValidator(0.01), MaxValueValidator(100)],
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
         null=True,
         blank=True,
     )
@@ -203,14 +203,31 @@ class BuildingOperationalInfo(models.Model):
         null=True,
         blank=True,
     )
-    has_design_drawings = models.BooleanField(
-        _("Has Design Drawings"),
-        default=False,
+    class DocumentStatus(models.TextChoices):
+        NOT_AVAILABLE    = "not_available",    "Not available"
+        AVAILABLE_PENDING = "available_pending", "Available — upload pending"
+        UPLOADED         = "uploaded",         "Uploaded"
+
+    design_drawings_status = models.CharField(
+        _("Design Drawings Status"),
+        max_length=20,
+        choices=DocumentStatus.choices,
+        default=DocumentStatus.NOT_AVAILABLE,
     )
-    has_boq = models.BooleanField(
-        _("Has Bill of Quantities (BoQ)"),
-        default=False,
+    boq_status = models.CharField(
+        _("Bill of Quantities Status"),
+        max_length=20,
+        choices=DocumentStatus.choices,
+        default=DocumentStatus.NOT_AVAILABLE,
     )
+
+    @property
+    def has_design_drawings(self):
+        return self.design_drawings_status != self.DocumentStatus.NOT_AVAILABLE
+
+    @property
+    def has_boq(self):
+        return self.boq_status != self.DocumentStatus.NOT_AVAILABLE
     ### Operational system N/A confirmations (user confirms system is not present)
     cooling_not_applicable = models.BooleanField(default=False)
     ventilation_not_applicable = models.BooleanField(default=False)

@@ -283,16 +283,26 @@
                 >
               </div>
             </li>
-            <li class="flex flex-col flex-1">
-              <span
-                class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
-                >{% translate "Carbon Savings" %}</span
-              >
-              <div class="flex px-2.5 items-end bg-[#81F28E] w-fit">
-                <span class="text-2xl/8 font-medium">{{ stats.carbon_savings_percentage|floatformat:1|default:"0" }}%</span>
-              </div>
-            </li>
+            {# Carbon Savings hidden — will be re-enabled in a future release #}
           </ul>
+          {% if design_drawings_status == 'available_pending' or boq_status == 'available_pending' %}
+          <div class="flex flex-col gap-1 pb-3">
+            {% if design_drawings_status == 'available_pending' %}
+            <div class="flex items-center gap-2 text-sm text-[var(--text--sub-600)]">
+              <span data-icon="information-line" data-size="16" data-color="var(--icon--soft-400)"></span>
+              <span>{% translate "Design drawings — marked as available, not yet uploaded." %}</span>
+              <a href="{% url 'edit_building' %}?building_uuid={{ building.uuid }}" class="link link-primary font-medium text-xs">{% translate "Upload now" %}</a>
+            </div>
+            {% endif %}
+            {% if boq_status == 'available_pending' %}
+            <div class="flex items-center gap-2 text-sm text-[var(--text--sub-600)]">
+              <span data-icon="information-line" data-size="16" data-color="var(--icon--soft-400)"></span>
+              <span>{% translate "Bill of Quantities — marked as available, not yet uploaded." %}</span>
+              <a href="{% url 'edit_building' %}?building_uuid={{ building.uuid }}" class="link link-primary font-medium text-xs">{% translate "Upload now" %}</a>
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
           <div id="tab-content-container-top" class="w-full py-6 max-w-[68.75rem] hidden"></div>
           <!-- Hidden off-screen cards for export capture — always rendered on page load, never visible -->
           <div id="export-cards-hidden" style="position:absolute;left:-9999px;top:0;pointer-events:none;" aria-hidden="true">
@@ -564,6 +574,21 @@
               </div> {% endcomment %}
         </div>
         <div class="w-full" id="export-system-chart-wrap">
+          {% if energy_mismatch %}
+          <!-- Energy mismatch blocking notice -->
+          <div class="flex items-start gap-3 p-4 mx-6 mt-4 rounded-xl bg-[var(--state--error--lighter)] border border-[var(--state--error--base)]">
+            <span data-icon="alert-fill" data-size="20" data-color="var(--state--error--base)" class="flex-shrink-0 mt-0.5"></span>
+            <div>
+              <p class="text-sm font-semibold text-[var(--state--error--base)]">{% translate "Energy consumption data is incomplete or inconsistent" %}</p>
+              <p class="text-sm text-[var(--text--sub-600)] mt-1">
+                {% blocktranslate with systems=energy_mismatch_systems_kwh|floatformat:0 carriers=energy_mismatch_carriers_kwh|floatformat:0 %}
+                  Your Energy Consumption Summary total ({{ systems }} kWh) does not match your Operational Data Entry total ({{ carriers }} kWh). Please return to the Energy Consumption Summary and Operational Data Entry pages and reconcile your totals before viewing carbon results.
+                {% endblocktranslate %}
+              </p>
+            </div>
+          </div>
+          {% endif %}
+          {% if not energy_mismatch %}
           <!-- Stats summary row -->
           <div class="bg-[#fafafa] border-t border-[#f1f1f1] flex flex-wrap gap-4 px-6 py-[18px] mt-4 w-full">
             <div class="flex flex-col flex-1 min-w-0">
@@ -608,6 +633,7 @@
             <span class="text-xs text-[var(--text--strong-950)]">{% translate "Total annual operational intensity" %}</span>
             <span id="system-total-value" class="text-xs font-bold text-[var(--text--strong-950)]">—</span>
           </div>
+          {% endif %}
         </div>
       </div>
   </template>
