@@ -5,6 +5,6 @@
     <option value="{{ item.id }}">{{ item.name }}</option>
   {% else %}
     {# Handle model objects #}
-    <option value="{{ item.id }}">{{ item }}</option>
+    <option value="{{ item.id }}"{% if include_coords and item.latitude is not None and item.longitude is not None %} data-lat="{{ item.latitude }}" data-lon="{{ item.longitude }}"{% endif %}>{{ item }}</option>
   {% endif %}
 {% endfor %}

@@ -139,6 +139,9 @@
       </select>
     </label>
     <p class="validator-hint">{% translate "Select a region first, then choose city" %}</p>
+    <p id="city-autopick-note" class="text-xs text-[var(--text--sub-600)] mt-1" style="display:none;">
+      {% translate "Could not auto-detect the closest city from the map pin — please pick the city manually." %}
+    </p>
   </fieldset>
 
   <!-- Longitude Field (Optional) -->

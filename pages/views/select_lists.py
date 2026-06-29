@@ -140,10 +140,22 @@ def select_lists(request):
                 {"items": [], "default_text": "Select a city"},
             )
         cities = CustomCity.objects.filter(region=region_id).order_by("name")
+        # When lat/lon are supplied (map pin), expose them as data-* attributes
+        # on each option so the frontend can pick the nearest city to the pin.
+        try:
+            lat = float(request.GET.get("lat")) if request.GET.get("lat") else None
+            lon = float(request.GET.get("lon")) if request.GET.get("lon") else None
+        except (TypeError, ValueError):
+            lat = lon = None
+        include_coords = lat is not None and lon is not None
         return render(
             request,
             "pages/utils/select_list.html",
-            {"items": cities, "default_text": "Select a city"},
+            {
+                "items": cities,
+                "default_text": "Select a city",
+                "include_coords": include_coords,
+            },
         )
     elif m := request.GET.get("category"):
         category_id = int(m)
