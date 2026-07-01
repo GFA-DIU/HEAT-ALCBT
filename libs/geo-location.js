@@ -222,6 +222,46 @@ function notifyChange(el) {
   if (el) el.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
+// Haversine distance (km) between two (lat,lon) pairs.
+function _haversineKm(lat1, lon1, lat2, lon2) {
+  const toRad = (d) => (d * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+// Find the option in `selectEl` whose data-lat/data-lon is closest to (lat,lon)
+// and within `maxKm` km. Returns the option element or null.
+function findOptionByDistance(selectEl, lat, lon, maxKm = 50) {
+  if (!selectEl || lat == null || lon == null) return null;
+  let best = null;
+  let bestKm = Infinity;
+  for (const opt of selectEl.options) {
+    if (!opt.value) continue;
+    const oLat = parseFloat(opt.getAttribute("data-lat"));
+    const oLon = parseFloat(opt.getAttribute("data-lon"));
+    if (Number.isNaN(oLat) || Number.isNaN(oLon)) continue;
+    const km = _haversineKm(lat, lon, oLat, oLon);
+    if (km < bestKm) {
+      bestKm = km;
+      best = opt;
+    }
+  }
+  return best && bestKm <= maxKm ? best : null;
+}
+
+// Show or hide a non-blocking inline note under the city select indicating
+// that auto-detection failed.
+function _setCityAutopickNote(visible) {
+  const note = document.getElementById("city-autopick-note");
+  if (!note) return;
+  note.style.display = visible ? "" : "none";
+}
+
 // Re-validate geo fields via FormValidator directly, without dispatching DOM events
 // that would re-trigger HTMX cascades and wipe freshly-loaded dropdown values.
 function _revalidateGeoFields(countryEl, regionEl, cityEl) {
@@ -310,7 +350,12 @@ async function selectCurrentLocation() {
     // 2. Load cities for the matched region into #city-select.
     // We use our own htmx.ajax call — do NOT fire notifyChange(regionSelect) here
     // because the region select's own hx-trigger="change" would race against us.
-    await htmx.ajax("GET", "/select_lists/?region=" + regionMatch.value, {
+    // Pass lat/lon so the backend emits data-lat/data-lon for nearest-city fallback.
+    const cityUrl =
+      "/select_lists/?region=" + regionMatch.value +
+      "&lat=" + encodeURIComponent(location.latitude) +
+      "&lon=" + encodeURIComponent(location.longitude);
+    await htmx.ajax("GET", cityUrl, {
       target: "#city-select",
       swap: "innerHTML",
     });
@@ -318,13 +363,26 @@ async function selectCurrentLocation() {
     await new Promise(r => setTimeout(r, 0));
 
     const citySelect = document.getElementById("city-select");
-    const cityMatch = findOptionByNames(citySelect, location.cityCandidates);
+    // Pass 1: match by name (handles cases where Nominatim's city matches the DB row)
+    let cityMatch = findOptionByNames(citySelect, location.cityCandidates);
+    // Pass 2: nearest-city by lat/lon (handles suburbs/neighborhoods Nominatim returns
+    // that aren't in cities_light — pick the closest large city within 50 km)
+    if (!cityMatch) {
+      cityMatch = findOptionByDistance(citySelect, location.latitude, location.longitude, 50);
+      if (cityMatch) {
+        console.log(
+          "[GeoLocation] Picked nearest city by distance:", cityMatch.text
+        );
+      }
+    }
     if (!cityMatch) {
       console.warn("[GeoLocation] No city match for candidates:", location.cityCandidates);
+      _setCityAutopickNote(true);
       _revalidateGeoFields(countrySelect, regionSelect, citySelect);
       return;
     }
     citySelect.value = cityMatch.value;
+    _setCityAutopickNote(false);
     console.log("[GeoLocation] Matched city:", cityMatch.text);
     _revalidateGeoFields(countrySelect, regionSelect, citySelect);
   } catch (err) {

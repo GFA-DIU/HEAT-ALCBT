@@ -832,10 +832,20 @@ def save_building_step(request):
         # For all other steps, just acknowledge receipt
         # Operational systems are saved immediately via their dedicated APIs
         # Other data is kept client-side until final completion
+        building_name = None
+        if building_uuid:
+            try:
+                _b = Building.objects.only("name").get(
+                    uuid=uuid_lib.UUID(building_uuid), created_by=request.user
+                )
+                building_name = _b.name
+            except (ValueError, Building.DoesNotExist):
+                pass
         return JsonResponse({
             "success": True,
             "message": "Step data saved successfully",
-            "building_uuid": building_uuid
+            "building_uuid": building_uuid,
+            "building_name": building_name,
         })
 
     except json.JSONDecodeError:
@@ -889,8 +899,8 @@ def get_building_data(request):
             'climate_type': building.climate_zone.name if building.climate_zone else '',
             'assessment_period': building.reference_period,
             'construction_year': building.construction_year,
-            'total_floor_area': str(building.total_floor_area) if building.total_floor_area else '',
-            'conditioned_floor_area': str(building.cond_floor_area) if building.cond_floor_area else '',
+            'total_floor_area': str(building.total_floor_area) if building.total_floor_area is not None else '',
+            'conditioned_floor_area': str(building.cond_floor_area) if building.cond_floor_area is not None else '',
             'floors_above_ground': building.floors_above_ground,
             'floors_below_ground': building.floors_below_ground,
             'has_design_drawings': building.has_design_drawings,

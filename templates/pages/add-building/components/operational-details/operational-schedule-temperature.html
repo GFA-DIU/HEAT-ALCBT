@@ -137,33 +137,20 @@
         const data = result.data;
 
         // Populate form fields
-        if (data.number_of_residents) {
-          form.querySelector('[name="number_of_residents"]').value = data.number_of_residents;
-        }
-        if (data.annual_operating_hours_per_day) {
-          form.querySelector('[name="annual_operating_hours_per_day"]').value = data.annual_operating_hours_per_day;
-        }
-        if (data.annual_operating_days_per_week) {
-          form.querySelector('[name="annual_operating_days_per_week"]').value = data.annual_operating_days_per_week;
-        }
-        if (data.annual_operating_weeks_per_year) {
-          form.querySelector('[name="annual_operating_weeks_per_year"]').value = data.annual_operating_weeks_per_year;
-        }
-        if (data.room_heating_temperature) {
-          form.querySelector('[name="room_heating_temperature"]').value = data.room_heating_temperature;
-        }
-        if (data.heating_temperature_unit) {
-          form.querySelector('[name="heating_temperature_unit"]').value = data.heating_temperature_unit;
-        }
-        if (data.room_cooling_temperature) {
-          form.querySelector('[name="room_cooling_temperature"]').value = data.room_cooling_temperature;
-        }
-        if (data.cooling_temperature_unit) {
-          form.querySelector('[name="cooling_temperature_unit"]').value = data.cooling_temperature_unit;
-        }
-        if (data.renewable_energy_percent) {
-          form.querySelector('[name="renewable_energy_percent"]').value = data.renewable_energy_percent;
-        }
+        const setIfPresent = (name, value) => {
+          if (value === null || value === undefined || value === '') return;
+          const el = form.querySelector(`[name="${name}"]`);
+          if (el) el.value = value;
+        };
+        setIfPresent('number_of_residents', data.number_of_residents);
+        setIfPresent('annual_operating_hours_per_day', data.annual_operating_hours_per_day);
+        setIfPresent('annual_operating_days_per_week', data.annual_operating_days_per_week);
+        setIfPresent('annual_operating_weeks_per_year', data.annual_operating_weeks_per_year);
+        setIfPresent('room_heating_temperature', data.room_heating_temperature);
+        setIfPresent('heating_temperature_unit', data.heating_temperature_unit);
+        setIfPresent('room_cooling_temperature', data.room_cooling_temperature);
+        setIfPresent('cooling_temperature_unit', data.cooling_temperature_unit);
+        setIfPresent('renewable_energy_percent', data.renewable_energy_percent);
         if (data.building_smart_system !== undefined) {
           const val = data.building_smart_system ? 'yes' : 'no';
           const radio = form.querySelector(`[name="building_smart_system"][value="${val}"]`);

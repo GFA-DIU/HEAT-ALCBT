@@ -241,10 +241,14 @@
                 >{% translate "Carbon Footprint" %}</span
               >
               <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
+                {% if energy_mismatch %}
+                <span class="text-2xl/8 font-medium" title="{% translate 'Hidden until energy totals are reconciled' %}">—</span>
+                {% else %}
                 <span class="text-2xl/8 font-medium">{{ stats.total_carbon_footprint|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
                 >
+                {% endif %}
               </div>
             </li>
             <li class="flex flex-col flex-1">
@@ -277,10 +281,14 @@
                 >{% translate "Operational Carbon" %}</span
               >
               <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
+                {% if energy_mismatch %}
+                <span class="text-2xl/8 font-medium" title="{% translate 'Hidden until energy totals are reconciled' %}">—</span>
+                {% else %}
                 <span class="text-2xl/8 font-medium">{{ stats.total_operational_carbon|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
                 >
+                {% endif %}
               </div>
             </li>
             {# Carbon Savings hidden — will be re-enabled in a future release #}

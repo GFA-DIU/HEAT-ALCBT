@@ -1056,6 +1056,11 @@ class StepManager {
             this.formData['building-information/building-name-location'].building_uuid = buildingUuid;
             this.formData['building-information/building-details'] = result.data;
 
+            // Update persistent project-name header in sidebar
+            if (result.data.building_name) {
+              this.updateProjectName(result.data.building_name);
+            }
+
             // Restore form fields
             Object.keys(result.data).forEach((key) => {
               const element = document.querySelector(
@@ -1199,6 +1204,27 @@ class StepManager {
     }
   }
 
+  /**
+   * Show / hide the persistent project-name header in the wizard sidebar.
+   * @param {string|null|undefined} name
+   */
+  updateProjectName(name) {
+    const label = document.getElementById('project-name-label');
+    const heading = document.getElementById('project-name');
+    if (!label || !heading) return;
+    if (name) {
+      heading.textContent = name;
+      heading.setAttribute('title', name);
+      label.style.display = '';
+      heading.style.display = '';
+    } else {
+      heading.textContent = '';
+      heading.removeAttribute('title');
+      label.style.display = 'none';
+      heading.style.display = 'none';
+    }
+  }
+
   updateCurrentStepInfo() {
     const currentStepInfo = this.getCurrentStepInfo();
     const currentStepTitle = document.getElementById("current-step-title");
@@ -1339,6 +1365,9 @@ class StepManager {
           Toast.success(gettext('Building created successfully!'));
         } else {
           Toast.success(gettext('Building updated successfully!'));
+        }
+        if (saveResult.building_name) {
+          this.updateProjectName(saveResult.building_name);
         }
       }
     }
