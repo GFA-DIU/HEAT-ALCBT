@@ -184,7 +184,11 @@ class FormValidator {
         fieldContainer.appendChild(errorElement);
       }
     }
-    fieldContainer.classList.add('input-error', 'border-error');
+    if (errors && errors.length > 0) {
+      fieldContainer.classList.add('input-error', 'border-error');
+    } else {
+      fieldContainer.classList.remove('input-error', 'border-error');
+    }
     if (errors && errors.length > 0) {
       // Show error
       field.setAttribute('aria-invalid', 'true');
