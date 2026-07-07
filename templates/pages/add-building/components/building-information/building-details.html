@@ -55,18 +55,19 @@
       <select id="seismic-zone-select" name="seismic_zone" class="select w-full">
         <option value="">{% translate "Select seismic zone" %}</option>
         {% if is_india %}
-        <option value="zone_ii"   {% if building_data.seismic_zone == "zone_ii"   %}selected{% endif %}>{% translate "Zone II" %}</option>
-        <option value="zone_iii"  {% if building_data.seismic_zone == "zone_iii"  %}selected{% endif %}>{% translate "Zone III" %}</option>
-        <option value="zone_iv"   {% if building_data.seismic_zone == "zone_iv"   %}selected{% endif %}>{% translate "Zone IV" %}</option>
-        <option value="zone_v"    {% if building_data.seismic_zone == "zone_v"    %}selected{% endif %}>{% translate "Zone V" %}</option>
+        <option value="Zone II"  {% if building_data.seismic_zone == "Zone II"  %}selected{% endif %}>{% translate "Zone II" %}</option>
+        <option value="Zone III" {% if building_data.seismic_zone == "Zone III" %}selected{% endif %}>{% translate "Zone III" %}</option>
+        <option value="Zone IV"  {% if building_data.seismic_zone == "Zone IV"  %}selected{% endif %}>{% translate "Zone IV" %}</option>
+        <option value="Zone V"   {% if building_data.seismic_zone == "Zone V"   %}selected{% endif %}>{% translate "Zone V" %}</option>
         {% else %}
-        <option value="low"       {% if building_data.seismic_zone == "low"       %}selected{% endif %}>{% translate "Low" %}</option>
-        <option value="moderate"  {% if building_data.seismic_zone == "moderate"  %}selected{% endif %}>{% translate "Moderate" %}</option>
-        <option value="high"      {% if building_data.seismic_zone == "high"      %}selected{% endif %}>{% translate "High" %}</option>
-        <option value="very_high" {% if building_data.seismic_zone == "very_high" %}selected{% endif %}>{% translate "Very High" %}</option>
+        <option value="Low"       {% if building_data.seismic_zone == "Low"       %}selected{% endif %}>{% translate "Low" %}</option>
+        <option value="Moderate"  {% if building_data.seismic_zone == "Moderate"  %}selected{% endif %}>{% translate "Moderate" %}</option>
+        <option value="High"      {% if building_data.seismic_zone == "High"      %}selected{% endif %}>{% translate "High" %}</option>
+        <option value="Very High" {% if building_data.seismic_zone == "Very High" %}selected{% endif %}>{% translate "Very High" %}</option>
         {% endif %}
       </select>
     </label>
+    <p id="seismic-autopick-note" class="text-xs text-[var(--text--sub-600)] mt-1" style="display:none;"></p>
   </fieldset>
 
   <fieldset class="fieldset">
@@ -93,6 +94,7 @@
       </select>
     </label>
     <p class="validator-hint">{% translate "This field is required" %}</p>
+    <p id="climate-autopick-note" class="text-xs text-[var(--text--sub-600)] mt-1" style="display:none;"></p>
   </fieldset>
 
   <fieldset class="fieldset">
@@ -391,6 +393,27 @@
   function toggleBoqUploadSection(val) {
     document.getElementById('boq-upload-section').classList.toggle('hidden', val !== 'uploaded');
   }
+
+  // Surface geo auto-detection warnings stashed by building-name-location.html
+  // (e.g. "India composite zone — please verify") without an extra round-trip.
+  (function showGeoAutopickNotes() {
+    var climateNote = document.getElementById('climate-autopick-note');
+    var seismicNote = document.getElementById('seismic-autopick-note');
+
+    var climateWarning = sessionStorage.getItem('geo_climate_warning');
+    if (climateNote && climateWarning) {
+      climateNote.textContent = climateWarning;
+      climateNote.style.display = '';
+    }
+    sessionStorage.removeItem('geo_climate_warning');
+
+    var seismicWarning = sessionStorage.getItem('geo_seismic_warning');
+    if (seismicNote && seismicWarning) {
+      seismicNote.textContent = seismicWarning;
+      seismicNote.style.display = '';
+    }
+    sessionStorage.removeItem('geo_seismic_warning');
+  })();
 
   window.toggleCertUpload = toggleCertUpload;
   window.toggleDrawingsYes = toggleDrawingsYes;
