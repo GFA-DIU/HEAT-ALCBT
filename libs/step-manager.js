@@ -1030,6 +1030,21 @@ class StepManager {
         this.formData['building-information/building-name-location'].building_uuid = result.building_uuid;
       }
 
+      // Stash geo auto-detection warnings so building-details.html can surface them
+      // as "please verify" notes next to the climate/seismic dropdowns.
+      if (stepKey === 'building-information/building-name-location') {
+        if (result.geo_climate_warning) {
+          sessionStorage.setItem('geo_climate_warning', result.geo_climate_warning);
+        } else {
+          sessionStorage.removeItem('geo_climate_warning');
+        }
+        if (result.geo_seismic_warning) {
+          sessionStorage.setItem('geo_seismic_warning', result.geo_seismic_warning);
+        } else {
+          sessionStorage.removeItem('geo_seismic_warning');
+        }
+      }
+
       return { success: true, building_uuid: result.building_uuid };
     } catch (error) {
       console.error('Error saving to server:', error);

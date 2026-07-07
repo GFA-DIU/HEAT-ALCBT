@@ -26,9 +26,32 @@ from pages.models.building import Building, BuildingAssembly, BuildingBoQFile, B
 from pages.models.building_operation.energy_summary import EnergySummary
 from pages.models.climate_type import ClimateType
 from pages.models.epd import EPD, EPDImpact, EPDType, MaterialCategory
+from pages.geo_lookup import resolve_building_location_fields
 from pages.views.building.impact_calculation import calculate_impacts, ImpactCalculationError
 
 logger = logging.getLogger(__name__)
+
+
+def _resolve_and_apply_geo_fields(building):
+    """
+    Auto-populate building.climate_zone / building.seismic_zone from GPS coordinates
+    (per BEAT spec: auto-fill when lat/lon + country are known, otherwise leave the
+    fields for manual selection in the next step). Does not save() the building.
+
+    Returns the resolve_building_location_fields() dict, or None if lat/lon/country
+    weren't available to attempt a lookup.
+    """
+    if building.latitude is None or building.longitude is None or not building.country_id:
+        return None
+
+    geo_result = resolve_building_location_fields(
+        building.latitude, building.longitude, building.country.name
+    )
+    if geo_result.get("climate_type"):
+        building.climate_zone = ClimateType.objects.filter(name=geo_result["climate_type"]).first()
+    if geo_result.get("seismic_zone"):
+        building.seismic_zone = geo_result["seismic_zone"]
+    return geo_result
 
 
 @login_required
@@ -636,6 +659,7 @@ def save_building_step(request):
             return JsonResponse({"error": "Missing step_key or data"}, status=400)
 
         building_uuid = step_data.get('building_uuid', '')
+        geo_result = None
 
         # Step 1.1: Create the Building with basic info from name & location
         if step_key == "building-information/building-name-location":
@@ -664,6 +688,8 @@ def save_building_step(request):
                     if 'latitude' in step_data:
                         building.latitude = step_data['latitude'] if step_data['latitude'] else None
 
+                    geo_result = _resolve_and_apply_geo_fields(building)
+
                     building.save()
                     building_uuid = str(building.uuid)
 
@@ -688,6 +714,9 @@ def save_building_step(request):
                     total_floor_area=100,  # Will be updated in step 1.2
                     reference_period=50,    # Will be updated in step 1.2
                 )
+                geo_result = _resolve_and_apply_geo_fields(building)
+                if geo_result:
+                    building.save()
                 building_uuid = str(building.uuid)
 
         # Step 1.2: Update the Building with detailed information
@@ -846,6 +875,10 @@ def save_building_step(request):
             "message": "Step data saved successfully",
             "building_uuid": building_uuid,
             "building_name": building_name,
+            "geo_climate_type": geo_result.get("climate_type") if geo_result else None,
+            "geo_climate_warning": geo_result.get("climate_warning") if geo_result else None,
+            "geo_seismic_zone": geo_result.get("seismic_zone") if geo_result else None,
+            "geo_seismic_warning": geo_result.get("seismic_warning") if geo_result else None,
         })
 
     except json.JSONDecodeError:
