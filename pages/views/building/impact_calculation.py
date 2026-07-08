@@ -110,6 +110,7 @@ def calculate_impacts(
             Unit.M2:  AssemblyDimension.AREA,
             Unit.M3:  AssemblyDimension.VOLUME,
             Unit.KG:  AssemblyDimension.MASS,
+            Unit.TONES: AssemblyDimension.MASS,
         }
         return boq_dim_map[p.input_unit]
 
