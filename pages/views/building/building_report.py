@@ -217,10 +217,9 @@ def _build_context(building, request, card_donut="", card_assembly="", card_mate
     material_data = get_embodied_carbon_by_material(building)
     operational_data = get_operational_carbon_by_system(building)
 
-    # AI narratives are optional enrichment. If generation is unavailable
-    # (no REPORT_API_KEY) or fails, fall back to the built-in narrative text
-    # baked into the PDF/DOCX builders rather than failing the whole export.
-    ai = _generate_ai_narratives(building, stats, assembly_data, material_data, operational_data) or {}
+    ai = _generate_ai_narratives(building, stats, assembly_data, material_data, operational_data)
+    if ai is None:
+        raise RuntimeError("AI narrative generation failed")
 
     def fmt(val):
         return f"{val:,.1f}"
@@ -248,11 +247,11 @@ def _build_context(building, request, card_donut="", card_assembly="", card_mate
         "card_material": card_material,
         "card_savings": card_savings,
         # AI-generated narratives (fall back to None if generation failed)
-        "ai_section_2_narrative": ai.get("section_2_narrative"),
-        "ai_section_3_material_insight": ai.get("section_3_material_insight"),
-        "ai_section_4_operational_insight": ai.get("section_4_operational_insight"),
-        "ai_section_5_benchmark_callout": ai.get("section_5_benchmark_callout"),
-        "ai_section_5_strategies": ai.get("section_5_strategies"),
+        "ai_section_2_narrative": ai["section_2_narrative"],
+        "ai_section_3_material_insight": ai["section_3_material_insight"],
+        "ai_section_4_operational_insight": ai["section_4_operational_insight"],
+        "ai_section_5_benchmark_callout": ai["section_5_benchmark_callout"],
+        "ai_section_5_strategies": ai["section_5_strategies"],
     }
 
 
@@ -556,29 +555,6 @@ def _pdf_html(ctx):
     floors_below = b.floors_below_ground if b.floors_below_ground is not None else None
     cond_area = f"{b.cond_floor_area} m&#178;" if b.cond_floor_area else None
 
-    # AI narratives are optional — fall back to static copy when unavailable so
-    # the PDF never renders the literal string "None".
-    s2_narrative = ctx["ai_section_2_narrative"] or (
-        f"Operational carbon accounts for {ctx['op_pct']}% of the total carbon footprint "
-        f"({ctx['operational_carbon']} kgCO<sub>2</sub>eq/m&#178;), with embodied carbon contributing the "
-        f"remaining {ctx['em_pct']}% ({ctx['embodied_carbon']} kgCO<sub>2</sub>eq/m&#178;). Because embodied "
-        "carbon is released upfront during construction, reducing it delivers immediate emissions savings."
-    )
-    s3_material_insight = ctx["ai_section_3_material_insight"] or (
-        "Concrete and reinforcement typically dominate embodied carbon in reinforced-concrete-frame "
-        "buildings. Specifying low-carbon concrete mixes (GGBS or fly ash blends), using recycled-content "
-        "reinforcement, and minimising structural over-design are the highest-impact reduction strategies."
-    )
-    s4_operational_insight = ctx["ai_section_4_operational_insight"] or (
-        "Cooling is typically the dominant operational carbon contributor, driven primarily by air "
-        "conditioning systems, followed by ventilation and lighting loads."
-    )
-    s5_benchmark_callout = ctx["ai_section_5_benchmark_callout"] or (
-        f"This building's total carbon footprint is {ctx['total_carbon']} kgCO<sub>2</sub>eq/m&#178;. "
-        "Compare against best-practice and national-average figures for buildings of this type and region "
-        "to identify the largest reduction opportunities."
-    )
-
     return f"""<!DOCTYPE html>
 <html>
 <head>
@@ -705,7 +681,7 @@ def _pdf_html(ctx):
 {ctx["donut_card"]}
 <p class="fig-caption">Figure 1 &#8212; Whole life carbon cycle of the building</p>
 
-<p class="body-text">{s2_narrative}</p>
+<p class="body-text">{ctx["ai_section_2_narrative"]}</p>
 
 <!-- ===== PAGE 4: SECTION 3 ===== -->
 <div class="page-break"></div>
@@ -728,7 +704,7 @@ def _pdf_html(ctx):
 {_chart_img(ctx["card_material"], "88%")}
 <p class="fig-caption">Figure 3 &#8212; Embodied carbon by material (Materials tab)</p>
 
-<p class="body-text">{s3_material_insight}</p>
+<p class="body-text">{ctx["ai_section_3_material_insight"]}</p>
 
 <!-- ===== PAGE 5: SECTION 4 — OPERATIONAL CARBON ===== -->
 <div class="page-break"></div>
@@ -745,7 +721,7 @@ def _pdf_html(ctx):
 
 <p class="fig-caption" style="margin-top:80pt;">Figure 4 &#8212; Operational carbon by system and appliance (Energy tab)</p>
 
-<p class="body-text">{s4_operational_insight}</p>
+<p class="body-text">{ctx["ai_section_4_operational_insight"]}</p>
 
 <!-- ===== PAGE 6: SECTION 5 — BENCHMARKING ===== -->
 <div class="page-break"></div>
@@ -783,7 +759,7 @@ def _pdf_html(ctx):
   </tr>
 </table>
 
-<div class="callout">{s5_benchmark_callout}</div>
+<div class="callout">{ctx["ai_section_5_benchmark_callout"]}</div>
 
 <p class="subsection-heading">5.3 &nbsp; Optimisation Strategies</p>
 
@@ -1361,11 +1337,7 @@ def _build_docx(ctx):
     callout5.paragraph_format.space_after = Pt(14)
     pPr5 = callout5._p.get_or_add_pPr()
     shd5 = OxmlElement("w:shd"); shd5.set(qn("w:val"), "clear"); shd5.set(qn("w:color"), "auto"); shd5.set(qn("w:fill"), "EFF6FF"); pPr5.append(shd5)
-    cr5 = callout5.add_run(ctx["ai_section_5_benchmark_callout"] or (
-        f"This building's total carbon footprint is {ctx['total_carbon']} kgCO₂eq/m². Compare against "
-        "best-practice and national-average figures for buildings of this type and region to identify the "
-        "largest reduction opportunities."
-    ))
+    cr5 = callout5.add_run(ctx["ai_section_5_benchmark_callout"])
     cr5.font.size = Pt(9); cr5.font.color.rgb = RGBColor(0x1D, 0x6F, 0xA8)
 
     # ── Section 5.3: Optimisation Strategies ─────────────────────────────────
