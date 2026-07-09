@@ -132,7 +132,7 @@ NO_DATA_COUNTRIES = {"indonesia", "thailand", "vietnam"}
 # ---------------------------------------------------------------------------
 
 SAVINGS_DATA = {
-    "Readymixconcrete & cement": {"method": "with GGBS/Fly Ash", "reduction_pct": 0.25},
+    "Ready-mix concrete and cement": {"method": "with GGBS/Fly Ash", "reduction_pct": 0.25},
     "Steel":                     {"method": "recycled content",   "reduction_pct": 0.20},
     "Rebar":                     {"method": "high recycled content", "reduction_pct": 0.30},
     "Pre-cast concrete":         {"method": "low-clinker/SCM Mix",   "reduction_pct": 0.22},
@@ -140,7 +140,7 @@ SAVINGS_DATA = {
     "Masonry":                   {"method": "AAC Blocks",             "reduction_pct": 0.18},
     "Insulation materials":      {"method": "low carbon options (mineral wool/wood fibre/cellulose)", "reduction_pct": 0.15},
     "Finishing materials":       {"method": "low-EC finishes package (paints, flooring, internal linings)", "reduction_pct": 0.20},
-    "Aluminium & other metals":  {"method": "high recycled / low carbon smelting", "reduction_pct": 0.40},
+    "Aluminium and other metals": {"method": "high recycled / low carbon smelting", "reduction_pct": 0.40},
     "Others":                    {"method": None, "reduction_pct": 0.0},
 }
 
