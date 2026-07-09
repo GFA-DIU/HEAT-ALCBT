@@ -38,7 +38,7 @@
           <div class="space-y-1 flex flex-col">
             <span class="text-sm font-medium text-[var(--text--strong-950)]">{% translate "Best Practice" %}</span>
             <span class="text-sm font-bold text-[var(--text--strong-950)] bg-[#4EDF81] px-1 py-0.5">{{ benchmark_position.best_practice|floatformat:0 }}
-              kgCO<sub>2</sub>e/m<sup>2</sup></span>
+              kgCO<sub>2</sub>eq/m<sup>2</sup></span>
           </div>
         </div>
 
@@ -47,7 +47,7 @@
              style="left: {{ benchmark_position.position_pct }}%;">
           <div class="text-base text-[var(--text--strong-950)] w-max text-center">{% translate "Your Building" %}</div>
           <div class="bg-[var(--text--strong-950)] text-white text-xs font-extrabold px-1 py-0.5">
-            {{ stats.total_embodied_carbon|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup>
+            {{ stats.total_embodied_carbon|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup>
           </div>
           <div class="grid grid-cols-1 place-items-center gap-0">
             <div class="h-3.25 w-0.5 bg-black"></div>
@@ -64,7 +64,7 @@
           <div class="space-y-1 flex flex-col">
             <span class="text-sm font-medium text-[var(--text--strong-950)]">{% translate "National Avg" %}</span>
             <span class="text-sm font-bold text-[var(--text--strong-950)] bg-[#FECBC9] px-1 py-0.5">{{ benchmark_position.national_average|floatformat:0 }}
-              kgCO<sub>2</sub>e/m<sup>2</sup></span>
+              kgCO<sub>2</sub>eq/m<sup>2</sup></span>
           </div>
         </div>
       </div>
@@ -188,11 +188,11 @@
             <div class="flex items-center gap-1.5">
               <span class="size-2 rounded-full bg-[var(--savings-primary)]"></span>
 
-              <span class="text-[var(--text--sub-600)]">{% translate "Baseline" %}</span>
+              <span class="text-[var(--text--sub-600)]">{% translate "Baseline savings (kgCO₂eq/m²)" %}</span>
             </div>
             <div class="flex items-center gap-1.5">
               <span class="size-2 rounded-full bg-[#4ADE80]"></span>
-              <span class="text-[var(--text--sub-600)]">{% translate "Potential savings" %}</span>
+              <span class="text-[var(--text--sub-600)]">{% translate "Potential savings (kgCO₂eq/m²)" %}</span>
             </div>
           </div>
 
@@ -207,15 +207,17 @@
                 </div>
                 <span class="text-xs font-semibold text-[var(--text--sub-600)]">{{ item.share_pct|floatformat:1 }}% {% translate "of total" %}</span>
               </div>
-              <div class="flex h-8 w-full rounded-md overflow-hidden text-[10px] font-medium text-[var(--text--strong-950)] bg-[var(--bg--weak-100)]">
-                <div class="bg-[var(--savings-primary)] flex items-center px-2 overflow-hidden whitespace-nowrap"
-                     style="width: {{ item.baseline_bar_pct }}%;">
-                  {{ item.baseline_ec|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup>
+              <div class="flex h-8 w-full rounded-md text-[10px] font-medium text-[var(--text--strong-950)] bg-[var(--bg--weak-100)]">
+                <div class="bg-[var(--savings-primary)] flex items-center px-2 whitespace-nowrap overflow-hidden"
+                     style="width: {{ item.baseline_bar_pct }}%; border-top-left-radius:0.375rem; border-bottom-left-radius:0.375rem;"
+                     title="{{ item.baseline_ec|floatformat:0 }} kgCO₂eq/m²">
+                  {{ item.baseline_ec|floatformat:0 }}
                 </div>
                 {% if item.has_reduction %}
-                <div class="bg-[var(--savings-primary-secondary)] flex items-center justify-center overflow-hidden whitespace-nowrap"
-                     style="width: {{ item.saving_bar_pct }}%;">
-                  -{{ item.potential_saving|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup>
+                <div class="savings-bar bg-[var(--savings-primary-secondary)] flex items-center justify-center whitespace-nowrap relative"
+                     style="width: {{ item.saving_bar_pct }}%; border-top-right-radius:0.375rem; border-bottom-right-radius:0.375rem;"
+                     title="-{{ item.potential_saving|floatformat:0 }} kgCO₂eq/m²">
+                  <span class="savings-bar-label px-1">-{{ item.potential_saving|floatformat:0 }}</span>
                 </div>
                 {% endif %}
               </div>
@@ -225,9 +227,9 @@
                 <p class="text-[var(--text--strong-950)] max-w-[85%]">
                   <span class="font-bold text-[#16A34A]">{{ item.reduction_pct_display }}%</span>
                   {{ item.method }}
-                  <span class="text-[var(--text--sub-600)]">• {{ item.baseline_ec|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup>
-                    → {{ item.optimised_ec|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup>
-                    (−{{ item.potential_saving|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup>)</span>
+                  <span class="text-[var(--text--sub-600)]">• {{ item.baseline_ec|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup>
+                    → {{ item.optimised_ec|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup>
+                    (−{{ item.potential_saving|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup>)</span>
                 </p>
               </div>
               {% endif %}
@@ -641,6 +643,30 @@
       });
     }
 
+
+    // Overflow savings-bar labels to the right of the bar when the bar is
+    // too narrow to fit the label inside it (Optimization Strategies panel).
+    function adjustSavingsBarLabels() {
+      document.querySelectorAll('.savings-bar').forEach(function (bar) {
+        var label = bar.querySelector('.savings-bar-label');
+        if (!label) return;
+        // Reset to inside state before measuring
+        label.classList.remove('savings-bar-label--outside');
+        label.style.position = '';
+        label.style.left = '';
+        label.style.marginLeft = '';
+        label.style.color = '';
+        // If the label is wider than the bar it lives in, push it outside
+        if (label.scrollWidth > bar.clientWidth) {
+          label.style.position = 'absolute';
+          label.style.left = '100%';
+          label.style.marginLeft = '4px';
+          label.style.color = 'var(--text--strong-950)';
+        }
+      });
+    }
+    adjustSavingsBarLabels();
+    window.addEventListener('resize', adjustSavingsBarLabels);
 
     // Toggle Logic
     window.toggleSavingsView = (view, btn) => {
