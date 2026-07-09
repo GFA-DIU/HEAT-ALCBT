@@ -378,14 +378,14 @@
                   </div>
                   <div style="display:flex;flex-direction:column;gap:4px;">
                     <span style="font-size:13px;font-weight:500;color:#0f172a;white-space:nowrap;">Best Practice</span>
-                    <span style="font-size:13px;font-weight:700;color:#0f172a;background:#4EDF81;padding:2px 6px;white-space:nowrap;">{{ benchmark_position.best_practice|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup></span>
+                    <span style="font-size:13px;font-weight:700;color:#0f172a;background:#4EDF81;padding:2px 6px;white-space:nowrap;">{{ benchmark_position.best_practice|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup></span>
                   </div>
                 </div>
 
                 <!-- Your building -->
                 <div style="position:absolute;top:0;left:{{ benchmark_position.position_pct }}%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;">
                   <div style="font-size:13px;font-weight:500;color:#0f172a;white-space:nowrap;">Your Building</div>
-                  <div style="background:#0f172a;color:#ffffff;font-size:11px;font-weight:800;padding:2px 6px;white-space:nowrap;">{{ stats.total_embodied_carbon|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup></div>
+                  <div style="background:#0f172a;color:#ffffff;font-size:11px;font-weight:800;padding:2px 6px;white-space:nowrap;">{{ stats.total_embodied_carbon|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup></div>
                   <div style="width:2px;height:13px;background:#000;"></div>
                   <div style="width:8px;height:8px;background:#000;border-radius:50%;"></div>
                 </div>
@@ -398,7 +398,7 @@
                   </div>
                   <div style="display:flex;flex-direction:column;gap:4px;">
                     <span style="font-size:13px;font-weight:500;color:#0f172a;white-space:nowrap;">National Avg</span>
-                    <span style="font-size:13px;font-weight:700;color:#0f172a;background:#FECBC9;padding:2px 6px;white-space:nowrap;">{{ benchmark_position.national_average|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup></span>
+                    <span style="font-size:13px;font-weight:700;color:#0f172a;background:#FECBC9;padding:2px 6px;white-space:nowrap;">{{ benchmark_position.national_average|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup></span>
                   </div>
                 </div>
               </div>
@@ -497,11 +497,11 @@
                           <span style="font-size:12px;color:#64748b;white-space:nowrap;margin-left:8px;">{{ item.share_pct|floatformat:1 }}% of total</span>
                         </div>
                         <div style="display:flex;height:32px;width:100%;border-radius:6px;overflow:hidden;font-size:11px;font-weight:500;color:#0f172a;background:#f1f5f9;">
-                          <div style="background:#FFA468;width:{{ item.baseline_bar_pct }}%;display:flex;align-items:center;padding:0 10px;white-space:nowrap;overflow:hidden;">{{ item.baseline_ec|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup></div>
-                          {% if item.has_reduction %}<div style="background:#86EFAC;width:{{ item.saving_bar_pct }}%;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;">-{{ item.potential_saving|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup></div>{% endif %}
+                          <div style="background:#FFA468;width:{{ item.baseline_bar_pct }}%;display:flex;align-items:center;padding:0 10px;white-space:nowrap;overflow:hidden;">{{ item.baseline_ec|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup></div>
+                          {% if item.has_reduction %}<div style="background:#86EFAC;width:{{ item.saving_bar_pct }}%;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;">-{{ item.potential_saving|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup></div>{% endif %}
                         </div>
                         {% if item.has_reduction %}
-                        <p style="font-size:12px;color:#0f172a;margin:0;line-height:1.5;"><span style="font-weight:700;color:#16A34A;">{{ item.reduction_pct_display }}%</span> {{ item.method }} <span style="color:#64748b;">• {{ item.baseline_ec|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup> → {{ item.optimised_ec|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup> (−{{ item.potential_saving|floatformat:0 }} kgCO<sub>2</sub>e/m<sup>2</sup>)</span></p>
+                        <p style="font-size:12px;color:#0f172a;margin:0;line-height:1.5;"><span style="font-weight:700;color:#16A34A;">{{ item.reduction_pct_display }}%</span> {{ item.method }} <span style="color:#64748b;">• {{ item.baseline_ec|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup> → {{ item.optimised_ec|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup> (−{{ item.potential_saving|floatformat:0 }} kgCO<sub>2</sub>eq/m<sup>2</sup>)</span></p>
                         {% endif %}
                       </div>
                       {% endfor %}
