@@ -44,7 +44,8 @@ def import_generic_operational_epds():
     superuser = get_superuser()
 
     try:
-        df = pd.read_csv(file_path, sep=";")
+        #df = pd.read_csv(file_path, sep=";")
+        df = pd.read_csv(file_path)
     except Exception as e:
         print(f"Error reading CSV file: {e}")
         return
