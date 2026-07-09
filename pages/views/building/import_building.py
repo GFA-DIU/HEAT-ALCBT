@@ -2192,7 +2192,7 @@ STRUCTURAL_UNIT_MAP = {
     'm3':  Unit.M3, 'm³': Unit.M3, 'cu m': Unit.M3, 'cum': Unit.M3,
     'm':   Unit.M,
     'kg':  Unit.KG,
-    'ton': Unit.TONES, 'tones': Unit.TONES, 'tonnes': Unit.TONES,
+    'ton': Unit.TON, 'tones': Unit.TON, 'tonnes': Unit.TON,
     'pcs': Unit.PCS, 'pieces': Unit.PCS,
 }
 

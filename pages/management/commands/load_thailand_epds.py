@@ -5,7 +5,7 @@ from pages.scripts.csv_import.import_thailand_epds import import_thailand_epds
 
 
 class Command(BaseCommand):
-    help = "Load Thailand TGO CFP EPDs from docs/TH_CFP-TGO_Data_final(18Feb2026).xlsx"
+    help = "Load Thailand TGO CFP EPDs from TH_CFP_Final_Usable_Dataset_20260709.xlsx"
 
     @transaction.atomic
     def handle(self, *args, **options):
