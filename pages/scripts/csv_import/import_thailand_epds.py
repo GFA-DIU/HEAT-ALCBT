@@ -1,7 +1,8 @@
-import re
-import uuid
 import logging
+import uuid
+
 import openpyxl
+from collections import Counter
 
 from cities_light.models import Country
 
@@ -10,47 +11,41 @@ from pages.scripts.csv_import.utils import get_superuser
 
 logger = logging.getLogger(__name__)
 
-FILE_PATH = "docs/TH_CFP-TGO_Data_final(18Feb2026).xlsx"
+FILE_PATH = "docs/TH_CFP_Final_Usable_Dataset_20260709.xlsx"
+SHEET_NAME = "CFP_TGO_TH"
 SOURCE = "TGO"
 
+# Maps the sheet's "Functional_Unit" column to a Unit choice.
 UNIT_MAP = {
-    "m2": Unit.M2,
-    "m3": Unit.M3,
     "kg": Unit.KG,
     "m": Unit.M,
+    "m2": Unit.M2,
+    "m3": Unit.M3,
     "pcs": Unit.PCS,
-    "ton": Unit.TONES,
-    "hour": Unit.UNKNOWN,
-    "gallon": Unit.UNKNOWN,
+    "ton": Unit.TON,
 }
 
 
-def parse_cf_volume(raw):
-    """
-    Parse strings like '268 gCO2e', '22.5 kgCO2e', or '14.6 kg'.
-    Returns (value_in_kg, True) or (None, False) if unparseable/null.
-    gCO2e values are divided by 1000 to convert to kgCO2e.
-    Bare 'kg' values are treated as kgCO2e.
-    """
-    if not raw:
-        return None, False
-    raw = str(raw).strip()
-    match = re.match(r"^([\d.]+)\s*(g|kg)(?:CO2e)?$", raw, re.IGNORECASE)
-    if not match:
-        return None, False
-    value = float(match.group(1))
-    if match.group(2).lower() == "g":
-        value = value / 1000
-    return value, True
-
-
 def map_unit(raw_unit):
-    if not raw_unit or str(raw_unit).strip() in ("0", "None", ""):
+    if not raw_unit:
         return Unit.UNKNOWN
     return UNIT_MAP.get(str(raw_unit).strip().lower(), Unit.UNKNOWN)
 
 
 def import_thailand_epds():
+    """
+    Import (or update) Thailand TGO CFP EPDs from the cleaned dataset.
+
+    Matches existing EPDs by name (+ country + source), same as before, so
+    re-running this command updates previously-imported rows in place.
+    Old TGO EPDs from prior runs that are absent from this file are left
+    untouched (not deleted) — some may still be referenced by buildings.
+
+    Rows whose Canonical_Name_EN or Certificate_No. is not unique within the
+    sheet are skipped entirely (not imported, not updated) since there's no
+    reliable way to tell them apart; they're reported at the end for the
+    data owner to disambiguate upstream.
+    """
     superuser = get_superuser()
 
     try:
@@ -61,7 +56,7 @@ def import_thailand_epds():
 
     try:
         wb = openpyxl.load_workbook(FILE_PATH, read_only=True, data_only=True)
-        ws = wb["Data"]
+        ws = wb[SHEET_NAME]
     except Exception as e:
         logger.error("Failed to open Excel file: %s", e)
         return
@@ -71,54 +66,46 @@ def import_thailand_epds():
         life_cycle_stage="a1a3",
     )
 
-    skipped_excluded = 0    # unit status != Good
-    skipped_no_unit = 0     # blank declared unit
-    skipped_no_name = 0     # blank English name
-    imported_with_gwp = 0   # EPD + GWP impact created
-    imported_no_gwp = 0     # EPD created, CF Volume null so no impact
+    all_rows = list(ws.iter_rows(min_row=2, values_only=True))
+    wb.close()
+    data_rows = [row for row in all_rows if row[0] is not None]
+
+    # Detect duplicate identity columns up front so those rows can be skipped.
+    name_counts = Counter(str(row[9]).strip() for row in data_rows if row[9])
+    cert_counts = Counter(row[1] for row in data_rows if row[1])
+    duplicate_names = {name for name, count in name_counts.items() if count > 1}
+    duplicate_certs = {cert for cert, count in cert_counts.items() if count > 1}
+
+    skipped_duplicate = 0
+    skipped_duplicate_rows = []
+    imported = 0
+    updated = 0
     failure = 0
     failure_rows = []
-    no_gwp_rows = []        # raw rows without GWP, for Excel export
 
-    all_rows = list(ws.iter_rows(min_row=1, values_only=True))
-    headers = list(all_rows[0])
-
-    for row_idx, row in enumerate(all_rows[1:], start=2):
-        if all(v is None for v in row):
-            break
-        if len(row) < 26:
-            continue
-
+    for row_idx, row in enumerate(data_rows, start=2):
         try:
-            unit_status = row[1]           # col B
-            declared_unit_raw = row[2]     # col C
-            declared_amount_raw = row[3]   # col D
-            name = row[21]                 # col V - English name
-            cf_volume_raw = row[25]        # col Z
+            cert_no = row[1]           # Certificate_No.
+            subcategory = row[4]       # Subcategory
+            functional_unit = row[5]   # Functional_Unit
+            gwp_value = row[6]         # kgCO2e
+            name_en = row[9]           # Canonical_Name _EN
 
-            if str(unit_status).strip().lower() != "good":
-                skipped_excluded += 1
+            name = str(name_en).strip() if name_en else ""
+
+            if not name:
+                failure += 1
+                failure_rows.append(row_idx)
                 continue
 
-            if not name or str(name).strip() == "":
-                skipped_no_name += 1
+            if name in duplicate_names or cert_no in duplicate_certs:
+                skipped_duplicate += 1
+                skipped_duplicate_rows.append((row_idx, name, cert_no))
                 continue
 
-            if not declared_unit_raw or str(declared_unit_raw).strip() in ("", "0", "None"):
-                skipped_no_unit += 1
-                continue
+            declared_unit = map_unit(functional_unit)
 
-            name = str(name).strip()
-            declared_unit = map_unit(declared_unit_raw)
-
-            try:
-                declared_amount = float(declared_amount_raw) if declared_amount_raw not in (None, "", "0", 0) else 1.0
-                if declared_amount <= 0:
-                    declared_amount = 1.0
-            except (ValueError, TypeError):
-                declared_amount = 1.0
-
-            epd, _ = EPD.objects.update_or_create(
+            epd, created = EPD.objects.update_or_create(
                 name=name,
                 country=country,
                 source=SOURCE,
@@ -127,56 +114,38 @@ def import_thailand_epds():
                     "names": [{"lang": "en", "value": name}],
                     "type": EPDType.OFFICIAL_NON_STANDARD,
                     "declared_unit": declared_unit,
-                    "declared_amount": declared_amount,
+                    "declared_amount": 1.0,
+                    "comment": f"Certificate: {cert_no}; Subcategory: {subcategory}" if cert_no else None,
                     "public": True,
                     "created_by_id": superuser.id,
                     "conversions": [],
                 },
             )
 
-            gwp_value, parseable = parse_cf_volume(cf_volume_raw)
-            if parseable:
-                EPDImpact.objects.update_or_create(
-                    epd=epd,
-                    impact=gwp_impact,
-                    defaults={"value": gwp_value},
-                )
-                imported_with_gwp += 1
+            EPDImpact.objects.update_or_create(
+                epd=epd,
+                impact=gwp_impact,
+                defaults={"value": float(gwp_value)},
+            )
+
+            if created:
+                imported += 1
             else:
-                imported_no_gwp += 1
-                no_gwp_rows.append(row)
-                logger.info(
-                    "Row %d: '%s' imported without GWP impact — CF Volume null/unparseable: %r",
-                    row_idx, name, cf_volume_raw,
-                )
+                updated += 1
 
         except Exception as e:
             logger.exception("Row %d: unexpected error — %s", row_idx, e)
             failure += 1
             failure_rows.append(row_idx)
 
-    wb.close()
-
-    # Export rows without GWP impact to Excel, mirroring the source Data tab structure
-    if no_gwp_rows:
-        out_path = "docs/TH_TGO_EPDs_without_GWP.xlsx"
-        out_wb = openpyxl.Workbook()
-        out_ws = out_wb.active
-        out_ws.title = "Data"
-        out_ws.append(list(headers))
-        for row in no_gwp_rows:
-            out_ws.append(list(row))
-        out_wb.save(out_path)
-        print(f"  Exported {len(no_gwp_rows)} rows without GWP to: {out_path}")
-
-    total_imported = imported_with_gwp + imported_no_gwp
     print(f"\n{'='*60}")
     print(f"Thailand TGO EPD import complete.")
-    print(f"  Skipped (Unit status != Good):  {skipped_excluded}")
-    print(f"  Skipped (blank declared unit):  {skipped_no_unit}")
-    print(f"  Skipped (missing name):         {skipped_no_name}")
-    print(f"  Total EPDs imported:            {total_imported}")
-    print(f"    - with GWP impact:            {imported_with_gwp}")
-    print(f"    - without GWP impact:         {imported_no_gwp}  (CF Volume null — EPDImpact.value does not allow null)")
-    print(f"  Failed rows (errors):           {failure}  {failure_rows if failure_rows else ''}")
+    print(f"  New EPDs created:                {imported}")
+    print(f"  Existing EPDs updated:           {updated}")
+    print(f"  Skipped (duplicate name/cert):   {skipped_duplicate}")
+    if skipped_duplicate_rows:
+        print(f"    Rows skipped (row, name, certificate):")
+        for row_idx, name, cert_no in skipped_duplicate_rows:
+            print(f"      row {row_idx}: {name!r} / {cert_no!r}")
+    print(f"  Failed rows (errors):            {failure}  {failure_rows if failure_rows else ''}")
     print(f"{'='*60}\n")
