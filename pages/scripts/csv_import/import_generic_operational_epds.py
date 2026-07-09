@@ -40,7 +40,7 @@ def get_comment(row):
 
 
 def import_generic_operational_epds():
-    file_path = "pages/data/generic_operational_EPDs.csv"
+    file_path = "pages/data/generic_operational_EPDs_v2.csv"#"pages/data/generic_operational_EPDs.csv"
     superuser = get_superuser()
 
     try:
