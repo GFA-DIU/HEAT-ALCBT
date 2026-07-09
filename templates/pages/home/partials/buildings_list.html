@@ -82,7 +82,7 @@
                     >{% translate "Total carbon footprint" %}</span
                   >
                   <span class="text-base/6 font-medium"
-                    >{{ building.stats.total_carbon_footprint|floatformat:"1" }} kgCO2e eq/m<sup>2</sup></span
+                    >{{ building.stats.total_carbon_footprint|floatformat:"1" }} kgCO<sub>2</sub>eq/m<sup>2</sup></span
                   >
                 </li>
                 <li
@@ -106,7 +106,7 @@
                   >
                   <span
                     class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                    >{{ building.stats.total_embodied_carbon|floatformat:"1" }} kgCO2e eq/m<sup>2</sup></span
+                    >{{ building.stats.total_embodied_carbon|floatformat:"1" }} kgCO<sub>2</sub>eq/m<sup>2</sup></span
                   >
                 </li>
                 <li
@@ -116,9 +116,10 @@
                     class="text-xs/4 font-medium text-[var(--text--sub-600)]"
                     >{% translate "Carbon Savings" %}</span
                   >
+                  {# Carbon savings figure withheld pending methodology review — shown as ---- for now #}
                   <span
                     class="text-base/6 font-medium text-[var(--text--sub-600)]"
-                    >{{ building.stats.carbon_savings_percentage|floatformat:"1" }}%</span
+                    >----</span
                   >
                 </li>
               </ul>
