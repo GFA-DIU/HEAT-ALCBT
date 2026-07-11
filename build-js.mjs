@@ -116,9 +116,14 @@ function buildEsbuildArgs(entryFiles, outputDir, options = {}) {
  */
 function runEsbuild(args) {
   return new Promise((resolve, reject) => {
-    console.log(`\n🔨 Running: npx ${args.join(" ")}\n`);
+    // With shell: true, Node joins args into a single command string without
+    // escaping. Quote any arg containing whitespace so paths like
+    // "C:\Users\Rohit Nepali\..." aren't split into separate arguments.
+    const quotedArgs = args.map((a) => (/\s/.test(a) ? `"${a}"` : a));
 
-    const child = spawn("npx", args, {
+    console.log(`\n🔨 Running: npx ${quotedArgs.join(" ")}\n`);
+
+    const child = spawn("npx", quotedArgs, {
       stdio: "inherit",
       shell: true,
       cwd: __dirname,
