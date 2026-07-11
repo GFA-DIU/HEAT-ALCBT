@@ -1,11 +1,16 @@
-const API_URL = "https://restcountries.com/v3.1/all?fields=name,cca2";
+// restcountries.com's v3.1 API was permanently deprecated (returns an error
+// with no CORS header, which browsers surface as a CORS failure). Countries
+// data is now served from a local static file bundled with the app. The URL
+// is injected by the base template since this bundle is built as an IIFE
+// (import.meta.url is unavailable in that format).
+const DATA_URL = window.COUNTRIES_DATA_URL || "/static/assets/data/countries.json";
 
 // Create a map of country code (lowercase) to country data for fast lookup
 const COUNTRIES_MAP = new Map();
 let isLoading = true;
 let hasError = false;
 
-// Fetch countries data from API
+// Fetch countries data from the local static dataset
 async function fetchCountriesData() {
   if (hasCountries()) {
     isLoading = false;
@@ -13,7 +18,7 @@ async function fetchCountriesData() {
     return;
   }
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(DATA_URL);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

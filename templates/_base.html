@@ -544,6 +544,9 @@
   {% block javascript %}
   <script src="{% static 'js/toast.js' %}"></script>
 
+  <script>
+    window.COUNTRIES_DATA_URL = "{% static 'assets/data/countries.json' %}";
+  </script>
   <script type="module" src="{% static 'js/countries-registry.js' %}"></script>
 
   <!-- Bootstrap JavaScript -->
