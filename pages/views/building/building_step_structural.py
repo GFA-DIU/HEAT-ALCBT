@@ -281,6 +281,7 @@ def handle_select_product(request):
                 Unit.M2:  ("Area (m²)", Unit.M2),
                 Unit.M3:  ("Volume (m³)", Unit.M3),
                 Unit.KG:  ("Mass (kg)", Unit.KG),
+                Unit.TON: ("Mass (ton)", Unit.TON),
                 Unit.M:   ("Length (m)", Unit.M),
                 Unit.PCS: ("Quantity (pcs)", Unit.PCS),
             }
@@ -353,8 +354,14 @@ def handle_get_techniques(request):
 
 
 def handle_get_categories(request):
-    """Get assembly categories (HTMX endpoint). Returns JSON when format=json."""
-    categories = list(AssemblyCategory.objects.all().values('id', 'name'))
+    """Get assembly categories (HTMX endpoint). Returns JSON when format=json.
+
+    Includes `family` (Building Part) and orders by `tag` so the front-end can
+    group/filter components by their Building Part.
+    """
+    categories = list(
+        AssemblyCategory.objects.all().order_by('tag').values('id', 'name', 'family')
+    )
 
     if request.GET.get('format') == 'json':
         return JsonResponse({'categories': categories})

@@ -1,4 +1,4 @@
-/*! tailwindcss v4.3.1 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.3.2 | MIT License | https://tailwindcss.com */
 @layer properties;
 :root {
   --TRUE: 1;
@@ -481,6 +481,59 @@
   }
 }
 @layer utilities {
+  .diff {
+    @layer daisyui.component {
+      position: relative;
+      display: grid;
+      width: 100%;
+      overflow: hidden;
+      webkit-user-select: none;
+      user-select: none;
+      grid-template-rows: 1fr 1.8rem 1fr;
+      direction: ltr;
+      container-type: inline-size;
+      grid-template-columns: auto 1fr;
+      &:focus-visible, &:has(.diff-item-1:focus-visible) {
+        outline-style: var(--tw-outline-style);
+        outline-width: 2px;
+        outline-offset: 1px;
+        outline-color: var(--color-base-content);
+      }
+      &:focus-visible {
+        outline-style: var(--tw-outline-style);
+        outline-width: 2px;
+        outline-offset: 1px;
+        outline-color: var(--color-base-content);
+        .diff-resizer {
+          min-width: 95cqi;
+          max-width: 95cqi;
+        }
+      }
+      &:has(.diff-item-1:focus-visible) {
+        outline-style: var(--tw-outline-style);
+        outline-width: 2px;
+        outline-offset: 1px;
+        .diff-resizer {
+          min-width: 5cqi;
+          max-width: 5cqi;
+        }
+      }
+      @supports (-webkit-overflow-scrolling: touch) and (overflow: -webkit-paged-x) {
+        &:focus {
+          .diff-resizer {
+            min-width: 5cqi;
+            max-width: 5cqi;
+          }
+        }
+        &:has(.diff-item-1:focus) {
+          .diff-resizer {
+            min-width: 95cqi;
+            max-width: 95cqi;
+          }
+        }
+      }
+    }
+  }
   .modal {
     @layer daisyui.component {
       pointer-events: none;
@@ -2702,6 +2755,9 @@
   .left-0 {
     left: 0;
   }
+  .left-0\.5 {
+    left: calc(var(--spacing) * 0.5);
+  }
   .left-1\/2 {
     left: calc(1 / 2 * 100%);
   }
@@ -3046,6 +3102,9 @@
   .col-10 {
     grid-column: 10;
   }
+  .col-12 {
+    grid-column: 12;
+  }
   .col-auto {
     grid-column: auto;
   }
@@ -3186,6 +3245,9 @@
   }
   .mx-5 {
     margin-inline: calc(var(--spacing) * 5);
+  }
+  .mx-6 {
+    margin-inline: calc(var(--spacing) * 6);
   }
   .mx-auto {
     margin-inline: auto;
@@ -4017,6 +4079,9 @@
   .w-8 {
     width: calc(var(--spacing) * 8);
   }
+  .w-10\.5 {
+    width: calc(var(--spacing) * 10.5);
+  }
   .w-12 {
     width: calc(var(--spacing) * 12);
   }
@@ -4151,9 +4216,6 @@
   }
   .max-w-\[85\%\] {
     max-width: 85%;
-  }
-  .max-w-\[140px\] {
-    max-width: 140px;
   }
   .max-w-md {
     max-width: var(--container-md);
@@ -4638,6 +4700,9 @@
   .border-\[var\(--bg--soft-200\)\] {
     border-color: var(--bg--soft-200);
   }
+  .border-\[var\(--state--error--base\)\] {
+    border-color: var(--state--error--base);
+  }
   .border-\[var\(--stroke--soft-200\)\] {
     border-color: var(--stroke--soft-200);
   }
@@ -4649,6 +4714,9 @@
   }
   .border-\[var\(--text--sub-600\)\] {
     border-color: var(--text--sub-600);
+  }
+  .border-base-300 {
+    border-color: var(--color-base-300);
   }
   .border-error {
     border-color: var(--color-error);
@@ -4684,9 +4752,6 @@
   }
   .bg-\[\#41B84E\] {
     background-color: #41B84E;
-  }
-  .bg-\[\#81F28E\] {
-    background-color: #81F28E;
   }
   .bg-\[\#86EFAC\] {
     background-color: #86EFAC;
@@ -5238,6 +5303,9 @@
     --tw-tracking: var(--tracking-widest);
     letter-spacing: var(--tracking-widest);
   }
+  .text-wrap {
+    text-wrap: wrap;
+  }
   .break-words {
     overflow-wrap: break-word;
   }
@@ -5573,12 +5641,6 @@
     @layer daisyui.modifier {
       --badge-color: var(--color-neutral);
       --badge-fg: var(--color-neutral-content);
-    }
-  }
-  .btn-accent {
-    @layer daisyui.modifier.color {
-      --btn-color: var(--color-accent);
-      --btn-fg: var(--color-accent-content);
     }
   }
   .btn-error {

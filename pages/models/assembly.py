@@ -74,13 +74,32 @@ class AssemblyCategoryManager(models.Manager):
         )
         return category
 
+class AssemblyFamily(models.TextChoices):
+    """Top-level grouping ("Building Part") that a component belongs to.
+
+    Lets users navigate the component list from the top down:
+    Building Part -> Building Component -> Construction Technique.
+    """
+
+    SUBSTRUCTURE = "substructure", "Substructure"
+    SUPERSTRUCTURE = "superstructure", "Superstructure"
+    ENVELOPE = "envelope", "Envelope & Openings"
+    FINISHES = "finishes", "Finishes & Other"
+
+
 class AssemblyCategory(models.Model):
     """
-    Represents a group of assemblies, e.g., 'Bottom Floor Construction'.
+    Represents a group of assemblies, e.g., 'Foundations'.
     """
 
     name = models.CharField(max_length=255, unique=True)
     tag = models.CharField(max_length=50)
+    family = models.CharField(
+        _("Building Part"),
+        max_length=20,
+        choices=AssemblyFamily.choices,
+        blank=True,
+    )
     techniques = models.ManyToManyField(
         AssemblyTechnique,
         through="AssemblyCategoryTechnique",
