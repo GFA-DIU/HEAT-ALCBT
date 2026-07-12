@@ -1,0 +1,29 @@
+# Cloudflare Containers build — same as Dockerfile but with collectstatic baked in
+# (Heroku ran collectstatic during slug build; containers must do it at image build)
+# Python 3.11 to match Heroku production runtime (.python-version = 3.11;
+# cffi==1.15.1 does not build on 3.12+)
+FROM python:3.11-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+RUN mkdir -p /code
+WORKDIR /code
+
+COPY requirements.txt /tmp/requirements.txt
+
+RUN set -ex && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends gcc libffi-dev libpq-dev && \
+    pip install --upgrade pip && \
+    pip install -r /tmp/requirements.txt && \
+    apt-get purge -y gcc && apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/* /root/.cache/
+
+COPY . /code/
+
+RUN mkdir -p logs && python manage.py collectstatic --noinput
+
+EXPOSE 8000
+
+CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "django_project.wsgi"]
