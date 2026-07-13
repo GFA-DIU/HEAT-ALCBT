@@ -316,6 +316,7 @@ def handle_select_product(request):
             "available_units": available_units,
             "gwp": epd.get_gwp_impact_sum("a1a3") or 0,
             "source": epd.source or "",
+            "type": epd.type,
         }
 
         # Get assembly categories for BOQ mode

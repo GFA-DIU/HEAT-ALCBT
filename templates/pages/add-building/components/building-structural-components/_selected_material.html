@@ -4,10 +4,18 @@
     data-epd-id="{{ epd.id }}"
     data-timestamp="{{ epd.timestamp }}"
     data-name="{{ epd.name }}"
-    data-gwp="{{ epd.gwp }}">
+    data-gwp="{{ epd.gwp }}"
+    data-type="{{ epd.type }}">
       <div class="flex items-center justify-between mb-2 w-full">
         <span class="text-sm/5 font-medium truncate flex-1">{{ epd.name|truncatechars:50 }}</span>
         <div class="flex items-center gap-2">
+          {% if epd.type == "generic" %}
+          <span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--white-0)] gap-1 flex items-center shrink-0"
+                title="{% translate 'Generic placeholder EPD — not from an official source' %}">
+            <span data-icon="pushpin-fill" data-size="16" data-color="var(--icon--soft-400)"></span>
+            <span class="text-[var(--text--sub-600)] text-xs">{% translate "Generic" %}</span>
+          </span>
+          {% endif %}
           <span data-country="{{ epd.country }}" data-width="16"></span>
           {% if epd.source and epd.source|slice:":4" == "http" %}
           <a href="{{ epd.source }}" target="_blank" rel="noopener">
