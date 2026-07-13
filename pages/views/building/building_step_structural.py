@@ -56,6 +56,11 @@ def _can_epd_be_used(dimension: str, epd) -> tuple[bool, str]:
     """
     declared = epd.declared_unit
 
+    # Ton is a mass unit resolved via the kg path in impact_calculation
+    # (1 ton = 1000 kg), so its usability mirrors kg exactly.
+    if declared == Unit.TON:
+        declared = Unit.KG
+
     # PCS dimension: accepts pcs EPDs directly; also accepts kg/m²/m³ EPDs if DB has ratio
     if dimension == AssemblyDimension.PCS:
         if declared == Unit.PCS:
