@@ -1,3 +1,4 @@
+import re
 import uuid as uuid_lib
 import logging
 
@@ -30,6 +31,50 @@ User = get_user_model()
 # changed in the source portal — so the original (still referenced by buildings)
 # is preserved untouched while the refreshed data is available as a new record.
 UPDATE_MARKER = " (Eco-platform update)"
+
+# Product-name keyword -> MaterialCategory name_en (first match wins). Used when the
+# source dataset's classification id doesn't map to an Ökobaudat category — common for
+# the distributed ECO-Platform nodes. This replaces the old hardcoded default of
+# "Primer for paints and plasters", which mislabelled the large majority of imports.
+_NAME_CATEGORY_RULES = [
+    (r"reinforc\w* bar|deformed bar|round(ed)? bar|\brebar\b|reinforc\w* mesh|wire mesh", "Steel reinforing bar"),
+    (r"stainless steel|structural steel|galvalume|alu[- ]?zinc|galvani[sz]ed steel|steel (sheet|coil|plate|pipe|product|bar|section|rod)|hot[- ]?rolled|cold[- ]?rolled|\bpurlin\b|\bsteel\b", "Steel"),
+    (r"alumin(i)?um|copper|\bbrass\b|\bzinc\b|\blead\b|metal", "Metals"),
+    (r"insulation|glass ?wool|rock ?wool|mineral wool|\beps\b|\bxps\b|acoustic|cellulose fib", "Insulation materials"),
+    (r"paint|primer|coating|enamel|varnish|lacquer|jotafloor|majestic|jotun|penguard|jotamastic|jotashield|hardtop", "Coverings"),
+    (r"waterproof|membrane|bitumen|sealant|adhesive|grout", "Coverings"),
+    (r"tile|floor|ceiling|gyp(sum|board|roc)|plaster ?board|\bpanel\b|\bboard\b|fascia|fa[cç]ade|laminate|wallpaper|vinyl", "Coverings"),
+    (r"concrete|cement|\bmortar\b|screed|\blean\b|aggregate|clinker", "Mineral building products"),
+    (r"brick|\bblock\b|masonry|\baac\b|ceramic|clay", "Mineral building products"),
+    (r"\bwood\b|timber|plywood|\bmdf\b|particle ?board|\bosb\b|bamboo", "Wood"),
+    (r"\bu?pvc\b|\bcpvc\b|\bppr\b|hdpe|plastic|polymer|polyethylene|polypropylene", "Plastics"),
+    (r"pipe|\bvalve\b|\bduct\b|fitting|hvac|plumb", "Building service engineering"),
+    (r"window|\bdoor\b|glazing|glass|curtain wall", "Components for windows and curtain walls"),
+]
+_NAME_CATEGORY_RULES = [(re.compile(p, re.I), name) for p, name in _NAME_CATEGORY_RULES]
+
+_category_cache = {}
+
+
+def _category_by_name(name_en):
+    if name_en not in _category_cache:
+        _category_cache[name_en] = (
+            MaterialCategory.objects.filter(name_en=name_en).order_by("level").first()
+        )
+    return _category_cache.get(name_en)
+
+
+def resolve_category(classification_id, name):
+    """Resolve an EPD to a MaterialCategory: exact classification-id match first,
+    then a product-name keyword match, else 'Unknown'. Never guesses 'Primer'."""
+    if classification_id:
+        cat = MaterialCategory.objects.filter(category_id=classification_id).first()
+        if cat:
+            return cat
+    for rx, cname in _NAME_CATEGORY_RULES:
+        if rx.search(name or ""):
+            return _category_by_name(cname)
+    return _category_by_name("Unknown")
 
 
 def _used_epd_ids():
@@ -158,29 +203,18 @@ def store_epd(epd_data: dict, country: Country, data: dict, superuser):
     """
     Parse the EPD data and link it to the correct material categories and impacts.
     """
-    try:
-        classification = MaterialCategory.objects.get(
-            category_id=epd_data.get("classification")
-        )
-    except MaterialCategory.DoesNotExist:
-        try:
-            classification_info = data["processInformation"]["dataSetInformation"].get(
-                "classificationInformation"
-            )
-            if classification_info:
-                classification = MaterialCategory.objects.get(
-                    name_en="Primer for paints and plasters"
-                )
-            else:
-                classification = MaterialCategory.objects.get(name_en="Unknown")
-        except MaterialCategory.DoesNotExist:
-            classification = None  # Or handle this case as needed
+    # Some source datasets pad the id / name with stray whitespace (even tabs) —
+    # strip so UUIDs stay clean and matchable and names display correctly.
+    uuid_val = str(epd_data["uuid"]).strip()
+    name_val = (epd_data.get("name") or "").strip()
+
+    classification = resolve_category(epd_data.get("classification"), name_val)
 
     # Step 2: Create or update the EPD record
     epd, created = EPD.objects.update_or_create(
-        UUID=epd_data["uuid"],
+        UUID=uuid_val,
         defaults={
-            "name": epd_data["name"],
+            "name": name_val,
             "names": epd_data.get("names"),
             "declared_unit": epd_data["declared_unit"],
             "conversions": epd_data["conversions"],
