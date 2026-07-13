@@ -43,7 +43,7 @@ def map_unit(raw_unit):
 # Rebar detection (scoped to the steel subcategory only, so it never catches
 # "reinforced concrete/AAC" products). Matches TGO rebar/mesh product names.
 REBAR_NAME_RE = re.compile(
-    r"(deformed bar|round bar|reinforcing bar|\brebar\b|reinforcement mesh|deformed .*wire mesh)",
+    r"(deformed bar|rounded? bar|reinforcing bar|\brebar\b|reinforcement mesh|deformed .*wire mesh)",
     re.IGNORECASE,
 )
 
@@ -121,15 +121,37 @@ def import_thailand_epds():
             )
         return _cat_cache.get(name)
 
+    # Name-keyword fallback (first match wins) — used when an EPD has no usable
+    # subcategory (legacy in-use rows), so it's still categorized by product name.
+    NAME_KEYWORD_RULES = [
+        (re.compile(r"glass wool|aeroflex|aero roof|insulation", re.I), "Insulation materials"),
+        (re.compile(r"structural steel|steel plate|steel sheet|hot[- ]?rolled steel|lip channel|steel coil|\bpurlin\b", re.I), "Steel"),
+        (re.compile(r"precast|pre-cast", re.I), "Precast concrete elements and goods"),
+        (re.compile(r"concrete|lean|cement|mortar|grout", re.I), "Mineral building products"),
+        (re.compile(r"paint|primer|coating|\bcool\b|semigloss|\bsheen\b|\bmatt\b|shield-1", re.I), "Coverings"),
+        (re.compile(r"tile|floor|gypsum|ceiling|\bpanel\b|\bboard\b|\bfascia\b", re.I), "Coverings"),
+        (re.compile(r"adhesive|bonding|chemical", re.I), "Others"),
+        (re.compile(r"brick|\bblock\b|masonry|\baac\b", re.I), "Mineral building products"),
+    ]
+
     def resolve_category(subcat, name=""):
+        nm = name or ""
         sc = str(subcat).strip() if subcat else ""
-        # Steel: split rebar (-> "Steel reinforing bar" -> dashboard "Rebar") from
-        # all other steel (-> "Steel" -> dashboard "Steel"), by product name.
+        # 1) Rebar by name (works even with no subcategory).
+        if REBAR_NAME_RE.search(nm):
+            return get_category("Steel reinforing bar")
+        # 2) Steel subcategory -> "Steel" (rebar already handled above).
         if sc in ("Steel / Metal", "Wire / Welding Rod"):
-            if REBAR_NAME_RE.search(name or ""):
-                return get_category("Steel reinforing bar")
             return get_category("Steel")
-        return get_category(TGO_SUBCATEGORY_TO_CATEGORY.get(sc))
+        # 3) Subcategory mapping (authoritative when present).
+        cat = get_category(TGO_SUBCATEGORY_TO_CATEGORY.get(sc))
+        if cat:
+            return cat
+        # 4) Name-keyword fallback (legacy rows without a subcategory).
+        for rx, cname in NAME_KEYWORD_RULES:
+            if rx.search(nm):
+                return get_category(cname)
+        return None
 
     all_rows = list(ws.iter_rows(min_row=2, values_only=True))
     wb.close()
@@ -248,13 +270,8 @@ def import_thailand_epds():
     # building's carbon calculation, so it is safe to update on in-use rows.
     backfilled = 0
     for e in EPD.objects.filter(source=SOURCE):
-        # Rebar is identifiable by product name even when the subcategory metadata
-        # is missing (legacy in-use rows). Otherwise use the subcategory in comment.
-        if REBAR_NAME_RE.search(e.name or ""):
-            cat = get_category("Steel reinforing bar")
-        else:
-            m = re.search(r"Subcategory:\s*(.+?)\s*$", e.comment or "")
-            cat = resolve_category(m.group(1), e.name) if m else None
+        m = re.search(r"Subcategory:\s*(.+?)\s*$", e.comment or "")
+        cat = resolve_category(m.group(1) if m else None, e.name)
         if cat and e.category_id != cat.id:
             e.category = cat
             e.save(update_fields=["category"])
