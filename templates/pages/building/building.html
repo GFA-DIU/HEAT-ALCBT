@@ -1070,6 +1070,16 @@
       };
 
       function initializeCharts() {
+        // Tear down any charts created by a previous call. initializeCharts() runs
+        // on every tab switch, and the Whole Life donut lives on a persistent
+        // canvas — re-creating a Chart on a canvas that still has one makes the
+        // responsive chart shrink a little each time. Destroy first to prevent that.
+        window.buildingCharts = window.buildingCharts || {};
+        Object.keys(window.buildingCharts).forEach(function (key) {
+          try { if (window.buildingCharts[key]) window.buildingCharts[key].destroy(); } catch (e) {}
+        });
+        window.buildingCharts = {};
+
         const ctx = document.getElementById("whole-life-carbon-cycle");
         const styles = getComputedStyle(document.documentElement);
         const stateFeatureBaseColor = styles
