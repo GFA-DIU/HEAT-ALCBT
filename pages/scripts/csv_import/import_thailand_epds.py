@@ -143,6 +143,14 @@ def import_thailand_epds():
         # 2) Steel subcategory -> "Steel" (rebar already handled above).
         if sc in ("Steel / Metal", "Wire / Welding Rod"):
             return get_category("Steel")
+        # 2b) Pipes: steel/iron pipes -> Steel, plastic pipes -> Plastics,
+        #     everything else (brass, asbestos cement, concrete, valves) -> services.
+        if sc in ("Pipe", "Pipe-accessory"):
+            if re.search(r"steel|cast iron", nm, re.I):
+                return get_category("Steel")
+            if re.search(r"\bu?pvc\b|cpvc|\bppr\b|hdpe|plastic|polyethylene|polypropylene|polybutylene", nm, re.I):
+                return get_category("Plastics")
+            return get_category("Building service engineering")
         # 3) Subcategory mapping (authoritative when present).
         cat = get_category(TGO_SUBCATEGORY_TO_CATEGORY.get(sc))
         if cat:
