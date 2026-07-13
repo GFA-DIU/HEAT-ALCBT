@@ -1,4 +1,5 @@
 import logging
+import re
 import uuid
 from collections import Counter
 
@@ -8,7 +9,7 @@ from cities_light.models import Country
 
 from pages.models.assembly import StructuralProduct
 from pages.models.building import OperationalProduct, SimulatedOperationalProduct
-from pages.models.epd import EPD, EPDImpact, EPDType, Impact, Unit
+from pages.models.epd import EPD, EPDImpact, EPDType, Impact, MaterialCategory, Unit
 from pages.scripts.csv_import.utils import get_superuser
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,28 @@ def map_unit(raw_unit):
     if not raw_unit:
         return Unit.UNKNOWN
     return UNIT_MAP.get(str(raw_unit).strip().lower(), Unit.UNKNOWN)
+
+
+# TGO Subcategory -> top-level MaterialCategory (name_en). Sets EPD.category so the
+# EPD-library category chip isn't empty and the material dashboard can group TGO EPDs.
+TGO_SUBCATEGORY_TO_CATEGORY = {
+    "Steel / Metal": "Metals",
+    "Wire / Welding Rod": "Metals",
+    "Insulation": "Insulation materials",
+    "Concrete": "Mineral building products",
+    "Cement": "Mineral building products",
+    "Mortar": "Mineral building products",
+    "Masonry": "Mineral building products",
+    "Paint and Coating": "Coverings",
+    "Flooring": "Coverings",
+    "Ceiling": "Coverings",
+    "Roofing": "Coverings",
+    "Wall Finishing / Panel": "Coverings",
+    "Pipe": "Building service engineering",
+    "Pipe-accessory": "Building service engineering",
+    "Door / Window / Opening": "Components for windows and curtain walls",
+    "Chemical / Bonding / Adhesive": "Others",
+}
 
 
 def _used_tgo_epd_ids():
@@ -82,6 +105,13 @@ def import_thailand_epds():
         impact_category="gwp", life_cycle_stage="a1a3"
     )
 
+    # Resolve TGO subcategory -> top-level MaterialCategory row (for EPD.category).
+    category_by_name = {c.name_en: c for c in MaterialCategory.objects.filter(level=1)}
+
+    def resolve_category(subcat):
+        group = TGO_SUBCATEGORY_TO_CATEGORY.get(str(subcat).strip() if subcat else "")
+        return category_by_name.get(group)
+
     all_rows = list(ws.iter_rows(min_row=2, values_only=True))
     wb.close()
     data_rows = [row for row in all_rows if row[0] is not None]
@@ -110,6 +140,7 @@ def import_thailand_epds():
                 "type": EPDType.OFFICIAL_NON_STANDARD,
                 "declared_unit": unit,
                 "declared_amount": 1.0,
+                "category": resolve_category(subcat),
                 "comment": f"Certificate: {cert}; Subcategory: {subcat}" if cert else None,
                 "public": True,
                 "created_by_id": superuser.id,
@@ -120,6 +151,7 @@ def import_thailand_epds():
                 "type": EPDType.OFFICIAL_NON_STANDARD,
                 "declared_unit": unit,
                 "declared_amount": 1.0,
+                "category": resolve_category(subcat),
                 "comment": f"Certificate: {cert}; Subcategory: {subcat}" if cert else None,
                 "public": True,
                 "created_by_id": superuser.id,
@@ -191,6 +223,18 @@ def import_thailand_epds():
             failure += 1
             failure_rows.append(row_idx)
 
+    # Backfill category on any TGO EPD still missing one (e.g. in-use rows we don't
+    # rewrite), from the subcategory stored in its comment. Category is display /
+    # dashboard only — it does NOT affect any building's carbon calculation.
+    backfilled = 0
+    for e in EPD.objects.filter(source=SOURCE, category__isnull=True):
+        m = re.search(r"Subcategory:\s*(.+?)\s*$", e.comment or "")
+        cat = resolve_category(m.group(1)) if m else None
+        if cat:
+            e.category = cat
+            e.save(update_fields=["category"])
+            backfilled += 1
+
     # Delete stale TGO EPDs: unused AND not part of the new file / copies.
     stale = EPD.objects.filter(source=SOURCE).exclude(id__in=keep_ids)
     deleted = stale.count()
@@ -203,6 +247,7 @@ def import_thailand_epds():
     print(f"  Used EPDs unchanged (matched):   {matched}")
     print(f"  Used EPDs changed -> copy made:   {copied}")
     print(f"  Stale unused EPDs deleted:       {deleted}")
+    print(f"  Categories backfilled:           {backfilled}")
     print(f"  Skipped (duplicate name/cert):   {skipped}")
     print(f"  Failed rows:                     {failure}  {failure_rows if failure_rows else ''}")
     print(f"{'='*60}\n")
