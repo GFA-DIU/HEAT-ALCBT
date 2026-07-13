@@ -660,8 +660,8 @@
           ></span>
           <span class="text-base/6 font-medium">{% translate "Whole Life Carbon Cycle" %}</span>
         </div>
-        <div class="grid place-items-center mt-6 w-[16.5rem] mx-auto">
-          <canvas id="whole-life-carbon-cycle"></canvas>
+        <div class="grid place-items-center mt-6 w-[16.5rem] h-[16.5rem] mx-auto">
+          <canvas id="whole-life-carbon-cycle" width="264" height="264"></canvas>
         </div>
         <div class="flex justify-center mt-6">
           <div id="whole-life-legend" class="flex flex-col gap-2"></div>
@@ -1121,8 +1121,10 @@
               ],
             },
             options: {
-              responsive: true,
-              maintainAspectRatio: true,
+              // Fixed-size canvas (264x264) with responsive OFF — prevents the
+              // Chart.js resize loop that made this donut shrink continuously.
+              responsive: false,
+              maintainAspectRatio: false,
               plugins: {
                 legend: {
                   display: false,
