@@ -131,9 +131,15 @@ class Command(BaseCommand):
                     self.style.ERROR(f"Country with code2={geo} does not exist ({uri}).")
                 )
                 uri_issue_list.append(uri)
-            except Exception as e:
+            except (KeyboardInterrupt, SystemExit):
+                raise
+            except BaseException as e:
+                # Catch BaseException (not just Exception): the lcax Rust parser
+                # raises pyo3_runtime.PanicException on malformed source datasets,
+                # and that subclasses BaseException. Without this, a single bad EPD
+                # aborts the whole run instead of being skipped.
                 logger.exception("Failed to process EPD %s", uri)
-                self.stdout.write(self.style.ERROR(f"error on {uri}: {e}"))
+                self.stdout.write(self.style.ERROR(f"error on {uri}: {e!r}"))
                 uri_issue_list.append(uri)
 
         self.stdout.write("\n" + "=" * 60)
