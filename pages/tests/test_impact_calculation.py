@@ -178,6 +178,32 @@ def test_mass_ton_component(create_epd, create_epd_impact, create_assembly, crea
 
 
 @pytest.mark.django_db
+def test_ton_dimension_ton_epd(create_epd, create_epd_impact, create_assembly, create_product):
+    """'Mass (ton)' assembly + ton EPD → direct match in tonnes.
+
+    1-ton assembly, 100% share of a 800 kgCO2e/ton EPD → 1 × 800 = 800.
+    """
+    epd = create_epd("Rebar", Unit.TON, [])
+    create_epd_impact(epd, Decimal("800"))  # per ton
+    assembly = create_assembly(AssemblyDimension.TON)
+    p = create_product(assembly, epd, Decimal("100"), Unit.PERCENT)  # 100% of mass
+    assert _gwp(_calc(AssemblyDimension.TON, p)) == pytest.approx(Decimal("800"))
+
+
+@pytest.mark.django_db
+def test_ton_dimension_kg_epd(create_epd, create_epd_impact, create_assembly, create_product):
+    """'Mass (ton)' assembly + kg EPD → tonnes converted to kg (×1000), no density needed.
+
+    1-ton assembly = 1000 kg; 100% of a 0.8 kgCO2e/kg EPD → 1000 × 0.8 = 800.
+    """
+    epd = create_epd("Cement", Unit.KG, [])
+    create_epd_impact(epd, Decimal("0.8"))  # per kg
+    assembly = create_assembly(AssemblyDimension.TON)
+    p = create_product(assembly, epd, Decimal("100"), Unit.PERCENT)  # 100% of mass
+    assert _gwp(_calc(AssemblyDimension.TON, p)) == pytest.approx(Decimal("800"))
+
+
+@pytest.mark.django_db
 def test_length_m_direct(create_epd, create_epd_impact, create_assembly, create_product):
     """Length assembly + EPD m → Factor = assembly_quantity × count."""
     epd = create_epd("Pipe", Unit.M, [])

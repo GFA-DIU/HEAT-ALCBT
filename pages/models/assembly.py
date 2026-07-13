@@ -34,6 +34,7 @@ DIMENSION_UNIT_MAPPING = {
     "area": "m^2",
     "length": "m",
     "mass": "kg",
+    "ton": "ton",
     "volume": "m^3",
     "pcs": "pcs",
 }
@@ -42,7 +43,8 @@ DIMENSION_UNIT_MAPPING = {
 class AssemblyDimension(models.TextChoices):
     AREA = "area", "m²"  # Area-type calculations
     LENGTH = "length", "m"  # Length-type calculations
-    MASS = "mass", "kg"  # Mass-type calculations
+    MASS = "mass", "kg"  # Mass-type calculations (base unit kg)
+    TON = "ton", "ton"  # Mass-type calculations in tonnes (1 ton = 1000 kg)
     VOLUME = "volume", "m³"  # Volume-type calculations
     PCS = "pcs", "pcs"  # Piece-count calculations
 

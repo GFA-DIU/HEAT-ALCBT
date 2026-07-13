@@ -120,6 +120,13 @@ def calculate_impacts(
 
     eff_dim = _fetch_dimension_for_boq() if p.assembly.is_boq else dimension
 
+    # A "ton" mass dimension is just the kg mass dimension with quantities in
+    # tonnes. Normalise it to MASS (and scale the assembly quantity tonnes -> kg
+    # below) so all the existing mass/density logic applies unchanged.
+    ton_dimension = eff_dim == AssemblyDimension.TON
+    if ton_dimension:
+        eff_dim = AssemblyDimension.MASS
+
     # ------------------------------------------------------------------
     # Composite validation: mass assembly shares must sum to 100%
     # ------------------------------------------------------------------
@@ -143,6 +150,8 @@ def calculate_impacts(
 
     declared_unit = p.epd.declared_unit
     assembly_qty = Decimal(str(assembly_quantity))
+    if ton_dimension:
+        assembly_qty = assembly_qty * Decimal("1000")  # tonnes -> kg base
 
     # Ton is a mass unit (1 ton = 1000 kg). Resolve the factor as if the EPD were
     # declared per kg (reusing all the mass/density logic), then convert kg → ton

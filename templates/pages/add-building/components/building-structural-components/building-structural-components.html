@@ -169,6 +169,7 @@
             <option value="area" selected>{% translate "Area (m²)" %}</option>
             <option value="volume">{% translate "Volume (m³)" %}</option>
             <option value="mass">{% translate "Mass (kg)" %}</option>
+            <option value="ton">{% translate "Mass (ton)" %}</option>
             <option value="length">{% translate "Length (m)" %}</option>
             <option value="pcs">{% translate "Pieces (pcs)" %}</option>
           </select>
@@ -572,7 +573,7 @@
     document.getElementById('btn-add-component-2')?.addEventListener('click', () => structural_component_component_type_modal.showModal());
 
     document.getElementById('component_dimension')?.addEventListener('change', (e) => {
-      var units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm', pcs: 'pcs' };
+      var units = { area: 'm²', volume: 'm³', mass: 'kg', ton: 'ton', length: 'm', pcs: 'pcs' };
       document.getElementById('component_unit_display').textContent = units[e.target.value] || 'm²';
       document.getElementById('epd_filter_dimension').value = e.target.value;
     });
@@ -699,7 +700,7 @@
       this.renderComponentOptions(savedPart);
       document.getElementById('component_category').value = item.category || '';
       document.getElementById('component_dimension').value = item.dimension || 'area';
-      document.getElementById('component_unit_display').textContent = ({ area: 'm²', volume: 'm³', mass: 'kg', length: 'm', pcs: 'pcs' })[item.dimension || 'area'] || 'm²';
+      document.getElementById('component_unit_display').textContent = ({ area: 'm²', volume: 'm³', mass: 'kg', ton: 'ton', length: 'm', pcs: 'pcs' })[item.dimension || 'area'] || 'm²';
       document.getElementById('component_quantity').value = item.quantity || '';
       document.getElementById('component_comment').value = item.comment || '';
       document.getElementById('component_is_template').checked = item.is_template || false;
@@ -835,7 +836,7 @@
     document.getElementById('component_comment').value = template.comment || '';
 
     // Update unit display
-    const units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm' };
+    const units = { area: 'm²', volume: 'm³', mass: 'kg', ton: 'ton', length: 'm' };
     document.getElementById('component_unit_display').textContent = units[template.dimension] || 'm²';
     document.getElementById('epd_filter_dimension').value = template.dimension || 'area';
 
@@ -1445,7 +1446,7 @@
             <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
               ${item.category_name || i18n.noCategory}
             </span>
-            <p class="text-sm/5 text-[var(--text--sub-600)]">${item.quantity || '-'} ${{ area: 'm²', volume: 'm³', mass: 'kg', length: 'm', pcs: 'pcs' }[item.dimension] || item.dimension || ''}</p>
+            <p class="text-sm/5 text-[var(--text--sub-600)]">${item.quantity || '-'} ${{ area: 'm²', volume: 'm³', mass: 'kg', ton: 'ton', length: 'm', pcs: 'pcs' }[item.dimension] || item.dimension || ''}</p>
           </div>
         </div>
         <div class="flex gap-2">

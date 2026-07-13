@@ -61,6 +61,10 @@ def _can_epd_be_used(dimension: str, epd) -> tuple[bool, str]:
     if declared == Unit.TON:
         declared = Unit.KG
 
+    # A "ton" mass dimension follows the same rules as the kg mass dimension.
+    if dimension == AssemblyDimension.TON:
+        dimension = AssemblyDimension.MASS
+
     # PCS dimension: accepts pcs EPDs directly; also accepts kg/m²/m³ EPDs if DB has ratio
     if dimension == AssemblyDimension.PCS:
         if declared == Unit.PCS:
