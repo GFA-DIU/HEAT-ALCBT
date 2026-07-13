@@ -40,11 +40,17 @@ def map_unit(raw_unit):
     return UNIT_MAP.get(str(raw_unit).strip().lower(), Unit.UNKNOWN)
 
 
+# Rebar detection (scoped to the steel subcategory only, so it never catches
+# "reinforced concrete/AAC" products). Matches TGO rebar/mesh product names.
+REBAR_NAME_RE = re.compile(
+    r"(deformed bar|round bar|reinforcing bar|\brebar\b|reinforcement mesh|deformed .*wire mesh)",
+    re.IGNORECASE,
+)
+
 # TGO Subcategory -> top-level MaterialCategory (name_en). Sets EPD.category so the
 # EPD-library category chip isn't empty and the material dashboard can group TGO EPDs.
+# Steel is handled separately (name-based rebar vs steel split) in resolve_category().
 TGO_SUBCATEGORY_TO_CATEGORY = {
-    "Steel / Metal": "Metals",
-    "Wire / Welding Rod": "Metals",
     "Insulation": "Insulation materials",
     "Concrete": "Mineral building products",
     "Cement": "Mineral building products",
@@ -105,12 +111,25 @@ def import_thailand_epds():
         impact_category="gwp", life_cycle_stage="a1a3"
     )
 
-    # Resolve TGO subcategory -> top-level MaterialCategory row (for EPD.category).
-    category_by_name = {c.name_en: c for c in MaterialCategory.objects.filter(level=1)}
+    # Resolve TGO subcategory (+ product name for steel) -> MaterialCategory row.
+    _cat_cache = {}
 
-    def resolve_category(subcat):
-        group = TGO_SUBCATEGORY_TO_CATEGORY.get(str(subcat).strip() if subcat else "")
-        return category_by_name.get(group)
+    def get_category(name):
+        if name and name not in _cat_cache:
+            _cat_cache[name] = (
+                MaterialCategory.objects.filter(name_en=name).order_by("level").first()
+            )
+        return _cat_cache.get(name)
+
+    def resolve_category(subcat, name=""):
+        sc = str(subcat).strip() if subcat else ""
+        # Steel: split rebar (-> "Steel reinforing bar" -> dashboard "Rebar") from
+        # all other steel (-> "Steel" -> dashboard "Steel"), by product name.
+        if sc in ("Steel / Metal", "Wire / Welding Rod"):
+            if REBAR_NAME_RE.search(name or ""):
+                return get_category("Steel reinforing bar")
+            return get_category("Steel")
+        return get_category(TGO_SUBCATEGORY_TO_CATEGORY.get(sc))
 
     all_rows = list(ws.iter_rows(min_row=2, values_only=True))
     wb.close()
@@ -140,7 +159,7 @@ def import_thailand_epds():
                 "type": EPDType.OFFICIAL_NON_STANDARD,
                 "declared_unit": unit,
                 "declared_amount": 1.0,
-                "category": resolve_category(subcat),
+                "category": resolve_category(subcat, name),
                 "comment": f"Certificate: {cert}; Subcategory: {subcat}" if cert else None,
                 "public": True,
                 "created_by_id": superuser.id,
@@ -151,7 +170,7 @@ def import_thailand_epds():
                 "type": EPDType.OFFICIAL_NON_STANDARD,
                 "declared_unit": unit,
                 "declared_amount": 1.0,
-                "category": resolve_category(subcat),
+                "category": resolve_category(subcat, name),
                 "comment": f"Certificate: {cert}; Subcategory: {subcat}" if cert else None,
                 "public": True,
                 "created_by_id": superuser.id,
@@ -223,14 +242,20 @@ def import_thailand_epds():
             failure += 1
             failure_rows.append(row_idx)
 
-    # Backfill category on any TGO EPD still missing one (e.g. in-use rows we don't
-    # rewrite), from the subcategory stored in its comment. Category is display /
-    # dashboard only — it does NOT affect any building's carbon calculation.
+    # (Re)set category on ALL TGO EPDs from the subcategory stored in their comment
+    # + product name — covers in-use rows we don't rewrite and corrects any earlier
+    # coarse mapping. Category is display / dashboard only — it does NOT affect any
+    # building's carbon calculation, so it is safe to update on in-use rows.
     backfilled = 0
-    for e in EPD.objects.filter(source=SOURCE, category__isnull=True):
-        m = re.search(r"Subcategory:\s*(.+?)\s*$", e.comment or "")
-        cat = resolve_category(m.group(1)) if m else None
-        if cat:
+    for e in EPD.objects.filter(source=SOURCE):
+        # Rebar is identifiable by product name even when the subcategory metadata
+        # is missing (legacy in-use rows). Otherwise use the subcategory in comment.
+        if REBAR_NAME_RE.search(e.name or ""):
+            cat = get_category("Steel reinforing bar")
+        else:
+            m = re.search(r"Subcategory:\s*(.+?)\s*$", e.comment or "")
+            cat = resolve_category(m.group(1), e.name) if m else None
+        if cat and e.category_id != cat.id:
             e.category = cat
             e.save(update_fields=["category"])
             backfilled += 1
