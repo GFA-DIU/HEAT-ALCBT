@@ -1,4 +1,3 @@
-import re
 import uuid as uuid_lib
 import logging
 
@@ -16,12 +15,12 @@ from pages.scripts.ecoplatform.ecoplatform_loader import (
 from pages.models.epd import (
     EPD,
     EPDType,
-    MaterialCategory,
     EPDImpact,
     Impact,
 )
 from pages.models.assembly import StructuralProduct
 from pages.models.building import OperationalProduct, SimulatedOperationalProduct
+from pages.scripts.epd_categorization import resolve_category
 
 logger = logging.getLogger(__name__)
 
@@ -31,50 +30,6 @@ User = get_user_model()
 # changed in the source portal — so the original (still referenced by buildings)
 # is preserved untouched while the refreshed data is available as a new record.
 UPDATE_MARKER = " (Eco-platform update)"
-
-# Product-name keyword -> MaterialCategory name_en (first match wins). Used when the
-# source dataset's classification id doesn't map to an Ökobaudat category — common for
-# the distributed ECO-Platform nodes. This replaces the old hardcoded default of
-# "Primer for paints and plasters", which mislabelled the large majority of imports.
-_NAME_CATEGORY_RULES = [
-    (r"reinforc\w* bar|deformed bar|round(ed)? bar|\brebar\b|reinforc\w* mesh|wire mesh", "Steel reinforing bar"),
-    (r"stainless steel|structural steel|galvalume|alu[- ]?zinc|galvani[sz]ed steel|steel (sheet|coil|plate|pipe|product|bar|section|rod)|hot[- ]?rolled|cold[- ]?rolled|\bpurlin\b|\bsteel\b", "Steel"),
-    (r"alumin(i)?um|copper|\bbrass\b|\bzinc\b|\blead\b|metal", "Metals"),
-    (r"insulation|glass ?wool|rock ?wool|mineral wool|\beps\b|\bxps\b|acoustic|cellulose fib", "Insulation materials"),
-    (r"paint|primer|coating|enamel|varnish|lacquer|jotafloor|majestic|jotun|penguard|jotamastic|jotashield|hardtop", "Coverings"),
-    (r"waterproof|membrane|bitumen|sealant|adhesive|grout", "Coverings"),
-    (r"tile|floor|ceiling|gyp(sum|board|roc)|plaster ?board|\bpanel\b|\bboard\b|fascia|fa[cç]ade|laminate|wallpaper|vinyl", "Coverings"),
-    (r"concrete|cement|\bmortar\b|screed|\blean\b|aggregate|clinker", "Mineral building products"),
-    (r"brick|\bblock\b|masonry|\baac\b|ceramic|clay", "Mineral building products"),
-    (r"\bwood\b|timber|plywood|\bmdf\b|particle ?board|\bosb\b|bamboo", "Wood"),
-    (r"\bu?pvc\b|\bcpvc\b|\bppr\b|hdpe|plastic|polymer|polyethylene|polypropylene", "Plastics"),
-    (r"pipe|\bvalve\b|\bduct\b|fitting|hvac|plumb", "Building service engineering"),
-    (r"window|\bdoor\b|glazing|glass|curtain wall", "Components for windows and curtain walls"),
-]
-_NAME_CATEGORY_RULES = [(re.compile(p, re.I), name) for p, name in _NAME_CATEGORY_RULES]
-
-_category_cache = {}
-
-
-def _category_by_name(name_en):
-    if name_en not in _category_cache:
-        _category_cache[name_en] = (
-            MaterialCategory.objects.filter(name_en=name_en).order_by("level").first()
-        )
-    return _category_cache.get(name_en)
-
-
-def resolve_category(classification_id, name):
-    """Resolve an EPD to a MaterialCategory: exact classification-id match first,
-    then a product-name keyword match, else 'Unknown'. Never guesses 'Primer'."""
-    if classification_id:
-        cat = MaterialCategory.objects.filter(category_id=classification_id).first()
-        if cat:
-            return cat
-    for rx, cname in _NAME_CATEGORY_RULES:
-        if rx.search(name or ""):
-            return _category_by_name(cname)
-    return _category_by_name("Unknown")
 
 
 def _used_epd_ids():

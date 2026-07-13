@@ -11,6 +11,7 @@ from pages.models.assembly import StructuralProduct
 from pages.models.building import OperationalProduct, SimulatedOperationalProduct
 from pages.models.epd import EPD, EPDImpact, EPDType, Impact, MaterialCategory, Unit
 from pages.scripts.csv_import.utils import get_superuser
+from pages.scripts.epd_categorization import resolve_category as resolve_epd_category
 
 logger = logging.getLogger(__name__)
 
@@ -38,35 +39,6 @@ def map_unit(raw_unit):
     if not raw_unit:
         return Unit.UNKNOWN
     return UNIT_MAP.get(str(raw_unit).strip().lower(), Unit.UNKNOWN)
-
-
-# Rebar detection (scoped to the steel subcategory only, so it never catches
-# "reinforced concrete/AAC" products). Matches TGO rebar/mesh product names.
-REBAR_NAME_RE = re.compile(
-    r"(deformed bar|rounded? bar|reinforcing bar|\brebar\b|reinforcement mesh|deformed .*wire mesh)",
-    re.IGNORECASE,
-)
-
-# TGO Subcategory -> top-level MaterialCategory (name_en). Sets EPD.category so the
-# EPD-library category chip isn't empty and the material dashboard can group TGO EPDs.
-# Steel is handled separately (name-based rebar vs steel split) in resolve_category().
-TGO_SUBCATEGORY_TO_CATEGORY = {
-    "Insulation": "Insulation materials",
-    "Concrete": "Mineral building products",
-    "Cement": "Mineral building products",
-    "Mortar": "Mineral building products",
-    "Masonry": "Mineral building products",
-    "Paint and Coating": "Coverings",
-    "Flooring": "Coverings",
-    "Ceiling": "Coverings",
-    "Roofing": "Coverings",
-    "Wall Finishing / Panel": "Coverings",
-    "Pipe": "Building service engineering",
-    "Pipe-accessory": "Building service engineering",
-    "Door / Window / Opening": "Components for windows and curtain walls",
-    # Cement tile adhesives etc. are used for tiling/finishing -> Finishing materials.
-    "Chemical / Bonding / Adhesive": "Coverings",
-}
 
 
 def _used_tgo_epd_ids():
@@ -112,55 +84,11 @@ def import_thailand_epds():
         impact_category="gwp", life_cycle_stage="a1a3"
     )
 
-    # Resolve TGO subcategory (+ product name for steel) -> MaterialCategory row.
-    _cat_cache = {}
-
-    def get_category(name):
-        if name and name not in _cat_cache:
-            _cat_cache[name] = (
-                MaterialCategory.objects.filter(name_en=name).order_by("level").first()
-            )
-        return _cat_cache.get(name)
-
-    # Name-keyword fallback (first match wins) — used when an EPD has no usable
-    # subcategory (legacy in-use rows), so it's still categorized by product name.
-    NAME_KEYWORD_RULES = [
-        (re.compile(r"glass wool|aeroflex|aero roof|insulation", re.I), "Insulation materials"),
-        (re.compile(r"structural steel|steel plate|steel sheet|hot[- ]?rolled steel|lip channel|steel coil|\bpurlin\b", re.I), "Steel"),
-        (re.compile(r"precast|pre-cast", re.I), "Precast concrete elements and goods"),
-        (re.compile(r"concrete|lean|cement|mortar|grout", re.I), "Mineral building products"),
-        (re.compile(r"paint|primer|coating|\bcool\b|semigloss|\bsheen\b|\bmatt\b|shield-1", re.I), "Coverings"),
-        (re.compile(r"tile|floor|gypsum|ceiling|\bpanel\b|\bboard\b|\bfascia\b", re.I), "Coverings"),
-        (re.compile(r"adhesive|bonding|chemical", re.I), "Coverings"),
-        (re.compile(r"brick|\bblock\b|masonry|\baac\b", re.I), "Mineral building products"),
-    ]
-
+    # Categorisation is centralised in pages/scripts/epd_categorization.py so every
+    # loader behaves identically. The TGO sheet has no Ökobaudat classification id,
+    # so we resolve from the sheet's Subcategory label + product name.
     def resolve_category(subcat, name=""):
-        nm = name or ""
-        sc = str(subcat).strip() if subcat else ""
-        # 1) Rebar by name (works even with no subcategory).
-        if REBAR_NAME_RE.search(nm):
-            return get_category("Steel reinforing bar")
-        # 2) Steel subcategory -> "Steel" (rebar already handled above).
-        if sc in ("Steel / Metal", "Wire / Welding Rod"):
-            return get_category("Steel")
-        # 2b) Pipes: steel/iron pipes -> Steel, plastic pipes -> Plastics,
-        #     everything else (brass, asbestos cement, concrete, valves) -> services.
-        if sc in ("Pipe", "Pipe-accessory"):
-            if re.search(r"steel|cast iron", nm, re.I):
-                return get_category("Steel")
-            if re.search(r"\bu?pvc\b|cpvc|\bppr\b|hdpe|plastic|polyethylene|polypropylene|polybutylene", nm, re.I):
-                return get_category("Plastics")
-            return get_category("Building service engineering")
-        # 3) Subcategory mapping (authoritative when present).
-        cat = get_category(TGO_SUBCATEGORY_TO_CATEGORY.get(sc))
-        if cat:
-            return cat
-        # 4) Name-keyword fallback (legacy rows without a subcategory).
-        for rx, cname in NAME_KEYWORD_RULES:
-            if rx.search(nm):
-                return get_category(cname)
-        return None
+        return resolve_epd_category(name=name, subcategory=subcat)
 
     all_rows = list(ws.iter_rows(min_row=2, values_only=True))
     wb.close()
