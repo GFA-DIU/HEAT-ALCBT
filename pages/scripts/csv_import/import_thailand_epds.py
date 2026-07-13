@@ -64,7 +64,8 @@ TGO_SUBCATEGORY_TO_CATEGORY = {
     "Pipe": "Building service engineering",
     "Pipe-accessory": "Building service engineering",
     "Door / Window / Opening": "Components for windows and curtain walls",
-    "Chemical / Bonding / Adhesive": "Others",
+    # Cement tile adhesives etc. are used for tiling/finishing -> Finishing materials.
+    "Chemical / Bonding / Adhesive": "Coverings",
 }
 
 
@@ -130,7 +131,7 @@ def import_thailand_epds():
         (re.compile(r"concrete|lean|cement|mortar|grout", re.I), "Mineral building products"),
         (re.compile(r"paint|primer|coating|\bcool\b|semigloss|\bsheen\b|\bmatt\b|shield-1", re.I), "Coverings"),
         (re.compile(r"tile|floor|gypsum|ceiling|\bpanel\b|\bboard\b|\bfascia\b", re.I), "Coverings"),
-        (re.compile(r"adhesive|bonding|chemical", re.I), "Others"),
+        (re.compile(r"adhesive|bonding|chemical", re.I), "Coverings"),
         (re.compile(r"brick|\bblock\b|masonry|\baac\b", re.I), "Mineral building products"),
     ]
 
