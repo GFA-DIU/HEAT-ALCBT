@@ -38,15 +38,24 @@ class ToastNotification {
             container.style.pointerEvents = 'none';
 
             if ('popover' in HTMLElement.prototype) {
-                // Top-layer promotion: appears above showModal() dialogs
                 container.popover = 'manual';
                 parent.appendChild(container);
-                container.showPopover();
             } else {
                 // Fallback for browsers without Popover API
                 container.style.zIndex = '999999';
                 parent.appendChild(container);
             }
+        }
+
+        // Top-layer promotion: re-promote on every call so the container
+        // jumps back to the top of the top-layer stack, above any <dialog>
+        // opened via showModal() *after* the container was first created
+        // (the top layer is ordered by promotion time, not just presence in it).
+        if ('popover' in HTMLElement.prototype) {
+            if (container.matches(':popover-open')) {
+                container.hidePopover();
+            }
+            container.showPopover();
         }
 
         return container;
