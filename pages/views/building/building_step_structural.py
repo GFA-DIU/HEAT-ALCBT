@@ -56,6 +56,15 @@ def _can_epd_be_used(dimension: str, epd) -> tuple[bool, str]:
     """
     declared = epd.declared_unit
 
+    # Ton is a mass unit resolved via the kg path in impact_calculation
+    # (1 ton = 1000 kg), so its usability mirrors kg exactly.
+    if declared == Unit.TON:
+        declared = Unit.KG
+
+    # A "ton" mass dimension follows the same rules as the kg mass dimension.
+    if dimension == AssemblyDimension.TON:
+        dimension = AssemblyDimension.MASS
+
     # PCS dimension: accepts pcs EPDs directly; also accepts kg/m²/m³ EPDs if DB has ratio
     if dimension == AssemblyDimension.PCS:
         if declared == Unit.PCS:
@@ -281,6 +290,7 @@ def handle_select_product(request):
                 Unit.M2:  ("Area (m²)", Unit.M2),
                 Unit.M3:  ("Volume (m³)", Unit.M3),
                 Unit.KG:  ("Mass (kg)", Unit.KG),
+                Unit.TON: ("Mass (ton)", Unit.TON),
                 Unit.M:   ("Length (m)", Unit.M),
                 Unit.PCS: ("Quantity (pcs)", Unit.PCS),
             }
@@ -306,6 +316,7 @@ def handle_select_product(request):
             "available_units": available_units,
             "gwp": epd.get_gwp_impact_sum("a1a3") or 0,
             "source": epd.source or "",
+            "type": epd.type,
         }
 
         # Get assembly categories for BOQ mode
@@ -353,8 +364,14 @@ def handle_get_techniques(request):
 
 
 def handle_get_categories(request):
-    """Get assembly categories (HTMX endpoint). Returns JSON when format=json."""
-    categories = list(AssemblyCategory.objects.all().values('id', 'name'))
+    """Get assembly categories (HTMX endpoint). Returns JSON when format=json.
+
+    Includes `family` (Building Part) and orders by `tag` so the front-end can
+    group/filter components by their Building Part.
+    """
+    categories = list(
+        AssemblyCategory.objects.all().order_by('tag').values('id', 'name', 'family')
+    )
 
     if request.GET.get('format') == 'json':
         return JsonResponse({'categories': categories})

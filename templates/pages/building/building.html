@@ -660,8 +660,8 @@
           ></span>
           <span class="text-base/6 font-medium">{% translate "Whole Life Carbon Cycle" %}</span>
         </div>
-        <div class="grid place-items-center mt-6 w-[16.5rem] mx-auto">
-          <canvas id="whole-life-carbon-cycle"></canvas>
+        <div class="grid place-items-center mt-6 w-[16.5rem] h-[16.5rem] mx-auto">
+          <canvas id="whole-life-carbon-cycle" width="264" height="264"></canvas>
         </div>
         <div class="flex justify-center mt-6">
           <div id="whole-life-legend" class="flex flex-col gap-2"></div>
@@ -1070,6 +1070,16 @@
       };
 
       function initializeCharts() {
+        // Tear down any charts created by a previous call. initializeCharts() runs
+        // on every tab switch, and the Whole Life donut lives on a persistent
+        // canvas — re-creating a Chart on a canvas that still has one makes the
+        // responsive chart shrink a little each time. Destroy first to prevent that.
+        window.buildingCharts = window.buildingCharts || {};
+        Object.keys(window.buildingCharts).forEach(function (key) {
+          try { if (window.buildingCharts[key]) window.buildingCharts[key].destroy(); } catch (e) {}
+        });
+        window.buildingCharts = {};
+
         const ctx = document.getElementById("whole-life-carbon-cycle");
         const styles = getComputedStyle(document.documentElement);
         const stateFeatureBaseColor = styles
@@ -1111,8 +1121,10 @@
               ],
             },
             options: {
-              responsive: true,
-              maintainAspectRatio: true,
+              // Fixed-size canvas (264x264) with responsive OFF — prevents the
+              // Chart.js resize loop that made this donut shrink continuously.
+              responsive: false,
+              maintainAspectRatio: false,
               plugins: {
                 legend: {
                   display: false,

@@ -7,6 +7,13 @@
     <div class="flex flex-col gap-2.5 flex-1 min-w-0">
       <div class="flex items-center gap-2">
         <span class="truncate">{{ epd.name|truncatechars:75 }}</span>
+        {% if epd.type == "generic" %}
+        <span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--weak-50)] gap-1 flex items-center shrink-0"
+              title="{% translate 'Generic placeholder EPD — not from an official source' %}">
+          <span data-icon="pushpin-fill" data-size="16" data-color="var(--icon--soft-400)"></span>
+          <span class="text-[var(--text--sub-600)] text-xs">{% translate "Generic" %}</span>
+        </span>
+        {% endif %}
         <span data-country="{{ epd.country }}" data-width="16"></span>
       </div>
       <div class="flex items-center gap-1.25 flex-wrap">

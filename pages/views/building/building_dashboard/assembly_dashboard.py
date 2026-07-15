@@ -18,15 +18,8 @@ def building_dashboard_assembly(user, building_id, simulation):
     df.loc[df["type"] == "structural", "category_short"] = (
         df.loc[df["type"] == "structural", "assembly_category"].str.split("- ").str[1]
     )
-    df.loc[
-        df["category_short"] == "Intermediate Floor Construction", "category_short"
-    ] = "Interm. Floor"
-    df.loc[df["category_short"] == "Bottom Floor Construction", "category_short"] = (
-        "Bottom Floor"
-    )
-    df.loc[df["category_short"] == "Roof Construction", "category_short"] = (
-        "Roof Const."
-    )
+    # Category names are already concise after the taxonomy consolidation
+    # (e.g. "Ground Floor", "Roof", "Beams & Slabs"), so no shortening needed here.
 
     # Aggregation for pie chart
     op_gwp_sum = df.loc[df["type"] == "operational", "gwp"].sum()

@@ -1,0 +1,7 @@
+{# crispy-forms "daisyui" template pack: Accordion container.
+   crispy_daisyui ships no accordion template, so we provide one here
+   (Django checks project templates before the package). #}
+<div class="flex flex-col gap-2{% if accordion.css_class %} {{ accordion.css_class }}{% endif %}"
+     id="{{ accordion.css_id }}">
+    {{ content|safe }}
+</div>

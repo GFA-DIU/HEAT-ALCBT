@@ -1,0 +1,9 @@
+{# crispy-forms "daisyui" template pack: one Accordion group.
+   Uses daisyui's CSS-only `collapse` (checkbox toggle) so no JS is required. #}
+<div class="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box{% if div.css_class %} {{ div.css_class }}{% endif %}">
+    <input type="checkbox"{% if div.active %} checked{% endif %} />
+    <div class="collapse-title font-medium">{{ div.name }}</div>
+    <div class="collapse-content">
+        {{ fields|safe }}
+    </div>
+</div>

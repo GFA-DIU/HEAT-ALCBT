@@ -7,6 +7,7 @@ from pages.models.assembly import (
     AssemblyDimension,
     AssemblyMode,
     AssemblyCategory,
+    AssemblyFamily,
     AssemblyTechnique,
     AssemblyCategoryTechnique,
 )
@@ -34,13 +35,27 @@ class AssemblyForm(forms.ModelForm):
         widget=forms.Select(attrs={"disabled": "disabled"}),
         label="Mode*",
     )
-    assembly_category = forms.ModelChoiceField(
-        queryset=AssemblyCategory.objects.all().order_by("tag"),
+    building_part = forms.ChoiceField(
+        choices=[("", "Select a building part")] + list(AssemblyFamily.choices),
         widget=forms.Select(
             attrs={
+                "hx-get": "/select_lists/",  # populate the component list for this part
+                "hx-trigger": "change",
+                "hx-target": "#assembly-category",  # narrow the Building Component dropdown
+                "class": "select form-select",
+            }
+        ),
+        label="Building Part",
+        required=False,  # UI helper: the chosen component already implies its part
+    )
+    assembly_category = forms.ModelChoiceField(
+        queryset=AssemblyCategory.objects.none(),  # populated once a Building Part is chosen
+        widget=forms.Select(
+            attrs={
+                "id": "assembly-category",
                 "hx-get": "/select_lists/",  # HTMX request to the root URL
                 "hx-trigger": "change",  # Trigger HTMX on change event
-                "hx-target": "#assembly-technique",  # Update the City dropdown
+                "hx-target": "#assembly-technique",  # Update the technique dropdown
                 "class": "select form-select",
             }
         ),
@@ -110,6 +125,9 @@ class AssemblyForm(forms.ModelForm):
             BuildingAssemblyModel = BuildingAssembly
 
         super().__init__(*args, **kwargs)
+        # Show only the component name in the dropdown (not the "tag - name" __str__);
+        # the tag is used purely to order the list ground-up.
+        self.fields["assembly_category"].label_from_instance = lambda obj: obj.name
         if kwargs.get("instance"):
             assembly_classification = self.instance.classification
             self.fields["mode"].initial = self.instance.mode
@@ -137,6 +155,25 @@ class AssemblyForm(forms.ModelForm):
             self.fields["country"].initial = Building.objects.get(
                 id=building_id
             ).country
+
+        # --- Building Part (family) cascade ---------------------------------
+        # Scope the component dropdown to a family so the list isn't overwhelming.
+        family = None
+        if self.instance and self.instance.pk and self.instance.classification:
+            family = self.instance.classification.category.family
+        elif self.data.get("building_part"):
+            family = self.data.get("building_part")
+        if family:
+            self.fields["building_part"].initial = family
+            self.fields["assembly_category"].queryset = (
+                AssemblyCategory.objects.filter(family=family).order_by("tag")
+            )
+        # On submit, accept whatever component was chosen even if the part field
+        # wasn't sent, so validation never wrongly rejects a valid component.
+        if self.is_bound and self.data.get("assembly_category"):
+            self.fields["assembly_category"].queryset = (
+                AssemblyCategory.objects.all().order_by("tag")
+            )
 
         # Dynamically update the queryset for assembly_technique to enable form validation
         if category_id := self.data.get("assembly_category"):

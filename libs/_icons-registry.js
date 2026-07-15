@@ -1,5 +1,5 @@
 // Auto-generated file - do not edit manually
-// Generated on: 2026-06-10T08:14:17.738Z
+// Generated on: 2026-07-10T18:37:40.203Z
 // Total icons: 90
 
 export const ICONS_REGISTRY = {

@@ -1,6 +1,7 @@
 import os
 import logging
 import json
+from datetime import date
 
 import environ
 import requests
@@ -12,7 +13,20 @@ env = environ.Env()
 environ.Env.read_env()  # Reads variables from a .env file
 
 ECO_PLATFORM_TOKEN = env("ECO_PLATFORM_TOKEN")
-ECO_PLATFORM_URL =  "https://data.eco-platform.org/resource/processes?search=true&distributed=true&virtual=true&metaDataOnly=false&validUntil=2025&format=json&iew=extended"
+# NOTE: ECO Platform migrated to the "New ECO Portal" — the old host
+# `data.eco-platform.org` now only redirects to the portal home page, so the
+# API base is `portal.eco-platform.org/resource/` (per the official API guide:
+# https://github.com/ECO-Platform/ECO_Platform_API_Guide).
+# validUntil is kept to the current year so we only pull EPDs still valid today
+# (was hardcoded to 2025, which silently excludes currently-valid datasets once
+# the year rolls over). No `view=extended` here on purpose: this is the LIST call
+# and we only read metadata (uuid/uri/geo/name); the full per-EPD download in
+# get_full_epd() adds view=extended. (Previously mistyped as `iew=extended`.)
+ECO_PLATFORM_URL = (
+    "https://portal.eco-platform.org/resource/processes"
+    "?search=true&distributed=true&virtual=true&metaDataOnly=false"
+    f"&validUntil={date.today().year}&format=json"
+)
 
 # ALCBT countries, ISO 3166-1 alpha-2
 country_list = [
