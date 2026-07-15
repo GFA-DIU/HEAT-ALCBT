@@ -197,11 +197,22 @@
             </fieldset>
 
             <fieldset class="fieldset">
+              <legend class="fieldset-legend">{% translate "Building Part" %}</legend>
+              <select id="template-part" class="select" disabled>
+                <option value="">{% translate "Select building part" %}</option>
+                <option value="substructure">{% translate "Substructure" %}</option>
+                <option value="superstructure">{% translate "Superstructure" %}</option>
+                <option value="envelope">{% translate "Envelope & Openings" %}</option>
+                <option value="finishes">{% translate "Finishes & Other" %}</option>
+              </select>
+            </fieldset>
+
+            <fieldset class="fieldset">
               <legend class="fieldset-legend">{% translate "Building component" %}</legend>
               <select id="template-category" name="category_id" class="select" disabled>
                 <option value="">{% translate "Select category" %}</option>
                 {% for category in categories %}
-                  <option value="{{ category.id }}">{{ category.name }}</option>
+                  <option value="{{ category.id }}" data-family="{{ category.family }}">{{ category.name }}</option>
                 {% endfor %}
               </select>
             </fieldset>
@@ -430,6 +441,11 @@
             document.getElementById('template-category').value = data.category_id || '';
             document.getElementById('template-technique').value = data.technique_id || '';
             document.getElementById('template-comment').value = data.comment || '';
+
+            // Reflect the component's Building Part (read-only, mirrors the category's family)
+            const _catSel = document.getElementById('template-category');
+            const _catOpt = _catSel.options[_catSel.selectedIndex];
+            document.getElementById('template-part').value = _catOpt ? (_catOpt.dataset.family || '') : '';
 
             // Show/hide controls based on permissions
             const canEdit = data.can_edit;

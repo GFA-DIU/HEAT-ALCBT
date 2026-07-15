@@ -110,7 +110,7 @@ def calculate_impacts(
             Unit.M2:  AssemblyDimension.AREA,
             Unit.M3:  AssemblyDimension.VOLUME,
             Unit.KG:  AssemblyDimension.MASS,
-            Unit.TONES: AssemblyDimension.MASS,
+            Unit.TON: AssemblyDimension.MASS,  # ton is a mass unit (1 ton = 1000 kg)
         }
         return boq_dim_map[p.input_unit]
 
@@ -119,6 +119,13 @@ def calculate_impacts(
     # ------------------------------------------------------------------
 
     eff_dim = _fetch_dimension_for_boq() if p.assembly.is_boq else dimension
+
+    # A "ton" mass dimension is just the kg mass dimension with quantities in
+    # tonnes. Normalise it to MASS (and scale the assembly quantity tonnes -> kg
+    # below) so all the existing mass/density logic applies unchanged.
+    ton_dimension = eff_dim == AssemblyDimension.TON
+    if ton_dimension:
+        eff_dim = AssemblyDimension.MASS
 
     # ------------------------------------------------------------------
     # Composite validation: mass assembly shares must sum to 100%
@@ -143,6 +150,16 @@ def calculate_impacts(
 
     declared_unit = p.epd.declared_unit
     assembly_qty = Decimal(str(assembly_quantity))
+    if ton_dimension:
+        assembly_qty = assembly_qty * Decimal("1000")  # tonnes -> kg base
+
+    # Ton is a mass unit (1 ton = 1000 kg). Resolve the factor as if the EPD were
+    # declared per kg (reusing all the mass/density logic), then convert kg → ton
+    # (÷1000) at the end. Exception: when the quantity itself was entered in tons
+    # (BoQ ton EPDs, input_unit == ton) it is already in the declared unit, so no
+    # conversion is applied.
+    ton_declared = declared_unit == Unit.TON
+    resolve_unit = Unit.KG if ton_declared else declared_unit
 
     # Step 1 — pcs EPD: assembly_quantity always ignored
     if declared_unit == Unit.PCS:
@@ -161,7 +178,7 @@ def calculate_impacts(
             AssemblyDimension.MASS:   Unit.KG,
             AssemblyDimension.LENGTH: Unit.M,
         }
-        if direct_match.get(eff_dim) == declared_unit:
+        if direct_match.get(eff_dim) == resolve_unit:
             qty = (
                 Decimal(str(p.quantity)) / Decimal("100")
                 if p.input_unit == Unit.PERCENT
@@ -172,9 +189,13 @@ def calculate_impacts(
         else:
             # Step 3 — conversion required
             factor = _resolve_conversion_factor(
-                eff_dim, declared_unit, assembly_qty,
+                eff_dim, resolve_unit, assembly_qty,
                 _epd_conversion, _resolve_thickness_m, _cross_section_m2, p,
             )
+
+    # kg → ton for ton-declared EPDs (unless the quantity was already in tons).
+    if ton_declared and p.input_unit != Unit.TON:
+        factor = factor / Decimal("1000")
 
     # ------------------------------------------------------------------
     # Build impact list

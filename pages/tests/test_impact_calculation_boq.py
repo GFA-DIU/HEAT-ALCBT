@@ -103,6 +103,20 @@ def test_boq_kg(create_epd, create_epd_impact, create_boq_assembly, create_produ
     assert _gwp(_calc_boq(p)) == pytest.approx(Decimal("12"))
 
 
+@pytest.mark.django_db
+def test_boq_ton(create_epd, create_epd_impact, create_boq_assembly, create_product):
+    """BoQ + ton EPD with input_unit=ton → direct match (quantity already in tons).
+
+    Common for TGO steel/rebar EPDs declared per ton. Factor = 1 × 4 = 4 tons,
+    impact = 3 kgCO2e/ton × 4 = 12 (no kg conversion because input is in tons).
+    """
+    epd = create_epd("Rebar", Unit.TON, [])
+    create_epd_impact(epd, Decimal("3"))
+    assembly = create_boq_assembly()
+    p = create_product(assembly, epd, Decimal("4"), Unit.TON)
+    assert _gwp(_calc_boq(p)) == pytest.approx(Decimal("12"))
+
+
 # ---------------------------------------------------------------------------
 # BoQ: conversions used when input_unit ≠ declared_unit
 # ---------------------------------------------------------------------------

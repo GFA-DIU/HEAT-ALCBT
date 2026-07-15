@@ -1,4 +1,8 @@
 {
+  "Insulation materials": "Insulation materials",
+  "Mineral building products": "Ready-mix concrete and cement",
+  "Coverings": "Finishing materials",
+  "Components for windows and curtain walls": "Finishing materials",
   "Lime": "Masonry",
   "Gypsum": "Finishing materials",
   "Clay": "Masonry",
@@ -312,9 +316,9 @@
   "Construction waste": "Others",
   "Consumer waste": "Others",
   "Metals": "Aluminium and other metals",
-  "Plastics": "Others",
+  "Plastics": "Plastics",
   "Building service engineering": "Others",
   "Cement": "Ready-mix concrete and cement",
   "Concrete": "Ready-mix concrete and cement",
-  "Dry mortar - INSEE - Mortar 23":	"Ready-mix Concrete & Cement"
+  "Dry mortar - INSEE - Mortar 23": "Ready-mix Concrete & Cement"
 }

@@ -50,7 +50,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
 from accounts.models import CustomCity, CustomRegion
-from pages.models.assembly import AssemblyTechnique
+from pages.models.assembly import AssemblyCategory, AssemblyTechnique
 from pages.models.building import (BuildingCategory, CategorySubcategory,
                                    ClimateZone, CoolingType, HeatingType,
                                    LightingType)
@@ -179,6 +179,17 @@ def select_lists(request):
             {"items": childcategories, "default_text": "Select a subcategory"},
         )
 
+    elif m := request.GET.get("building_part"):
+        # Components within the chosen family. Pass as {id, name} dicts so the
+        # template shows the clean component name (not the "tag - name" __str__).
+        categories = AssemblyCategory.objects.filter(family=m).order_by("tag")
+        items = [{"id": c.id, "name": c.name} for c in categories]
+        return render(
+            request,
+            "pages/utils/select_list.html",
+            {"items": items, "default_text": "Select a component"},
+        )
+
     elif m := request.GET.get("assembly_category"):
         assembly_category_id = int(m)
         techniques = AssemblyTechnique.objects.filter(
@@ -187,7 +198,7 @@ def select_lists(request):
         return render(
             request,
             "pages/utils/select_list.html",
-            {"items": techniques, "default_text": "Select a category"},
+            {"items": techniques, "default_text": "Select a technique"},
         )
     
     # Building Categories and Types

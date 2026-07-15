@@ -7,9 +7,15 @@
 {% endif %}
     {% csrf_token %}
     <div class="row">
+        <!-- Building Part narrows the Building Component list -->
+        <div class="col-12">
+            {{ form.building_part |as_crispy_field }}
+        </div>
+    </div>
+    <div class="row">
         <!-- Category and Technique in the first row -->
         <div class="col-6">
-            {{ form.assembly_category |as_crispy_field }} 
+            {{ form.assembly_category |as_crispy_field }}
         </div>
         <div class="col-6">
             {{ form.assembly_technique |as_crispy_field }}

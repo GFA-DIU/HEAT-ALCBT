@@ -559,6 +559,7 @@ def handle_structural_components_step(request):
                         'description': sp.description or '',
                         'gwp': float(sp.epd.get_gwp_impact_sum("a1a3") or 0),
                         'country': sp.epd.country.name if sp.epd.country else 'Unknown',
+                        'type': sp.epd.type,
                     }
 
                     # Add category for BOQ items

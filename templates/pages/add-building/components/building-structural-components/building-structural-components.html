@@ -138,7 +138,17 @@
           </label>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">{% translate "Building Component" %}</legend>
+          <legend class="fieldset-legend">{% translate "Building Part" %} <span class="text-[var(--state--error--base)]">*</span></legend>
+          <select id="component_part" class="select w-full">
+            <option value="" selected disabled>{% translate "Select building part" %}</option>
+            <option value="substructure">{% translate "Substructure" %}</option>
+            <option value="superstructure">{% translate "Superstructure" %}</option>
+            <option value="envelope">{% translate "Envelope & Openings" %}</option>
+            <option value="finishes">{% translate "Finishes & Other" %}</option>
+          </select>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">{% translate "Building Component" %} <span class="text-[var(--state--error--base)]">*</span></legend>
           <select id="component_category" name="category_id" class="select w-full"
                   hx-get="{% url 'building_step_structural' %}?action=get_techniques"
                   hx-target="#component_technique"
@@ -154,17 +164,18 @@
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">{% translate "Dimension" %}</legend>
+          <legend class="fieldset-legend">{% translate "Dimension" %} <span class="text-[var(--state--error--base)]">*</span></legend>
           <select id="component_dimension" class="select w-full">
             <option value="area" selected>{% translate "Area (m²)" %}</option>
             <option value="volume">{% translate "Volume (m³)" %}</option>
             <option value="mass">{% translate "Mass (kg)" %}</option>
+            <option value="ton">{% translate "Mass (ton)" %}</option>
             <option value="length">{% translate "Length (m)" %}</option>
             <option value="pcs">{% translate "Pieces (pcs)" %}</option>
           </select>
         </fieldset>
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">{% translate "Quantity" %}</legend>
+          <legend class="fieldset-legend">{% translate "Quantity" %} <span class="text-[var(--state--error--base)]">*</span></legend>
           <label class="input w-full">
             <input type="number" id="component_quantity" placeholder="{% translate 'Enter quantity' %}" step="0.01" min="0" />
             <span id="component_unit_display" class="text-xs text-[var(--text--sub-600)]">m²</span>
@@ -520,6 +531,8 @@
     createNewComponent:"{% translate 'Create New Component' %}",
     addDescription:    "{% translate 'Add description' %}",
     qty:               "{% translate 'Qty' %}",
+    generic:           "{% translate 'Generic' %}",
+    genericEpd:        "{% translate 'Generic placeholder EPD — not from an official source' %}",
     category:          "{% translate 'Category' %}",
     boqMaterials:      "{% translate 'BOQ' %}",
     materials:         "{% translate 'materials' %}",
@@ -562,9 +575,15 @@
     document.getElementById('btn-add-component-2')?.addEventListener('click', () => structural_component_component_type_modal.showModal());
 
     document.getElementById('component_dimension')?.addEventListener('change', (e) => {
-      var units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm', pcs: 'pcs' };
+      var units = { area: 'm²', volume: 'm³', mass: 'kg', ton: 'ton', length: 'm', pcs: 'pcs' };
       document.getElementById('component_unit_display').textContent = units[e.target.value] || 'm²';
       document.getElementById('epd_filter_dimension').value = e.target.value;
+    });
+
+    // Building Part narrows the Building Component list; reset the technique below it.
+    document.getElementById('component_part')?.addEventListener('change', (e) => {
+      this.renderComponentOptions(e.target.value);
+      document.getElementById('component_technique').innerHTML = `<option value="">${i18n.selectTechnique}</option>`;
     });
 
     document.getElementById('saved-items-list')?.addEventListener('click', (e) => {
@@ -624,11 +643,20 @@
       .then(res => res.json())
       .then(data => {
         this.categories = data.categories || [];
-        const options = [`<option value="">${i18n.selectCategory}</option>`,
-          ...this.categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`)
-        ].join('');
-        document.getElementById('component_category').innerHTML = options;
+        this.renderComponentOptions('');
       });
+  }
+
+  // Populate the Building Component dropdown, optionally narrowed to one Building Part.
+  renderComponentOptions(part = '') {
+    // Building Part is required, so with no part chosen the component list is empty.
+    const cats = part
+      ? this.categories.filter(c => c.family === part)
+      : [];
+    document.getElementById('component_category').innerHTML = [
+      `<option value="">${i18n.selectCategory}</option>`,
+      ...cats.map(cat => `<option value="${cat.id}">${cat.name}</option>`)
+    ].join('');
   }
 
   openBoqModal(index = null) {
@@ -667,9 +695,14 @@
       const item = this.componentItems[index];
       document.getElementById('structural_component_modal_title').textContent = i18n.editComponent;
       document.getElementById('component_title').value = item.title;
+      // Preselect the Building Part from the component's family, filter the list, then select the component.
+      const savedCat = this.categories.find(c => String(c.id) === String(item.category));
+      const savedPart = savedCat ? (savedCat.family || '') : '';
+      document.getElementById('component_part').value = savedPart;
+      this.renderComponentOptions(savedPart);
       document.getElementById('component_category').value = item.category || '';
       document.getElementById('component_dimension').value = item.dimension || 'area';
-      document.getElementById('component_unit_display').textContent = ({ area: 'm²', volume: 'm³', mass: 'kg', length: 'm', pcs: 'pcs' })[item.dimension || 'area'] || 'm²';
+      document.getElementById('component_unit_display').textContent = ({ area: 'm²', volume: 'm³', mass: 'kg', ton: 'ton', length: 'm', pcs: 'pcs' })[item.dimension || 'area'] || 'm²';
       document.getElementById('component_quantity').value = item.quantity || '';
       document.getElementById('component_comment').value = item.comment || '';
       document.getElementById('component_is_template').checked = item.is_template || false;
@@ -693,6 +726,8 @@
     } else {
       document.getElementById('structural_component_modal_title').textContent = i18n.createNewComponent;
       document.getElementById('component_title').value = '';
+      document.getElementById('component_part').value = '';
+      this.renderComponentOptions('');
       document.getElementById('component_category').value = '';
       document.getElementById('component_technique').innerHTML = `<option value="">${i18n.selectTechnique}</option>`;
       document.getElementById('component_dimension').value = 'area';
@@ -803,7 +838,7 @@
     document.getElementById('component_comment').value = template.comment || '';
 
     // Update unit display
-    const units = { area: 'm²', volume: 'm³', mass: 'kg', length: 'm' };
+    const units = { area: 'm²', volume: 'm³', mass: 'kg', ton: 'ton', length: 'm' };
     document.getElementById('component_unit_display').textContent = units[template.dimension] || 'm²';
     document.getElementById('epd_filter_dimension').value = template.dimension || 'area';
 
@@ -913,6 +948,7 @@
         epd_id: epdId,
         name: li.dataset.name,
         gwp: parseFloat(li.dataset.gwp) || 0,
+        type: li.dataset.type || '',
         description: li.querySelector('.material-description')?.value || '',
         quantity: parseFloat(li.querySelector('.material-quantity')?.value) || 0,
         unit: li.querySelector('.material-unit-value')?.value || li.querySelector('.material-unit')?.dataset?.unit || '',
@@ -983,14 +1019,37 @@
     });
   }
 
+  // Building Part <option>s for a BoQ material row.
+  _boqPartOptions(selected = '') {
+    const fams = [
+      ['substructure', '{% translate "Substructure" %}'],
+      ['superstructure', '{% translate "Superstructure" %}'],
+      ['envelope', '{% translate "Envelope & Openings" %}'],
+      ['finishes', '{% translate "Finishes & Other" %}'],
+    ];
+    return `<option value="" disabled ${selected ? '' : 'selected'}>{% translate "Building Part" %}</option>`
+      + fams.map(([v, l]) => `<option value="${v}" ${selected === v ? 'selected' : ''}>${l}</option>`).join('');
+  }
+
+  // Building Component <option>s filtered to one Building Part (empty until a part is chosen).
+  _boqCategoryOptions(part = '') {
+    const cats = part ? this.categories.filter(c => c.family === part) : [];
+    return `<option value="" disabled selected>${i18n.category}</option>`
+      + cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  }
+
+  // A BoQ material row's Building Part filters that row's Component (Category) list.
+  onMaterialPartChange(sel) {
+    sel.classList.remove('select-error');
+    const row = sel.closest('li');
+    const catSel = row && row.querySelector('.material-category');
+    if (catSel) catSel.innerHTML = this._boqCategoryOptions(sel.value);
+  }
+
   renderMaterials(materials, mode) {
     const listId = mode === 'boq' ? 'structural_materials_list' : 'component_materials_list';
     const list = document.getElementById(listId);
     if (!list) return;
-
-    const categoryOptions = this.categories.map(cat =>
-      `<option value="${cat.id}">${cat.name}</option>`
-    ).join('');
 
     list.innerHTML = '';
     materials.forEach(m => {
@@ -1001,25 +1060,40 @@
       li.dataset.timestamp = m.timestamp;
       li.dataset.name = m.name;
       li.dataset.gwp = m.gwp;
+      if (m.type) li.dataset.type = m.type;
 
+      const genericBadge = m.type === 'generic' ? `
+          <span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--white-0)] gap-1 flex items-center shrink-0" title="${i18n.genericEpd || 'Generic placeholder EPD — not from an official source'}">
+            <span data-icon="pushpin-fill" data-size="16" data-color="var(--icon--soft-400)"></span>
+            <span class="text-[var(--text--sub-600)] text-xs">${i18n.generic || 'Generic'}</span>
+          </span>` : '';
+
+      // Derive the material's Building Part from its saved component's family.
+      const savedCat = this.categories.find(c => String(c.id) === String(m.category));
+      const savedPart = savedCat ? (savedCat.family || '') : '';
+      const partSelect = mode === 'boq' ? `
+        <select class="select material-part" style="flex:1.3 1 0;min-width:0;" required onchange="structuralManager.onMaterialPartChange(this)">
+          ${this._boqPartOptions(savedPart)}
+        </select>` : '';
       const categorySelect = mode === 'boq' ? `
-        <select class="select material-category" required>
-          <option value="" disabled>${i18n.category}</option>
-          ${categoryOptions}
+        <select class="select material-category" style="flex:1.3 1 0;min-width:0;" required>
+          ${this._boqCategoryOptions(savedPart)}
         </select>` : '';
 
       li.innerHTML = `
         <div class="flex items-center justify-between mb-2 w-full">
           <span class="text-sm/5 font-medium truncate flex-1">${m.name}</span>
+          ${genericBadge}
         </div>
-        <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">
+        <div class="flex items-stretch bg-[var(--bg--white-0)] rounded-xl p-2.5" style="gap:0.5rem;">
           <div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]">
           </div>
-          <label class="input w-full">
+          <label class="input" style="flex:2 1 0;min-width:100px;">
             <input type="text" value="${m.description || ''}" placeholder="${i18n.addDescription}" class="material-description w-full" />
           </label>
+          ${partSelect}
           ${categorySelect}
-          <label class="input w-full max-w-[140px]">
+          <label class="input" style="flex:1 1 0;min-width:0;">
             <input type="number" value="${m.quantity || ''}" placeholder="${i18n.qty}" class="material-quantity w-full" step="0.01" min="0" />
             <span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="${m.unit}">${m.unit === 'unknown' ? '#' : m.unit}</span>
             <input type="hidden" class="material-unit-value" value="${m.unit}" />
@@ -1136,6 +1210,20 @@
     const title = document.getElementById('component_title').value.trim();
     if (!title) {
       Toast.error('Please enter a component title');
+      return;
+    }
+
+    // Required fields (Construction Technique is optional).
+    if (!document.getElementById('component_part').value) {
+      Toast.error('Please select a building part');
+      return;
+    }
+    if (!document.getElementById('component_category').value) {
+      Toast.error('Please select a building component');
+      return;
+    }
+    if (!(parseFloat(document.getElementById('component_quantity').value) > 0)) {
+      Toast.error('Please enter a quantity');
       return;
     }
 
@@ -1369,7 +1457,7 @@
             <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
               ${item.category_name || i18n.noCategory}
             </span>
-            <p class="text-sm/5 text-[var(--text--sub-600)]">${item.quantity || '-'} ${{ area: 'm²', volume: 'm³', mass: 'kg', length: 'm', pcs: 'pcs' }[item.dimension] || item.dimension || ''}</p>
+            <p class="text-sm/5 text-[var(--text--sub-600)]">${item.quantity || '-'} ${{ area: 'm²', volume: 'm³', mass: 'kg', ton: 'ton', length: 'm', pcs: 'pcs' }[item.dimension] || item.dimension || ''}</p>
           </div>
         </div>
         <div class="flex gap-2">
