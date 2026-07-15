@@ -93,6 +93,11 @@ heroku run python manage.py load_local_epds -f generic_EPDs --app <your-app>
 
 # F — generic operational EPDs (electricity/natural-gas + names; needs 0049 applied)
 heroku run python manage.py load_local_epds -f generic_operationaL_EPDs --app <your-app>
+
+# G — GCCA A–G concrete Low Carbon Ratings (dynamic; additive; run AFTER C so the
+#     Thai ready-mix concretes exist). Rates ready-mix/precast concrete only; skips
+#     off-table strengths / non-structural products.
+heroku run python manage.py apply_gcca_concrete_labels --app <your-app>
 ```
 (Note the capital "L" in `generic_operationaL_EPDs` — that is the actual file key.)
 
