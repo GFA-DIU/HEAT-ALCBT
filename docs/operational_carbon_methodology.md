@@ -45,7 +45,7 @@ loaded from `pages/data/generic_operational_EPDs_v2.csv`.
 | Thailand | 0.475 | TGO 2022–24 |
 | Vietnam | **0.659** | MONRE 2023 (corrected from an understated 0.410) |
 | Cambodia | **0.588** | Electricity Authority of Cambodia 2023 (corrected from 0.418) |
-| Indonesia | 0.676 | IEA / national ~0.68 |
+| Indonesia | 0.78 | national published (Ember 2023 ~0.76 / prior 0.778) |
 | India | 0.705 | CEA / IEA ~0.71 |
 
 Fuels (Thailand set, from the TGO Operational_EF sheet) and carrier names were also
@@ -98,7 +98,7 @@ electricity-heavy buildings. This is the single biggest realism gap, addressed i
 | Thailand | 0.475 | TGO 2022–24 | 2050 (carbon-neutral) | 0.05 | ~0.152 | −68% |
 | Vietnam | 0.659 | MONRE 2023 | 2050 | 0.05 | ~0.196 | −70% |
 | Cambodia | 0.588 | EAC 2023 | 2050 | 0.05 | ~0.179 | −70% |
-| Indonesia | 0.676 | IEA ~0.68 | 2060 | 0.05 | ~0.263 | −61% |
+| Indonesia | 0.78 | national published (Ember/prior) | 2060 | 0.05 | ~0.298 | −62% |
 | India | 0.705 | CEA/IEA ~0.71 | 2070 | 0.05 | ~0.338 | −52% |
 
 Reference trajectory: ASEAN grid intensity ~0.54 → 0.18 kgCO₂/kWh by 2050 under a net-zero

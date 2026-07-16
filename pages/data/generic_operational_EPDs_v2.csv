@@ -12,7 +12,7 @@ level_0_index,level_0_text,level_1_index,level_1_text,level_2_index,level_2_text
 9,Others,2,Energy carrier - delivery free user,10,Solid Fuel,IN,Firewood (Wood Chips),kWh,4.3,230,,,0.792,0.0242,"Rechnagel, T2.9.2-1",
 9,Others,2,Energy carrier - delivery free user,10,Solid Fuel,IN,Firewood (Wood Pellets),kWh,4.9,650,,,0.792,0.033,"Rechnagel, T2.9.2-1",
 9,Others,2,Energy carrier - delivery free user,10,Solid Fuel,IN,Charcoal,kWh,9.027777778,350,,,0.792,0.0385,"GEG (German Building Energy Law, additonal data)",
-9,Others,2,Energy carrier - delivery free user,5,Electricity,ID,Electricity,kWh,,,,,2.896450659,0.6759309,"GEG (German Building Energy Law, additonal data)",
+9,Others,2,Energy carrier - delivery free user,5,Electricity,ID,Electricity,kWh,,,,,2.896450659,0.78,"GEG (German Building Energy Law, additonal data)",
 9,Others,2,Energy carrier - delivery free user,3,Heating oil,ID,Light Fuel Oil,kWh,11.72,860,,,4.73225256,0.293039766,,de4f1273-f63f-4c2e-998c-639cb0e6e2c3
 9,Others,2,Energy carrier - delivery free user,3,Heating oil,ID,Heavy Fuel Oil,kWh,11.75,930,,,4.106042553,0.314819748,,2efcb539-f2f6-4db4-97ae-ece46761395d
 9,Others,2,Energy carrier - delivery free user,2,Liquid gas,ID,Liquefied Petroleum Gas (LPG),kWh,12.77777778,550,,,4.645252174,0.241955806,,ac476639-0ef2-4485-bb73-d446948eb7c6

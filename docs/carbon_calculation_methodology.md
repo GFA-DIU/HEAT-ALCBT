@@ -60,7 +60,7 @@ coverage is thin; category is not used in the maths (so a mislabel is cosmetic, 
   lighting, hot water, etc.) — a single representative annual figure, not year-by-year metered data.
 - **Emission factors** are per-carrier at stage B6 (per kWh): **electricity is country-specific**
   (grid mix); **fuels use one shared factor** across the ALCBT countries (combustion ≈ physics).
-- **Current electricity factors (kgCO₂e/kWh):** TH 0.475, VN 0.659, KH 0.588, ID 0.676, IN 0.705.
+- **Current electricity factors (kgCO₂e/kWh):** TH 0.475, VN 0.659, KH 0.588, ID 0.78, IN 0.705.
   (VN and KH were corrected 2026-07 from understated 0.410/0.418 to MONRE 2023 / EAC 2023.)
 - **Building age:** BEAT uses a **timeless design assessment** — the RSP is assessed from the
   assessment year with the representative annual energy; the building's actual age/construction
@@ -89,7 +89,7 @@ energy (see §5).
    | Thailand | 0.475 | TGO 2022–24 | 2050 | 0.05 | ~0.152 | −68% |
    | Vietnam | 0.659 | MONRE 2023 | 2050 | 0.05 | ~0.196 | −70% |
    | Cambodia | 0.588 | EAC 2023 | 2050 | 0.05 | ~0.179 | −70% |
-   | Indonesia | 0.676 | IEA ~0.68 | 2060 | 0.05 | ~0.263 | −61% |
+   | Indonesia | 0.78 | national published | 2060 | 0.05 | ~0.298 | −62% |
    | India | 0.705 | CEA/IEA ~0.71 | 2070 | 0.05 | ~0.338 | −52% |
 
    Report constant vs declining side by side. Upgrade path: swap in IEA WEO/APS year-by-year values.
