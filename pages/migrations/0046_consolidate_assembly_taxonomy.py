@@ -91,7 +91,11 @@ OVERRIDES = {
     "Bottom Floor Construction": {
         "Precast Concrete Double Tee Floor Units": DROP,
         "Hollow Core Precast Slab": DROP,
-        "Thin Precast Concrete Deck and Composite In-situ Slab": DROP,
+        # KEEP (not DROP): a qa building uses this as a ground floor. Remap to the
+        # cleaned technique name used elsewhere (Beams & Slabs / Roof) so the material
+        # keeps a meaningful technique (Ground Floor / Thin Precast Concrete Deck …)
+        # instead of falling back to "Not specified".
+        "Thin Precast Concrete Deck and Composite In-situ Slab": "Thin Precast Concrete Deck & Composite In-Situ Slab",
     },
     "Roof Construction": {
         "Steel (Zinc or Galvanized Iron) Sheets on Steel Rafters": "Metal Sheets on Steel Rafters",
