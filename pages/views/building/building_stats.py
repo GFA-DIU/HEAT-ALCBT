@@ -19,6 +19,10 @@ from typing import Dict, Any, List, Optional
 from pages.models.building import Building
 from pages.models.epd import Unit
 from pages.views.building.embodied_benchmark_data import get_embodied_savings_data
+from pages.views.building.operational_benchmark_data import (
+    get_operational_benchmark_for_building,
+    calculate_operational_benchmark_position,
+)
 from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
 from pages.models.building_operation.chilling import CoolingSystemChiller
 from pages.models.building_operation.ventilation import VentilationSystem
@@ -707,6 +711,249 @@ def get_operational_carbon_by_appliance(
     }
 
 
+# ---------------------------------------------------------------------------
+# Layer 3 — optimisation measures, BMS, refrigerant (operational savings)
+# ---------------------------------------------------------------------------
+
+# Per-system optimisation measures (spec §6). Each entry:
+#   key, label, description, saving % (of the system's remaining carbon), and the
+#   model + boolean flag (or predicate) that marks it "already installed".
+# ``installed_when`` is a callable(records) -> bool: True when the measure counts
+# as already installed (shown ON + locked, zero additional saving). A measure is
+# installed only when EVERY record of that system has it (spec §10); a system with
+# no records reports False (shown available/OFF, install state unknown).
+_SYSTEM_STYLE = {
+    "Cooling systems": {"key": "cooling", "icon": "snowflake-fill", "color": "#3B82F6"},
+    "Ventilation systems": {"key": "ventilation", "icon": "windy-fill", "color": "#22C55E"},
+    "Lighting systems": {"key": "lighting", "icon": "lightbulb-line", "color": "#EAB308"},
+    "Hot Water Systems": {"key": "hot_water", "icon": "fire-line", "color": "#EF4444"},
+    "Lift & escalator": {"key": "lift", "icon": "stairs-line", "color": "#818CF8"},
+}
+
+# Natural (target) refrigerants for the Scope-1 transition, lowest GWP preferred.
+_NATURAL_REFRIGERANTS = ["R-717", "R-744", "R-290"]
+
+
+def _all_records_flagged(records, attr):
+    """True when there is at least one record and every record has ``attr`` truthy."""
+    records = list(records)
+    if not records:
+        return False
+    return all(bool(getattr(r, attr, False)) for r in records)
+
+
+def _measures_for_system(system_key, building):
+    """Return the list of measures for a system with their already-installed state.
+
+    Each measure dict: {key, label, description, pct (0-1), installed (bool)}.
+    """
+    if system_key == "cooling":
+        chillers = list(building.chillers.all())
+        acs = list(building.air_conditioners.all())
+        cooling_records = chillers + acs
+        # VSD flag exists on both chillers and ACs; heat recovery on chillers.
+        vsd_installed = bool(cooling_records) and all(
+            getattr(r, "variable_speed_drives", False) for r in cooling_records
+        )
+        hr_installed = _all_records_flagged(chillers, "heat_recovery_system")
+        return [
+            {"key": "cooling_vsd", "label": "VSD on compressors & fans",
+             "description": "Apply where VSD not already installed",
+             "pct": 0.20, "installed": vsd_installed},
+            {"key": "cooling_hr", "label": "Heat recovery system",
+             "description": "Reclaim waste heat from cooling plant",
+             "pct": 0.30, "installed": hr_installed},
+        ]
+    if system_key == "ventilation":
+        vents = list(building.ventilation_systems.all())
+        return [
+            {"key": "vent_dcv", "label": "Demand-controlled ventilation (DCV)",
+             "description": "Modulate airflow via occupancy & CO₂ sensors",
+             "pct": 0.30, "installed": _all_records_flagged(vents, "demand_controlled_ventilation")},
+            {"key": "vent_vsd", "label": "VSD on AHU & FCU fans",
+             "description": "Variable speed drives on air handling units",
+             "pct": 0.20, "installed": _all_records_flagged(vents, "variable_speed_drives")},
+        ]
+    if system_key == "lighting":
+        lights = list(building.lighting_systems.all())
+        all_led = bool(lights) and all(
+            (l.lighting_bulb_type or "").startswith("LED_") for l in lights
+        )
+        return [
+            {"key": "light_led", "label": "LED retrofit on fluorescent zones",
+             "description": "Replace remaining fluorescent fixtures with LED equivalents",
+             "pct": 0.40, "installed": all_led},
+            {"key": "light_sensors", "label": "Occupancy & daylight sensors",
+             "description": "Auto-switch lighting based on presence and natural light",
+             "pct": 0.20, "installed": _all_records_flagged(lights, "sensors_installed")},
+        ]
+    if system_key == "hot_water":
+        hw = list(building.hot_water_systems.all())
+        all_heat_pump = bool(hw) and all(
+            r.type_of_hot_water_system == "heat-pump" for r in hw
+        )
+        return [
+            {"key": "hw_heatpump", "label": "Heat-pump water heater",
+             "description": "Replace electric resistance with air-source heat pump",
+             "pct": 0.50, "installed": all_heat_pump},
+        ]
+    if system_key == "lift":
+        lifts = list(building.lift_escalator_systems.all())
+        return [
+            {"key": "lift_regen", "label": "Regenerative drives",
+             "description": "Capture energy from braking and return to the grid",
+             "pct": 0.20, "installed": _all_records_flagged(lifts, "lift_regenerative_features")},
+            {"key": "lift_vvvf", "label": "VVVF drive & sleep mode",
+             "description": "Variable-voltage variable-frequency drive with sleep mode",
+             "pct": 0.40, "installed": _all_records_flagged(lifts, "vvvf_sleep_mode")},
+        ]
+    return []
+
+
+def _refrigerant_scope1_saving(building, floor_area):
+    """Scope-1 refrigerant-transition saving (kgCO2eq/m²/yr), summed over cooling units.
+
+    For each AC + chiller: qty_kg * (leakage%/100) * (baseline_GWP - natural_GWP) / GFA.
+    Target = lowest-GWP natural refrigerant available. Units already at/below the
+    target GWP, or with missing refrigerant data, contribute zero.
+    """
+    from pages.models.building_operation.chilling import RefrigerantGWP
+
+    if not floor_area or Decimal(str(floor_area)) <= 0:
+        return 0.0, None
+    gfa = Decimal(str(floor_area))
+
+    # Cheapest available natural target.
+    target_gwp = None
+    for code in _NATURAL_REFRIGERANTS:
+        gwp = RefrigerantGWP.get_gwp(code)
+        if gwp is not None:
+            target_gwp = Decimal(str(gwp))
+            break
+    if target_gwp is None:
+        return 0.0, None
+
+    units = list(building.chillers.all()) + list(building.air_conditioners.all())
+
+    total = Decimal("0")
+    for u in units:
+        qty = getattr(u, "refrigerant_quantity_kg", None)
+        gwp = getattr(u, "baseline_refrigerant_emission_factor", None)
+        leakage = getattr(u, "baseline_leakage_factor_percent", None)
+        if qty is None or gwp is None or leakage is None:
+            continue
+        gwp = Decimal(str(gwp))
+        if gwp <= target_gwp:
+            continue
+        saving = Decimal(str(qty)) * (Decimal(str(leakage)) / Decimal("100")) \
+            * (gwp - target_gwp) / gfa
+        total += saving
+
+    return round(float(total), 2), (float(target_gwp) if total > 0 else None)
+
+
+def get_operational_savings_measures(
+    building: Building,
+    prefetched_operational=None,
+) -> Dict[str, Any]:
+    """Layer 3 — per-system optimisation measures, BMS and refrigerant transition.
+
+    Reuses get_operational_carbon_by_system() for the per-system baseline carbon
+    (kgCO2eq/m²/yr) so the numbers match the Systems tab exactly. Per-system
+    measures stack multiplicatively; BMS applies last to the whole-building
+    electricity total; refrigerant Scope-1 is additive and separate. Returns a
+    dict shaped for savings_tab.html and safe for JSON serialisation.
+    """
+    by_system = get_operational_carbon_by_system(
+        building, prefetched_operational=prefetched_operational
+    )
+    baseline_labels = by_system.get("labels", [])
+    baseline_absolute = by_system.get("absolute", [])
+    electricity_total = float(by_system.get("total", 0.0) or 0.0)
+
+    systems = []
+    optimized_electricity = 0.0
+    for label, baseline in zip(baseline_labels, baseline_absolute):
+        style = _SYSTEM_STYLE.get(label)
+        if not style:
+            continue
+        baseline = float(baseline)
+        measures = _measures_for_system(style["key"], building)
+
+        # Stack available (not-installed) measures multiplicatively.
+        remaining = baseline
+        measure_rows = []
+        for m in measures:
+            applies = not m["installed"]
+            saving = remaining * m["pct"] if applies else 0.0
+            if applies:
+                remaining -= saving
+            measure_rows.append({
+                "key": m["key"],
+                "label": m["label"],
+                "description": m["description"],
+                "pct": m["pct"],
+                "installed": m["installed"],
+                "saving": round(saving, 2),
+            })
+        optimized = round(remaining, 2)
+        optimized_electricity += optimized
+        reduction_pct = round((baseline - optimized) / baseline * 100, 1) if baseline > 0 else 0.0
+        share_pct = round(baseline / electricity_total * 100, 1) if electricity_total > 0 else 0.0
+
+        systems.append({
+            "label": label,
+            "key": style["key"],
+            "icon": style["icon"],
+            "color": style["color"],
+            "baseline": round(baseline, 2),
+            "optimized": optimized,
+            "reduction_pct": reduction_pct,
+            "share_pct": share_pct,
+            "measures": measure_rows,
+        })
+
+    # BMS applies last, multiplicatively, to the whole-building electricity total.
+    bms_saving = round(optimized_electricity * 0.20, 2)
+    optimized_after_bms = round(optimized_electricity - bms_saving, 2)
+
+    # Refrigerant (Scope 1) — additive, separate from electricity.
+    refrigerant_saving, target_gwp = _refrigerant_scope1_saving(
+        building, building.total_floor_area
+    )
+
+    baseline_total = round(electricity_total, 2)
+    optimized_total = round(optimized_after_bms - refrigerant_saving, 2)
+    total_saving = round(baseline_total - optimized_total, 2)
+    reduction_pct = round(total_saving / baseline_total * 100, 1) if baseline_total > 0 else 0.0
+
+    period = building.reference_period or 50
+
+    return {
+        "systems": systems,
+        "bms": {
+            "label": "Building Management System (BMS)",
+            "description": "Whole-building controls optimisation",
+            "pct": 0.20,
+            "saving": bms_saving,
+        },
+        "refrigerant": {
+            "label": "Refrigerant transition (natural refrigerant)",
+            "saving": refrigerant_saving,
+            "target_gwp": target_gwp,
+            "has_saving": refrigerant_saving > 0,
+        },
+        "baseline_total": baseline_total,
+        "optimized_total": optimized_total,
+        "total_saving": total_saving,
+        "reduction_pct": reduction_pct,
+        "baseline_total_lifetime": round(baseline_total * period),
+        "optimized_total_lifetime": round(optimized_total * period),
+        "total_saving_lifetime": round(total_saving * period),
+        "reference_period": period,
+    }
+
+
 def get_building_chart_data(
     building: Building,
     prefetched_assemblies=None,
@@ -738,6 +985,27 @@ def get_building_chart_data(
         building, prefetched_assemblies=prefetched_assemblies
     )
 
+    # Layer 1 — operational EUI benchmark position (actual EUI vs national/best practice)
+    operational_benchmark = get_operational_benchmark_for_building(building)
+    operational_benchmark_position = None
+    if operational_benchmark:
+        summary = getattr(building, 'energy_summary', None)
+        floor_area = building.total_floor_area
+        actual_eui = None
+        if summary is not None and floor_area and Decimal(str(floor_area)) > 0:
+            total_kwh = summary.total_kwh
+            if total_kwh:
+                actual_eui = float(Decimal(str(total_kwh)) / Decimal(str(floor_area)))
+        grid_factor = _derive_grid_emission_factor(building, prefetched_operational)
+        # Fall back to the country's reference grid EF when no electricity EPD gave one.
+        if not grid_factor or float(grid_factor) <= 0:
+            from pages.views.building.operational_benchmark_data import GRID_EF_FALLBACK
+            grid_factor = GRID_EF_FALLBACK.get(operational_benchmark["country"], 0)
+        operational_benchmark_position = calculate_operational_benchmark_position(
+            actual_eui, operational_benchmark, grid_factor,
+            floor_area, building.reference_period,
+        )
+
     return {
         'whole_life_carbon': {
             'labels': ['Operational carbon', 'Embodied carbon'],
@@ -752,6 +1020,11 @@ def get_building_chart_data(
             building, prefetched_operational=prefetched_operational
         ),
         'operational_by_appliance': get_operational_carbon_by_appliance(
+            building, prefetched_operational=prefetched_operational
+        ),
+        'operational_benchmark': operational_benchmark,
+        'operational_benchmark_position': operational_benchmark_position,
+        'operational_savings': get_operational_savings_measures(
             building, prefetched_operational=prefetched_operational
         ),
     }
