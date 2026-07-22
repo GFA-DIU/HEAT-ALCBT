@@ -62,12 +62,29 @@
                 hx-target="#buildings-container"
                 hx-swap="innerHTML"
                 hx-indicator="#buildings-loading-spinner"
+                hx-include="[name='sort']"
               />
                 <!-- Loading spinner -->
               <div id="buildings-loading-spinner" class="htmx-indicator flex items-center justify-center py-8">
                 <span class="loading loading-spinner loading-lg text-primary"></span>
               </div>
             </label>
+            <select
+              class="select w-max"
+              name="sort"
+              aria-label="{% translate 'Sort buildings' %}"
+              hx-get="{% url 'home' %}"
+              hx-trigger="change"
+              hx-target="#buildings-container"
+              hx-swap="innerHTML"
+              hx-indicator="#buildings-loading-spinner"
+              hx-include="[name='search']"
+            >
+              <option value="date_desc" {% if sort_query == "date_desc" or not sort_query %}selected{% endif %}>{% translate "Date created (newest first)" %}</option>
+              <option value="date_asc" {% if sort_query == "date_asc" %}selected{% endif %}>{% translate "Date created (oldest first)" %}</option>
+              <option value="name_asc" {% if sort_query == "name_asc" %}selected{% endif %}>{% translate "Name (A-Z)" %}</option>
+              <option value="name_desc" {% if sort_query == "name_desc" %}selected{% endif %}>{% translate "Name (Z-A)" %}</option>
+            </select>
             <a href="{% url 'new_building' %}">
               <button class="btn btn-primary rounded-lg w-max">
                 <span data-icon="add-large-fill"></span>
