@@ -16,6 +16,15 @@ from pages.views.building.building_stats import get_building_statistics
 logger = logging.getLogger(__name__)
 
 
+SORT_OPTIONS = {
+    "name_asc": "name",
+    "name_desc": "-name",
+    "date_desc": "-created_at",
+    "date_asc": "created_at",
+}
+DEFAULT_SORT = "date_desc"
+
+
 @login_required
 @require_http_methods(["GET", "POST", "DELETE"])
 def buildings_list(request):
@@ -33,6 +42,12 @@ def buildings_list(request):
             models.Q(category__subcategory__name__icontains=search_query) |
             models.Q(street__icontains=search_query)
         ).distinct()
+
+    # Handle sorting
+    sort_query = request.GET.get("sort", DEFAULT_SORT)
+    if sort_query not in SORT_OPTIONS:
+        sort_query = DEFAULT_SORT
+    buildings = buildings.order_by(SORT_OPTIONS[sort_query])
 
     # Check if this is a new user (first time on home page after signup)
     show_account_success_modal = request.session.pop('show_account_success_modal', False)
@@ -52,6 +67,7 @@ def buildings_list(request):
     context = {
         "buildings": buildings_with_stats,
         "search_query": search_query,
+        "sort_query": sort_query,
         "show_account_success_modal": show_account_success_modal,
         "user_form": user_form,
         "profile_form": profile_form,
@@ -96,14 +112,17 @@ def handle_delete_building(request):
 
 
     # Get remaining buildings and add statistics
-    buildings = Building.objects.filter(created_by=request.user)
+    sort_query = request.GET.get("sort", DEFAULT_SORT)
+    if sort_query not in SORT_OPTIONS:
+        sort_query = DEFAULT_SORT
+    buildings = Building.objects.filter(created_by=request.user).order_by(SORT_OPTIONS[sort_query])
     buildings_with_stats = []
     for building in buildings:
         stats = get_building_statistics(building)
         building.stats = stats
         buildings_with_stats.append(building)
 
-    context = {"buildings": buildings_with_stats}
+    context = {"buildings": buildings_with_stats, "sort_query": sort_query}
     return context
 
 

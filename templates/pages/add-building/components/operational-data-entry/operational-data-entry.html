@@ -1,6 +1,29 @@
 {% load crispy_forms_tags %}
 {% load static %}
 {% load i18n %}
+
+{% if total_annual_energy_consumption is not None %}
+<div
+  class="flex items-center justify-between gap-2 p-3 rounded-lg bg-[var(--state--information--lighter)] border border-[var(--state--information--base)] mb-2"
+  id="energy_target_banner"
+  data-target-kwh="{{ total_annual_energy_consumption }}"
+>
+  <div class="flex items-center gap-2">
+    <span
+      data-icon="information-2-line"
+      data-size="16"
+      data-color="var(--icon--strong-950)"
+    ></span>
+    <span class="text-sm/5">
+      {% blocktranslate with target=total_annual_energy_consumption|floatformat:0 %}Target total energy from building systems: <strong>{{ target }} kWh</strong>{% endblocktranslate %}
+    </span>
+  </div>
+  <span class="text-xs text-[var(--text--sub-600)]" id="energy_running_total">
+    {% translate "Entered so far: 0 kWh" %}
+  </span>
+</div>
+{% endif %}
+
 <div
   class="flex items-center gap-2 p-2 rounded-lg bg-[var(--state--faded--lighter)]"
   id="select_epd_text"
@@ -366,6 +389,40 @@
     if (unsavedIndicator) {
       unsavedIndicator.style.display = (hasProducts && !isSaved) ? 'inline' : 'none';
     }
+
+    updateEnergyRunningTotal();
+  }
+
+  // Sums entered energy carriers that are already denominated in kWh.
+  // Carriers entered in other units (m3, kg, liter) are converted server-side
+  // on save, so they aren't reflected here — this is a live approximation,
+  // not the authoritative total.
+  function updateEnergyRunningTotal() {
+    const totalEl = document.getElementById('energy_running_total');
+    if (!totalEl) return;
+
+    const list = document.getElementById('selected_op_products');
+    let total = 0;
+    let hasNonKwh = false;
+
+    list?.querySelectorAll('li[id^="epd-"]').forEach(function(li) {
+      const qtyInput = li.querySelector('input[name*="_quantity_"]');
+      const unitSelect = li.querySelector('select[name*="_unit_"]');
+      const qty = parseFloat(qtyInput?.value);
+      if (isNaN(qty)) return;
+      if (unitSelect && unitSelect.value && unitSelect.value.toLowerCase() === 'kwh') {
+        total += qty;
+      } else {
+        hasNonKwh = true;
+      }
+    });
+
+    const roundedTotal = Math.round(total * 100) / 100;
+    if (hasNonKwh) {
+      totalEl.textContent = '{% translate "Entered so far (kWh carriers): " %}' + roundedTotal + ' {% translate "kWh (other units convert on save)" %}';
+    } else {
+      totalEl.textContent = '{% translate "Entered so far: " %}' + roundedTotal + ' {% translate "kWh" %}';
+    }
   }
 
   // Handle successful EPD addition
@@ -524,6 +581,7 @@
   // so it works after HTMX outerHTML swaps
   document.addEventListener('input', function(event) {
     if (!event.target.closest('#selected_op_products')) return;
+    updateEnergyRunningTotal();
     const form = document.getElementById('operational-products-form');
     if (form && form.dataset.saved === 'true') {
       form.removeAttribute('data-saved');
@@ -533,6 +591,13 @@
         saveStatus.classList.remove('text-success');
         saveStatus.classList.add('text-warning');
       }
+    }
+  });
+
+  document.addEventListener('change', function(event) {
+    if (!event.target.closest('#selected_op_products')) return;
+    if (event.target.matches('select[name*="_unit_"]')) {
+      updateEnergyRunningTotal();
     }
   });
 

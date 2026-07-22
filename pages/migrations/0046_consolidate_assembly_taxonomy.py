@@ -91,7 +91,11 @@ OVERRIDES = {
     "Bottom Floor Construction": {
         "Precast Concrete Double Tee Floor Units": DROP,
         "Hollow Core Precast Slab": DROP,
-        "Thin Precast Concrete Deck and Composite In-situ Slab": DROP,
+        # KEEP (not DROP): a qa building uses this as a ground floor. Remap to the
+        # cleaned technique name used elsewhere (Beams & Slabs / Roof) so the material
+        # keeps a meaningful technique (Ground Floor / Thin Precast Concrete Deck …)
+        # instead of falling back to "Not specified".
+        "Thin Precast Concrete Deck and Composite In-situ Slab": "Thin Precast Concrete Deck & Composite In-Situ Slab",
     },
     "Roof Construction": {
         "Steel (Zinc or Galvanized Iron) Sheets on Steel Rafters": "Metal Sheets on Steel Rafters",
@@ -186,8 +190,24 @@ def forward(apps, schema_editor):
             new_tech_name = OVERRIDES.get(old_cat, {}).get(old_tech, old_tech)  # default: keep name
 
         if new_tech_name == DROP:
-            n = StructuralProduct.objects.filter(classification=join).count()
-            assert n == 0, f"Refusing to drop '{old_cat} / {old_tech}': {n} materials use it"
+            # This technique option is being retired. If any material still uses it,
+            # don't crash and don't lose it — repoint the material(s) to the destination
+            # category's "Not specified" (null-technique) join and warn, so the user can
+            # re-pick a technique from the consolidated list afterwards. (Preserves the
+            # material's data; only the retired technique label is cleared.)
+            movers = StructuralProduct.objects.filter(classification=join)
+            n = movers.count()
+            if n:
+                dest_cat, _ = AssemblyCategory.objects.get_or_create(
+                    name=new_cat_name, defaults={"tag": NEW_CATEGORY_TAGS[new_cat_name]}
+                )
+                dest_null, _ = ACT.objects.get_or_create(category=dest_cat, technique=None)
+                keep.add(dest_null.pk)
+                movers.update(classification=dest_null)
+                print(
+                    f"[taxonomy] retired '{old_cat} / {old_tech}': reassigned {n} "
+                    f"material(s) to '{new_cat_name} / Not specified'"
+                )
             continue
 
         # get/create destination category (+ apply clean tag) …

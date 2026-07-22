@@ -442,6 +442,7 @@ def handle_operational_data_step(request):
     
     # Load previously saved operational products from database (if building exists)
     selected_products = []
+    total_annual_energy_consumption = None
     building_uuid = request.GET.get('building_uuid')
 
     logger.info(f"Loading operational data step with building_uuid: {building_uuid}")
@@ -451,6 +452,11 @@ def handle_operational_data_step(request):
             uuid_obj = uuid_lib.UUID(building_uuid)
             building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
             logger.info(f"Found building: {building.id} - {building.name}")
+
+            # Target total energy from building systems (Systems/Consumption section)
+            energy_summary = EnergySummary.objects.filter(building=building).first()
+            if energy_summary and energy_summary.total_kwh is not None:
+                total_annual_energy_consumption = energy_summary.total_kwh
 
             # Get saved operational products from database
             saved_products = OperationalProduct.objects.filter(
@@ -487,6 +493,7 @@ def handle_operational_data_step(request):
         'epd_filters_form': epd_filters_form,
         'countries': ALCBTCountryManager.get_all_countries(),
         'selected_products': selected_products,
+        'total_annual_energy_consumption': total_annual_energy_consumption,
     }
     return render(
         request,
