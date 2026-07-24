@@ -135,7 +135,19 @@ def _can_epd_be_used(dimension: str, epd) -> tuple[bool, str]:
                 "no volume density or conversion factor is available for this EPD."
             )
         if declared == Unit.M2:
-            return True, ""  # needs thickness
+            # A volume (m³) component never collects a layer thickness (the volume
+            # flow only asks "Share of volume"). So an m²-declared EPD can only be
+            # used if its thickness is derivable from the EPD itself — i.e. it has a
+            # volume density (thickness = area density ÷ volume density). Without it
+            # the impact silently resolves to 0, so block the add with a clear reason.
+            if _epd_has_conversion(epd, "volume density"):
+                return True, ""
+            return False, (
+                "Cannot add this EPD (declared in m²) to a volume (m³) component: "
+                "it has no volume density, so its layer thickness cannot be derived. "
+                "Add it in an area (m²) component instead, or use an EPD that carries "
+                "a volume density."
+            )
         if declared == Unit.PCS:
             return True, ""  # user enters pieces per m³
 
