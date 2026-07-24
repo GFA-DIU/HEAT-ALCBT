@@ -10,6 +10,7 @@ from pages.scripts.csv_import.import_generic_structural_epds import (
 )
 from pages.scripts.csv_import.import_edge_handbook_epds import import_EDGE_EPDs
 from pages.scripts.csv_import.import_india_cambodia_epds import import_india_and_cambodia_epds
+from pages.scripts.csv_import.import_ifc_localized_epds import import_ifc_localized_epds
 
 
 local_epd_files = {
@@ -18,6 +19,7 @@ local_epd_files = {
     "generic_operationaL_EPDs": import_generic_operational_epds,
     "ECO_Platform_Global_EPDs": import_global_epds,
     "India_and_Cambodia_updated_20250424": import_india_and_cambodia_epds,
+    "IFC_localized_generic_EPDs": import_ifc_localized_epds,
 }
 
 
