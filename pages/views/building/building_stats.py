@@ -370,6 +370,8 @@ def get_building_detail_statistics(
         'total_operational_carbon': operational,
         # Per-year intensity (sum of Systems-tab bars), so the stat card matches the chart.
         'operational_carbon_per_year': operational_by_system.get('total', 0),
+        # Annual energy-use intensity (EPI, kWh/m2/yr) — gross demand, for the toggle.
+        'operational_energy_intensity': operational_by_system.get('total_energy', 0),
         'grid_emission_factor': _derive_grid_emission_factor(
             building, prefetched_operational=prefetched_operational
         ),
@@ -608,7 +610,7 @@ def get_operational_carbon_by_system(
         (kgCO2eq/m²/yr) and 'total'. May include 'blocked' (floor area missing)
         or 'warning' (grid factor is zero).
     """
-    empty = {'labels': [], 'data': [], 'absolute': [], 'total': 0}
+    empty = {'labels': [], 'data': [], 'absolute': [], 'absolute_energy': [], 'total': 0, 'total_energy': 0}
 
     summary = getattr(building, 'energy_summary', None)
     if summary is None:
@@ -634,33 +636,42 @@ def get_operational_carbon_by_system(
         ("Plug & equipment loads", summary.plug_load_kwh),
     ]
 
+    # Track carbon intensity (kgCO2e/m2/yr, net of renewables) and energy intensity
+    # (kWh/m2/yr, gross demand) per system. Percentage share is identical for both
+    # because the grid factor and renewable multiplier are uniform across systems.
     intensity_by_system = []
     for label, kwh in systems:
         if kwh is None or Decimal(str(kwh)) <= 0:
             continue
-        intensity = Decimal(str(kwh)) * grid_factor * electricity_multiplier / floor_area
-        intensity_by_system.append((label, intensity))
+        energy_intensity = Decimal(str(kwh)) / floor_area
+        carbon_intensity = energy_intensity * grid_factor * electricity_multiplier
+        intensity_by_system.append((label, carbon_intensity, energy_intensity))
 
     if not intensity_by_system:
         return empty
 
     intensity_by_system.sort(key=lambda x: x[1], reverse=True)
-    total = sum(value for _, value in intensity_by_system)
+    total = sum(c for _, c, _ in intensity_by_system)
+    total_energy = sum(e for _, _, e in intensity_by_system)
 
     labels = []
     data = []
     absolute = []
-    for label, value in intensity_by_system:
+    absolute_energy = []
+    for label, carbon_intensity, energy_intensity in intensity_by_system:
         labels.append(label)
-        percentage = float((value / total) * 100) if total > 0 else 0.0
+        percentage = float((carbon_intensity / total) * 100) if total > 0 else 0.0
         data.append(round(percentage, 1))
-        absolute.append(round(float(value), 2))
+        absolute.append(round(float(carbon_intensity), 2))
+        absolute_energy.append(round(float(energy_intensity), 2))
 
     result = {
         'labels': labels,
         'data': data,
         'absolute': absolute,
+        'absolute_energy': absolute_energy,
         'total': round(float(total), 2),
+        'total_energy': round(float(total_energy), 2),
     }
     if grid_factor == 0:
         result['warning'] = 'grid_factor_zero'
@@ -680,7 +691,7 @@ def get_operational_carbon_by_appliance(
     Returns dict with 'labels' (appliance display name), 'systemNames' (parent system),
     'data' (% share), 'absolute' (kgCO2eq/m²/yr), 'total'.
     """
-    empty = {'labels': [], 'systemNames': [], 'data': [], 'absolute': [], 'total': 0}
+    empty = {'labels': [], 'systemNames': [], 'data': [], 'absolute': [], 'absolute_energy': [], 'total': 0, 'total_energy': 0}
 
     floor_area = building.total_floor_area
     if not floor_area or Decimal(str(floor_area)) == 0:
@@ -754,23 +765,31 @@ def get_operational_carbon_by_appliance(
 
     # On-site renewables offset grid electricity; all appliances here are electricity.
     electricity_multiplier = Decimal('1') - _renewable_electricity_fraction(building, prefetched_operational)
-    intensities = [(label, sys_name, kwh * grid_factor * electricity_multiplier / floor_area) for label, sys_name, kwh in appliances]
-    intensities.sort(key=lambda x: x[2], reverse=True)
-    total = sum(v for _, _, v in intensities)
+    rows = []
+    for label, sys_name, kwh in appliances:
+        energy_intensity = kwh / floor_area
+        carbon_intensity = energy_intensity * grid_factor * electricity_multiplier
+        rows.append((label, sys_name, carbon_intensity, energy_intensity))
+    rows.sort(key=lambda x: x[2], reverse=True)
+    total = sum(c for _, _, c, _ in rows)
+    total_energy = sum(e for _, _, _, e in rows)
 
-    labels, system_names, data, absolute = [], [], [], []
-    for label, sys_name, value in intensities:
+    labels, system_names, data, absolute, absolute_energy = [], [], [], [], []
+    for label, sys_name, carbon_intensity, energy_intensity in rows:
         labels.append(label)
         system_names.append(sys_name)
-        data.append(round(float((value / total) * 100) if total > 0 else 0.0, 1))
-        absolute.append(round(float(value), 2))
+        data.append(round(float((carbon_intensity / total) * 100) if total > 0 else 0.0, 1))
+        absolute.append(round(float(carbon_intensity), 2))
+        absolute_energy.append(round(float(energy_intensity), 2))
 
     return {
         'labels': labels,
         'systemNames': system_names,
         'data': data,
         'absolute': absolute,
+        'absolute_energy': absolute_energy,
         'total': round(float(total), 2),
+        'total_energy': round(float(total_energy), 2),
     }
 
 
