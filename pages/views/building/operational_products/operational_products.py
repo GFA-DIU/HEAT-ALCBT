@@ -66,6 +66,12 @@ def serialize_operational_products(operational_products):
                 "source": op_product.epd.source,
                 "gwp_b6": round(impacts["gwp_b6"], 2),
                 "penrt_b6": round(impacts["penrt_b6"], 2),
+                # Grid electricity (both units kWh) is the only carrier on-site
+                # renewables can offset — flagged so downstream carbon can reduce it.
+                "is_electricity": (
+                    op_product.epd.declared_unit == Unit.KWH
+                    and op_product.input_unit == Unit.KWH
+                ),
             }
         )
     return serialised_op_products
