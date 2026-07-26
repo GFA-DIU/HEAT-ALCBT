@@ -379,13 +379,19 @@ def get_building_detail_statistics(
         else building.operational_products.all()
     )
     gross_elec_carbon_py = Decimal('0')
+    gross_elec_kwh = Decimal('0')
     for op in ops_for_renewable:
         if _op_is_electricity(op):
             try:
                 gross_elec_carbon_py += calculate_impact_operational(op).get('gwp_b6', Decimal('0'))
             except (ValueError, AttributeError, ZeroDivisionError):
                 continue
+            if op.quantity:
+                gross_elec_kwh += Decimal(str(op.quantity))
     renewable_carbon_saved = gross_elec_carbon_py * renewable_fraction
+    # Grid electricity actually purchased after netting self-consumed renewables
+    # (the energy that carries B6 carbon); capped at >= 0 via the clamped fraction.
+    grid_electricity_kwh = gross_elec_kwh * (Decimal('1') - renewable_fraction)
 
     return {
         'total_carbon_footprint': embodied + operational,
@@ -399,6 +405,7 @@ def get_building_detail_statistics(
         # On-site renewable benefit (0 when none set) — for the Systems-panel tile.
         'renewable_percent': float(renewable_fraction * 100),
         'renewable_carbon_saved_per_year': float(renewable_carbon_saved),
+        'grid_electricity_kwh': float(grid_electricity_kwh),
         'carbon_savings_percentage': calculate_carbon_savings_percentage(building),
         'calculation_errors': calculation_errors,
     }

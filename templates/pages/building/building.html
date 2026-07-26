@@ -647,7 +647,7 @@
                 <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">{% translate "% of electricity" %}</span>
               </div>
               <p class="pl-2.5 text-[11px] text-[var(--text--sub-600)] mt-0.5">
-                {% blocktranslate with saved=stats.renewable_carbon_saved_per_year|floatformat:2 %}saves {{ saved }} kgCO<sub>2</sub>eq/m²/yr{% endblocktranslate %}
+                {% blocktranslate with grid=stats.grid_electricity_kwh|floatformat:0 saved=stats.renewable_carbon_saved_per_year|floatformat:2 %}grid {{ grid }} kWh/yr, saves {{ saved }} kgCO<sub>2</sub>eq/m²/yr{% endblocktranslate %}
               </p>
             </div>
             {% endif %}
