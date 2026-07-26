@@ -637,6 +637,20 @@
                 <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">kgCO<sub>2</sub>eq/kWh electricity factor</span>
               </div>
             </div>
+            {% if stats.renewable_percent %}
+            <div class="flex flex-col flex-1 min-w-0">
+              <div class="border-l-2 border-[#c8e6c9] pl-2.5">
+                <p class="text-[13px] font-medium text-[var(--text--sub-600)] leading-5">{% translate "On-site renewables" %}</p>
+              </div>
+              <div class="pl-2.5 flex items-baseline mt-1">
+                <span class="text-2xl font-medium">{{ stats.renewable_percent|floatformat:0 }}</span>
+                <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">{% translate "% of electricity" %}</span>
+              </div>
+              <p class="pl-2.5 text-[11px] text-[var(--text--sub-600)] mt-0.5">
+                {% blocktranslate with saved=stats.renewable_carbon_saved_per_year|floatformat:2 %}saves {{ saved }} kgCO<sub>2</sub>eq/m²/yr{% endblocktranslate %}
+              </p>
+            </div>
+            {% endif %}
           </div>
 
           <!-- Divider -->

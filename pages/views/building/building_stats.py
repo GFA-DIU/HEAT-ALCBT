@@ -364,6 +364,29 @@ def get_building_detail_statistics(
         building, prefetched_operational=prefetched_operational
     )
 
+    grid_factor = _derive_grid_emission_factor(
+        building, prefetched_operational=prefetched_operational
+    )
+
+    # On-site renewable benefit (electricity only), based on the authoritative
+    # carrier (bill) electricity — the same basis as the headline operational
+    # carbon — so it's correct whether or not a system breakdown was entered.
+    # gross electricity carbon = sum of electricity carriers' un-reduced B6 (already
+    # per m2, per year); carbon saved/yr = that x renewable_fraction.
+    renewable_fraction = _renewable_electricity_fraction(building, prefetched_operational)
+    ops_for_renewable = (
+        prefetched_operational if prefetched_operational is not None
+        else building.operational_products.all()
+    )
+    gross_elec_carbon_py = Decimal('0')
+    for op in ops_for_renewable:
+        if _op_is_electricity(op):
+            try:
+                gross_elec_carbon_py += calculate_impact_operational(op).get('gwp_b6', Decimal('0'))
+            except (ValueError, AttributeError, ZeroDivisionError):
+                continue
+    renewable_carbon_saved = gross_elec_carbon_py * renewable_fraction
+
     return {
         'total_carbon_footprint': embodied + operational,
         'total_embodied_carbon': embodied,
@@ -372,9 +395,10 @@ def get_building_detail_statistics(
         'operational_carbon_per_year': operational_by_system.get('total', 0),
         # Annual energy-use intensity (EPI, kWh/m2/yr) — gross demand, for the toggle.
         'operational_energy_intensity': operational_by_system.get('total_energy', 0),
-        'grid_emission_factor': _derive_grid_emission_factor(
-            building, prefetched_operational=prefetched_operational
-        ),
+        'grid_emission_factor': grid_factor,
+        # On-site renewable benefit (0 when none set) — for the Systems-panel tile.
+        'renewable_percent': float(renewable_fraction * 100),
+        'renewable_carbon_saved_per_year': float(renewable_carbon_saved),
         'carbon_savings_percentage': calculate_carbon_savings_percentage(building),
         'calculation_errors': calculation_errors,
     }
