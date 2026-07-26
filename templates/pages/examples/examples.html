@@ -15,7 +15,7 @@
         {% include "pages/examples/_example_badge.html" %}
       </div>
       <p class="text-sm font-normal text-[var(--text--sub-600)]">
-        {% translate "Ready-made reference buildings you can preview and clone as a starting point. Each pair shows a typical building and a lower-carbon version of the same building. These are read-only — cloning creates your own editable copy." %}
+        {% translate "Ready-made reference buildings you can preview and clone as a starting point. Each pair shows a typical building and a lower-carbon version of the same building. These are read-only, so cloning creates your own editable copy." %}
       </p>
     </div>
   </div>
@@ -63,7 +63,7 @@
                 </div>
                 <div class="flex flex-col">
                   <span class="text-xs/4 font-medium text-[var(--text--sub-600)]">{% translate "Total embodied carbon" %}</span>
-                  <span class="text-base/6 font-bold">{{ b.stats.total_embodied_carbon|floatformat:"1" }} kgCO<sub>2</sub>eq/m<sup>2</sup></span>
+                  <span class="text-base/6 font-bold">{{ b.embodied_carbon|floatformat:"1" }} kgCO<sub>2</sub>eq/m<sup>2</sup></span>
                 </div>
               </div>
 

@@ -28,8 +28,7 @@ from pages.models.assembly import StructuralProduct
 from pages.models.building import Building, BuildingAssembly
 from pages.models.epd import EPDImpact
 from pages.views.building.building import get_assemblies
-from pages.views.building.building_stats import (
-    get_building_detail_statistics, get_building_statistics)
+from pages.views.building.building_stats import calculate_total_embodied_carbon
 from pages.views.building.clone_building import clone_building
 
 logger = logging.getLogger(__name__)
@@ -78,13 +77,17 @@ def examples_list(request):
     """The Example buildings area: cards grouped by (building type, country)."""
     examples = list(_example_qs())
     for b in examples:
-        b.stats = get_building_statistics(b)
+        # Only embodied carbon is shown on the cards; compute just that, reusing the
+        # already-prefetched components so we don't re-query per building.
+        b.embodied_carbon = calculate_total_embodied_carbon(
+            b, prefetched_assemblies=b.prefetched_components
+        )
 
     # Group by (type name, country name) -> {typical, low_carbon}
     groups = {}
     for b in examples:
-        type_name = b.category.category.name if b.category and b.category.category else "—"
-        country_name = b.country.name if b.country else "—"
+        type_name = b.category.category.name if b.category and b.category.category else "-"
+        country_name = b.country.name if b.country else "-"
         key = (type_name, country_name)
         groups.setdefault(
             key,
@@ -111,18 +114,18 @@ def example_preview(request, building_id):
     building = get_object_or_404(_example_qs(), pk=building_id)
 
     structural_components, _ = get_assemblies(building.prefetched_components)
-    stats = get_building_detail_statistics(
+    embodied_carbon = calculate_total_embodied_carbon(
         building, prefetched_assemblies=building.prefetched_components
     )
 
     context = {
         "building": building,
         "structural_components": structural_components,
-        "stats": stats,
+        "embodied_carbon": embodied_carbon,
         "type_name": building.category.category.name
         if building.category and building.category.category
-        else "—",
-        "country_name": building.country.name if building.country else "—",
+        else "-",
+        "country_name": building.country.name if building.country else "-",
     }
     return render(request, "pages/examples/example_preview.html", context)
 
@@ -152,6 +155,6 @@ def start_from_example(request, building_id):
     )
     messages.info(
         request,
-        "This is your own editable copy — the example stays unchanged.",
+        "This is your own editable copy. The example stays unchanged.",
     )
     return redirect("building", building_id=new_building.id)

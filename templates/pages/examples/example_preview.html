@@ -12,14 +12,14 @@
 
     <div class="mt-6">
       <a href="{% url 'examples' %}" class="text-sm text-[var(--text--sub-600)] flex items-center gap-1 w-max">
-        <span data-icon="arrow-left-line" data-size="16"></span>
+        <span data-icon="arrow-left-s-line" data-size="16"></span>
         {% translate "Back to example buildings" %}
       </a>
     </div>
 
     <!-- Read-only notice -->
     <div class="mt-4 flex items-center gap-2 bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)] rounded-lg px-3 py-2">
-      <span data-icon="lock-line" data-size="18" data-color="var(--icon--sub-600)"></span>
+      <span data-icon="lock-2-line" data-size="18" data-color="var(--icon--sub-600)"></span>
       <span class="text-sm text-[var(--text--sub-600)]">
         {% translate "This is a read-only example. To edit it, clone it into your own buildings with the button on the right." %}
       </span>
@@ -31,7 +31,7 @@
         <div class="flex items-center gap-2">
           <h1 class="text-2xl font-extrabold">
             {% if building.example_variant == "low_carbon" %}{% translate "Low-carbon" %}{% else %}{% translate "Typical" %}{% endif %}
-            — {{ type_name }}
+            {{ type_name }}
           </h1>
           {% include "pages/examples/_example_badge.html" %}
         </div>
@@ -64,7 +64,7 @@
         </div>
         <div class="flex flex-col">
           <span class="text-xs/4 font-medium text-[var(--text--sub-600)]">{% translate "Total embodied carbon" %}</span>
-          <span class="text-lg font-bold">{{ stats.total_embodied_carbon|floatformat:"1" }} kgCO<sub>2</sub>eq/m<sup>2</sup></span>
+          <span class="text-lg font-bold">{{ embodied_carbon|floatformat:"1" }} kgCO<sub>2</sub>eq/m<sup>2</sup></span>
         </div>
       </div>
       <div class="flex items-center gap-3 bg-[var(--bg--weak-50)] rounded-lg p-4">
@@ -89,14 +89,14 @@
                 <th class="px-4 py-2 font-medium">{% translate "Component" %}</th>
                 <th class="px-4 py-2 font-medium">{% translate "Classification" %}</th>
                 <th class="px-4 py-2 font-medium text-right">{% translate "Quantity" %}</th>
-                <th class="px-4 py-2 font-medium text-right">{% translate "GWP A1–A3 (kgCO₂eq)" %}</th>
+                <th class="px-4 py-2 font-medium text-right">{% translate "GWP A1-A3 (kgCO2eq)" %}</th>
               </tr>
             </thead>
             <tbody>
               {% for c in structural_components %}
                 <tr class="border-b border-[var(--stroke--soft-200)] last:border-0">
-                  <td class="px-4 py-2">{{ c.assembly_name|default:"—" }}</td>
-                  <td class="px-4 py-2 text-[var(--text--sub-600)]">{{ c.assembly_classification|default:"—" }}</td>
+                  <td class="px-4 py-2">{{ c.assembly_name|default:"-" }}</td>
+                  <td class="px-4 py-2 text-[var(--text--sub-600)]">{{ c.assembly_classification|default:"-" }}</td>
                   <td class="px-4 py-2 text-right">{{ c.quantity|floatformat:"2" }} {{ c.unit }}</td>
                   <td class="px-4 py-2 text-right">{{ c.impacts|floatformat:"1" }}</td>
                 </tr>
