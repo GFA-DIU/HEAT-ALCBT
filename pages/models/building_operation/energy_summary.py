@@ -62,6 +62,14 @@ class EnergySummary(models.Model):
     )
     is_manual_hot_water = models.BooleanField(default=False)
 
+    # Plug / equipment loads (small power, appliances, IT). There is no equipment
+    # table to derive these from, so this category is always manually entered.
+    plug_load_kwh = models.DecimalField(
+        max_digits=14, decimal_places=3, null=True, blank=True,
+        verbose_name=_("Plug & Equipment Loads (kWh/yr)"),
+    )
+    is_manual_plug_load = models.BooleanField(default=True)
+
     total_override_kwh = models.DecimalField(
         max_digits=14, decimal_places=3, null=True, blank=True,
         verbose_name=_("Total Annual Energy Consumption Override (kWh/yr)"),
@@ -146,6 +154,7 @@ class EnergySummary(models.Model):
             self.lighting_kwh,
             self.lift_escalator_kwh,
             self.hot_water_kwh,
+            self.plug_load_kwh,
         ]
         nums = [Decimal(str(v)) for v in vals if v is not None]
         return sum(nums) if nums else None

@@ -34,6 +34,8 @@ def _serialize(summary):
         "is_manual_lift_escalator": summary.is_manual_lift_escalator,
         "hot_water_kwh": _dec(summary.hot_water_kwh),
         "is_manual_hot_water": summary.is_manual_hot_water,
+        "plug_load_kwh": _dec(summary.plug_load_kwh),
+        "is_manual_plug_load": summary.is_manual_plug_load,
         "total_kwh": _dec(summary.total_kwh),
         "any_components": summary.any_components,
     }
@@ -87,6 +89,8 @@ def save_energy_summary(request):
         ("lighting_kwh", "is_manual_lighting"),
         ("lift_escalator_kwh", "is_manual_lift_escalator"),
         ("hot_water_kwh", "is_manual_hot_water"),
+        # Plug loads have no equipment table, so they are always manually entered.
+        ("plug_load_kwh", "is_manual_plug_load"),
     ]
 
     for value_field, manual_flag in _MANUAL_FIELDS:

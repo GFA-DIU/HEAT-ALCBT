@@ -144,6 +144,51 @@ def calculate_total_embodied_carbon(
     return total_gwp
 
 
+def _op_is_electricity(op) -> bool:
+    """An operational product is grid electricity when both its EPD's declared
+    unit and the entered input unit are kWh (matches the grid-EF heuristic)."""
+    try:
+        return op.epd.declared_unit == Unit.KWH and op.input_unit == Unit.KWH
+    except Exception:
+        return False
+
+
+def _renewable_electricity_fraction(building: Building, operational_products=None) -> Decimal:
+    """Fraction (0..1) of the building's electricity offset by on-site renewables.
+
+    On-site renewables are electricity, so this only ever reduces the electricity
+    carrier's carbon. Entered either as a percentage of electricity, or as kWh/yr
+    (converted to a fraction of the building's total electricity carriers).
+    """
+    mode = getattr(building, "renewable_input_mode", None) or Building.RENEWABLE_INPUT_PERCENT
+
+    if mode == Building.RENEWABLE_INPUT_KWH:
+        renew = getattr(building, "renewable_energy_kwh", None)
+        if not renew:
+            return Decimal("0")
+        if operational_products is None:
+            operational_products = building.operational_products.all()
+        electricity_kwh = Decimal("0")
+        for op in operational_products:
+            if _op_is_electricity(op) and op.quantity:
+                electricity_kwh += Decimal(str(op.quantity))
+        if electricity_kwh <= 0:
+            return Decimal("0")
+        fraction = Decimal(str(renew)) / electricity_kwh
+    else:
+        pct = getattr(building, "renewable_energy_percent", None)
+        if not pct:
+            return Decimal("0")
+        fraction = Decimal(str(pct)) / Decimal("100")
+
+    # Clamp to [0, 1] — a building can't offset more than 100% of its electricity.
+    if fraction < 0:
+        return Decimal("0")
+    if fraction > 1:
+        return Decimal("1")
+    return fraction
+
+
 def calculate_total_operational_carbon(
     building: Building,
     simulated: bool = False,
@@ -171,10 +216,17 @@ def calculate_total_operational_carbon(
 
     reference_period = Decimal(str(building.reference_period))
 
+    # On-site renewables offset grid electricity only.
+    renewable_fraction = _renewable_electricity_fraction(building, operational_products)
+    electricity_multiplier = Decimal('1') - renewable_fraction
+
     for op in operational_products:
         try:
             impacts = calculate_impact_operational(op)
-            total_gwp_b6 += impacts.get('gwp_b6', Decimal('0.0')) * reference_period
+            gwp_b6 = impacts.get('gwp_b6', Decimal('0.0'))
+            if _op_is_electricity(op):
+                gwp_b6 = gwp_b6 * electricity_multiplier
+            total_gwp_b6 += gwp_b6 * reference_period
         except (ValueError, AttributeError, ZeroDivisionError):
             continue
 
@@ -569,6 +621,9 @@ def get_operational_carbon_by_system(
     grid_factor = _derive_grid_emission_factor(building, prefetched_operational)
     floor_area = Decimal(str(floor_area))
 
+    # On-site renewables offset grid electricity; every system here is electricity.
+    electricity_multiplier = Decimal('1') - _renewable_electricity_fraction(building, prefetched_operational)
+
     # Labels must match the substrings used by the Systems-tab JS systemStyleMap.
     systems = [
         ("Cooling systems", summary.cooling_kwh),
@@ -576,13 +631,14 @@ def get_operational_carbon_by_system(
         ("Lighting systems", summary.lighting_kwh),
         ("Lift & escalator", summary.lift_escalator_kwh),
         ("Hot Water Systems", summary.hot_water_kwh),
+        ("Plug & equipment loads", summary.plug_load_kwh),
     ]
 
     intensity_by_system = []
     for label, kwh in systems:
         if kwh is None or Decimal(str(kwh)) <= 0:
             continue
-        intensity = Decimal(str(kwh)) * grid_factor / floor_area
+        intensity = Decimal(str(kwh)) * grid_factor * electricity_multiplier / floor_area
         intensity_by_system.append((label, intensity))
 
     if not intensity_by_system:
@@ -688,10 +744,17 @@ def get_operational_carbon_by_appliance(
         if kwh and Decimal(str(kwh)) > 0:
             appliances.append((HW_LABEL.get(hw.type_of_hot_water_system, 'Water heater'), 'Hot water system', Decimal(str(kwh))))
 
+    # Plug / equipment loads: a manual energy-summary category with no per-unit records.
+    summary = getattr(building, 'energy_summary', None)
+    if summary is not None and summary.plug_load_kwh and Decimal(str(summary.plug_load_kwh)) > 0:
+        appliances.append(('Plug & equipment loads', 'Plug & equipment loads', Decimal(str(summary.plug_load_kwh))))
+
     if not appliances:
         return empty
 
-    intensities = [(label, sys_name, kwh * grid_factor / floor_area) for label, sys_name, kwh in appliances]
+    # On-site renewables offset grid electricity; all appliances here are electricity.
+    electricity_multiplier = Decimal('1') - _renewable_electricity_fraction(building, prefetched_operational)
+    intensities = [(label, sys_name, kwh * grid_factor * electricity_multiplier / floor_area) for label, sys_name, kwh in appliances]
     intensities.sort(key=lambda x: x[2], reverse=True)
     total = sum(v for _, _, v in intensities)
 

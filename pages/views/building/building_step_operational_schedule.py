@@ -62,6 +62,8 @@ def handle_get_schedule(request):
             "room_cooling_temperature": float(building.cooling_temp) if building.cooling_temp is not None else None,
             "cooling_temperature_unit": building.cooling_temp_unit,
             "renewable_energy_percent": float(building.renewable_energy_percent) if building.renewable_energy_percent is not None else None,
+            "renewable_energy_kwh": float(building.renewable_energy_kwh) if building.renewable_energy_kwh is not None else None,
+            "renewable_input_mode": building.renewable_input_mode or Building.RENEWABLE_INPUT_PERCENT,
             "building_smart_system": building.building_smart_system,
         }
     }
@@ -114,9 +116,20 @@ def handle_save_schedule(request):
         building.cooling_temp = cooling_raw if cooling_raw not in (None, "") else None
         building.cooling_temp_unit = data.get("cooling_temperature_unit")
 
-        # Update new operational fields — 0 is a valid renewable energy value
-        renewable = data.get("renewable_energy_percent")
-        building.renewable_energy_percent = renewable if renewable not in (None, "") else None
+        # Renewable energy: stored as either a % of electricity or kWh/yr. Keep only
+        # the field matching the chosen mode so the carbon formula reads the right one.
+        mode = data.get("renewable_input_mode") or Building.RENEWABLE_INPUT_PERCENT
+        if mode not in (Building.RENEWABLE_INPUT_PERCENT, Building.RENEWABLE_INPUT_KWH):
+            mode = Building.RENEWABLE_INPUT_PERCENT
+        building.renewable_input_mode = mode
+        pct = data.get("renewable_energy_percent")
+        kwh = data.get("renewable_energy_kwh")
+        if mode == Building.RENEWABLE_INPUT_KWH:
+            building.renewable_energy_kwh = kwh if kwh not in (None, "") else None
+            building.renewable_energy_percent = None
+        else:
+            building.renewable_energy_percent = pct if pct not in (None, "") else None
+            building.renewable_energy_kwh = None
         smart_raw = data.get("building_smart_system", "no")
         building.building_smart_system = smart_raw in (True, "yes", "true", "1", 1)
 

@@ -87,12 +87,26 @@
 
   <fieldset class="fieldset col-span-3">
     <legend class="fieldset-legend">
-      {% translate "Renewable energy installation (%)" %}
+      {% translate "Renewable energy (on-site electricity)" %}
     </legend>
-    <label class="input w-full">
-      <input type="number" placeholder="e.g. 15" name="renewable_energy_percent" min="0" max="100" step="0.01" />
-      <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
-    </label>
+    <div class="flex items-center gap-2">
+      <select name="renewable_input_mode" id="renewable_input_mode"
+              class="select select-bordered w-max shrink-0">
+        <option value="percent" selected>{% translate "As %" %}</option>
+        <option value="kwh">{% translate "As kWh/yr" %}</option>
+      </select>
+      <label class="input w-full" id="renewable_percent_wrap">
+        <input type="number" placeholder="e.g. 15" name="renewable_energy_percent" min="0" max="100" step="0.01" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
+      </label>
+      <label class="input w-full" id="renewable_kwh_wrap" style="display:none;">
+        <input type="number" placeholder="e.g. 5000" name="renewable_energy_kwh" min="0" step="0.001" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/yr</span>
+      </label>
+    </div>
+    <p class="text-xs text-[var(--text--sub-600)] mt-1">
+      {% translate "Share of the building's electricity produced on site from renewables. Only the non-renewable portion of electricity counts towards operational carbon." %}
+    </p>
   </fieldset>
 
   <fieldset class="fieldset col-span-3">
@@ -151,6 +165,10 @@
         setIfPresent('room_cooling_temperature', data.room_cooling_temperature);
         setIfPresent('cooling_temperature_unit', data.cooling_temperature_unit);
         setIfPresent('renewable_energy_percent', data.renewable_energy_percent);
+        setIfPresent('renewable_energy_kwh', data.renewable_energy_kwh);
+        const modeSel = form.querySelector('[name="renewable_input_mode"]');
+        if (modeSel && data.renewable_input_mode) modeSel.value = data.renewable_input_mode;
+        applyRenewableMode();
         if (data.building_smart_system !== undefined) {
           const val = data.building_smart_system ? 'yes' : 'no';
           const radio = form.querySelector(`[name="building_smart_system"][value="${val}"]`);
@@ -163,6 +181,19 @@
       console.error('[OperationalSchedule] Error loading data:', error);
     }
   }
+
+  // Show the % or kWh input depending on the selected renewable input mode.
+  function applyRenewableMode() {
+    const modeSel = form.querySelector('[name="renewable_input_mode"]');
+    const pctWrap = form.querySelector('#renewable_percent_wrap');
+    const kwhWrap = form.querySelector('#renewable_kwh_wrap');
+    if (!modeSel || !pctWrap || !kwhWrap) return;
+    const isKwh = modeSel.value === 'kwh';
+    pctWrap.style.display = isKwh ? 'none' : '';
+    kwhWrap.style.display = isKwh ? '' : 'none';
+  }
+  const _renewModeSel = document.querySelector('#renewable_input_mode');
+  if (_renewModeSel) _renewModeSel.addEventListener('change', applyRenewableMode);
 
   const DEFAULT_STYLE = 'color: var(--text--disabled-300); font-style: italic;';
 
