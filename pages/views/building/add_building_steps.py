@@ -245,6 +245,10 @@ def handle_details_step(request):
                 "has_boq": building.has_boq,
                 "boq_files": boq_info,
                 "total_annual_energy_consumption": energy_summary.total_kwh if energy_summary and energy_summary.total_kwh is not None else None,
+                # Bill total (metered) is user-entered and may coexist with systems;
+                # systems sum is shown as a helper so plug = bill − systems is clear.
+                "bill_total_kwh": float(energy_summary.total_override_kwh) if energy_summary and energy_summary.total_override_kwh is not None else None,
+                "systems_total_kwh": float(energy_summary.systems_sum) if energy_summary and energy_summary.systems_sum else None,
                 "energy_summary_any_components": energy_summary.any_components if energy_summary else False,
                 "energy_summary_exists": energy_summary is not None,
                 "seismic_zone": building.seismic_zone,
@@ -777,14 +781,17 @@ def save_building_step(request):
                     building.save()
                     building_uuid = str(building.uuid)
 
-                    # Save manual total energy if no system-derived data exists
-                    raw_total = step_data.get('total_annual_energy_consumption')
-                    if raw_total not in (None, ''):
+                    # Metered/bill total (from energy bills). Kept as the authoritative
+                    # total even when system records exist, so plug/other loads can be
+                    # derived by difference (bill − Σ systems). Blank clears it.
+                    if 'total_annual_energy_consumption' in step_data:
+                        raw_total = step_data.get('total_annual_energy_consumption')
                         try:
                             summary, _ = EnergySummary.objects.get_or_create(building=building)
-                            if not summary.any_components:
-                                summary.total_override_kwh = Decimal(str(raw_total))
-                                summary.save(update_fields=['total_override_kwh'])
+                            summary.total_override_kwh = (
+                                Decimal(str(raw_total)) if raw_total not in (None, '') else None
+                            )
+                            summary.save(update_fields=['total_override_kwh'])
                         except (InvalidOperation, ValueError):
                             pass
 

@@ -36,6 +36,8 @@ def _serialize(summary):
         "is_manual_hot_water": summary.is_manual_hot_water,
         "plug_load_kwh": _dec(summary.plug_load_kwh),
         "is_manual_plug_load": summary.is_manual_plug_load,
+        "suggested_plug_load": _dec(summary.suggested_plug_load()),
+        "systems_sum": _dec(summary.systems_sum),
         "total_kwh": _dec(summary.total_kwh),
         "any_components": summary.any_components,
     }

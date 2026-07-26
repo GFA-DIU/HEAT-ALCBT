@@ -157,13 +157,25 @@
             <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
           </button>
         {% else %}
-          <div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
-            <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
-            <span class="text-[0.625rem] font-medium uppercase tracking-widest">{% translate "No data" %}</span>
-          </div>
-          <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('plug_load', null)">
-            <span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-          </button>
+          {% with sug=summary.suggested_plug_load %}
+            {% if sug %}
+              <span class="text-sm font-medium text-[var(--text--sub-600)] italic" title="{% translate 'Estimated. Enter a value to override.' %}">
+                {{ sug|floatformat:-3 }} <span class="font-normal">kWh/yr</span>
+              </span>
+              <span class="text-[0.625rem] font-medium uppercase tracking-widest rounded px-1.5 py-0.5 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]">{% translate "Estimated" %}</span>
+              <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('plug_load', {{ sug|floatformat:3 }})">
+                <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
+              </button>
+            {% else %}
+              <div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
+                <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
+                <span class="text-[0.625rem] font-medium uppercase tracking-widest">{% translate "No data" %}</span>
+              </div>
+              <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('plug_load', null)">
+                <span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+              </button>
+            {% endif %}
+          {% endwith %}
         {% endif %}
       </div>
     </div>
