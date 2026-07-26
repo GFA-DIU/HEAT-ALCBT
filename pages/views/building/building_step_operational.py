@@ -209,11 +209,17 @@ def handle_save_products(request):
         logger.error(f"Invalid building UUID or building not found: {building_uuid}")
         return JsonResponse({"error": "Invalid building UUID or building not found"}, status=400)
 
-    # Pre-save validation: sum all carriers' kWh and compare against total annual energy
+    # Pre-save validation. We only HARD-BLOCK when the user has stated an actual
+    # metered bill total (total_override_kwh): the carriers are the fuels that make
+    # up that bill, so their sum shouldn't exceed it (beyond a rounding tolerance).
+    # When the only reference is the SYSTEMS estimate, we do NOT block — that
+    # estimate omits plug/other loads, so a real bill legitimately exceeds it (the
+    # dashboard shows a soft energy-mismatch warning instead).
     try:
         energy_summary = EnergySummary.objects.filter(building=building).first()
-        if energy_summary and energy_summary.total_kwh:
-            total_limit = energy_summary.total_kwh
+        bill_total = energy_summary.total_override_kwh if energy_summary else None
+        if bill_total is not None:
+            total_limit = Decimal(str(bill_total))
 
             # Parse submitted carriers from POST data (mirrors handle_op_products_save logic)
             submitted = {}
@@ -253,12 +259,13 @@ def handle_save_products(request):
                 if kwh is not None:
                     total_kwh += kwh
 
-            if total_kwh > total_limit:
+            tolerance = total_limit * Decimal("0.02")
+            if total_kwh > total_limit + tolerance:
                 response = JsonResponse({
                     "error": (
                         f"The total energy of all carriers ({round(total_kwh, 1)} kWh) "
-                        f"exceeds the total annual energy consumption ({total_limit} kWh). "
-                        f"Please reduce your carrier quantities."
+                        f"exceeds your stated total annual energy from bills ({total_limit} kWh). "
+                        f"Please check your carrier quantities or update the bill total."
                     )
                 }, status=400)
                 response['HX-Reswap'] = 'none'
