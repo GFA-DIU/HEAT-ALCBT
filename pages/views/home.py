@@ -28,7 +28,7 @@ DEFAULT_SORT = "date_desc"
 @login_required
 @require_http_methods(["GET", "POST", "DELETE"])
 def buildings_list(request):
-    buildings = Building.objects.filter(created_by=request.user)
+    buildings = Building.objects.filter(created_by=request.user).exclude(is_example=True)
 
     # Handle search query
     search_query = request.GET.get("search", "").strip()
@@ -115,7 +115,11 @@ def handle_delete_building(request):
     sort_query = request.GET.get("sort", DEFAULT_SORT)
     if sort_query not in SORT_OPTIONS:
         sort_query = DEFAULT_SORT
-    buildings = Building.objects.filter(created_by=request.user).order_by(SORT_OPTIONS[sort_query])
+    buildings = (
+        Building.objects.filter(created_by=request.user)
+        .exclude(is_example=True)
+        .order_by(SORT_OPTIONS[sort_query])
+    )
     buildings_with_stats = []
     for building in buildings:
         stats = get_building_statistics(building)

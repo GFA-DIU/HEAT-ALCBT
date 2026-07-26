@@ -20,6 +20,8 @@ from .views.building.add_building_steps import (building_step_view,
                                                 save_building_step,
                                                 toggle_system_not_applicable)
 from .views.building.building import building, savings_tab
+from .views.building.examples import (example_preview, examples_list,
+                                      start_from_example)
 from .views.building.building_report import export_building
 from .views.building.building_simulation import building_simulation
 from .views.building.building_step_operational import \
@@ -69,6 +71,9 @@ from .views.resources import resources
 
 urlpatterns = [
     path("", buildings_list, name="home"),
+    path("examples/", examples_list, name="examples"),
+    path("examples/<uuid:building_id>/", example_preview, name="example_preview"),
+    path("examples/<uuid:building_id>/start/", start_from_example, name="start_from_example"),
     path("resource/", resources, name="resources"),
     path("templates/", templates, name="templates"),
     path("templates/<uuid:template_id>/", get_template_detail, name="get_template_detail"),

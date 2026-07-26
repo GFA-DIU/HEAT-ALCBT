@@ -1,0 +1,7 @@
+{% load i18n %}
+{# Reusable "Example" badge — marks a read-only reference building. #}
+<span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--weak-50)] gap-1 flex items-center shrink-0"
+      title="{% translate 'Read-only reference building — clone it to create your own editable copy' %}">
+  <span data-icon="information-fill" data-size="16" data-color="var(--color-primary)"></span>
+  <span class="text-[var(--text--sub-600)] text-xs">{% translate "Example" %}</span>
+</span>
