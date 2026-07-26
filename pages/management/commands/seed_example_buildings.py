@@ -13,6 +13,8 @@ NOTE (prototype): "Typical" reuses a real building's structure for realism. For
 production, HEAT should curate/authorise the source or author examples explicitly.
 """
 
+import re
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import Count
@@ -27,6 +29,36 @@ from pages.views.building.building_stats import calculate_total_embodied_carbon
 # Plausible upfront embodied carbon per m2 (kgCO2e/m2) — used to reject source
 # buildings with broken/zero/absurd data so examples are clean.
 EC_MIN, EC_MAX = 50.0, 2500.0
+
+# Placeholder / throwaway building names — de-preferred so a real-world named
+# building (e.g. "Rumah Subsidi") wins over "B1"/"Building X" at equal fitness.
+_PLACEHOLDER_RE = re.compile(
+    r"^(building\s*[a-z]?|b\d+|bldg\.?\s*\d*|blg\s*\d*|\d+|test\s*\d*|sample|xyz|abc)$",
+    re.IGNORECASE,
+)
+
+
+def _is_placeholder_name(name):
+    return bool(_PLACEHOLDER_RE.match((name or "").strip()))
+
+
+def _pick_representative(clean):
+    """From [(building, ec), ...] pick the one nearest the cluster median carbon.
+
+    Nearest-median gives a genuinely *typical* building rather than the richest
+    outlier. A modest penalty de-prefers placeholder-named buildings.
+    """
+    ecs = sorted(ec for _, ec in clean)
+    n = len(ecs)
+    median_ec = ecs[n // 2] if n % 2 else (ecs[n // 2 - 1] + ecs[n // 2]) / 2
+
+    def score(item):
+        building, ec = item
+        penalty = 0.15 * median_ec if _is_placeholder_name(building.name) else 0.0
+        return abs(ec - median_ec) + penalty
+
+    building, ec = min(clean, key=score)
+    return building, ec, median_ec
 
 # (building_type_label, category name in DB, country name)
 CELLS = [
@@ -112,22 +144,23 @@ class Command(BaseCommand):
                 .filter(n__gt=0)
                 .order_by("-n")[:25]
             )
-            # Pick the richest building whose embodied carbon is plausible (clean data).
-            src = None
+            # Keep only buildings whose embodied carbon is plausible (clean data),
+            # then pick the one nearest the cluster median (a *typical* building,
+            # not the richest outlier).
+            clean = []
             for c in candidates:
                 try:
                     ec = float(calculate_total_embodied_carbon(c, simulated=False))
                 except Exception:
                     continue
                 if EC_MIN <= ec <= EC_MAX:
-                    src = c
-                    src_ec = ec
-                    break
-            if src is None:
+                    clean.append((c, ec))
+            if not clean:
                 self.stdout.write(self.style.ERROR(
                     f"  {label} — {country_name}: no representative building with clean data, skipped."
                 ))
                 continue
+            src, src_ec, median_ec = _pick_representative(clean)
 
             # Typical
             typ = clone_building(
@@ -152,7 +185,9 @@ class Command(BaseCommand):
                     swaps += 1
 
             self.stdout.write(self.style.SUCCESS(
-                f"  {label} — {country_name}: seeded Typical (src rows={src.n}) + Low-carbon ({swaps} material swaps)."
+                f"  {label} — {country_name}: '{src.name}' "
+                f"(EC={src_ec:.0f}, median={median_ec:.0f}, rows={src.n}) "
+                f"-> Typical + Low-carbon ({swaps} material swaps)."
             ))
 
         self.stdout.write(self.style.SUCCESS(f"Total example buildings now: {Building.objects.filter(is_example=True).count()}"))
