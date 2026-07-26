@@ -533,6 +533,8 @@
     qty:               "{% translate 'Qty' %}",
     generic:           "{% translate 'Generic' %}",
     genericEpd:        "{% translate 'Generic placeholder EPD — not from an official source' %}",
+    local:             "{% translate 'Local' %}",
+    localEpd:          "{% translate 'Local / traditional low-carbon material (regional proxy)' %}",
     category:          "{% translate 'Category' %}",
     boqMaterials:      "{% translate 'BOQ' %}",
     materials:         "{% translate 'materials' %}",
@@ -1068,6 +1070,12 @@
             <span class="text-[var(--text--sub-600)] text-xs">${i18n.generic || 'Generic'}</span>
           </span>` : '';
 
+      const localBadge = m.source === 'Vernacular/local (literature)' ? `
+          <span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--white-0)] gap-1 flex items-center shrink-0" title="${i18n.localEpd || 'Local / traditional low-carbon material (regional proxy)'}">
+            <span data-icon="leaf-fill" data-size="16" data-color="#1FC16B"></span>
+            <span class="text-[var(--text--sub-600)] text-xs">${i18n.local || 'Local'}</span>
+          </span>` : '';
+
       // Derive the material's Building Part from its saved component's family.
       const savedCat = this.categories.find(c => String(c.id) === String(m.category));
       const savedPart = savedCat ? (savedCat.family || '') : '';
@@ -1084,6 +1092,7 @@
         <div class="flex items-center justify-between mb-2 w-full">
           <span class="text-sm/5 font-medium truncate flex-1">${m.name}</span>
           ${genericBadge}
+          ${localBadge}
         </div>
         <div class="flex items-stretch bg-[var(--bg--white-0)] rounded-xl p-2.5" style="gap:0.5rem;">
           <div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]">

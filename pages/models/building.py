@@ -337,6 +337,27 @@ class Building(BaseModel, BaseGeoModel, BuildingOperationalInfo):
         db_index=True,
     )
     name = models.CharField(_("Building name/code"), max_length=255)
+    is_example = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=_(
+            "Read-only reference/example building shown in the Examples area; "
+            "users clone it to start their own building. Excluded from user dashboards."
+        ),
+    )
+    EXAMPLE_TYPICAL = "typical"
+    EXAMPLE_LOW_CARBON = "low_carbon"
+    EXAMPLE_VARIANT_CHOICES = [
+        (EXAMPLE_TYPICAL, _("Typical")),
+        (EXAMPLE_LOW_CARBON, _("Low-carbon")),
+    ]
+    example_variant = models.CharField(
+        max_length=16,
+        null=True,
+        blank=True,
+        choices=EXAMPLE_VARIANT_CHOICES,
+        help_text=_("For example buildings only: which variant."),
+    )
     structural_components = models.ManyToManyField(
         Assembly,
         blank=True,

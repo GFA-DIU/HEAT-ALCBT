@@ -16,6 +16,13 @@
             <span class="text-[var(--text--sub-600)] text-xs">{% translate "Generic" %}</span>
           </span>
           {% endif %}
+          {% if epd.source == "Vernacular/local (literature)" %}
+          <span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--white-0)] gap-1 flex items-center shrink-0"
+                title="{% translate 'Local / traditional low-carbon material (regional proxy)' %}">
+            <span data-icon="leaf-fill" data-size="16" data-color="#1FC16B"></span>
+            <span class="text-[var(--text--sub-600)] text-xs">{% translate "Local" %}</span>
+          </span>
+          {% endif %}
           <span data-country="{{ epd.country }}" data-width="16"></span>
           {% if epd.source and epd.source|slice:":4" == "http" %}
           <a href="{{ epd.source }}" target="_blank" rel="noopener">
