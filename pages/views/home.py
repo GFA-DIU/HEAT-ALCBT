@@ -8,12 +8,93 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 
 from accounts.forms import CustomUserUpdateForm, UserProfileUpdateForm
-from pages.models.assembly import Assembly, AssemblyMode
+from pages.models.assembly import Assembly, AssemblyMode, StructuralProduct
 from pages.models.building import (Building, BuildingAssembly,
-                                   BuildingAssemblySimulated)
-from pages.views.building.building_stats import get_building_statistics
+                                   BuildingAssemblySimulated, OperationalProduct)
+from pages.models.epd import EPDImpact
+from pages.views.building.building_stats import (
+    calculate_total_embodied_carbon, calculate_total_operational_carbon)
 
 logger = logging.getLogger(__name__)
+
+
+def _buildings_with_stats(buildings):
+    """Attach card stats to each building, prefetching assemblies/products/impacts
+    and operational products so embodied + operational carbon are computed without
+    an N+1 explosion. Only the values the card shows are computed (footprint,
+    embodied, progress) — the unused carbon-savings baseline is skipped."""
+    buildings = buildings.select_related(
+        "country", "category__category", "energy_summary"
+    ).prefetch_related(
+        # System relations so the progress bar's checks hit the prefetch cache
+        # instead of ~8 count/exists queries per building.
+        "air_conditioners", "chillers", "ventilation_systems",
+        "lighting_systems", "lift_escalator_systems", "hot_water_systems",
+        models.Prefetch(
+            "buildingassembly_set",
+            queryset=BuildingAssembly.objects.select_related("assembly").prefetch_related(
+                models.Prefetch(
+                    "assembly__structuralproduct_set",
+                    queryset=StructuralProduct.objects.select_related("epd", "classification").prefetch_related(
+                        models.Prefetch(
+                            "epd__epdimpact_set",
+                            queryset=EPDImpact.objects.select_related("impact"),
+                            to_attr="all_impacts",
+                        ),
+                    ),
+                    to_attr="prefetched_products",
+                ),
+            ),
+            to_attr="prefetched_components",
+        ),
+        models.Prefetch(
+            "operational_products",
+            queryset=OperationalProduct.objects.select_related("epd").prefetch_related(
+                models.Prefetch(
+                    "epd__epdimpact_set",
+                    queryset=EPDImpact.objects.select_related("impact"),
+                    to_attr="all_impacts",
+                ),
+            ),
+            to_attr="prefetched_ops",
+        ),
+    )
+    result = []
+    for b in buildings:
+        embodied = calculate_total_embodied_carbon(b, prefetched_assemblies=b.prefetched_components)
+        operational = calculate_total_operational_carbon(b, prefetched_operational=b.prefetched_ops)
+        b.stats = {
+            "total_embodied_carbon": embodied,
+            "total_carbon_footprint": embodied + operational,
+            "progress_percentage": _progress_from_prefetch(b),
+        }
+        result.append(b)
+    return result
+
+
+def _progress_from_prefetch(b):
+    """Same weighting as calculate_progress_percentage, but reads the prefetched
+    relations (no per-building count/exists queries)."""
+    p = 0
+    if b.name and b.address and b.country_id:
+        p += 10
+    if b.category_id and b.total_floor_area:
+        p += 10
+    if len(b.prefetched_ops) > 0:
+        p += 30
+    if len(b.prefetched_components) > 0:
+        p += 40
+    if len(b.air_conditioners.all()) or len(b.chillers.all()) or b.cooling_not_applicable:
+        p += 2
+    if len(b.ventilation_systems.all()) or b.ventilation_not_applicable:
+        p += 2
+    if len(b.lighting_systems.all()) or b.lighting_not_applicable:
+        p += 2
+    if len(b.lift_escalator_systems.all()) or b.lift_not_applicable:
+        p += 2
+    if len(b.hot_water_systems.all()) or b.hot_water_not_applicable:
+        p += 2
+    return min(p, 100)
 
 
 SORT_OPTIONS = {
@@ -56,13 +137,8 @@ def buildings_list(request):
     user_form = CustomUserUpdateForm(instance=request.user)
     profile_form = UserProfileUpdateForm(instance=request.user.userprofile)
 
-    # Calculate statistics for each building
-    buildings_with_stats = []
-    for building in buildings:
-        stats = get_building_statistics(building)
-        # Attach statistics as attributes to the building object
-        building.stats = stats
-        buildings_with_stats.append(building)
+    # Calculate statistics for each building (prefetched, N+1-free)
+    buildings_with_stats = _buildings_with_stats(buildings)
 
     context = {
         "buildings": buildings_with_stats,
@@ -120,11 +196,7 @@ def handle_delete_building(request):
         .exclude(is_example=True)
         .order_by(SORT_OPTIONS[sort_query])
     )
-    buildings_with_stats = []
-    for building in buildings:
-        stats = get_building_statistics(building)
-        building.stats = stats
-        buildings_with_stats.append(building)
+    buildings_with_stats = _buildings_with_stats(buildings)
 
     context = {"buildings": buildings_with_stats, "sort_query": sort_query}
     return context
