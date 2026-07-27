@@ -42,7 +42,7 @@
           <div class="flex flex-col">
             <span class="text-xl font-bold">{% translate "Your buildings" %}</span>
             <p class="text-sm font-normal text-[var(--text--sub-600)]">
-              {% translate "Add your buildings to access for low carbon" %}
+              {% translate "Add your buildings to assess their whole-life carbon." %}
             </p>
           </div>
           <div class="flex items-center gap-2 flex-1 justify-end">
@@ -80,8 +80,8 @@
               hx-indicator="#buildings-loading-spinner"
               hx-include="[name='search']"
             >
-              <option value="date_desc" {% if sort_query == "date_desc" or not sort_query %}selected{% endif %}>{% translate "Date created (newest first)" %}</option>
-              <option value="date_asc" {% if sort_query == "date_asc" %}selected{% endif %}>{% translate "Date created (oldest first)" %}</option>
+              <option value="date_desc" {% if sort_query == "date_desc" or not sort_query %}selected{% endif %}>{% translate "Newest first" %}</option>
+              <option value="date_asc" {% if sort_query == "date_asc" %}selected{% endif %}>{% translate "Oldest first" %}</option>
               <option value="name_asc" {% if sort_query == "name_asc" %}selected{% endif %}>{% translate "Name (A-Z)" %}</option>
               <option value="name_desc" {% if sort_query == "name_desc" %}selected{% endif %}>{% translate "Name (Z-A)" %}</option>
             </select>
