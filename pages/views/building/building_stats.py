@@ -662,8 +662,6 @@ def get_operational_carbon_by_system(
     empty = {'labels': [], 'data': [], 'absolute': [], 'absolute_energy': [], 'total': 0, 'total_energy': 0}
 
     summary = getattr(building, 'energy_summary', None)
-    if summary is None:
-        return empty
 
     floor_area = building.total_floor_area
     if not floor_area or Decimal(str(floor_area)) == 0:
@@ -676,7 +674,7 @@ def get_operational_carbon_by_system(
     electricity_multiplier = Decimal('1') - _renewable_electricity_fraction(building, prefetched_operational)
 
     # Labels must match the substrings used by the Systems-tab JS systemStyleMap.
-    systems = [
+    systems = [] if summary is None else [
         ("Cooling systems", summary.cooling_kwh),
         ("Ventilation systems", summary.ventilation_kwh),
         ("Lighting systems", summary.lighting_kwh),
@@ -697,6 +695,27 @@ def get_operational_carbon_by_system(
         energy_intensity = (Decimal(str(kwh)) / floor_area) * electricity_multiplier
         carbon_intensity = energy_intensity * grid_factor
         intensity_by_system.append((label, carbon_intensity, energy_intensity))
+
+    # No per-system breakdown entered → fall back to the entered energy CARRIERS so
+    # this panel matches the top Operational Carbon tile (which reads carriers) and
+    # is never empty when the user only entered carriers.
+    if not intensity_by_system:
+        from pages.views.building.building_step_operational import _to_kwh
+        ops = prefetched_operational if prefetched_operational is not None else building.operational_products.all()
+        for op in ops:
+            try:
+                carbon_intensity = calculate_impact_operational(op).get('gwp_b6', Decimal('0'))
+            except (ValueError, AttributeError, ZeroDivisionError):
+                continue
+            kwh = _to_kwh(op)
+            energy_intensity = (Decimal(str(kwh)) / floor_area) if kwh else Decimal('0')
+            if _op_is_electricity(op):
+                carbon_intensity = carbon_intensity * electricity_multiplier
+                energy_intensity = energy_intensity * electricity_multiplier
+            if carbon_intensity <= 0 and energy_intensity <= 0:
+                continue
+            label = ((op.epd.name if op.epd else None) or "Energy")[:40]
+            intensity_by_system.append((label, carbon_intensity, energy_intensity))
 
     if not intensity_by_system:
         return empty

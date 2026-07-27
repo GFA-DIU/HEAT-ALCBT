@@ -290,6 +290,9 @@
                 >
                 {% endif %}
               </div>
+              {% if not energy_mismatch %}
+              <span class="text-[10px] text-[var(--text--sub-600)] pl-2.5 mt-0.5">{% blocktranslate with yrs=building.reference_period|default:50 %}over {{ yrs }} years{% endblocktranslate %}</span>
+              {% endif %}
             </li>
             {# Carbon Savings hidden — will be re-enabled in a future release #}
           </ul>
