@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 from django.db.models import Prefetch
 from django.http import HttpResponse
@@ -9,6 +10,7 @@ from pages.models.assembly import StructuralProduct
 from pages.models.building import Building, BuildingAssembly, BuildingAssemblySimulated, OperationalProduct, SimulatedOperationalProduct
 from pages.models.epd import EPDImpact
 from pages.views.building.building import get_assemblies
+from pages.views.building.building_stats import _renewable_electricity_fraction
 from pages.views.building.operational_products.operational_products import serialize_operational_products
 
 logger = logging.getLogger(__name__)
@@ -84,31 +86,40 @@ def prep_building_dashboard_df(user, building_id, simulation):
     structural_components, impact_list = get_assemblies(building.prefetched_components)
     operational_impact_list = serialize_operational_products(building.prefetched_operational_products)
     reference_period = building.reference_period
+    # On-site renewables offset grid electricity only (see building_stats).
+    renewable_fraction = _renewable_electricity_fraction(
+        building, building.prefetched_operational_products
+    )
 
     if not structural_components and not operational_impact_list:
         return HttpResponse()
     elif not structural_components:
-        df = prep_operational_df(operational_impact_list, reference_period)
+        df = prep_operational_df(operational_impact_list, reference_period, renewable_fraction)
     elif not operational_impact_list:
         df = prep_structural_df(impact_list)
     elif operational_impact_list and structural_components:
-        
+
         df = prep_structural_df(impact_list)
-    
+
         # operational df
-        df_op = prep_operational_df(operational_impact_list, reference_period)
+        df_op = prep_operational_df(operational_impact_list, reference_period, renewable_fraction)
 
         df = pd.concat([df, df_op], axis=0)[["assembly_category", "material_category", "gwp", "penrt", "type"]]
     return df
 
 
-def prep_operational_df(operational_impact_list, reference_period):
+def prep_operational_df(operational_impact_list, reference_period, renewable_fraction=Decimal("0")):
     df_op = pd.DataFrame.from_records(operational_impact_list)
     df_op["material_category"] = df_op["category"].apply(lambda x: x.__str__())
     df_op["type"] = "operational"
     df_op["assembly_category"] = "Operational Carbon"
     df_op["year"] = reference_period
     df_op["gwp_b6"] = df_op["gwp_b6"] * df_op["year"]
+    # Reduce electricity rows' carbon by the on-site renewable fraction (electricity only).
+    if renewable_fraction and "is_electricity" in df_op.columns:
+        multiplier = Decimal("1") - Decimal(str(renewable_fraction))
+        mask = df_op["is_electricity"] == True  # noqa: E712 (pandas boolean mask)
+        df_op.loc[mask, "gwp_b6"] = df_op.loc[mask, "gwp_b6"] * multiplier
     df_op.rename(columns={"gwp_b6": "gwp", "penrt_b6": "penrt"}, inplace=True)
     return df_op
 

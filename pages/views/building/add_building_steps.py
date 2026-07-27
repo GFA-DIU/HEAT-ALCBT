@@ -245,6 +245,10 @@ def handle_details_step(request):
                 "has_boq": building.has_boq,
                 "boq_files": boq_info,
                 "total_annual_energy_consumption": energy_summary.total_kwh if energy_summary and energy_summary.total_kwh is not None else None,
+                # Bill total (metered) is user-entered and may coexist with systems;
+                # systems sum is shown as a helper so plug = bill − systems is clear.
+                "bill_total_kwh": float(energy_summary.total_override_kwh) if energy_summary and energy_summary.total_override_kwh is not None else None,
+                "systems_total_kwh": float(energy_summary.systems_sum) if energy_summary and energy_summary.systems_sum else None,
                 "energy_summary_any_components": energy_summary.any_components if energy_summary else False,
                 "energy_summary_exists": energy_summary is not None,
                 "seismic_zone": building.seismic_zone,
@@ -393,6 +397,8 @@ def handle_energy_consumption_summary_step(request):
     building_uuid = request.GET.get('building_uuid', '')
     summary = None
 
+    renewable_percent = None
+    net_grid_total = None
     if building_uuid:
         try:
             building = Building.objects.get(uuid=building_uuid, created_by=request.user)
@@ -400,12 +406,21 @@ def handle_energy_consumption_summary_step(request):
             if created:
                 summary.recalculate()
                 summary.save()
+            # Net grid energy after on-site renewables (what operational carbon uses)
+            from pages.views.building.building_stats import _renewable_electricity_fraction
+            _fraction = _renewable_electricity_fraction(building)
+            if _fraction > 0:
+                renewable_percent = float(_fraction * 100)
+                if summary.total_kwh is not None:
+                    net_grid_total = float(Decimal(str(summary.total_kwh)) * (Decimal("1") - _fraction))
         except Building.DoesNotExist:
             pass
 
     context = {
         "building_uuid": building_uuid,
         "summary": summary,
+        "renewable_percent": renewable_percent,
+        "net_grid_total": net_grid_total,
     }
     return render(
         request,
@@ -443,6 +458,8 @@ def handle_operational_data_step(request):
     # Load previously saved operational products from database (if building exists)
     selected_products = []
     total_annual_energy_consumption = None
+    renewable_percent = None
+    net_grid_energy = None
     building_uuid = request.GET.get('building_uuid')
 
     logger.info(f"Loading operational data step with building_uuid: {building_uuid}")
@@ -457,6 +474,17 @@ def handle_operational_data_step(request):
             energy_summary = EnergySummary.objects.filter(building=building).first()
             if energy_summary and energy_summary.total_kwh is not None:
                 total_annual_energy_consumption = energy_summary.total_kwh
+
+            # On-site renewable share + resulting net grid energy (shown so the user
+            # sees that only the grid share is used for operational carbon).
+            from pages.views.building.building_stats import _renewable_electricity_fraction
+            _fraction = _renewable_electricity_fraction(building)
+            _frac = float(_fraction * 100)
+            renewable_percent = _frac if _frac > 0 else None
+            if renewable_percent and total_annual_energy_consumption is not None:
+                net_grid_energy = float(
+                    Decimal(str(total_annual_energy_consumption)) * (Decimal("1") - _fraction)
+                )
 
             # Get saved operational products from database
             saved_products = OperationalProduct.objects.filter(
@@ -494,6 +522,8 @@ def handle_operational_data_step(request):
         'countries': ALCBTCountryManager.get_all_countries(),
         'selected_products': selected_products,
         'total_annual_energy_consumption': total_annual_energy_consumption,
+        'renewable_percent': renewable_percent,
+        'net_grid_energy': net_grid_energy,
     }
     return render(
         request,
@@ -777,14 +807,17 @@ def save_building_step(request):
                     building.save()
                     building_uuid = str(building.uuid)
 
-                    # Save manual total energy if no system-derived data exists
-                    raw_total = step_data.get('total_annual_energy_consumption')
-                    if raw_total not in (None, ''):
+                    # Metered/bill total (from energy bills). Kept as the authoritative
+                    # total even when system records exist, so plug/other loads can be
+                    # derived by difference (bill − Σ systems). Blank clears it.
+                    if 'total_annual_energy_consumption' in step_data:
+                        raw_total = step_data.get('total_annual_energy_consumption')
                         try:
                             summary, _ = EnergySummary.objects.get_or_create(building=building)
-                            if not summary.any_components:
-                                summary.total_override_kwh = Decimal(str(raw_total))
-                                summary.save(update_fields=['total_override_kwh'])
+                            summary.total_override_kwh = (
+                                Decimal(str(raw_total)) if raw_total not in (None, '') else None
+                            )
+                            summary.save(update_fields=['total_override_kwh'])
                         except (InvalidOperation, ValueError):
                             pass
 

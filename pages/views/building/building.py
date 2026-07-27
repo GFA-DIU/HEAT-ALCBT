@@ -193,17 +193,26 @@ def handle_building_load(request, building_id, simulation):
         parent=initial
     )
 
-    # Check energy mismatch between energy summary and carrier totals
+    # Energy mismatch is only a real inconsistency when the user has stated an
+    # actual metered BILL total (total_override_kwh): the carriers should then add
+    # up to that bill. When the only reference is the SYSTEMS estimate (which omits
+    # plug/other loads) we don't flag a mismatch — the estimate isn't authoritative,
+    # and operational carbon is computed from the carriers regardless.
     from decimal import Decimal as _D
     from django.db.models import Sum as _Sum
     energy_summary = getattr(building, 'energy_summary', None)
+    bill_total_kwh = energy_summary.total_override_kwh if energy_summary else None
     systems_total_kwh = _D(str(energy_summary.total_kwh)) if energy_summary and energy_summary.total_kwh else _D('0')
     carriers_total_kwh = _D(str(
         OperationalProduct.objects.filter(building=building, input_unit='kwh')
         .aggregate(t=_Sum('quantity'))['t'] or 0
     ))
-    _tol = max(_D('2000'), systems_total_kwh * _D('0.05'))
-    energy_mismatch = (systems_total_kwh > 0 or carriers_total_kwh > 0) and abs(systems_total_kwh - carriers_total_kwh) > _tol
+    if bill_total_kwh is not None:
+        _bill = _D(str(bill_total_kwh))
+        _tol = max(_D('2000'), _bill * _D('0.05'))
+        energy_mismatch = carriers_total_kwh > 0 and abs(_bill - carriers_total_kwh) > _tol
+    else:
+        energy_mismatch = False
 
     # Calculate statistics and chart data for building detail page using already-prefetched data
     building_stats = get_building_detail_statistics(

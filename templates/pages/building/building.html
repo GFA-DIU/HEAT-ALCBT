@@ -290,6 +290,9 @@
                 >
                 {% endif %}
               </div>
+              {% if not energy_mismatch %}
+              <span class="text-[10px] text-[var(--text--sub-600)] pl-2.5 mt-0.5">{% blocktranslate with yrs=building.reference_period|default:50 %}over {{ yrs }} years{% endblocktranslate %}</span>
+              {% endif %}
             </li>
             {# Carbon Savings hidden — will be re-enabled in a future release #}
           </ul>
@@ -567,7 +570,16 @@
             <span class="text-sm  block">{% translate "Operational carbon" %}</span>
             <span id="system-tab-subtitle" class="text-base/6 font-medium block">{% translate "Emissions by Building Systems" %}</span>
           </div>
-        
+
+          <div class="w-fit bg-[var(--bg--weak-50)] p-1 rounded-lg flex gap-1 ml-auto shrink-0">
+            <button type="button" id="op-unit-carbon-btn"
+              class="btn btn-sm bg-[#86EFAC] text-[var(--text--strong-950)] shadow-sm"
+              onclick="setOpUnit('carbon')">{% translate "Carbon" %}</button>
+            <button type="button" id="op-unit-energy-btn"
+              class="btn btn-sm btn-ghost text-[var(--text--sub-600)]"
+              onclick="setOpUnit('energy')">{% translate "Energy (EPI)" %}</button>
+          </div>
+
               {% comment %} <div class="w-fit bg-[var(--bg--weak-50)] p-1 rounded-lg flex gap-1">
                 <button
                   class="btn btn-primary btn-sm text-[var(--text--strong-950)] bg-[#86EFAC] shadow-sm transition-all"
@@ -587,10 +599,10 @@
           <div class="flex items-start gap-3 p-4 mx-6 mt-4 rounded-xl bg-[var(--state--error--lighter)] border border-[var(--state--error--base)]">
             <span data-icon="alert-fill" data-size="20" data-color="var(--state--error--base)" class="flex-shrink-0 mt-0.5"></span>
             <div>
-              <p class="text-sm font-semibold text-[var(--state--error--base)]">{% translate "Energy consumption data is incomplete or inconsistent" %}</p>
+              <p class="text-sm font-semibold text-[var(--state--error--base)]">{% translate "Energy carriers don't match your stated bill total" %}</p>
               <p class="text-sm text-[var(--text--sub-600)] mt-1">
                 {% blocktranslate with systems=energy_mismatch_systems_kwh|floatformat:0 carriers=energy_mismatch_carriers_kwh|floatformat:0 %}
-                  Your Energy Consumption Summary total ({{ systems }} kWh) does not match your Operational Data Entry total ({{ carriers }} kWh). Please return to the Energy Consumption Summary and Operational Data Entry pages and reconcile your totals before viewing carbon results.
+                  Your stated total annual energy from bills ({{ systems }} kWh) does not match the sum of the energy carriers you entered ({{ carriers }} kWh). Please reconcile them on the Building details and Operational Data Entry pages before viewing carbon results.
                 {% endblocktranslate %}
               </p>
             </div>
@@ -601,11 +613,13 @@
           <div class="bg-[#fafafa] border-t border-[#f1f1f1] flex flex-wrap gap-4 px-6 py-[18px] mt-4 w-full">
             <div class="flex flex-col flex-1 min-w-0">
               <div class="border-l-2 border-[#d5edcd] pl-2.5">
-                <p class="text-[13px] font-medium text-[var(--text--sub-600)] leading-5">{% translate "Total Operational Carbon Intensity" %}</p>
+                <p id="op-intensity-label" class="text-[13px] font-medium text-[var(--text--sub-600)] leading-5">{% translate "Total Operational Carbon Intensity" %}</p>
               </div>
               <div class="pl-2.5 flex items-baseline mt-1">
-                <span class="text-2xl font-medium">{{ stats.operational_carbon_per_year|floatformat:2|default:"0" }}</span>
-                <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">kgCO<sub>2</sub>eq/m²/yr</span>
+                <span id="op-intensity-value" class="text-2xl font-medium"
+                  data-carbon="{{ stats.operational_carbon_per_year|floatformat:2|default:'0' }}"
+                  data-energy="{{ stats.operational_energy_intensity|floatformat:2|default:'0' }}">{{ stats.operational_carbon_per_year|floatformat:2|default:"0" }}</span>
+                <span id="op-intensity-unit" class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">kgCO<sub>2</sub>eq/m²/yr</span>
               </div>
             </div>
             <div class="flex flex-col flex-1 min-w-0">
@@ -626,6 +640,20 @@
                 <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">kgCO<sub>2</sub>eq/kWh electricity factor</span>
               </div>
             </div>
+            {% if stats.renewable_percent %}
+            <div class="flex flex-col flex-1 min-w-0">
+              <div class="border-l-2 border-[#c8e6c9] pl-2.5">
+                <p class="text-[13px] font-medium text-[var(--text--sub-600)] leading-5">{% translate "On-site renewables" %}</p>
+              </div>
+              <div class="pl-2.5 flex items-baseline mt-1">
+                <span class="text-2xl font-medium">{{ stats.renewable_percent|floatformat:0 }}</span>
+                <span class="text-sm font-medium text-[var(--text--sub-600)] ml-0.5">{% translate "% of electricity" %}</span>
+              </div>
+              <p class="pl-2.5 text-[11px] text-[var(--text--sub-600)] mt-0.5">
+                {% blocktranslate with grid=stats.grid_electricity_kwh|floatformat:0 saved=stats.renewable_carbon_saved_per_year|floatformat:2 %}grid {{ grid }} kWh/yr, saves {{ saved }} kgCO<sub>2</sub>eq/m²/yr{% endblocktranslate %}
+              </p>
+            </div>
+            {% endif %}
           </div>
 
           <!-- Divider -->
@@ -1317,6 +1345,7 @@
             { match: (l) => l.includes("light") || l.includes("lamp"), icon: "lightbulb-line", color: "#f2ec81" },
             { match: (l) => l.includes("water") || l.includes("heat"), icon: "temp-cold-line", color: "#f28e81" },
             { match: (l) => l.includes("lift") || l.includes("elevator") || l.includes("escalator"), icon: "stairs-line", color: "#8198f2" },
+            { match: (l) => l.includes("plug") || l.includes("equipment"), icon: "flashlight-line", color: "#d0a3f2" },
           ];
 
           function getSystemStyle(label) {
@@ -1337,9 +1366,11 @@
             systemData.labels.forEach(function (label, i) {
               const pct = systemData.data[i] || 0;
               const abs = systemData.absolute[i] || 0;
+              const absEnergy = (systemData.absolute_energy && systemData.absolute_energy[i]) || 0;
               const widthPct = (abs / maxAbs) * 100;
               const style = getSystemStyle(label);
               const absFormatted = abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+              const energyFormatted = absEnergy.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
               const row = document.createElement("div");
               row.className = "flex gap-2 items-center w-full";
@@ -1354,7 +1385,7 @@
                       <span class="text-[12px] font-semibold ml-2 text-[var(--text--strong-950)] whitespace-nowrap">${pct}%</span>
                     </div>
                   </div>
-                  <span class="text-[13px] font-semibold text-[var(--text--sub-600)] whitespace-nowrap shrink-0">${absFormatted} kgCO₂eq/m²/yr</span>
+                  <span class="op-abs-value text-[13px] font-semibold text-[var(--text--sub-600)] whitespace-nowrap shrink-0" data-carbon="${absFormatted}" data-energy="${energyFormatted}">${absFormatted} kgCO₂eq/m²/yr</span>
                 </div>
               `;
               systemBarsContainer.appendChild(row);
@@ -1364,7 +1395,10 @@
           const totalEl = document.getElementById("system-total-value");
           if (totalEl) {
             const total = systemData.total || 0;
-            totalEl.textContent = total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " kgCO₂eq/m²/yr";
+            const totalEnergy = systemData.total_energy || 0;
+            totalEl.dataset.carbon = total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            totalEl.dataset.energy = totalEnergy.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            totalEl.textContent = totalEl.dataset.carbon + " kgCO₂eq/m²/yr";
           }
 
           // Build appliance-level bar rows from real backend data
@@ -1391,9 +1425,11 @@
             applianceData.labels.forEach(function (label, i) {
               const pct = applianceData.data[i] || 0;
               const abs = applianceData.absolute[i] || 0;
+              const absEnergy = (applianceData.absolute_energy && applianceData.absolute_energy[i]) || 0;
               const systemName = (applianceData.systemNames && applianceData.systemNames[i]) || label;
               const style = getApplianceStyle(systemName);
               const absFormatted = abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+              const energyFormatted = absEnergy.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
               const row = document.createElement("div");
               row.className = "flex gap-2 items-center w-full";
@@ -1411,13 +1447,46 @@
                       <span class="text-[12px] font-semibold ml-2 text-[var(--text--strong-950)] whitespace-nowrap">${pct}%</span>
                     </div>
                   </div>
-                  <span class="text-[13px] font-semibold text-[var(--text--sub-600)] whitespace-nowrap shrink-0">${absFormatted} kgCO₂eq/m²/yr</span>
+                  <span class="op-abs-value text-[13px] font-semibold text-[var(--text--sub-600)] whitespace-nowrap shrink-0" data-carbon="${absFormatted}" data-energy="${energyFormatted}">${absFormatted} kgCO₂eq/m²/yr</span>
                 </div>
               `;
               appliancesContainer.appendChild(row);
             });
           }
         }
+
+        // Toggle the Systems panel between Carbon (kgCO₂eq/m²/yr) and Energy/EPI
+        // (kWh/m²/yr). Percentages/bar widths are unit-independent, so we only swap
+        // the absolute values, the header intensity tile, and the footer total.
+        window.setOpUnit = function (mode) {
+          const isEnergy = mode === 'energy';
+          const active = "btn btn-sm bg-[#86EFAC] text-[var(--text--strong-950)] shadow-sm";
+          const idle = "btn btn-sm btn-ghost text-[var(--text--sub-600)]";
+          const cbtn = document.getElementById('op-unit-carbon-btn');
+          const ebtn = document.getElementById('op-unit-energy-btn');
+          if (cbtn) cbtn.className = isEnergy ? idle : active;
+          if (ebtn) ebtn.className = isEnergy ? active : idle;
+
+          const label = document.getElementById('op-intensity-label');
+          const val = document.getElementById('op-intensity-value');
+          const unit = document.getElementById('op-intensity-unit');
+          if (label) label.textContent = isEnergy
+            ? "{% translate 'Total Operational Energy Intensity (EPI)' %}"
+            : "{% translate 'Total Operational Carbon Intensity' %}";
+          if (val) val.textContent = isEnergy ? (val.dataset.energy || '0') : (val.dataset.carbon || '0');
+          if (unit) unit.innerHTML = isEnergy ? 'kWh/m²/yr' : 'kgCO<sub>2</sub>eq/m²/yr';
+
+          const unitText = isEnergy ? ' kWh/m²/yr' : ' kgCO₂eq/m²/yr';
+          document.querySelectorAll('.op-abs-value').forEach(function (el) {
+            const v = isEnergy ? (el.dataset.energy || '0') : (el.dataset.carbon || '0');
+            el.textContent = v + unitText;
+          });
+          const totalEl = document.getElementById('system-total-value');
+          if (totalEl && totalEl.dataset.carbon !== undefined) {
+            const v = isEnergy ? (totalEl.dataset.energy || '0') : (totalEl.dataset.carbon || '0');
+            totalEl.textContent = v + unitText;
+          }
+        };
 
         // Toggle between "By appliances" and "By system" views
         window.toggleSystem = function (view, btn) {

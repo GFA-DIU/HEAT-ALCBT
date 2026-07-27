@@ -144,6 +144,51 @@ def calculate_total_embodied_carbon(
     return total_gwp
 
 
+def _op_is_electricity(op) -> bool:
+    """An operational product is grid electricity when both its EPD's declared
+    unit and the entered input unit are kWh (matches the grid-EF heuristic)."""
+    try:
+        return op.epd.declared_unit == Unit.KWH and op.input_unit == Unit.KWH
+    except Exception:
+        return False
+
+
+def _renewable_electricity_fraction(building: Building, operational_products=None) -> Decimal:
+    """Fraction (0..1) of the building's electricity offset by on-site renewables.
+
+    On-site renewables are electricity, so this only ever reduces the electricity
+    carrier's carbon. Entered either as a percentage of electricity, or as kWh/yr
+    (converted to a fraction of the building's total electricity carriers).
+    """
+    mode = getattr(building, "renewable_input_mode", None) or Building.RENEWABLE_INPUT_PERCENT
+
+    if mode == Building.RENEWABLE_INPUT_KWH:
+        renew = getattr(building, "renewable_energy_kwh", None)
+        if not renew:
+            return Decimal("0")
+        if operational_products is None:
+            operational_products = building.operational_products.all()
+        electricity_kwh = Decimal("0")
+        for op in operational_products:
+            if _op_is_electricity(op) and op.quantity:
+                electricity_kwh += Decimal(str(op.quantity))
+        if electricity_kwh <= 0:
+            return Decimal("0")
+        fraction = Decimal(str(renew)) / electricity_kwh
+    else:
+        pct = getattr(building, "renewable_energy_percent", None)
+        if not pct:
+            return Decimal("0")
+        fraction = Decimal(str(pct)) / Decimal("100")
+
+    # Clamp to [0, 1] — a building can't offset more than 100% of its electricity.
+    if fraction < 0:
+        return Decimal("0")
+    if fraction > 1:
+        return Decimal("1")
+    return fraction
+
+
 def calculate_total_operational_carbon(
     building: Building,
     simulated: bool = False,
@@ -163,20 +208,38 @@ def calculate_total_operational_carbon(
     total_gwp_b6 = Decimal('0.0')
 
     if prefetched_operational is not None:
-        operational_products = prefetched_operational
+        operational_products = list(prefetched_operational)
     elif simulated:
-        operational_products = building.simulated_operational_products.all()
+        operational_products = list(building.simulated_operational_products.all())
     else:
-        operational_products = building.operational_products.all()
+        operational_products = list(building.operational_products.all())
 
     reference_period = Decimal(str(building.reference_period))
+
+    # On-site renewables offset grid electricity only.
+    renewable_fraction = _renewable_electricity_fraction(building, operational_products)
+    electricity_multiplier = Decimal('1') - renewable_fraction
 
     for op in operational_products:
         try:
             impacts = calculate_impact_operational(op)
-            total_gwp_b6 += impacts.get('gwp_b6', Decimal('0.0')) * reference_period
+            gwp_b6 = impacts.get('gwp_b6', Decimal('0.0'))
+            if _op_is_electricity(op):
+                gwp_b6 = gwp_b6 * electricity_multiplier
+            total_gwp_b6 += gwp_b6 * reference_period
         except (ValueError, AttributeError, ZeroDivisionError):
             continue
+
+    # No energy carriers entered: estimate from the system-energy breakdown
+    # (EnergySummary x country grid factor), so a building whose energy was entered
+    # only in the Energy Consumption Summary still gets operational carbon that
+    # matches the Systems panel. (Not applied to the simulated baseline.)
+    if not operational_products and not simulated:
+        by_system = get_operational_carbon_by_system(
+            building, prefetched_operational=operational_products
+        )
+        per_year = Decimal(str(by_system.get('total', 0) or 0))
+        return per_year * reference_period
 
     return total_gwp_b6
 
@@ -312,15 +375,48 @@ def get_building_detail_statistics(
         building, prefetched_operational=prefetched_operational
     )
 
+    grid_factor = _derive_grid_emission_factor(
+        building, prefetched_operational=prefetched_operational
+    )
+
+    # On-site renewable benefit (electricity only), based on the authoritative
+    # carrier (bill) electricity — the same basis as the headline operational
+    # carbon — so it's correct whether or not a system breakdown was entered.
+    # gross electricity carbon = sum of electricity carriers' un-reduced B6 (already
+    # per m2, per year); carbon saved/yr = that x renewable_fraction.
+    renewable_fraction = _renewable_electricity_fraction(building, prefetched_operational)
+    ops_for_renewable = (
+        prefetched_operational if prefetched_operational is not None
+        else building.operational_products.all()
+    )
+    gross_elec_carbon_py = Decimal('0')
+    gross_elec_kwh = Decimal('0')
+    for op in ops_for_renewable:
+        if _op_is_electricity(op):
+            try:
+                gross_elec_carbon_py += calculate_impact_operational(op).get('gwp_b6', Decimal('0'))
+            except (ValueError, AttributeError, ZeroDivisionError):
+                continue
+            if op.quantity:
+                gross_elec_kwh += Decimal(str(op.quantity))
+    renewable_carbon_saved = gross_elec_carbon_py * renewable_fraction
+    # Grid electricity actually purchased after netting self-consumed renewables
+    # (the energy that carries B6 carbon); capped at >= 0 via the clamped fraction.
+    grid_electricity_kwh = gross_elec_kwh * (Decimal('1') - renewable_fraction)
+
     return {
         'total_carbon_footprint': embodied + operational,
         'total_embodied_carbon': embodied,
         'total_operational_carbon': operational,
         # Per-year intensity (sum of Systems-tab bars), so the stat card matches the chart.
         'operational_carbon_per_year': operational_by_system.get('total', 0),
-        'grid_emission_factor': _derive_grid_emission_factor(
-            building, prefetched_operational=prefetched_operational
-        ),
+        # Annual energy-use intensity (EPI, kWh/m2/yr) — gross demand, for the toggle.
+        'operational_energy_intensity': operational_by_system.get('total_energy', 0),
+        'grid_emission_factor': grid_factor,
+        # On-site renewable benefit (0 when none set) — for the Systems-panel tile.
+        'renewable_percent': float(renewable_fraction * 100),
+        'renewable_carbon_saved_per_year': float(renewable_carbon_saved),
+        'grid_electricity_kwh': float(grid_electricity_kwh),
         'carbon_savings_percentage': calculate_carbon_savings_percentage(building),
         'calculation_errors': calculation_errors,
     }
@@ -510,11 +606,18 @@ def _derive_grid_emission_factor(building: Building, prefetched_operational=None
         except AttributeError:
             return False
 
+    def _country_fallback() -> Decimal:
+        """The building country's reference grid EF, so operational carbon can be
+        estimated from system energy even when no electricity carrier was entered."""
+        from pages.views.building.operational_benchmark_data import GRID_EF_FALLBACK
+        country = getattr(building.country, "name", None) if getattr(building, "country", None) else None
+        return Decimal(str(GRID_EF_FALLBACK.get(country, 0)))
+
     electricity_product = next(
         (op for op in operational_products if _is_electricity(op)), None
     )
     if electricity_product is None:
-        return Decimal("0")
+        return _country_fallback()
 
     try:
         epd = electricity_product.epd
@@ -523,10 +626,10 @@ def _derive_grid_emission_factor(building: Building, prefetched_operational=None
             (i.value for i in impact_set if i.impact.impact_category == "gwp"), None
         )
         if gwp_b6 is None or not epd.declared_amount:
-            return Decimal("0")
+            return _country_fallback()
         return Decimal(str(gwp_b6)) / Decimal(str(epd.declared_amount))
     except (AttributeError, ZeroDivisionError):
-        return Decimal("0")
+        return _country_fallback()
 
 
 def get_operational_carbon_by_system(
@@ -556,11 +659,9 @@ def get_operational_carbon_by_system(
         (kgCO2eq/m²/yr) and 'total'. May include 'blocked' (floor area missing)
         or 'warning' (grid factor is zero).
     """
-    empty = {'labels': [], 'data': [], 'absolute': [], 'total': 0}
+    empty = {'labels': [], 'data': [], 'absolute': [], 'absolute_energy': [], 'total': 0, 'total_energy': 0}
 
     summary = getattr(building, 'energy_summary', None)
-    if summary is None:
-        return empty
 
     floor_area = building.total_floor_area
     if not floor_area or Decimal(str(floor_area)) == 0:
@@ -569,42 +670,88 @@ def get_operational_carbon_by_system(
     grid_factor = _derive_grid_emission_factor(building, prefetched_operational)
     floor_area = Decimal(str(floor_area))
 
-    # Labels must match the substrings used by the Systems-tab JS systemStyleMap.
-    systems = [
-        ("Cooling systems", summary.cooling_kwh),
-        ("Ventilation systems", summary.ventilation_kwh),
-        ("Lighting systems", summary.lighting_kwh),
-        ("Lift & escalator", summary.lift_escalator_kwh),
-        ("Hot Water Systems", summary.hot_water_kwh),
-    ]
+    # On-site renewables offset grid electricity; every system here is electricity.
+    electricity_multiplier = Decimal('1') - _renewable_electricity_fraction(building, prefetched_operational)
 
+    # Labels must match the substrings used by the Systems-tab JS systemStyleMap.
+    # Plug load uses the effective value (stored, else the derived/estimated one) so
+    # the breakdown sums to the same total as the carriers/bill — otherwise the
+    # panel would omit an estimated plug load and read far too low.
+    if summary is None:
+        systems = []
+    else:
+        if summary.plug_load_kwh is not None:
+            plug_val, plug_label = summary.plug_load_kwh, "Plug & equipment loads"
+        else:
+            plug_val, plug_label = summary.suggested_plug_load(), "Plug & equipment loads (estimated)"
+        systems = [
+            ("Cooling systems", summary.cooling_kwh),
+            ("Ventilation systems", summary.ventilation_kwh),
+            ("Lighting systems", summary.lighting_kwh),
+            ("Lift & escalator", summary.lift_escalator_kwh),
+            ("Hot Water Systems", summary.hot_water_kwh),
+            (plug_label, plug_val),
+        ]
+
+    # Track carbon intensity (kgCO2e/m2/yr, net of renewables) and energy intensity
+    # (kWh/m2/yr, gross demand) per system. Percentage share is identical for both
+    # because the grid factor and renewable multiplier are uniform across systems.
     intensity_by_system = []
     for label, kwh in systems:
         if kwh is None or Decimal(str(kwh)) <= 0:
             continue
-        intensity = Decimal(str(kwh)) * grid_factor / floor_area
-        intensity_by_system.append((label, intensity))
+        # Net grid energy (after on-site renewables) so EPI reflects the renewable
+        # reduction and EPI x grid_factor == carbon.
+        energy_intensity = (Decimal(str(kwh)) / floor_area) * electricity_multiplier
+        carbon_intensity = energy_intensity * grid_factor
+        intensity_by_system.append((label, carbon_intensity, energy_intensity))
+
+    # No per-system breakdown entered → fall back to the entered energy CARRIERS so
+    # this panel matches the top Operational Carbon tile (which reads carriers) and
+    # is never empty when the user only entered carriers.
+    if not intensity_by_system:
+        from pages.views.building.building_step_operational import _to_kwh
+        ops = prefetched_operational if prefetched_operational is not None else building.operational_products.all()
+        for op in ops:
+            try:
+                carbon_intensity = calculate_impact_operational(op).get('gwp_b6', Decimal('0'))
+            except (ValueError, AttributeError, ZeroDivisionError):
+                continue
+            kwh = _to_kwh(op)
+            energy_intensity = (Decimal(str(kwh)) / floor_area) if kwh else Decimal('0')
+            if _op_is_electricity(op):
+                carbon_intensity = carbon_intensity * electricity_multiplier
+                energy_intensity = energy_intensity * electricity_multiplier
+            if carbon_intensity <= 0 and energy_intensity <= 0:
+                continue
+            label = ((op.epd.name if op.epd else None) or "Energy")[:40]
+            intensity_by_system.append((label, carbon_intensity, energy_intensity))
 
     if not intensity_by_system:
         return empty
 
     intensity_by_system.sort(key=lambda x: x[1], reverse=True)
-    total = sum(value for _, value in intensity_by_system)
+    total = sum(c for _, c, _ in intensity_by_system)
+    total_energy = sum(e for _, _, e in intensity_by_system)
 
     labels = []
     data = []
     absolute = []
-    for label, value in intensity_by_system:
+    absolute_energy = []
+    for label, carbon_intensity, energy_intensity in intensity_by_system:
         labels.append(label)
-        percentage = float((value / total) * 100) if total > 0 else 0.0
+        percentage = float((carbon_intensity / total) * 100) if total > 0 else 0.0
         data.append(round(percentage, 1))
-        absolute.append(round(float(value), 2))
+        absolute.append(round(float(carbon_intensity), 2))
+        absolute_energy.append(round(float(energy_intensity), 2))
 
     result = {
         'labels': labels,
         'data': data,
         'absolute': absolute,
+        'absolute_energy': absolute_energy,
         'total': round(float(total), 2),
+        'total_energy': round(float(total_energy), 2),
     }
     if grid_factor == 0:
         result['warning'] = 'grid_factor_zero'
@@ -624,7 +771,7 @@ def get_operational_carbon_by_appliance(
     Returns dict with 'labels' (appliance display name), 'systemNames' (parent system),
     'data' (% share), 'absolute' (kgCO2eq/m²/yr), 'total'.
     """
-    empty = {'labels': [], 'systemNames': [], 'data': [], 'absolute': [], 'total': 0}
+    empty = {'labels': [], 'systemNames': [], 'data': [], 'absolute': [], 'absolute_energy': [], 'total': 0, 'total_energy': 0}
 
     floor_area = building.total_floor_area
     if not floor_area or Decimal(str(floor_area)) == 0:
@@ -688,26 +835,42 @@ def get_operational_carbon_by_appliance(
         if kwh and Decimal(str(kwh)) > 0:
             appliances.append((HW_LABEL.get(hw.type_of_hot_water_system, 'Water heater'), 'Hot water system', Decimal(str(kwh))))
 
+    # Plug / equipment loads: a manual energy-summary category with no per-unit records.
+    summary = getattr(building, 'energy_summary', None)
+    if summary is not None and summary.plug_load_kwh and Decimal(str(summary.plug_load_kwh)) > 0:
+        appliances.append(('Plug & equipment loads', 'Plug & equipment loads', Decimal(str(summary.plug_load_kwh))))
+
     if not appliances:
         return empty
 
-    intensities = [(label, sys_name, kwh * grid_factor / floor_area) for label, sys_name, kwh in appliances]
-    intensities.sort(key=lambda x: x[2], reverse=True)
-    total = sum(v for _, _, v in intensities)
+    # On-site renewables offset grid electricity; all appliances here are electricity.
+    electricity_multiplier = Decimal('1') - _renewable_electricity_fraction(building, prefetched_operational)
+    rows = []
+    for label, sys_name, kwh in appliances:
+        # Net grid energy (after on-site renewables); carbon = energy x grid_factor.
+        energy_intensity = (kwh / floor_area) * electricity_multiplier
+        carbon_intensity = energy_intensity * grid_factor
+        rows.append((label, sys_name, carbon_intensity, energy_intensity))
+    rows.sort(key=lambda x: x[2], reverse=True)
+    total = sum(c for _, _, c, _ in rows)
+    total_energy = sum(e for _, _, _, e in rows)
 
-    labels, system_names, data, absolute = [], [], [], []
-    for label, sys_name, value in intensities:
+    labels, system_names, data, absolute, absolute_energy = [], [], [], [], []
+    for label, sys_name, carbon_intensity, energy_intensity in rows:
         labels.append(label)
         system_names.append(sys_name)
-        data.append(round(float((value / total) * 100) if total > 0 else 0.0, 1))
-        absolute.append(round(float(value), 2))
+        data.append(round(float((carbon_intensity / total) * 100) if total > 0 else 0.0, 1))
+        absolute.append(round(float(carbon_intensity), 2))
+        absolute_energy.append(round(float(energy_intensity), 2))
 
     return {
         'labels': labels,
         'systemNames': system_names,
         'data': data,
         'absolute': absolute,
+        'absolute_energy': absolute_energy,
         'total': round(float(total), 2),
+        'total_energy': round(float(total_energy), 2),
     }
 
 
@@ -1008,7 +1171,7 @@ def get_building_chart_data(
 
     return {
         'whole_life_carbon': {
-            'labels': ['Operational carbon', 'Embodied carbon'],
+            'labels': ['Operational carbon (B6)', 'Embodied carbon (A1-A3)'],
             'data': [float(operational), float(embodied)],
         },
         'embodied_by_assembly': get_embodied_carbon_by_assembly(

@@ -172,6 +172,23 @@
         <div class="flex flex-col flex-1 items-center justify-center gap-4">
           <img src="{% static 'assets/building.png' %}" alt="map" />
           <span class="text-sm/5 font-medium text-center">{% translate "You have no buildings added" %}</span>
+
+          {# Onboarding nudge: point first-time users at the example buildings #}
+          <div id="examples-nudge" class="flex items-center gap-3 bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)] rounded-xl px-4 py-3 max-w-[34rem]">
+            <span data-icon="lightbulb-line" data-size="20" data-color="var(--color-primary)" class="shrink-0"></span>
+            <div class="flex flex-col">
+              <span class="text-sm font-medium">{% translate "New to BEAT? Start from an example building." %}</span>
+              <span class="text-xs text-[var(--text--sub-600)]">{% translate "Preview a ready-made reference building and clone it as your own starting point." %}</span>
+            </div>
+            <a href="{% url 'examples' %}" class="btn btn-outline btn-sm rounded-lg shrink-0 ml-auto">
+              {% translate "Browse examples" %}
+            </a>
+            <button type="button" onclick="document.getElementById('examples-nudge').style.display='none'"
+                    class="btn btn-ghost btn-sm size-6 p-0 shrink-0" aria-label="{% translate 'Dismiss' %}">
+              <span data-icon="close-line" data-size="18" data-color="var(--icon--sub-600)"></span>
+            </button>
+          </div>
+
               <a href="{% url 'new_building' %}">
             <button class="btn btn-outline rounded-lg">
               <span data-icon="add-large-fill"></span>

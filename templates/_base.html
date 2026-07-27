@@ -69,7 +69,20 @@
               </div>
               <span>{% translate "My Building Projects" %}</span>
             </a>
-         
+
+          <input
+            type="radio"
+            name="navbar-radio-group"
+            id="examples"
+            {% url 'examples' as examples_url %}
+            {% if request.path == examples_url %}checked{% endif %}
+            style="--navbar-radio-group-index: 1"
+          />
+
+            <a href="{% url 'examples' %}" >
+              <span data-icon="lightbulb-line"></span>
+              <span>{% translate "Example buildings" %}</span>
+            </a>
 
           <input
             type="radio"

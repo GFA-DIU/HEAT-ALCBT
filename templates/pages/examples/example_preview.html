@@ -1,0 +1,114 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "Example preview" %}{% endblock title %}
+
+{% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock %}
+
+{% block content %}
+<section class="flex-1 card bg-white rounded-none rounded-t-[var(--radius-24)] border border-[var(--stroke--soft-200)]">
+  <div class="max-w-[68.75rem] mx-auto w-full px-4 pb-12">
+
+    <div class="mt-6">
+      <a href="{% url 'examples' %}" class="text-sm text-[var(--text--sub-600)] flex items-center gap-1 w-max">
+        <span data-icon="arrow-left-s-line" data-size="16"></span>
+        {% translate "Back to example buildings" %}
+      </a>
+    </div>
+
+    <!-- Read-only notice -->
+    <div class="mt-4 flex items-center gap-2 bg-[var(--bg--weak-50)] border border-[var(--stroke--soft-200)] rounded-lg px-3 py-2">
+      <span data-icon="lock-2-line" data-size="18" data-color="var(--icon--sub-600)"></span>
+      <span class="text-sm text-[var(--text--sub-600)]">
+        {% translate "This is a read-only example. To edit it, clone it into your own buildings with the button on the right." %}
+      </span>
+    </div>
+
+    <!-- Header -->
+    <div class="mt-6 flex items-start justify-between gap-4 flex-wrap">
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-extrabold">
+            {% if building.example_variant == "low_carbon" %}{% translate "Low-carbon" %}{% else %}{% translate "Typical" %}{% endif %}
+            {{ type_name }}
+          </h1>
+          {% include "pages/examples/_example_badge.html" %}
+        </div>
+        <ul class="flex gap-2 flex-wrap">
+          <li class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]">
+            <span data-country="{{ building.country.code2|lower }}" data-width="16"></span>
+            <span class="text-xs/4 font-medium text-[var(--text--sub-600)]">{{ country_name }}</span>
+          </li>
+          <li class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]">
+            <span data-icon="building-2-fill" data-size="16"></span>
+            <span class="text-xs/4 font-medium text-[var(--text--sub-600)]">{% translate "Building type:" %} {{ type_name }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <form method="post" action="{% url 'start_from_example' building_id=building.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary rounded-lg">
+          <span data-icon="add-large-fill" data-size="18"></span>
+          {% translate "Start from this example" %}
+        </button>
+      </form>
+    </div>
+
+    <!-- Carbon summary -->
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="flex items-center gap-3 bg-[var(--bg--weak-50)] rounded-lg p-4">
+        <div class="bg-[var(--color-primary)] size-10 grid place-items-center rounded-full shrink-0">
+          <span data-icon="leaf-line" data-size="24" data-color="var(--bg--strong-950)"></span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs/4 font-medium text-[var(--text--sub-600)]">{% translate "Total embodied carbon" %}</span>
+          <span class="text-lg font-bold">{{ embodied_carbon|floatformat:"1" }} kgCO<sub>2</sub>eq/m<sup>2</sup></span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 bg-[var(--bg--weak-50)] rounded-lg p-4">
+        <div class="bg-[var(--bg--base-600)] size-10 grid place-items-center rounded-full shrink-0">
+          <span data-icon="building-fill" data-size="24" data-color="var(--icon--sub-600)"></span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs/4 font-medium text-[var(--text--sub-600)]">{% translate "Total floor area" %}</span>
+          <span class="text-lg font-bold">{{ building.total_floor_area|floatformat:"0" }} m<sup>2</sup></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Structural components (read-only) -->
+    <div class="mt-8">
+      <h2 class="text-lg font-bold mb-3">{% translate "Structural components" %}</h2>
+      {% if structural_components %}
+        <div class="overflow-x-auto border border-[var(--stroke--soft-200)] rounded-xl">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-[var(--text--sub-600)] border-b border-[var(--stroke--soft-200)]">
+                <th class="px-4 py-2 font-medium">{% translate "Component" %}</th>
+                <th class="px-4 py-2 font-medium">{% translate "Classification" %}</th>
+                <th class="px-4 py-2 font-medium text-right">{% translate "Quantity" %}</th>
+                <th class="px-4 py-2 font-medium text-right">{% translate "GWP A1-A3 (kgCO2eq)" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in structural_components %}
+                <tr class="border-b border-[var(--stroke--soft-200)] last:border-0">
+                  <td class="px-4 py-2">{{ c.assembly_name|default:"-" }}</td>
+                  <td class="px-4 py-2 text-[var(--text--sub-600)]">{{ c.assembly_classification|default:"-" }}</td>
+                  <td class="px-4 py-2 text-right">{{ c.quantity|floatformat:"2" }} {{ c.unit }}</td>
+                  <td class="px-4 py-2 text-right">{{ c.impacts|floatformat:"1" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-sm text-[var(--text--sub-600)]">{% translate "No structural components in this example." %}</p>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% translate "Example buildings" %}{% endblock title %}
+
+{% block body_class %}min-h-screen bg-[var(--bg--base-500)] flex flex-col{% endblock %}
+
+{% block content %}
+<section class="flex-1 card bg-white rounded-none rounded-t-[var(--radius-24)] border border-[var(--stroke--soft-200)]">
+  <div class="max-w-[68.75rem] mx-auto w-full px-4">
+    <div class="flex flex-col gap-2 w-full mt-7">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl/[110%] font-extrabold text-[var(--text--strong-950)]">{% translate "Example buildings" %}</span>
+        {% include "pages/examples/_example_badge.html" %}
+      </div>
+      <p class="text-sm font-normal text-[var(--text--sub-600)]">
+        {% translate "Ready-made reference buildings you can preview and clone as a starting point. Each pair shows a typical building and a lower-carbon version of the same building. These are read-only, so cloning creates your own editable copy." %}
+      </p>
+    </div>
+  </div>
+
+  <div class="divider before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)] before:h-[0.065rem] after:h-[0.065rem]"></div>
+
+  <div class="card-body p-0 px-4 max-w-[68.75rem] mx-auto w-full text-[var(--text--strong-950)] pb-10">
+
+    {% for group in grouped_examples %}
+      <div class="mt-8">
+        <div class="flex items-center gap-2 mb-3">
+          <span data-icon="building-2-fill" data-size="20" data-color="var(--icon--sub-600)"></span>
+          <h2 class="text-lg font-bold">{{ group.type_name }}</h2>
+          <span class="flex items-center gap-1 border p-1 pr-2 rounded-md border-[var(--stroke--soft-200)]">
+            <span data-country="{{ group.country_code2|lower }}" data-width="16"></span>
+            <span class="text-xs/4 font-medium text-[var(--text--sub-600)]">{{ group.country_name }}</span>
+          </span>
+        </div>
+
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {% for b in group.variants %}
+            <li class="bg-[var(--bg--white-0)] border border-[var(--stroke--soft-200)] rounded-xl p-4 flex flex-col gap-4">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex flex-col gap-1">
+                  <span class="text-base font-bold">
+                    {% if b.example_variant == "low_carbon" %}{% translate "Low-carbon" %}{% else %}{% translate "Typical" %}{% endif %}
+                  </span>
+                  <span class="text-xs text-[var(--text--sub-600)]">{{ group.type_name }} · {{ group.country_name }}</span>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  {% if b.example_variant == "low_carbon" %}
+                    <span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--weak-50)] gap-1 flex items-center shrink-0"
+                          title="{% translate 'Lower-carbon variant using greener / local materials' %}">
+                      <span data-icon="leaf-fill" data-size="16" data-color="#1FC16B"></span>
+                      <span class="text-[var(--text--sub-600)] text-xs">{% translate "Greener" %}</span>
+                    </span>
+                  {% endif %}
+                  {% include "pages/examples/_example_badge.html" %}
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 bg-[var(--bg--weak-50)] rounded-lg p-3">
+                <div class="bg-[var(--color-primary)] size-9 grid place-items-center rounded-full shrink-0">
+                  <span data-icon="leaf-line" data-size="20" data-color="var(--bg--strong-950)"></span>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-xs/4 font-medium text-[var(--text--sub-600)]">{% translate "Total embodied carbon" %}</span>
+                  <span class="text-base/6 font-bold">{{ b.embodied_carbon|floatformat:"1" }} kgCO<sub>2</sub>eq/m<sup>2</sup></span>
+                </div>
+              </div>
+
+              <div class="flex gap-2 mt-auto">
+                <a href="{% url 'example_preview' building_id=b.id %}" class="btn btn-outline rounded-lg flex-1">
+                  <span data-icon="eye-line" data-size="18"></span>
+                  {% translate "Preview" %}
+                </a>
+                <form method="post" action="{% url 'start_from_example' building_id=b.id %}" class="flex-1">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary rounded-lg w-full">
+                    <span data-icon="add-large-fill" data-size="18"></span>
+                    {% translate "Start from this example" %}
+                  </button>
+                </form>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% empty %}
+      <section class="flex flex-col flex-1 items-center justify-center gap-4 py-16">
+        <img src="{% static 'assets/building.png' %}" alt="" />
+        <span class="text-sm/5 font-medium text-center">{% translate "No example buildings are available yet." %}</span>
+      </section>
+    {% endfor %}
+
+  </div>
+</section>
+{% endblock %}

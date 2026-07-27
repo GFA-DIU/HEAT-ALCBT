@@ -187,6 +187,28 @@ class BuildingOperationalInfo(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(100)],
         null=True,
         blank=True,
+        help_text=_("Share of the building's electricity supplied by on-site renewables."),
+    )
+    renewable_energy_kwh = models.DecimalField(
+        _("Renewable Energy (kWh/yr)"),
+        max_digits=14,
+        decimal_places=3,
+        validators=[MinValueValidator(0)],
+        null=True,
+        blank=True,
+        help_text=_("On-site renewable electricity generated per year."),
+    )
+    RENEWABLE_INPUT_PERCENT = "percent"
+    RENEWABLE_INPUT_KWH = "kwh"
+    RENEWABLE_INPUT_CHOICES = [
+        (RENEWABLE_INPUT_PERCENT, _("Percentage")),
+        (RENEWABLE_INPUT_KWH, _("kWh/yr")),
+    ]
+    renewable_input_mode = models.CharField(
+        max_length=8,
+        choices=RENEWABLE_INPUT_CHOICES,
+        default=RENEWABLE_INPUT_PERCENT,
+        help_text=_("Whether renewable energy was entered as a percentage or in kWh/yr."),
     )
     building_smart_system = models.BooleanField(
         _("Building Smart System Installation"),
