@@ -674,14 +674,24 @@ def get_operational_carbon_by_system(
     electricity_multiplier = Decimal('1') - _renewable_electricity_fraction(building, prefetched_operational)
 
     # Labels must match the substrings used by the Systems-tab JS systemStyleMap.
-    systems = [] if summary is None else [
-        ("Cooling systems", summary.cooling_kwh),
-        ("Ventilation systems", summary.ventilation_kwh),
-        ("Lighting systems", summary.lighting_kwh),
-        ("Lift & escalator", summary.lift_escalator_kwh),
-        ("Hot Water Systems", summary.hot_water_kwh),
-        ("Plug & equipment loads", summary.plug_load_kwh),
-    ]
+    # Plug load uses the effective value (stored, else the derived/estimated one) so
+    # the breakdown sums to the same total as the carriers/bill — otherwise the
+    # panel would omit an estimated plug load and read far too low.
+    if summary is None:
+        systems = []
+    else:
+        if summary.plug_load_kwh is not None:
+            plug_val, plug_label = summary.plug_load_kwh, "Plug & equipment loads"
+        else:
+            plug_val, plug_label = summary.suggested_plug_load(), "Plug & equipment loads (estimated)"
+        systems = [
+            ("Cooling systems", summary.cooling_kwh),
+            ("Ventilation systems", summary.ventilation_kwh),
+            ("Lighting systems", summary.lighting_kwh),
+            ("Lift & escalator", summary.lift_escalator_kwh),
+            ("Hot Water Systems", summary.hot_water_kwh),
+            (plug_label, plug_val),
+        ]
 
     # Track carbon intensity (kgCO2e/m2/yr, net of renewables) and energy intensity
     # (kWh/m2/yr, gross demand) per system. Percentage share is identical for both
@@ -1161,7 +1171,7 @@ def get_building_chart_data(
 
     return {
         'whole_life_carbon': {
-            'labels': ['Operational carbon', 'Embodied carbon'],
+            'labels': ['Operational carbon (B6)', 'Embodied carbon (A1-A3)'],
             'data': [float(operational), float(embodied)],
         },
         'embodied_by_assembly': get_embodied_carbon_by_assembly(

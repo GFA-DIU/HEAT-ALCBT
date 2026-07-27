@@ -192,6 +192,15 @@
       {% endif %}
     </div>
 
+    {% if net_grid_total is not None %}
+    <div class="flex items-center justify-between px-2.5 mt-1">
+      <span class="text-xs text-[var(--text--sub-600)]">
+        {% blocktranslate with pct=renewable_percent|floatformat:0 %}Grid electricity after {{ pct }}% on-site renewables (used for operational carbon){% endblocktranslate %}
+      </span>
+      <span class="text-xs font-medium text-[var(--text--sub-600)]">{{ net_grid_total|floatformat:0 }} kWh/yr</span>
+    </div>
+    {% endif %}
+
   </div>
 </div>
 

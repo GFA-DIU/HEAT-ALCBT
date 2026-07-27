@@ -397,6 +397,8 @@ def handle_energy_consumption_summary_step(request):
     building_uuid = request.GET.get('building_uuid', '')
     summary = None
 
+    renewable_percent = None
+    net_grid_total = None
     if building_uuid:
         try:
             building = Building.objects.get(uuid=building_uuid, created_by=request.user)
@@ -404,12 +406,21 @@ def handle_energy_consumption_summary_step(request):
             if created:
                 summary.recalculate()
                 summary.save()
+            # Net grid energy after on-site renewables (what operational carbon uses)
+            from pages.views.building.building_stats import _renewable_electricity_fraction
+            _fraction = _renewable_electricity_fraction(building)
+            if _fraction > 0:
+                renewable_percent = float(_fraction * 100)
+                if summary.total_kwh is not None:
+                    net_grid_total = float(Decimal(str(summary.total_kwh)) * (Decimal("1") - _fraction))
         except Building.DoesNotExist:
             pass
 
     context = {
         "building_uuid": building_uuid,
         "summary": summary,
+        "renewable_percent": renewable_percent,
+        "net_grid_total": net_grid_total,
     }
     return render(
         request,
@@ -448,6 +459,7 @@ def handle_operational_data_step(request):
     selected_products = []
     total_annual_energy_consumption = None
     renewable_percent = None
+    net_grid_energy = None
     building_uuid = request.GET.get('building_uuid')
 
     logger.info(f"Loading operational data step with building_uuid: {building_uuid}")
@@ -463,10 +475,16 @@ def handle_operational_data_step(request):
             if energy_summary and energy_summary.total_kwh is not None:
                 total_annual_energy_consumption = energy_summary.total_kwh
 
-            # On-site renewable share (for the grid-netting note in this step)
+            # On-site renewable share + resulting net grid energy (shown so the user
+            # sees that only the grid share is used for operational carbon).
             from pages.views.building.building_stats import _renewable_electricity_fraction
-            _frac = float(_renewable_electricity_fraction(building) * 100)
+            _fraction = _renewable_electricity_fraction(building)
+            _frac = float(_fraction * 100)
             renewable_percent = _frac if _frac > 0 else None
+            if renewable_percent and total_annual_energy_consumption is not None:
+                net_grid_energy = float(
+                    Decimal(str(total_annual_energy_consumption)) * (Decimal("1") - _fraction)
+                )
 
             # Get saved operational products from database
             saved_products = OperationalProduct.objects.filter(
@@ -505,6 +523,7 @@ def handle_operational_data_step(request):
         'selected_products': selected_products,
         'total_annual_energy_consumption': total_annual_energy_consumption,
         'renewable_percent': renewable_percent,
+        'net_grid_energy': net_grid_energy,
     }
     return render(
         request,
