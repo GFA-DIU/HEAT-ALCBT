@@ -24,9 +24,17 @@
 </div>
 {% endif %}
 
-<p class="text-xs text-[var(--text--sub-600)] mb-3">
-  {% translate "Enter each source's total annual energy. For electricity, enter the total consumed, including any produced on-site by renewables — operational carbon is counted only on the grid-supplied share." %}
+<p class="text-xs text-[var(--text--sub-600)] mb-2">
+  {% translate "Enter each source's total annual energy. For electricity, enter the total (gross) consumed, including any produced on-site by renewables. Operational carbon is counted only on the grid-supplied share." %}
 </p>
+{% if renewable_percent %}
+<div class="flex items-center gap-2 p-2 rounded-lg bg-[var(--state--success--lighter)] mb-3">
+  <span data-icon="leaf-fill" data-size="16" data-color="#1FC16B" class="shrink-0"></span>
+  <span class="text-xs text-[var(--text--sub-600)]">
+    {% blocktranslate with pct=renewable_percent|floatformat:0 %}On-site renewables cover {{ pct }}% of electricity, so only the remaining grid share of the electricity you enter here counts towards operational carbon.{% endblocktranslate %}
+  </span>
+</div>
+{% endif %}
 
 <div
   class="flex items-center gap-2 p-2 rounded-lg bg-[var(--state--faded--lighter)]"

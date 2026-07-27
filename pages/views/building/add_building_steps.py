@@ -447,6 +447,7 @@ def handle_operational_data_step(request):
     # Load previously saved operational products from database (if building exists)
     selected_products = []
     total_annual_energy_consumption = None
+    renewable_percent = None
     building_uuid = request.GET.get('building_uuid')
 
     logger.info(f"Loading operational data step with building_uuid: {building_uuid}")
@@ -461,6 +462,11 @@ def handle_operational_data_step(request):
             energy_summary = EnergySummary.objects.filter(building=building).first()
             if energy_summary and energy_summary.total_kwh is not None:
                 total_annual_energy_consumption = energy_summary.total_kwh
+
+            # On-site renewable share (for the grid-netting note in this step)
+            from pages.views.building.building_stats import _renewable_electricity_fraction
+            _frac = float(_renewable_electricity_fraction(building) * 100)
+            renewable_percent = _frac if _frac > 0 else None
 
             # Get saved operational products from database
             saved_products = OperationalProduct.objects.filter(
@@ -498,6 +504,7 @@ def handle_operational_data_step(request):
         'countries': ALCBTCountryManager.get_all_countries(),
         'selected_products': selected_products,
         'total_annual_energy_consumption': total_annual_energy_consumption,
+        'renewable_percent': renewable_percent,
     }
     return render(
         request,

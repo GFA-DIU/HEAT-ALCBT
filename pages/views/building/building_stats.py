@@ -208,11 +208,11 @@ def calculate_total_operational_carbon(
     total_gwp_b6 = Decimal('0.0')
 
     if prefetched_operational is not None:
-        operational_products = prefetched_operational
+        operational_products = list(prefetched_operational)
     elif simulated:
-        operational_products = building.simulated_operational_products.all()
+        operational_products = list(building.simulated_operational_products.all())
     else:
-        operational_products = building.operational_products.all()
+        operational_products = list(building.operational_products.all())
 
     reference_period = Decimal(str(building.reference_period))
 
@@ -229,6 +229,17 @@ def calculate_total_operational_carbon(
             total_gwp_b6 += gwp_b6 * reference_period
         except (ValueError, AttributeError, ZeroDivisionError):
             continue
+
+    # No energy carriers entered: estimate from the system-energy breakdown
+    # (EnergySummary x country grid factor), so a building whose energy was entered
+    # only in the Energy Consumption Summary still gets operational carbon that
+    # matches the Systems panel. (Not applied to the simulated baseline.)
+    if not operational_products and not simulated:
+        by_system = get_operational_carbon_by_system(
+            building, prefetched_operational=operational_products
+        )
+        per_year = Decimal(str(by_system.get('total', 0) or 0))
+        return per_year * reference_period
 
     return total_gwp_b6
 
@@ -595,11 +606,18 @@ def _derive_grid_emission_factor(building: Building, prefetched_operational=None
         except AttributeError:
             return False
 
+    def _country_fallback() -> Decimal:
+        """The building country's reference grid EF, so operational carbon can be
+        estimated from system energy even when no electricity carrier was entered."""
+        from pages.views.building.operational_benchmark_data import GRID_EF_FALLBACK
+        country = getattr(building.country, "name", None) if getattr(building, "country", None) else None
+        return Decimal(str(GRID_EF_FALLBACK.get(country, 0)))
+
     electricity_product = next(
         (op for op in operational_products if _is_electricity(op)), None
     )
     if electricity_product is None:
-        return Decimal("0")
+        return _country_fallback()
 
     try:
         epd = electricity_product.epd
@@ -608,10 +626,10 @@ def _derive_grid_emission_factor(building: Building, prefetched_operational=None
             (i.value for i in impact_set if i.impact.impact_category == "gwp"), None
         )
         if gwp_b6 is None or not epd.declared_amount:
-            return Decimal("0")
+            return _country_fallback()
         return Decimal(str(gwp_b6)) / Decimal(str(epd.declared_amount))
     except (AttributeError, ZeroDivisionError):
-        return Decimal("0")
+        return _country_fallback()
 
 
 def get_operational_carbon_by_system(
@@ -674,8 +692,10 @@ def get_operational_carbon_by_system(
     for label, kwh in systems:
         if kwh is None or Decimal(str(kwh)) <= 0:
             continue
-        energy_intensity = Decimal(str(kwh)) / floor_area
-        carbon_intensity = energy_intensity * grid_factor * electricity_multiplier
+        # Net grid energy (after on-site renewables) so EPI reflects the renewable
+        # reduction and EPI x grid_factor == carbon.
+        energy_intensity = (Decimal(str(kwh)) / floor_area) * electricity_multiplier
+        carbon_intensity = energy_intensity * grid_factor
         intensity_by_system.append((label, carbon_intensity, energy_intensity))
 
     if not intensity_by_system:
@@ -798,8 +818,9 @@ def get_operational_carbon_by_appliance(
     electricity_multiplier = Decimal('1') - _renewable_electricity_fraction(building, prefetched_operational)
     rows = []
     for label, sys_name, kwh in appliances:
-        energy_intensity = kwh / floor_area
-        carbon_intensity = energy_intensity * grid_factor * electricity_multiplier
+        # Net grid energy (after on-site renewables); carbon = energy x grid_factor.
+        energy_intensity = (kwh / floor_area) * electricity_multiplier
+        carbon_intensity = energy_intensity * grid_factor
         rows.append((label, sys_name, carbon_intensity, energy_intensity))
     rows.sort(key=lambda x: x[2], reverse=True)
     total = sum(c for _, _, c, _ in rows)
