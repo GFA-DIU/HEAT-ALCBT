@@ -89,8 +89,7 @@ class Command(BaseCommand):
                         prod_here += len(valid_products)
                         continue
 
-                    cls_id = a["classification_id"] if a["classification_id"] and \
-                        AssemblyCategoryTechnique.objects.filter(pk=a["classification_id"]).exists() else None
+                    # NB: classification lives on StructuralProduct, not Assembly.
                     asm = Assembly.objects.create(
                         created_by=building.created_by,
                         name=a["name"],
@@ -101,7 +100,6 @@ class Command(BaseCommand):
                         is_template=False,
                         public=False,
                         draft=False,
-                        classification_id=cls_id,
                     )
                     for p in valid_products:
                         p_cls = p["classification_id"] if p["classification_id"] and \
