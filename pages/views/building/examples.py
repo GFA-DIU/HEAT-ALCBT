@@ -118,6 +118,14 @@ def example_preview(request, building_id):
         building, prefetched_assemblies=building.prefetched_components
     )
 
+    # Display-only cleanup for the preview table: classification without its numeric
+    # code ("120 - Finishes" -> "Finishes") and units in standard notation.
+    _unit_display = {"m^2": "m²", "m^3": "m³", "m": "m", "kg": "kg", "ton": "t", "pcs": "pcs"}
+    for c in structural_components:
+        cls = c.get("assembly_classification")
+        c["classification_display"] = getattr(cls, "name", None) or (str(cls) if cls else "-")
+        c["unit_display"] = _unit_display.get(c.get("unit"), c.get("unit") or "")
+
     context = {
         "building": building,
         "structural_components": structural_components,

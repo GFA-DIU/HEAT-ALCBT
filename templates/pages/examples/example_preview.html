@@ -96,8 +96,8 @@
               {% for c in structural_components %}
                 <tr class="border-b border-[var(--stroke--soft-200)] last:border-0">
                   <td class="px-4 py-2">{{ c.assembly_name|default:"-" }}</td>
-                  <td class="px-4 py-2 text-[var(--text--sub-600)]">{{ c.assembly_classification|default:"-" }}</td>
-                  <td class="px-4 py-2 text-right">{{ c.quantity|floatformat:"2" }} {{ c.unit }}</td>
+                  <td class="px-4 py-2 text-[var(--text--sub-600)]">{{ c.classification_display|default:"-" }}</td>
+                  <td class="px-4 py-2 text-right">{{ c.quantity|floatformat:"2" }} {{ c.unit_display }}</td>
                   <td class="px-4 py-2 text-right">{{ c.impacts|floatformat:"1" }}</td>
                 </tr>
               {% endfor %}
