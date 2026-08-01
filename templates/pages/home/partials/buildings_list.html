@@ -271,11 +271,10 @@
     event.preventDefault();
     event.stopPropagation();
 
-    const confirmed = await askConfirm(
-      i18n.deleteBuildingConfirm,
-      i18n.deleteBuildingTitle,
-      true
-    );
+    // Destructive action: use the native browser confirm directly so a blocking
+    // prompt is GUARANTEED (the styled delete dialog was not reliably appearing
+    // on this page). OK -> delete; Cancel -> nothing happens.
+    const confirmed = window.confirm(i18n.deleteBuildingTitle + '\n\n' + i18n.deleteBuildingConfirm);
 
     if (confirmed) {
       try {

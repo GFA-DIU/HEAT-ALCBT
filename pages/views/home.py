@@ -1,4 +1,5 @@
 import logging
+import re
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -250,6 +251,36 @@ def _delete_building(building_id):
     logger.info("Successfully deleted building %s", building_id)
 
 
+def _ordinal(n):
+    """1 -> '1st', 2 -> '2nd', 3 -> '3rd', 4 -> '4th', 11 -> '11th' ..."""
+    if 10 <= (n % 100) <= 20:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"
+
+
+# Matches a trailing copy marker: " (copy)", " (1st copy)", " (2nd copy)" ...
+_COPY_SUFFIX_RE = re.compile(r"\s*\(\s*(?:\d+(?:st|nd|rd|th)\s+)?copy\s*\)\s*$", re.IGNORECASE)
+
+
+def _next_copy_name(source_name, user):
+    """Return '<base> (Nth copy)' with the next free ordinal for this user.
+
+    Strips any existing copy suffix first so copying a copy doesn't stack
+    '(copy) (copy)'. Skips ordinals already taken by the user's buildings.
+    """
+    base = _COPY_SUFFIX_RE.sub("", source_name or "").strip() or "Building"
+    existing = set(
+        Building.objects.filter(created_by=user, is_example=False)
+        .values_list("name", flat=True)
+    )
+    n = 1
+    while f"{base} ({_ordinal(n)} copy)" in existing:
+        n += 1
+    return f"{base} ({_ordinal(n)} copy)"
+
+
 @login_required
 @require_http_methods(["POST"])
 def duplicate_building(request, building_id):
@@ -262,7 +293,8 @@ def duplicate_building(request, building_id):
     """
     source = get_object_or_404(
         Building, id=building_id, created_by=request.user, is_example=False)
-    new = clone_building(source, request.user, f"{source.name} (copy)")
+    new_name = _next_copy_name(source.name, request.user)
+    new = clone_building(source, request.user, new_name)
     logger.info("Duplicated building %s -> %s for user %s", source.pk, new.pk, request.user)
     messages.success(request, f"Duplicated '{source.name}'.")
 

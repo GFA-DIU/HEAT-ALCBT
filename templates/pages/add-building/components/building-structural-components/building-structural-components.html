@@ -545,8 +545,14 @@
     edit:              "{% translate 'Edit' %}",
     delete:            "{% translate 'Delete' %}",
     duplicate:         "{% translate 'Duplicate' %}",
-    unit:              "{% translate 'Unit' %}",
+    unit:              "{% translate 'Switch unit' %}",
     duplicatedItem:    "{% translate 'Duplicated successfully' %}",
+  };
+
+  // "dimension (unit)" labels so the unit selector + quantity field are self-explanatory.
+  var UNIT_LABEL = {
+    kg: "Mass (kg)", ton: "Mass (ton)", m3: "Volume (m³)",
+    m2: "Area (m²)", m: "Length (m)", pcs: "Quantity (pcs)", unknown: "Layers (#)",
   };
 
   // Use window assignment to avoid const/class re-declaration errors on dynamic reload
@@ -979,6 +985,13 @@
     return materials;
   }
 
+  /** Keep the quantity placeholder in sync with the chosen unit (Mass/Volume/Area). */
+  onMaterialUnitChange(sel) {
+    const li = sel.closest('li');
+    const qty = li && li.querySelector('.material-quantity');
+    if (qty) qty.placeholder = UNIT_LABEL[sel.value] || sel.value;
+  }
+
   /** Duplicate one material row inside the open modal (client-side, pre-save). */
   duplicateMaterialRow(mode, ts) {
     const listId = mode === 'boq' ? 'structural_materials_list' : 'component_materials_list';
@@ -1139,12 +1152,21 @@
       // Unit cell: a dropdown only when the EPD supports >1 convertible unit (BoQ mode);
       // otherwise a locked label. Options come from EPD.get_available_units() so the calc
       // can always convert the chosen unit — no maths change.
-      const unitCell = (mode === 'boq' && availableUnits.length > 1)
-        ? `<select class="material-unit-value select select-ghost px-1 text-xs text-[var(--text--sub-600)]" style="min-width:3.5rem;" title="${i18n.unit || 'Unit'}">
-             ${availableUnits.map(u => `<option value="${u}" ${u === m.unit ? 'selected' : ''}>${u === 'unknown' ? '#' : u}</option>`).join('')}
+      // Quantity + unit, matching the single-unit row layout: the unit sits compactly
+      // INSIDE the quantity box. For convertible EPDs it's a small switchable dropdown
+      // (kg / m³); otherwise a locked label. Keeps the typed number fully visible.
+      const isMultiUnit = (mode === 'boq' && availableUnits.length > 1);
+      const unitSymbol = (u) => u === 'm3' ? 'm³' : u === 'm2' ? 'm²' : u === 'unknown' ? '#' : u;
+      const unitInline = isMultiUnit
+        ? `<select class="material-unit-value select select-ghost select-xs text-xs shrink-0" style="width:auto;min-width:2.9rem;padding-left:0.35rem;padding-right:1.1rem;" title="${i18n.unit || 'Switch unit'}" onchange="structuralManager.onMaterialUnitChange(this)">
+             ${availableUnits.map(u => `<option value="${u}" ${u === m.unit ? 'selected' : ''}>${unitSymbol(u)}</option>`).join('')}
            </select>`
-        : `<span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="${m.unit}">${m.unit === 'unknown' ? '#' : m.unit}</span>
+        : `<span class="text-xs text-[var(--text--sub-600)] material-unit shrink-0" data-unit="${m.unit}">${unitSymbol(m.unit)}</span>
            <input type="hidden" class="material-unit-value" value="${m.unit}" />`;
+      const qtyUnit = `<label class="input" style="flex:1 1 0;min-width:0;">
+            <input type="number" value="${m.quantity || ''}" placeholder="${UNIT_LABEL[m.unit] || i18n.qty}" class="material-quantity w-full" step="0.01" min="0" />
+            ${unitInline}
+          </label>`;
 
       const genericBadge = m.type === 'generic' ? `
           <span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--white-0)] gap-1 flex items-center shrink-0" title="${i18n.genericEpd || 'Generic placeholder EPD — not from an official source'}">
@@ -1184,10 +1206,7 @@
           </label>
           ${partSelect}
           ${categorySelect}
-          <label class="input" style="flex:1 1 0;min-width:0;">
-            <input type="number" value="${m.quantity || ''}" placeholder="${i18n.qty}" class="material-quantity w-full" step="0.01" min="0" />
-            ${unitCell}
-          </label>
+          ${qtyUnit}
           <div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"></div>
           <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch"
                   title="${i18n.duplicate || 'Duplicate'}"

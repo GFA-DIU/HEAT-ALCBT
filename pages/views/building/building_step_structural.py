@@ -264,6 +264,16 @@ def handle_filter_epds(request):
     )
 
 
+# "dimension (unit)" labels so the BoQ unit selector is self-explanatory. Computed
+# here (not via a template filter) so adding an EPD never depends on a filter loading.
+_UNIT_DIMENSION_LABEL = {
+    "kg": "Mass (kg)", "ton": "Mass (ton)", "m3": "Volume (m³)",
+    "m2": "Area (m²)", "m": "Length (m)", "pcs": "Quantity (pcs)", "unknown": "Layers (#)",
+}
+# Compact symbol shown in the inline unit dropdown (keeps the row clean like single-unit rows).
+_UNIT_SYMBOL = {"m3": "m³", "m2": "m²", "unknown": "#"}
+
+
 def handle_select_product(request):
     """Add an EPD to the selected materials list."""
     epd_id = request.POST.get("epd_id")
@@ -326,6 +336,11 @@ def handle_select_product(request):
             "selection_text": selection_text,
             "timestamp": datetime.now().strftime("%Y%m%d%H%M%S%f"),
             "available_units": available_units,
+            "available_unit_options": [
+                {"value": u, "label": _UNIT_DIMENSION_LABEL.get(u, u),
+                 "symbol": _UNIT_SYMBOL.get(u, u), "selected": u == selection_unit}
+                for u in available_units
+            ],
             "gwp": epd.get_gwp_impact_sum("a1a3") or 0,
             "source": epd.source or "",
             "type": epd.type,
