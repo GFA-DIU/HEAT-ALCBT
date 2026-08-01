@@ -91,7 +91,7 @@
                 <span class="shrink-0">{% translate "Add building" %}</span>
               </button>
             </a>
-            <button id="import-btn" class="btn btn-outline rounded-lg w-max" onclick="import_dialog.showModal()">
+            <button id="import-btn" class="btn btn-outline rounded-lg w-max" onclick="import_choice_dialog.showModal()">
               <span data-icon="import-line"></span>
               <span class="shrink-0">{% translate "Import building" %}</span>
             </button>
@@ -237,6 +237,8 @@
 
     <div hx-get="{% url 'import_dialog' %}" hx-trigger="load" hx-swap="outerHTML">
     </div>
+
+    {% include "pages/home/boq-import/boq-import-dialog.html" %}
 
     <script>
     var i18n = {

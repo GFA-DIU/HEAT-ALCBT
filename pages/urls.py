@@ -67,11 +67,16 @@ from .views.building.ventilation_system import (
     create_or_update_ventilation_system, delete_ventilation_system,
     get_ventilation_systems)
 from .views.home import buildings_list, duplicate_building
+from .views.building.import_boq import (download_boq_template,
+                                        import_boq_preview, import_boq_process)
 from .views.resources import resources
 
 urlpatterns = [
     path("", buildings_list, name="home"),
     path("building/<uuid:building_id>/duplicate/", duplicate_building, name="duplicate_building"),
+    path("import-boq/template/", download_boq_template, name="import_boq_template"),
+    path("import-boq/preview/", import_boq_preview, name="import_boq_preview"),
+    path("import-boq/process/", import_boq_process, name="import_boq_process"),
     path("examples/", examples_list, name="examples"),
     path("examples/<uuid:building_id>/", example_preview, name="example_preview"),
     path("examples/<uuid:building_id>/start/", start_from_example, name="start_from_example"),
