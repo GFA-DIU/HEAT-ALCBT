@@ -150,8 +150,19 @@
               ></span>
             </a>
             <button type="button"
+              onclick="handleBuildingDuplicate(event, '{{ building.id }}')"
+              class="btn size-6 btn-ghost p-0"
+              title="{% translate 'Duplicate' %}">
+              <span
+                data-icon="file-copy-line"
+                data-size="20"
+                data-color="var(--icon--sub-600)"
+              ></span>
+            </button>
+            <button type="button"
               onclick="handleBuildingDelete(event, '{{ building.id }}')"
-              class="btn size-6 btn-ghost p-0">
+              class="btn size-6 btn-ghost p-0"
+              title="{% translate 'Delete' %}">
               <span
                 data-icon="delete-bin-5-line"
                 data-size="20"
@@ -205,15 +216,65 @@
   var i18n = {
     deleteBuildingConfirm: "{% translate 'This will permanently delete the building and all associated data.' %}",
     deleteBuildingTitle:   "{% translate 'Delete Building?' %}",
+    duplicateBuildingConfirm: "{% translate 'A full editable copy of this building (all components and data) will be created.' %}",
+    duplicateBuildingTitle:   "{% translate 'Duplicate Building?' %}",
+    deleteFailed:          "{% translate 'Could not delete the building. Please try again.' %}",
+    duplicateFailed:       "{% translate 'Could not duplicate the building. Please try again.' %}",
   };
+
+  // Always ask a question before a state-changing action. Prefer the styled
+  // dialog, but GUARANTEE a prompt with a native confirm fallback if the styled
+  // dialog is unavailable or misbehaves on this page.
+  async function askConfirm(message, title, danger) {
+    try {
+      if (window.confirmDialog && typeof window.confirmDialog.delete === 'function') {
+        const res = danger
+          ? await window.confirmDialog.delete(message, title)
+          : await window.confirmDialog.info(message, title);
+        if (typeof res === 'boolean') return res;   // dialog answered
+      }
+    } catch (e) { /* fall through to native */ }
+    return window.confirm((title ? title + '\n\n' : '') + message);
+  }
+
+  async function handleBuildingDuplicate(event, buildingId) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const confirmed = await askConfirm(
+      i18n.duplicateBuildingConfirm,
+      i18n.duplicateBuildingTitle,
+      false
+    );
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/building/${buildingId}/duplicate/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        window.location.reload();   // Django success message renders as a toast
+      } else {
+        alert(i18n.duplicateFailed);
+      }
+    } catch (error) {
+      console.error('Error duplicating building:', error);
+      alert(i18n.duplicateFailed);
+    }
+  }
 
   async function handleBuildingDelete(event, buildingId) {
     event.preventDefault();
     event.stopPropagation();
 
-    const confirmed = await confirmDialog.delete(
+    const confirmed = await askConfirm(
       i18n.deleteBuildingConfirm,
-      i18n.deleteBuildingTitle
+      i18n.deleteBuildingTitle,
+      true
     );
 
     if (confirmed) {
@@ -230,9 +291,11 @@
           window.location.reload();
         } else {
           console.error('Delete failed');
+          alert(i18n.deleteFailed);
         }
       } catch (error) {
         console.error('Error:', error);
+        alert(i18n.deleteFailed);
       }
     }
   }

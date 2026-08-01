@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.db import models, transaction
@@ -10,10 +11,12 @@ from django.views.decorators.http import require_http_methods
 from accounts.forms import CustomUserUpdateForm, UserProfileUpdateForm
 from pages.models.assembly import Assembly, AssemblyMode, StructuralProduct
 from pages.models.building import (Building, BuildingAssembly,
-                                   BuildingAssemblySimulated, OperationalProduct)
+                                   BuildingAssemblySimulated, OperationalProduct,
+                                   SimulatedOperationalProduct)
 from pages.models.epd import EPDImpact
 from pages.views.building.building_stats import (
     calculate_total_embodied_carbon, calculate_total_operational_carbon)
+from pages.views.building.clone_building import clone_building, _LEAF_CHILD_MODELS
 
 logger = logging.getLogger(__name__)
 
@@ -161,10 +164,11 @@ def buildings_list(request):
         )  # Partial update for POST
 
     elif request.method == "DELETE":
-        context = handle_delete_building(request)
+        context, ok = handle_delete_building(request)
         if request.headers.get("HX-Request"):
             return render(request, "pages/home/partials/buildings_list.html", context)
-        return JsonResponse({"status": "success"}, status=200)
+        return JsonResponse(
+            {"status": "success" if ok else "error"}, status=200 if ok else 500)
     
     # If HTMX request, return only the buildings list partial
     if request.headers.get("HX-Request"):
@@ -176,18 +180,23 @@ def buildings_list(request):
     return render(request, "pages/home/home.html", context)
 
 
-@transaction.atomic
 def handle_delete_building(request):
-    building_id = request.GET.get("building_id")
+    """Delete a building and report whether it actually succeeded.
 
+    Returns (context, ok). Previously this swallowed every exception and always
+    reported success, so a failed delete looked like it worked but the building
+    stayed. Now a failure rolls back cleanly (in _delete_building's atomic) and is
+    surfaced to the caller.
+    """
+    building_id = request.GET.get("building_id")
+    ok = True
     try:
         _delete_building(building_id)
+    except Exception:
+        logger.exception("Error deleting building %s", building_id)
+        ok = False
 
-    except:
-        logger.exception("Error occured when trying to delete building: %s", building_id)
-
-
-    # Get remaining buildings and add statistics
+    # Remaining buildings for the refreshed list (fresh query, outside the delete txn)
     sort_query = request.GET.get("sort", DEFAULT_SORT)
     if sort_query not in SORT_OPTIONS:
         sort_query = DEFAULT_SORT
@@ -196,37 +205,73 @@ def handle_delete_building(request):
         .exclude(is_example=True)
         .order_by(SORT_OPTIONS[sort_query])
     )
-    buildings_with_stats = _buildings_with_stats(buildings)
-
-    context = {"buildings": buildings_with_stats, "sort_query": sort_query}
-    return context
+    context = {"buildings": _buildings_with_stats(buildings), "sort_query": sort_query}
+    return context, ok
 
 
+@transaction.atomic
 def _delete_building(building_id):
-    # Delete assemblies
-    # TODO: Change once assemblies are managed separately
-    assemblies_list = (
-        BuildingAssembly.objects.filter(building__id=building_id).values_list('assembly_id', flat=True).union(
-            BuildingAssemblySimulated.objects.filter(building__id=building_id).values_list('assembly_id', flat=True)
+    """Delete a building and ALL its data, child-rows first.
+
+    The building's child tables (energy summary, operational systems/products,
+    BoQ files, assembly links, ...) are declared CASCADE in the ORM but the DB
+    foreign keys are DEFERRABLE NO-ACTION, so a plain building.delete() fails at
+    commit (see HANDOVER.md). Deleting the children explicitly first avoids that.
+    Runs in one transaction: any error rolls the whole thing back (nothing half-deleted).
+    """
+    building = get_object_or_404(Building, id=building_id)
+
+    # 1) Structural: link rows, then the CUSTOM assemblies they own
+    #    (custom assemblies cascade-delete their StructuralProducts; shared/template
+    #    assemblies are left intact — only the link rows to this building go).
+    custom_assembly_ids = list(
+        BuildingAssembly.objects.filter(building=building).values_list("assembly_id", flat=True).union(
+            BuildingAssemblySimulated.objects.filter(building=building).values_list("assembly_id", flat=True)
         )
     )
+    BuildingAssembly.objects.filter(building=building).delete()
+    BuildingAssemblySimulated.objects.filter(building=building).delete()
+    Assembly.objects.filter(id__in=custom_assembly_ids, mode=AssemblyMode.CUSTOM).delete()
 
-    # Find and delete associated assemblies with AssemblyMode.CUSTOM
-    assemblies_to_delete = Assembly.objects.filter(
-            id__in=assemblies_list,
-            mode=AssemblyMode.CUSTOM
-        )
-    logger.info("Delete %s out of %s assemblies from building %s", len(assemblies_list), len(assemblies_to_delete), building_id)
-    assemblies_to_delete.delete()
-    
-    
-    building_to_delete = get_object_or_404(Building, id=building_id)
+    # 2) Operational children + energy summary + simulated products (child-first)
+    for model in _LEAF_CHILD_MODELS:  # incl. OperationalProduct, EnergySummary, systems...
+        model.objects.filter(building=building).delete()
+    SimulatedOperationalProduct.objects.filter(building=building).delete()
 
-    # Delete certification file and BoQ files from storage before deleting the building
-    if building_to_delete.certification_file:
-        building_to_delete.certification_file.delete(save=False)
-    for boq in building_to_delete.boq_files.all():
+    # 3) Files: clear storage, then the DB rows
+    if building.certification_file:
+        building.certification_file.delete(save=False)
+    for boq in building.boq_files.all():
         boq.file.delete(save=False)
+    building.boq_files.all().delete()
 
-    building_to_delete.delete()
-    logger.info("Successfully deleted building '%s' from list", building_to_delete)
+    # 4) The building itself (all children gone -> no deferred-FK violation)
+    building.delete()
+    logger.info("Successfully deleted building %s", building_id)
+
+
+@login_required
+@require_http_methods(["POST"])
+def duplicate_building(request, building_id):
+    """Deep-copy one of the user's own buildings into a new, editable copy.
+
+    Reuses clone_building() (the example-buildings deep-copy). The copy is a
+    private, non-example building named '<name> (copy)', owned by the same user.
+    Returns the refreshed list partial (HTMX) or JSON; a success toast is shown
+    via Django messages after the page reloads.
+    """
+    source = get_object_or_404(
+        Building, id=building_id, created_by=request.user, is_example=False)
+    new = clone_building(source, request.user, f"{source.name} (copy)")
+    logger.info("Duplicated building %s -> %s for user %s", source.pk, new.pk, request.user)
+    messages.success(request, f"Duplicated '{source.name}'.")
+
+    buildings = (
+        Building.objects.filter(created_by=request.user)
+        .exclude(is_example=True)
+        .order_by(SORT_OPTIONS[DEFAULT_SORT])
+    )
+    context = {"buildings": _buildings_with_stats(buildings), "sort_query": DEFAULT_SORT}
+    if request.headers.get("HX-Request"):
+        return render(request, "pages/home/partials/buildings_list.html", context)
+    return JsonResponse({"status": "success", "id": str(new.pk)}, status=200)

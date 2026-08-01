@@ -66,11 +66,12 @@ from .views.building.energy_summary import get_energy_summary, save_energy_summa
 from .views.building.ventilation_system import (
     create_or_update_ventilation_system, delete_ventilation_system,
     get_ventilation_systems)
-from .views.home import buildings_list
+from .views.home import buildings_list, duplicate_building
 from .views.resources import resources
 
 urlpatterns = [
     path("", buildings_list, name="home"),
+    path("building/<uuid:building_id>/duplicate/", duplicate_building, name="duplicate_building"),
     path("examples/", examples_list, name="examples"),
     path("examples/<uuid:building_id>/", example_preview, name="example_preview"),
     path("examples/<uuid:building_id>/start/", start_from_example, name="start_from_example"),
