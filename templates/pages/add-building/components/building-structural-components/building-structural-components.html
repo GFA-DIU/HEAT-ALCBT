@@ -542,6 +542,11 @@
     saving:            "{% translate 'Saving...' %}",
     allSubcategories:  "{% translate 'All Sub-categories' %}",
     allChildCategories:"{% translate 'All Child Categories' %}",
+    edit:              "{% translate 'Edit' %}",
+    delete:            "{% translate 'Delete' %}",
+    duplicate:         "{% translate 'Duplicate' %}",
+    unit:              "{% translate 'Unit' %}",
+    duplicatedItem:    "{% translate 'Duplicated successfully' %}",
   };
 
   // Use window assignment to avoid const/class re-declaration errors on dynamic reload
@@ -591,11 +596,18 @@
     document.getElementById('saved-items-list')?.addEventListener('click', (e) => {
       var editBtn = e.target.closest('.edit-item-btn');
       var deleteBtn = e.target.closest('.delete-item-btn');
+      var duplicateBtn = e.target.closest('.duplicate-item-btn');
 
       if (editBtn) {
         var type = editBtn.dataset.itemType;
         var index = parseInt(editBtn.dataset.itemIndex);
         this.editItem(type, index);
+      }
+
+      if (duplicateBtn) {
+        var type = duplicateBtn.dataset.itemType;
+        var index = parseInt(duplicateBtn.dataset.itemIndex);
+        this.duplicateSavedItem(type, index);
       }
 
       if (deleteBtn) {
@@ -946,14 +958,17 @@
     const materials = Array.from(list.children).map(li => {
       const epdId = li.dataset.epdId;
       const timestamp = li.dataset.timestamp;
+      const availableUnits = (li.dataset.availableUnits || '').split(',').filter(Boolean);
       const material = {
         epd_id: epdId,
         name: li.dataset.name,
         gwp: parseFloat(li.dataset.gwp) || 0,
         type: li.dataset.type || '',
+        source: li.dataset.source || '',
         description: li.querySelector('.material-description')?.value || '',
         quantity: parseFloat(li.querySelector('.material-quantity')?.value) || 0,
         unit: li.querySelector('.material-unit-value')?.value || li.querySelector('.material-unit')?.dataset?.unit || '',
+        available_units: availableUnits,
         category: li.querySelector('.material-category')?.value || '',
         timestamp: timestamp
       };
@@ -962,6 +977,60 @@
     });
     console.log(`[collectMaterials] Total materials from ${listId}:`, materials.length);
     return materials;
+  }
+
+  /** Duplicate one material row inside the open modal (client-side, pre-save). */
+  duplicateMaterialRow(mode, ts) {
+    const listId = mode === 'boq' ? 'structural_materials_list' : 'component_materials_list';
+    const materials = this.collectMaterials(listId);
+    const idx = materials.findIndex(m => String(m.timestamp) === String(ts));
+    if (idx === -1) return;
+    const clone = { ...materials[idx] };
+    clone.timestamp = 'dup' + Date.now() + Math.floor(Math.random() * 1000);
+    materials.splice(idx + 1, 0, clone);           // insert right after the original
+    this.renderMaterials(materials, mode);          // re-render (also rebinds events + updates UI)
+  }
+
+  /** Duplicate a saved component/BoQ card as '<name> (copy)', persisted via the
+   *  normal save endpoint so carbon is recomputed server-side (no maths in JS). */
+  async duplicateSavedItem(type, index) {
+    const src = (type === 'boq' ? this.boqItems : this.componentItems)[index];
+    if (!src) return;
+    const clone = JSON.parse(JSON.stringify(src));
+    clone.id = null;
+    if (type === 'boq') clone.name = (clone.name || 'BOQ') + ' (copy)';
+    else clone.title = (clone.title || 'Component') + ' (copy)';
+    (clone.materials || []).forEach((m, i) => { m.timestamp = 'dup' + Date.now() + i; });
+
+    const buildingUuid = new URLSearchParams(window.location.search).get('building_uuid');
+    if (!buildingUuid) { Toast.error('Building UUID not found'); return; }
+    try {
+      const response = await fetch('{% url "building_step_structural" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+        },
+        body: JSON.stringify({
+          action: 'save_assembly', building_uuid: buildingUuid,
+          mode: type, assembly_id: null, assembly_data: clone
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        clone.id = result.assembly.id;
+        clone.total_gwp = result.assembly.total_gwp ?? 0;
+        if (type === 'boq') this.boqItems.unshift(clone); else this.componentItems.unshift(clone);
+        this.updateUI();
+        this.emitFormStatus();
+        Toast.success(i18n.duplicatedItem || 'Duplicated successfully');
+      } else {
+        Toast.error(result.error || 'Failed to duplicate');
+      }
+    } catch (e) {
+      console.error('Error duplicating item:', e);
+      Toast.error('Failed to duplicate');
+    }
   }
 
   validateMaterials(materials, mode) {
@@ -1063,6 +1132,19 @@
       li.dataset.name = m.name;
       li.dataset.gwp = m.gwp;
       if (m.type) li.dataset.type = m.type;
+      if (m.source) li.dataset.source = m.source;
+      const availableUnits = (m.available_units && m.available_units.length) ? m.available_units : [m.unit];
+      li.dataset.availableUnits = availableUnits.join(',');
+
+      // Unit cell: a dropdown only when the EPD supports >1 convertible unit (BoQ mode);
+      // otherwise a locked label. Options come from EPD.get_available_units() so the calc
+      // can always convert the chosen unit — no maths change.
+      const unitCell = (mode === 'boq' && availableUnits.length > 1)
+        ? `<select class="material-unit-value select select-ghost px-1 text-xs text-[var(--text--sub-600)]" style="min-width:3.5rem;" title="${i18n.unit || 'Unit'}">
+             ${availableUnits.map(u => `<option value="${u}" ${u === m.unit ? 'selected' : ''}>${u === 'unknown' ? '#' : u}</option>`).join('')}
+           </select>`
+        : `<span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="${m.unit}">${m.unit === 'unknown' ? '#' : m.unit}</span>
+           <input type="hidden" class="material-unit-value" value="${m.unit}" />`;
 
       const genericBadge = m.type === 'generic' ? `
           <span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--white-0)] gap-1 flex items-center shrink-0" title="${i18n.genericEpd || 'Generic placeholder EPD — not from an official source'}">
@@ -1104,12 +1186,16 @@
           ${categorySelect}
           <label class="input" style="flex:1 1 0;min-width:0;">
             <input type="number" value="${m.quantity || ''}" placeholder="${i18n.qty}" class="material-quantity w-full" step="0.01" min="0" />
-            <span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="${m.unit}">${m.unit === 'unknown' ? '#' : m.unit}</span>
-            <input type="hidden" class="material-unit-value" value="${m.unit}" />
+            ${unitCell}
           </label>
           <div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"></div>
+          <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch"
+                  title="${i18n.duplicate || 'Duplicate'}"
+                  onclick="structuralManager.duplicateMaterialRow('${mode}', '${m.timestamp}')">
+            <span data-icon="file-copy-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
           <button type="button" class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch remove-material-btn"
-                  data-element-id="material-${m.epd_id}-${m.timestamp}">
+                  data-element-id="material-${m.epd_id}-${m.timestamp}" title="${i18n.delete || 'Delete'}">
             <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
           </button>
         </div>
@@ -1438,10 +1524,13 @@
           </div>
         </div>
         <div class="flex gap-2">
-          <button type="button" class="btn size-5 btn-ghost p-0 edit-item-btn" data-item-type="boq" data-item-index="${index}">
+          <button type="button" class="btn size-5 btn-ghost p-0 edit-item-btn" data-item-type="boq" data-item-index="${index}" title="${i18n.edit || 'Edit'}">
             <span data-icon="edit-line" data-size="20" data-color="var(--icon--strong-950)"></span>
           </button>
-          <button type="button" class="btn size-5 btn-ghost p-0 delete-item-btn" data-item-type="boq" data-item-index="${index}">
+          <button type="button" class="btn size-5 btn-ghost p-0 duplicate-item-btn" data-item-type="boq" data-item-index="${index}" title="${i18n.duplicate || 'Duplicate'}">
+            <span data-icon="file-copy-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
+          <button type="button" class="btn size-5 btn-ghost p-0 delete-item-btn" data-item-type="boq" data-item-index="${index}" title="${i18n.delete || 'Delete'}">
             <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
           </button>
         </div>
@@ -1466,14 +1555,25 @@
             <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)]">
               ${item.category_name || i18n.noCategory}
             </span>
+            ${(item.flags && item.flags.length) ? `
+            <span class="badge badge-outline py-1 px-2" style="border-color: var(--state-error-base, #e0182d); color: var(--state-error-base, #e0182d);">
+              &#9888; ${item.flags.length} issue${item.flags.length > 1 ? 's' : ''}
+            </span>` : ''}
             <p class="text-sm/5 text-[var(--text--sub-600)]">${item.quantity || '-'} ${{ area: 'm²', volume: 'm³', mass: 'kg', ton: 'ton', length: 'm', pcs: 'pcs' }[item.dimension] || item.dimension || ''}</p>
           </div>
+          ${(item.flags && item.flags.length) ? `
+          <ul class="text-xs/4 mt-0.5 flex flex-col gap-0.5" style="color: var(--state-error-base, #e0182d);">
+            ${item.flags.map(f => `<li>&#9888; ${f}</li>`).join('')}
+          </ul>` : ''}
         </div>
         <div class="flex gap-2">
-          <button type="button" class="btn size-5 btn-ghost p-0 edit-item-btn" data-item-type="component" data-item-index="${index}">
+          <button type="button" class="btn size-5 btn-ghost p-0 edit-item-btn" data-item-type="component" data-item-index="${index}" title="${i18n.edit || 'Edit'}">
             <span data-icon="edit-line" data-size="20" data-color="var(--icon--strong-950)"></span>
           </button>
-          <button type="button" class="btn size-5 btn-ghost p-0 delete-item-btn" data-item-type="component" data-item-index="${index}">
+          <button type="button" class="btn size-5 btn-ghost p-0 duplicate-item-btn" data-item-type="component" data-item-index="${index}" title="${i18n.duplicate || 'Duplicate'}">
+            <span data-icon="file-copy-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+          </button>
+          <button type="button" class="btn size-5 btn-ghost p-0 delete-item-btn" data-item-type="component" data-item-index="${index}" title="${i18n.delete || 'Delete'}">
             <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
           </button>
         </div>
