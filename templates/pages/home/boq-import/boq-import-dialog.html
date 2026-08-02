@@ -1,0 +1,177 @@
+{% load i18n %}
+{# ---- Choice modal: Whole building vs BoQ (opened by the Import button) ---- #}
+<dialog id="import_choice_dialog" class="modal">
+  <div class="modal-box max-w-lg">
+    <div class="flex items-center justify-between mb-1">
+      <h2 class="text-lg font-bold">{% translate "Import" %}</h2>
+      <button class="btn btn-ghost btn-sm size-8 p-0" onclick="import_choice_dialog.close()">
+        <span data-icon="close-line" data-size="20"></span>
+      </button>
+    </div>
+    <p class="text-sm text-[var(--text--sub-600)] mb-4">{% translate "Choose what you want to import." %}</p>
+    <div class="flex flex-col gap-3">
+      <button class="btn btn-outline justify-start h-auto py-3 rounded-xl"
+              onclick="import_choice_dialog.close(); import_dialog.showModal();">
+        <span data-icon="building-3-line" data-size="22"></span>
+        <span class="flex flex-col items-start">
+          <span class="font-semibold">{% translate "Whole building (full template)" %}</span>
+          <span class="text-xs text-[var(--text--sub-600)]">{% translate "Building info, structural + operational data." %}</span>
+        </span>
+      </button>
+      <button class="btn btn-outline justify-start h-auto py-3 rounded-xl"
+              onclick="import_choice_dialog.close(); window.boqImport.open();">
+        <span data-icon="file-list-3-line" data-size="22"></span>
+        <span class="flex flex-col items-start">
+          <span class="font-semibold">{% translate "BoQ / components only" %}</span>
+          <span class="text-xs text-[var(--text--sub-600)]">{% translate "Upload a Bill of Quantities — auto-fills components & embodied carbon." %}</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</dialog>
+
+{# ---- BoQ import dialog (4 steps) ---- #}
+<dialog id="boq_import_dialog" class="modal">
+  <div class="modal-box max-w-3xl">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-bold">{% translate "Import BoQ" %}</h2>
+      <button class="btn btn-ghost btn-sm size-8 p-0" onclick="boqImport.close()">
+        <span data-icon="close-line" data-size="20"></span>
+      </button>
+    </div>
+
+    {# Step 1 — building details #}
+    <div data-boq-step="1">
+      <p class="text-sm text-[var(--text--sub-600)] mb-3">{% translate "Building details (needed to compute kgCO₂/m²)." %}</p>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex flex-col gap-1 col-span-2"><span class="text-xs font-medium">{% translate "Name" %} *</span>
+          <input id="boq_name" class="input input-bordered" placeholder="e.g. Khema Hospital" /></label>
+        <label class="flex flex-col gap-1"><span class="text-xs font-medium">{% translate "Country" %}</span>
+          <select id="boq_country" class="select select-bordered">
+            <option value="Cambodia">Cambodia</option><option value="India">India</option>
+            <option value="Indonesia">Indonesia</option><option value="Thailand">Thailand</option>
+            <option value="Vietnam">Vietnam</option>
+          </select></label>
+        <label class="flex flex-col gap-1"><span class="text-xs font-medium">{% translate "Total floor area (m²)" %} *</span>
+          <input id="boq_gfa" type="number" min="1" step="1" class="input input-bordered" placeholder="e.g. 5100" /></label>
+      </div>
+    </div>
+
+    {# Step 2 — upload #}
+    <div data-boq-step="2" class="hidden">
+      <div class="border-2 border-dashed rounded-2xl p-8 text-center border-[var(--stroke--soft-200)]">
+        <span data-icon="upload-cloud-2-line" data-size="28"></span>
+        <p class="text-sm mt-2">{% translate "Upload your BoQ (.xlsx) in the BEAT mapped format." %}</p>
+        <input id="boq_file" type="file" accept=".xlsx,.xls" class="file-input file-input-bordered mt-3" />
+      </div>
+      <p class="text-xs text-[var(--text--sub-600)] mt-3">{% translate "Need the format?" %}
+        <a href="{% url 'import_boq_template' %}" class="link link-primary">{% translate "Download BoQ template" %}</a></p>
+    </div>
+
+    {# Step 3 — preview #}
+    <div data-boq-step="3" class="hidden">
+      <div id="boq_preview_summary" class="text-sm mb-2"></div>
+      <div class="max-h-80 overflow-auto border rounded-xl border-[var(--stroke--soft-200)]">
+        <table class="table table-xs"><thead><tr>
+          <th></th><th>{% translate "Description" %}</th><th>{% translate "Component" %}</th>
+          <th>{% translate "Qty" %}</th><th>{% translate "EPD" %}</th><th>{% translate "Status" %}</th></tr></thead>
+          <tbody id="boq_preview_rows"></tbody></table>
+      </div>
+    </div>
+
+    {# Step 4 — done #}
+    <div data-boq-step="4" class="hidden text-center py-6">
+      <span data-icon="checkbox-circle-fill" data-size="36" data-color="#1FC16B"></span>
+      <p id="boq_done_msg" class="text-sm mt-2"></p>
+    </div>
+
+    <div class="flex justify-between items-center mt-5">
+      <button id="boq_back" class="btn btn-ghost" onclick="boqImport.back()">{% translate "Back" %}</button>
+      <div class="flex gap-2">
+        <button class="btn btn-ghost" onclick="boqImport.close()">{% translate "Cancel" %}</button>
+        <button id="boq_next" class="btn btn-primary" onclick="boqImport.next()">{% translate "Continue" %}</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+window.boqImport = new (class {
+  constructor(){ this.step=1; this.rows=[]; this.buildingUuid=null; }
+  open(){ this.step=1; this.rows=[]; this._render(); boq_import_dialog.showModal(); }
+  close(){ boq_import_dialog.close(); }
+  _csrf(){ return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}'; }
+  _render(){
+    document.querySelectorAll('[data-boq-step]').forEach(el =>
+      el.classList.toggle('hidden', String(el.dataset.boqStep)!==String(this.step)));
+    document.getElementById('boq_back').classList.toggle('invisible', this.step===1 || this.step===4);
+    const next=document.getElementById('boq_next');
+    next.textContent = this.step===3 ? 'Create building' : (this.step===4 ? 'Open building' : 'Continue');
+    next.classList.toggle('hidden', false);
+  }
+  back(){ if(this.step>1){ this.step--; this._render(); } }
+  async next(){
+    if(this.step===1){
+      if(!document.getElementById('boq_name').value.trim()){ alert('Enter a building name'); return; }
+      if(!(parseFloat(document.getElementById('boq_gfa').value)>0)){ alert('Enter the floor area (m²)'); return; }
+      this.step=2; this._render(); return;
+    }
+    if(this.step===2){ await this._upload(); return; }
+    if(this.step===3){ await this._process(); return; }
+    if(this.step===4){ if(this.buildingUuid) window.location.href='/building/edit?building_uuid='+this.buildingUuid; return; }
+  }
+  async _upload(){
+    const f=document.getElementById('boq_file').files[0];
+    if(!f){ alert('Choose a BoQ file'); return; }
+    const fd=new FormData(); fd.append('file', f);
+    const btn=document.getElementById('boq_next'); btn.disabled=true; btn.textContent='Reading…';
+    try{
+      const r=await fetch('{% url "import_boq_preview" %}',{method:'POST',headers:{'X-CSRFToken':this._csrf()},body:fd});
+      const d=await r.json();
+      if(!d.success){ alert(d.error||'Could not read the file'); return; }
+      this.rows=d.rows;
+      this._renderPreview(d.counts);
+      this.step=3; this._render();
+    }catch(e){ console.error(e); alert('Upload failed'); }
+    finally{ btn.disabled=false; this._render(); }
+  }
+  _renderPreview(counts){
+    document.getElementById('boq_preview_summary').innerHTML =
+      `<b>${counts.ok}</b> ready · <b>${counts.bad_unit+counts.no_epd}</b> flagged (excluded by default) · ${counts.total} total`;
+    const tb=document.getElementById('boq_preview_rows'); tb.innerHTML='';
+    this.rows.forEach((row,i)=>{
+      row._include = (row.status==='ok');
+      const tr=document.createElement('tr');
+      const badge = row.status==='ok'
+        ? '<span class="badge badge-success badge-sm">ready</span>'
+        : `<span class="badge badge-error badge-sm" title="${(row.reason||'').replace(/"/g,'&quot;')}">flagged</span>`;
+      tr.innerHTML=`<td><input type="checkbox" class="checkbox checkbox-xs" data-i="${i}" ${row._include?'checked':''}></td>
+        <td>${(row.description||'').slice(0,28)}</td><td>${row.component||''}</td>
+        <td>${row.quantity} ${row.unit_raw}</td><td>${(row.epd_name||'').slice(0,26)}</td><td>${badge}</td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.addEventListener('change',e=>{
+      this.rows[+e.target.dataset.i]._include = e.target.checked; }));
+  }
+  async _process(){
+    const materials=this.rows.filter(r=>r._include && r.epd_id).map(r=>({
+      epd_id:r.epd_id, unit:r.unit, quantity:r.quantity, description:r.description, component:r.component }));
+    if(!materials.length){ alert('No rows selected to import'); return; }
+    const btn=document.getElementById('boq_next'); btn.disabled=true; btn.textContent='Creating…';
+    try{
+      const r=await fetch('{% url "import_boq_process" %}',{method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRFToken':this._csrf()},
+        body:JSON.stringify({name:document.getElementById('boq_name').value.trim(),
+          country:document.getElementById('boq_country').value,
+          gfa:document.getElementById('boq_gfa').value, materials})});
+      const d=await r.json();
+      if(!d.success){ alert(d.error||'Could not create the building'); return; }
+      this.buildingUuid=d.building_uuid;
+      document.getElementById('boq_done_msg').textContent =
+        `Building created with ${d.created} materials`+(d.skipped?.length?` (${d.skipped.length} skipped)`:'')+'. Add operational data next to get whole-life carbon.';
+      this.step=4; this._render();
+    }catch(e){ console.error(e); alert('Create failed'); }
+    finally{ btn.disabled=false; this._render(); }
+  }
+})();
+</script>

@@ -28,6 +28,7 @@ from pages.models.climate_type import ClimateType
 from pages.models.epd import EPD, EPDImpact, EPDType, MaterialCategory
 from pages.geo_lookup import resolve_building_location_fields
 from pages.views.building.impact_calculation import calculate_impacts, ImpactCalculationError
+from pages.views.building.plausibility import assembly_flags
 
 logger = logging.getLogger(__name__)
 
@@ -588,11 +589,14 @@ def handle_structural_components_step(request):
                 # Get materials for this assembly
                 materials = []
                 for sp in products:
+                    _avail = sp.epd.get_available_units()
+                    _avail = sorted(list(_avail)) if _avail else [sp.input_unit]
                     material = {
                         'epd_id': sp.epd.id,
                         'name': sp.epd.name,
                         'quantity': float(sp.quantity),
                         'unit': sp.input_unit,
+                        'available_units': _avail,
                         'description': sp.description or '',
                         'gwp': float(sp.epd.get_gwp_impact_sum("a1a3") or 0),
                         'country': sp.epd.country.name if sp.epd.country else 'Unknown',
@@ -654,6 +658,8 @@ def handle_structural_components_step(request):
                         'total_gwp': total_gwp,
                         'is_template': assembly.is_template,
                         'is_newest': is_newest,
+                        # Plausibility badge: short "doesn't make sense" labels for this row.
+                        'flags': assembly_flags(assembly, products, total_gwp),
                     })
 
         except (ValueError, Building.DoesNotExist):

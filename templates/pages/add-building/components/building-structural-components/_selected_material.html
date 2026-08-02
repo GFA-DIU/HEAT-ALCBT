@@ -5,7 +5,9 @@
     data-timestamp="{{ epd.timestamp }}"
     data-name="{{ epd.name }}"
     data-gwp="{{ epd.gwp }}"
-    data-type="{{ epd.type }}">
+    data-type="{{ epd.type }}"
+    data-source="{{ epd.source }}"
+    data-available-units="{{ epd.available_units|join:"," }}">
       <div class="flex items-center justify-between mb-2 w-full">
         <span class="text-sm/5 font-medium truncate flex-1">{{ epd.name|truncatechars:50 }}</span>
         <div class="flex items-center gap-2">
@@ -60,17 +62,28 @@
     <label class="input" style="flex:1 1 0;min-width:0;">
       <input type="number"
             placeholder="{% if epd.selection_text %}{{ epd.selection_text }}{% else %}{% translate 'Qty' %}{% endif %}"
-            step="0.01"
-            min="0"
-            class="material-quantity"
-            required />
-      <span class="text-xs text-[var(--text--sub-600)] material-unit" data-unit="{{ epd.selection_unit }}">{% if epd.selection_unit == 'unknown' %}layers{% else %}{{ epd.selection_unit }}{% endif %}</span>
+            step="0.01" min="0" class="material-quantity" required />
+      {% if mode == 'boq' and epd.available_units|length > 1 %}
+      <select class="material-unit-value select select-ghost select-xs text-xs shrink-0" style="width:auto;min-width:2.9rem;padding-left:0.35rem;padding-right:1.1rem;"
+              title="{% translate 'Switch unit' %}" onchange="structuralManager.onMaterialUnitChange(this)">
+        {% for opt in epd.available_unit_options %}
+        <option value="{{ opt.value }}" {% if opt.selected %}selected{% endif %}>{{ opt.symbol }}</option>
+        {% endfor %}
+      </select>
+      {% else %}
+      <span class="text-xs text-[var(--text--sub-600)] material-unit shrink-0" data-unit="{{ epd.selection_unit }}">{% if epd.selection_unit == 'unknown' %}#{% else %}{{ epd.selection_unit }}{% endif %}</span>
       <input type="hidden" class="material-unit-value" value="{{ epd.selection_unit }}" />
-    </label>
+      {% endif %}
+    </label>{% comment %}unit sits inside the quantity box (compact) so all rows share the clean single-unit layout{% endcomment %}
 
     <div class="w-[0.0625rem] bg-[var(--stroke--soft-200)] h-full my-2"></div>
 
-
+        <button type="button"
+                class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch"
+                title="{% translate 'Duplicate' %}"
+                onclick="structuralManager.duplicateMaterialRow('{{ mode }}', '{{ epd.timestamp }}')">
+          <span data-icon="file-copy-line" data-size="20" data-color="var(--icon--strong-950)"></span>
+        </button>
         <button type="button"
                 class="btn px-1.5 btn-outline border-[var(--stroke--soft-200)] self-stretch remove-material-btn"
                 data-element-id="material-{{ epd.id }}-{{ epd.timestamp }}">

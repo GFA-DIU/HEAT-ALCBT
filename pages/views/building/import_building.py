@@ -2416,6 +2416,26 @@ def import_structural_components(request):
     # Remove assemblies that ended up with no materials
     assemblies_to_create = [a for a in assemblies_to_create if a["materials"]]
 
+    # Normalize share-of-mass / share-of-volume materials. For mass/volume
+    # assemblies get_epd_dimension_info assigns input_unit=PERCENT, but the template
+    # provides each material's raw mass/volume, not a 0-100 share. Convert each to a
+    # percentage of the assembly total so the shares sum to 100 (the carbon calc
+    # requires this; storing raw values as 'percent' produced shares of thousands of
+    # percent that were silently skipped). The material's absolute amount still comes
+    # from the assembly quantity x share, so this preserves the mass/volume ratios.
+    for a in assemblies_to_create:
+        pct = [m for m in a["materials"] if m["unit"] == Unit.PERCENT]
+        total = sum(Decimal(str(m["quantity"])) for m in pct)
+        if pct and total > 0:
+            shares = [[m, (Decimal(str(m["quantity"])) / total * Decimal("100")).quantize(Decimal("0.01"))]
+                      for m in pct]
+            residual = Decimal("100") - sum(s for _, s in shares)
+            if residual != 0:
+                largest = max(range(len(shares)), key=lambda i: shares[i][1])
+                shares[largest][1] += residual
+            for m, s in shares:
+                m["quantity"] = s
+
     if errors:
         return JsonResponse({"success": False, "errors": errors}, status=400)
 
