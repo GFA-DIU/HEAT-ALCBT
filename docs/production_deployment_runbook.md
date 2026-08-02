@@ -21,6 +21,7 @@ step is deliberate. Read §0 and §1 before starting.
 | E | Generic structural EPD refresh (GWP/PENRT, steel→tonne) | `load_local_epds -f generic_EPDs` |
 | F | Generic operational EF update (TH electricity 0.475, natural gas) | `load_local_epds -f generic_operationaL_EPDs` |
 | G | Centralized categorization (shared resolver) | code only (used by C–F) |
+| H | IFC grid-localized generic EPDs (98 materials × ID/VN/KH/TH: binders, aluminium, glass, tiles…) | `load_local_epds -f IFC_localized_generic_EPDs` |
 
 **In-use safety:** C and D never modify EPDs already used in a building (copy-on-change).
 E and F update in place **by design** (generic placeholders) — verified during dev that
@@ -93,6 +94,12 @@ heroku run python manage.py load_local_epds -f generic_EPDs --app <your-app>
 
 # F — generic operational EPDs (electricity/natural-gas + names; needs 0049 applied)
 heroku run python manage.py load_local_epds -f generic_operationaL_EPDs --app <your-app>
+
+# H — IFC grid-localized generic EPDs (the ~216 new localized rows for ID/VN/KH/TH).
+#     NOTE: the loader is invoked through load_local_epds with the -f key below — there is
+#     NO standalone `import_ifc_localized_epds` manage.py command (that is an internal
+#     importer function). Idempotent: update_or_create keyed on (name, country, source).
+heroku run python manage.py load_local_epds -f IFC_localized_generic_EPDs --app <your-app>
 
 # G — GCCA A–G concrete Low Carbon Ratings (dynamic; run AFTER C so the Thai ready-mix
 #     concretes exist). --overwrite recomputes ALL m³ concrete labels from the formula,
