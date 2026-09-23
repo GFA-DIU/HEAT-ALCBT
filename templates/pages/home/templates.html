@@ -191,7 +191,7 @@
               <select id="template-country" name="country_id" class="select" required>
                 <option value="">{% translate "Select country" %}</option>
                 {% for country in countries %}
-                  <option value="{{ country.id }}"> <span data-country="{{ country.code2 }}"></span> {{ country.name }}</option>
+                  <option value="{{ country.id }}">{{ country.name }}</option>
                 {% endfor %}
               </select>
             </fieldset>
@@ -322,7 +322,7 @@
                 <select name="country" id="epd-country-filter" class="select">
                   <option value="">{% translate "All Countries" %}</option>
                   {% for country in countries %}
-                    <option value="{{ country.id }}"> <span data-country="{{country.code2}}"></span> {{ country.name }}</option>
+                    <option value="{{ country.id }}">{{ country.name }}</option>
                   {% endfor %}
                 </select>
               </div>

@@ -2,12 +2,7 @@
 <option disabled selected>select an item</option>
 
 {% for item in  options %}
-    {% if type == 'country' %}
-        <option value="{{ item.value }}" >
-            <span data-country="{{item.name}}" data-width="20"></span>
-            <span data-country="{{item.name}}" data-flag="false"></span>
-        </option>
-    {% else %}
-        <option value="{{ item.value }}" >{{ item.name }}</option>  
-    {% endif %}
+        {# Plain text only: native <select> options cannot render child <span>/<img> #}
+        {# in Firefox/Safari. Flags belong in a custom dropdown, not a native option. #}
+        <option value="{{ item.value }}">{{ item.name }}</option>
 {% endfor %}

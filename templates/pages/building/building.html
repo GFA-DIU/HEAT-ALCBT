@@ -266,14 +266,20 @@
             <li class="flex flex-col flex-1">
               <span
                 class="text-sm/5 font-medium text-[var(--text--sub-600)] border-l-2 border-[var(--stroke--soft-200)] pl-2.5"
-                >{% translate "Embodied Carbon" %}</span
+                >{% translate "Embodied Carbon (A1-A5)" %}</span
               >
               <div class="flex px-2.5 items-end bg-[#C1DBE3] w-fit">
-                <span class="text-2xl/8 font-medium">{{ stats.total_embodied_carbon|floatformat:1|default:"0" }}</span>
+                <span class="text-2xl/8 font-medium">{{ stats.upfront_carbon|default:stats.total_embodied_carbon|floatformat:1|default:"0" }}</span>
                 <span class="text-sm/5 font-medium text-[var(--text--sub-600)]"
                   >kgCO<sub>2</sub>eq/m<sup>2</sup></span
                 >
               </div>
+              {% if stats.upfront_carbon %}
+              <span class="text-[10px] text-[var(--text--sub-600)] pl-2.5 mt-0.5"
+                    title="{% translate 'A1-A3 from the EPD; A4 transport and A5w construction waste estimated from country + RICS defaults' %}">
+                A1-A3 {{ stats.total_embodied_carbon|floatformat:1 }} + A4 {{ stats.embodied_a4|floatformat:1 }} + A5w {{ stats.embodied_a5w|floatformat:1 }}
+              </span>
+              {% endif %}
             </li>
             <li class="flex flex-col flex-1">
               <span
@@ -296,6 +302,7 @@
             </li>
             {# Carbon Savings hidden — will be re-enabled in a future release #}
           </ul>
+          {% include "pages/building/_upfront_panel.html" %}
           {% if design_drawings_status == 'available_pending' or boq_status == 'available_pending' %}
           <div class="flex flex-col gap-1 pb-3">
             {% if design_drawings_status == 'available_pending' %}
@@ -334,7 +341,7 @@
             <div id="export-card-assembly" class="flex w-full flex-col border border-[var(--stroke--soft-200)] rounded-2xl bg-white p-4 mt-4" style="width:560px;">
               <div class="flex items-center gap-2 pb-4 border-b border-[var(--stroke--soft-200)]">
                 <span data-icon="bar-chart-box-line" data-size="24" data-color="var(--icon--sub-600)"></span>
-                <span class="text-base/6 font-medium">{% translate "Embodied Carbon" %}</span>
+                <span class="text-base/6 font-medium">{% translate "Embodied Carbon (A1-A3)" %}</span>
               </div>
               <div class="w-full" id="export-assembly-chart-wrap">
                 <canvas id="emboided-carbon-chart-export"></canvas>
@@ -344,7 +351,7 @@
             <div id="export-card-material" class="flex w-full flex-col border border-[var(--stroke--soft-200)] rounded-2xl bg-white p-4 mt-4" style="width:560px;">
               <div class="flex items-center gap-2 pb-4 border-b border-[var(--stroke--soft-200)]">
                 <span data-icon="bar-chart-box-line" data-size="24" data-color="var(--icon--sub-600)"></span>
-                <span class="text-base/6 font-medium">{% translate "Embodied Carbon by Material" %}</span>
+                <span class="text-base/6 font-medium">{% translate "Embodied Carbon by Material (A1-A3)" %}</span>
               </div>
               <div class="w-full" id="export-material-chart-wrap">
                 <canvas id="emboided-carbon-by-material-chart-export"></canvas>
@@ -715,7 +722,7 @@
             data-size="24"
             data-color="var(--icon--sub-600)"
           ></span>
-          <span class="text-base/6 font-medium">{% translate "Embodied Carbon" %}</span>
+          <span class="text-base/6 font-medium">{% translate "Embodied Carbon (A1-A3)" %}</span>
           <div class="ml-auto flex gap-1">
             <button onclick="downloadChartPNG('chart-card-embodied-assembly', 'embodied-carbon-by-assembly')" class="btn btn-xs btn-ghost gap-1" title="{% translate 'Download PNG' %}">
               <span data-icon="download-2-line" data-size="14"></span> PNG
@@ -745,7 +752,7 @@
             data-color="var(--icon--sub-600)"
           ></span>
           <span class="text-base/6 font-medium"
-            >{% translate "Embodied Carbon by Material" %}</span
+            >{% translate "Embodied Carbon by Material (A1-A3)" %}</span
           >
           <div class="ml-auto flex gap-1">
             <button onclick="downloadChartPNG('chart-card-embodied-material', 'embodied-carbon-by-material')" class="btn btn-xs btn-ghost gap-1" title="{% translate 'Download PNG' %}">
@@ -1001,7 +1008,7 @@
         makeExportBarChart("emboided-carbon-chart-export", "export-assembly-chart-wrap",
           chartData.embodied_by_assembly || { labels: [], data: [], absolute: [] }, primaryColor);
         CHART_PNG_META['chart-card-embodied-assembly'] = {
-          title: '{% translate "Embodied Carbon by Assembly" %}',
+          title: '{% translate "Embodied Carbon by Assembly (A1-A3)" %}',
           legendItems: [],
         };
 
@@ -1009,7 +1016,7 @@
         makeExportBarChart("emboided-carbon-by-material-chart-export", "export-material-chart-wrap",
           chartData.embodied_by_material || { labels: [], data: [], absolute: [] }, operationalColor);
         CHART_PNG_META['chart-card-embodied-material'] = {
-          title: '{% translate "Embodied Carbon by Material" %}',
+          title: '{% translate "Embodied Carbon by Material (A1-A3)" %}',
           legendItems: [],
         };
       })();

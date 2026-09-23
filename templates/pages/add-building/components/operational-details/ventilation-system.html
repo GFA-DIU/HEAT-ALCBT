@@ -90,7 +90,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5." title="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -99,7 +99,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -186,7 +186,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5." title="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -195,7 +195,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 2000" min="1" required />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -266,7 +266,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5." title="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -275,7 +275,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -371,7 +371,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5." title="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -380,7 +380,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 3000" min="1" required />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -451,7 +451,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5." title="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -460,7 +460,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 500" min="1" required />
         <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">

@@ -28,7 +28,7 @@
       {% csrf_token %}
       <div class="px-5 py-4">
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">{% translate "Type of hot water system" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Type of hot water system" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="The technology heating the water (electric resistance, heat pump, gas boiler, solar, etc.). It sets the fuel and efficiency basis." title="The technology heating the water (electric resistance, heat pump, gas boiler, solar, etc.). It sets the fuel and efficiency basis."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
           <select class="select w-full" id="hot-water-type-select" name="type_of_hot_water_system"
             hx-get="/select_lists/?hot_water_system_types=1"
             hx-trigger="load"
@@ -126,7 +126,7 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">{% translate "Coefficient of Performance (COP)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Coefficient of Performance (COP)" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Useful heat out divided by energy in. Electric resistance is about 1.0; heat pumps are about 2.5 to 4.0." title="Useful heat out divided by energy in. Electric resistance is about 1.0; heat pumps are about 2.5 to 4.0."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="2.5–4.5" required min="0.01" step="0.001" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">COP</span>
@@ -259,7 +259,7 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency (COP)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency (COP)" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Useful heat out divided by energy in. Electric resistance is about 1.0; heat pumps are about 2.5 to 4.0." title="Useful heat out divided by energy in. Electric resistance is about 1.0; heat pumps are about 2.5 to 4.0."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="e.g. 0.85" required min="0.01" step="0.001" />
       </label>
@@ -353,7 +353,7 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency (COP)" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency (COP)" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Useful heat out divided by energy in. Electric resistance is about 1.0; heat pumps are about 2.5 to 4.0." title="Useful heat out divided by energy in. Electric resistance is about 1.0; heat pumps are about 2.5 to 4.0."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="e.g. 0.90" required min="0.01" step="0.001" />
       </label>

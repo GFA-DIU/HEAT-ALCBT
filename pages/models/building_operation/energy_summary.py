@@ -143,16 +143,6 @@ class EnergySummary(models.Model):
         elif not self.is_manual_lighting:
             self.lighting_kwh = None
 
-        # Lift & Escalator
-        lift_qs = LiftEscalatorSystem.objects.filter(building=b)
-        if lift_qs.exists():
-            self.lift_escalator_kwh = lift_qs.aggregate(
-                s=Sum("annual_energy_consumption_kwh")
-            )["s"] or 0
-            self.is_manual_lift_escalator = False
-        elif not self.is_manual_lift_escalator:
-            self.lift_escalator_kwh = None
-
         # Hot water
         hw_qs = HotWaterSystem.objects.filter(building=b)
         if hw_qs.exists():
@@ -162,6 +152,24 @@ class EnergySummary(models.Model):
             self.is_manual_hot_water = False
         elif not self.is_manual_hot_water:
             self.hot_water_kwh = None
+
+        # Lift & Escalator — top-down estimate: 7.5% of the other modelled systems'
+        # energy, recomputed live here so it is never a stale 0. (It used to be computed
+        # once client-side at entry time, when the building total was still 0, and stored.)
+        # Computed AFTER the four systems above so their current values are available;
+        # number of lifts does not change it (by design of the 7.5% method).
+        lift_qs = LiftEscalatorSystem.objects.filter(building=b)
+        if lift_qs.exists():
+            base = sum(
+                Decimal(str(v)) for v in [
+                    self.cooling_kwh, self.ventilation_kwh,
+                    self.lighting_kwh, self.hot_water_kwh,
+                ] if v is not None
+            )
+            self.lift_escalator_kwh = (base * Decimal("0.075")).quantize(Decimal("0.001"))
+            self.is_manual_lift_escalator = False
+        elif not self.is_manual_lift_escalator:
+            self.lift_escalator_kwh = None
 
         # NB: a metered/bill total (total_override_kwh) is intentionally kept even
         # when system records exist — it is the authoritative bill figure and lets

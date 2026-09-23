@@ -29,14 +29,14 @@
       <div class="px-5 py-4 grid grid-cols-2 gap-x-2.5 gap-y-1">
 
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">{% translate "Number of lifts" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Number of lifts" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="How many lifts/elevators serve the building. Note: annual lift energy is estimated as 7.5 percent of the building's other operational energy, so this count is descriptive and does not change the energy figure." title="How many lifts/elevators serve the building. Note: annual lift energy is estimated as 7.5 percent of the building's other operational energy, so this count is descriptive and does not change the energy figure."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
           <label class="input validator w-full">
             <input type="number" placeholder="e.g. 5" name="number_of_lifts" required min="1" />
           </label>
         </fieldset>
 
         <fieldset class="fieldset">
-          <legend class="fieldset-legend">{% translate "Installation of lift regenerative features" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+          <legend class="fieldset-legend">{% translate "Installation of lift regenerative features" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Regenerative drives feed braking energy back to the grid, lowering lift energy use. Choose Yes only if the lift has this feature." title="Regenerative drives feed braking energy back to the grid, lowering lift energy use. Choose Yes only if the lift has this feature."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
           <div class="flex items-center gap-2.5 mt-1">
             <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="yes" class="radio radio-xs" /> {% translate "Yes" %}</label>
             <label class="flex items-center gap-2"><input type="radio" name="lift_regenerative_features" value="no" class="radio radio-xs" checked /> {% translate "No" %}</label>
