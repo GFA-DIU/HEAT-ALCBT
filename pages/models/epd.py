@@ -381,7 +381,7 @@ class EPD(BaseModel, epdLCAx):
         units = {self.declared_unit}
         if self.declared_unit not in [Unit.KG, Unit.M3, Unit.KWH]:
             return list(units)
-        for item in self.conversions:
+        for item in (self.conversions or []):
             match (self.declared_unit, item.get("unit")):
                 case (Unit.KWH | Unit.M3, "kg" | "-"):
                     units.add(Unit.KG)

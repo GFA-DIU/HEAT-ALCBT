@@ -90,8 +90,13 @@ def building_step_view(request):
     
     handler = step_handlers.get(step)
     if handler:
-        return handler(request)
-    
+        response = handler(request)
+        # Step fragments are dynamic (fetched via JS and their inline scripts are
+        # re-executed on each load). Never let a browser or proxy serve a stale copy.
+        response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response["Pragma"] = "no-cache"
+        return response
+
     return JsonResponse({"error": f"Unknown step: {step}"}, status=404)
 
 
@@ -546,12 +551,14 @@ def handle_structural_components_step(request):
     # Load previously saved assemblies from database (if building exists)
     boq_items = []
     component_items = []
+    building_pk = None          # Building.id (URL pk) for the "open full A4-A5 panel" link
     building_uuid = request.GET.get('building_uuid')
 
     if building_uuid:
         try:
             uuid_obj = uuid_lib.UUID(building_uuid)
             building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+            building_pk = building.id
 
             # Get saved assemblies with their structural products, newest first
             building_assemblies = BuildingAssembly.objects.filter(
@@ -582,7 +589,12 @@ def handle_structural_components_step(request):
             building_assemblies_list = list(building_assemblies)
             newest_assembly_id = building_assemblies_list[0].assembly.id if building_assemblies_list else None
 
+            skipped_assemblies = 0
             for ba in building_assemblies_list:
+              # Per-assembly guard: one bad assembly (e.g. an EPD with malformed
+              # conversions) must never abort the whole list and silently hide the
+              # other components. Skip + log the offender, keep everything else.
+              try:
                 assembly = ba.assembly
                 products = getattr(assembly, 'prefetched_products', None) or list(assembly.structuralproduct_set.all())
 
@@ -602,6 +614,11 @@ def handle_structural_components_step(request):
                         'country': sp.epd.country.name if sp.epd.country else 'Unknown',
                         'type': sp.epd.type,
                         'source': sp.epd.source,
+                        # A4/A5 per-material overrides (null → category default)
+                        'scenario': sp.sourcing_scenario or '',
+                        'waste_rate': float(sp.waste_rate) if sp.waste_rate is not None else '',
+                        'a4_distance_km': float(sp.a4_distance_km) if sp.a4_distance_km is not None else '',
+                        'a4_ef': float(sp.a4_ef) if sp.a4_ef is not None else '',
                     }
 
                     # Add category for BOQ items
@@ -661,6 +678,14 @@ def handle_structural_components_step(request):
                         # Plausibility badge: short "doesn't make sense" labels for this row.
                         'flags': assembly_flags(assembly, products, total_gwp),
                     })
+              except Exception as _asm_err:
+                skipped_assemblies += 1
+                logger.exception(
+                    "Skipping assembly '%s' in structural load: %s",
+                    getattr(getattr(ba, 'assembly', None), 'name', '?'), _asm_err)
+                continue
+            if skipped_assemblies:
+                logger.warning("Structural load skipped %s problematic assembly(ies).", skipped_assemblies)
 
         except (ValueError, Building.DoesNotExist):
             logger.warning(f"Building not found for UUID: {building_uuid}")
@@ -675,6 +700,7 @@ def handle_structural_components_step(request):
         'epd_types': epd_types,
         'boq_items': boq_items,
         'component_items': component_items,
+        'building_id': building_pk,
     }
     return render(
         request,

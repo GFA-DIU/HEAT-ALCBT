@@ -6,6 +6,7 @@ Provides HTMX endpoints for filtering, selecting, and managing structural EPDs.
 import json
 import logging
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 import uuid as uuid_lib
 
 from cities_light.models import Country
@@ -325,6 +326,13 @@ def handle_select_product(request):
             except (ValueError, KeyError):
                 selection_unit = epd.declared_unit
 
+        # Fall back to the declared unit when the dimension mapping yields no usable unit.
+        # Some EPDs declare a real unit (e.g. m²) but return 'unknown' from the mapping,
+        # which would otherwise show as '#' and block the A4/A5 mass derivation.
+        if (not selection_unit or selection_unit == "unknown") and \
+           epd.declared_unit and epd.declared_unit != "unknown":
+            selection_unit = epd.declared_unit
+
         epd_data = {
             "id": str(epd.id),
             "name": epd.name,
@@ -599,13 +607,37 @@ def handle_save_assembly(request):
                     except AssemblyCategoryTechnique.DoesNotExist:
                         logger.warning(f"Classification not found for category {category_id}, technique {technique_id}")
 
+            # A4/A5 overrides (optional; blank/None → category default at calc time)
+            scenario = material.get("scenario") or None
+            if scenario not in ("local", "national", "imported"):
+                scenario = None
+            waste_raw = material.get("waste_rate")
+            try:
+                waste_rate = Decimal(str(waste_raw)) if waste_raw not in (None, "", "null") else None
+            except (InvalidOperation, ValueError, TypeError):
+                waste_rate = None
+
+            def _opt_decimal(key):
+                """Optional A4 override (distance / EF); blank -> None -> scenario default."""
+                raw = material.get(key)
+                if raw in (None, "", "null"):
+                    return None
+                try:
+                    return Decimal(str(raw))
+                except (InvalidOperation, ValueError, TypeError):
+                    return None
+
             StructuralProduct.objects.create(
                 epd=epd,
                 assembly=assembly,
                 quantity=material.get("quantity", 0),
                 input_unit=material.get("unit", epd.declared_unit),
                 description=material.get("description", ""),
-                classification=classification
+                classification=classification,
+                sourcing_scenario=scenario,
+                waste_rate=waste_rate,
+                a4_distance_km=_opt_decimal("a4_distance_km"),
+                a4_ef=_opt_decimal("a4_ef"),
             )
 
         # Create or update BuildingAssembly join record
