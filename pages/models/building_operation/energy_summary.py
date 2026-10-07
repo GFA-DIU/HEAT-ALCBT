@@ -153,20 +153,39 @@ class EnergySummary(models.Model):
         elif not self.is_manual_hot_water:
             self.hot_water_kwh = None
 
-        # Lift & Escalator — top-down estimate: 7.5% of the other modelled systems'
-        # energy, recomputed live here so it is never a stale 0. (It used to be computed
-        # once client-side at entry time, when the building total was still 0, and stored.)
-        # Computed AFTER the four systems above so their current values are available;
-        # number of lifts does not change it (by design of the 7.5% method).
+        # Lift & Escalator.
+        #
+        # A figure the user actually entered always wins. Only when every lift
+        # record leaves it blank does BEAT fall back to the top-down estimate of
+        # 7.5% of the other modelled systems.
+        #
+        # Blank and zero mean different things here, which is why this checks for
+        # None rather than truthiness: blank means "estimate it for me", while an
+        # explicit 0 means "there is no lift energy" and is respected. Previously
+        # the estimate overwrote the entered value unconditionally, so a building
+        # whose other systems were all zero reported 0 kWh with no way to correct
+        # it, and the number of lifts appeared to do nothing.
+        #
+        # Computed AFTER the four systems above so their current values are
+        # available. Note the 7.5% method is driven by the other systems, not by
+        # how many lifts there are - the lift count is recorded for reference.
         lift_qs = LiftEscalatorSystem.objects.filter(building=b)
         if lift_qs.exists():
-            base = sum(
-                Decimal(str(v)) for v in [
-                    self.cooling_kwh, self.ventilation_kwh,
-                    self.lighting_kwh, self.hot_water_kwh,
-                ] if v is not None
-            )
-            self.lift_escalator_kwh = (base * Decimal("0.075")).quantize(Decimal("0.001"))
+            entered = [
+                Decimal(str(v)) for v in lift_qs.values_list(
+                    "annual_energy_consumption_kwh", flat=True
+                ) if v is not None
+            ]
+            if entered:
+                self.lift_escalator_kwh = sum(entered).quantize(Decimal("0.001"))
+            else:
+                base = sum(
+                    Decimal(str(v)) for v in [
+                        self.cooling_kwh, self.ventilation_kwh,
+                        self.lighting_kwh, self.hot_water_kwh,
+                    ] if v is not None
+                )
+                self.lift_escalator_kwh = (base * Decimal("0.075")).quantize(Decimal("0.001"))
             self.is_manual_lift_escalator = False
         elif not self.is_manual_lift_escalator:
             self.lift_escalator_kwh = None

@@ -51,14 +51,15 @@
           </div>
         </fieldset>
 
-        <!-- Annual energy consumption = total building operational kWh × 7.5% -->
+        <!-- Editable. Left blank, BEAT estimates it as 7.5% of the other
+             systems; an entered figure (including 0) is used as given. -->
         <fieldset class="fieldset col-span-2">
-          <legend class="fieldset-legend">{% translate "Annual lift system energy consumption" %}</legend>
-          <label class="input w-full bg-[var(--bg--weak-50)]">
-            <input type="number" name="annual_energy_consumption" placeholder="{% translate 'Auto-calculated' %}" min="0" readonly class="cursor-not-allowed" />
+          <legend class="fieldset-legend">{% translate "Annual lift system energy consumption" %}<span class="tooltip align-middle ml-1" data-tip="Leave blank and BEAT estimates this as 7.5% of your cooling, ventilation, lighting and hot water energy. Enter a figure from a meter or sub-bill to use that instead. Entering 0 means the building genuinely uses no lift energy. The number of lifts is recorded for reference but does not change the 7.5% estimate." title="Leave blank and BEAT estimates this as 7.5% of your cooling, ventilation, lighting and hot water energy. Enter a figure from a meter or sub-bill to use that instead. Entering 0 means the building genuinely uses no lift energy. The number of lifts is recorded for reference but does not change the 7.5% estimate."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+          <label class="input w-full">
+            <input type="number" name="annual_energy_consumption" placeholder="{% translate 'Leave blank to estimate' %}" min="0" step="0.001" oninput="this.dataset.userEdited='1'" />
             <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kWh/year</span>
           </label>
-          <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total building operational energy × 7.5%" %}</p>
+          <p class="label-text-alt text-[var(--text--soft-400)] lift-energy-hint">{% translate "Blank: estimated as 7.5% of cooling, ventilation, lighting and hot water." %}</p>
         </fieldset>
 
       </div>
@@ -130,9 +131,14 @@
           var form = document.getElementById('lift-escalator-system-form');
           var energyEl = form ? form.querySelector('[name="annual_energy_consumption"]') : null;
           console.log('[Lift] energyEl:', energyEl);
-          if (energyEl) {
-            energyEl.value = (data.total_kwh * 0.075).toFixed(3);
-            console.log('[Lift] set value to:', energyEl.value);
+          if (energyEl && !energyEl.dataset.userEdited && !energyEl.value) {
+            var est = data.total_kwh * 0.075;
+            energyEl.value = est > 0 ? est.toFixed(3) : '';
+            var hint = form.querySelector('.lift-energy-hint');
+            if (hint && est <= 0) {
+              hint.textContent = '{% translate "Your other systems are still empty, so the 7.5% estimate is 0. Enter the cooling, ventilation, lighting and hot water systems first, or type a figure here." %}';
+              hint.classList.add('text-[var(--state--warning--base)]');
+            }
           }
         }
       })
