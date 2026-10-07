@@ -296,6 +296,24 @@ class EPD(BaseModel, epdLCAx):
         null=False,
         blank=False,
     )
+    class Meta:
+        # Overrides epdLCAx.Meta, which keys uniqueness on (UUID, name) only.
+        #
+        # That was unworkable here: 966 generic EPDs carry a placeholder UUID
+        # (two distinct values across all of them), so for those rows the rule
+        # collapsed to "unique on name", and the same material could not exist
+        # for two countries. The workaround was a trailing space in the name -
+        # "Steel reinforcement (steel rebar) " for India beside
+        # "Steel reinforcement (steel rebar)" for Cambodia. That made every
+        # name-based lookup pick whichever it met first, which is how an import
+        # once resolved 1,398 rebar lines to India's factor (2.60) instead of
+        # Cambodia's (2.4247), and how an aluminium record with no density was
+        # silently valued at zero.
+        #
+        # The same material in two countries is the normal case, so country
+        # belongs in the key.
+        unique_together = ("UUID", "name", "country")
+
     labels = models.ManyToManyField(
         Label, blank=True, related_name="epd_labels", through="EPDLabel"
     )
