@@ -3,7 +3,7 @@
     id="epd-{{epd.id}}" 
     data-id="{{ epd.id }}">
     <div class="col-5" >
-        <h6 class="mb-1" title="{{epd.name}}">{{ epd.name|truncatechars:75}}</h6>
+        <h6 class="mb-1" title="{{epd.name}}">{{ epd.display_name|truncatechars:75}}</h6>
         <div class="d-flex flex-column">
             <div class="d-flex align-items-center">
                 <span class="text-muted ms-1 me-3">{{ epd.country }}</span>

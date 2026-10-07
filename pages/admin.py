@@ -130,16 +130,21 @@ def export_epds_action(modeladmin, request, queryset):
 class EPDAdmin(CountryFieldMixin, admin.ModelAdmin):
     use_all_countries = True
     inlines = [ImpactsInline, LabelsInline]  # Add the inline for impacts and labels
-    list_display = ["name", "country", "category", "type"]  # Show all fields in list view
+    list_display = ["name", "material_name", "manufacturer", "country", "category", "type"]
     list_display_links = ["name"]
     ordering = ["name", "country"]
     list_filter  = [
         "country",
         "type",
         TopLevelCategoryFilter,  # ← our custom filter
+        # The handful of records the nomenclature backfill could not place.
+        ("material_name", admin.EmptyFieldListFilter),
     ]
     search_fields = (
         "name",
+        "material_name",
+        "product_name",
+        "manufacturer",
         "category__name_en",
     )    
     actions = [export_epds_action]

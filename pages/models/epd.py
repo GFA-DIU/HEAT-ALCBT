@@ -287,6 +287,35 @@ class EPD(BaseModel, epdLCAx):
         MaterialCategory, on_delete=models.SET_NULL, null=True, blank=True
     )
     source = models.CharField(_("Source"), max_length=255, null=True, blank=True)
+
+    # --- nomenclature -----------------------------------------------------
+    # `name` arrived from a dozen different importers and carries whatever the
+    # source document happened to be titled: sometimes the material ("Gypsum"),
+    # sometimes a trade name alone ("MU-307", "Xtend"), sometimes the maker
+    # buried mid-string ("Shutters - clauss markisen Projekt GmbH - Fire
+    # curtain"), sometimes a 227-character specification dump. A user searching
+    # "cement" never finds MU-307, which is a cement.
+    #
+    # These split the parts out so the label can be composed instead of
+    # hand-written, and so search and sort work on the right thing. All are
+    # optional: a record with none of them behaves exactly as before.
+    material_name = models.CharField(
+        _("Material"), max_length=255, null=True, blank=True,
+        help_text=_("What the product is, independent of brand. Drives search and sorting."),
+    )
+    product_name = models.CharField(
+        _("Product / trade name"), max_length=255, null=True, blank=True,
+        help_text=_("Manufacturer's name for this specific product, where it has one."),
+    )
+    manufacturer = models.CharField(
+        _("Manufacturer"), max_length=255, null=True, blank=True,
+    )
+    source_name = models.CharField(
+        _("Original title"), max_length=255, null=True, blank=True,
+        help_text=_("The title exactly as it appeared in the source document. Kept so a "
+                    "figure can always be traced back after the display name changes."),
+    )
+
     type = models.CharField(_("Type"), choices=EPDType.choices, max_length=255)
     declared_amount = models.DecimalField(
         _("Reference Quantity of EPD"),
@@ -319,7 +348,33 @@ class EPD(BaseModel, epdLCAx):
     )
 
     def __str__(self):
-        return self.name
+        return self.display_name
+
+    @property
+    def display_name(self):
+        """Label shown in the material picker and on reports.
+
+        Material first, so an alphabetical list groups cements together instead
+        of scattering them under M, S and X:
+
+            Portland composite cement - MU-307 - PT Cipta Mortar Utama
+            Ready-mix concrete C25/30            (generic: no product or maker)
+
+        Falls back to `name` whenever the parts have not been filled in, so a
+        record that predates this structure is unaffected. `source_name` keeps
+        the original title either way, so a figure can still be traced back to
+        its EPD document.
+        """
+        if not self.material_name:
+            return self.name
+        parts = [self.material_name]
+        if (self.product_name
+                and self.product_name != self.material_name
+                and self.product_name != self.manufacturer):
+            parts.append(self.product_name)
+        if self.manufacturer:
+            parts.append(self.manufacturer)
+        return " - ".join(parts)
 
     def get_gwp_impact_sum(self, life_cycle_stage):
         """

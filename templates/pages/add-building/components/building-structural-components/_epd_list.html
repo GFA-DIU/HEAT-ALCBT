@@ -6,7 +6,7 @@
   <li class="py-2.5 flex items-center justify-between gap-2.5 not-last:border-b border-[var(--stroke--soft-200)]">
     <div class="flex flex-col gap-2.5 flex-1 min-w-0">
       <div class="flex items-center gap-2">
-        <span class="truncate">{{ epd.name|truncatechars:75 }}</span>
+        <span class="truncate" title="{{ epd.name }}">{{ epd.display_name|truncatechars:75 }}</span>
         {% if epd.type == "generic" %}
         <span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--weak-50)] gap-1 flex items-center shrink-0"
               title="{% translate 'Generic placeholder EPD — not from an official source' %}">

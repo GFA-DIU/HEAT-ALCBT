@@ -9,7 +9,7 @@
     data-source="{{ epd.source }}"
     data-available-units="{{ epd.available_units|join:"," }}">
       <div class="flex items-center justify-between mb-2 w-full">
-        <span class="text-sm/5 font-medium truncate flex-1">{{ epd.name|truncatechars:50 }}</span>
+        <span class="text-sm/5 font-medium truncate flex-1" title="{{ epd.name }}">{{ epd.display_name|truncatechars:50 }}</span>
         <div class="flex items-center gap-2">
           {% if epd.type == "generic" %}
           <span class="p-1 pr-2 rounded-[var(--radius-6)] bg-[var(--bg--white-0)] gap-1 flex items-center shrink-0"

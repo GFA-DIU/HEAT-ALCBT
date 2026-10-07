@@ -103,9 +103,18 @@ def get_filtered_epd_list(request, dimension=None, operational=False):
         if search_query := req.get("search_query"):
             search_terms = search_query.split()
             query = Q()
-            # Add a case-insensitive filter for each search term
+            # Each term must appear somewhere in the record, but not
+            # necessarily in the same field: the original title carries
+            # whatever the source document was called, while material_name,
+            # product_name and manufacturer hold the split-out nomenclature.
+            # Without this a search for "cement" misses MU-307, which is one.
             for term in search_terms:
-                query &= Q(name__icontains=term)
+                query &= (
+                    Q(name__icontains=term)
+                    | Q(material_name__icontains=term)
+                    | Q(product_name__icontains=term)
+                    | Q(manufacturer__icontains=term)
+                )
 
             filtered_epds = filtered_epds.filter(query)
 
