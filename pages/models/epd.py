@@ -376,9 +376,15 @@ class EPD(BaseModel, epdLCAx):
         if not self.material_name:
             return self.name
         category_name = self.category.name_en if self.category_id else None
-        parts = [] if self.material_name == category_name else [self.material_name]
-        if (self.product_name
-                and self.product_name not in parts
+        product = self.product_name or ""
+        # Drop the material when the badge beside it already says so, or when
+        # the product name contains it - "Mortar - Tiger Mortar General
+        # Masonry" and "Fly ash - Dry Fly ash" say it twice otherwise.
+        redundant = (self.material_name == category_name
+                     or self.material_name.lower() in product.lower())
+        parts = [] if redundant else [self.material_name]
+        if (product
+                and product not in parts
                 and self.product_name != self.manufacturer):
             parts.append(self.product_name)
         if self.manufacturer:
