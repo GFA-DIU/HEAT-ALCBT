@@ -382,7 +382,18 @@ class EPD(BaseModel, epdLCAx):
         Decimal(round(value, 2)) divided by self.declared_amount.
         If `all_impacts` was prefetched, it will use that; otherwise it falls
         back to a database query.
+
+        Nine records carry declared_amount = 0, which made every one of these
+        divisions raise DivisionByZero. Most callers write
+        `get_gwp_impact_sum(...) or 0`, which cannot help because the exception
+        is raised before the `or` is reached, so selecting one of those EPDs in
+        the material picker returned a 500. There is no meaningful impact per
+        unit when the declared amount is zero, so report nothing and let the
+        caller's `or 0` do its job.
         """
+        if not self.declared_amount:
+            return None
+
         # 1) Try to use the prefetched list first
         impacts_list = getattr(self, "all_impacts", None)
 
@@ -419,7 +430,14 @@ class EPD(BaseModel, epdLCAx):
         Decimal(round(value, 2)) divided by self.declared_amount.
         If `all_impacts` was prefetched, it will use that; otherwise it falls
         back to a database query.
+
+        Guarded against declared_amount = 0 for the same reason as
+        get_gwp_impact_sum above; this one additionally divided in its
+        not-found branch, so it raised even when no PENRT impact existed.
         """
+        if not self.declared_amount:
+            return None
+
         # 1) Try to use the prefetched list first
         impacts_list = getattr(self, "all_impacts", None)
 

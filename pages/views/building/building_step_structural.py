@@ -336,6 +336,9 @@ def handle_select_product(request):
         epd_data = {
             "id": str(epd.id),
             "name": epd.name,
+            # Carried explicitly: this is a plain dict, so a missing key renders
+            # as an empty string instead of raising.
+            "display_name": epd.display_name,
             "country": epd.country.code2 if epd.country else "",
             "country_name": epd.country.name if epd.country else "Unknown",
             "category": epd.category.name_en if epd.category else "Unknown",
