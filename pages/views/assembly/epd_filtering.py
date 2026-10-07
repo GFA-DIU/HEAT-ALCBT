@@ -55,7 +55,10 @@ def filter_by_dimension(epds: BaseManager[EPD], dimension: AssemblyDimension):
 
 def get_filtered_epd_list(request, dimension=None, operational=False):
     # Start with the base queryset
-    filtered_epds = EPD.objects.exclude(declared_unit=Unit.UNKNOWN).order_by("id")
+    # display_name compares material_name against the category, so pull the
+    # category in with the row rather than one query per EPD rendered.
+    filtered_epds = (EPD.objects.select_related("category", "country")
+                     .exclude(declared_unit=Unit.UNKNOWN).order_by("id"))
     if operational:
         # TODO: Adapt with Ökobaudat operational EPDs are added
         filtered_epds = filtered_epds.filter(

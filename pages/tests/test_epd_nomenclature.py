@@ -38,6 +38,14 @@ def test_display_name_composes_material_product_maker(epd):
 
 
 @pytest.mark.django_db
+def test_display_name_omits_a_material_that_only_repeats_the_category(epd):
+    """The picker prints the category as a badge; the name must not stutter."""
+    epd.material_name = epd.category.name_en
+    epd.product_name = "Shotcrete"
+    assert epd.display_name == "Shotcrete"
+
+
+@pytest.mark.django_db
 def test_display_name_falls_back_to_name(epd):
     """An EPD the backfill could not place must still show something."""
     epd.material_name = None

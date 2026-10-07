@@ -364,16 +364,27 @@ class EPD(BaseModel, epdLCAx):
         record that predates this structure is unaffected. `source_name` keeps
         the original title either way, so a figure can still be traced back to
         its EPD document.
+
+        The material is omitted when it is only repeating the record's own
+        category. For the ~1,580 EPDs whose material_name was derived from that
+        category there is nothing new in the prefix, and the picker already
+        prints the category as a badge beside the name, so including it gave
+        every row a stutter - "Ready mixed concrete - Shotcrete" sitting next to
+        a badge reading "Ready mixed concrete". Search is unaffected: it queries
+        material_name directly and does not care what is displayed.
         """
         if not self.material_name:
             return self.name
-        parts = [self.material_name]
+        category_name = self.category.name_en if self.category_id else None
+        parts = [] if self.material_name == category_name else [self.material_name]
         if (self.product_name
-                and self.product_name != self.material_name
+                and self.product_name not in parts
                 and self.product_name != self.manufacturer):
             parts.append(self.product_name)
         if self.manufacturer:
             parts.append(self.manufacturer)
+        if not parts:
+            return self.name
         return " - ".join(parts)
 
     def get_gwp_impact_sum(self, life_cycle_stage):
