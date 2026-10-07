@@ -720,7 +720,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Total cooling load" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
+      <legend class="fieldset-legend">{% translate "Total cooling load" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span><span class="tooltip align-middle ml-1" data-tip="The combined design cooling load of the WHOLE chiller plant, not the load of one machine. Do not multiply by the number of chillers - BEAT does not, so entering a per-machine figure will understate the result. If you only know each machine's rating, add them together (2 x 250 RT = 500 RT). If the plant load is unknown, a common rule of thumb is 0.03 to 0.06 RT per m2 of conditioned floor area; use the design drawings or the chiller nameplates where available." title="The combined design cooling load of the WHOLE chiller plant, not the load of one machine. Do not multiply by the number of chillers - BEAT does not, so entering a per-machine figure will understate the result. If you only know each machine's rating, add them together (2 x 250 RT = 500 RT). If the plant load is unknown, a common rule of thumb is 0.03 to 0.06 RT per m2 of conditioned floor area; use the design drawings or the chiller nameplates where available."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_cooling_load" placeholder="e.g. 500" required min="0" step="0.1"
           oninput="applyRefrigerantQtyDefault(this.form,'water_cooled'); recalcChillerEnergy(this.form)" />
@@ -730,7 +730,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Number of units" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of units" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="How many chiller machines make up the plant. This is recorded for reference and does not scale the energy result: the plant energy comes from the total cooling load above, which already covers all machines." title="How many chiller machines make up the plant. This is recorded for reference and does not scale the energy result: the plant energy comes from the total cooling load above, which already covers all machines."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_chillers" placeholder="e.g. 2" required min="1"
           oninput="recalcChillerEnergy(this.form)" />
@@ -878,7 +878,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Total cooling load" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span></legend>
+      <legend class="fieldset-legend">{% translate "Total cooling load" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(RT)</span><span class="tooltip align-middle ml-1" data-tip="The combined design cooling load of the WHOLE chiller plant, not the load of one machine. Do not multiply by the number of chillers - BEAT does not, so entering a per-machine figure will understate the result. If you only know each machine's rating, add them together (2 x 100 RT = 200 RT). If the plant load is unknown, a common rule of thumb is 0.03 to 0.06 RT per m2 of conditioned floor area; use the design drawings or the chiller nameplates where available." title="The combined design cooling load of the WHOLE chiller plant, not the load of one machine. Do not multiply by the number of chillers - BEAT does not, so entering a per-machine figure will understate the result. If you only know each machine's rating, add them together (2 x 100 RT = 200 RT). If the plant load is unknown, a common rule of thumb is 0.03 to 0.06 RT per m2 of conditioned floor area; use the design drawings or the chiller nameplates where available."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="total_cooling_load" placeholder="e.g. 200" required min="0" step="0.1"
           oninput="applyRefrigerantQtyDefault(this.form,'air_cooled'); recalcChillerEnergy(this.form)" />
@@ -888,7 +888,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Number of units" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Number of units" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="How many chiller machines make up the plant. This is recorded for reference and does not scale the energy result: the plant energy comes from the total cooling load above, which already covers all machines." title="How many chiller machines make up the plant. This is recorded for reference and does not scale the energy result: the plant energy comes from the total cooling load above, which already covers all machines."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="number_of_chillers" placeholder="e.g. 3" required min="1"
           oninput="recalcChillerEnergy(this.form)" />
@@ -1538,10 +1538,16 @@
     }
   };
 
+  // Chiller annual energy.
+  //
+  // NOTE: "Total cooling load" is the load of the WHOLE chiller plant, not the load
+  // per machine, so the number of chillers must NOT multiply it. It previously did,
+  // which multiplied the plant energy by the unit count (2 chillers = 2x, 4 = 4x).
+  // The unit count is still collected, but it describes how the plant is split, not
+  // how much it serves.
   window.recalcChillerEnergy = function(form) {
     if (!form) return;
     var loadEl   = form.querySelector('[name="total_cooling_load"]');
-    var unitsEl  = form.querySelector('[name="number_of_chillers"]');
     var effEl    = form.querySelector('[name="baseline_cooling_efficiency"]');
     var hrsEl    = form.querySelector('[name="annual_operating_hours_per_day"]');
     var daysEl   = form.querySelector('[name="annual_operating_days_per_week"]');
@@ -1549,17 +1555,16 @@
     var vsdEl    = form.querySelector('[name="installation_of_variable_speed_drives"]:checked');
     var hrEl     = form.querySelector('[name="installation_of_heat_recovery_systems"]:checked');
     var energyEl = form.querySelector('[name="total_energy_consumption_of_chiller_system_annually"]');
-    if (!loadEl || !unitsEl || !effEl || !hrsEl || !daysEl || !weeksEl || !energyEl) return;
+    if (!loadEl || !effEl || !hrsEl || !daysEl || !weeksEl || !energyEl) return;
     var load  = parseFloat(loadEl.value)  || 0;
-    var units = parseFloat(unitsEl.value) || 0;
     var eff   = parseFloat(effEl.value)   || 0;
     var hrs   = parseFloat(hrsEl.value)   || 0;
     var days  = parseFloat(daysEl.value)  || 0;
     var weeks = parseFloat(weeksEl.value) || 0;
     var vsdFactor = (vsdEl && vsdEl.value === 'yes') ? 0.80 : 1.00;
     var hrFactor  = (hrEl  && hrEl.value  === 'yes') ? 0.70 : 1.00;
-    if (load > 0 && units > 0 && eff > 0 && hrs > 0 && days > 0 && weeks > 0) {
-      energyEl.value = (load * units * eff * hrs * days * weeks * vsdFactor * hrFactor).toFixed(3);
+    if (load > 0 && eff > 0 && hrs > 0 && days > 0 && weeks > 0) {
+      energyEl.value = (load * eff * hrs * days * weeks * vsdFactor * hrFactor).toFixed(3);
     } else {
       energyEl.value = '';
     }

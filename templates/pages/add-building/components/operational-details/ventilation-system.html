@@ -90,7 +90,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5." title="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -102,7 +102,7 @@
       <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -186,7 +186,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5." title="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -266,7 +266,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5." title="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -278,7 +278,7 @@
       <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -371,7 +371,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5." title="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -451,7 +451,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5." title="Specific Fan Power (SFP): electrical power per unit of airflow (W per L/s). Lower is better; typical range 1.5 to 2.5."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -549,6 +549,14 @@
     var airflow  = airflowEl  ? parseFloat(airflowEl.value)  : NaN;
     var eff      = effEl      ? parseFloat(effEl.value)      : NaN;
     var units    = unitsEl    ? parseFloat(unitsEl.value)    : NaN;
+
+    // Baseline efficiency is W per m³/h, so the airflow must be in m³/h too.
+    // The unit selector also offers CFM — convert it (1 ft³/min = 1.699 m³/h),
+    // otherwise a CFM entry understates fan power by that factor.
+    var capUnitEl = form.querySelector('[name="ventilation_capacity"]');
+    if (capUnitEl && capUnitEl.value === 'F3M' && !isNaN(airflow)) {
+      airflow = airflow * 1.699;
+    }
 
     // Recalculate power_input from airflow when all three inputs are present
     if (!isNaN(airflow) && !isNaN(eff) && !isNaN(units) && airflow > 0 && units > 0) {
