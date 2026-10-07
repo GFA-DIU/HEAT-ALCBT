@@ -5,7 +5,7 @@
     {% for item in epds %}
       <li class="py-2.5 flex items-center justify-between gap-2.5 border-b border-[var(--stroke--soft-200)]" data-epd-id="{{ item.id }}">
         <div class="flex flex-col gap-2.5 flex-1">
-          <span class="text-sm/5 font-medium">{{ item.name }}</span>
+          <span class="text-sm/5 font-medium" title="{{ item.name }}">{{ item.display_name|default:item.name }}</span>
           <div class="flex items-stretch gap-1.25">
             <span class="badge gap-1 py-1 px-2 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"> <span data-country="{{item.country}}"></span> {{ item.country }}</span>
             <div class="bg-[var(--stroke--sub-300)] w-[0.0625rem] my-1"></div>
