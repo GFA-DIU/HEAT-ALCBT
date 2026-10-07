@@ -57,11 +57,62 @@ from pages.models.building import (BuildingCategory, CategorySubcategory,
 from pages.models.epd import MaterialCategory, Unit
 from pages.models.building_operation.hot_water import (HotWaterSystemType, FuelType,
                                                        EnergyEfficiencyLabelType)
-from pages.models.building_operation.lighting import RoomType, LightingBulbType
+from pages.models.building_operation.lighting import (RoomType, LightingBulbType,
+                                                      LightingSpaceType, LightingReference)
 from pages.models.building_operation.chilling import RefrigerantType
 from pages.models.building_operation.ventilation import VentilationType, VentilationCapacity
 
 logger = logging.getLogger(__name__)
+
+
+
+def _lighting_room_type_items(building_uuid):
+    """Room-type options for the lighting step, narrowed to the building type.
+
+    SNI 6197:2020 lists 99 rooms; most are irrelevant to any one building, and
+    nine of them (toilet, stairs, kitchen ...) repeat verbatim across building
+    categories. Those are held once as `is_common` and shown everywhere, so an
+    office sees ~14 options rather than 99 or the old fixed six.
+
+    Falls back to every non-legacy space when the building or its category
+    cannot be determined, which is better than showing nothing.
+    """
+    from pages.models.building import Building
+
+    qs = LightingSpaceType.objects.filter(legacy=False)
+    category = None
+    if building_uuid:
+        building = (
+            Building.objects.filter(uuid=building_uuid)
+            .select_related("category__category")
+            .first()
+        )
+        if building and building.category and building.category.category:
+            category = building.category.category.name
+
+    if category:
+        qs = qs.filter(Q(is_common=True) | Q(building_categories__contains=[category]))
+
+    # The country's own standard supplies the reference shown beside each room.
+    refs = {}
+    if building_uuid:
+        building = Building.objects.filter(uuid=building_uuid).select_related("country").first()
+        if building and building.country:
+            refs = {
+                r.space_type_id: r
+                for r in LightingReference.objects.filter(
+                    country=building.country, basis=LightingReference.Basis.ROOM
+                )
+            }
+
+    items = []
+    for st in qs:
+        label = st.name
+        ref = refs.get(st.id)
+        if ref and ref.lpd_w_m2:
+            label = f"{st.name} — {ref.lpd_w_m2} W/m²"
+        items.append({"id": st.code, "name": label})
+    return items
 
 
 @login_required
@@ -352,9 +403,55 @@ def select_lists(request):
             {"items": items, "default_text": "Select refrigerant type"},
         )
 
+    # One room's reference value, as JSON, for the benchmark line under the LPD
+    # field. Returns nothing usable for a country with no standard (Cambodia),
+    # which the caller treats as "no benchmark" rather than an error.
+    elif request.GET.get("lighting_reference"):
+        from django.http import JsonResponse
+        from pages.models.building import Building
+
+        code = request.GET.get("code") or ""
+        building = (
+            Building.objects.filter(uuid=request.GET.get("building_uuid") or None)
+            .select_related("country", "category__category").first()
+        )
+        out = {"has_reference": False}
+        if building and building.country and code:
+            ref = LightingReference.objects.filter(
+                country=building.country, space_type__code=code,
+                basis=LightingReference.Basis.ROOM,
+            ).first()
+            if ref is None:
+                # Countries whose standard is whole-building only (Vietnam,
+                # Thailand) still have a limit worth showing, but it applies to
+                # the building average rather than this room.
+                cat = (building.category.category.name
+                       if building.category and building.category.category else None)
+                if cat:
+                    ref = LightingReference.objects.filter(
+                        country=building.country, building_category=cat,
+                        basis=LightingReference.Basis.BUILDING,
+                    ).first()
+            if ref and ref.lpd_w_m2:
+                out = {
+                    "has_reference": True,
+                    "lpd_w_m2": float(ref.lpd_w_m2),
+                    "lux": ref.lux,
+                    "standard": ref.standard,
+                    "basis": ref.basis,
+                    "country": building.country.name,
+                }
+        return JsonResponse(out)
+
     # Room Types (for lighting systems)
+    #
+    # Filtered by the building type the user already chose, so someone modelling
+    # a school is not offered "Hospital: Patient Room". Spaces that occur in
+    # every building (toilet, stairs, parking) come first, then the ones
+    # specific to that building type. Legacy codes are excluded from new
+    # entries but still resolve for records that already hold them.
     elif request.GET.get("room_types"):
-        items = [{"id": choice[0], "name": choice[1]} for choice in RoomType.choices]
+        items = _lighting_room_type_items(request.GET.get("building_uuid"))
         return render(
             request,
             "pages/utils/select_list.html",
