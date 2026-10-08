@@ -1142,12 +1142,31 @@ def get_operational_savings_measures(
     electricity_total = float(by_system.get("total", 0.0) or 0.0)
 
     systems = []
+    unoptimisable = []
     optimized_electricity = 0.0
     for label, baseline in zip(baseline_labels, baseline_absolute):
+        baseline = float(baseline)
         style = _SYSTEM_STYLE.get(label)
         if not style:
+            # Only five labels carry optimisation measures. The rest - plug and
+            # equipment loads, and the fuel carriers (Natural Gas, Diesel,
+            # Firewood, bare Electricity) - have none, but they are still part
+            # of the building's operational carbon.
+            #
+            # They used to be skipped here, which dropped their baseline from
+            # the optimised total while leaving it in electricity_total. A
+            # building whose energy was mostly plug load therefore reported
+            # baseline 64.40, optimised 0.00 and a 100% reduction against an
+            # empty list of systems.
+            #
+            # Carry them through unchanged: no saving claimed, and none lost.
+            unoptimisable.append({
+                "label": label,
+                "baseline": round(baseline, 2),
+                "share_pct": (round(baseline / electricity_total * 100, 1)
+                              if electricity_total > 0 else 0.0),
+            })
             continue
-        baseline = float(baseline)
         measures = _measures_for_system(style["key"], building)
 
         # Stack available (not-installed) measures multiplicatively.
@@ -1183,9 +1202,14 @@ def get_operational_savings_measures(
             "measures": measure_rows,
         })
 
-    # BMS applies last, multiplicatively, to the whole-building electricity total.
+    # BMS applies last, to the systems it can actually control. Plug loads and
+    # fuel carriers are carried at their baseline and deliberately left out of
+    # it - a building management system does not switch off desk equipment or
+    # a boiler's gas supply.
+    unoptimisable_total = round(sum(u["baseline"] for u in unoptimisable), 2)
     bms_saving = round(optimized_electricity * 0.20, 2)
-    optimized_after_bms = round(optimized_electricity - bms_saving, 2)
+    optimized_after_bms = round(
+        optimized_electricity - bms_saving + unoptimisable_total, 2)
 
     # Refrigerant (Scope 1) — additive, separate from electricity.
     refrigerant_saving, target_gwp = _refrigerant_scope1_saving(
@@ -1209,6 +1233,10 @@ def get_operational_savings_measures(
 
     return {
         "systems": systems,
+        # Carried at their baseline; shown so the panel can say where the rest
+        # of the energy sits rather than looking half empty.
+        "unoptimisable": unoptimisable,
+        "unoptimisable_total": unoptimisable_total,
         "bms": {
             "label": "Building Management System (BMS)",
             "description": "Whole-building controls optimisation",

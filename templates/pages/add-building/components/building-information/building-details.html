@@ -208,7 +208,7 @@
       <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Accepted: images (JPG, PNG, GIF, WEBP) and PDF. Max 20 MB." %}</p>
       {% if building_data.certification_file %}
       <div id="cert-existing" class="mt-1 flex items-center gap-2 text-sm">
-        <span data-icon="file-text" data-size="16"></span>
+        <span data-icon="file-paper-2-fill" data-size="16"></span>
         <a href="{{ building_data.certification_file.url }}" target="_blank" class="link link-primary truncate max-w-xs">
           {{ building_data.certification_file.name }}
         </a>
@@ -267,7 +267,7 @@
       <div id="drawings-existing" class="mt-1 flex flex-col gap-1">
         {% for df in building_data.design_drawing_files %}
         <div class="flex items-center gap-2 text-sm">
-          <span data-icon="file-text" data-size="16"></span>
+          <span data-icon="file-paper-2-fill" data-size="16"></span>
           <a href="{{ df.url }}" target="_blank" class="link link-primary truncate max-w-xs">
             {{ df.name }}
           </a>
@@ -327,7 +327,7 @@
       <div id="boq-existing" class="mt-1 flex flex-col gap-1">
         {% for boq_file in building_data.boq_files %}
         <div class="flex items-center gap-2 text-sm">
-          <span data-icon="file-text" data-size="16"></span>
+          <span data-icon="file-paper-2-fill" data-size="16"></span>
           <a href="{{ boq_file.url }}" target="_blank" class="link link-primary truncate max-w-xs">
             {{ boq_file.name }}
           </a>

@@ -307,14 +307,14 @@
           <div class="flex flex-col gap-1 pb-3">
             {% if design_drawings_status == 'available_pending' %}
             <div class="flex items-center gap-2 text-sm text-[var(--text--sub-600)]">
-              <span data-icon="information-line" data-size="16" data-color="var(--icon--soft-400)"></span>
+              <span data-icon="information-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
               <span>{% translate "Design drawings — marked as available, not yet uploaded." %}</span>
               <a href="{% url 'edit_building' %}?building_uuid={{ building.uuid }}" class="link link-primary font-medium text-xs">{% translate "Upload now" %}</a>
             </div>
             {% endif %}
             {% if boq_status == 'available_pending' %}
             <div class="flex items-center gap-2 text-sm text-[var(--text--sub-600)]">
-              <span data-icon="information-line" data-size="16" data-color="var(--icon--soft-400)"></span>
+              <span data-icon="information-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
               <span>{% translate "Bill of Quantities — marked as available, not yet uploaded." %}</span>
               <a href="{% url 'edit_building' %}?building_uuid={{ building.uuid }}" class="link link-primary font-medium text-xs">{% translate "Upload now" %}</a>
             </div>

@@ -354,3 +354,48 @@ error rather than a deliberate exclusion.
 The estimate now counts, and the total carries a tooltip saying so whenever it
 is being used. A metered bill total still overrides everything, as it always
 did, since it already includes plug loads.
+
+## The Savings tab reported 100% reductions it had not earned
+
+`get_operational_savings_measures` walked the per-system carbon breakdown and
+skipped any label without an entry in `_SYSTEM_STYLE`:
+
+```python
+style = _SYSTEM_STYLE.get(label)
+if not style:
+    continue          # baseline silently dropped
+```
+
+Only five labels have optimisation measures. The breakdown also carries plug
+and equipment loads and the fuel carriers — Electricity, Natural Gas, Diesel,
+Light and Heavy Fuel Oil, Firewood. Those were counted in `electricity_total`,
+which is the baseline, and then skipped here, so they contributed **nothing**
+to the optimised figure. A real building in the database read:
+
+```
+baseline   64.40 kgCO₂eq/m²/yr
+optimised   0.00
+reduction  100.0%          with an empty list of systems
+```
+
+Systems without measures now carry their baseline into the optimised total
+unchanged — no saving claimed, none lost — and are listed in the strategies
+panel under "No optimisation measures available", so the panel accounts for the
+whole baseline instead of appearing to cover only part of it. The same building
+now reads 64.40 → 64.40, 0.0%, which is the honest answer: BEAT has no measure
+for plug load.
+
+### BMS applies only to what a BMS controls
+
+It was applied to the whole electricity total. It now applies to the systems
+with measures, and the unoptimisable baseline is added afterwards — a building
+management system does not switch off desk equipment or a boiler's gas supply.
+
+### The toggles did not move the headline
+
+`recomputeOperationalSavings()` computed a new optimised total and returned it
+to nothing. Flipping a measure updated its own "Saves ~X" text while the Carbon
+Reduction headline, the reduction percentage and the Baseline/Optimised pair
+stayed at their server-rendered values. The return is now written back into all
+four, and the client mirrors the server on refrigerant and on the unoptimisable
+carry-through.

@@ -214,7 +214,7 @@
         <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-5 rounded-2xl space-y-6">
           <div class="flex items-center gap-2">
             <span data-icon="leaf-line" data-size="20"></span>
-            <h6 class="text-sm font-semibold">{% translate "Carbon Reduction" %}</h6>
+            <h6 class="text-sm font-semibold">{% translate "Embodied Carbon Reduction" %}</h6>
           </div>
 
           <div class="space-y-1 p-4 bg-[var(--bg--weak-100)] rounded-[0.5rem]">
@@ -285,17 +285,17 @@
           <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-5 rounded-2xl space-y-6">
             <div class="flex items-center gap-2">
               <span data-icon="leaf-line" data-size="20"></span>
-              <h6 class="text-sm font-semibold">{% translate "Carbon Reduction" %}</h6>
+              <h6 class="text-sm font-semibold">{% translate "Operational Carbon Reduction" %}</h6>
             </div>
 
             <div class="space-y-1 p-4 bg-[var(--bg--weak-100)] rounded-[0.5rem]">
               <p class="text-xs text-[var(--text--sub-600)]">{% translate "Energy focus" %}</p>
               <div class="flex items-baseline gap-2">
-                <h3 class="text-3xl font-bold text-[#16A34A]">-{{ operational_savings.total_saving|floatformat:1 }}<span class="text-lg font-medium text-[#16A34A]">kg
+                <h3 class="text-3xl font-bold text-[#16A34A]"><span id="op-saving-headline">-{{ operational_savings.total_saving|floatformat:1 }}</span><span class="text-lg font-medium text-[#16A34A]">kg
                     CO<sub>2</sub>eq/m<sup>2</sup>/{% translate "yr" %}</span></h3>
               </div>
               <div class="flex items-center gap-1 text-xs font-medium">
-                <span class="text-[var(--text--strong-950)]">{{ operational_savings.reduction_pct|floatformat:1 }}%</span>
+                <span class="text-[var(--text--strong-950)]" id="op-reduction-pct">{{ operational_savings.reduction_pct|floatformat:1 }}%</span>
                 <span data-icon="arrow-up-circle-fill" data-size="16" class="text-[#16A34A]"></span>
                 <span class="text-[var(--text--sub-600)]">{% translate "Reduction" %}</span>
               </div>
@@ -310,14 +310,14 @@
             <div class="grid grid-cols-2 gap-2.25">
               <div class="bg-[var(--bg--weak-100)] p-2 rounded-[0.5rem] space-y-0.5">
                 <span class="text-[var(--text--strong-950)] label-x-small">
-                  <span class="text-[var(--savings-primary)] h5-title font-bold">{{ operational_savings.baseline_total|floatformat:1 }}</span>
+                  <span class="text-[var(--savings-primary)] h5-title font-bold" id="op-baseline-stat">{{ operational_savings.baseline_total|floatformat:1 }}</span>
                   kgCO<sub>2</sub>eq/m<sup>2</sup>/{% translate "yr" %}
                 </span>
                 <span class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Baseline" %}</span>
               </div>
               <div class="bg-[var(--bg--weak-100)] p-2 rounded-[0.5rem] space-y-0.5">
                 <span class="text-[var(--text--strong-950)] label-x-small">
-                  <span class="text-[var(--savings-primary)] h5-title font-bold">{{ operational_savings.optimized_total|floatformat:1 }}</span>
+                  <span class="text-[var(--savings-primary)] h5-title font-bold" id="op-optimised-stat">{{ operational_savings.optimized_total|floatformat:1 }}</span>
                   kgCO<sub>2</sub>eq/m<sup>2</sup>/{% translate "yr" %}
                 </span>
                 <span class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Optimized" %}</span>
@@ -387,7 +387,7 @@
             <div class="space-y-2">
               <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                  <span data-icon="lego" data-size="16"></span>
+                  <span data-icon="building-3-line" data-size="16"></span>
                   <span class="paragraph-x-small font-bold text-[var(--text--strong-950)]">{{ item.label }}</span>
                 </div>
                 <span class="text-xs font-semibold text-[var(--text--sub-600)]">{{ item.share_pct|floatformat:1 }}% {% translate "of total" %}</span>
@@ -445,7 +445,7 @@
               <h6 class="text-base font-semibold">{% translate "Optimization Strategies — Energy Focus" %}</h6>
             </div>
 
-            {% if operational_savings.systems %}
+            {% if operational_savings.systems or operational_savings.unoptimisable %}
             <div class="divide-y divide-[var(--stroke--soft-200)]">
               {% for system in operational_savings.systems %}
               <div class="py-5 space-y-3 first:pt-0 last:pb-0" data-op-system="{{ system.key }}">
@@ -493,7 +493,7 @@
               <div class="py-5 space-y-3">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span data-icon="drop-line" data-size="16" class="text-[#0EA5E9]"></span>
+                    <span data-icon="temp-cold-line" data-size="16" class="text-[#0EA5E9]"></span>
                     <span class="text-sm font-bold text-[var(--text--strong-950)]">{{ operational_savings.refrigerant.label }}</span>
                     <span class="text-[9px] font-bold text-[#0369A1] bg-[#E0F2FE] px-1.5 py-0.5 rounded uppercase tracking-wider">{% translate "Scope 1" %}</span>
                   </div>
@@ -505,11 +505,30 @@
               </div>
               {% endif %}
 
+              {% if operational_savings.unoptimisable %}
+              <!-- Energy BEAT carries but cannot optimise: plug loads and fuel
+                   carriers. Listed so the panel accounts for the whole
+                   baseline rather than appearing to cover only part of it. -->
+              <div class="py-5 space-y-2 last:pb-0">
+                <div class="flex items-center gap-2">
+                  <span data-icon="information-2-line" data-size="16" class="text-[#64748B]"></span>
+                  <span class="text-sm font-bold text-[var(--text--strong-950)]">{% translate "No optimisation measures available" %}</span>
+                </div>
+                {% for u in operational_savings.unoptimisable %}
+                  <div class="flex items-center justify-between text-[11px] text-[var(--text--sub-600)]">
+                    <span>{{ u.label }}</span>
+                    <span>{{ u.baseline|floatformat:1 }} kgCO₂eq/m²/yr · {{ u.share_pct }}%</span>
+                  </div>
+                {% endfor %}
+                <p class="text-[11px] text-[var(--text--sub-600)]">{% translate "Counted in the baseline and carried unchanged into the optimised figure." %}</p>
+              </div>
+              {% endif %}
+
               <!-- Whole-building — BMS (applies last) -->
               <div class="py-5 space-y-3 last:pb-0">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span data-icon="settings-3-line" data-size="16" class="text-[#64748B]"></span>
+                    <span data-icon="dashboard-horizontal-fill" data-size="16" class="text-[#64748B]"></span>
                     <span class="text-sm font-bold text-[var(--text--strong-950)]">{{ operational_savings.bms.label }}</span>
                   </div>
                   <div class="flex items-center gap-2">
@@ -531,7 +550,7 @@
           <div class="bg-[var(--bg--strong-950)] text-white py-5 px-4 rounded-2xl flex flex-col gap-2">
             <h6 class="text-base font-medium">{% translate "Energy Insight" %}</h6>
             <p class="text-xs leading-5">{% translate "Installing variable speed drives (VSDs) on cooling and ventilation equipment typically yields 20–35% energy savings with payback periods under 3 years." %}</p>
-            <button class="btn btn-primary btn-sm border-none w-fit mt-1.5 shadow-none">{% translate "Read Energy Guidelines" %}</button>
+            <a href="{% url 'resources' %}" class="btn btn-primary btn-sm border-none w-fit mt-1.5 shadow-none">{% translate "Read Energy Guidelines" %}</a>
           </div>
         </div><!-- end #savings-operational-strategies -->
 
@@ -700,9 +719,18 @@
     // Per-system measures stack multiplicatively on the system's baseline; BMS
     // applies last (multiplicatively) to the whole-building electricity total.
     // Refrigerant (Scope 1) is fixed and always-on (handled server-side).
-    const refrigerantSaving = {{ operational_savings.refrigerant.saving|default:0 }};
+    const refrigerantSaving   = {{ operational_savings.refrigerant.saving|default:0 }};
+    // Leakage sits in the baseline as well as the optimised side, so the client
+    // has to mirror the server or the headline jumps on the first toggle.
+    const refrigerantBaseline = {{ operational_savings.refrigerant.baseline|default:0 }};
+    // Systems with no optimisation measures - plug loads, fuel carriers. They
+    // carry into the optimised total unchanged.
+    const unoptimisableTotal  = {{ operational_savings.unoptimisable_total|default:0 }};
+    const opBaselineTotal     = {{ operational_savings.baseline_total|default:0 }};
 
     function recomputeOperationalSavings() {
+      // Only the systems with measures; the unoptimisable baseline is added
+      // after BMS, because a BMS does not control plug loads or boiler fuel.
       let optimizedElectricity = 0;
       document.querySelectorAll('[data-op-system]').forEach(function (sysEl) {
         const baselineEl = sysEl.querySelector('[data-op-baseline]');
@@ -725,7 +753,28 @@
       const bmsEl = document.getElementById('op-bms-saving');
       if (bmsEl) bmsEl.textContent = bmsSaving.toFixed(1);
 
-      return optimizedElectricity - bmsSaving + 0 - refrigerantSaving;
+      const optimised = optimizedElectricity - bmsSaving + unoptimisableTotal
+                        + refrigerantBaseline - refrigerantSaving;
+      const saving = opBaselineTotal - optimised;
+      const pct = opBaselineTotal > 0 ? (saving / opBaselineTotal * 100) : 0;
+
+      // Previously this value was returned and discarded, so flipping a toggle
+      // updated the per-measure text but never the headline or the two stats.
+      const set = function (id, text) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+      };
+      set('op-saving-headline', '-' + saving.toFixed(1));
+      set('op-reduction-pct', pct.toFixed(1) + '%');
+      set('op-baseline-stat', opBaselineTotal.toFixed(1));
+      set('op-optimised-stat', optimised.toFixed(1));
+
+      const chart = window.operationalReductionChart;
+      if (chart) {
+        chart.data.datasets[0].data = [opBaselineTotal, optimised];
+        chart.update();
+      }
+      return optimised;
     }
 
     document.querySelectorAll('.op-measure-toggle, #op-bms-toggle').forEach(function (t) {
