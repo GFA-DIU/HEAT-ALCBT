@@ -87,6 +87,80 @@ Lower-carbon options in Thailand
 Every row links to the source EPD, so the user can confirm the substitution is
 technically valid before trusting it. BEAT suggests; it does not decide.
 
+## Checked again: material_name is still too coarse to recommend a swap
+
+The groups above look reasonable until you read their contents. Three examples,
+all official EPDs, all one country, one material name and one declared unit:
+
+**Thailand, gypsum plasterboard /m²**
+
+```
+0.880  Standard Board 9mm          <- "best"
+1.630  Standard Board 12mm
+2.820  MultiWall 15mm
+2.970  GlassBloc 12.7mm
+4.350  MultiWall MR 15mm           <- "worst"
+```
+
+A 9 mm standard board is not a substitute for a 15 mm moisture-resistant
+multi-layer wall board. Different thickness, different fire, acoustic and
+moisture ratings. The 80% "saving" is mostly the difference between two
+different products doing two different jobs.
+
+**Thailand, glass wool insulation /m²**
+
+```
+0.530  SCG Encapsulated Insulation
+0.650  SCG Green Batts
+6.990  SCG Cylence Zandera          <- an acoustic product
+```
+
+**India, structural steel /kg**
+
+```
+2.110  Optigal (metallic colour coated steel)
+2.420  Finished Long Products
+5.510  Steel Flange
+```
+
+Coated sheet against a forged flange. Not a swap.
+
+The one family where matching is rigorous is **concrete**, because strength
+class is a real equivalence and BEAT already parses it. Those rows hold up:
+M25 271 → 209, M30 347 → 202.
+
+There is also the occasional genuine pair — Thailand has `Standard Board 9mm`
+from two different EPDs at 0.880 and 1.330, which is a real like-for-like 34%
+difference. But finding those needs thickness and type parsed out of product
+names, and the naming is inconsistent between manufacturers.
+
+## Decided direction: show the local range, prescribe nothing
+
+Rather than "switch to X", report where the building's material sits among what
+is actually declared in its country:
+
+> Gypsum plasterboard in Thailand ranges **0.88 – 4.35 kgCO₂e/m²** across 13
+> official EPDs. Yours is 3.09 — in the upper quartile.
+
+This is true without claiming substitutability. It tells a designer their
+specification is carbon-heavy for its class and leaves the engineering
+judgement where it belongs. It is the same shape as the EUI benchmark banner
+already on the Savings tab.
+
+Rules agreed:
+
+- **official EPDs only** — generics excluded. This costs nothing: of the 130
+  EPDs in these families, 125 are already official, 1 official-non-standard and
+  only 4 generic.
+- **concrete matched on strength class**; a concrete whose strength cannot be
+  parsed is excluded rather than compared against an unknown mix.
+- **savings below 10% are noise** and not worth showing — that drops
+  prestressing strand at 1% and ready-mix M50 at 5%.
+- **cross-country availability belongs on its own tab**, not here.
+- **Cambodia will be empty and must say why**: 179 of its 186 EPDs are generic
+  and the 7 official ones are all cement, which is not comparable like-for-like.
+  The panel should state that rather than render blank.
+
 ## Open questions for GT
 
 1. Should a suggestion be withheld when the alternative is from a different
