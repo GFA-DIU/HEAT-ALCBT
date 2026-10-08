@@ -49,14 +49,15 @@
             {% endwith %}
           {% endif %}
         {% endwith %}
+        {% comment %}
+          Why cement carries no GCCA letter: docs/carbon_rating_labels.md.
+          {# #} only comments out a single line, so this has to be a block tag
+          or it renders to the page as text.
+        {% endcomment %}
         {% if epd.category == "Cement" %}
-          {# GCCA publishes cement ratings, but each country must first choose
-             its own clinker/cement ratio to derive the thresholds. Until that
-             choice is made the figure is simply unrated - see
-             docs/carbon_rating_labels.md. #}
-          <span class="text-[var(--text--sub-600)] text-xs italic shrink-0"
-                title="{% translate 'GCCA Low Carbon Ratings cover concrete. Cement ratings require a country-specific clinker/cement ratio, which has not been set for this country.' %}">
-            {% translate "no GCCA rating" %}
+          <span class="badge badge-outline py-1 px-2 border-[var(--stroke--soft-200)] text-[var(--text--sub-600)] shrink-0 cursor-help"
+                title="{% translate 'GCCA rates concrete, not cement.' %}">
+            {% translate "no rating" %}
           </span>
         {% endif %}
       </div>
