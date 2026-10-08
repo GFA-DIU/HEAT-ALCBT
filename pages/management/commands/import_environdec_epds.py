@@ -267,8 +267,10 @@ class Command(BaseCommand):
     help = "Import extracted environdec EPDs that pass the plausibility gates."
 
     def add_arguments(self, parser):
-        parser.add_argument("--in", dest="infile", default=os.path.expanduser(
-            "~/Downloads/environdec_parsed_404.csv"))
+        # Ships with the repo, so the import reproduces anywhere - including
+        # production, where nobody has the extractor's scratch files.
+        parser.add_argument("--in", dest="infile",
+                            default="pages/data/environdec_epds.csv")
         parser.add_argument("--rejects", default=os.path.expanduser(
             "~/Downloads/environdec_rejected.csv"))
         parser.add_argument("--dry-run", action="store_true")
