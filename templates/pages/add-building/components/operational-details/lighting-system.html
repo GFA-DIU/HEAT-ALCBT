@@ -32,10 +32,11 @@
           <legend class="fieldset-legend">{% translate "Room type" %}<span class="text-[var(--state--error--base)]">*</span></legend>
           <select class="select w-full" name="room_type"
             hx-get="/select_lists/?room_types=1"
+            hx-vals='js:{building_uuid: new URLSearchParams(window.location.search).get("building_uuid") || ""}'
             hx-trigger="load"
             hx-target="this"
             hx-swap="innerHTML"
-            onchange="handleLightingRoomTypeChange(this.value)"
+            onchange="handleLightingRoomTypeChange(this.value); if (window.updateLpdBenchmark) updateLpdBenchmark();"
             required>
             <option disabled selected value="">{% translate "Select an option" %}</option>
           </select>
@@ -151,12 +152,13 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}</legend>
+      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}<span class="tooltip align-middle ml-1" data-tip="Installed lighting power per floor area (W/m2), from the design or a code baseline. For example offices are typically around 8 to 11 W/m2." title="Installed lighting power per floor area (W/m2), from the design or a code baseline. For example offices are typically around 8 to 11 W/m2."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
         <input type="number" name="baseline_lpd" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
       <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total lighting power ÷ Area of room" %}</p>
+      <p class="label-text-alt lpd-benchmark hidden mt-0.5"></p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -273,12 +275,13 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}</legend>
+      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}<span class="tooltip align-middle ml-1" data-tip="Installed lighting power per floor area (W/m2), from the design or a code baseline. For example offices are typically around 8 to 11 W/m2." title="Installed lighting power per floor area (W/m2), from the design or a code baseline. For example offices are typically around 8 to 11 W/m2."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
         <input type="number" name="baseline_lpd" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
       <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total lighting power ÷ Area of room" %}</p>
+      <p class="label-text-alt lpd-benchmark hidden mt-0.5"></p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -388,12 +391,13 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}</legend>
+      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}<span class="tooltip align-middle ml-1" data-tip="Installed lighting power per floor area (W/m2), from the design or a code baseline. For example offices are typically around 8 to 11 W/m2." title="Installed lighting power per floor area (W/m2), from the design or a code baseline. For example offices are typically around 8 to 11 W/m2."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
         <input type="number" name="baseline_lpd" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
       <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total lighting power ÷ Area of room" %}</p>
+      <p class="label-text-alt lpd-benchmark hidden mt-0.5"></p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -503,12 +507,13 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}</legend>
+      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}<span class="tooltip align-middle ml-1" data-tip="Installed lighting power per floor area (W/m2), from the design or a code baseline. For example offices are typically around 8 to 11 W/m2." title="Installed lighting power per floor area (W/m2), from the design or a code baseline. For example offices are typically around 8 to 11 W/m2."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
         <input type="number" name="baseline_lpd" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
       <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total lighting power ÷ Area of room" %}</p>
+      <p class="label-text-alt lpd-benchmark hidden mt-0.5"></p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -618,12 +623,13 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}</legend>
+      <legend class="fieldset-legend">{% translate "Baseline Lighting Power Density (LPD)" %}<span class="tooltip align-middle ml-1" data-tip="Installed lighting power per floor area (W/m2), from the design or a code baseline. For example offices are typically around 8 to 11 W/m2." title="Installed lighting power per floor area (W/m2), from the design or a code baseline. For example offices are typically around 8 to 11 W/m2."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input w-full bg-[var(--bg--weak-50)]">
         <input type="number" name="baseline_lpd" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.000001" readonly class="cursor-not-allowed" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW/m²</span>
       </label>
       <p class="label-text-alt text-[var(--text--soft-400)]">{% translate "Total lighting power ÷ Area of room" %}</p>
+      <p class="label-text-alt lpd-benchmark hidden mt-0.5"></p>
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
@@ -826,6 +832,62 @@
       lpdEl.value = (power / area).toFixed(6);
     }
     recalcLightingEnergy();
+    if (window.updateLpdBenchmark) updateLpdBenchmark();
+  };
+
+  // ================================================================
+  // National reference LPD, shown beside the calculated value.
+  //
+  // The room type used to be a label that drove nothing. It now carries the
+  // value the country's own standard allows, so the user can see whether the
+  // design complies. Countries differ in what they publish: Indonesia gives a
+  // per-room limit (SNI 6197:2020), Vietnam and Thailand only a whole-building
+  // average, and Cambodia has no building energy code at all - there the line
+  // simply stays hidden rather than borrowing a neighbour's number.
+  // ================================================================
+  var _lpdRefCache = {};
+
+  window.updateLpdBenchmark = function() {
+    var form = document.getElementById('lighting-system-form');
+    if (!form) return;
+    var roomEl = form.querySelector('[name="room_type"]');
+    var lpdEl  = form.querySelector('[name="baseline_lpd"]');
+    var noteEl = form.querySelector('.lpd-benchmark');
+    if (!roomEl || !lpdEl || !noteEl) return;
+
+    var code = roomEl.value;
+    var buildingId = getBuildingId();
+    if (!code || !buildingId) { noteEl.classList.add('hidden'); return; }
+
+    var render = function(ref) {
+      if (!ref || !ref.has_reference) { noteEl.classList.add('hidden'); return; }
+      // Stored in kW/m2, standards are published in W/m2.
+      var actual = parseFloat(lpdEl.value) * 1000;
+      var limit  = ref.lpd_w_m2;
+      var scope  = (ref.basis === 'building')
+        ? 'whole-building average'
+        : 'for this room';
+      if (isNaN(actual) || actual <= 0) {
+        noteEl.textContent = ref.standard + ' allows ' + limit + ' W/m² ' + scope + '.';
+        noteEl.className = 'label-text-alt lpd-benchmark mt-0.5 text-[var(--text--soft-400)]';
+      } else if (actual > limit) {
+        noteEl.textContent = 'Above the limit: ' + actual.toFixed(1) + ' W/m² entered, '
+          + ref.standard + ' allows ' + limit + ' W/m² ' + scope + '.';
+        noteEl.className = 'label-text-alt lpd-benchmark mt-0.5 text-[var(--state--error--base)]';
+      } else {
+        noteEl.textContent = 'Within the limit: ' + actual.toFixed(1) + ' W/m² entered, '
+          + ref.standard + ' allows ' + limit + ' W/m² ' + scope + '.';
+        noteEl.className = 'label-text-alt lpd-benchmark mt-0.5 text-[var(--state--success--base)]';
+      }
+      noteEl.classList.remove('hidden');
+    };
+
+    if (_lpdRefCache[code]) { render(_lpdRefCache[code]); return; }
+    fetch('/select_lists/?lighting_reference=1&code=' + encodeURIComponent(code)
+          + '&building_uuid=' + encodeURIComponent(buildingId), { cache: 'no-store' })
+      .then(function(r) { return r.json(); })
+      .then(function(ref) { _lpdRefCache[code] = ref; render(ref); })
+      .catch(function() { noteEl.classList.add('hidden'); });
   };
 
   // ================================================================

@@ -191,7 +191,7 @@
               <select id="template-country" name="country_id" class="select" required>
                 <option value="">{% translate "Select country" %}</option>
                 {% for country in countries %}
-                  <option value="{{ country.id }}"> <span data-country="{{ country.code2 }}"></span> {{ country.name }}</option>
+                  <option value="{{ country.id }}">{{ country.name }}</option>
                 {% endfor %}
               </select>
             </fieldset>
@@ -322,7 +322,7 @@
                 <select name="country" id="epd-country-filter" class="select">
                   <option value="">{% translate "All Countries" %}</option>
                   {% for country in countries %}
-                    <option value="{{ country.id }}"> <span data-country="{{country.code2}}"></span> {{ country.name }}</option>
+                    <option value="{{ country.id }}">{{ country.name }}</option>
                   {% endfor %}
                 </select>
               </div>
@@ -766,7 +766,7 @@
         const materialHtml = `
           <li class="bg-[var(--bg--weak-50)] rounded-xl p-4" data-material-id="${tempId}" data-is-new="true">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-sm/5 font-medium">${epd.name}</span>
+              <span class="text-sm/5 font-medium" title="${epd.name}">${epd.display_name || epd.name}</span>
               <a href="/epd/${epd.id}/" target="_blank"><span data-icon="external-link-line" data-size="20" data-color="var(--icon--sub-600)"></span></a>
             </div>
             <div class="flex items-stretch gap-1 bg-[var(--bg--white-0)] rounded-xl p-2.5">

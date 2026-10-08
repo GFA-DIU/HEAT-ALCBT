@@ -64,3 +64,9 @@ static/js/geo-location.js
 static/js/*.map
 static/css/output.css
 static/css/output.css
+
+# Local scratch output (contains unrelated projects and browser profiles)
+outputs/
+.claude/
+HANDOVER.md
+.epd_pdfs/

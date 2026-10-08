@@ -213,7 +213,7 @@
 </ul>
 
 <script>
-  var i18n = {
+  var buildingsListI18n = {
     deleteBuildingConfirm: "{% translate 'This will permanently delete the building and all associated data.' %}",
     deleteBuildingTitle:   "{% translate 'Delete Building?' %}",
     duplicateBuildingConfirm: "{% translate 'A full editable copy of this building (all components and data) will be created.' %}",
@@ -242,8 +242,8 @@
     event.stopPropagation();
 
     const confirmed = await askConfirm(
-      i18n.duplicateBuildingConfirm,
-      i18n.duplicateBuildingTitle,
+      buildingsListI18n.duplicateBuildingConfirm,
+      buildingsListI18n.duplicateBuildingTitle,
       false
     );
     if (!confirmed) return;
@@ -259,11 +259,11 @@
       if (response.ok) {
         window.location.reload();   // Django success message renders as a toast
       } else {
-        alert(i18n.duplicateFailed);
+        alert(buildingsListI18n.duplicateFailed);
       }
     } catch (error) {
       console.error('Error duplicating building:', error);
-      alert(i18n.duplicateFailed);
+      alert(buildingsListI18n.duplicateFailed);
     }
   }
 
@@ -274,7 +274,7 @@
     // Destructive action: use the native browser confirm directly so a blocking
     // prompt is GUARANTEED (the styled delete dialog was not reliably appearing
     // on this page). OK -> delete; Cancel -> nothing happens.
-    const confirmed = window.confirm(i18n.deleteBuildingTitle + '\n\n' + i18n.deleteBuildingConfirm);
+    const confirmed = window.confirm(buildingsListI18n.deleteBuildingTitle + '\n\n' + buildingsListI18n.deleteBuildingConfirm);
 
     if (confirmed) {
       try {
@@ -290,11 +290,11 @@
           window.location.reload();
         } else {
           console.error('Delete failed');
-          alert(i18n.deleteFailed);
+          alert(buildingsListI18n.deleteFailed);
         }
       } catch (error) {
         console.error('Error:', error);
-        alert(i18n.deleteFailed);
+        alert(buildingsListI18n.deleteFailed);
       }
     }
   }

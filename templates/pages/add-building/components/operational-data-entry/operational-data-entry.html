@@ -15,7 +15,7 @@
       data-color="var(--icon--strong-950)"
     ></span>
     <span class="text-sm/5">
-      {% blocktranslate with target=total_annual_energy_consumption|floatformat:0 %}Total annual energy consumption: <strong>{{ target }} kWh</strong>{% endblocktranslate %}
+      {% blocktranslate with target=total_annual_energy_consumption|floatformat:"0g" %}Total annual energy consumption: <strong>{{ target }} kWh</strong>{% endblocktranslate %}
     </span>
   </div>
   <span class="text-xs text-[var(--text--sub-600)]" id="energy_running_total">
@@ -433,11 +433,13 @@
       }
     });
 
-    const roundedTotal = Math.round(total * 100) / 100;
+    // Match the banner above, which renders the target as a whole number.
+    // Showing 2,020 next to 2,021.72 made the two look like different quantities.
+    const shownTotal = Math.round(total).toLocaleString();
     if (hasNonKwh) {
-      totalEl.textContent = '{% translate "Entered so far (kWh carriers): " %}' + roundedTotal + ' {% translate "kWh (other units convert on save)" %}';
+      totalEl.textContent = '{% translate "Entered so far (kWh carriers): " %}' + shownTotal + ' {% translate "kWh (other units convert on save)" %}';
     } else {
-      totalEl.textContent = '{% translate "Entered so far: " %}' + roundedTotal + ' {% translate "kWh" %}';
+      totalEl.textContent = '{% translate "Entered so far: " %}' + shownTotal + ' {% translate "kWh" %}';
     }
   }
 

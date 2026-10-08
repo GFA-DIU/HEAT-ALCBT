@@ -287,6 +287,35 @@ class EPD(BaseModel, epdLCAx):
         MaterialCategory, on_delete=models.SET_NULL, null=True, blank=True
     )
     source = models.CharField(_("Source"), max_length=255, null=True, blank=True)
+
+    # --- nomenclature -----------------------------------------------------
+    # `name` arrived from a dozen different importers and carries whatever the
+    # source document happened to be titled: sometimes the material ("Gypsum"),
+    # sometimes a trade name alone ("MU-307", "Xtend"), sometimes the maker
+    # buried mid-string ("Shutters - clauss markisen Projekt GmbH - Fire
+    # curtain"), sometimes a 227-character specification dump. A user searching
+    # "cement" never finds MU-307, which is a cement.
+    #
+    # These split the parts out so the label can be composed instead of
+    # hand-written, and so search and sort work on the right thing. All are
+    # optional: a record with none of them behaves exactly as before.
+    material_name = models.CharField(
+        _("Material"), max_length=255, null=True, blank=True,
+        help_text=_("What the product is, independent of brand. Drives search and sorting."),
+    )
+    product_name = models.CharField(
+        _("Product / trade name"), max_length=255, null=True, blank=True,
+        help_text=_("Manufacturer's name for this specific product, where it has one."),
+    )
+    manufacturer = models.CharField(
+        _("Manufacturer"), max_length=255, null=True, blank=True,
+    )
+    source_name = models.CharField(
+        _("Original title"), max_length=255, null=True, blank=True,
+        help_text=_("The title exactly as it appeared in the source document. Kept so a "
+                    "figure can always be traced back after the display name changes."),
+    )
+
     type = models.CharField(_("Type"), choices=EPDType.choices, max_length=255)
     declared_amount = models.DecimalField(
         _("Reference Quantity of EPD"),
@@ -296,12 +325,73 @@ class EPD(BaseModel, epdLCAx):
         null=False,
         blank=False,
     )
+    class Meta:
+        # Overrides epdLCAx.Meta, which keys uniqueness on (UUID, name) only.
+        #
+        # That was unworkable here: 966 generic EPDs carry a placeholder UUID
+        # (two distinct values across all of them), so for those rows the rule
+        # collapsed to "unique on name", and the same material could not exist
+        # for two countries. The workaround was a trailing space in the name -
+        # "Steel reinforcement (steel rebar) " for India beside
+        # "Steel reinforcement (steel rebar)" for Cambodia. That made every
+        # name-based lookup pick whichever it met first, which is how an import
+        # once resolved 1,398 rebar lines to India's factor (2.60) instead of
+        # Cambodia's (2.4247), and how an aluminium record with no density was
+        # silently valued at zero.
+        #
+        # The same material in two countries is the normal case, so country
+        # belongs in the key.
+        unique_together = ("UUID", "name", "country")
+
     labels = models.ManyToManyField(
         Label, blank=True, related_name="epd_labels", through="EPDLabel"
     )
 
     def __str__(self):
-        return self.name
+        return self.display_name
+
+    @property
+    def display_name(self):
+        """Label shown in the material picker and on reports.
+
+        Material first, so an alphabetical list groups cements together instead
+        of scattering them under M, S and X:
+
+            Portland composite cement - MU-307 - PT Cipta Mortar Utama
+            Ready-mix concrete C25/30            (generic: no product or maker)
+
+        Falls back to `name` whenever the parts have not been filled in, so a
+        record that predates this structure is unaffected. `source_name` keeps
+        the original title either way, so a figure can still be traced back to
+        its EPD document.
+
+        The material is omitted when it is only repeating the record's own
+        category. For the ~1,580 EPDs whose material_name was derived from that
+        category there is nothing new in the prefix, and the picker already
+        prints the category as a badge beside the name, so including it gave
+        every row a stutter - "Ready mixed concrete - Shotcrete" sitting next to
+        a badge reading "Ready mixed concrete". Search is unaffected: it queries
+        material_name directly and does not care what is displayed.
+        """
+        if not self.material_name:
+            return self.name
+        category_name = self.category.name_en if self.category_id else None
+        product = self.product_name or ""
+        # Drop the material when the badge beside it already says so, or when
+        # the product name contains it - "Mortar - Tiger Mortar General
+        # Masonry" and "Fly ash - Dry Fly ash" say it twice otherwise.
+        redundant = (self.material_name == category_name
+                     or self.material_name.lower() in product.lower())
+        parts = [] if redundant else [self.material_name]
+        if (product
+                and product not in parts
+                and self.product_name != self.manufacturer):
+            parts.append(self.product_name)
+        if self.manufacturer:
+            parts.append(self.manufacturer)
+        if not parts:
+            return self.name
+        return " - ".join(parts)
 
     def get_gwp_impact_sum(self, life_cycle_stage):
         """
@@ -309,7 +399,18 @@ class EPD(BaseModel, epdLCAx):
         Decimal(round(value, 2)) divided by self.declared_amount.
         If `all_impacts` was prefetched, it will use that; otherwise it falls
         back to a database query.
+
+        Nine records carry declared_amount = 0, which made every one of these
+        divisions raise DivisionByZero. Most callers write
+        `get_gwp_impact_sum(...) or 0`, which cannot help because the exception
+        is raised before the `or` is reached, so selecting one of those EPDs in
+        the material picker returned a 500. There is no meaningful impact per
+        unit when the declared amount is zero, so report nothing and let the
+        caller's `or 0` do its job.
         """
+        if not self.declared_amount:
+            return None
+
         # 1) Try to use the prefetched list first
         impacts_list = getattr(self, "all_impacts", None)
 
@@ -346,7 +447,14 @@ class EPD(BaseModel, epdLCAx):
         Decimal(round(value, 2)) divided by self.declared_amount.
         If `all_impacts` was prefetched, it will use that; otherwise it falls
         back to a database query.
+
+        Guarded against declared_amount = 0 for the same reason as
+        get_gwp_impact_sum above; this one additionally divided in its
+        not-found branch, so it raised even when no PENRT impact existed.
         """
+        if not self.declared_amount:
+            return None
+
         # 1) Try to use the prefetched list first
         impacts_list = getattr(self, "all_impacts", None)
 
@@ -381,7 +489,7 @@ class EPD(BaseModel, epdLCAx):
         units = {self.declared_unit}
         if self.declared_unit not in [Unit.KG, Unit.M3, Unit.KWH]:
             return list(units)
-        for item in self.conversions:
+        for item in (self.conversions or []):
             match (self.declared_unit, item.get("unit")):
                 case (Unit.KWH | Unit.M3, "kg" | "-"):
                     units.add(Unit.KG)

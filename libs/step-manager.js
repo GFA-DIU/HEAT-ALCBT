@@ -531,7 +531,9 @@ class StepManager {
         this.updateUrl({ replaceState: true });
       }
 
-      const response = await fetch(url);
+      // no-store: step fragments are dynamic and re-execute their inline scripts,
+      // so never serve a stale cached copy (browser or intercepting proxy).
+      const response = await fetch(url, { cache: 'no-store' });
 
       // If the session expired, the server redirects to login.
       if (response.url && response.url.indexOf('/accounts/login/') !== -1) {

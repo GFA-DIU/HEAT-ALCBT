@@ -67,6 +67,7 @@ from .views.building.ventilation_system import (
     create_or_update_ventilation_system, delete_ventilation_system,
     get_ventilation_systems)
 from .views.home import buildings_list, duplicate_building
+from .views.building.upfront import building_upfront
 from .views.building.import_boq import (download_boq_template,
                                         import_boq_preview, import_boq_process)
 from .views.resources import resources
@@ -122,6 +123,7 @@ urlpatterns = [
     path("building/complete", complete_building_setup, name="complete_building_setup"),
     path("building/step/system-na", toggle_system_not_applicable, name="toggle_system_not_applicable"),
     path("building/step/systems-status", get_systems_status, name="get_systems_status"),
+    path("building/<uuid:building_id>/upfront/", building_upfront, name="building_upfront"),
     path("building/<uuid:building_id>/", building, name="building"),
     path("building/<uuid:building_id>/savings/", savings_tab, name="savings_tab"),
     path("building/<uuid:building_id>/export/", export_building, name="building_export"),

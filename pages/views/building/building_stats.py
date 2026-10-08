@@ -144,6 +144,76 @@ def calculate_total_embodied_carbon(
     return total_gwp
 
 
+def calculate_embodied_modules(
+    building: Building,
+    simulated: bool = False,
+    prefetched_assemblies=None,
+    calculation_errors: Optional[list] = None,
+) -> Dict[str, Decimal]:
+    """Upfront-carbon module split (kg CO2e/m²): A1–A3, A4 (transport), A5w (waste).
+
+    A1–A3 comes from the EPD (as today). A4/A5 are estimated per material from the
+    building's country + a per-category sourcing scenario / waste rate
+    (pages/scripts/a4a5). Same loop/skip semantics as calculate_total_embodied_carbon.
+    """
+    from pages.scripts.a4a5.compute import material_a4_a5
+
+    country_name = getattr(getattr(building, "country", None), "name", None) or "?"
+    floor_area = float(building.total_floor_area or 0)
+    a1a3 = Decimal("0"); a4 = Decimal("0"); a5w = Decimal("0")
+
+    if prefetched_assemblies is not None:
+        building_assemblies = prefetched_assemblies
+    elif simulated:
+        building_assemblies = building.buildingassemblysimulated_set.all()
+    else:
+        building_assemblies = building.buildingassembly_set.all()
+
+    for ba in building_assemblies:
+        assembly = ba.assembly
+        products = getattr(assembly, "prefetched_products", None)
+        if products is None:
+            products = assembly.structuralproduct_set.all()
+        for sp in products:
+            try:
+                impacts = calculate_impacts(
+                    dimension=assembly.dimension,
+                    assembly_quantity=ba.quantity,
+                    total_floor_area=floor_area,
+                    p=sp,
+                )
+            except (ImpactCalculationError, ValueError, AttributeError, ZeroDivisionError) as e:
+                if calculation_errors is not None:
+                    calculation_errors.append({
+                        'assembly': assembly.name or 'Unknown assembly',
+                        'epd': getattr(getattr(sp, 'epd', None), 'name', 'Unknown EPD'),
+                        'reason': str(e),
+                    })
+                continue
+
+            p_a1a3 = next((Decimal(str(i["impact_value"])) for i in impacts
+                           if i["impact_type"].impact_category == "gwp"
+                           and i["impact_type"].life_cycle_stage == "a1a3"
+                           and Decimal(str(i["impact_value"])) > 0), Decimal("0"))
+            mass_kg = next((i.get("mass_kg") for i in impacts), None)
+            cat = getattr(sp.epd, "category", None)
+            cat_name = (getattr(cat, "name_en", None) or getattr(cat, "name", None)
+                        or (str(cat) if cat else "")) if cat else ""
+            scenario = getattr(sp, "sourcing_scenario", None) or None
+            waste = getattr(sp, "waste_rate", None)
+            dist = getattr(sp, "a4_distance_km", None)
+            efv = getattr(sp, "a4_ef", None)
+            p_a4, p_a5w, _ = material_a4_a5(
+                a1a3_per_m2=p_a1a3, mass_kg=mass_kg, floor_area=floor_area,
+                country_name=country_name, category_name=cat_name,
+                scenario=scenario, waste_rate=float(waste) if waste is not None else None,
+                distance_km=float(dist) if dist is not None else None,
+                ef=float(efv) if efv is not None else None)
+            a1a3 += p_a1a3; a4 += p_a4; a5w += p_a5w
+
+    return {"a1a3": a1a3, "a4": a4, "a5w": a5w, "upfront": a1a3 + a4 + a5w}
+
+
 def _op_is_electricity(op) -> bool:
     """An operational product is grid electricity when both its EPD's declared
     unit and the entered input unit are kWh (matches the grid-EF heuristic)."""
@@ -358,12 +428,13 @@ def get_building_detail_statistics(
         - calculation_errors: list of dicts with assembly/epd/reason for skipped products
     """
     calculation_errors = []
-    embodied = calculate_total_embodied_carbon(
+    modules = calculate_embodied_modules(
         building,
         simulated=False,
         prefetched_assemblies=prefetched_assemblies,
         calculation_errors=calculation_errors,
     )
+    embodied = modules["a1a3"]  # headline "embodied" stays A1–A3 (unchanged meaning)
     operational = calculate_total_operational_carbon(
         building,
         simulated=False,
@@ -405,8 +476,14 @@ def get_building_detail_statistics(
     grid_electricity_kwh = gross_elec_kwh * (Decimal('1') - renewable_fraction)
 
     return {
-        'total_carbon_footprint': embodied + operational,
+        # Whole-life now includes upfront A4/A5 (embodied stays A1-A3 for benchmarks).
+        'total_carbon_footprint': modules['upfront'] + operational,
         'total_embodied_carbon': embodied,
+        # Upfront-carbon module split (A1–A3 from EPD; A4 transport + A5w waste estimated
+        # from country + RICS defaults). New metrics — headline embodied/footprint unchanged.
+        'embodied_a4': modules['a4'],
+        'embodied_a5w': modules['a5w'],
+        'upfront_carbon': modules['upfront'],
         'total_operational_carbon': operational,
         # Per-year intensity (sum of Systems-tab bars), so the stat card matches the chart.
         'operational_carbon_per_year': operational_by_system.get('total', 0),
@@ -1137,9 +1214,11 @@ def get_building_chart_data(
         - embodied_by_material: data for bar chart by material
         - operational_by_system: data for bar chart by system/appliance
     """
-    embodied = calculate_total_embodied_carbon(
+    # Donut uses Upfront (A1-A5) so it matches the whole-life footprint card.
+    modules = calculate_embodied_modules(
         building, simulated=False, prefetched_assemblies=prefetched_assemblies
     )
+    embodied = modules["upfront"]
     operational = calculate_total_operational_carbon(
         building, simulated=False, prefetched_operational=prefetched_operational
     )
@@ -1171,7 +1250,7 @@ def get_building_chart_data(
 
     return {
         'whole_life_carbon': {
-            'labels': ['Operational carbon (B6)', 'Embodied carbon (A1-A3)'],
+            'labels': ['Operational carbon (B6)', 'Upfront embodied carbon (A1-A5)'],
             'data': [float(operational), float(embodied)],
         },
         'embodied_by_assembly': get_embodied_carbon_by_assembly(

@@ -1,4 +1,4 @@
-"""Compute and apply GCCA A–G concrete Low Carbon Ratings dynamically.
+"""Compute and apply GCCA AA–F concrete Low Carbon Ratings dynamically.
 
 Rates ready-mix / precast STRUCTURAL concrete (declared per m³, with a parseable
 compressive strength class) from its GWP A1–A3, using pages/scripts/Label_mapping/
@@ -18,7 +18,8 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from pages.models.epd import EPD, EPDLabel, Label, Unit
-from pages.scripts.Label_mapping.gcca_rating import strength_to_mxx, rate
+from pages.scripts.Label_mapping.gcca_rating import (
+    GCCA_BANDS, rate, strength_to_mxx)
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ MIN_SANE_GWP = 50.0  # kgCO₂e/m³ — below this a per-m³ concrete value is b
 
 
 class Command(BaseCommand):
-    help = "Compute & apply GCCA A–G ratings to ready-mix/precast concrete EPDs."
+    help = "Compute & apply GCCA AA–F ratings to ready-mix/precast concrete EPDs."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -46,7 +47,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         label, _ = Label.objects.get_or_create(
             name=LABEL_NAME,
-            defaults={"scale_parameters": ["A", "B", "C", "D", "E", "F", "G"]},
+            defaults={"scale_parameters": list(GCCA_BANDS)},
         )
 
         qs = EPD.objects.filter(declared_unit=Unit.M3).filter(
@@ -57,7 +58,7 @@ class Command(BaseCommand):
         if not options["overwrite"]:
             qs = qs.exclude(epdlabel__label=label)
 
-        rated = skipped = 0
+        rated = skipped = removed = 0
         by_band = {}
         skip_examples = []
         for epd in qs.iterator():
@@ -77,6 +78,18 @@ class Command(BaseCommand):
                     skip_examples.append(f"{epd.name[:55]} (gwp anomaly: {gwp})")
                 continue
             band = rate(gwp, mxx)
+            if band is None:
+                # Above the top of F. The GCCA scale stops there, so the
+                # product is left unrated rather than given an invented letter.
+                # A label from an earlier run is removed, otherwise a letter
+                # the scale no longer defines would survive re-rating.
+                if options["overwrite"] and not options["dry_run"]:
+                    removed += EPDLabel.objects.filter(epd=epd, label=label).delete()[0]
+                skipped += 1
+                if len(skip_examples) < 12:
+                    skip_examples.append(
+                        f"{epd.name[:55]} (above the top of F: {gwp:.0f} kgCO2e/m3)")
+                continue
             by_band[band] = by_band.get(band, 0) + 1
             if not options["dry_run"]:
                 EPDLabel.objects.update_or_create(
@@ -86,7 +99,8 @@ class Command(BaseCommand):
 
         prefix = "[DRY-RUN] " if options["dry_run"] else ""
         self.stdout.write(self.style.SUCCESS(
-            f"{prefix}Rated {rated} concrete EPDs; skipped {skipped}."
+            f"{prefix}Rated {rated} concrete EPDs; skipped {skipped}"
+            + (f"; removed {removed} stale label(s)." if removed else ".")
         ))
         self.stdout.write(f"  Band distribution: {dict(sorted(by_band.items()))}")
         if skip_examples:

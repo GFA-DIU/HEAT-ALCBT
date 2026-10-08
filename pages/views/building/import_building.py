@@ -1,8 +1,13 @@
+import csv
 import datetime
+import difflib
 import logging
+import os
+import re
 import uuid as uuid_lib
 from decimal import Decimal, InvalidOperation
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -101,6 +106,94 @@ def _resolve_country(name):
     )
 
 
+# Confident fuzzy matching for imported free-text names (city/region).
+# Source templates often carry small typos (e.g. "Pnomh Penh" for "Phnom Penh").
+# We only auto-correct when the match is unambiguous and close enough; every
+# substitution is logged so the import can be audited.
+FUZZY_CUTOFF = 0.82
+
+
+def _fuzzy_pick(name, candidates):
+    """Return (best_match, score) from `candidates` (list of str) or (None, 0).
+
+    Only returns a match when it is clearly the best one: the top score must be
+    >= FUZZY_CUTOFF and strictly better than the runner-up (no ambiguity).
+    """
+    if not name or not candidates:
+        return None, 0.0
+    scored = sorted(
+        ((difflib.SequenceMatcher(None, name.lower(), c.lower()).ratio(), c) for c in candidates),
+        reverse=True,
+    )
+    top_score, top_name = scored[0]
+    if top_score < FUZZY_CUTOFF:
+        return None, top_score
+    if len(scored) > 1 and abs(scored[1][0] - top_score) < 1e-9:
+        return None, top_score  # tie -> ambiguous, do not guess
+    return top_name, top_score
+
+
+# Tokens that carry no distinguishing power in an EPD catalogue.
+_EPD_STOPWORDS = {
+    "the", "and", "of", "for", "with", "grade", "type", "class", "mm", "kg", "m2", "m3",
+    "steel", "concrete", "cement", "board", "panel", "system", "average", "mix",
+}
+
+
+def _epd_tokens(text):
+    return {t for t in re.findall(r"[a-z0-9]+", (text or "").lower()) if len(t) > 1}
+
+
+def _fuzzy_epd_pick(name, candidates):
+    """Confidently match an EPD name against catalogue `candidates`.
+
+    Requires a DISTINCTIVE shared token (one that is rare across the catalogue),
+    reasonable coverage of the query's words, and a clear margin over the
+    runner-up. Returns (best_name, score) or (None, 0.0).
+    """
+    if not name or not candidates:
+        return None, 0.0
+
+    q_tokens = _epd_tokens(name)
+    if not q_tokens:
+        return None, 0.0
+
+    # Document frequency of each token across the candidate set.
+    freq = {}
+    cand_tokens = []
+    for c in candidates:
+        ct = _epd_tokens(c)
+        cand_tokens.append(ct)
+        for t in ct:
+            freq[t] = freq.get(t, 0) + 1
+    rare_cap = max(2, int(len(candidates) * 0.05))  # "rare" = in <=5% of names
+
+    scored = []
+    for c, ct in zip(candidates, cand_tokens):
+        shared = q_tokens & ct
+        if not shared:
+            continue
+        informative = {
+            t for t in shared
+            if t not in _EPD_STOPWORDS and freq.get(t, 0) <= rare_cap
+        }
+        if not informative:
+            continue  # only generic words in common -> not a confident match
+        coverage = len(shared) / len(q_tokens)
+        seq = difflib.SequenceMatcher(None, name.lower(), c.lower()).ratio()
+        scored.append((0.45 * seq + 0.55 * coverage, c))
+
+    if not scored:
+        return None, 0.0
+    scored.sort(reverse=True)
+    top_score, top_name = scored[0]
+    if top_score < 0.45:
+        return None, top_score
+    if len(scored) > 1 and (top_score - scored[1][0]) < 0.05:
+        return None, top_score  # ambiguous -> do not guess
+    return top_name, top_score
+
+
 def _resolve_region(name, country):
     """Look up CustomRegion by name within a country. Returns (region, error_string)."""
     name = _str(name)
@@ -112,6 +205,20 @@ def _resolve_region(name, country):
     ).first()
     if region:
         return region, None
+
+    # Fuzzy fallback — tolerate small typos in the source template.
+    names = list(
+        CustomRegion.objects.filter(country=country).values_list("name", flat=True)
+    )
+    best, score = _fuzzy_pick(name, names)
+    if best:
+        region = CustomRegion.objects.filter(name__iexact=best, country=country).first()
+        if region:
+            logger.warning(
+                "Import fuzzy-matched region %r -> %r (score %.2f, country %s)",
+                name, best, score, country.name,
+            )
+            return region, None
 
     return None, f"Region '{name}' was not found for country '{country.name}'."
 
@@ -127,6 +234,21 @@ def _resolve_city(name, country):
     ).first()
     if city:
         return city, None
+
+    # Fuzzy fallback — tolerate small typos in the source template
+    # (e.g. "Pnomh Penh" -> "Phnom Penh").
+    names = list(
+        CustomCity.objects.filter(country=country).values_list("name", flat=True)
+    )
+    best, score = _fuzzy_pick(name, names)
+    if best:
+        city = CustomCity.objects.filter(name__iexact=best, country=country).first()
+        if city:
+            logger.warning(
+                "Import fuzzy-matched city %r -> %r (score %.2f, country %s)",
+                name, best, score, country.name,
+            )
+            return city, None
 
     return None, f"City '{name}' was not found for country '{country.name}'."
 
@@ -882,6 +1004,26 @@ def _calc_vent_power(airflow, efficiency, units):
     return None
 
 
+def _vent_power_kw_from_watts(power_w_raw, units_raw):
+    """Convert the template's ventilation power column into kW.
+
+    The source template states this column as "Number in W unit" (Watts) and the
+    value is PER UNIT: the dataset's own annual figure is reproduced by
+    W x units / 1000 x hours (50 W x 2 units / 1000 x 4368 h = 436.8 kWh).
+    BEAT stores total_power_input_kw, and its AHU/DOAS path already follows the
+    same convention (airflow x efficiency x units / 1000), so Cassette/Fan/FCU
+    must convert too. Reading the raw value as kW overstated energy 500x.
+    """
+    try:
+        w = float(power_w_raw)
+        u = float(units_raw)
+        if w > 0 and u > 0:
+            return round((w * u) / 1000, 6)
+    except (ValueError, TypeError):
+        pass
+    return None
+
+
 def _calc_vent_energy(power, hours, days, weeks, vsd=False, dcv=False):
     """
     Auto-calculate total annual energy consumption (kWh/year) for ventilation.
@@ -988,11 +1130,12 @@ def _parse_ventilation_rows(vent_type, raw_rows):
             row_data['operating_hours_per_day']   = cell(3)
             row_data['operating_days_per_week']   = cell(4)
             row_data['operating_weeks_per_year']  = cell(5)
-            row_data['power_input']               = cell(6)
+            _pk = _vent_power_kw_from_watts(cell(6), units_raw)
+            row_data['power_input']               = str(_pk) if _pk is not None else cell(6)
             row_data['airflow_rate']              = cell(7)
             airflow_unit_raw = cell(8).lower()
 
-            computed_energy = _calc_vent_energy(cell(6), cell(3), cell(4), cell(5))
+            computed_energy = _calc_vent_energy(row_data['power_input'], cell(3), cell(4), cell(5))
             if computed_energy is not None:
                 row_data['annual_energy_consumption'] = str(computed_energy)
 
@@ -1003,12 +1146,13 @@ def _parse_ventilation_rows(vent_type, raw_rows):
             row_data['operating_hours_per_day']   = cell(2)
             row_data['operating_days_per_week']   = cell(3)
             row_data['operating_weeks_per_year']  = cell(4)
-            row_data['power_input']               = cell(5)
+            _pk = _vent_power_kw_from_watts(cell(5), units_raw)
+            row_data['power_input']               = str(_pk) if _pk is not None else cell(5)
             row_data['airflow_rate']              = cell(6)
             airflow_unit_raw = cell(7).lower()
             row_data['number_of_stars']           = cell(8)
 
-            computed_energy = _calc_vent_energy(cell(5), cell(2), cell(3), cell(4))
+            computed_energy = _calc_vent_energy(row_data['power_input'], cell(2), cell(3), cell(4))
             if computed_energy is not None:
                 row_data['annual_energy_consumption'] = str(computed_energy)
 
@@ -1019,11 +1163,12 @@ def _parse_ventilation_rows(vent_type, raw_rows):
             row_data['operating_hours_per_day']   = cell(2)
             row_data['operating_days_per_week']   = cell(3)
             row_data['operating_weeks_per_year']  = cell(4)
-            row_data['power_input']               = cell(5)
+            _pk = _vent_power_kw_from_watts(cell(5), units_raw)
+            row_data['power_input']               = str(_pk) if _pk is not None else cell(5)
             row_data['airflow_rate']              = cell(6)
             airflow_unit_raw = cell(7).lower()
 
-            computed_energy = _calc_vent_energy(cell(5), cell(2), cell(3), cell(4))
+            computed_energy = _calc_vent_energy(row_data['power_input'], cell(2), cell(3), cell(4))
             if computed_energy is not None:
                 row_data['annual_energy_consumption'] = str(computed_energy)
 
@@ -2075,6 +2220,15 @@ def import_operational_energy_carriers(request):
         description = cell(1)
         quantity_raw = cell(2)
         unit_raw = cell(3).lower()
+        # Source datasets often express the unit as an annual RATE in brackets,
+        # e.g. "[ kWh/a ]", "[ liter/a ]", "[ kg/a ]". The quantity is already the
+        # annual figure, so strip the brackets and the per-annum suffix and keep
+        # just the unit itself.
+        unit_raw = unit_raw.strip().strip("[]").strip()
+        for _suffix in ("/a", "/yr", "/year", "/annum", " per year", " per annum"):
+            if unit_raw.endswith(_suffix):
+                unit_raw = unit_raw[: -len(_suffix)].strip()
+                break
 
         label = f"row {row_idx + 1}"
 
@@ -2104,12 +2258,24 @@ def import_operational_energy_carriers(request):
             'kwh': 'kwh', 'kilowatt hour': 'kwh', 'kilowatt-hour': 'kwh',
             'kg': 'kg', 'kilogram': 'kg',
             'm3': 'm3', 'm³': 'm3', 'cubic meter': 'm3', 'cubic metre': 'm3',
-            'l': 'l', 'liter': 'l', 'litre': 'l', 'liter ': 'l',
+            # NOTE: BEAT has two distinct litre units - Unit.L ('l') and
+            # Unit.LITER ('liter'). Only ('kwh', 'liter') is handled by
+            # calculate_impact_operational, and EPD.get_available_units() returns
+            # 'liter', so normalise every litre spelling to 'liter'. Mapping to 'l'
+            # passed import validation but crashed the building page with
+            # "Unsupported combination: declared_unit 'kwh', input_unit 'l'".
+            'l': 'liter', 'liter': 'liter', 'litre': 'liter', 'liter ': 'liter',
+            'liters': 'liter', 'litres': 'liter',
         }
         unit_norm = unit_norm_map.get(unit_raw, unit_raw)
 
         # Look up EPD
-        epd, epd_error = _lookup_energy_carrier_epd(name_raw)
+        # Pass the building's country: energy carriers exist once PER COUNTRY with
+        # localised grid/fuel factors (electricity b6: IN 0.705, KH 0.588, VN 0.659,
+        # TH 0.475, ID 0.78). Without it the lookup fell back to whichever country
+        # came first, so a Cambodian building was billed at India's 0.705 (+20%).
+        _country = building.country.name if building.country else None
+        epd, epd_error = _lookup_energy_carrier_epd(name_raw, _country)
         if epd_error:
             errors[label] = {"name": [epd_error]}
             continue
@@ -2197,6 +2363,52 @@ STRUCTURAL_UNIT_MAP = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Curated EPD name mapping (template name -> catalogue EPD)
+# ---------------------------------------------------------------------------
+# Source templates use their own material wording, which often has no exact
+# counterpart in the BEAT catalogue. Rather than letting a fuzzy score silently
+# pick a material (which directly changes the carbon result), the agreed
+# mappings live in a reviewable CSV next to this code.
+SKIP_MATERIAL = object()  # sentinel: row deliberately carries no material
+
+_EPD_ALIAS_PATH = os.path.join(
+    settings.BASE_DIR, "pages", "scripts", "import_mapping", "epd_alias.csv"
+)
+_EPD_ALIAS_CACHE = None
+
+
+def _load_epd_aliases():
+    """Load the alias CSV into {(template_name_lower, country_lower): row}."""
+    global _EPD_ALIAS_CACHE
+    if _EPD_ALIAS_CACHE is not None:
+        return _EPD_ALIAS_CACHE
+    aliases = {}
+    try:
+        with open(_EPD_ALIAS_PATH, newline="", encoding="utf-8-sig") as fh:
+            rows = [ln for ln in fh if not ln.lstrip().startswith("#")]
+        for row in csv.DictReader(rows):
+            tname = (row.get("template_name") or "").strip().lower()
+            if not tname:
+                continue
+            aliases[(tname, (row.get("country") or "").strip().lower())] = {
+                "action": (row.get("action") or "map").strip().lower(),
+                "epd_name": (row.get("epd_name") or "").strip(),
+                "note": (row.get("note") or "").strip(),
+            }
+    except FileNotFoundError:
+        logger.warning("EPD alias file not found at %s", _EPD_ALIAS_PATH)
+    _EPD_ALIAS_CACHE = aliases
+    return aliases
+
+
+def _alias_for(name, country):
+    """Country-specific alias wins; blank-country row is the wildcard."""
+    a = _load_epd_aliases()
+    n, c = (name or "").strip().lower(), (country or "").strip().lower()
+    return a.get((n, c)) or a.get((n, ""))
+
+
 def _lookup_structural_epd(epd_name_raw, country_name_raw):
     """
     Look up a structural (non-operational) EPD by name and country.
@@ -2209,6 +2421,32 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
 
     name = epd_name_raw.strip()
     country = country_name_raw.strip()
+
+    # 0. Curated alias table — an explicit human decision always wins over
+    #    automatic matching.
+    alias = _alias_for(name, country)
+    if alias:
+        if alias["action"] == "skip":
+            logger.info("Import: material %r skipped by alias table (%s)", name, alias["note"])
+            return SKIP_MATERIAL, None
+        target = alias["epd_name"]
+        # Many generic EPDs exist once PER COUNTRY (localised GWP, e.g. steel rebar:
+        # India 2.60, Indonesia 2.52, Vietnam 2.46, Cambodia 2.42, Thailand 2.37).
+        # Always prefer the row's own country so the localised factor is used;
+        # only fall back to any country when that country has no such EPD.
+        epd = None
+        if country:
+            epd = (qs.filter(name__iexact=target, country__name__iexact=country).first()
+                   or qs.filter(name__icontains=target, country__name__iexact=country).first())
+        if not epd:
+            epd = qs.filter(name__iexact=target).first() or qs.filter(name__icontains=target).first()
+        if epd:
+            logger.warning(
+                "Import alias: %r (%s) -> %r [%s] (curated mapping)",
+                name, country or "no country", epd.name, epd.country,
+            )
+            return epd, None
+        logger.error("Alias target EPD %r not found in catalogue (for %r)", target, name)
 
     # 1. Exact name + country
     epd = qs.filter(name__iexact=name, country__name__iexact=country).first()
@@ -2229,6 +2467,31 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
     epd = qs.filter(name__icontains=name).first()
     if epd:
         return epd, None
+
+    # 5. Fuzzy fallback — templates abbreviate or reword EPD names
+    #    (e.g. "TMT Steel bars (Fe 550)" vs the catalogue's "TMT Bars").
+    #    A plain similarity ratio is unsafe here: "TMT Steel bars (Fe 550)" scores
+    #    0.52 against the correct "TMT Bars" but 0.46 against the WRONG "Steel Plates",
+    #    so a low cutoff would silently substitute the wrong material and corrupt the
+    #    carbon result. Instead we require a DISTINCTIVE (rare) shared token — a word
+    #    that appears in few catalogue names, like "tmt" or "rebar" — plus decent token
+    #    coverage, plus a clear margin over the runner-up. Every match is logged.
+    for scope_qs, scope_label in (
+        (qs.filter(country__name__iexact=country), country),
+        (qs, "any country"),
+    ):
+        if not country and scope_label != "any country":
+            continue
+        candidates = list(scope_qs.values_list("name", flat=True)[:5000])
+        best, score = _fuzzy_epd_pick(name, candidates)
+        if best:
+            epd = scope_qs.filter(name__iexact=best).first()
+            if epd:
+                logger.warning(
+                    "Import fuzzy-matched structural EPD %r -> %r (score %.2f, scope %s)",
+                    name, best, score, scope_label,
+                )
+                return epd, None
 
     return None, f"Structural EPD not found for name '{name}' (country: '{country}')."
 
@@ -2399,6 +2662,10 @@ def import_structural_components(request):
 
             # Look up EPD
             epd, epd_error = _lookup_structural_epd(epd_name, epd_country)
+            if epd is SKIP_MATERIAL:
+                # Row deliberately carries no material (e.g. "No Insulation").
+                # Contributes zero carbon — skip without raising an error.
+                continue
             if epd_error:
                 errors[label] = {"epd_name": [epd_error]}
                 continue

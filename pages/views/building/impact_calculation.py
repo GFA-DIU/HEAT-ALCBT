@@ -198,6 +198,35 @@ def calculate_impacts(
         factor = factor / Decimal("1000")
 
     # ------------------------------------------------------------------
+    # Physical mass in kg (for downstream A4 transport / A5 waste modules).
+    # `factor` is the material quantity expressed in the EPD's declared unit;
+    # convert it to kg via the EPD density conversions. None when mass cannot
+    # be derived (e.g. pcs-declared EPD without a mass conversion) — callers
+    # then skip A4/A5 for that material.
+    # ------------------------------------------------------------------
+
+    def _factor_to_kg(f: Decimal) -> Decimal | None:
+        if declared_unit == Unit.KG:
+            return f
+        if declared_unit == Unit.TON:
+            return f * Decimal("1000")
+        if declared_unit == Unit.M3:
+            vd = _epd_conversion("volume density")
+            return f * vd if vd is not None else None
+        if declared_unit == Unit.M2:
+            ad = _epd_conversion("area density")
+            return f * ad if ad is not None else None
+        if declared_unit == Unit.M:
+            ld = _epd_conversion("linear density")
+            return f * ld if ld is not None else None
+        return None  # pcs / unknown → mass not derivable
+
+    try:
+        mass_kg = _factor_to_kg(Decimal(str(factor)))
+    except Exception:
+        mass_kg = None
+
+    # ------------------------------------------------------------------
     # Build impact list
     # ------------------------------------------------------------------
 
@@ -222,6 +251,7 @@ def calculate_impacts(
                     / Decimal(str(p.epd.declared_amount))
                     / Decimal(str(total_floor_area))
                 ),
+                "mass_kg": mass_kg,  # material mass (kg); None if not derivable
             }
         )
     return result

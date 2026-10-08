@@ -409,10 +409,10 @@
         const sheetName = wb.SheetNames[si];
         const nameLower = sheetName.toLowerCase().replace(/\s+/g, '');
         let matchedKey = null;
-        if (nameLower.includes('ahu'))                                          matchedKey = 'ahu';
-        else if (nameLower.includes('fcu'))                                     matchedKey = 'fcu';
+        if (nameLower.includes('ahu') || nameLower.includes('airhandl'))        matchedKey = 'ahu';
+        else if (nameLower.includes('fcu') || nameLower.includes('fancoil'))    matchedKey = 'fcu';
         else if (nameLower.includes('ceilingwa') || nameLower.includes('cassette')) matchedKey = 'ceilingwa';
-        else if (nameLower.includes('doas'))                                    matchedKey = 'doas';
+        else if (nameLower.includes('doas') || nameLower.includes('dedicated')) matchedKey = 'doas';
         else if (nameLower.includes('ceilingex') || nameLower.includes('exhaustfan') || nameLower.includes('ceilingfan')) matchedKey = 'ceilingex';
         if (!matchedKey) continue;
 
@@ -440,7 +440,7 @@
           if (nameLower.includes('fluorescent'))      lightingKey = 'fluorescent';
           else if (nameLower.includes('cfl'))         lightingKey = 'cfl';
           else if (nameLower.includes('incandescent')) lightingKey = 'incandescent';
-          else if (nameLower.includes('hid'))         lightingKey = 'hid';
+          else if (nameLower.includes('hid') || nameLower.includes('metalhalide') || nameLower.includes('sodium')) lightingKey = 'hid';
           else if (nameLower.includes('led'))         lightingKey = 'led';
         }
         if (!lightingKey) continue;
