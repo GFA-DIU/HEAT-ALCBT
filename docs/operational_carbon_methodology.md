@@ -313,3 +313,44 @@ unreferenced; it must not be wired up as it stands.
 Cassette is therefore its own cooling type, not a sub-type of packaged. It was
 briefly offered in both places; the packaged sub-type has been removed, with no
 records affected.
+
+## Refrigerant leakage is now in the operational baseline
+
+Correcting an earlier note in this file: the refrigerant data users enter
+**was** already used — `_refrigerant_scope1_saving` on the Savings tab computes
+the drop from switching to a natural refrigerant:
+
+```
+saving = Σ  qty_kg × leakage% ÷ 100 × (GWP_current − GWP_natural) ÷ GFA
+```
+
+But that saving was subtracted from an **electricity-only** baseline, so BEAT
+credited a reduction against emissions it had never counted, and the reported
+reduction percentage came out too generous.
+
+Leakage now appears on both sides:
+
+```
+baseline  = electricity + Σ qty × leakage% × GWP          ÷ GFA
+optimised = electricity × measures
+          + Σ qty × leakage% × GWP_natural                ÷ GFA
+```
+
+Magnitudes are small against electricity — 0.1 to 3.4 kgCO₂e/m²/yr across the
+cooled buildings in the database — so the reduction percentage moves by about a
+point. The point is consistency, not size.
+
+Under RICS WLCA refrigerant leakage is **B1**, not B6. It is folded into the
+operational baseline because that is the figure the Savings tab reduces; the
+Systems tab breakdown is unchanged and still shows electricity by system.
+
+## Plug loads count toward the total
+
+`total_kwh` summed `plug_load_kwh` only when the user had typed one. The screen
+meanwhile showed BEAT's own estimate on its own row marked "ESTIMATED", so a
+summary reading 8 + 0.6 + 2.15 totalled 8.6 — which looks like an arithmetic
+error rather than a deliberate exclusion.
+
+The estimate now counts, and the total carries a tooltip saying so whenever it
+is being used. A metered bill total still overrides everything, as it always
+did, since it already includes plug loads.

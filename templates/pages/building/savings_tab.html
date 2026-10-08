@@ -205,6 +205,11 @@
 
       <!-- Left Column -->
       <div class="space-y-6">
+        <!-- Embodied left column. The operational twin below is shown by the
+             same toggle: previously only the right-hand strategies panel
+             swapped, so the Operational view kept reporting "Material focus"
+             and listing rebar and concrete. -->
+        <div id="savings-embodied-left" class="space-y-6">
         <!-- Chart Card -->
         <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-5 rounded-2xl space-y-6">
           <div class="flex items-center gap-2">
@@ -271,6 +276,84 @@
             {% empty %}
               <p class="text-xs text-[var(--text--sub-600)]">{% translate "No material data available." %}</p>
             {% endfor %}
+          </div>
+        </div>
+        </div><!-- /savings-embodied-left -->
+
+        <!-- Operational left column -->
+        <div id="savings-operational-left" class="space-y-6 hidden">
+          <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-5 rounded-2xl space-y-6">
+            <div class="flex items-center gap-2">
+              <span data-icon="leaf-line" data-size="20"></span>
+              <h6 class="text-sm font-semibold">{% translate "Carbon Reduction" %}</h6>
+            </div>
+
+            <div class="space-y-1 p-4 bg-[var(--bg--weak-100)] rounded-[0.5rem]">
+              <p class="text-xs text-[var(--text--sub-600)]">{% translate "Energy focus" %}</p>
+              <div class="flex items-baseline gap-2">
+                <h3 class="text-3xl font-bold text-[#16A34A]">-{{ operational_savings.total_saving|floatformat:1 }}<span class="text-lg font-medium text-[#16A34A]">kg
+                    CO<sub>2</sub>eq/m<sup>2</sup>/{% translate "yr" %}</span></h3>
+              </div>
+              <div class="flex items-center gap-1 text-xs font-medium">
+                <span class="text-[var(--text--strong-950)]">{{ operational_savings.reduction_pct|floatformat:1 }}%</span>
+                <span data-icon="arrow-up-circle-fill" data-size="16" class="text-[#16A34A]"></span>
+                <span class="text-[var(--text--sub-600)]">{% translate "Reduction" %}</span>
+              </div>
+            </div>
+
+            <div class="w-full h-[200px] relative">
+              <canvas id="savings-operational-reduction-chart"
+                data-baseline="{{ operational_savings.baseline_total }}"
+                data-optimised="{{ operational_savings.optimized_total }}"></canvas>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.25">
+              <div class="bg-[var(--bg--weak-100)] p-2 rounded-[0.5rem] space-y-0.5">
+                <span class="text-[var(--text--strong-950)] label-x-small">
+                  <span class="text-[var(--savings-primary)] h5-title font-bold">{{ operational_savings.baseline_total|floatformat:1 }}</span>
+                  kgCO<sub>2</sub>eq/m<sup>2</sup>/{% translate "yr" %}
+                </span>
+                <span class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Baseline" %}</span>
+              </div>
+              <div class="bg-[var(--bg--weak-100)] p-2 rounded-[0.5rem] space-y-0.5">
+                <span class="text-[var(--text--strong-950)] label-x-small">
+                  <span class="text-[var(--savings-primary)] h5-title font-bold">{{ operational_savings.optimized_total|floatformat:1 }}</span>
+                  kgCO<sub>2</sub>eq/m<sup>2</sup>/{% translate "yr" %}
+                </span>
+                <span class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Optimized" %}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Savings by system, not by material -->
+          <div class="card bg-white border border-[var(--stroke--soft-200)] shadow-sm p-5 rounded-2xl space-y-6">
+            <div class="flex items-center gap-2">
+              <span data-icon="bar-chart-horizontal-line" data-size="20"></span>
+              <h6 class="text-base font-medium">{% translate "Savings by System" %}</h6>
+            </div>
+
+            <div class="space-y-2.5">
+              {% for sys in operational_savings.systems %}
+                <div class="space-y-2">
+                  <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
+                    <span>{{ sys.label }}</span>
+                    <span class="text-[#81F28E]">-{{ sys.baseline|floatformat:1|add:"0"|default:"0" }}</span>
+                  </div>
+                  <progress class="progress progress-success w-full h-3" value="{{ sys.reduction_pct }}" max="100"></progress>
+                </div>
+              {% empty %}
+                <p class="text-xs text-[var(--text--sub-600)]">{% translate "No operational system data entered yet. Add a cooling, ventilation, lighting, hot water or lift system to see savings." %}</p>
+              {% endfor %}
+              {% if operational_savings.refrigerant.has_saving %}
+                <div class="space-y-2">
+                  <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
+                    <span>{% translate "Refrigerant transition" %}</span>
+                    <span class="text-[#81F28E]">-{{ operational_savings.refrigerant.saving|floatformat:2 }}</span>
+                  </div>
+                  <progress class="progress progress-success w-full h-3" value="100" max="100"></progress>
+                </div>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
@@ -559,6 +642,16 @@
           embodied.classList.remove('hidden');
           operational.classList.add('hidden');
         }
+      }
+
+      // Swap the left column too - Carbon Reduction and the per-category
+      // breakdown. Without this the Operational view kept showing the embodied
+      // headline and material categories.
+      const leftEmbodied = document.getElementById('savings-embodied-left');
+      const leftOperational = document.getElementById('savings-operational-left');
+      if (leftEmbodied && leftOperational) {
+        leftEmbodied.classList.toggle('hidden', view === 'operational');
+        leftOperational.classList.toggle('hidden', view !== 'operational');
       }
 
       // Swap the top benchmark banner (embodied vs operational EUI)

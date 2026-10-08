@@ -250,19 +250,38 @@ class EnergySummary(models.Model):
 
     @property
     def total_kwh(self):
-        # A metered/bill total is authoritative and already includes plug loads.
+        """Annual building energy, including an estimated plug load.
+
+        A metered/bill total is authoritative and already includes plug loads.
+
+        Otherwise the plug load counts whether the user typed it or BEAT
+        estimated it. The screen shows the estimate on its own row labelled
+        "ESTIMATED", and previously the total quietly left it out - so a summary
+        reading 8 + 0.6 + 2.15 totalled 8.6, which looks like an arithmetic
+        error rather than a deliberate exclusion.
+        """
         if self.total_override_kwh is not None:
             return Decimal(str(self.total_override_kwh))
+        plug = self.plug_load_kwh
+        if plug is None:
+            plug = self.suggested_plug_load()
         vals = [
             self.cooling_kwh,
             self.ventilation_kwh,
             self.lighting_kwh,
             self.lift_escalator_kwh,
             self.hot_water_kwh,
-            self.plug_load_kwh,
+            plug,
         ]
         nums = [Decimal(str(v)) for v in vals if v is not None]
         return sum(nums) if nums else None
+
+    @property
+    def plug_load_is_estimated(self):
+        """True when the plug load in total_kwh came from the estimate."""
+        return (self.total_override_kwh is None
+                and self.plug_load_kwh is None
+                and self.suggested_plug_load() is not None)
 
     @property
     def any_components(self):

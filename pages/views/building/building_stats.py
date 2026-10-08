@@ -1050,6 +1050,36 @@ def _measures_for_system(system_key, building):
     return []
 
 
+def _refrigerant_scope1_baseline(building, floor_area):
+    """Scope-1 refrigerant leakage as declared, kgCO2eq/m2/yr.
+
+        sum over cooling units of  qty_kg * leakage% / 100 * GWP / GFA
+
+    Every input is already collected on the cooling forms. Until this was
+    added, the saving below was subtracted from an electricity-only baseline -
+    a reduction claimed against emissions the tool never counted, which made
+    the reported reduction percentage too generous.
+
+    Under RICS WLCA refrigerant leakage is B1 rather than B6. It is folded into
+    the operational baseline here because that is the figure the Savings tab
+    reduces; the Systems tab breakdown is unchanged and still shows electricity
+    by system.
+    """
+    if not floor_area or Decimal(str(floor_area)) <= 0:
+        return 0.0
+    gfa = Decimal(str(floor_area))
+    total = Decimal("0")
+    for u in list(building.chillers.all()) + list(building.air_conditioners.all()):
+        qty = getattr(u, "refrigerant_quantity_kg", None)
+        gwp = getattr(u, "baseline_refrigerant_emission_factor", None)
+        leakage = getattr(u, "baseline_leakage_factor_percent", None)
+        if qty is None or gwp is None or leakage is None:
+            continue
+        total += (Decimal(str(qty)) * (Decimal(str(leakage)) / Decimal("100"))
+                  * Decimal(str(gwp)) / gfa)
+    return round(float(total), 2)
+
+
 def _refrigerant_scope1_saving(building, floor_area):
     """Scope-1 refrigerant-transition saving (kgCO2eq/m²/yr), summed over cooling units.
 
@@ -1162,8 +1192,16 @@ def get_operational_savings_measures(
         building, building.total_floor_area
     )
 
-    baseline_total = round(electricity_total, 2)
-    optimized_total = round(optimized_after_bms - refrigerant_saving, 2)
+    # Refrigerant leakage belongs in both sides of the comparison. The saving
+    # above is the drop from switching to a natural refrigerant; subtracting it
+    # from an electricity-only baseline credited a reduction against emissions
+    # that were never in the baseline.
+    refrigerant_baseline = _refrigerant_scope1_baseline(
+        building, building.total_floor_area)
+
+    baseline_total = round(electricity_total + refrigerant_baseline, 2)
+    optimized_total = round(
+        optimized_after_bms + refrigerant_baseline - refrigerant_saving, 2)
     total_saving = round(baseline_total - optimized_total, 2)
     reduction_pct = round(total_saving / baseline_total * 100, 1) if baseline_total > 0 else 0.0
 
@@ -1179,6 +1217,7 @@ def get_operational_savings_measures(
         },
         "refrigerant": {
             "label": "Refrigerant transition (natural refrigerant)",
+            "baseline": refrigerant_baseline,
             "saving": refrigerant_saving,
             "target_gwp": target_gwp,
             "has_saving": refrigerant_saving > 0,
