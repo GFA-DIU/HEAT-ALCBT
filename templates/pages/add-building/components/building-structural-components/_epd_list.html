@@ -49,6 +49,16 @@
             {% endwith %}
           {% endif %}
         {% endwith %}
+        {% if epd.category == "Cement" %}
+          {# GCCA publishes cement ratings, but each country must first choose
+             its own clinker/cement ratio to derive the thresholds. Until that
+             choice is made the figure is simply unrated - see
+             docs/carbon_rating_labels.md. #}
+          <span class="text-[var(--text--sub-600)] text-xs italic shrink-0"
+                title="{% translate 'GCCA Low Carbon Ratings cover concrete. Cement ratings require a country-specific clinker/cement ratio, which has not been set for this country.' %}">
+            {% translate "no GCCA rating" %}
+          </span>
+        {% endif %}
       </div>
     </div>
     <div class="flex flex-col items-end gap-2.5 shrink-0">
