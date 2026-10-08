@@ -114,7 +114,7 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 1.0" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'window-ac'); recalcWindowAcEnergy(this.form)" />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
           <option value="ton">{% translate "Ton" %}</option>
           <option value="btu_hr">BTU/hr</option>
@@ -135,7 +135,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -145,7 +145,7 @@
 
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1">
@@ -177,7 +177,7 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 2.8" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
-        <select name="eer_metric" class="select select-ghost focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
+        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
           <option value="cop" selected>COP</option>
           <option value="eer">EER</option>
           <option value="iseer">ISEER</option>
@@ -271,7 +271,7 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 1.5" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'split-ac'); recalcWindowAcEnergy(this.form)" />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
           <option value="ton">{% translate "Ton" %}</option>
           <option value="btu_hr">BTU/hr</option>
@@ -292,7 +292,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -302,7 +302,7 @@
 
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -328,7 +328,7 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 2.8" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
-        <select name="eer_metric" class="select select-ghost focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
+        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
           <option value="cop" selected>COP</option>
           <option value="eer">EER</option>
           <option value="iseer">ISEER</option>
@@ -418,7 +418,7 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 10" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'vrf-system'); recalcWindowAcEnergy(this.form)" />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
           <option value="ton">{% translate "Ton" %}</option>
           <option value="btu_hr">BTU/hr</option>
@@ -439,7 +439,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -449,7 +449,7 @@
 
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -475,7 +475,7 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 4.0" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
-        <select name="eer_metric" class="select select-ghost focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
+        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
           <option value="cop" selected>COP</option>
           <option value="eer">EER</option>
           <option value="iseer">ISEER</option>
@@ -576,7 +576,7 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="cooling_capacity_per_unit" placeholder="e.g. 5" required min="0" step="0.001"
           oninput="applyRefrigerantQtyDefaultCapacity(this.form,'packaged-ac'); recalcWindowAcEnergy(this.form)" />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-[4.5rem]" name="cooling_capacity_unit"
           onchange="recalcWindowAcEnergy(this.form)">
           <option value="ton">{% translate "Ton" %}</option>
           <option value="btu_hr">BTU/hr</option>
@@ -597,7 +597,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -607,7 +607,7 @@
 
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -633,7 +633,7 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 3.0" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
-        <select name="eer_metric" class="select select-ghost focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
+        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
           <option value="cop" selected>COP</option>
           <option value="eer">EER</option>
           <option value="iseer">ISEER</option>
@@ -739,7 +739,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -749,7 +749,7 @@
 
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -897,7 +897,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Drives the refrigerant (F-gas) emissions."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total." title="Yearly refrigerant leakage as a percent of the charge (IPCC/RICS default about 2 percent/yr for split systems). Recorded for reporting; BEAT does not yet include F-gas emissions in the operational carbon total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -907,7 +907,7 @@
 
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">

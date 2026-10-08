@@ -10,7 +10,8 @@ from pages.models.building_operation.chilling import CoolingSystemChiller
 from pages.models.building_operation.general_systems import LiftEscalatorSystem
 from pages.models.building_operation.hot_water import HotWaterSystem
 from pages.models.building_operation.lighting import LightingSystem
-from pages.models.building_operation.ventilation import VentilationSystem
+from pages.models.building_operation.ventilation import (
+    VentilationSystem, VentilationType)
 
 # Plug / equipment load as a fraction of the modelled system energy, used to
 # estimate plug load when there is no metered bill total to derive it by
@@ -112,21 +113,41 @@ class EnergySummary(models.Model):
         b = self.building
         had_any_before = self.any_components
 
-        # Cooling: AC units + chillers
+        # Cassette air conditioners are cooling equipment, but the ventilation
+        # form offered a "Ceiling/Wall Mounted Cassette AC" type and 106 records
+        # across 67 buildings were entered there - it is the most used
+        # ventilation type in the database. Their energy is computed exactly as
+        # the cooling form computes it (power x hours x days x weeks), so the
+        # figures are right; only the category was wrong, which put cooling
+        # energy into the ventilation line of every report and benchmark.
+        #
+        # They are counted as cooling here rather than physically moved,
+        # because CoolingSystemAirConditioner requires year_of_installation,
+        # refrigerant_type and refrigerant_quantity_kg, none of which the
+        # ventilation form collects. Moving the rows would mean inventing three
+        # values per record. Building totals are unaffected either way - this
+        # only decides which line the energy is reported on.
+        cassette_qs = VentilationSystem.objects.filter(
+            building=b, ventilation_type=VentilationType.CASSETTE_AC)
+        other_vent_qs = VentilationSystem.objects.filter(building=b).exclude(
+            ventilation_type=VentilationType.CASSETTE_AC)
+
+        # Cooling: AC units + chillers + cassette ACs filed under ventilation
         ac_qs = CoolingSystemAirConditioner.objects.filter(building=b)
         chiller_qs = CoolingSystemChiller.objects.filter(building=b)
-        if ac_qs.exists() or chiller_qs.exists():
+        if ac_qs.exists() or chiller_qs.exists() or cassette_qs.exists():
             ac_sum = ac_qs.aggregate(s=Sum("total_energy_consumption_kwh_per_year"))["s"] or 0
             ch_sum = chiller_qs.aggregate(s=Sum("total_energy_consumption_kwh_per_year"))["s"] or 0
-            self.cooling_kwh = ac_sum + ch_sum
+            cas_sum = cassette_qs.aggregate(
+                s=Sum("total_energy_consumption_kwh_per_year"))["s"] or 0
+            self.cooling_kwh = ac_sum + ch_sum + cas_sum
             self.is_manual_cooling = False
         elif not self.is_manual_cooling:
             self.cooling_kwh = None
 
-        # Ventilation
-        vent_qs = VentilationSystem.objects.filter(building=b)
-        if vent_qs.exists():
-            self.ventilation_kwh = vent_qs.aggregate(
+        # Ventilation: everything except the cassettes counted above
+        if other_vent_qs.exists():
+            self.ventilation_kwh = other_vent_qs.aggregate(
                 s=Sum("total_energy_consumption_kwh_per_year")
             )["s"] or 0
             self.is_manual_ventilation = False

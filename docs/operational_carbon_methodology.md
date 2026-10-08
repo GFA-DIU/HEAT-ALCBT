@@ -147,3 +147,63 @@ EN 15978 (module B6), EN 15804 / ISO 21930 (EPDs). Grid EFs: TGO, MONRE 2023 (Vi
 Electricity Authority of Cambodia 2023, IEA Emissions Factors, CEA (India). National NDC /
 net-zero pledges. IEA World Energy Outlook / Southeast Asia Energy Outlook 2024 (scenario
 trajectories, licensed).
+
+---
+
+## System classification: cassette air conditioners
+
+A cassette AC is cooling equipment. The ventilation form nevertheless offered
+"Ceiling/Wall Mounted Cassette AC", and it became the most used ventilation
+type in the database: **106 records across 67 buildings**, against **zero**
+records on the cooling form's own `packaged → cassette` path.
+
+No building had both, so nothing was ever double counted. The fault was
+attribution: both forms compute annual energy the same way —
+
+```
+energy = power_input × hours/day × days/week × weeks/year
+```
+
+— so the figures were right, but 106 air conditioners reported on the
+*ventilation* line of every report and benchmark.
+
+`EnergySummary.recalculate` now counts cassette records as cooling. Verified
+across all 267 energy summaries: the cooling/ventilation split changes for 66
+buildings and the cooling + ventilation **sum is identical for every one**.
+No building total moves.
+
+The records are re-attributed rather than physically moved to
+`CoolingSystemAirConditioner`, because that model requires
+`year_of_installation`, `refrigerant_type` and `refrigerant_quantity_kg` as
+NOT NULL and the ventilation form collects none of them. Moving the rows would
+mean inventing three values per record.
+
+The option is withheld from new ventilation entries while the value stays valid
+on the model, so the 106 existing records keep rendering and editing normally.
+
+## Known gap: refrigerant (F-gas) emissions are collected but not counted
+
+Every air conditioner and chiller records:
+
+- `refrigerant_type`
+- `refrigerant_quantity_kg`
+- `baseline_leakage_factor_percent` (default 2%)
+- `baseline_refrigerant_emission_factor` (the refrigerant's GWP, auto-filled
+  from `RefrigerantGWP`)
+
+**None of it enters any carbon figure.** The values are stored and exposed
+through the API, and nothing computes leakage emissions from them. The leakage
+tooltip previously claimed the field "drives the refrigerant (F-gas)
+emissions", which was untrue; it now says the value is recorded for reporting
+only.
+
+The calculation itself would be straightforward —
+
+```
+annual F-gas kgCO₂e = charge_kg × leakage% × GWP × units
+```
+
+— but adding it raises the reported operational carbon of every cooled
+building. Under RICS WLCA refrigerant leakage sits in **B1**, not B6, so it is
+a scope decision rather than a bug fix and needs agreeing with GT before it
+ships.

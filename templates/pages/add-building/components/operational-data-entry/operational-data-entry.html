@@ -1,3 +1,16 @@
+<style>
+  /* The efficiency-metric pickers (COP / EER / ISEER) and the other inline
+     unit selectors use daisyUI's `select-ghost`, which leaves the control
+     transparent. Chrome paints an open <option> list with the control's own
+     background, so the list rendered see-through on top of the field beneath
+     it - the weeks/year value showed through the open EER menu. Force both
+     the control and its options opaque. */
+  select.select-ghost,
+  select.select-ghost option {
+    background-color: var(--bg--white-0, #fff);
+    color: var(--text--strong-950, inherit);
+  }
+</style>
 {% load crispy_forms_tags %}
 {% load static %}
 {% load i18n %}

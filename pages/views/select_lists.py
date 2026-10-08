@@ -309,7 +309,14 @@ def select_lists(request):
         )
     
     elif request.GET.get("ventilation_types"):
-        items = [{"id": choice[0], "name": choice[1]} for choice in VentilationType.choices]
+        # Cassette ACs are cooling equipment and belong on the cooling form,
+        # where their refrigerant charge and efficiency rating can be captured.
+        # The option is withheld from new entries, but the value stays valid on
+        # the model so the 106 existing records keep rendering and editing
+        # normally - see EnergySummary.recalculate, which reports them as
+        # cooling.
+        items = [{"id": c[0], "name": c[1]} for c in VentilationType.choices
+                 if c[0] != VentilationType.CASSETTE_AC]
         return render(
             request,
             "pages/utils/select_list.html",

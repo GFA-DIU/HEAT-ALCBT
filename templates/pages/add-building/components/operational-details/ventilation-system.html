@@ -102,7 +102,7 @@
       <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')">
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -127,7 +127,7 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -198,7 +198,7 @@
       <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 2000" min="1" required />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -207,7 +207,7 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -278,7 +278,7 @@
       <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')">
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -303,7 +303,7 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -383,7 +383,7 @@
       <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 3000" min="1" required />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -392,7 +392,7 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -463,7 +463,7 @@
       <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 500" min="1" required />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -472,7 +472,7 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
