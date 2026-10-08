@@ -27,10 +27,18 @@ class EfficiencyMetric(models.TextChoices):
 
 
 class PackagedACSubType(models.TextChoices):
+    """Forms a packaged or ductable unit actually takes.
+
+    Cassette is deliberately absent. A cassette is the ceiling-recessed indoor
+    unit of a split system - it blows straight into the room and has no
+    ductwork - so it is its own cooling type, not a kind of packaged unit.
+    Offering it in both places is what let the same equipment be filed two
+    different ways.
+    """
+
     ROOFTOP = "rooftop", _("Rooftop Unit")
     FLOOR_STANDING = "floor_standing", _("Floor-standing")
     DUCTABLE = "ductable", _("Ductable")
-    CASSETTE = "cassette", _("Cassette")
 
 
 class CoolingSystemAirConditioner(models.Model):

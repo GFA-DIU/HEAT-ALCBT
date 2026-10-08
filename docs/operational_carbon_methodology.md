@@ -266,3 +266,50 @@ multiplies the plant load by the unit count, which would double count — the
 chiller tooltip correctly states the load "already covers all machines". The
 function is unreferenced and is left in place only because removing dead code
 was out of scope for this change; it must not be wired up as it stands.
+
+## Unit counts: which quantities are per-unit and which are totals
+
+Reviewed across every operational sheet, because a count multiplying a total is
+how double counting starts.
+
+| Sheet | Quantity entered | × unit count? | Verdict |
+|---|---|---|---|
+| Cooling — window / split / cassette / VRF | capacity or power **per unit** | yes | correct |
+| Cooling — chiller | **total** plant load | no | correct; the unit count is explicitly for reference |
+| Ventilation — AHU / DOAS | airflow **per unit** | yes | correct, label now says so |
+| Ventilation — FCU / cassette / fan | power **per unit** | yes | **fixed**, see below |
+| Lighting | watts per bulb × tubes per fixture × fixtures | yes | correct |
+| Hot water | power **per unit** | yes (equipment count) | correct, label now says so |
+
+### Fixed: the fan and FCU forms ignored their own unit count
+
+They asked for "Total ventilation system power input" and computed
+`energy = power × hours × days × weeks`, never touching `number_of_units` —
+which was nonetheless a required field. Someone entering one fan's nameplate
+power alongside 50 units received a fiftieth of the real figure.
+
+Power is now asked per unit and the total derived, matching the AHU and DOAS
+forms on the same page and the cooling form. `total_power_input_kw` remains the
+stored field and still holds the total, so the 143 existing records keep their
+meaning; the editable per-unit field is derived from it on load.
+
+### Deliberately not multiplied
+
+The chiller form's unit count does not scale the result, and says so in its own
+tooltip: the plant energy comes from the total cooling load, which already
+covers every machine. `recalcCoolingSimpleEnergy` in the cooling template does
+multiply a total load by the unit count and would double count, but it is
+unreferenced; it must not be wired up as it stands.
+
+## Packaged, ductable and cassette are three different things
+
+- **Packaged** — self-contained, every component in one casing; rooftop or
+  floor-standing, air distributed through ducts.
+- **Ductable** — indoor unit concealed in a ceiling void, air delivered through
+  ductwork.
+- **Cassette** — ceiling-recessed indoor unit of a *split* system, blowing
+  straight into the room through a four-way grille. No ducts.
+
+Cassette is therefore its own cooling type, not a sub-type of packaged. It was
+briefly offered in both places; the packaged sub-type has been removed, with no
+records affected.

@@ -99,7 +99,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
         <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')">
@@ -180,7 +180,7 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="number_of_units" placeholder="e.g. 50" required min="1" />
+        <input type="number" name="number_of_units" placeholder="e.g. 50" required min="1" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
       </label>
       <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
@@ -195,7 +195,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 2000" min="1" required />
         <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -226,12 +226,20 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-3">
-      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Power input per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit." title="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 8" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <input type="number" name="power_input_per_unit" placeholder="e.g. 8" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
       <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-3">
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="power_input" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.01" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
     </fieldset>
 
     <div class="col-span-3 mt-3">
@@ -275,7 +283,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
         <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')">
@@ -380,7 +388,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 3000" min="1" required />
         <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -411,12 +419,20 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-3">
-      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Power input per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit." title="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 12" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <input type="number" name="power_input_per_unit" placeholder="e.g. 12" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
       <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-3">
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="power_input" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.01" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
     </fieldset>
 
     <div class="col-span-3 mt-3">
@@ -460,7 +476,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification." title="Design airflow the fans move (e.g. in m3/h or L/s), taken from the fan or AHU specification."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 500" min="1" required />
         <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
@@ -491,12 +507,20 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-3">
-      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Power input per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit." title="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 2" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <input type="number" name="power_input_per_unit" placeholder="e.g. 2" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
       <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-3">
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="power_input" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.01" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
     </fieldset>
 
     <div class="col-span-3 mt-3">
@@ -587,12 +611,31 @@
     energyEl.value = (power * hrs * days * weeks * vsdFactor * dcvFactor).toFixed(3);
   };
 
-  // FCU / Cassette / Fan: annual_energy = power_input × h × d × w
+  // FCU / Cassette / Fan:
+  //   total_power   = power_input_per_unit × units
+  //   annual_energy = total_power × h × d × w
+  //
+  // The form used to ask for "Total ventilation system power input" and ignore
+  // the unit count entirely, while still requiring it. Someone entering one
+  // fan's nameplate power alongside 50 units got a fiftieth of the real
+  // figure. Power is now asked per unit and the total derived, matching the
+  // AHU and DOAS forms and the cooling form.
+  //
+  // total_power_input_kw remains the stored field and still holds the total,
+  // so the 143 existing records keep their meaning.
   window.recalcVentSimpleEnergy = function(form) {
     if (!form) return;
     var powerEl  = form.querySelector('[name="power_input"]');
+    var perUnitEl = form.querySelector('[name="power_input_per_unit"]');
+    var unitsEl   = form.querySelector('[name="number_of_units"]');
     var energyEl = form.querySelector('[name="annual_energy_consumption"]');
     if (!powerEl || !energyEl) return;
+
+    var perUnit = parseFloat(perUnitEl ? perUnitEl.value : NaN);
+    var units   = parseFloat(unitsEl   ? unitsEl.value   : NaN);
+    if (!isNaN(perUnit) && !isNaN(units) && units > 0) {
+      powerEl.value = (perUnit * units).toFixed(2);
+    }
 
     var power = parseFloat(powerEl.value);
     var hrsEl   = form.querySelector('[name="operating_hours_per_day"]');
@@ -833,6 +876,11 @@
         sf('operating_days_per_week', system.workdays_per_week);
         sf('operating_weeks_per_year', system.workweeks_per_year);
         sf('power_input', system.total_power_input_kw);
+        // stored value is the total; the editable field is per unit
+        if (system.total_power_input_kw && system.number_of_units_installed) {
+          sf('power_input_per_unit', (Number(system.total_power_input_kw) /
+                                      Number(system.number_of_units_installed)).toFixed(2));
+        }
         sf('airflow_rate', system.air_flow_rate);
         sf('ventilation_capacity', system.ventilation_capacity);
         sf('annual_energy_consumption', system.total_energy_consumption_kwh_per_year);
