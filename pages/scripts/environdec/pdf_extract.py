@@ -35,6 +35,21 @@ GWP_ROW = re.compile(
     r"^\s*(?:GWP|Global\s+Warming\s+Potential)\s*[-,–]?\s*(.{0,46})", re.I)
 
 
+def is_data_row(stripped_line, first_number):
+    """True when what follows the first value is only more values.
+
+    A table row is a label, a unit and then numbers. A sentence that happens to
+    begin with an indicator name keeps using words after its first digit, so
+    requiring the tail to be free of words separates the two reliably. Footnote
+    markers, separators and the E of scientific notation are all short enough
+    to survive the three-letter threshold.
+    """
+    if " = " in stripped_line:
+        return False
+    tail = stripped_line[stripped_line.find(first_number):]
+    return not re.search(r"[A-Za-z]{3,}", tail)
+
+
 def classify_gwp(qualifier):
     """Which GWP indicator a row is - or None for one that must not be used.
 
@@ -151,8 +166,15 @@ def extract_from_text(text):
         indicator = classify_gwp(match.group(1))
         if indicator is None:          # biogenic / land-use row, not the headline
             continue
-        numbers = NUMBER.findall(strip_unit(line))
+        stripped = strip_unit(line)
+        numbers = NUMBER.findall(stripped)
         if not numbers:
+            continue
+        if not is_data_row(stripped, numbers[0]):
+            # Prose, not a table row. The acronym legends start the same way:
+            #   "GWP-GHG = Global Warming Potential total excl. biogenic
+            #    carbon following IPCC AR5 methodology."
+            # which reads as the headline indicator and yields 5, from "AR5".
             continue
 
         # Walk back to the nearest line that looks like a table header. Six

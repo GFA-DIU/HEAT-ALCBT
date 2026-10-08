@@ -96,3 +96,20 @@ def test_refuses_when_there_is_no_header_at_all():
 
 def test_refuses_an_unreadable_document():
     assert not extract_from_text("")["ok"]
+
+
+LEGEND = """
+Parameter Unit A1-A3
+GWP-GHG = Global Warming Potential total excl. biogenic carbon following IPCC AR5 methodology.
+"""
+
+
+def test_refuses_an_acronym_legend_that_reads_like_a_data_row():
+    """AR5 ends in a digit, and "Potential total" reads as the headline row.
+
+    This legend line produced 5.0 kgCO2e per tonne for a CEM III/A cement -
+    about 1/70th of the real figure, and perfectly plausible-looking in a
+    spreadsheet. A table row is numbers after its first value; a sentence
+    keeps using words.
+    """
+    assert not extract_from_text(LEGEND)["ok"], "a prose legend was read as a value"
