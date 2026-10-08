@@ -77,7 +77,6 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     'crispy_daisyui',
-    "debug_toolbar",
     "encrypted_json_fields",
     "cookie_consent",
     "newrelic.extras.framework_django",
@@ -101,7 +100,6 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",  # i18n language detection
     "django.middleware.common.CommonMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",  # Django Debug Toolbar
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -278,6 +276,22 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "") # Default sender e
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
 # https://docs.djangoproject.com/en/dev/ref/settings/#internal-ips
 INTERNAL_IPS = ["127.0.0.1"]
+
+# --- Django Debug Toolbar -------------------------------------------------
+# Opt-in rather than always-on in development. The toolbar instruments every
+# template node and SQL call, and on the EPD picker that is around 85% of the
+# request: the same filtered search measured ~600 ms with it and ~75 ms
+# without, against only 30 ms of actual SQL. Production never loaded it
+# (DEBUG=False), so this only affects local work - but it made filtering feel
+# broken while testing.
+#
+#     ENABLE_DEBUG_TOOLBAR=1 python manage.py runserver
+ENABLE_DEBUG_TOOLBAR = DEBUG and env.bool("ENABLE_DEBUG_TOOLBAR", default=False)
+if ENABLE_DEBUG_TOOLBAR:
+    INSTALLED_APPS.append("debug_toolbar")
+    # Must sit after CommonMiddleware, as it did before.
+    _i = MIDDLEWARE.index("django.middleware.common.CommonMiddleware") + 1
+    MIDDLEWARE.insert(_i, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 # https://docs.djangoproject.com/en/dev/topics/auth/customizing/#substituting-a-custom-user-model
 AUTH_USER_MODEL = "accounts.CustomUser"

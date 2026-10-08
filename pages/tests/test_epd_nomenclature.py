@@ -76,3 +76,17 @@ def test_picker_carries_display_name_through_to_the_template(epd):
         "FilteredEPD dropped display_name - the picker will render blank names"
     )
     assert items[0].display_name == "Dry-mix mortar - MU-307"
+
+
+@pytest.mark.parametrize("value, expected", [
+    ("5", 5), ("  7 ", 7), ("TH", None), ("abc", None),
+    ("", None), (None, None), ("0", None), ("-3", None),
+])
+def test_filter_values_that_are_not_ids_are_dropped_not_fatal(value, expected):
+    """`country=TH` used to reach the ORM and return a 500.
+
+    ValueError: Field 'id' expected a number but got 'TH'. A stale bookmark or
+    a hand-edited URL should show no results, not an error page.
+    """
+    from pages.views.assembly.epd_filtering import _as_pk
+    assert _as_pk(value) == expected

@@ -27,7 +27,7 @@ urlpatterns = [
     ),
 ]
 
-if settings.DEBUG:
+if getattr(settings, "ENABLE_DEBUG_TOOLBAR", False):
     import debug_toolbar
 
     urlpatterns = [

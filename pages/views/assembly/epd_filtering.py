@@ -6,6 +6,21 @@ from pages.models.assembly import AssemblyDimension
 from pages.models.epd import EPD, EPDType, MaterialCategory, Unit
 
 
+def _as_pk(value):
+    """A request value as a positive integer primary key, or None.
+
+    The country and category filters are sent as database ids by the UI, but
+    anything can arrive in a URL. Previously `country=TH` reached the ORM and
+    raised ValueError("Field 'id' expected a number but got 'TH'"), returning
+    a 500 instead of simply showing no results.
+    """
+    try:
+        pk = int(value)
+    except (TypeError, ValueError):
+        return None
+    return pk if pk > 0 else None
+
+
 def filter_by_dimension(epds: BaseManager[EPD], dimension: AssemblyDimension):
     """Logic for filering EPDs from DB by Assembly Dimension.
 
@@ -85,20 +100,25 @@ def get_filtered_epd_list(request, dimension=None, operational=False):
         if operational and dimension and dimension != "None":
             filtered_epds = filter_by_dimension(filtered_epds, dimension)
 
-        if childcategory := req.get("childcategory"):
+        # A filter value that is not a number is a stale bookmark or a
+        # hand-edited URL, not a server error. `int()` raised ValueError here
+        # and the country filter raised it inside the ORM, so either returned
+        # a 500 where an empty result set was meant. _as_pk turns anything
+        # unparseable into None, which drops the filter.
+        if childcategory := _as_pk(req.get("childcategory")):
             childcategory_object = get_object_or_404(
-                MaterialCategory, pk=int(childcategory)
+                MaterialCategory, pk=childcategory
             )
             filtered_epds = filtered_epds.filter(category=childcategory_object)
-        elif subcategory := req.get("subcategory"):
+        elif subcategory := _as_pk(req.get("subcategory")):
             subcategory_object = get_object_or_404(
-                MaterialCategory, pk=int(subcategory)
+                MaterialCategory, pk=subcategory
             )
             filtered_epds = filtered_epds.filter(
                 category__category_id__istartswith=subcategory_object.category_id
             )
-        elif category := req.get("category"):
-            category_object = get_object_or_404(MaterialCategory, pk=int(category))
+        elif category := _as_pk(req.get("category")):
+            category_object = get_object_or_404(MaterialCategory, pk=category)
             filtered_epds = filtered_epds.filter(
                 category__category_id__istartswith=category_object.category_id
             )
@@ -121,10 +141,8 @@ def get_filtered_epd_list(request, dimension=None, operational=False):
 
             filtered_epds = filtered_epds.filter(query)
 
-        if country := req.get("country"):
-            filtered_epds = filtered_epds.filter(
-                country=country
-            )  # Adjust the field for your model
+        if country := _as_pk(req.get("country")):
+            filtered_epds = filtered_epds.filter(country_id=country)
 
         if type := req.get("type"):
             filtered_epds = filtered_epds.filter(type=type)
