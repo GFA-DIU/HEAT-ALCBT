@@ -287,6 +287,20 @@
               <span data-icon="leaf-line" data-size="20"></span>
               <h6 class="text-sm font-semibold">{% translate "Operational Carbon Reduction" %}</h6>
             </div>
+            {% if operational_savings.insufficient_data %}
+              {# Below ~1 kgCO2eq/m2/yr every figure rounds to 0.0 and the
+                 percentage reads 100% from rounding alone. Say so rather than
+                 draw a chart of zeros. #}
+              <div class="space-y-2 p-4 bg-[var(--bg--weak-100)] rounded-[0.5rem]">
+                <p class="text-sm font-medium text-[var(--text--strong-950)]">{% translate "Not enough operational data yet" %}</p>
+                <p class="text-xs text-[var(--text--sub-600)]">
+                  {% blocktranslate trimmed with b=operational_savings.baseline_total %}
+                    This building's operational carbon is {{ b }} kgCO₂eq/m²/yr — too little to model savings against.
+                    Add cooling, lighting, ventilation or hot water systems on the Systems step.
+                  {% endblocktranslate %}
+                </p>
+              </div>
+            {% else %}
 
             <div class="space-y-1 p-4 bg-[var(--bg--weak-100)] rounded-[0.5rem]">
               <p class="text-xs text-[var(--text--sub-600)]">{% translate "Energy focus" %}</p>
@@ -323,6 +337,7 @@
                 <span class="text-xs font-semibold text-[var(--text--strong-950)]">{% translate "Optimized" %}</span>
               </div>
             </div>
+            {% endif %}
           </div>
 
           <!-- Savings by system, not by material -->

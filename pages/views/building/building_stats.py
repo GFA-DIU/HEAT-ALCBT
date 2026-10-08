@@ -1223,6 +1223,13 @@ def get_operational_savings_measures(
     refrigerant_baseline = _refrigerant_scope1_baseline(
         building, building.total_floor_area)
 
+    # Below this there is not enough operational carbon to model anything. The
+    # arithmetic still works, but every figure rounds to 0.0 and the percentage
+    # comes out at 100% purely from rounding - a building with a 0.01
+    # kgCO2eq/m2/yr baseline reported a 100% reduction. The panel should say it
+    # has nothing to work with instead of showing a chart of zeros.
+    MIN_MODELLABLE = 1.0
+
     baseline_total = round(electricity_total + refrigerant_baseline, 2)
     optimized_total = round(
         optimized_after_bms + refrigerant_baseline - refrigerant_saving, 2)
@@ -1254,6 +1261,8 @@ def get_operational_savings_measures(
         "optimized_total": optimized_total,
         "total_saving": total_saving,
         "reduction_pct": reduction_pct,
+        # the template shows an explanation instead of a chart of zeros
+        "insufficient_data": baseline_total < MIN_MODELLABLE,
         "baseline_total_lifetime": round(baseline_total * period),
         "optimized_total_lifetime": round(optimized_total * period),
         "total_saving_lifetime": round(total_saving * period),
