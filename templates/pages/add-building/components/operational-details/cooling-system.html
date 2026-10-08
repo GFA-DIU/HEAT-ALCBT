@@ -177,13 +177,13 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 2.8" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
-        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
+        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form); updateEffHint(this)" title="Efficiency metric on your label">
           <option value="cop" selected>COP</option>
           <option value="eer">EER</option>
           <option value="iseer">ISEER</option>
         </select>
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "From BEE/EGAT/SNI label. Typical EER: 2.3 – 3.5. Cannot be zero." %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5"><span data-eff-hint>{% translate "COP from the label, typically 2.3 – 5.3. Cannot be zero." %}</span></p>
       <p class="validator-hint">{% translate "Value must be greater than zero" %}</p>
     </fieldset>
 
@@ -328,13 +328,13 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 2.8" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
-        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
+        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form); updateEffHint(this)" title="Efficiency metric on your label">
           <option value="cop" selected>COP</option>
           <option value="eer">EER</option>
           <option value="iseer">ISEER</option>
         </select>
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "From BEE/EGAT/SNI label. Typical EER: 2.3 – 3.5. Cannot be zero." %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5"><span data-eff-hint>{% translate "COP from the label, typically 2.3 – 5.3. Cannot be zero." %}</span></p>
       <p class="validator-hint">{% translate "Value must be greater than zero" %}</p>
     </fieldset>
 
@@ -475,13 +475,13 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 4.0" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
-        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
+        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form); updateEffHint(this)" title="Efficiency metric on your label">
           <option value="cop" selected>COP</option>
           <option value="eer">EER</option>
           <option value="iseer">ISEER</option>
         </select>
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "From BEE/EGAT/SNI label. Typical EER: 3.5 – 5.5. Cannot be zero." %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5"><span data-eff-hint>{% translate "COP from the label, typically 2.3 – 5.3. Cannot be zero." %}</span></p>
       <p class="validator-hint">{% translate "Value must be greater than zero" %}</p>
     </fieldset>
 
@@ -633,13 +633,13 @@
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 3.0" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
-        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form)" title="Efficiency metric on your label">
+        <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form); updateEffHint(this)" title="Efficiency metric on your label">
           <option value="cop" selected>COP</option>
           <option value="eer">EER</option>
           <option value="iseer">ISEER</option>
         </select>
       </label>
-      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">{% translate "From BEE/EGAT/SNI label. Typical EER: 2.5 – 4.0. Cannot be zero." %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5"><span data-eff-hint>{% translate "COP from the label, typically 2.3 – 5.3. Cannot be zero." %}</span></p>
       <p class="validator-hint">{% translate "Value must be greater than zero" %}</p>
     </fieldset>
 
@@ -1019,6 +1019,9 @@
   var COOLING_TYPE_MAP = {
     'window-ac':    { templateId: 'window-ac-template',         backendType: 'air_conditioner', acType: 'window' },
     'split-ac':     { templateId: 'split-ac-template',          backendType: 'air_conditioner', acType: 'split' },
+    // A cassette is a split system with a ceiling-mounted indoor unit, so it
+    // reuses the split form and formula unchanged.
+    'cassette-ac':  { templateId: 'split-ac-template',          backendType: 'air_conditioner', acType: 'cassette' },
     'vrf-system':   { templateId: 'vrf-template',               backendType: 'air_conditioner', acType: 'vrv' },
     'packaged-ac':  { templateId: 'packaged-ac-template',       backendType: 'air_conditioner', acType: 'packaged' },
     'chiller-water':{ templateId: 'water-cooled-chiller-template', backendType: 'chiller',       acType: null },
@@ -1394,7 +1397,7 @@
           setField(form, 'number_of_stars', system.number_of_stars);
           if (system.packaged_subtype) setField(form, 'packaged_subtype', system.packaged_subtype);
 
-          if (system.ac_type === 'window' || system.ac_type === 'split' || system.ac_type === 'vrv' || system.ac_type === 'packaged') {
+          if (['window', 'split', 'cassette', 'vrv', 'packaged'].includes(system.ac_type)) {
             if (system.cooling_capacity_per_unit_kw) {
               setField(form, 'cooling_capacity_per_unit', system.cooling_capacity_per_unit_kw);
               setField(form, 'cooling_capacity_unit', 'kw');
@@ -1474,6 +1477,28 @@
     }
   };
 
+
+  // The three metrics are not interchangeable and their typical ranges differ
+  // by a factor of 3.4, so the hint has to follow the picker. A user told
+  // "typical 2.3 - 5.3" while EER is selected would enter a COP and get an
+  // answer 3.4x out.
+  var EFF_HINTS = {
+    cop:   "{% translate 'COP from the label, typically 2.3 - 5.3. Cannot be zero.' %}",
+    eer:   "{% translate 'EER in Btu/h per W (Thai EGAT No.5 label), typically 9 - 14. Cannot be zero.' %}",
+    iseer: "{% translate 'ISEER from the Indian BEE label, typically 3.5 - 5.5. Cannot be zero.' %}"
+  };
+  window.updateEffHint = function(sel) {
+    if (!sel) return;
+    var fs = sel.closest('fieldset');
+    var hint = fs && fs.parentElement
+      ? fs.parentElement.querySelector('[data-eff-hint]') : null;
+    if (!hint) {
+      var wrap = sel.closest('.fieldset');
+      hint = wrap ? wrap.querySelector('[data-eff-hint]') : null;
+    }
+    if (hint && EFF_HINTS[sel.value]) hint.textContent = EFF_HINTS[sel.value];
+  };
+
   window.recalcWindowAcEnergy = function(form) {
     if (!form) return;
     var capEl    = form.querySelector('[name="cooling_capacity_per_unit"]');
@@ -1498,13 +1523,22 @@
     if (power > 0) {
       energyEl.value = (power * units * hrs * days * weeks).toFixed(3);
     } else {
-      // EER/ISEER (Btu/h per W) are ~3.412× a dimensionless COP. The energy formula
-      // needs a COP (power = capacity ÷ COP), so convert first — otherwise an EER value
-      // makes the AC consumption ~3.4× too low.
+      // The energy formula needs a COP (power = capacity ÷ COP), so whichever
+      // figure the user read off their label has to be put on that basis.
+      //
+      // Only EER needs converting. On the Thai EGAT No.5 label EER is in
+      // Btu/h per watt - the No.5 threshold is 11.60 - so it is ~3.412× a COP.
+      //
+      // ISEER does NOT. India's BEE defines ISEER as CSTL ÷ CSEC, both in Wh,
+      // so it is already dimensionless W/W: a 5-star split AC is ≥ 5.30.
+      // Dividing it made the AC consume 3.4× too much. No saved record was
+      // affected - the picker defaults to COP and every one of the 167 records
+      // was stored that way - but a user following their Indian label would
+      // have hit it immediately.
       var eerRaw   = parseFloat(eerEl && eerEl.value) || 0;
       var metricEl = form.querySelector('[name="eer_metric"]');
       var metric   = metricEl ? metricEl.value : 'cop';
-      var eer      = (metric === 'eer' || metric === 'iseer') ? (eerRaw / 3.412) : eerRaw;
+      var eer      = (metric === 'eer') ? (eerRaw / 3.412) : eerRaw;
       var unit = unitEl ? unitEl.value : 'kw';
       var cap  = capacityToKw(parseFloat(capEl && capEl.value) || 0, unit);
       if (cap > 0 && eer > 0) {

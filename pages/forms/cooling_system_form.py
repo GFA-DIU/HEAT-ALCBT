@@ -192,6 +192,7 @@ class CoolingSystemAirConditionerForm(forms.ModelForm):
             'cop',
             'iseer_rating',
             'eer_iseer_cop',
+            'efficiency_metric',
             'energy_efficiency_label',
             'number_of_stars',
         ]
@@ -216,6 +217,9 @@ class CoolingSystemAirConditionerForm(forms.ModelForm):
                 'power_input_per_unit': 'power_input_per_unit_kw',
                 'iseer': 'iseer_rating',
                 'eer_iseer_cop': 'eer_iseer_cop',
+                # which figure the number above is; without it a
+                # re-opened record recomputes against the default
+                'eer_metric': 'efficiency_metric',
             }
 
             for frontend_name, model_name in field_mapping.items():

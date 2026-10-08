@@ -207,3 +207,62 @@ annual F-gas kgCO₂e = charge_kg × leakage% × GWP × units
 building. Under RICS WLCA refrigerant leakage sits in **B1**, not B6, so it is
 a scope decision rather than a bug fix and needs agreeing with GT before it
 ships.
+
+## Efficiency metrics: EER, ISEER and COP are not interchangeable
+
+The cooling form lets a user enter the efficiency figure from their own
+national label. Three are offered, and only one of them needs converting:
+
+| Metric | Unit | Where | Typical | Convert to COP |
+|---|---|---|---|---|
+| COP | W/W | generic | 2.3 – 5.3 | as entered |
+| ISEER | W/W | India, BEE (`CSTL ÷ CSEC`) | 3.5 – 5.5 | **as entered** |
+| EER | Btu/h per W | Thailand, EGAT No.5 | 9 – 14 | `÷ 3.412` |
+
+BEAT previously divided **both** EER and ISEER by 3.412. ISEER is already
+dimensionless, so an Indian 5-star unit at ISEER 5.30 was treated as a COP of
+1.55 and the AC reported about 3.4× the energy it should.
+
+No stored record was affected. The picker defaults to COP, and reconstructing
+all 167 AC records from their own inputs showed every one of them was computed
+on the COP basis — 105 matched the COP arithmetic exactly, 47 were entered as
+a power input, and none matched the divided form. The fault was latent, not
+historical.
+
+The metric is now stored on the record (`efficiency_metric`). Without it,
+re-opening a saved AC recomputed its energy against whatever the form happened
+to default to, silently changing a number the user never touched.
+
+The field hint also contradicted the code: it read "Typical EER: 2.3 – 3.5",
+which is a COP range. A Thai user following that hint while EER was selected
+would have entered a COP and got an answer 3.4× out. The hint now follows the
+picker.
+
+## Known gap: no part-load factor on air conditioners
+
+```
+annual energy = rated capacity × units ÷ COP × hours × days × weeks
+```
+
+This bills every operating hour at 100% of rated capacity. Real air
+conditioners cycle or modulate once the setpoint is reached, so the figure
+runs high. A worked example from the live data:
+
+> A 1.5 TR (5.27 kW) split at COP 2.8 running 8 h × 7 d × 52 w
+> BEAT: **5,485 kWh/yr per unit**. Metered consumption for a unit of that size
+> and duty is typically **1,500 – 2,500 kWh/yr**.
+
+Simplified tools commonly apply a part-load or diversity factor of about
+0.4 – 0.7 to close that gap. BEAT applies none.
+
+This is deliberately left alone for now. Applying a factor would lower the
+reported operational energy of **every** cooled building in the database, so it
+is a methodology decision to agree with GT rather than a defect to patch. Note
+the same assumption does not apply to the chiller path, which is driven by a
+measured plant load and a kW/RT efficiency.
+
+One related tidy-up: `recalcCoolingSimpleEnergy` in the cooling template
+multiplies the plant load by the unit count, which would double count — the
+chiller tooltip correctly states the load "already covers all machines". The
+function is unreferenced and is left in place only because removing dead code
+was out of scope for this change; it must not be wired up as it stands.
