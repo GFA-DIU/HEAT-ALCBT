@@ -125,6 +125,12 @@ def test_grid_factor_no_electricity_epd(create_building):
 # ---------------------------------------------------------------------------
 # get_operational_carbon_by_system
 # ---------------------------------------------------------------------------
+# The breakdown deliberately includes an estimated plug & equipment load when the
+# user has not entered one. Without it the panel omits a real part of the
+# building's energy and reads far too low against the bill — see the comment in
+# get_operational_carbon_by_system. These assertions predate that behaviour and
+# were asserting the old, incomplete shape.
+
 
 @pytest.mark.django_db
 def test_system_carbon_basic(
@@ -143,11 +149,14 @@ def test_system_carbon_basic(
     result = get_operational_carbon_by_system(building)
 
     # cooling = 1000 * 0.5 / 100 = 5.0 ; lighting = 500 * 0.5 / 100 = 2.5
-    assert result["labels"] == ["Cooling systems", "Lighting systems"]
-    assert result["absolute"] == [5.0, 2.5]
-    assert result["total"] == 7.5
-    assert result["data"][0] == pytest.approx(66.7, abs=0.1)
-    assert result["data"][1] == pytest.approx(33.3, abs=0.1)
+    # plug load is estimated at 20% of the 1500 kWh of systems = 300 kWh -> 1.5
+    assert result["labels"] == [
+        "Cooling systems", "Lighting systems", "Plug & equipment loads (estimated)"]
+    assert result["absolute"] == [5.0, 2.5, 1.5]
+    assert result["total"] == 9.0
+    assert result["data"][0] == pytest.approx(55.6, abs=0.1)
+    assert result["data"][1] == pytest.approx(27.8, abs=0.1)
+    assert result["data"][2] == pytest.approx(16.7, abs=0.1)
     assert "warning" not in result
 
 
@@ -177,8 +186,9 @@ def test_system_carbon_grid_factor_zero_warns(
 
     result = get_operational_carbon_by_system(building)
 
-    assert result["labels"] == ["Cooling systems"]
-    assert result["absolute"] == [0.0]
+    assert result["labels"] == [
+        "Cooling systems", "Plug & equipment loads (estimated)"]
+    assert result["absolute"] == [0.0, 0.0]
     assert result["total"] == 0
     assert result.get("warning") == "grid_factor_zero"
 
@@ -188,7 +198,8 @@ def test_system_carbon_no_energy_summary(create_building):
     building = create_building(total_floor_area=Decimal("100"))
     result = get_operational_carbon_by_system(building)
 
-    assert result == {"labels": [], "data": [], "absolute": [], "total": 0}
+    assert result == {"labels": [], "data": [], "absolute": [],
+                      "absolute_energy": [], "total": 0, "total_energy": 0}
 
 
 @pytest.mark.django_db
@@ -205,5 +216,7 @@ def test_system_carbon_blank_systems_excluded(
 
     result = get_operational_carbon_by_system(building)
 
-    assert result["labels"] == ["Cooling systems"]
-    assert result["total"] == 5.0
+    # ventilation is 0 and excluded; plug load is estimated at 20% of 1000 kWh
+    assert result["labels"] == [
+        "Cooling systems", "Plug & equipment loads (estimated)"]
+    assert result["total"] == 6.0
