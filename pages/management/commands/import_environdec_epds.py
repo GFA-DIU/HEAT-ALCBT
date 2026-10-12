@@ -424,15 +424,29 @@ class Command(BaseCommand):
         self.stdout.write("\nimported: %d created, %d updated" % (created, updated))
         self.stdout.write("rejected: %d" % len(rejects))
         if rejects:
-            with open(path, "w", newline="", encoding="utf-8-sig") as fh:
-                w = csv.DictWriter(fh, fieldnames=REJECT_FIELDS)
-                w.writeheader()
-                for r in rejects:
-                    w.writerow(r)
-            self.stdout.write("  -> %s" % path)
+            # The reasons go to stdout first and unconditionally. On a Heroku
+            # dyno the log is the only thing anyone reads, and the default
+            # rejects path (~/Downloads) does not exist there - writing the
+            # file must never be what decides whether you learn why a row was
+            # refused.
             for reason, n in Counter(
                     re.sub(r"[\d.]+", "N", r["reason"]) for r in rejects).most_common(10):
                 self.stdout.write("   %4d  %s" % (n, reason[:84]))
+            try:
+                parent = os.path.dirname(path)
+                if parent:
+                    os.makedirs(parent, exist_ok=True)
+                with open(path, "w", newline="", encoding="utf-8-sig") as fh:
+                    w = csv.DictWriter(fh, fieldnames=REJECT_FIELDS)
+                    w.writeheader()
+                    for r in rejects:
+                        w.writerow(r)
+                self.stdout.write("  -> %s" % path)
+            except OSError as exc:
+                self.stdout.write(
+                    "  (no rejects file written: %s - the reasons above are "
+                    "the whole story; pass --rejects to choose a writable "
+                    "path)" % exc)
 
 
 class _Rollback(Exception):
