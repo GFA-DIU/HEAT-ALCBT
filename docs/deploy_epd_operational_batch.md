@@ -18,8 +18,18 @@ Migrations run automatically — `Procfile` has
 
 ## 0. Before you touch anything
 
-**Take a backup and confirm it restores.** Supabase dashboard → manual backup
-or PITR snapshot, or:
+**Take the backup in Supabase, not Heroku.**
+
+Django reads `SUPABASE_DATABASE_URL` (`django_project/settings.py:157`), so the
+real data is in Supabase — `aws-0-eu-west-1.pooler.supabase.com`. The app also
+has a `heroku-postgresql` addon attached, which sets `DATABASE_URL` and is
+**unused**. `heroku pg:backups:capture` would back that empty database up and
+give you false confidence.
+
+Supabase dashboard → the project → **Database → Backups** → take a manual
+backup, or note the PITR restore point. Confirm it exists before merging.
+
+Or by hand, with the connection string:
 
 ```bash
 pg_dump "$SUPABASE_DATABASE_URL" -Fc -f prod_backup_$(date +%Y%m%d_%H%M).dump
@@ -41,12 +51,16 @@ runbook did not say would move, stop and find out why.
 It also warns about any label outside the published AA–G scale, which would
 render a broken image until `apply_gcca_concrete_labels --overwrite` has run.
 
-**Know your app name:**
+**The app is `beat-qa`** (eu, one Eco web dyno). Confirmed as the live tool:
+`heroku domains --app beat-qa` lists `beat-alcbt.gggi.org`.
 
-```bash
-heroku apps
-heroku info --app <app>        # confirm it serves beat-alcbt.gggi.org
-```
+**Expect a short outage.** Preboot is off and there is a single web dyno, so the
+release restarts it — roughly 10–30 seconds of downtime.
+
+**Two commits that are not yours go live with this.** The current release is
+`v169 = c43eb06a` from 02 August; `qa` has since gained PR #592's BOQ classifier
+keyword fallback, merged but never released. It is covered by the test run, but
+tell its author before you ship it.
 
 No ECO Platform token is needed for this batch — the 250 EPD values are
 committed at `pages/data/environdec_epds.csv`.
