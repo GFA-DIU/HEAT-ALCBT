@@ -29,11 +29,39 @@ give you false confidence.
 Supabase dashboard → the project → **Database → Backups** → take a manual
 backup, or note the PITR restore point. Confirm it exists before merging.
 
-Or by hand, with the connection string:
+Or by hand. **Do not pipe `pg_dump` out of `heroku run`** — the dump arrives
+truncated and `pg_restore --list` reports a corrupt TOC. Encode it in transit:
 
 ```bash
-pg_dump "$SUPABASE_DATABASE_URL" -Fc -f prod_backup_$(date +%Y%m%d_%H%M).dump
+heroku run --app beat-qa --no-tty -- \
+    bash -c 'pg_dump "$SUPABASE_DATABASE_URL" -Fc --no-owner --no-acl | base64 -w0' \
+  2>/dev/null | tr -d '\r\n ' | grep -oE '[A-Za-z0-9+/=]{500,}' > dump.b64
+base64 -d dump.b64 > beat_backup_$(date +%Y%m%d_%H%M).dump
 ```
+
+**Then verify it, every time.** A file that exists is not a backup:
+
+```bash
+docker exec -i heat-alcbt-db-1 sh -c 'cat > /tmp/v.dump' < beat_backup_*.dump
+docker exec heat-alcbt-db-1 sh -c 'pg_restore --list /tmp/v.dump' | grep -c 'TABLE DATA'
+```
+
+Expect **94**. Zero, or `entry ID ... out of range -- perhaps a corrupt TOC`,
+means the transfer failed — take it again, do not merge.
+
+Stronger still, restore into a scratch database and count rows against the
+pre-flight snapshot. Three `supabase_vault` errors are expected and harmless:
+that extension does not exist outside Supabase and holds no application data.
+
+Two traps that cost an hour:
+
+- `ls -l | awk '{print $5}'` reports a **constant 197121** under this Git Bash
+  whatever the file's real size. Size files with `wc -c`.
+- Git Bash rewrites container paths, so `docker cp ... :/tmp/x` lands at
+  `C:\tmp\x`. Pipe through `docker exec -i ... sh -c 'cat > /tmp/x'` instead.
+
+The dump is about **4.4 MB**, not 43 MB. 43 MB is the database's on-disk size
+including indexes; the custom format is compressed and carries no indexes.
 
 Do not continue without one. Nothing else in this runbook is irreversible, but
 this is the only thing that makes that true.
