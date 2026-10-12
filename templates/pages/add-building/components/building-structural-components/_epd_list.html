@@ -37,7 +37,7 @@
           {{ epd.impact_gwp|floatformat:2 }} kgCO2eq/{{ epd.declared_unit }}
         </span>
         {% with label=epd.labels|get_item:"GCCA Global Reference Threshold Low Carbon and Near Zero Emissions Concrete" %}
-          {% if label %}
+          {% if label and label|has_gcca_image %}
             {% with image_path='images/svg/GCCA_label_'|add:label|add:'.svg' %}
               <img
                 src="{% static image_path %}"

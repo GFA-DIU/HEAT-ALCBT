@@ -28,6 +28,21 @@ pg_dump "$SUPABASE_DATABASE_URL" -Fc -f prod_backup_$(date +%Y%m%d_%H%M).dump
 Do not continue without one. Nothing else in this runbook is irreversible, but
 this is the only thing that makes that true.
 
+**Take a snapshot you can compare against afterwards.** Read-only, writes
+nothing:
+
+```bash
+heroku run python manage.py preflight_deploy_check --app <app> | tee before.txt
+```
+
+Run it again after the deploy and diff the two. If a number moves that this
+runbook did not say would move, stop and find out why.
+
+It also warns if the database still holds GCCA labels scored "G" — a band the
+corrected AA–F scale does not define. Those render a broken image until
+`apply_gcca_concrete_labels --overwrite` has run, which is the main reason the
+data commands should not be left for another day.
+
 **Know your app name:**
 
 ```bash
