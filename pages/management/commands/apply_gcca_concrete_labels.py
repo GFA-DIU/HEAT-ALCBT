@@ -1,4 +1,4 @@
-"""Compute and apply GCCA AA–F concrete Low Carbon Ratings dynamically.
+"""Compute and apply GCCA AA–G concrete Low Carbon Ratings dynamically.
 
 Rates ready-mix / precast STRUCTURAL concrete (declared per m³, with a parseable
 compressive strength class) from its GWP A1–A3, using pages/scripts/Label_mapping/
@@ -28,7 +28,7 @@ MIN_SANE_GWP = 50.0  # kgCO₂e/m³ — below this a per-m³ concrete value is b
 
 
 class Command(BaseCommand):
-    help = "Compute & apply GCCA AA–F ratings to ready-mix/precast concrete EPDs."
+    help = "Compute & apply GCCA AA–G ratings to ready-mix/precast concrete EPDs."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -79,10 +79,10 @@ class Command(BaseCommand):
                 continue
             band = rate(gwp, mxx)
             if band is None:
-                # Above the top of F. The GCCA scale stops there, so the
-                # product is left unrated rather than given an invented letter.
-                # A label from an earlier run is removed, otherwise a letter
-                # the scale no longer defines would survive re-rating.
+                # Strength class outside the published columns - not rateable.
+                # High-carbon concrete is NOT this case: it gets G, the
+                # open-ended band. A label from an earlier run is removed so a
+                # stale score cannot survive a re-rate.
                 if options["overwrite"] and not options["dry_run"]:
                     removed += EPDLabel.objects.filter(epd=epd, label=label).delete()[0]
                 skipped += 1

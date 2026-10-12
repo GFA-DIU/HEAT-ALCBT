@@ -7,9 +7,22 @@ decisions do not get re-opened from memory.
 
 Source: <https://gccaepd.org/blog/lcr> (Table 1)
 
-Seven bands, **AA to F**. AA is "near zero emissions concrete". There is no G.
-Thresholds are the upper bound of each band in kgCO₂e/m³, keyed to the
-concrete's **cylinder** strength class:
+**Eight** bands, **AA to G**. GCCA's EN 206 report states it plainly:
+
+> There are 8 ratings (AA to G): **AA** Near Zero Emissions Concrete …
+> **A–F** Equally spaced carbon footprint values define the ratings …
+> **G** Open ended band
+
+G exists so that every concrete can be allocated a band whatever its GWP.
+Source: <https://gccassociation.org/wp-content/uploads/2025/11/GCCA_EN206-Report.pdf>
+
+Note the blog summary at gccaepd.org/blog/lcr says "seven ratings, from AA to
+F". That is the **cement** scale — concrete has the extra open-ended band. This
+module briefly had G removed on the strength of that sentence before the EN 206
+report was checked; see the correction note below.
+
+Thresholds are the upper bound of each bounded band in kgCO₂e/m³, keyed to the
+concrete's **cylinder** strength class. G has no upper bound:
 
 | Top of | M20 | M25 | M30 | M35 | M40 | M50 |
 |---|---|---|---|---|---|---|
@@ -27,9 +40,19 @@ which is what GCCA means by "equally spaced carbon footprint values".
 Computed by `pages/scripts/Label_mapping/gcca_rating.py`, applied by
 `manage.py apply_gcca_concrete_labels`. Currently rates 294 EPDs.
 
-A product above the top of F is reported as **unrated**, not given a letter.
-An earlier version of this table omitted AA and invented a "G" for exactly
-that case; two EPDs carried it until the scale was corrected.
+A product above the top of F is **G**. Returning `None` from `rate()` means
+the *strength class* is outside the six published columns — never that a
+concrete is too carbon-heavy to rate.
+
+### Correction, for the record
+
+An earlier pass through this file removed G and reported anything above the top
+of F as unrated, on the strength of the blog page's "seven ratings, from AA to
+F". That was wrong: the sentence describes the cement scale. Two EPDs had their
+G labels withdrawn and the G image was deleted. Both are restored, and the
+label count is back to 296. The genuine fault in the original implementation
+was only the missing **AA** band, which meant a near-zero concrete would have
+been reported as A.
 
 Strength classes outside the six published columns (C12/15, C45/55, Thai 180
 and 210 KSC) are left unrated, as are strength *ranges* — "200–300 KSC" cannot

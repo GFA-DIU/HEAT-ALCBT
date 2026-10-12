@@ -1,9 +1,14 @@
-"""The GCCA Low Carbon Rating scale, as GCCA publishes it.
+"""The GCCA Low Carbon Rating scale for concrete, as GCCA publishes it.
 
-Thresholds transcribed from Table 1 at https://gccaepd.org/blog/lcr. The scale
-has seven bands, AA to F, and stops at F - there is no G. An earlier version of
-this module omitted AA and invented a G, so a near-zero product would have been
-reported as A and two EPDs carried a letter the scheme does not define.
+Eight bands. GCCA's EN 206 report states it plainly: "There are 8 ratings
+(AA to G)" - AA near-zero, A to F equally spaced, and "G - Open ended band",
+added so every concrete can be allocated a band whatever its GWP.
+https://gccassociation.org/wp-content/uploads/2025/11/GCCA_EN206-Report.pdf
+
+Thresholds from Table 1 at https://gccaepd.org/blog/lcr. Note that page says
+"seven ratings, from AA to F" - that is the *cement* scale. Concrete has the
+extra open-ended band, and this module had G removed on the strength of that
+sentence before the EN 206 report was checked.
 """
 import pytest
 
@@ -11,10 +16,10 @@ from pages.scripts.Label_mapping.gcca_rating import (
     GCCA_BANDS, GCCA_THRESHOLDS, rate, strength_to_mxx)
 
 
-def test_the_scale_is_AA_to_F_with_no_G():
-    assert GCCA_BANDS == ["AA", "A", "B", "C", "D", "E", "F"]
-    assert "G" not in GCCA_BANDS
-    assert all(len(v) == len(GCCA_BANDS) for v in GCCA_THRESHOLDS.values())
+def test_the_scale_is_AA_to_G():
+    assert GCCA_BANDS == ["AA", "A", "B", "C", "D", "E", "F", "G"]
+    # G is open-ended, so it has no threshold row of its own
+    assert all(len(v) == len(GCCA_BANDS) - 1 for v in GCCA_THRESHOLDS.values())
 
 
 @pytest.mark.parametrize("mxx, gwp, expected", [
@@ -30,10 +35,17 @@ def test_bands_match_the_published_table(mxx, gwp, expected):
     assert rate(gwp, mxx) == expected
 
 
-def test_above_the_top_of_F_is_unrated_not_G():
-    """968 kgCO2e/m3 is off the scale; GCCA defines no band for it."""
-    assert rate(303, 20) is None
-    assert rate(968, 50) is None
+def test_above_the_top_of_F_is_G():
+    """G is the open-ended band - every concrete gets a rating."""
+    assert rate(303, 20) == "G"
+    assert rate(968, 50) == "G"
+
+
+def test_unrateable_means_the_strength_class_is_off_table_not_high_carbon():
+    """None signals an unknown strength, never "too carbon-heavy to rate"."""
+    assert rate(501, 45) is None      # M45 is not a published column at all
+    assert rate(501, 50) == "G"       # M50 is, so a heavy mix still gets G
+    assert rate(500, 50) == "F"       # 500 is exactly the top of F, not G
 
 
 def test_off_table_strength_classes_are_unrated():

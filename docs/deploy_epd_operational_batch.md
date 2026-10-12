@@ -38,10 +38,8 @@ heroku run python manage.py preflight_deploy_check --app <app> | tee before.txt
 Run it again after the deploy and diff the two. If a number moves that this
 runbook did not say would move, stop and find out why.
 
-It also warns if the database still holds GCCA labels scored "G" — a band the
-corrected AA–F scale does not define. Those render a broken image until
-`apply_gcca_concrete_labels --overwrite` has run, which is the main reason the
-data commands should not be left for another day.
+It also warns about any label outside the published AA–G scale, which would
+render a broken image until `apply_gcca_concrete_labels --overwrite` has run.
 
 **Know your app name:**
 
@@ -67,7 +65,7 @@ Be ready to explain these, because they are visible immediately:
 | Savings tab no longer claims 100% | Buildings whose energy is mostly plug load previously showed a 100% reduction. They now show the honest figure, often 0%. |
 | EPD names | The picker shows a composed label (material · product · maker). The original title is on hover and in `source_name`. |
 | 250 new EPDs | Catalogue grows; existing selections are untouched. |
-| GCCA labels | Scale corrected to AA–F. Two EPDs lose a "G" that the scheme does not define. |
+| GCCA labels | The missing **AA** near-zero band is added. G is unchanged — GCCA defines it as the open-ended band above F. |
 
 ---
 
@@ -125,7 +123,7 @@ heroku run python manage.py apply_gcca_concrete_labels --overwrite --app <app>
 | `backfill_epd_nomenclature` | ~5,460 updated; ~11 left blank and listed |
 | `fix_epd_source_urls` | 399 URLs, all verified 200, 0 skipped |
 | `import_environdec_epds` | 250 created (first run), 12 rejected |
-| `apply_gcca_concrete_labels` | ~294 rated, 2 stale labels removed |
+| `apply_gcca_concrete_labels` | ~296 rated, 0 stale labels removed |
 
 If a dry run reports something materially different from this, **stop** and
 work out why before running it for real.
@@ -157,8 +155,7 @@ starts from a different place, but the shape should match:
 EPDs total        5710
 EPDs ALCBT        2809
 environdec         298
-GCCA labels        294   bands B 3, C 196, D 22, E 32, F 41
-any G labels         0
+GCCA labels        296   bands B 3, C 196, D 22, E 32, F 41, G 2
 EPDs failing GWP     0
 ```
 

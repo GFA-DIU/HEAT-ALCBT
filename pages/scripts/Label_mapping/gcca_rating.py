@@ -2,7 +2,7 @@
 GWP (A1–A3, per m³) and its compressive strength class.
 
 Scheme: GCCA Global Low Carbon Ratings (https://gccaepd.org/blog/lcr).
-Seven bands, AA to F; AA is "near zero emissions concrete".
+Eight bands, AA to G; AA is "near zero emissions concrete" and G is open-ended.
 Bands are keyed to the concrete's CYLINDER strength class (Mxx). Thresholds are
 the upper bound (kgCO₂e/m³) of each band; lower GWP = better letter.
 
@@ -25,10 +25,14 @@ KSC_TO_MPA = 0.0980665  # 1 kg/cm² in MPa
 # GCCA "top of band" thresholds, kgCO₂e/m³, per cylinder strength class,
 # transcribed from Table 1 at https://gccaepd.org/blog/lcr.
 #
-# Order = [AA, A, B, C, D, E, F]. The scale has seven bands and stops at F -
-# there is no G. An earlier version of this table omitted AA and invented a G
-# for anything above F, which meant a near-zero product was reported as A
-# rather than AA, and two EPDs carried a letter GCCA does not define.
+# Order = [AA, A, B, C, D, E, F]; anything above the top of F is G.
+#
+# GCCA's EN 206 report is explicit: "There are 8 ratings (AA to G)" - AA is
+# near-zero, A-F are equally spaced carbon footprint values, and "G - Open
+# ended band", added so that every concrete can be allocated a band whatever
+# its GWP. The blog summary at gccaepd.org/blog/lcr says "seven ratings, from
+# AA to F", which is the cement scale; concrete has the extra open-ended band.
+# https://gccassociation.org/wp-content/uploads/2025/11/GCCA_EN206-Report.pdf
 GCCA_THRESHOLDS = {
     20: [21, 68, 115, 161, 208, 255, 302],
     25: [23, 75, 127, 179, 231, 283, 335],
@@ -38,7 +42,8 @@ GCCA_THRESHOLDS = {
     50: [36, 113, 190, 268, 345, 422, 500],
 }
 # Best to worst. "AA" is the near-zero band.
-GCCA_BANDS = ["AA", "A", "B", "C", "D", "E", "F"]
+# The seven bounded bands, in order. G is open-ended above the last of them.
+GCCA_BANDS = ["AA", "A", "B", "C", "D", "E", "F", "G"]
 GCCA_COLUMNS = set(GCCA_THRESHOLDS)  # {20,25,30,35,40,50}
 
 # EN-206 characteristic CUBE strength (MPa) -> CYLINDER class Mxx.
@@ -82,16 +87,15 @@ def strength_to_mxx(name):
 
 
 def rate(gwp_per_m3, mxx):
-    """Return the AA–F band for a per-m³ GWP at cylinder class Mxx, or None.
+    """Return the AA–G band for a per-m³ GWP at cylinder class Mxx, or None.
 
-    None means the product sits above the top of F, which the GCCA scale does
-    not cover. It is reported as unrated rather than given a letter, because
-    inventing a band below the published floor would read as a GCCA rating
-    while being nothing of the kind.
+    None means the strength class is outside the published columns, not that
+    the concrete is too carbon-heavy to rate - G is the open-ended band and
+    covers everything above the top of F.
     """
     if mxx not in GCCA_THRESHOLDS or gwp_per_m3 is None:
         return None
     for letter, thr in zip(GCCA_BANDS, GCCA_THRESHOLDS[mxx]):
         if gwp_per_m3 <= thr:
             return letter
-    return None
+    return "G"

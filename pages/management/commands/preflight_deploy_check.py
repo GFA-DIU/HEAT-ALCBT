@@ -56,12 +56,13 @@ class Command(BaseCommand):
                      .annotate(n=Count("id")).order_by())
         w("  labels total             %d" % EPDLabel.objects.count())
         w("  bands                    %s" % bands)
-        stale = bands.get("G", 0)
-        if stale:
+        from pages.scripts.Label_mapping.gcca_rating import GCCA_BANDS
+        unknown = {b: n for b, n in bands.items() if b not in GCCA_BANDS}
+        if unknown:
             w(self.style.WARNING(
-                "  %d label(s) scored 'G' - a band the corrected AA-F scale does\n"
-                "    not define. They render a broken image until\n"
-                "    apply_gcca_concrete_labels --overwrite has run." % stale))
+                "  labels outside the published AA-G scale: %s\n"
+                "    these render a broken image; re-rate with\n"
+                "    apply_gcca_concrete_labels --overwrite" % unknown))
 
         w(self.style.MIGRATE_HEADING("\n== operational =="))
         w("  buildings                %d" % Building.objects.count())
