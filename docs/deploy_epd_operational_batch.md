@@ -69,6 +69,33 @@ Be ready to explain these, because they are visible immediately:
 
 ---
 
+## 1.5 Post-deploy walkthrough — what to click
+
+Numbers first, from the pre-flight diff:
+
+| Check | Expect |
+|---|---|
+| EPDs total | **+250** |
+| GCCA labels | every score inside **AA–G**; the pre-flight warns on any outside |
+| EPDs failing `get_gwp_impact_sum` | **0** |
+| Cassette records | unchanged count; they simply report as cooling now |
+
+Then four screens, each chosen because this batch changes what a user sees:
+
+1. **Material picker** — search `Saint-Gobain`. Returned **0** before this release,
+   about **35** after. Also try `SCG`, `CPAC`, `Cylence`.
+2. **Systems step**, on a building with a cassette AC — cooling and ventilation
+   figures move between the two lines. **The building total must not change.**
+3. **Savings tab → Operational Carbon Savings** — on a plug-load-only building the
+   headline must *not* read 100%. Flip a measure toggle: the headline, the
+   percentage and the Baseline/Optimised pair should all move together.
+4. **Cooling form** — open the COP / EER / ISEER dropdown: it must be opaque, not
+   see-through over the field beneath. Hover any ⓘ: every one of the 72 icons now
+   has a tip.
+
+If (2) changes a building total, stop and restore the backup — that is the one
+outcome this release is not supposed to produce.
+
 ## 2. Merge and deploy
 
 ```bash
