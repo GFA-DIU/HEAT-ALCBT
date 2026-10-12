@@ -49,7 +49,7 @@
     <legend class="fieldset-legend">
       {% translate "Country" %}<span class="text-[var(--state--error--base)]">*</span>
     </legend>
-    <label class="w-full flex relative">
+    <label class="w-full flex relative" id="country-combo">
       <div class="select-icon" id="country-select-icon">
         <span
           data-icon="global-line"
@@ -57,26 +57,67 @@
           data-color="var(--icon--soft-400)"
         ></span>
       </div>
+
+      {# Native <select> kept as the source of truth (form submit, HTMX region load, #}
+      {# validation, existing JS). Visually hidden; the custom flag dropdown below     #}
+      {# drives it and fires its native change event so nothing downstream breaks.     #}
       <select
         id="country-select"
         name="country"
-        class="select select-with-icon w-full"
         required
         hx-get="/select_lists/"
         hx-target="#region-select"
         hx-trigger="change[this.value != '']"
         hx-swap="innerHTML"
         hx-vals='js:{"country": this.value}'
+        tabindex="-1"
+        aria-hidden="true"
+        style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;"
       >
         <option value="" disabled {% if not selected_country %}selected{% endif %}>{% translate "Select a country" %}</option>
         {% for country in countries %}
-          <option data-name="{{ country.name }}" value="{{ country.id }}" {% if country.id == selected_country %}selected{% endif %}>
-            <span data-country="{{ country.name }}" data-width="20"></span>
-            <span data-country="{{ country.name }}" data-flag="false"></span>
-          </option>
+          <option data-name="{{ country.name }}" value="{{ country.id }}" {% if country.id == selected_country %}selected{% endif %}>{{ country.name }}</option>
         {% endfor %}
       </select>
+
+      {# Custom, cross-browser dropdown: <li> are real elements, so the flag <img> #}
+      {# renders in Chrome, Firefox and Safari alike (unlike <option> children).    #}
+      <button
+        type="button"
+        id="country-combo-btn"
+        class="select select-with-icon w-full"
+        style="display:flex;align-items:center;text-align:left;"
+        aria-haspopup="listbox"
+        aria-expanded="false"
+      >
+        <span id="country-combo-label" class="truncate" style="display:flex;align-items:center;gap:8px;">{% translate "Select a country" %}</span>
+        <span style="margin-left:auto;padding-left:8px;color:var(--icon--soft-400);flex-shrink:0;">&#9662;</span>
+      </button>
+
+      <ul
+        id="country-combo-list"
+        role="listbox"
+        class="hidden"
+        style="position:absolute;left:0;right:0;top:100%;margin-top:4px;z-index:50;max-height:16rem;overflow:auto;border:1px solid var(--stroke--soft-200);border-radius:8px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,0.12);padding:4px 0;list-style:none;"
+      >
+        {% for country in countries %}
+          <li
+            role="option"
+            data-value="{{ country.id }}"
+            data-name="{{ country.name }}"
+            class="country-combo-opt"
+            style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;font-size:14px;"
+          >
+            <span data-country="{{ country.name }}" data-width="20"></span>
+            <span>{{ country.name }}</span>
+          </li>
+        {% endfor %}
+      </ul>
     </label>
+    <style>
+      #country-combo-list .country-combo-opt:hover { background: var(--bg--weak-50, #f4f4f5); }
+      #country-combo-list .country-combo-opt[aria-selected="true"] { background: var(--bg--weak-50, #eef2ff); font-weight: 600; }
+    </style>
     <p class="validator-hint">{% translate "Please select a country" %}</p>
   </fieldset>
 
@@ -224,6 +265,57 @@
 
     // No polling needed - server handles edit mode pre-population
     // HTMX handles dynamic loading on user interaction
+  })();
+
+  // Custom cross-browser country dropdown (flags render in FF/Safari too).
+  // Drives the hidden native #country-select and fires its change event so the
+  // existing HTMX region load, reset logic and validation all keep working.
+  (function initCountryCombo() {
+    var sel   = document.getElementById('country-select');
+    var btn   = document.getElementById('country-combo-btn');
+    var list  = document.getElementById('country-combo-list');
+    var label = document.getElementById('country-combo-label');
+    if (!sel || !btn || !list || !label) return;
+
+    function open()  { list.classList.remove('hidden'); btn.setAttribute('aria-expanded', 'true'); }
+    function close() { list.classList.add('hidden');    btn.setAttribute('aria-expanded', 'false'); }
+
+    function reflect(li) {
+      // Copy the chosen row's flag + name into the button label. If the flag
+      // image hasn't been injected yet, the registry's MutationObserver will
+      // render the copied [data-country] span in place.
+      label.innerHTML = li.innerHTML;
+      list.querySelectorAll('.country-combo-opt[aria-selected="true"]')
+          .forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+      li.setAttribute('aria-selected', 'true');
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      list.classList.contains('hidden') ? open() : close();
+    });
+
+    list.querySelectorAll('.country-combo-opt').forEach(function (li) {
+      li.addEventListener('click', function () {
+        sel.value = li.getAttribute('data-value');
+        reflect(li);
+        close();
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('#country-combo')) close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+
+    // Pre-fill the button from the server-selected country (edit mode).
+    if (sel.value) {
+      var cur = list.querySelector('.country-combo-opt[data-value="' + sel.value + '"]');
+      if (cur) reflect(cur);
+    }
   })();
 </script>
 

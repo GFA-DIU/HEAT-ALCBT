@@ -60,3 +60,25 @@ _UNIT_DISPLAY_OP = {
 def display_unit_op(value):
     return _UNIT_DISPLAY_OP.get(value, value)
 
+
+
+@register.filter
+def has_gcca_image(label):
+    """True when a GCCA band has a label image on disk.
+
+    The band is read from the database and interpolated straight into a static
+    path, so a score the image set no longer covers renders a dead link.
+
+    This is not hypothetical. The scale was corrected from A-G to the published
+    AA-F and GCCA_label_G.svg was deleted with it, but any database not yet
+    re-rated by `apply_gcca_concrete_labels --overwrite` still holds "G" rows -
+    which is exactly the state after a deploy where that command has not been
+    run. Every concrete still labelled "G" would show a broken image in the
+    material picker.
+
+    Checked rather than assumed: whitenoise's CompressedManifestStaticFilesStorage
+    returns the plain URL for a file missing from the manifest instead of
+    raising, so this is a broken image and not a 500.
+    """
+    from pages.scripts.Label_mapping.gcca_rating import GCCA_BANDS
+    return label in GCCA_BANDS

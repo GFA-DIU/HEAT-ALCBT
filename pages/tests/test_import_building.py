@@ -614,7 +614,7 @@ class TestImportVentilationSystems:
                     "8",    # hours
                     "5",    # days
                     "52",   # weeks
-                    "0.5",  # power_input kW
+                    "250",  # power_input W per unit (-> 4 x 250 / 1000 = 1.0 kW)
                     "500",  # airflow
                     "cmh",  # unit
                     None,   # energy
@@ -651,7 +651,7 @@ class TestImportVentilationSystems:
                     "8",    # hours
                     "5",    # days
                     "52",   # weeks
-                    "0.75", # power_input
+                    "250",  # power_input W per unit (-> 3 x 250 / 1000 = 0.75 kW)
                     "600",  # airflow
                     "cmh",  # unit
                     None,   # energy
@@ -673,7 +673,7 @@ class TestImportVentilationSystems:
                     "10",   # hours
                     "6",    # days
                     "50",   # weeks
-                    "0.25", # power_input
+                    "250",  # power_input W per unit (-> 6 x 250 / 1000 = 1.5 kW)
                     "300",  # airflow
                     "cmh",  # unit
                     "3",    # stars
@@ -699,7 +699,7 @@ class TestImportVentilationSystems:
             "building_uuid": str(building.uuid),
             "systems": [
                 {"tab": "ahu", "rows": [["1","0.5","No","No","10","5","50","1000","cmh",None]]},
-                {"tab": "fcu", "rows": [["2","0.8","8","5","52","0.5","500","cmh",None]]},
+                {"tab": "fcu", "rows": [["2","0.8","8","5","52","250","500","cmh",None]]},  # 250 W/unit -> 0.5 kW
             ],
         })
         assert resp.status_code == 200

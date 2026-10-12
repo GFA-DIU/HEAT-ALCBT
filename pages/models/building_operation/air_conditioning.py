@@ -5,11 +5,40 @@ from pages.models.building import Building
 from pages.models.building_operation.chilling import RefrigerantGWP, RefrigerantType
 
 
+class EfficiencyMetric(models.TextChoices):
+    """Which efficiency figure the user read off their equipment label.
+
+    These are not interchangeable, and the difference is a factor of 3.412:
+
+      COP    dimensionless, W/W
+      ISEER  dimensionless, W/W - India's BEE defines it as CSTL/CSEC, so it
+             is already on the COP basis. A 5-star split AC is >= 5.30.
+      EER    Btu/h per watt on the Thai EGAT No.5 label, where the No.5
+             threshold is >= 11.60. This one does need converting.
+
+    Storing the choice matters as much as converting it: without it, re-opening
+    a saved record recomputes the energy against whatever the form defaults to,
+    silently changing a number the user never touched.
+    """
+
+    COP = "cop", _("COP (W/W)")
+    EER = "eer", _("EER (Btu/h per W)")
+    ISEER = "iseer", _("ISEER (W/W)")
+
+
 class PackagedACSubType(models.TextChoices):
+    """Forms a packaged or ductable unit actually takes.
+
+    Cassette is deliberately absent. A cassette is the ceiling-recessed indoor
+    unit of a split system - it blows straight into the room and has no
+    ductwork - so it is its own cooling type, not a kind of packaged unit.
+    Offering it in both places is what let the same equipment be filed two
+    different ways.
+    """
+
     ROOFTOP = "rooftop", _("Rooftop Unit")
     FLOOR_STANDING = "floor_standing", _("Floor-standing")
     DUCTABLE = "ductable", _("Ductable")
-    CASSETTE = "cassette", _("Cassette")
 
 
 class CoolingSystemAirConditioner(models.Model):
@@ -24,6 +53,7 @@ class CoolingSystemAirConditioner(models.Model):
         choices=[
             ("window", _("Window Air Conditioners")),
             ("split", _("Split Air Conditioners")),
+            ("cassette", _("Cassette / Ceiling-mounted Air Conditioners")),
             ("vrv", _("VRV/VRF (Variable Refrigerant Volume/Flow)")),
             ("packaged", _("Packaged/Ductable Air Conditioners")),
         ],
@@ -82,6 +112,17 @@ class CoolingSystemAirConditioner(models.Model):
         null=True,
         blank=True,
         verbose_name=_("EER / ISEER / COP"),
+    )
+    efficiency_metric = models.CharField(
+        max_length=10,
+        choices=EfficiencyMetric.choices,
+        default=EfficiencyMetric.COP,
+        # blank=True so the form falls back to the default instead of demanding
+        # the field; a default alone does not make a ModelForm field optional.
+        blank=True,
+        verbose_name=_("Efficiency metric"),
+        help_text=_("Which figure eer_iseer_cop holds. EER is the only one "
+                    "that needs converting to a COP."),
     )
     power_input_per_unit_kw = models.DecimalField(
         max_digits=8,

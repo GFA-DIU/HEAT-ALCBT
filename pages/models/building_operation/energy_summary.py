@@ -10,7 +10,8 @@ from pages.models.building_operation.chilling import CoolingSystemChiller
 from pages.models.building_operation.general_systems import LiftEscalatorSystem
 from pages.models.building_operation.hot_water import HotWaterSystem
 from pages.models.building_operation.lighting import LightingSystem
-from pages.models.building_operation.ventilation import VentilationSystem
+from pages.models.building_operation.ventilation import (
+    VentilationSystem, VentilationType)
 
 # Plug / equipment load as a fraction of the modelled system energy, used to
 # estimate plug load when there is no metered bill total to derive it by
@@ -112,21 +113,41 @@ class EnergySummary(models.Model):
         b = self.building
         had_any_before = self.any_components
 
-        # Cooling: AC units + chillers
+        # Cassette air conditioners are cooling equipment, but the ventilation
+        # form offered a "Ceiling/Wall Mounted Cassette AC" type and 106 records
+        # across 67 buildings were entered there - it is the most used
+        # ventilation type in the database. Their energy is computed exactly as
+        # the cooling form computes it (power x hours x days x weeks), so the
+        # figures are right; only the category was wrong, which put cooling
+        # energy into the ventilation line of every report and benchmark.
+        #
+        # They are counted as cooling here rather than physically moved,
+        # because CoolingSystemAirConditioner requires year_of_installation,
+        # refrigerant_type and refrigerant_quantity_kg, none of which the
+        # ventilation form collects. Moving the rows would mean inventing three
+        # values per record. Building totals are unaffected either way - this
+        # only decides which line the energy is reported on.
+        cassette_qs = VentilationSystem.objects.filter(
+            building=b, ventilation_type=VentilationType.CASSETTE_AC)
+        other_vent_qs = VentilationSystem.objects.filter(building=b).exclude(
+            ventilation_type=VentilationType.CASSETTE_AC)
+
+        # Cooling: AC units + chillers + cassette ACs filed under ventilation
         ac_qs = CoolingSystemAirConditioner.objects.filter(building=b)
         chiller_qs = CoolingSystemChiller.objects.filter(building=b)
-        if ac_qs.exists() or chiller_qs.exists():
+        if ac_qs.exists() or chiller_qs.exists() or cassette_qs.exists():
             ac_sum = ac_qs.aggregate(s=Sum("total_energy_consumption_kwh_per_year"))["s"] or 0
             ch_sum = chiller_qs.aggregate(s=Sum("total_energy_consumption_kwh_per_year"))["s"] or 0
-            self.cooling_kwh = ac_sum + ch_sum
+            cas_sum = cassette_qs.aggregate(
+                s=Sum("total_energy_consumption_kwh_per_year"))["s"] or 0
+            self.cooling_kwh = ac_sum + ch_sum + cas_sum
             self.is_manual_cooling = False
         elif not self.is_manual_cooling:
             self.cooling_kwh = None
 
-        # Ventilation
-        vent_qs = VentilationSystem.objects.filter(building=b)
-        if vent_qs.exists():
-            self.ventilation_kwh = vent_qs.aggregate(
+        # Ventilation: everything except the cassettes counted above
+        if other_vent_qs.exists():
+            self.ventilation_kwh = other_vent_qs.aggregate(
                 s=Sum("total_energy_consumption_kwh_per_year")
             )["s"] or 0
             self.is_manual_ventilation = False
@@ -143,16 +164,6 @@ class EnergySummary(models.Model):
         elif not self.is_manual_lighting:
             self.lighting_kwh = None
 
-        # Lift & Escalator
-        lift_qs = LiftEscalatorSystem.objects.filter(building=b)
-        if lift_qs.exists():
-            self.lift_escalator_kwh = lift_qs.aggregate(
-                s=Sum("annual_energy_consumption_kwh")
-            )["s"] or 0
-            self.is_manual_lift_escalator = False
-        elif not self.is_manual_lift_escalator:
-            self.lift_escalator_kwh = None
-
         # Hot water
         hw_qs = HotWaterSystem.objects.filter(building=b)
         if hw_qs.exists():
@@ -162,6 +173,43 @@ class EnergySummary(models.Model):
             self.is_manual_hot_water = False
         elif not self.is_manual_hot_water:
             self.hot_water_kwh = None
+
+        # Lift & Escalator.
+        #
+        # A figure the user actually entered always wins. Only when every lift
+        # record leaves it blank does BEAT fall back to the top-down estimate of
+        # 7.5% of the other modelled systems.
+        #
+        # Blank and zero mean different things here, which is why this checks for
+        # None rather than truthiness: blank means "estimate it for me", while an
+        # explicit 0 means "there is no lift energy" and is respected. Previously
+        # the estimate overwrote the entered value unconditionally, so a building
+        # whose other systems were all zero reported 0 kWh with no way to correct
+        # it, and the number of lifts appeared to do nothing.
+        #
+        # Computed AFTER the four systems above so their current values are
+        # available. Note the 7.5% method is driven by the other systems, not by
+        # how many lifts there are - the lift count is recorded for reference.
+        lift_qs = LiftEscalatorSystem.objects.filter(building=b)
+        if lift_qs.exists():
+            entered = [
+                Decimal(str(v)) for v in lift_qs.values_list(
+                    "annual_energy_consumption_kwh", flat=True
+                ) if v is not None
+            ]
+            if entered:
+                self.lift_escalator_kwh = sum(entered).quantize(Decimal("0.001"))
+            else:
+                base = sum(
+                    Decimal(str(v)) for v in [
+                        self.cooling_kwh, self.ventilation_kwh,
+                        self.lighting_kwh, self.hot_water_kwh,
+                    ] if v is not None
+                )
+                self.lift_escalator_kwh = (base * Decimal("0.075")).quantize(Decimal("0.001"))
+            self.is_manual_lift_escalator = False
+        elif not self.is_manual_lift_escalator:
+            self.lift_escalator_kwh = None
 
         # NB: a metered/bill total (total_override_kwh) is intentionally kept even
         # when system records exist — it is the authoritative bill figure and lets
@@ -202,19 +250,38 @@ class EnergySummary(models.Model):
 
     @property
     def total_kwh(self):
-        # A metered/bill total is authoritative and already includes plug loads.
+        """Annual building energy, including an estimated plug load.
+
+        A metered/bill total is authoritative and already includes plug loads.
+
+        Otherwise the plug load counts whether the user typed it or BEAT
+        estimated it. The screen shows the estimate on its own row labelled
+        "ESTIMATED", and previously the total quietly left it out - so a summary
+        reading 8 + 0.6 + 2.15 totalled 8.6, which looks like an arithmetic
+        error rather than a deliberate exclusion.
+        """
         if self.total_override_kwh is not None:
             return Decimal(str(self.total_override_kwh))
+        plug = self.plug_load_kwh
+        if plug is None:
+            plug = self.suggested_plug_load()
         vals = [
             self.cooling_kwh,
             self.ventilation_kwh,
             self.lighting_kwh,
             self.lift_escalator_kwh,
             self.hot_water_kwh,
-            self.plug_load_kwh,
+            plug,
         ]
         nums = [Decimal(str(v)) for v in vals if v is not None]
         return sum(nums) if nums else None
+
+    @property
+    def plug_load_is_estimated(self):
+        """True when the plug load in total_kwh came from the estimate."""
+        return (self.total_override_kwh is None
+                and self.plug_load_kwh is None
+                and self.suggested_plug_load() is not None)
 
     @property
     def any_components(self):

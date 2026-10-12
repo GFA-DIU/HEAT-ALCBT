@@ -204,6 +204,24 @@ class StructuralProduct(BaseProduct):
         AssemblyCategoryTechnique, on_delete=models.SET_NULL, null=True, blank=True
     )
     assembly = models.ForeignKey(Assembly, on_delete=models.CASCADE)
+    # A4/A5 upfront-carbon per-material overrides (null → use country + category default).
+    sourcing_scenario = models.CharField(
+        max_length=20, null=True, blank=True,
+        choices=[("local", "Local"), ("national", "National"), ("imported", "Imported")],
+        help_text="A4 transport sourcing scenario override (null = category default).",
+    )
+    waste_rate = models.DecimalField(
+        max_digits=5, decimal_places=4, null=True, blank=True,
+        help_text="A5 construction waste rate as a fraction, e.g. 0.05 (null = category default).",
+    )
+    a4_distance_km = models.DecimalField(
+        max_digits=8, decimal_places=1, null=True, blank=True,
+        help_text="A4 transport distance override in km (null = scenario default).",
+    )
+    a4_ef = models.DecimalField(
+        max_digits=8, decimal_places=5, null=True, blank=True,
+        help_text="A4 transport emission factor override, kg CO2e/tonne-km (null = country default).",
+    )
 
     def clean(self):
         """

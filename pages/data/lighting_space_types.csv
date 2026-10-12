@@ -1,0 +1,63 @@
+code,name,is_common,building_categories,sort_order,id_lux,id_lpd,notes
+COMMON_CORRIDOR,Corridor / Lobby,TRUE,,10,100,9.04,"SNI lobby 9.04; hotel 5.49, hospital corridor 7.64 merged here"
+COMMON_RECEPTION,Reception,TRUE,,11,300,7.97,SNI office 7.97; hotel reception 9.04
+COMMON_MEETING,Meeting room,TRUE,,12,300,7.53,Identical in SNI office and hotel
+COMMON_TOILET,Toilet / Bathroom,TRUE,,13,200,6.78,Identical across SNI residential/restaurant/airport/hospital
+COMMON_STAIRS,Stairs / Escalator,TRUE,,14,100,5.27,Identical across SNI residential/office/educational; airport escalator also 5.27
+COMMON_KITCHEN,Kitchen,TRUE,,15,250,7.53,Identical across SNI residential/restaurant/hotel
+COMMON_CAFETERIA,Cafeteria / Canteen,TRUE,,16,150,4.31,Identical across SNI restaurant/hotel/educational
+COMMON_STORAGE,Storage,TRUE,,17,50,3.88,SNI residential and office 3.88; house of worship 3.55
+COMMON_PARKING,Parking area,TRUE,,18,100,1.40,SNI office parking
+RES_LIVING,Living room,FALSE,"Homes,Apartments",20,150,4.41,
+RES_FAMILY,Family room,FALSE,"Homes,Apartments",21,100,4.41,
+RES_DINING,Dining room,FALSE,"Homes,Apartments",22,100,4.41,Hotel dining differs (7.53); see HOT_DINING
+RES_BEDROOM,Bedroom,FALSE,"Homes,Apartments",23,50,6.35,
+RES_STUDY,Study / Work room,FALSE,"Homes,Apartments",24,350,7.53,
+RES_LAUNDRY,Laundry,FALSE,"Homes,Apartments",25,200,5.70,
+RES_TERRACE,Terrace / Porch,FALSE,"Homes,Apartments",26,40,1.08,
+RES_GARAGE,Garage,FALSE,"Homes,Apartments",27,50,1.40,
+OFF_DIRECTOR,Director's room,FALSE,"Office,Office/Business",30,350,7.53,
+OFF_WORK,Work room / Open plan,FALSE,"Office,Office/Business",31,350,7.53,
+OFF_COMPUTER,Computer room,FALSE,"Office,Office/Business",32,150,7.53,
+OFF_DRAFTING,Drafting room,FALSE,"Office,Office/Business",33,750,15.00,
+OFF_ARCHIVE,Active archive room,FALSE,"Office,Office/Business",34,350,5.49,
+EDU_CLASSROOM,Classroom,FALSE,"Education,Educational",40,350,11.95,
+EDU_LIBRARY,Library reading room,FALSE,"Education,Educational",41,350,10.33,
+EDU_LAB,Laboratory,FALSE,"Education,Educational,Healthcare,Health care",42,500,12.16,Same value in SNI educational and hospital
+EDU_COMPUTER_LAB,Computer laboratory,FALSE,"Education,Educational",43,500,10.12,
+EDU_LANGUAGE_LAB,Language laboratory,FALSE,"Education,Educational",44,300,11.84,
+EDU_TEACHERS,Teachers' room,FALSE,"Education,Educational",45,300,7.53,
+EDU_SPORTS,Sports hall,FALSE,"Education,Educational",46,300,10.66,
+EDU_DRAWING,Drawing room,FALSE,"Education,Educational",47,750,13.67,
+EDU_AUDITORIUM,Auditorium,FALSE,"Education,Educational,Assembly",48,300,6.57,
+HOT_DINING,Dining room (hotel),FALSE,"Hotels,Hospitality,Resorts",50,250,7.53,
+HOT_BEDROOM,Guest bedroom,FALSE,"Hotels,Hospitality,Resorts",51,150,6.35,
+HOT_MULTIPURPOSE,Multipurpose room,FALSE,"Hotels,Hospitality,Resorts",52,250,6.35,
+RST_FAST_FOOD,Fast food restaurant,FALSE,"Retail,Shopping complex,Hotels,Hospitality",60,250,4.63,
+RST_FINE_DINING,Fine dining,FALSE,"Retail,Shopping complex,Hotels,Hospitality",61,30,9.26,SNI gives 30 lux for ambience
+RST_COFFEE,Coffee shop,FALSE,"Retail,Shopping complex,Hotels,Hospitality",62,100,4.63,
+RST_LOUNGE,Lounge,FALSE,"Retail,Shopping complex,Hotels,Hospitality",63,100,9.26,
+HOS_WAITING,Waiting room,FALSE,"Healthcare,Health care",70,200,7.64,
+HOS_STAFF_OFFICE,Staff office,FALSE,"Healthcare,Health care",71,350,7.64,
+HOS_INPATIENT,Inpatient room,FALSE,"Healthcare,Health care",72,350,7.32,
+HOS_RADIOLOGY,Radiology room,FALSE,"Healthcare,Health care",73,500,10.12,
+HOS_RECREATION,Recreation & rehabilitation room,FALSE,"Healthcare,Health care",74,250,13.45,
+HOS_DELIVERY,Delivery room,FALSE,"Healthcare,Health care",75,1000,15.07,
+HOS_PHARMACY,Pharmacy,FALSE,"Healthcare,Health care",76,750,17.76,
+HOS_OPERATING,Operating room,FALSE,"Healthcare,Health care",77,1000,24.33,
+RET_SALES_AREA,Sales area,FALSE,"Retail,Shopping complex",80,300,8.83,SNI small and large sales areas share this value
+RET_CASHIER,Cashier area,FALSE,"Retail,Shopping complex",81,300,8.83,
+RET_SPECIALIST,"Specialist store (clothing, jewellery, supermarket, toys)",FALSE,"Retail,Shopping complex",82,500,10.76,"SNI lists 7 such stores, all at 10.76"
+RET_GENERAL_STORE,"General store (bakery, florist, electronics, music)",FALSE,"Retail,Shopping complex",83,250,10.76,"SNI lists 4 such stores, all at 10.76"
+RET_SHOWROOM,Showroom with large objects,FALSE,"Retail,Shopping complex",84,500,10.76,
+AIR_TICKET,Ticket counter,FALSE,Assembly,90,300,5.49,
+AIR_IMMIGRATION,Immigration inspection area,FALSE,Assembly,91,300,5.49,
+AIR_GATE,Gate / waiting area,FALSE,Assembly,92,150,2.69,
+AIR_BAGGAGE,Baggage conveyor,FALSE,Assembly,93,200,4.20,
+AIR_ATM,ATM area,FALSE,Assembly,94,200,6.57,
+IND_EQUIPMENT,Equipment room,FALSE,Industrial,100,,8.18,SNI gives no illuminance for this space
+IND_MANUFACTURING,Detailed manufacturing area,FALSE,Industrial,101,,8.61,SNI gives no illuminance for this space
+IND_HIGH_BAY,Extra high bay area (>= 15.24 m),FALSE,Industrial,102,,15.28,SNI gives no illuminance for this space
+IND_WAREHOUSE,Warehouse,FALSE,Industrial,103,100,,SNI gives illuminance only; no LPD published
+WOR_MAIN_HALL,Main hall,FALSE,Assembly,110,,7.53,SNI gives no illuminance for this space
+WOR_OFFICE,Office / Work room,FALSE,Assembly,111,300,7.53,

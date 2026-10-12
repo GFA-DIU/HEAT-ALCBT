@@ -435,6 +435,7 @@ def search_epds(request):
         epd_data = {
             "id": str(epd.id),
             "name": epd.name,
+            "display_name": epd.display_name,
             "country": epd.country.name if epd.country else "Unknown",
             "country_code": epd.country.code2 if epd.country else None,
             "category": epd.category.name_en if epd.category else "Unknown",

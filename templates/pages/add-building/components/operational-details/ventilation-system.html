@@ -90,7 +90,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -99,10 +99,10 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 5000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'ahu')" />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity" onchange="recalcVentPowerAndEnergy(this.closest('form'),'ahu')">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -127,7 +127,7 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -180,13 +180,13 @@
     <fieldset class="fieldset">
       <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
-        <input type="number" name="number_of_units" placeholder="e.g. 50" required min="1" />
+        <input type="number" name="number_of_units" placeholder="e.g. 50" required min="1" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
       </label>
       <p class="validator-hint">{% translate "Must be at least 1" %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -195,10 +195,10 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 2000" min="1" required />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -207,7 +207,7 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -226,12 +226,20 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-3">
-      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Power input per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit." title="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 8" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <input type="number" name="power_input_per_unit" placeholder="e.g. 8" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
       <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-3">
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="power_input" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.01" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
     </fieldset>
 
     <div class="col-span-3 mt-3">
@@ -266,7 +274,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -275,10 +283,10 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 8000" min="1" required oninput="recalcVentPowerAndEnergy(this.closest('form'),'doas')" />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity" onchange="recalcVentPowerAndEnergy(this.closest('form'),'doas')">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -303,7 +311,7 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -371,7 +379,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -380,10 +388,10 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 3000" min="1" required />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -392,7 +400,7 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -411,12 +419,20 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-3">
-      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Power input per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit." title="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 12" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <input type="number" name="power_input_per_unit" placeholder="e.g. 12" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
       <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-3">
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="power_input" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.01" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
     </fieldset>
 
     <div class="col-span-3 mt-3">
@@ -451,7 +467,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
@@ -460,10 +476,10 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="airflow_rate" placeholder="e.g. 500" min="1" required />
-        <select class="select select-ghost focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
@@ -472,7 +488,7 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Annual operating schedule" %}<span class="text-[var(--state--error--base)]">*</span>
-        <span data-icon="info-custom-fill" data-size="20" data-color="var(--icon--disabled-300)"></span>
+        <span class="tooltip align-middle ml-1" data-tip="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all." title="Hours per day x days per week x weeks per year this system actually runs. An office is typically 10 x 5 x 48; a hotel or hospital runs closer to 24 x 7 x 52. Allow for holidays and shutdowns - 52 weeks means no downtime at all."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span>
       </legend>
       <div class="w-full flex gap-1.5 items-center">
         <div class="flex-1"><label class="input validator w-full">
@@ -491,12 +507,20 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-3">
-      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Power input per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit." title="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
-        <input type="number" name="power_input" placeholder="e.g. 2" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <input type="number" name="power_input_per_unit" placeholder="e.g. 2" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
       </label>
       <p class="validator-hint">{% translate "This field is required" %}</p>
+    </fieldset>
+
+    <fieldset class="fieldset col-span-3">
+      <legend class="fieldset-legend">{% translate "Total ventilation system power input" %} <span class="text-[var(--text--sub-600)]">({% translate "Auto-calculated" %})</span></legend>
+      <label class="input w-full bg-[var(--bg--weak-50)]">
+        <input type="number" name="power_input" placeholder="{% translate 'Auto-calculated' %}" min="0" step="0.01" readonly class="cursor-not-allowed" />
+        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      </label>
     </fieldset>
 
     <div class="col-span-3 mt-3">
@@ -550,6 +574,14 @@
     var eff      = effEl      ? parseFloat(effEl.value)      : NaN;
     var units    = unitsEl    ? parseFloat(unitsEl.value)    : NaN;
 
+    // Baseline efficiency is W per m³/h, so the airflow must be in m³/h too.
+    // The unit selector also offers CFM — convert it (1 ft³/min = 1.699 m³/h),
+    // otherwise a CFM entry understates fan power by that factor.
+    var capUnitEl = form.querySelector('[name="ventilation_capacity"]');
+    if (capUnitEl && capUnitEl.value === 'F3M' && !isNaN(airflow)) {
+      airflow = airflow * 1.699;
+    }
+
     // Recalculate power_input from airflow when all three inputs are present
     if (!isNaN(airflow) && !isNaN(eff) && !isNaN(units) && airflow > 0 && units > 0) {
       if (powerEl) powerEl.value = ((airflow * eff * units) / 1000).toFixed(2);
@@ -579,12 +611,31 @@
     energyEl.value = (power * hrs * days * weeks * vsdFactor * dcvFactor).toFixed(3);
   };
 
-  // FCU / Cassette / Fan: annual_energy = power_input × h × d × w
+  // FCU / Cassette / Fan:
+  //   total_power   = power_input_per_unit × units
+  //   annual_energy = total_power × h × d × w
+  //
+  // The form used to ask for "Total ventilation system power input" and ignore
+  // the unit count entirely, while still requiring it. Someone entering one
+  // fan's nameplate power alongside 50 units got a fiftieth of the real
+  // figure. Power is now asked per unit and the total derived, matching the
+  // AHU and DOAS forms and the cooling form.
+  //
+  // total_power_input_kw remains the stored field and still holds the total,
+  // so the 143 existing records keep their meaning.
   window.recalcVentSimpleEnergy = function(form) {
     if (!form) return;
     var powerEl  = form.querySelector('[name="power_input"]');
+    var perUnitEl = form.querySelector('[name="power_input_per_unit"]');
+    var unitsEl   = form.querySelector('[name="number_of_units"]');
     var energyEl = form.querySelector('[name="annual_energy_consumption"]');
     if (!powerEl || !energyEl) return;
+
+    var perUnit = parseFloat(perUnitEl ? perUnitEl.value : NaN);
+    var units   = parseFloat(unitsEl   ? unitsEl.value   : NaN);
+    if (!isNaN(perUnit) && !isNaN(units) && units > 0) {
+      powerEl.value = (perUnit * units).toFixed(2);
+    }
 
     var power = parseFloat(powerEl.value);
     var hrsEl   = form.querySelector('[name="operating_hours_per_day"]');
@@ -825,6 +876,11 @@
         sf('operating_days_per_week', system.workdays_per_week);
         sf('operating_weeks_per_year', system.workweeks_per_year);
         sf('power_input', system.total_power_input_kw);
+        // stored value is the total; the editable field is per unit
+        if (system.total_power_input_kw && system.number_of_units_installed) {
+          sf('power_input_per_unit', (Number(system.total_power_input_kw) /
+                                      Number(system.number_of_units_installed)).toFixed(2));
+        }
         sf('airflow_rate', system.air_flow_rate);
         sf('ventilation_capacity', system.ventilation_capacity);
         sf('annual_energy_consumption', system.total_energy_consumption_kwh_per_year);

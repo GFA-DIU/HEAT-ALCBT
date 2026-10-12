@@ -1,0 +1,197 @@
+{% load i18n %}
+{# Upfront Carbon (A4–A5) panel — collapsible components, subtotal in header, inline editing #}
+<details id="upfront-panel" data-building-id="{{ building.id }}"
+         class="w-full max-w-[68.75rem] my-4 border border-[var(--stroke--soft-200)] rounded-2xl bg-white">
+  <summary class="cursor-pointer select-none px-5 py-4 flex items-center gap-2 font-medium">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+         stroke-linecap="round" stroke-linejoin="round" style="color:var(--icon--sub-600)">
+      <path d="M1 4h13v10H1z"/><path d="M14 8h4l3 3v3h-7z"/><circle cx="5.5" cy="17" r="1.8"/><circle cx="17.5" cy="17" r="1.8"/>
+    </svg>
+    {% translate "Upfront Carbon (A4-A5): transport & construction waste" %}
+    <span class="text-xs text-[var(--text--sub-600)] font-normal">{% translate "click to view / edit" %}</span>
+  </summary>
+  <div id="upfront-body" class="px-5 pb-5">
+    <p class="text-sm text-[var(--text--sub-600)]">{% translate "Loading…" %}</p>
+  </div>
+</details>
+
+<style>
+  #upfront-body table.uf-table{width:100%;border-collapse:collapse;font-size:13px}
+  #upfront-body .uf-table th{font-size:11px;text-transform:uppercase;letter-spacing:.02em;
+    color:var(--text--sub-600);font-weight:600;padding:8px;border-bottom:1px solid var(--stroke--soft-200);text-align:right}
+  #upfront-body .uf-table th.l{text-align:left}
+  #upfront-body .uf-table td{padding:10px 8px;border-bottom:1px solid var(--stroke--soft-200);
+    text-align:right;vertical-align:middle}
+  #upfront-body .uf-table td.l{text-align:left}
+  #upfront-body .uf-table td.c{text-align:center}
+  #upfront-body .uf-name{font-weight:500;white-space:normal;word-break:break-word;line-height:1.3;max-width:26rem}
+  #upfront-body .uf-cat{font-size:11px;color:var(--text--sub-600);margin-top:2px}
+  #upfront-body .uf-num{white-space:nowrap;font-variant-numeric:tabular-nums}
+  #upfront-body .uf-grp td{background:var(--bg--weak-50);font-weight:600;text-align:left;cursor:pointer}
+  #upfront-body .uf-grp td.uf-num{text-align:right}
+  #upfront-body .uf-grp:hover td{background:var(--bg--soft-200)}
+  #upfront-body .uf-caret{display:inline-block;width:1em;color:var(--icon--soft-400);transition:transform .12s}
+  #upfront-body select.uf-src{min-width:8.5rem}
+  #upfront-body input.uf-in{width:4rem;text-align:right}
+  #upfront-body input.uf-w{width:3.4rem;text-align:right}
+  #upfront-body .uf-gear{background:none;border:none;cursor:pointer;color:var(--icon--soft-400);
+    padding:4px;border-radius:6px;display:inline-flex;line-height:0}
+  #upfront-body .uf-gear:hover{color:var(--icon--strong-950);background:var(--bg--weak-50)}
+  #upfront-body .uf-gear.open{color:var(--icon--strong-950)}
+  #upfront-body .uf-advrow td{background:var(--bg--weak-50);text-align:left;font-size:12px;color:var(--text--sub-600)}
+  #upfront-body .uf-advrow .lbl{font-weight:500;margin-right:2px}
+  #upfront-body .uf-info{color:var(--icon--soft-400);cursor:help;display:inline-flex;vertical-align:middle;margin-left:8px}
+</style>
+
+<script>
+(function(){
+  const root=document.getElementById('upfront-panel'); if(!root) return;
+  const body=document.getElementById('upfront-body');
+  const url='/building/'+root.dataset.buildingId+'/upfront/';
+  let state=null, loaded=false;
+
+  const GEAR='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    +'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/>'
+    +'<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 '
+    +'1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83'
+    +'l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82'
+    +'l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 '
+    +'1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+  const INFO='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+    +'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+
+  const num=(n,d=2)=>(n===null||n===undefined||isNaN(n))?'—':Number(n).toFixed(d);
+  const esc=(s)=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
+  function csrf(){return document.querySelector('[name=csrfmiddlewaretoken]')?.value||getCookie('csrftoken');}
+
+  function recalc(r){
+    if(r.mass_kg===null||r.mass_kg===undefined){r.a4=0;r.a5w=0;return;}
+    const fa=state.floor_area||1,t=r.mass_kg/1000,w=(r.waste_pct||0)/100;
+    r.a4=(t*(r.distance_km||0)*(r.ef||0))/fa;
+    r.a5w=w*((r.a1a3||0)+r.a4)+(r.mass_kg*w*state.disposal_ef)/fa;
+  }
+  function paintRow(i){const r=state.rows[i];
+    document.getElementById('uf-a4-'+i).textContent=num(r.a4,3);
+    document.getElementById('uf-a5w-'+i).textContent=num(r.a5w,3);}
+  function paintGroups(){(state._groups||[]).forEach(g=>{
+    let a1=0,a4=0,a5=0;g.idx.forEach(i=>{const r=state.rows[i];a1+=r.a1a3||0;a4+=r.a4||0;a5+=r.a5w||0;});
+    const set=(id,v,d)=>{const e=document.getElementById(id);if(e)e.textContent=num(v,d);};
+    set('uf-g-a1a3-'+g.g,a1,2);set('uf-g-a4-'+g.g,a4,3);set('uf-g-a5w-'+g.g,a5,3);});}
+  function paintTotals(){let a1=0,a4=0,a5=0;state.rows.forEach(r=>{a1+=r.a1a3||0;a4+=r.a4||0;a5+=r.a5w||0;});
+    document.getElementById('uf-t-a1a3').textContent=num(a1,1);
+    document.getElementById('uf-t-a4').textContent=num(a4,2);
+    document.getElementById('uf-t-a5w').textContent=num(a5,2);
+    document.getElementById('uf-t-up').textContent=num(a1+a4+a5,1);}
+
+  function matRows(r,i,g){
+    const massless=(r.mass_kg===null||r.mass_kg===undefined);
+    const opt=(v,sel)=>'<option value="'+v+'"'+(sel===v?' selected':'')+'>'+v+'</option>';
+    const dis=massless?'disabled':'';
+    const tip=r.scenario?('Overrides the “'+esc(r.scenario)+'” default'):'Auto default by material';
+    const main='<tr data-grp="'+g+'" data-kind="main" style="display:none"'+(massless?' data-massless="1"':'')+'>'
+      + '<td class="l" style="padding-left:24px"><div class="uf-name"'+(massless?' style="opacity:.55"':'')+'>'+esc(r.name)+'</div>'
+        + (r.category?'<div class="uf-cat">'+esc(r.category)+'</div>':'') + '</td>'
+      + '<td class="uf-num">'+num(r.a1a3,2)+'</td>'
+      + '<td class="l"><select data-i="'+i+'" data-f="scenario" class="select select-bordered select-sm uf-src" '+dis+'>'
+        + '<option value=""'+(r.scenario?'':' selected')+'>auto</option>'
+        + opt('local',r.scenario)+opt('national',r.scenario)+opt('imported',r.scenario)+'</select></td>'
+      + '<td class="uf-num" id="uf-a4-'+i+'">'+num(r.a4,3)+'</td>'
+      + '<td><input data-i="'+i+'" data-f="waste_pct" type="number" step="0.5" min="0" max="100" '
+        + 'value="'+r.waste_pct+'" class="input input-bordered input-sm uf-w" '+dis+'> %</td>'
+      + '<td class="uf-num" id="uf-a5w-'+i+'">'+num(r.a5w,3)+'</td>'
+      + '<td class="c">'+(massless?'':'<button type="button" class="uf-gear" data-adv="'+i+'" title="'
+        + '{% translate "Adjust distance / emission factor" %}">'+GEAR+'</button>')+'</td></tr>';
+    const adv='<tr class="uf-advrow" data-grp="'+g+'" data-kind="adv" id="adv-'+i+'" style="display:none"><td class="l" colspan="7" style="padding-left:24px">'
+      + '<span class="lbl">Distance (km):</span>'
+      + '<input data-i="'+i+'" data-f="distance_km" type="number" step="1" min="0" value="'+r.distance_km+'" class="input input-bordered input-sm uf-in" '+dis+'>'
+      + '<span class="lbl" style="margin-left:16px">EF (kg CO₂e/tonne-km):</span>'
+      + '<input data-i="'+i+'" data-f="ef" type="number" step="0.001" min="0" value="'+r.ef+'" class="input input-bordered input-sm uf-in" '+dis+'>'
+      + '<span class="uf-info" title="'+tip+'">'+INFO+'</span>'
+      + '</td></tr>';
+    return main+adv;
+  }
+
+  function render(){
+    const groups=[];let cur=null;
+    state.rows.forEach((r,i)=>{if(!cur||cur.name!==r.component){cur={name:r.component,g:groups.length,idx:[]};groups.push(cur);}cur.idx.push(i);});
+    state._groups=groups;
+
+    let html='<div class="text-xs text-[var(--text--sub-600)] mb-3" style="line-height:1.7">'
+      + '<div><b>A1-A3</b>: from the EPD (product stage, cradle-to-gate).</div>'
+      + '<div><b>A4</b>: transport of materials to the site.</div>'
+      + '<div><b>A5w</b>: construction / installation waste.</div>'
+      + '<div><b>Country</b>: '+esc(state.country)+' (GFA '+num(state.floor_area,0)+' m²) &mdash; sets the default transport distances and emission factors.</div>'.replace('&mdash;',':')
+      + '<div><b>Sourcing scenario</b>: Local / National / Imported &ndash; chooses the transport distance and EF for each material; use the gear icon to fine-tune.</div>'.replace('&ndash;',':')
+      + '<div>All values are kg CO₂e/m². Click a component to expand its materials.</div>'
+      + '</div>';
+    html+='<div style="overflow-x:auto"><table class="uf-table"><thead><tr>'
+      + '<th class="l">{% translate "Component / material" %}</th><th>A1-A3</th><th class="l">{% translate "Sourcing" %}</th>'
+      + '<th>A4</th><th>{% translate "Waste" %}</th><th>A5w</th><th></th></tr></thead><tbody>';
+    groups.forEach(g=>{
+      html+='<tr class="uf-grp" data-grp="'+g.g+'"><td class="l"><span class="uf-caret">▸</span> '+esc(g.name)+'</td>'
+        + '<td class="uf-num" id="uf-g-a1a3-'+g.g+'"></td><td></td>'
+        + '<td class="uf-num" id="uf-g-a4-'+g.g+'"></td><td></td>'
+        + '<td class="uf-num" id="uf-g-a5w-'+g.g+'"></td><td></td></tr>';
+      g.idx.forEach(i=>{ html+=matRows(state.rows[i],i,g.g); });
+    });
+    html+='</tbody><tfoot>'
+      + '<tr style="font-weight:600;border-top:2px solid var(--stroke--soft-200)"><td class="l">{% translate "TOTAL (kg CO₂e/m²)" %}</td>'
+      + '<td class="uf-num" id="uf-t-a1a3"></td><td></td><td class="uf-num" id="uf-t-a4"></td><td></td><td class="uf-num" id="uf-t-a5w"></td><td></td></tr>'
+      + '<tr style="font-weight:700"><td class="l" colspan="5" style="text-align:right">{% translate "Upfront A1–A5" %}</td>'
+      + '<td class="uf-num" id="uf-t-up"></td><td></td></tr></tfoot></table></div>';
+    html+='<div class="flex items-center gap-3 mt-3"><button id="uf-save" class="btn btn-primary btn-sm">{% translate "Save changes" %}</button>'
+      + '<span id="uf-msg" class="text-sm text-[var(--text--sub-600)]"></span></div>';
+    body.innerHTML=html;
+    paintTotals();paintGroups();
+
+    // collapsible component sections (collapsed by default)
+    body.querySelectorAll('tr.uf-grp').forEach(h=>h.addEventListener('click',()=>{
+      const g=h.dataset.grp, caret=h.querySelector('.uf-caret');
+      const open=caret.textContent.trim()!=='▸'; const now=!open;
+      caret.textContent=now?'▾':'▸';
+      body.querySelectorAll('tr[data-grp="'+g+'"][data-kind="main"]').forEach(tr=>tr.style.display=now?'table-row':'none');
+      if(!now){ body.querySelectorAll('tr[data-grp="'+g+'"][data-kind="adv"]').forEach(tr=>tr.style.display='none');
+        body.querySelectorAll('tr[data-grp="'+g+'"][data-kind="main"] .uf-gear').forEach(b=>b.classList.remove('open')); }
+    }));
+    body.querySelectorAll('.uf-gear').forEach(b=>b.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      const row=document.getElementById('adv-'+b.dataset.adv);
+      if(row){const show=row.style.display==='none';row.style.display=show?'table-row':'none';b.classList.toggle('open',show);}
+    }));
+    body.querySelectorAll('input[data-f], select[data-f]').forEach(el=>{
+      el.addEventListener('input',()=>{
+        const i=+el.dataset.i,f=el.dataset.f,r=state.rows[i];
+        if(f==='scenario'){r.scenario=el.value;
+          if(el.value&&state.scenario_defaults[el.value]){const sd=state.scenario_defaults[el.value];
+            r.distance_km=sd.distance_km;r.ef=sd.ef;
+            const di=body.querySelector('input[data-i="'+i+'"][data-f="distance_km"]');
+            const ei=body.querySelector('input[data-i="'+i+'"][data-f="ef"]');
+            if(di)di.value=sd.distance_km; if(ei)ei.value=sd.ef;}
+          const info=body.querySelector('#adv-'+i+' .uf-info');
+          if(info)info.title=el.value?('Overrides the “'+el.value+'” default'):'Auto default by material';
+        } else { r[f]=parseFloat(el.value); }
+        recalc(r);paintRow(i);paintGroups();paintTotals();
+        document.getElementById('uf-msg').textContent='{% translate "unsaved changes" %}';
+      });
+    });
+    document.getElementById('uf-save').addEventListener('click',save);
+  }
+
+  function save(){
+    const overrides=state.rows.map(r=>({id:r.id,scenario:r.scenario||'',distance_km:r.distance_km,ef:r.ef,waste_pct:r.waste_pct}));
+    const btn=document.getElementById('uf-save');btn.disabled=true;
+    document.getElementById('uf-msg').textContent='{% translate "Saving…" %}';
+    fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':csrf()},body:JSON.stringify({overrides})})
+      .then(r=>r.json()).then(d=>{btn.disabled=false;
+        if(d.success){state.rows=d.rows;render();
+          document.getElementById('uf-msg').textContent='{% translate "Saved ✓ (reload the page to update the dashboard totals)" %}';
+        } else {document.getElementById('uf-msg').textContent=d.error||'Error';}
+      }).catch(()=>{btn.disabled=false;document.getElementById('uf-msg').textContent='Error';});
+  }
+  function load(){if(loaded)return;loaded=true;
+    fetch(url).then(r=>r.json()).then(d=>{if(!d.success){body.innerHTML='<p class="text-sm">'+(d.error||'Error')+'</p>';return;}state=d;render();})
+      .catch(()=>{body.innerHTML='<p class="text-sm">Error loading breakdown</p>';});}
+  root.addEventListener('toggle',()=>{if(root.open)load();});
+})();
+</script>

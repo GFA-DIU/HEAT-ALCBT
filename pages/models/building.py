@@ -44,6 +44,11 @@ class HeatingType(models.TextChoices):
 class CoolingType(models.TextChoices):
     WINDOW_AC = "window-ac", "Window air conditioners"
     SPLIT_AC = "split-ac", "Split air conditioners"
+    # A cassette is the ceiling-mounted indoor unit of a split system, not a
+    # packaged or ductable unit. It used to be reachable only as a sub-type of
+    # "Packaged/Ductable", where nobody looked - which is why 106 of them were
+    # entered on the ventilation form instead.
+    CASSETTE_AC = "cassette-ac", "Cassette / ceiling-mounted air conditioners"
     VRF_SYSTEM = "vrf-system", "Variable refrigerant flow (VRF) systems"
     PACKAGED_AC = "packaged-ac", "Packaged/Ductable air conditioners"
     CHILLER_WATER = "chiller-water", "Chiller system - Water cooled chiller"

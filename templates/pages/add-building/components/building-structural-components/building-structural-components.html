@@ -272,7 +272,7 @@
             <select name="country" class="select min-w-[120px]">
               <option value="">{% translate "All Countries" %}</option>
               {% for country in countries %}
-                <option value="{{ country.id }}"> <span data-country="{{ country.name }}" data-size="16" data-color="var(--icon--soft-400)"></span> {{ country.name }}</option>
+                <option value="{{ country.id }}">{{ country.name }}</option>
               {% endfor %}
             </select>
             <input type="hidden" name="dimension" id="epd_filter_dimension" value="area" />
@@ -456,7 +456,7 @@
             <select name="country" class="select min-w-[120px]">
               <option value="">{% translate "All Countries" %}</option>
               {% for country in countries %}
-                <option value="{{ country.id }}"> <span data-country="{{ country.name }}" data-size="16" data-color="var(--icon--soft-400)"></span> {{ country.name }}</option>
+                <option value="{{ country.id }}">{{ country.name }}</option>
               {% endfor %}
             </select>
           </div>
@@ -550,6 +550,9 @@
   };
 
   // "dimension (unit)" labels so the unit selector + quantity field are self-explanatory.
+  // Building pk (NOT uuid) - the building page URL uses the primary key.
+  var uploadedBuildingId = "{{ building_id|default_if_none:'' }}";
+
   var UNIT_LABEL = {
     kg: "Mass (kg)", ton: "Mass (ton)", m3: "Volume (m³)",
     m2: "Area (m²)", m: "Length (m)", pcs: "Quantity (pcs)", unknown: "Layers (#)",
@@ -656,6 +659,39 @@
         e.target.classList.remove('select-error');
       });
     });
+
+    // Sourcing segmented control: clicking a button sets its group's hidden
+    // .material-scenario value and highlights the active option. Delegated once
+    // so it works for both server-rendered rows and dynamically added ones.
+    // Gear toggles the per-material A4 distance / EF detail row.
+    if (!this._a4GearDelegated) {
+      this._a4GearDelegated = true;
+      document.addEventListener('click', (e) => {
+        const g = e.target.closest('.a4-gear');
+        if (!g) return;
+        e.preventDefault();
+        const det = g.closest('details')?.querySelector('.a4-detail');
+        if (det) det.classList.toggle('hidden');
+      });
+    }
+
+    if (!this._scenarioDelegated) {
+      this._scenarioDelegated = true;
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.scenario-opt');
+        if (!btn) return;
+        const group = btn.closest('.scenario-group');
+        if (!group) return;
+        const hidden = group.querySelector('.material-scenario');
+        if (hidden) hidden.value = btn.dataset.value || '';
+        group.querySelectorAll('.scenario-opt').forEach(b => {
+          const on = b === btn;
+          b.classList.toggle('btn-primary', on);
+          b.classList.toggle('btn-outline', !on);
+          b.classList.toggle('border-[var(--stroke--soft-200)]', !on);
+        });
+      });
+    }
   }
 
   loadCategories() {
@@ -976,6 +1012,14 @@
         unit: li.querySelector('.material-unit-value')?.value || li.querySelector('.material-unit')?.dataset?.unit || '',
         available_units: availableUnits,
         category: li.querySelector('.material-category')?.value || '',
+        scenario: li.querySelector('.material-scenario')?.value || '',
+        waste_rate: (function(){
+          const w = parseFloat(li.querySelector('.material-waste')?.value);
+          return isNaN(w) ? '' : (w / 100);   // UI is % → store as fraction
+        })(),
+        // A4 fine-tuning (blank → scenario default at calc time)
+        a4_distance_km: li.querySelector('.material-a4-distance')?.value || '',
+        a4_ef: li.querySelector('.material-a4-ef')?.value || '',
         timestamp: timestamp
       };
       console.log(`[collectMaterials] Material collected:`, material);
@@ -1149,6 +1193,22 @@
       const availableUnits = (m.available_units && m.available_units.length) ? m.available_units : [m.unit];
       li.dataset.availableUnits = availableUnits.join(',');
 
+      // Fall back to a declared unit ONLY when the saved unit is genuinely empty.
+      // 'unknown' must NOT be treated as missing: for an m²-declared EPD in an AREA
+      // assembly, get_epd_dimension_info() deliberately returns Unit.UNKNOWN meaning
+      // "Number of layers" (UNIT_LABEL.unknown = "Layers (#)"). Overriding it with the
+      // declared unit both hid that label and would rewrite input_unit on save,
+      // silently changing the calculation.
+      const _realUnits = availableUnits.filter(u => u && u !== 'unknown');
+      const effUnit = m.unit ? m.unit : (_realUnits[0] || 'unknown');
+
+      // Country flag: renderMaterials had none, so re-rendered rows lost their flag even
+      // when the EPD has a country. Mirror _selected_material.html. Skip 'Unknown' so the
+      // registry doesn't fall back to an "earth" globe.
+      const _hasCountry = m.country && m.country !== 'Unknown';
+      const countryFlag    = _hasCountry ? `<span data-country="${m.country}" data-width="16"></span>` : '';
+      const countryFlagBox = _hasCountry ? `<span data-country="${m.country}" data-width="20"></span>` : '';
+
       // Unit cell: a dropdown only when the EPD supports >1 convertible unit (BoQ mode);
       // otherwise a locked label. Options come from EPD.get_available_units() so the calc
       // can always convert the chosen unit — no maths change.
@@ -1161,10 +1221,10 @@
         ? `<select class="material-unit-value select select-ghost select-xs text-xs shrink-0" style="width:auto;min-width:2.9rem;padding-left:0.35rem;padding-right:1.1rem;" title="${i18n.unit || 'Switch unit'}" onchange="structuralManager.onMaterialUnitChange(this)">
              ${availableUnits.map(u => `<option value="${u}" ${u === m.unit ? 'selected' : ''}>${unitSymbol(u)}</option>`).join('')}
            </select>`
-        : `<span class="text-xs text-[var(--text--sub-600)] material-unit shrink-0" data-unit="${m.unit}">${unitSymbol(m.unit)}</span>
-           <input type="hidden" class="material-unit-value" value="${m.unit}" />`;
+        : `<span class="text-xs text-[var(--text--sub-600)] material-unit shrink-0" data-unit="${effUnit}">${unitSymbol(effUnit)}</span>
+           <input type="hidden" class="material-unit-value" value="${effUnit}" />`;
       const qtyUnit = `<label class="input" style="flex:1 1 0;min-width:0;">
-            <input type="number" value="${m.quantity || ''}" placeholder="${UNIT_LABEL[m.unit] || i18n.qty}" class="material-quantity w-full" step="0.01" min="0" />
+            <input type="number" value="${m.quantity || ''}" placeholder="${UNIT_LABEL[effUnit] || i18n.qty}" class="material-quantity w-full" step="0.01" min="0" />
             ${unitInline}
           </label>`;
 
@@ -1195,11 +1255,15 @@
       li.innerHTML = `
         <div class="flex items-center justify-between mb-2 w-full">
           <span class="text-sm/5 font-medium truncate flex-1">${m.name}</span>
-          ${genericBadge}
-          ${localBadge}
+          <div class="flex items-center gap-2 shrink-0">
+            ${genericBadge}
+            ${localBadge}
+            ${countryFlag}
+          </div>
         </div>
         <div class="flex items-stretch bg-[var(--bg--white-0)] rounded-xl p-2.5" style="gap:0.5rem;">
           <div class="bg-[var(--bg--weak-50)] px-1 flex items-center shrink-0 rounded-[var(--radius-6)]">
+            ${countryFlagBox}
           </div>
           <label class="input" style="flex:2 1 0;min-width:100px;">
             <input type="text" value="${m.description || ''}" placeholder="${i18n.addDescription}" class="material-description w-full" />
@@ -1218,6 +1282,41 @@
             <span data-icon="delete-bin-5-line" data-size="20" data-color="var(--icon--strong-950)"></span>
           </button>
         </div>
+        ${(mode === 'boq' || mode === 'component') ? `
+        <details class="mt-2 text-xs">
+          <summary class="cursor-pointer text-[var(--text--sub-600)] select-none">Transport &amp; waste (A4–A5)</summary>
+          <div class="flex items-center gap-3 mt-2 flex-wrap">
+            <label class="flex items-center gap-1"><span class="text-[var(--text--sub-600)]">Sourcing</span>
+              <span class="join scenario-group">
+                <input type="hidden" class="material-scenario" value="${m.scenario||''}" />
+                <button type="button" class="join-item btn btn-xs scenario-opt ${(m.scenario||'')===''?'btn-primary':'btn-outline border-[var(--stroke--soft-200)]'}" data-value="" title="Country + material default (RICS)">Auto</button>
+                <button type="button" class="join-item btn btn-xs scenario-opt ${m.scenario==='local'?'btn-primary':'btn-outline border-[var(--stroke--soft-200)]'}" data-value="local" title="Local sourcing (~50 km)">Local</button>
+                <button type="button" class="join-item btn btn-xs scenario-opt ${m.scenario==='national'?'btn-primary':'btn-outline border-[var(--stroke--soft-200)]'}" data-value="national" title="National sourcing (~300 km)">National</button>
+                <button type="button" class="join-item btn btn-xs scenario-opt ${m.scenario==='imported'?'btn-primary':'btn-outline border-[var(--stroke--soft-200)]'}" data-value="imported" title="Imported (sea + inland)">Imported</button>
+              </span>
+            </label>
+            <label class="flex items-center gap-1"><span class="text-[var(--text--sub-600)]">Waste</span>
+              <input type="number" class="material-waste input input-xs" style="width:4rem" min="0" max="100" step="0.5" placeholder="auto"
+                     value="${(m.waste_rate!==null&&m.waste_rate!==undefined&&m.waste_rate!=='')?(parseFloat(m.waste_rate)*100):''}" />
+              <span class="text-[var(--text--sub-600)]">%</span>
+            </label>
+            <button type="button" class="btn btn-xs btn-ghost a4-gear" title="Adjust distance / emission factor">&#9881;</button>
+            ${uploadedBuildingId ? `<a href="/building/${uploadedBuildingId}/#upfront-panel" target="_blank" rel="noopener"
+                 class="text-[10px] underline text-[var(--state--information--base)]"
+                 title="Open the full A4-A5 panel with A1-A3, mass and computed A4/A5w">Open full A4&ndash;A5 panel &#8599;</a>` : ''}
+          </div>
+          <div class="a4-detail hidden flex items-center gap-3 mt-2 flex-wrap">
+            <label class="flex items-center gap-1"><span class="text-[var(--text--sub-600)]">Distance (km)</span>
+              <input type="number" class="material-a4-distance input input-xs" style="width:5rem" min="0" step="1" placeholder="auto"
+                     value="${(m.a4_distance_km!==null&&m.a4_distance_km!==undefined)?m.a4_distance_km:''}" />
+            </label>
+            <label class="flex items-center gap-1"><span class="text-[var(--text--sub-600)]">EF (kgCO&#8322;e/tonne&#8209;km)</span>
+              <input type="number" class="material-a4-ef input input-xs" style="width:5.5rem" min="0" step="0.001" placeholder="auto"
+                     value="${(m.a4_ef!==null&&m.a4_ef!==undefined)?m.a4_ef:''}" />
+            </label>
+            <span class="text-[10px] text-[var(--text--sub-600)]">Blank = scenario default</span>
+          </div>
+        </details>` : ''}
       `;
 
       // Set the saved category value after inserting into DOM

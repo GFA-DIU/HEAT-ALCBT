@@ -58,6 +58,12 @@ class SelectedEPD:
 class FilteredEPD:
     id: str
     name: str
+    # The composed label (material - product - maker). The templates render
+    # this and keep `name` on hover; it has to be carried explicitly because
+    # this is a dataclass, not the EPD model - a missing attribute here renders
+    # as an empty string rather than raising, which is how the material picker
+    # silently lost every name.
+    display_name: str
     type: str
     country: str
     category: Optional[str]
@@ -121,6 +127,7 @@ class LazyProcessor:
         return FilteredEPD(
             id=epd.pk,
             name=epd.name,
+            display_name=epd.display_name,
             type=epd.type,
             country=epd.country.name if epd.country else "",
             category=epd.category.name_en if epd.category else None,

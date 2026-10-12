@@ -254,8 +254,11 @@ def test_totals_and_lifetime(create_building, setup_grid):
     EnergySummary.objects.create(building=building, lift_escalator_kwh=Decimal("1000"))
 
     result = get_operational_savings_measures(building)
-    # baseline_total = 5.0; lifetime = 5.0 * 50 = 250
-    assert result["baseline_total"] == 5.0
-    assert result["baseline_total_lifetime"] == 250
+    # lift = 1000 kWh -> 5.0 kgCO2eq/m2/yr, plus an estimated plug load of 20%
+    # of the modelled systems (200 kWh -> 1.0). The plug load carries into the
+    # optimised total unchanged: BEAT has no measure for it, so it must not
+    # appear as a saving. baseline 6.0, lifetime 6.0 * 50 = 300.
+    assert result["baseline_total"] == 6.0
+    assert result["baseline_total_lifetime"] == 300
     assert result["reduction_pct"] > 0
     assert result["optimized_total"] < result["baseline_total"]
