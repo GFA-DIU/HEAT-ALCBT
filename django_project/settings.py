@@ -39,8 +39,16 @@ SECRET_KEY = os.environ.get(
 IS_HEROKU_APP = "DYNO" in os.environ and not "CI" in os.environ
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# Both branches assign DEBUG. The else used to be missing, which left the name
+# undefined on a dyno - Django still read False from its own defaults, so the
+# app ran, but any later line in this module referring to the bare name DEBUG
+# raised NameError during collectstatic and rejected the build. That is a
+# production-only failure no local run or test can reach, because every one of
+# them takes the other branch.
 if not IS_HEROKU_APP:
     DEBUG = True
+else:
+    DEBUG = False
 
 # When True, Django will automatically append a trailing slash to URLs
 # that are requested without one if a matching URL pattern exists with a slash.
