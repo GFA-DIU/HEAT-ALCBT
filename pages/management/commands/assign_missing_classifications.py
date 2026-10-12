@@ -60,6 +60,27 @@ _NAME_TO_TAG = {
 }
 
 
+# Keyword fallback for free-text BOQ names that don't exactly match a key above.
+# Checked ONLY after exact match misses. First hit wins, so order = priority
+# (most specific first). Classification is display-only (does NOT affect carbon),
+# so a best-effort keyword tag is strictly better than leaving "No category".
+# Deliberately conservative: obvious test rows ("Test", "Hello World", "????")
+# match nothing and stay skipped rather than being mis-assigned.
+_KEYWORD_RULES = [
+    ("roof", "060"),                                             # 060 Roof
+    ("railing", "140"), ("balustrade", "140"), ("handrail", "140"),  # 140 Misc
+    ("white wash", "120"), ("whitewash", "120"), ("paint", "120"),   # 120 Finishes
+    ("plaster", "120"), ("render", "120"), ("mortar", "120"),
+    ("ceramic", "120"), ("tile", "120"), ("floor finish", "120"),
+    ("gypsum", "120"), ("screed", "120"),
+    ("floor construction", "040"),                              # 040 Beams & Slabs
+    ("weld mesh", "040"), ("reinforc", "040"), ("rebar", "040"),
+    ("lintel", "040"), ("concrete", "040"), ("rcc", "040"),
+    ("m20", "040"), ("m25", "040"), ("m30", "040"),
+    ("slab", "040"), ("beam", "040"), ("column", "040"),
+]
+
+
 def _tag_for(assembly_name, epd_name):
     name = (assembly_name or "").strip().lower()
     if name == "openings":
@@ -69,7 +90,13 @@ def _tag_for(assembly_name, epd_name):
         if "door" in e or "plywood" in e:
             return "110"
         return "140"
-    return _NAME_TO_TAG.get(name)
+    tag = _NAME_TO_TAG.get(name)
+    if tag is not None:
+        return tag
+    for kw, kw_tag in _KEYWORD_RULES:      # keyword fallback (substring, priority order)
+        if kw in name:
+            return kw_tag
+    return None
 
 
 class Command(BaseCommand):
