@@ -70,3 +70,6 @@ outputs/
 .claude/
 HANDOVER.md
 .epd_pdfs/
+
+# production database backups - never commit
+beat_backup_*.dump
