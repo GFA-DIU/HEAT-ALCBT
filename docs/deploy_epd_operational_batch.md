@@ -1,6 +1,10 @@
 # Deployment runbook — EPD catalogue + operational carbon batch
 
-For the work on `rohit-qa` in PR #593 (commits `0c36ccf`..`546c612`).
+For PR #593. **This is wider than it looks.** `qa` sits at migration
+`0051`; `rohit-qa` carries **36 commits and nine migrations** (0052–0060),
+including work from earlier sessions — the A4/A5 scope, the lighting space
+types and the per-country EPD uniqueness key — not only the EPD catalogue
+and operational carbon batch.
 
 > **Merging this PR is a release.** `qa` is the live tool at
 > beat-alcbt.gggi.org. There is no staging step after it. Treat the merge
@@ -60,7 +64,7 @@ git merge --no-ff rohit-qa
 git push origin qa
 ```
 
-Heroku deploys and runs migrations `0056`–`0060` in the release phase. Watch it:
+Heroku deploys and runs migrations `0052`–`0060` in the release phase. Watch it:
 
 ```bash
 heroku logs --tail --app <app>
@@ -71,7 +75,7 @@ rejected and the old code keeps serving — that is the behaviour you want.
 
 ```bash
 heroku run python manage.py showmigrations pages --app <app> | tail -8
-# 0056 … 0060 should all read [X]
+# 0052 … 0060 should all read [X]
 ```
 
 ---
@@ -163,11 +167,12 @@ heroku releases --app <app>
 heroku releases:rollback vNNN --app <app>
 ```
 
-**Schema needs reverting.** The four migrations only add nullable columns and
-choice-list entries:
+**Schema needs reverting.** `qa` is currently at `0051`, so this merge brings **nine** migrations,
+0052 through 0060. They add nullable columns, choice-list entries and a
+few new tables:
 
 ```bash
-heroku run python manage.py migrate pages 0055 --app <app>
+heroku run python manage.py migrate pages 0051 --app <app>
 ```
 
 **A data command did the wrong thing.** All four are idempotent, so re-running
