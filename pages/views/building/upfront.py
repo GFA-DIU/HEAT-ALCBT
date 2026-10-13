@@ -63,7 +63,13 @@ def _rows_and_totals(building):
                 "a1a3": round(a1a3, 3),
                 "scenario": meta["scenario"],
                 "distance_km": meta["distance_km"],
-                "ef": meta["ef"],
+                # One entry per transport mode. There is deliberately no single
+                # "ef" field: a blended factor across a sea leg and a road leg
+                # is not a property of anything, and reading it as one made the
+                # factor look like it fell as distance rose.
+                "legs": meta["legs"],
+                "legs_text": meta["legs_text"],
+                "kgco2e_per_tonne": meta["kgco2e_per_tonne"],
                 "waste_pct": round(meta["waste_rate"] * 100, 2),
                 "a4": round(float(a4), 3),
                 "a5w": round(float(a5w), 3),
@@ -73,9 +79,17 @@ def _rows_and_totals(building):
             t_a1a3 += a1a3; t_a4 += float(a4); t_a5w += float(a5w)
     totals = {"a1a3": round(t_a1a3, 2), "a4": round(t_a4, 2), "a5w": round(t_a5w, 2),
               "upfront": round(t_a1a3 + t_a4 + t_a5w, 2)}
-    # scenario→(distance,ef) defaults for this country, so the UI can prefill on change
-    sdef = {k: dict(zip(("distance_km", "ef"), D.scenario_distance_ef(k, country_name)))
-            for k in ("local", "national", "imported")}
+    # scenario → journey defaults for this country, so the UI can prefill on change
+    sdef = {}
+    for k in ("local", "national", "imported"):
+        legs = D.scenario_legs(k, country_name)
+        sdef[k] = {
+            "label": D.SCENARIOS[k]["label"],
+            "legs": legs,
+            "legs_text": D.describe_legs(legs),
+            "distance_km": D.scenario_total_km(legs),
+            "kgco2e_per_tonne": round(D.legs_tonne_km_co2(legs), 4),
+        }
     return rows, totals, floor_area, country_name, sdef
 
 

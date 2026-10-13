@@ -12,8 +12,24 @@ testable locally. Refine against source at build-out:
   - Distances & waste rates: RICS WLCA 2nd ed. Table 17 (transport) & Table 18 (waste)
 
 Method (see docs/a4_a5_upfront_carbon_scope.md):
-  A4  = (mass_kg/1000) x distance_km x EF_mode         [tonne-km; EF already embeds load + empty running]
+  A4  = (mass_kg/1000) x SUM(leg_km x leg_ef)          [tonne-km; EF embeds load + empty running]
   A5w = waste_frac x (A1A3 + A4)  +  wasted_mass x disposal_EF
+
+Why A4 is modelled as legs
+--------------------------
+A journey is not one vehicle. "Imported" is a ship followed by a truck, and a
+national haul in India is largely rail followed by a truck. Each mode has its
+own emission factor, so the only honest model is a list of legs summed
+together.
+
+An earlier version collapsed every scenario into one distance and one
+"blended" factor. That produced the reading that **the emission factor falls as
+distance rises** — India showed 0.070 for a 50 km local haul and 0.01286 for a
+3,150 km import. Nothing was wrong with the arithmetic (sea freight really is
+about seven times cleaner per tonne-km than road, so an average dominated by a
+3,000 km sea leg sits near the sea figure), but the number on screen was a
+weighted average of two different vehicles and was not a property of anything
+real. Legs are reported separately now, and no blended figure is shown.
 """
 
 # --- Freight emission factors, kg CO2e per tonne-km (well-to-wheel) -----------
@@ -27,12 +43,42 @@ COUNTRY_TRANSPORT_EF = {
 }
 DEFAULT_TRANSPORT_EF = {"road": 0.100, "rail": 0.025, "sea": 0.010, "source": "GLEC v3 default"}
 
-# --- Sourcing scenarios → distance (km) + mode (RICS Table 17 style) ----------
-# 'imported' has a sea leg (origin→nearest port) + inland road leg.
+# --- Share of a NATIONAL land haul carried by rail ----------------------------
+# ⚠️ ASSUMPTION, not sourced. These shares are judgement about how much of a
+# ~300 km domestic freight movement realistically goes by rail rather than road,
+# and they are the least defensible numbers in this file. They matter: India's
+# rail factor (0.008) is roughly a ninth of its road factor (0.070), so the
+# share moves A4 for every nationally-sourced material.
+#
+# Rationale for the current values, to be replaced with real modal-split data:
+#   India      0.60  dedicated freight corridors; cement and steel move by rail
+#   Thailand   0.30  rail freight exists but road dominates
+#   Vietnam    0.20  north-south line used for bulk, limited capacity
+#   Indonesia  0.10  archipelago; rail freight is Java-only and marginal
+#   Cambodia   0.00  negligible rail freight — treat as all road
+#
+# Local and imported hauls use no rail: a 50 km local delivery and the inland
+# leg off a port are both road in practice.
+NATIONAL_RAIL_SHARE = {
+    "India": 0.60,
+    "Thailand": 0.30,
+    "Vietnam": 0.20,
+    "Indonesia": 0.10,
+    "Cambodia": 0.00,
+}
+DEFAULT_NATIONAL_RAIL_SHARE = 0.0
+
+# --- Sourcing scenarios (RICS Table 17 style) ---------------------------------
+# land_km  : distance over land, split road/rail by NATIONAL_RAIL_SHARE when
+#            rail_eligible, otherwise all road.
+# sea_km   : sea leg, 0 for domestic scenarios.
 SCENARIOS = {
-    "local":    {"road_km": 50,   "sea_km": 0,    "label": "Local (~50 km road)"},
-    "national": {"road_km": 300,  "sea_km": 0,    "label": "National (~300 km road)"},
-    "imported": {"road_km": 150,  "sea_km": 3000, "label": "Imported (sea + ~150 km inland)"},
+    "local":    {"land_km": 50,  "sea_km": 0,    "rail_eligible": False,
+                 "label": "Local (~50 km road)"},
+    "national": {"land_km": 300, "sea_km": 0,    "rail_eligible": True,
+                 "label": "National (~300 km rail + road)"},
+    "imported": {"land_km": 150, "sea_km": 3000, "rail_eligible": False,
+                 "label": "Imported (~3,000 km sea + 150 km road)"},
 }
 SCENARIO_CHOICES = [("local", "Local"), ("national", "National"), ("imported", "Imported")]
 
@@ -68,6 +114,10 @@ def transport_ef(country_name: str) -> dict:
     return COUNTRY_TRANSPORT_EF.get(country_name, DEFAULT_TRANSPORT_EF)
 
 
+def national_rail_share(country_name: str) -> float:
+    return NATIONAL_RAIL_SHARE.get(country_name, DEFAULT_NATIONAL_RAIL_SHARE)
+
+
 def default_scenario(category_name: str | None) -> str:
     name = (category_name or "").lower()
     for scenario, kws in _SCENARIO_KEYWORDS:
@@ -84,18 +134,56 @@ def default_waste_rate(category_name: str | None) -> float:
     return DEFAULT_WASTE_RATE
 
 
-def scenario_distance_ef(scenario: str, country_name: str):
-    """Return (distance_km, ef_kg_per_tonne_km) for a sourcing scenario + country.
+def scenario_legs(scenario: str, country_name: str) -> list[dict]:
+    """The journey for a sourcing scenario, one entry per transport mode.
 
-    A4 is modelled as a single leg: A4 = tonnes x distance x ef. For 'imported'
-    the sea + inland legs are collapsed into one effective distance and a blended
-    ef, so both numbers stay directly editable in the UI.
+    Returns a list of {"mode", "km", "ef"} in the order travelled. A4 is the sum
+    of km x ef across them, so each leg can be shown and reasoned about on its
+    own terms. Legs of zero length are left out.
     """
     ef = transport_ef(country_name)
     scen = SCENARIOS.get(scenario, SCENARIOS["national"])
-    road_km = float(scen["road_km"]); sea_km = float(scen["sea_km"])
+    legs = []
+
+    sea_km = float(scen["sea_km"])
     if sea_km > 0:
-        total = sea_km + road_km
-        blended = (sea_km * ef["sea"] + road_km * ef["road"]) / total if total else ef["road"]
-        return round(total, 1), round(blended, 5)
-    return round(road_km, 1), round(ef["road"], 5)
+        legs.append({"mode": "sea", "km": round(sea_km, 1), "ef": round(ef["sea"], 5)})
+
+    land_km = float(scen["land_km"])
+    rail_share = national_rail_share(country_name) if scen["rail_eligible"] else 0.0
+    rail_km = land_km * rail_share
+    road_km = land_km - rail_km
+    if rail_km > 0:
+        legs.append({"mode": "rail", "km": round(rail_km, 1), "ef": round(ef["rail"], 5)})
+    if road_km > 0:
+        legs.append({"mode": "road", "km": round(road_km, 1), "ef": round(ef["road"], 5)})
+
+    return legs
+
+
+def legs_tonne_km_co2(legs) -> float:
+    """kg CO2e per tonne carried, summed over the legs."""
+    return sum(float(l["km"]) * float(l["ef"]) for l in legs)
+
+
+def effective_ef(legs) -> float:
+    """Distance-weighted mean factor across the legs.
+
+    Reporting this as "the emission factor" is what made the old output look
+    wrong, so it is NOT shown anywhere. It exists for one purpose: filling in
+    the missing half of a half-specified per-material override (a user who sets
+    a distance but no factor, or the reverse).
+    """
+    total_km = sum(float(l["km"]) for l in legs)
+    if not total_km:
+        return 0.0
+    return legs_tonne_km_co2(legs) / total_km
+
+
+def scenario_total_km(legs) -> float:
+    return round(sum(float(l["km"]) for l in legs), 1)
+
+
+def describe_legs(legs) -> str:
+    """One-line human reading of a journey, e.g. 'sea 3000 km @ 0.01 + road 150 km @ 0.07'."""
+    return " + ".join("%s %g km @ %g" % (l["mode"], l["km"], l["ef"]) for l in legs) or "—"

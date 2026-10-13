@@ -39,8 +39,22 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             f"\nBuilding: {b.name}  |  country: {country_name}  |  GFA: {floor_area:g} m²"
             + (f"  |  forced scenario: {force}" if force else "")))
-        self.stdout.write(f"{'Material':38} {'cat':16} {'A1-A3':>9} {'A4':>8} {'A5w':>8} {'scenario':10} {'w%':>4}")
-        self.stdout.write("-" * 100)
+        from pages.scripts.a4a5 import defaults as D
+        self.stdout.write("")
+        self.stdout.write("Journeys for this country (A4 = tonnes x sum of leg km x leg factor):")
+        for k in ("local", "national", "imported"):
+            legs = D.scenario_legs(k, country_name)
+            self.stdout.write(
+                "  %-9s %7.1f km total  %6.2f kgCO2e/tonne   %s"
+                % (k, D.scenario_total_km(legs), D.legs_tonne_km_co2(legs), D.describe_legs(legs)))
+        self.stdout.write(
+            "  national rail share: %.0f%%  (assumption, not sourced - see defaults.py)"
+            % (D.national_rail_share(country_name) * 100))
+        self.stdout.write("")
+        self.stdout.write(
+            f"{'Material':34} {'cat':14} {'A1-A3':>8} {'A4':>7} {'A5w':>7} "
+            f"{'scenario':10} {'w%':>3}  journey")
+        self.stdout.write("-" * 128)
 
         tot = {"a1a3": Decimal("0"), "a4": Decimal("0"), "a5w": Decimal("0")}
         skipped = 0
@@ -74,12 +88,13 @@ class Command(BaseCommand):
 
                 tot["a1a3"] += a1a3; tot["a4"] += a4; tot["a5w"] += a5w
                 self.stdout.write(
-                    f"{(p.epd.name or '')[:37]:38} {cat_name[:15]:16} "
-                    f"{float(a1a3):9.2f} {float(a4):8.3f} {float(a5w):8.3f} "
-                    f"{meta['scenario']:10} {meta['waste_rate']*100:3.0f}")
+                    f"{(p.epd.name or '')[:33]:34} {cat_name[:13]:14} "
+                    f"{float(a1a3):8.2f} {float(a4):7.3f} {float(a5w):7.3f} "
+                    f"{meta['scenario']:10} {meta['waste_rate']*100:3.0f}  "
+                    f"{meta['legs_text']}")
 
         up = tot["a1a3"] + tot["a4"] + tot["a5w"]
-        self.stdout.write("-" * 100)
+        self.stdout.write("-" * 128)
         self.stdout.write(self.style.SUCCESS(
             f"{'TOTAL (kg CO2e/m²)':55} A1-A3={float(tot['a1a3']):.1f}  "
             f"A4={float(tot['a4']):.2f}  A5w={float(tot['a5w']):.2f}  → Upfront A1-A5={float(up):.1f}"))

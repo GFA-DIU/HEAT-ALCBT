@@ -49,14 +49,54 @@ build. Sea leg (imports) = GLEC container-ship default everywhere.
 Each material is auto-assigned a **sourcing scenario** (user-overridable dropdown). Each
 scenario maps to a distance + mode + the country EF above:
 
-| Scenario | Default distance / mode | Auto-assigned to (by MaterialCategory) |
+| Scenario | Journey | Auto-assigned to (by MaterialCategory) |
 |---|---|---|
 | **Local** | ~50 km road | Concrete, aggregate, sand, cement, blocks/bricks/AAC, mortar/plaster |
-| **National** | ~300 km road | Reinforcement, timber, tiles, plasterboard, finishes |
-| **Imported** | sea leg (country→nearest port, e.g. ~2,000–4,000 km) + ~150 km inland road | Structural steel, aluminium, glass, specialised products |
+| **National** | ~300 km over land, **split rail/road by country** | Reinforcement, timber, tiles, plasterboard, finishes |
+| **Imported** | ~3,000 km sea + ~150 km inland road | Structural steel, aluminium, glass, specialised products |
 
 Distances are country-tunable (RICS Table 17 as the template). User can switch any material's
-scenario; "Imported" reveals an editable sea-distance.
+scenario.
+
+### A journey is a list of legs, not one averaged number
+
+A scenario resolves to **one leg per transport mode**, each carrying its own
+mode's emission factor, and A4 sums them. This replaced an earlier model that
+collapsed each scenario into a single distance and a single *blended* factor.
+
+That blend was the source of a real complaint: for India it reported
+**0.070 kgCO₂e/tonne-km over 50 km and 0.01286 over 3,150 km**, which reads as
+the emission factor falling as the distance grows. The arithmetic was right — a
+3,150 km import is 95% sea, and sea freight is roughly seven times cleaner per
+tonne-km than road, so an average dominated by the sea leg sits near the sea
+figure — but the number shown was a weighted mean of two different vehicles and
+was not a property of anything. The carbon it stood for had been rising all
+along (3.5 → 21 → 40.5 kgCO₂e/tonne).
+
+Nothing now reports a blended factor. `effective_ef()` survives for exactly one
+job: filling in the missing half when a user overrides a distance but not a
+factor, or the reverse. Setting either by hand replaces the journey with a
+single explicit leg, because someone who types "400 km" means one trip of
+400 km, not a reshuffle of the legs behind it.
+
+### Rail
+
+`rail` was defined for every country and **used by no code path**. It is now the
+line-haul portion of the national scenario:
+
+| Country | National rail share | Why |
+|---|---|---|
+| India | 60% | dedicated freight corridors; cement and steel move by rail |
+| Thailand | 30% | rail freight exists but road dominates |
+| Vietnam | 20% | north–south line used for bulk, limited capacity |
+| Indonesia | 10% | archipelago; rail freight is Java-only and marginal |
+| Cambodia | 0% | negligible rail freight — treated as all road |
+
+⚠️ **These shares are an assumption, not sourced**, and they are the least
+defensible numbers in the file. They are also consequential: India's rail factor
+(0.008) is about a ninth of its road factor (0.070), so introducing the split
+moved India's national haul from 21.0 to **9.84 kgCO₂e/tonne**. Replace them
+with real modal-split data before any published figure relies on them.
 
 ## 5. Construction waste rates (A5w) — RICS Table 18 defaults
 
@@ -111,7 +151,7 @@ only when explicitly requested).
 ## 7. Formulas (final)
 
 ```
-A4_material   = (mass_kg / 1000) × distance_km × EF_mode
+A4_material   = (mass_kg / 1000) × Σ( leg_km × leg_EF )     over the journey's legs
 A5w_material  = mass_kg × waste_rate × ( GWP_A1A3_per_kg + A4_per_kg + disposal_EF_per_kg )
 Upfront       = Σ(A1A3 + A4 + A5w) / GFA        [kg CO₂e/m²]
 ```
