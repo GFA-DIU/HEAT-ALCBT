@@ -197,6 +197,42 @@ heroku run python manage.py apply_gcca_concrete_labels --overwrite --app <app>
 If a dry run reports something materially different from this, **stop** and
 work out why before running it for real.
 
+### Two more commands the first pass missed
+
+These were already deployed and had simply never been run on production. Both
+are idempotent and both take `--dry-run`:
+
+```bash
+# 5. the 6 official Cambodian cement EPDs (KCC Kampot + Chip Mong INSEE)
+heroku run python manage.py load_cambodia_official_epds --dry-run --app <app>
+heroku run python manage.py load_cambodia_official_epds --app <app>
+
+# 6. strip the pre-0055 workaround whitespace from EPD names
+heroku run python manage.py normalise_epd_names --dry-run --app <app>
+heroku run python manage.py normalise_epd_names --app <app>
+```
+
+| Command | Expect |
+|---|---|
+| `load_cambodia_official_epds` | 6 created, 1 renamed; Cambodia goes 1 official -> 7 |
+| `normalise_epd_names` | 140 trimmed + 1 renamed, 0 collisions |
+
+`normalise_epd_names` also resolves India's two identically-named
+`Cement mortar` records - one official per kg, one generic per m3, 3,000x
+apart - by qualifying the first. Both rename steps keep the record id, so
+materials pointing at them are unaffected.
+
+**How to tell whether a data command still needs running.** Deploying code
+and loading data are separate acts: a migration changes the shape of the
+database and never fills it. Compare the two catalogues by (country, name)
+rather than by counts, and do **not** `.strip()` the names on the way out -
+that masks exactly what `normalise_epd_names` fixes, which is how 141 untidy
+names first went unnoticed here.
+
+Three German EPD names contain a literal newline from their source data.
+`normalise_epd_names` trims spaces, not line breaks, so they are left as they
+are in both databases.
+
 ---
 
 ## 4. Verify
