@@ -1,0 +1,232 @@
+{% load i18n %}
+{% if not_found %}
+  <div class="w-full py-8 text-center text-[var(--text--sub-600)]">{% translate "Building not found." %}</div>
+{% elif not has_rows %}
+  <div class="w-full py-8 text-center text-[var(--text--sub-600)]">
+    {% translate "No materials with a resolvable mass yet — add materials on the Assembly tab to see A4 and A5." %}
+  </div>
+{% else %}
+<div class="w-full flex flex-col gap-6" id="upfront-wrapper"
+     data-upfront-url="{% url 'building_upfront' building_id=building.id %}">
+
+  {# ---- headline numbers ------------------------------------------------ #}
+  <div class="space-y-1">
+    <h6 class="text-xl text-[var(--text--strong-950)] font-bold">{% translate "Upfront Carbon (A1–A5)" %}</h6>
+    <p class="text-sm text-[var(--text--sub-600)]">
+      {% blocktranslate trimmed with country=country area=floor_area %}
+        Product, transport and construction-waste emissions for this building — {{ country }}, {{ area }} m².
+      {% endblocktranslate %}
+    </p>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div class="rounded-lg border border-[var(--stroke--soft-200)] p-4">
+      <div class="text-xs text-[var(--text--sub-600)]">{% translate "A1–A3 Product" %}</div>
+      <div class="text-2xl font-bold text-[var(--text--strong-950)]" id="up-a1a3">{{ totals.a1a3|floatformat:1 }}</div>
+      <div class="text-xs text-[var(--text--sub-600)]">kgCO<sub>2</sub>eq/m<sup>2</sup></div>
+    </div>
+    <div class="rounded-lg border border-[var(--stroke--soft-200)] p-4">
+      <div class="text-xs text-[var(--text--sub-600)]">{% translate "A4 Transport" %}</div>
+      <div class="text-2xl font-bold text-[#FFA468]" id="up-a4">{{ totals.a4|floatformat:2 }}</div>
+      <div class="text-xs text-[var(--text--sub-600)]">kgCO<sub>2</sub>eq/m<sup>2</sup></div>
+    </div>
+    <div class="rounded-lg border border-[var(--stroke--soft-200)] p-4">
+      <div class="text-xs text-[var(--text--sub-600)]">{% translate "A5w Construction waste" %}</div>
+      <div class="text-2xl font-bold text-[#FFA468]" id="up-a5w">{{ totals.a5w|floatformat:2 }}</div>
+      <div class="text-xs text-[var(--text--sub-600)]">kgCO<sub>2</sub>eq/m<sup>2</sup></div>
+    </div>
+    <div class="rounded-lg border-2 border-[var(--color-primary)] p-4">
+      <div class="text-xs text-[var(--text--sub-600)]">{% translate "Upfront A1–A5" %}</div>
+      <div class="text-2xl font-bold text-[var(--text--strong-950)]" id="up-total">{{ totals.upfront|floatformat:1 }}</div>
+      <div class="text-xs text-[var(--text--sub-600)]">kgCO<sub>2</sub>eq/m<sup>2</sup></div>
+    </div>
+  </div>
+
+  {# ---- the journeys behind every A4 figure ----------------------------- #}
+  <div class="rounded-lg border border-[var(--stroke--soft-200)] p-4 space-y-3">
+    <div class="flex items-center gap-2">
+      <span data-icon="road-map-line" class="size-4"></span>
+      <span class="text-sm font-bold text-[var(--text--strong-950)]">
+        {% blocktranslate trimmed with country=country %}How transport is estimated in {{ country }}{% endblocktranslate %}
+      </span>
+    </div>
+    <p class="text-sm text-[var(--text--sub-600)]">
+      {% translate "A journey is one leg per transport mode, each with its own emission factor. A4 is the sum of them, multiplied by the material's mass." %}
+    </p>
+    <div class="overflow-x-auto">
+      <table class="table table-sm">
+        <thead>
+          <tr class="text-xs text-[var(--text--sub-600)]">
+            <th>{% translate "Scenario" %}</th>
+            <th class="text-right">{% translate "Total distance" %}</th>
+            <th class="text-right">{% translate "Carbon per tonne" %}</th>
+            <th>{% translate "Legs" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for j in journeys %}
+          <tr>
+            <td class="font-medium capitalize">{{ j.key }}</td>
+            <td class="text-right tabular-nums">{{ j.distance_km|floatformat:0 }} km</td>
+            <td class="text-right tabular-nums">{{ j.kgco2e_per_tonne|floatformat:2 }} kgCO<sub>2</sub>eq/t</td>
+            <td class="text-xs text-[var(--text--sub-600)]">{{ j.legs_text }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="text-xs text-[var(--text--sub-600)]">
+      {% translate "Emission factors" %}: {{ ef_source }} ·
+      {% translate "Disposal factor" %}: {{ disposal_ef }} kgCO<sub>2</sub>eq/kg
+    </p>
+    {% if rail_share_pct %}
+      <div class="rounded-md bg-[#FEF3C7] px-3 py-2 text-xs text-[var(--text--strong-950)]">
+        <span class="font-bold">{% translate "Assumption, not sourced:" %}</span>
+        {% blocktranslate trimmed with pct=rail_share_pct country=country %}
+          {{ pct }}% of a national haul in {{ country }} is assumed to travel by rail rather than road.
+          Rail is far less carbon-intensive per tonne-kilometre, so this materially lowers A4 for
+          nationally-sourced materials. Replace with real modal-split data before publishing figures.
+        {% endblocktranslate %}
+      </div>
+    {% endif %}
+  </div>
+
+  {# ---- per-material table --------------------------------------------- #}
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <span class="text-base font-bold text-[var(--text--strong-950)]">{% translate "By material" %}</span>
+      <button type="button" id="upfront-save" class="btn btn-sm btn-primary" disabled>
+        {% translate "Save changes" %}
+      </button>
+    </div>
+
+    {% for g in groups %}
+    <div class="rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden">
+      <div class="bg-[var(--bg--weak-50)] px-4 py-2 flex items-center justify-between">
+        <span class="text-sm font-bold text-[var(--text--strong-950)]">{{ g.name }}</span>
+        <span class="text-xs text-[var(--text--sub-600)] tabular-nums">
+          A1–A3 {{ g.a1a3|floatformat:1 }} · A4 {{ g.a4|floatformat:2 }} · A5w {{ g.a5w|floatformat:2 }}
+        </span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="table table-sm w-full">
+          <thead>
+            <tr class="text-xs text-[var(--text--sub-600)]">
+              <th>{% translate "Material" %}</th>
+              <th class="text-right">{% translate "Mass" %}</th>
+              <th class="text-right">A1–A3</th>
+              <th>{% translate "Sourcing" %}</th>
+              <th class="text-right">A4</th>
+              <th class="text-right">{% translate "Waste" %}</th>
+              <th class="text-right">A5w</th>
+              <th>{% translate "Journey" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in g.rows %}
+            <tr data-row-id="{{ r.id }}">
+              <td class="max-w-[16rem]">
+                <div class="truncate text-sm text-[var(--text--strong-950)]" title="{{ r.name }}">{{ r.name }}</div>
+                <div class="truncate text-xs text-[var(--text--sub-600)]" title="{{ r.category }}">{{ r.category }}</div>
+              </td>
+              <td class="text-right tabular-nums text-sm">
+                {% if r.mass_kg %}{{ r.mass_kg|floatformat:0 }} kg{% else %}<span class="text-[var(--text--sub-600)]">—</span>{% endif %}
+              </td>
+              <td class="text-right tabular-nums text-sm">{{ r.a1a3|floatformat:2 }}</td>
+              <td>
+                <select class="select select-xs w-28 upfront-scenario" data-field="scenario">
+                  {% for value, label in scenario_choices %}
+                    <option value="{{ value }}" {% if r.scenario == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td class="text-right tabular-nums text-sm js-a4">{{ r.a4|floatformat:3 }}</td>
+              <td class="text-right">
+                <input type="number" step="0.1" min="0" max="100"
+                       class="input input-xs w-16 text-right upfront-waste" data-field="waste_pct"
+                       value="{{ r.waste_pct }}" />
+              </td>
+              <td class="text-right tabular-nums text-sm js-a5w">{{ r.a5w|floatformat:3 }}</td>
+              <td class="text-xs text-[var(--text--sub-600)] js-journey">{{ r.legs_text }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+
+    <p class="text-xs text-[var(--text--sub-600)]">
+      {% translate "A4 and A5 are estimated from this project's country and sourcing assumptions. An EPD's own declared A4/A5 is not used, because transport and site waste belong to the project, not to the product." %}
+    </p>
+  </div>
+</div>
+
+<script>
+(function () {
+  const wrap = document.getElementById("upfront-wrapper");
+  if (!wrap) return;
+  const url = wrap.dataset.upfrontUrl;
+  const saveBtn = document.getElementById("upfront-save");
+  const dirty = new Set();
+
+  function markDirty(e) {
+    const tr = e.target.closest("tr[data-row-id]");
+    if (!tr) return;
+    dirty.add(tr.dataset.rowId);
+    saveBtn.disabled = false;
+  }
+  wrap.addEventListener("change", markDirty);
+
+  function csrf() {
+    const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+    return m ? m[1] : "";
+  }
+
+  saveBtn.addEventListener("click", async function () {
+    const overrides = [];
+    dirty.forEach(function (id) {
+      const tr = wrap.querySelector('tr[data-row-id="' + id + '"]');
+      if (!tr) return;
+      overrides.push({
+        id: id,
+        scenario: tr.querySelector('[data-field="scenario"]').value,
+        waste_pct: tr.querySelector('[data-field="waste_pct"]').value,
+      });
+    });
+    if (!overrides.length) return;
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "{% translate 'Saving…' %}";
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrf() },
+        body: JSON.stringify({ overrides: overrides }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || "save failed");
+
+      // repaint the figures that moved, rather than reloading the whole tab
+      data.rows.forEach(function (r) {
+        const tr = wrap.querySelector('tr[data-row-id="' + r.id + '"]');
+        if (!tr) return;
+        tr.querySelector(".js-a4").textContent = Number(r.a4).toFixed(3);
+        tr.querySelector(".js-a5w").textContent = Number(r.a5w).toFixed(3);
+        tr.querySelector(".js-journey").textContent = r.legs_text;
+      });
+      document.getElementById("up-a1a3").textContent = Number(data.totals.a1a3).toFixed(1);
+      document.getElementById("up-a4").textContent = Number(data.totals.a4).toFixed(2);
+      document.getElementById("up-a5w").textContent = Number(data.totals.a5w).toFixed(2);
+      document.getElementById("up-total").textContent = Number(data.totals.upfront).toFixed(1);
+      dirty.clear();
+    } catch (err) {
+      console.error(err);
+      saveBtn.disabled = false;
+    } finally {
+      saveBtn.textContent = "{% translate 'Save changes' %}";
+    }
+  });
+})();
+</script>
+{% endif %}

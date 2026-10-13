@@ -38,6 +38,24 @@ gives 5,485 kWh/yr against a metered 1,500–2,500. Applying a 0.4–0.7 factor
 would lower every cooled building's reported energy, so it is GT's call, not a
 patch. Written up in `docs/operational_carbon_methodology.md`.
 
+**A4 national rail share — needs GT.** The `national` sourcing scenario now
+splits its 300 km land haul between rail and road. The shares are
+**an assumption, not sourced**: India 60%, Thailand 30%, Vietnam 20%,
+Indonesia 10%, Cambodia 0% (Cambodia has negligible rail freight, so that one
+is safe). They are consequential — India's rail factor is 0.008 against road
+at 0.070, so introducing the split moved India's national haul from **21.0 to
+9.84 kgCO₂e/tonne**, lowering A4 for every nationally-sourced material in an
+Indian building. Before any published figure relies on this, the shares need
+real modal-split data. Flagged in `pages/scripts/a4a5/defaults.py`,
+`docs/a4_a5_upfront_carbon_scope.md` and the `estimate_a4a5` output.
+
+**A4 imported sea leg is a flat 3,000 km** regardless of origin. Chinese steel
+into Vietnam and Brazilian steel into India get the same distance. Known
+simplification, left deliberately: now that the sea leg is reported separately
+rather than blended away, the assumption is at least visible to whoever reads
+the figure. The per-material override fields (`a4_distance_km`, `a4_ef`) can
+already be used to correct a specific material.
+
 **F-gas emissions as a B1 line.** Refrigerant type, charge, leakage factor and
 GWP are collected on every AC and chiller. They now feed the operational
 baseline on the Savings tab, but there is no B1 scope line and the Systems tab
@@ -53,6 +71,18 @@ match since plug load entered the breakdown.
 cassette re-attribution, which was verified to change no total.
 
 ## Decided — do not reopen
+
+**A4 is modelled as legs, never a blended factor.** A journey is one leg per
+transport mode, each carrying its own mode's emission factor. The earlier model
+collapsed each scenario into a single distance and a single averaged factor,
+which reported India's factor as 0.070 over 50 km and 0.01286 over 3,150 km —
+reading as though the factor fell as distance rose. The arithmetic was correct
+(an import is 95% sea, and sea is ~7× cleaner per tonne-km than road) but the
+displayed number was a weighted mean of a ship and a truck and was not a
+property of anything. `effective_ef()` survives only to fill the missing half of
+a half-specified override; `test_a4_transport.py` fails if a blended factor is
+reported again.
+
 
 **Cement carries no GCCA rating.** GCCA publishes cement ratings, but each
 country must first choose its own clinker/cement ratio to derive the
