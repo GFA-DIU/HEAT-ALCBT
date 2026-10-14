@@ -156,3 +156,27 @@ def test_the_scope_note_names_what_is_missing():
     note = scope_note()
     for fragment in ("A5.2", "A5.3", "A5.1", "A5.4", "not included"):
         assert fragment in note, fragment
+
+
+# --- how a quantity is labelled ---------------------------------------------
+
+def test_construction_units_are_not_labelled_per_year():
+    """A5.2 is a one-off total for the build, not an annual rate.
+
+    The construction rows first reused display_unit_op, which appends "/yr"
+    because it was written for annual carriers. 2,000 litres of site diesel is
+    not 2,000 litres a year.
+    """
+    from pages.templatetags.custom_filters import display_unit_constr
+    assert display_unit_constr("kwh") == "kWh"
+    assert display_unit_constr("l") == "litres"
+    assert display_unit_constr("kg") == "kg"
+    assert display_unit_constr("ton") == "tonnes"
+    for unit in ("kwh", "l", "kg", "ton", "mj", "m3"):
+        assert "/yr" not in display_unit_constr(unit), unit
+
+
+def test_operational_units_still_say_per_year():
+    """The annual carriers are unaffected by the construction label."""
+    from pages.templatetags.custom_filters import display_unit_op
+    assert display_unit_op("kwh") == "kWh/yr"

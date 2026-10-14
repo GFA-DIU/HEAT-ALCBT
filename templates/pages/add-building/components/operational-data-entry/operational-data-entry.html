@@ -15,6 +15,38 @@
 {% load static %}
 {% load i18n %}
 
+{% comment %}
+Two phases of energy, entered in the same step because they use the same
+carriers and the same picker. Operational is annual running energy (B6);
+construction is the one-off total used while the building was being built
+(RICS A5.2). Both can be entered - a project may have records for both - so
+these are tabs rather than a one-time choice.
+{% endcomment %}
+<div class="flex w-full rounded-lg border border-[var(--stroke--soft-200)] overflow-hidden mb-4" id="phase_tabs" role="tablist">
+  <button type="button" role="tab" data-phase="operational"
+          class="phase-tab flex-1 px-4 py-3 text-left border-r border-[var(--stroke--soft-200)]">
+    <span class="block text-sm font-medium">{% translate "In operation (annual)" %}</span>
+    <span class="block text-xs text-[var(--text--sub-600)]" id="tab_count_operational">
+      {{ selected_products|length }} {% translate "carriers" %}
+    </span>
+  </button>
+  <button type="button" role="tab" data-phase="construction"
+          class="phase-tab flex-1 px-4 py-3 text-left">
+    <span class="block text-sm font-medium">{% translate "During construction" %}</span>
+    <span class="block text-xs text-[var(--text--sub-600)]" id="tab_count_construction">
+      {{ construction_products|length }} {% translate "carriers" %}
+    </span>
+  </button>
+</div>
+<style>
+  #phase_tabs .phase-tab{background:var(--bg--white-0,#fff);cursor:pointer}
+  #phase_tabs .phase-tab[aria-selected="true"]{
+    background:var(--bg--weak-50);
+    box-shadow:inset 0 -3px 0 0 var(--color-primary,#1FC16B);
+  }
+</style>
+
+<div id="phase_panel_operational">
 {% if total_annual_energy_consumption is not None %}
 <div
   class="flex items-center justify-between gap-2 p-3 rounded-lg bg-[var(--state--information--lighter)] border border-[var(--state--information--base)] mb-2"
@@ -140,6 +172,119 @@
         </span>
       </div>
     </form>
+  </div>
+</div>
+</div><!-- /phase_panel_operational -->
+
+<div id="phase_panel_construction" hidden>
+  <h5 class="text-base font-bold text-[var(--text--strong-950)]">
+    {% translate "Construction-phase Energy (A5.2)" %}
+  </h5>
+  <p class="text-xs text-[var(--text--sub-600)] mt-1 mb-2">
+    {% translate "Energy used on site while the building was being built - diesel for plant and generators, site electricity, temporary works. Enter the total for the whole construction period, as metered kWh or as litres and kilograms from delivery notes." %}
+  </p>
+
+  <div class="flex items-center justify-between gap-2 p-3 rounded-lg bg-[var(--state--information--lighter)] border border-[var(--state--information--base)] mb-2">
+    <span class="text-sm">
+      <span data-icon="information-2-line" data-size="16" data-color="var(--icon--strong-950)"></span>
+      {% translate "Site energy entered:" %}
+      <strong id="constr_running_kwh">0</strong> {% translate "kWh" %}
+    </span>
+    <span class="text-xs text-[var(--text--sub-600)]">
+      {% translate "A5.2:" %}
+      <strong id="constr_a5_2">{% if a5_2_per_m2 %}{{ a5_2_per_m2|floatformat:3 }}{% else %}0.000{% endif %}</strong>
+      kgCO<sub>2</sub>e/m<sup>2</sup>
+    </span>
+  </div>
+  <p class="text-xs text-[var(--text--sub-600)] mb-3">
+    {% translate "There is no target to match here - site energy is whatever the site used. Litres and kilograms are converted to kWh on save using IPCC 2006 calorific values; the conversion is shown in the Upfront Carbon panel." %}
+  </p>
+
+  <div class="flex items-center gap-2 p-2 rounded-lg bg-[var(--state--faded--lighter)]"
+       id="select_constr_text" {% if construction_products %}hidden{% endif %}>
+    <span data-icon="information-2-line" data-size="16" data-color="var(--icon--strong-950)"></span>
+    {% translate "No site energy entered yet. A5.2 will be reported as zero and the upfront total will be understated." %}
+  </div>
+
+  <div class="w-full flex flex-col mt-5">
+    <button class="btn btn-outline w-fit" type="button"
+            onclick="window.BEAT_PHASE='construction';energy_carrier_modal.showModal()">
+      <span data-icon="add-large-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
+      {% translate "Add site energy carrier" %}
+    </button>
+    <div class="divider before:h-[0.0625rem] after:h-[0.0625rem] before:bg-[var(--stroke--soft-200)] after:bg-[var(--stroke--soft-200)]"></div>
+
+    <form id="construction-products-form"
+          hx-post="{% url 'building_step_operational' %}"
+          hx-vals='js:{"action": "save_constr_products", "building_uuid": new URLSearchParams(window.location.search).get("building_uuid")}'
+          hx-swap="none">
+      {% csrf_token %}
+      <ul class="grid grid-cols-1 gap-2" id="selected_constr_products">
+        {% for epd in construction_products %}
+          {% include 'pages/add-building/components/operational-data-entry/_selected_construction_product.html' with epd=epd %}
+        {% endfor %}
+      </ul>
+
+      <div class="flex items-center gap-2 mt-4" id="constr_save_container"
+           {% if not construction_products %}hidden{% endif %}>
+        <button type="submit" class="btn btn-sm btn-primary" id="constr_save_button">
+          <span data-icon="save-line" data-size="16" data-color="currentColor"></span>
+          <span class="button-text">{% translate "Save Site Energy" %}</span>
+        </button>
+        <span class="text-xs text-[var(--text--sub-600)]" id="constr_save_status"></span>
+      </div>
+    </form>
+  </div>
+
+  <div class="mt-4 p-3 rounded-lg bg-[var(--bg--weak-50)] text-xs text-[var(--text--sub-600)]">
+    <b>{% translate "Scope:" %}</b>
+    {% translate "A5 covers construction waste (A5.3) and site energy (A5.2). Pre-construction demolition (A5.1) and worker transport (A5.4) are not included." %}
+  </div>
+</div><!-- /phase_panel_construction -->
+
+{% comment %} What has been entered, both phases at once. {% endcomment %}
+<div class="mt-6 p-4 rounded-lg border border-[var(--stroke--soft-200)]">
+  <h6 class="text-sm font-bold text-[var(--text--strong-950)] mb-2">
+    {% translate "What you have entered" %}
+  </h6>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+    <div>
+      <div class="font-medium text-[var(--text--strong-950)] mb-1">
+        {% translate "In operation - annual (B6)" %}
+      </div>
+      {% if selected_products %}
+        <ul class="space-y-0.5">
+          {% for p in selected_products %}
+            <li class="flex justify-between gap-2">
+              <span class="truncate">{{ p.name|truncatechars:34 }}</span>
+              <span class="tabular-nums whitespace-nowrap">{{ p.selection_quantity|floatformat:'-2' }} {{ p.selection_unit }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-[var(--text--sub-600)]">{% translate "Nothing entered." %}</p>
+      {% endif %}
+    </div>
+    <div>
+      <div class="font-medium text-[var(--text--strong-950)] mb-1">
+        {% translate "During construction - one-off (A5.2)" %}
+      </div>
+      {% if construction_products %}
+        <ul class="space-y-0.5">
+          {% for p in construction_products %}
+            <li class="flex justify-between gap-2">
+              <span class="truncate">{{ p.name|truncatechars:34 }}</span>
+              <span class="tabular-nums whitespace-nowrap">{{ p.selection_quantity|floatformat:'-2' }} {{ p.selection_unit }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+        {% for n in construction_notes %}
+          <p class="mt-1 text-[var(--text--sub-600)]">{{ n }}</p>
+        {% endfor %}
+      {% else %}
+        <p class="text-[var(--text--sub-600)]">{% translate "Nothing entered - A5.2 counts as zero." %}</p>
+      {% endif %}
+    </div>
   </div>
 </div>
 
@@ -459,6 +604,20 @@
   // Handle successful EPD addition
   document.body.addEventListener('htmx:afterSwap', function(event) {
     if (event.detail.target.id === 'selected_op_products') {
+      // A row added while the construction tab is open belongs in the other
+      // list. The server has already rendered it with constr_* field names, so
+      // it only has to be moved.
+      if (window.BEAT_PHASE === 'construction') {
+        const moved = document.querySelector('#selected_op_products > li[id^="constr-"]');
+        const target = document.getElementById('selected_constr_products');
+        if (moved && target) {
+          target.appendChild(moved);
+          updateConstructionUI();
+          if (mainModal) mainModal.close();
+          Toast.warning('Site energy carrier added. Click "Save Site Energy" to save.');
+          return;
+        }
+      }
       updateUI();
       // Mark form as unsaved since a new product was added
       const form = document.getElementById('operational-products-form');
@@ -476,12 +635,16 @@
   document.addEventListener('click', function(event) {
     const removeBtn = event.target.closest('.remove-epd');
     if (!removeBtn) return;
-    // Only handle buttons inside the operational products list
-    if (!removeBtn.closest('#selected_op_products')) return;
+    // Both phases live on this page. The guard used to accept only the
+    // operational list, so the bin on a construction row did nothing at all.
+    const inOperational = !!removeBtn.closest('#selected_op_products');
+    const inConstruction = !!removeBtn.closest('#selected_constr_products');
+    if (!inOperational && !inConstruction) return;
     epdToDelete = {
       id: removeBtn.dataset.epdId,
       timestamp: removeBtn.dataset.timestamp,
-      elementId: removeBtn.dataset.elementId
+      elementId: removeBtn.dataset.elementId,
+      phase: inConstruction ? 'construction' : 'operational'
     };
     const modal = document.getElementById('energy_carrier_modal_delete');
     if (modal) modal.showModal();
@@ -493,8 +656,27 @@
     if (!confirmDeleteBtn || !epdToDelete) return;
 
     const modal = document.getElementById('energy_carrier_modal_delete');
-    const form = document.getElementById('operational-products-form');
-    const isSaved = form && form.dataset.saved === 'true';
+    const isConstruction = epdToDelete.phase === 'construction';
+    const form = document.getElementById(
+      isConstruction ? 'construction-products-form' : 'operational-products-form');
+    // Construction rows are written by a save of the whole list, so removing
+    // the row and saving again is the delete - there is no per-row endpoint.
+    const isSaved = !isConstruction && form && form.dataset.saved === 'true';
+
+    if (isConstruction) {
+      const el = document.getElementById(epdToDelete.elementId);
+      if (el) el.remove();
+      updateConstructionUI();
+      epdToDelete = null;
+      if (modal) modal.close();
+      // persist straight away so the bin behaves like a delete, not an edit
+      if (window.htmx && form) {
+        htmx.trigger(form, 'submit');
+        const st = document.getElementById('constr_save_status');
+        if (st) st.textContent = 'Removed \u2713';
+      }
+      return;
+    }
 
     // If the form hasn't been saved yet, just remove from DOM — nothing in DB to delete
     if (!isSaved) {
@@ -643,6 +825,124 @@
   }
 
   // Initialize UI on load
+
+  // ---- phase tabs ---------------------------------------------------------
+  window.BEAT_PHASE = window.BEAT_PHASE || 'operational';
+
+  function showPhase(phase) {
+    window.BEAT_PHASE = phase;
+    document.querySelectorAll('#phase_tabs .phase-tab').forEach(function (b) {
+      b.setAttribute('aria-selected', String(b.dataset.phase === phase));
+    });
+    const op = document.getElementById('phase_panel_operational');
+    const cn = document.getElementById('phase_panel_construction');
+    if (op) op.hidden = (phase !== 'operational');
+    if (cn) cn.hidden = (phase !== 'construction');
+  }
+
+  document.querySelectorAll('#phase_tabs .phase-tab').forEach(function (b) {
+    b.addEventListener('click', function () { showPhase(b.dataset.phase); });
+  });
+  showPhase('operational');
+
+  // Reset the phase whenever the picker is opened from the operational side,
+  // so a carrier never lands in the wrong list after switching tabs.
+  document.querySelectorAll('#energy_carrier_template_container button').forEach(function (b) {
+    if ((b.getAttribute('onclick') || '').indexOf('energy_carrier_modal') !== -1) {
+      b.addEventListener('click', function () { window.BEAT_PHASE = 'operational'; });
+    }
+  });
+
+  // ---- construction tab ---------------------------------------------------
+  // Net calorific values and densities, mirroring pages/scripts/a4a5/fuels.py.
+  // This is only to show a live running figure while typing; the authoritative
+  // conversion happens on the server at save.
+  const FUEL_MJ_PER_KG = {
+    diesel: [43.0, 0.832], gasoline: [44.3, 0.740], kerosene: [43.8, 0.800],
+    fuel_oil: [40.4, 0.980], lpg: [47.3, null], natural_gas: [48.0, null],
+    coal: [25.8, null], lignite: [11.9, null], anthracite: [26.7, null],
+    charcoal: [29.5, null], wood: [15.6, null]
+  };
+  const FUEL_TOKENS = [
+    ['liquefied petroleum gas', 'lpg'], ['heavy fuel oil', 'fuel_oil'],
+    ['light fuel oil', 'fuel_oil'], ['natural gas', 'natural_gas'],
+    ['firewood', 'wood'], ['anthracite', 'anthracite'], ['charcoal', 'charcoal'],
+    ['kerosene', 'kerosene'], ['gasoline', 'gasoline'], ['lignite', 'lignite'],
+    ['petrol', 'gasoline'], ['diesel', 'diesel'], ['lpg', 'lpg'],
+    ['coal', 'coal'], ['wood', 'wood']
+  ];
+  function carrierFor(name) {
+    const n = (name || '').toLowerCase();
+    for (let i = 0; i < FUEL_TOKENS.length; i++) {
+      if (n.indexOf(FUEL_TOKENS[i][0]) !== -1) return FUEL_TOKENS[i][1];
+    }
+    return null;
+  }
+  function rowKwh(li) {
+    const qty = parseFloat(li.querySelector('.constr-qty')?.value);
+    if (isNaN(qty)) return null;
+    const unit = (li.querySelector('.constr-unit')?.value || '').toLowerCase();
+    if (unit === 'kwh') return qty;
+    if (unit === 'mj') return qty / 3.6;
+    const c = carrierFor(li.querySelector('p')?.textContent);
+    if (!c) return null;
+    const pair = FUEL_MJ_PER_KG[c];
+    if (unit === 'kg') return qty * pair[0] / 3.6;
+    if (unit === 'ton') return qty * 1000 * pair[0] / 3.6;
+    if (unit === 'l' && pair[1]) return qty * pair[1] * pair[0] / 3.6;
+    return null;
+  }
+  function updateConstructionUI() {
+    const list = document.getElementById('selected_constr_products');
+    const rows = list ? list.querySelectorAll('li[id^="constr-"]') : [];
+    const has = rows.length > 0;
+
+    const hint = document.getElementById('select_constr_text');
+    if (hint) hint.hidden = has;
+    const saveBox = document.getElementById('constr_save_container');
+    if (saveBox) saveBox.hidden = !has;
+    const count = document.getElementById('tab_count_construction');
+    if (count) count.textContent = rows.length + ' carriers';
+
+    let kwh = 0, unknown = false;
+    rows.forEach(function (li) {
+      const k = rowKwh(li);
+      if (k === null) { unknown = true; } else { kwh += k; }
+    });
+    const el = document.getElementById('constr_running_kwh');
+    if (el) el.textContent = Math.round(kwh).toLocaleString() + (unknown ? ' +' : '');
+  }
+
+  document.addEventListener('input', function (e) {
+    if (e.target.closest && e.target.closest('#selected_constr_products')) {
+      updateConstructionUI();
+    }
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target.closest && e.target.closest('#selected_constr_products')) {
+      updateConstructionUI();
+    }
+  });
+
+  // the construction form answers with JSON rather than a swap
+  document.body.addEventListener('htmx:afterRequest', function (evt) {
+    const form = document.getElementById('construction-products-form');
+    if (!form || evt.detail.elt !== form) return;
+    const status = document.getElementById('constr_save_status');
+    let data = {};
+    try { data = JSON.parse(evt.detail.xhr.responseText); } catch (err) { data = {}; }
+    if (data.success) {
+      const a52 = document.getElementById('constr_a5_2');
+      if (a52) a52.textContent = Number(data.a5_2_per_m2 || 0).toFixed(3);
+      if (status) status.textContent = 'Saved \u2713 ' + (data.saved || 0) + ' carrier(s)';
+      (data.notes || []).forEach(function (n) { console.info('A5.2:', n); });
+    } else if (status) {
+      status.textContent = data.error || 'Error';
+    }
+  });
+
+  updateConstructionUI();
+
   updateUI();
 })();
 </script>

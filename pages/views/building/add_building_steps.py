@@ -523,6 +523,37 @@ def handle_operational_data_step(request):
         except (ValueError, Building.DoesNotExist):
             logger.warning(f"Building not found for UUID: {building_uuid}")
     
+    # --- A5.2 construction-phase energy, the step's second tab ---------------
+    construction_products, a5_2_per_m2, construction_notes = [], None, []
+    if building_uuid:
+        try:
+            _b = Building.objects.get(uuid=uuid_lib.UUID(building_uuid),
+                                      created_by=request.user)
+            from pages.models.building import ConstructionProduct
+            from pages.scripts.a4a5.construction import construction_energy
+            saved_constr = ConstructionProduct.objects.filter(
+                building=_b).select_related('epd', 'epd__country', 'epd__category')
+            for cp in saved_constr:
+                units = cp.epd.get_available_units()
+                if units is None:
+                    units = [cp.epd.declared_unit]
+                elif isinstance(units, set):
+                    units = sorted(units)
+                construction_products.append({
+                    "id": str(cp.epd.id),
+                    "name": cp.epd.name,
+                    "description": cp.description,
+                    "selection_unit": cp.input_unit,
+                    "selection_quantity": cp.quantity,
+                    "timestamp": datetime.now().strftime("%Y%m%d%H%M%S%f"),
+                    "op_units": list(units),
+                })
+            total, _rows, construction_notes = construction_energy(
+                saved_constr, _b.total_floor_area)
+            a5_2_per_m2 = float(round(total, 3))
+        except (ValueError, Building.DoesNotExist):
+            pass
+
     context = {
         'epd_filters_form': epd_filters_form,
         'countries': ALCBTCountryManager.get_all_countries(),
@@ -530,6 +561,9 @@ def handle_operational_data_step(request):
         'total_annual_energy_consumption': total_annual_energy_consumption,
         'renewable_percent': renewable_percent,
         'net_grid_energy': net_grid_energy,
+        'construction_products': construction_products,
+        'a5_2_per_m2': a5_2_per_m2,
+        'construction_notes': construction_notes,
     }
     return render(
         request,

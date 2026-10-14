@@ -17,17 +17,46 @@
 
 <style>
   #upfront-body table.uf-table{width:100%;border-collapse:collapse;font-size:13px}
+  /* A header must sit over its own column. SOURCING was left-aligned while
+     A1-A3 was right-aligned, so the two met in the middle and it read as if
+     SOURCING labelled the A1-A3 numbers. Every header now takes the alignment
+     of the cells beneath it, and the two control columns are centred so they
+     are visibly not part of the run of figures. */
   #upfront-body .uf-table th{font-size:11px;text-transform:uppercase;letter-spacing:.02em;
-    color:var(--text--sub-600);font-weight:600;padding:8px;border-bottom:1px solid var(--stroke--soft-200);text-align:right}
+    color:var(--text--sub-600);font-weight:600;padding:8px 10px;
+    border-bottom:1px solid var(--stroke--soft-200);text-align:right;white-space:nowrap}
   #upfront-body .uf-table th.l{text-align:left}
-  #upfront-body .uf-table td{padding:10px 8px;border-bottom:1px solid var(--stroke--soft-200);
+  #upfront-body .uf-table th.c,#upfront-body .uf-table td.c{text-align:center}
+  #upfront-body .uf-table th small{display:block;text-transform:none;letter-spacing:0;
+    font-weight:400;font-size:10px;opacity:.75;margin-top:1px}
+  /* the controls sit in their own band, fenced off from the figures */
+  #upfront-body .uf-table th.ctl,#upfront-body .uf-table td.ctl{
+    background:var(--bg--weak-50);border-left:1px solid var(--stroke--soft-200);
+    border-right:1px solid var(--stroke--soft-200);text-align:center}
+  #upfront-body .uf-table td{padding:7px 10px;border-bottom:1px solid var(--stroke--soft-200);
     text-align:right;vertical-align:middle}
   #upfront-body .uf-table td.l{text-align:left}
   #upfront-body .uf-table td.c{text-align:center}
   #upfront-body .uf-name{font-weight:500;white-space:normal;word-break:break-word;line-height:1.3;max-width:26rem}
   #upfront-body .uf-cat{font-size:11px;color:var(--text--sub-600);margin-top:2px}
   #upfront-body .uf-num{white-space:nowrap;font-variant-numeric:tabular-nums}
-  #upfront-body .uf-grp td{background:var(--bg--weak-50);font-weight:600;text-align:left;cursor:pointer}
+  #upfront-body .uf-grp td{background:var(--bg--weak-50);font-weight:600;text-align:left;cursor:pointer;
+    border-top:2px solid var(--stroke--soft-200)}
+  /* the stacked upfront breakdown under the table */
+  #upfront-body .uf-sum{margin-top:18px;border:1px solid var(--stroke--soft-200);border-radius:8px;overflow:hidden}
+  #upfront-body .uf-sum table{width:100%;border-collapse:collapse;font-size:13px}
+  #upfront-body .uf-sum td{padding:8px 14px;vertical-align:middle}
+  #upfront-body .uf-sum .st{font-weight:700;color:var(--text--strong-950);width:4.5rem}
+  #upfront-body .uf-sum .lbl2{color:var(--text--sub-600)}
+  #upfront-body .uf-sum .val{text-align:right;font-variant-numeric:tabular-nums;
+    font-weight:600;white-space:nowrap;width:7rem}
+  #upfront-body .uf-sum .sub td{padding-top:2px;padding-bottom:2px;font-size:12px;
+    color:var(--text--sub-600);background:var(--bg--weak-50)}
+  #upfront-body .uf-sum .sub .st{padding-left:34px;font-weight:600}
+  #upfront-body .uf-sum .tot td{border-top:2px solid var(--stroke--soft-200);
+    font-size:15px;font-weight:700;color:var(--text--strong-950);padding-top:10px;padding-bottom:10px}
+  #upfront-body .uf-sum .unit{text-align:right;font-size:11px;color:var(--text--sub-600);
+    padding:0 14px 10px}
   #upfront-body .uf-grp td.uf-num{text-align:right}
   #upfront-body .uf-grp:hover td{background:var(--bg--soft-200)}
   #upfront-body .uf-caret{display:inline-block;width:1em;color:var(--icon--soft-400);transition:transform .12s}
@@ -109,6 +138,7 @@
     document.getElementById('uf-t-a4').textContent=num(a4,2);
     document.getElementById('uf-t-a5w').textContent=num(a5,2);
     const e52=document.getElementById('uf-t-a52'); if(e52)e52.textContent=num(a52,2);
+    const e5=document.getElementById('uf-t-a5'); if(e5)e5.textContent=num(a5+a52,2);
     document.getElementById('uf-t-up').textContent=num(a1+a4+a5+a52,1);}
 
   function matRows(r,i,g){
@@ -120,11 +150,11 @@
       + '<td class="l" style="padding-left:24px"><div class="uf-name"'+(massless?' style="opacity:.55"':'')+'>'+esc(r.name)+'</div>'
         + (r.category?'<div class="uf-cat">'+esc(r.category)+'</div>':'') + '</td>'
       + '<td class="uf-num">'+num(r.a1a3,2)+'</td>'
-      + '<td class="l"><select data-i="'+i+'" data-f="scenario" class="select select-bordered select-sm uf-src" '+dis+'>'
+      + '<td class="ctl"><select data-i="'+i+'" data-f="scenario" class="select select-bordered select-sm uf-src" '+dis+'>'
         + '<option value=""'+(r.scenario?'':' selected')+'>auto</option>'
         + opt('local',r.scenario)+opt('national',r.scenario)+opt('imported',r.scenario)+'</select></td>'
       + '<td class="uf-num" id="uf-a4-'+i+'">'+num(r.a4,3)+'</td>'
-      + '<td><input data-i="'+i+'" data-f="waste_pct" type="number" step="0.5" min="0" max="100" '
+      + '<td class="ctl"><input data-i="'+i+'" data-f="waste_pct" type="number" step="0.5" min="0" max="100" '
         + 'value="'+r.waste_pct+'" class="input input-bordered input-sm uf-w" '+dis+'> %</td>'
       + '<td class="uf-num" id="uf-a5w-'+i+'">'+num(r.a5w,3)+'</td>'
       + '<td class="c">'+(massless?'':'<button type="button" class="uf-gear" data-adv="'+i+'" title="'
@@ -213,22 +243,38 @@
     html+='</div>';
 
     html+='<div style="overflow-x:auto"><table class="uf-table"><thead><tr>'
-      + '<th class="l">{% translate "Component / material" %}</th><th>A1-A3</th><th class="l">{% translate "Sourcing" %}</th>'
-      + '<th>A4</th><th>{% translate "Waste" %}</th><th>A5w</th><th></th></tr></thead><tbody>';
+      + '<th class="l">{% translate "Component / material" %}</th>'
+      + '<th>A1&ndash;A3<small>{% translate "product" %}</small></th>'
+      + '<th class="ctl">{% translate "Sourcing" %}<small>{% translate "sets A4" %}</small></th>'
+      + '<th>A4<small>{% translate "transport" %}</small></th>'
+      + '<th class="ctl">{% translate "Waste" %}<small>{% translate "sets A5.3" %}</small></th>'
+      + '<th>A5.3<small>{% translate "waste" %}</small></th><th></th></tr></thead><tbody>';
     groups.forEach(g=>{
       html+='<tr class="uf-grp" data-grp="'+g.g+'"><td class="l"><span class="uf-caret">▸</span> '+esc(g.name)+'</td>'
-        + '<td class="uf-num" id="uf-g-a1a3-'+g.g+'"></td><td></td>'
-        + '<td class="uf-num" id="uf-g-a4-'+g.g+'"></td><td></td>'
+        + '<td class="uf-num" id="uf-g-a1a3-'+g.g+'"></td><td class="ctl"></td>'
+        + '<td class="uf-num" id="uf-g-a4-'+g.g+'"></td><td class="ctl"></td>'
         + '<td class="uf-num" id="uf-g-a5w-'+g.g+'"></td><td></td></tr>';
       g.idx.forEach(i=>{ html+=matRows(state.rows[i],i,g.g); });
     });
-    html+='</tbody><tfoot>'
-      + '<tr style="font-weight:600;border-top:2px solid var(--stroke--soft-200)"><td class="l">{% translate "Materials: A1–A3 · A4 · A5.3" %}</td>'
-      + '<td class="uf-num" id="uf-t-a1a3"></td><td></td><td class="uf-num" id="uf-t-a4"></td><td></td><td class="uf-num" id="uf-t-a5w"></td><td></td></tr>'
-      + '<tr><td class="l" colspan="5" style="text-align:right">{% translate "A5.2 site energy (whole project)" %}</td>'
-      + '<td class="uf-num" id="uf-t-a52"></td><td></td></tr>'
-      + '<tr style="font-weight:700"><td class="l" colspan="5" style="text-align:right">{% translate "Upfront A1–A5" %}</td>'
-      + '<td class="uf-num" id="uf-t-up"></td><td></td></tr></tfoot></table></div>';
+    html+='</tbody></table></div>';
+
+    // The stages spelled out, with A5 split into the two parts BEAT models.
+    // Reading a column total off the table told you the number but not which
+    // stage it was, and A5.2 and A5.3 had no visible relationship at all.
+    html+='<div class="uf-sum"><table>'
+      + '<tr><td class="st">A1&ndash;A3</td><td class="lbl2">{% translate "Product stage (materials)" %}</td>'
+        + '<td class="val" id="uf-t-a1a3"></td></tr>'
+      + '<tr><td class="st">A4</td><td class="lbl2">{% translate "Transport to site" %}</td>'
+        + '<td class="val" id="uf-t-a4"></td></tr>'
+      + '<tr><td class="st">A5</td><td class="lbl2">{% translate "Construction" %}</td>'
+        + '<td class="val" id="uf-t-a5"></td></tr>'
+      + '<tr class="sub"><td class="st">A5.2</td><td class="lbl2">{% translate "Site energy (whole project)" %}</td>'
+        + '<td class="val" id="uf-t-a52"></td></tr>'
+      + '<tr class="sub"><td class="st">A5.3</td><td class="lbl2">{% translate "Construction waste (per material)" %}</td>'
+        + '<td class="val" id="uf-t-a5w"></td></tr>'
+      + '<tr class="tot"><td class="st">{% translate "UPFRONT" %}</td><td class="lbl2">A1&ndash;A5</td>'
+        + '<td class="val" id="uf-t-up"></td></tr>'
+      + '</table><div class="unit">kgCO<sub>2</sub>e/m<sup>2</sup></div></div>';
     html+='<div class="flex items-center gap-3 mt-3"><button id="uf-save" class="btn btn-primary btn-sm">{% translate "Save changes" %}</button>'
       + '<span id="uf-msg" class="text-sm text-[var(--text--sub-600)]"></span></div>';
     body.innerHTML=html;
