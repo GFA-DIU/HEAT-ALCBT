@@ -1,5 +1,10 @@
 # Working on BEAT
 
+> **Current state of the work — what is in flight, what is deliberately
+> not built, and the decisions waiting on a human — is in
+> [`docs/AGENT_HANDOVER.md`](docs/AGENT_HANDOVER.md). Read it before
+> starting a task. This file is the rules; that file is the state.**
+
 Rules for any agent working in this repository. They are not style preferences —
 each one is here because breaking it produced a wrong carbon number, lost work,
 or broke the app.

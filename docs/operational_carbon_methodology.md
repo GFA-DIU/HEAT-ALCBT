@@ -152,39 +152,103 @@ trajectories, licensed).
 
 ## Outdoor units (CDU) and indoor units (FCU): how BEAT counts them
 
-Cooling entries now declare their electrical coverage. FCUs can link to one
-AC/VRF or chiller entry in the same building.
+**The base rule: BEAT adds every record once and deducts nothing.** Everything
+below is the one exception to it.
 
-| Cooling entry coverage | Treatment of its linked FCUs |
-|---|---|
-| Complete system, including indoor fans | Retain fan inventory and its estimate; add zero extra fan electricity |
-| Outdoor equipment / chiller only | Add the linked FCUs' electrical fan energy separately |
-| Not yet specified (legacy entries) | Require a coverage choice before a new fan link is accepted |
+```python
+cooling_kwh     = Σ air conditioners + Σ chillers + Σ cassette ACs
+ventilation_kwh = Σ everything else under ventilation   ← fan coil units sit here
+total_kwh       = cooling_kwh + ventilation_kwh + lighting + …
+```
 
-Unlinked fans are counted separately and carry a warning. BEAT cannot infer
-coverage from the equipment name: users must check the manufacturer's data
-sheet or meter boundary. Existing records remain unlinked and keep their stored
-energy until reviewed. There is no automatic reclassification or backfill.
+### The problem this creates
 
-For a matched split, enter the complete pair once when the declared input
-includes both units. For outdoor-only VRF data, add the linked indoor fans.
-For a chiller-only figure, include FCU fans separately. Pumps and cooling-tower
-fans still need separate accounting unless explicitly included in the input.
-This limited change does not introduce an auxiliary-equipment inventory.
+Two opposite errors were possible on the same building, and neither was visible:
 
-Do not add indoor and outdoor cooling capacities: they serve the same cooling
-load. FCU fan inputs are electrical W or kW, not thermal cooling capacity.
-The fan calculation is power per unit x count x annual operating hours.
-SFP and airflow are optional reference inputs for FCUs.
+- **Double counting.** A matched split system's energy is derived from cooling
+  capacity ÷ efficiency, and the manufacturer's capacity and COP/EER describe
+  the *whole* system, indoor fan included. Entering that indoor unit again as a
+  fan coil counted the fan twice.
+- **Omission.** A chilled-water FCU's fan is genuinely separate from its
+  chiller's electricity. Assuming the chiller figure covered it lost that load.
 
-Refrigerant charge is entered once for the connected DX circuit on the cooling
-record. Chilled-water FCUs have water in their coils; their refrigerant belongs
-to the chiller. Refrigerant circuit modelling is outside this change.
+From the data the two look identical — a cooling record and a ventilation
+record on the same building. The difference is in what the entered number
+already includes, which only the user knows.
 
-The summary and system carbon breakdown exclude linked fans already covered
-by a complete-system entry. Changing coverage recalculates the summary;
-copying a building reconnects fans to the new building's cooling entries.
-Unlinking or deleting a parent makes its fans standalone, so review coverage.
+### So BEAT asks
+
+Every cooling record carries **what its electricity figure covers**:
+
+| Boundary | Meaning | A linked fan is |
+|---|---|---|
+| **Not specified** (default) | nobody has said | **added**, exactly as before |
+| **Complete system, including indoor fans** | matched split or packaged unit | **not added** — already inside the figure |
+| **Outdoor unit / chiller only** | VRF outdoor module, or a chiller | **added** — separate electricity |
+
+And a fan coil or cassette row can name its parent, through
+`cooling_parent_ac` or `cooling_parent_chiller` on `VentilationSystem`.
+
+**A fan is skipped only when both are true** — it is linked, *and* its parent
+says it covers the complete system:
+
+```python
+# EnergySummary.recalculate
+for v in other_vent_qs:
+    if v.fan_energy_already_counted:   # linked AND parent covers the system
+        continue
+    vent_total += v.total_energy_consumption_kwh_per_year or 0
+```
+
+### Nothing that already existed moved
+
+All 273 cooling records and 154 ventilation rows predating the field default to
+**not specified** and are unlinked, so they sum exactly as they always did.
+Verified on a real building: linking a fan changed nothing; only setting the
+parent to *complete system* removed it, and unsetting restored the original
+figure.
+
+Removing a fan also reduces the **estimated** plug load, which is a fraction of
+system energy — so a 40 kWh fan moved the building total by 48 kWh. That is
+intended.
+
+### What this does and does not do
+
+It **removes the ambiguity for users who fill it in**. It does **not** detect
+anything on its own: an unlinked fan beside a complete-system AC record is
+still double counted, and BEAT cannot know. Entering each unit of electricity
+once is still the user's responsibility.
+
+Not built, deliberately:
+
+- no requirement to state coverage before linking
+- no warning when a building has a complete-system record and unlinked fans
+- no reconnection of links when a building is cloned
+- no auxiliary inventory — pumps and cooling-tower fans still need separate
+  accounting unless the entered plant figure already includes them
+
+### Measured exposure, when the field was added
+
+Of the 5 buildings with fan coil rows: **2** had a chiller (adding both is
+correct), **2** had an AC record and no chiller (the real exposure), **1** had
+neither. The 67 buildings with cassette rows are not in this category — a
+cassette is standalone cooling equipment, already counted as cooling and
+excluded from the ventilation line.
+
+### Capacities and refrigerant
+
+**Do not add indoor and outdoor capacities.** A 5 kW outdoor unit serving a
+matched 5 kW indoor unit is a 5 kW system. For VRF, even summing the indoor
+capacities does not give the outdoor capacity: Daikin's VRV S permits a
+connected indoor index between **50% and 130%** of the outdoor index.
+
+FCU fan inputs are **electrical** W or kW, not thermal capacity. The fan
+calculation is power per unit × count × annual hours.
+
+A connected DX system holds **one** refrigerant charge across the outdoor unit,
+the indoor coils and the pipework — record it once on the cooling record.
+A chilled-water FCU has water in its coil; Daikin's FWMJCC2BV1 lists
+refrigerant as "N/A". The refrigerant belongs to the chiller.
 
 ## System classification: cassette air conditioners
 

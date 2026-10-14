@@ -178,20 +178,17 @@ def test_cassette_rows_cannot_be_counted_in_both_lines():
     assert "other_vent_qs = VentilationSystem.objects.filter(building=b).exclude(" in src
 
 
-def test_there_is_still_no_link_between_indoor_and_outdoor_equipment():
-    """Guards the claim the documentation makes.
+def test_indoor_fans_can_now_be_linked_to_their_parent():
+    """This test used to assert the OPPOSITE, and that was deliberate.
 
-    If someone adds the link, this test fails - and the methodology section
-    saying BEAT cannot detect a double count must be rewritten at the same
-    time, rather than being left behind as a false statement.
+    While no link existed, the methodology said plainly that BEAT could not
+    detect a double count, and a test guarded that claim so it could not
+    quietly become false. The link now exists, so the claim and the test were
+    rewritten together - which is exactly what that guard was for.
     """
     from pages.models.building_operation.ventilation import VentilationSystem
-    from pages.models.building_operation.air_conditioning import (
-        CoolingSystemAirConditioner)
-    vent_fields = {f.name for f in VentilationSystem._meta.get_fields()}
-    ac_fields = {f.name for f in CoolingSystemAirConditioner._meta.get_fields()}
-    assert not {f for f in vent_fields if "cooling" in f or "parent" in f}
-    assert not {f for f in ac_fields if "indoor" in f or "parent" in f}
+    fields = {f.name for f in VentilationSystem._meta.get_fields()}
+    assert {"cooling_parent_ac", "cooling_parent_chiller"} <= fields
 
 
 def test_the_fcu_form_warns_at_the_point_of_entry():
@@ -205,3 +202,85 @@ def test_the_fcu_form_warns_at_the_point_of_entry():
 def test_the_cooling_form_says_what_its_figure_already_covers():
     html = COOLING_FORM.read_text(encoding="utf-8")
     assert "cover the WHOLE system, indoor fan included" in html
+
+
+# --- the energy boundary ----------------------------------------------------
+
+def test_an_unlinked_fan_is_counted_exactly_as_before():
+    """The default must move no existing figure.
+
+    273 cooling records and 154 ventilation rows predate this field. Every one
+    of them has no parent and an unspecified boundary, and must keep summing
+    the way it always did.
+    """
+    from pages.models.building_operation.energy_boundary import (
+        fan_is_already_counted)
+    assert fan_is_already_counted(None) is False
+
+
+def test_a_parent_that_has_not_said_does_not_reduce_anything():
+    from pages.models.building_operation.energy_boundary import (
+        EnergyBoundary, fan_is_already_counted)
+
+    class Parent:
+        energy_boundary = EnergyBoundary.UNKNOWN
+
+    assert fan_is_already_counted(Parent()) is False
+
+
+def test_only_a_complete_system_absorbs_its_fans():
+    from pages.models.building_operation.energy_boundary import (
+        EnergyBoundary, fan_is_already_counted)
+
+    class Parent:
+        pass
+
+    p = Parent()
+    p.energy_boundary = EnergyBoundary.COMPLETE_SYSTEM
+    assert fan_is_already_counted(p) is True
+    # a chiller's figure is its own: its FCU fans are separate electricity
+    p.energy_boundary = EnergyBoundary.EQUIPMENT_ONLY
+    assert fan_is_already_counted(p) is False
+
+
+def test_the_default_boundary_is_the_one_that_changes_nothing():
+    from pages.models.building_operation.energy_boundary import EnergyBoundary
+    from pages.models.building_operation.air_conditioning import (
+        CoolingSystemAirConditioner)
+    field = CoolingSystemAirConditioner._meta.get_field("energy_boundary")
+    assert field.default == EnergyBoundary.UNKNOWN
+    assert field.blank is True
+
+
+def test_deleting_a_cooling_record_unlinks_its_fans_rather_than_deleting_them():
+    """SET_NULL, not CASCADE - a fan is real equipment even once unlinked."""
+    from django.db.models import SET_NULL
+    from pages.models.building_operation.ventilation import VentilationSystem
+    for name in ("cooling_parent_ac", "cooling_parent_chiller"):
+        field = VentilationSystem._meta.get_field(name)
+        assert field.remote_field.on_delete is SET_NULL, name
+        assert field.null is True and field.blank is True, name
+
+
+def test_the_summary_only_skips_a_fan_the_parent_already_covers():
+    """Guards the rule in EnergySummary.recalculate."""
+    src = SUMMARY.read_text(encoding="utf-8")
+    assert "fan_energy_already_counted" in src
+    # the skip must be conditional, never a blanket exclusion
+    assert "if v.fan_energy_already_counted:" in src
+    assert "continue" in src
+
+
+@pytest.mark.parametrize("fragment", [
+    "BEAT adds every record once and deducts nothing",   # the base rule
+    "A fan is skipped only when both are true",          # the one exception
+    "does **not** detect",                               # the remaining gap
+    "no warning when a building has a complete-system",  # what is NOT built
+])
+def test_the_methodology_matches_what_is_built(fragment):
+    """The doc drifted once already, describing behaviour that did not exist.
+
+    Nothing guarded it, so a section written for a different implementation was
+    committed and read as fact. These fragments pin the claims that matter.
+    """
+    assert fragment in METHODOLOGY.read_text(encoding="utf-8"), fragment

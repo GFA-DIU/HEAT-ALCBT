@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from pages.models.building_operation.energy_boundary import (
+    EnergyBoundary)
+
 from pages.models.building import Building
 from pages.models.building_operation.chilling import RefrigerantGWP, RefrigerantType
 
@@ -142,6 +145,19 @@ class CoolingSystemAirConditioner(models.Model):
         blank=True,
         verbose_name=_("EER / ISEER / COP"),
     )
+    energy_boundary = models.CharField(
+        max_length=24,
+        choices=EnergyBoundary.choices,
+        default=EnergyBoundary.UNKNOWN,
+        blank=True,
+        verbose_name=_("What this electricity figure covers"),
+        help_text=_(
+            "Whether the entered figure already includes the indoor fans. "
+            "Leave as not specified and BEAT adds any linked fans separately, "
+            "exactly as it did before this field existed."
+        ),
+    )
+
     efficiency_metric = models.CharField(
         max_length=10,
         choices=EfficiencyMetric.choices,
