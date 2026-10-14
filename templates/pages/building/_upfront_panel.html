@@ -32,7 +32,29 @@
   #upfront-body .uf-grp:hover td{background:var(--bg--soft-200)}
   #upfront-body .uf-caret{display:inline-block;width:1em;color:var(--icon--soft-400);transition:transform .12s}
   #upfront-body select.uf-src{min-width:8.5rem}
-  #upfront-body input.uf-in{width:4rem;text-align:right}
+  #upfront-body input.uf-in{width:5.5rem;text-align:right}
+  #upfront-body .uf-key{font-size:12px;color:var(--text--sub-600);line-height:1.8;margin-bottom:12px}
+  #upfront-body .uf-assump{border:1px solid var(--stroke--soft-200);border-radius:8px;padding:12px 14px;margin-bottom:16px}
+  #upfront-body .uf-assump-h{font-weight:700;font-size:13px;color:var(--text--strong-950);margin-bottom:8px}
+  #upfront-body .uf-jtable{width:100%;border-collapse:collapse;font-size:12px}
+  #upfront-body .uf-jtable th{text-align:left;font-weight:600;color:var(--text--sub-600);
+    padding:4px 8px;border-bottom:1px solid var(--stroke--soft-200)}
+  #upfront-body .uf-jtable td{padding:4px 8px;font-variant-numeric:tabular-nums}
+  #upfront-body .uf-jtable .r,#upfront-body .uf-jtable th.r{text-align:right}
+  #upfront-body .uf-jtable .cap{text-transform:capitalize;font-weight:600;color:var(--text--strong-950)}
+  #upfront-body .uf-jtable .legs{color:var(--text--sub-600)}
+  #upfront-body .uf-src{font-size:11px;color:var(--text--sub-600);margin-top:8px}
+  #upfront-body .uf-warn{font-size:11px;line-height:1.6;background:#FEF3C7;border-radius:6px;
+    padding:8px 10px;margin-top:8px;color:var(--text--strong-950)}
+  /* the read-only derivation line: journey = per-tonne x mass / area = A4 */
+  #upfront-body .uf-advrow td{padding:10px 8px 10px 24px;background:var(--bg--weak-50)}
+  #upfront-body .uf-legs{font-variant-numeric:tabular-nums;color:var(--text--strong-950);
+    background:#fff;border:1px solid var(--stroke--soft-200);border-radius:4px;padding:2px 8px;margin:0 2px}
+  #upfront-body .uf-pt{font-variant-numeric:tabular-nums;color:var(--text--sub-600);white-space:nowrap}
+  #upfront-body .uf-pt.strong{color:var(--text--strong-950);font-weight:600}
+  #upfront-body .uf-sep{color:var(--text--sub-600);margin:0 8px;font-weight:600}
+  #upfront-body .uf-advrow .lbl{font-weight:600;margin-right:8px;color:var(--text--sub-600);
+    text-transform:uppercase;font-size:10px;letter-spacing:.04em}
   #upfront-body input.uf-w{width:3.4rem;text-align:right}
   #upfront-body .uf-gear{background:none;border:none;cursor:pointer;color:var(--icon--soft-400);
     padding:4px;border-radius:6px;display:inline-flex;line-height:0}
@@ -60,6 +82,7 @@
   const INFO='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
     +'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
 
+  const val=(v)=>(v===null||v===undefined)?'':v;
   const num=(n,d=2)=>(n===null||n===undefined||isNaN(n))?'—':Number(n).toFixed(d);
   const esc=(s)=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
@@ -68,7 +91,7 @@
   function recalc(r){
     if(r.mass_kg===null||r.mass_kg===undefined){r.a4=0;r.a5w=0;return;}
     const fa=state.floor_area||1,t=r.mass_kg/1000,w=(r.waste_pct||0)/100;
-    r.a4=(t*(r.distance_km||0)*(r.ef||0))/fa;
+    r.a4=(t*(Number(r.kgco2e_per_tonne)||0))/fa;
     r.a5w=w*((r.a1a3||0)+r.a4)+(r.mass_kg*w*state.disposal_ef)/fa;
   }
   function paintRow(i){const r=state.rows[i];
@@ -103,10 +126,16 @@
       + '<td class="c">'+(massless?'':'<button type="button" class="uf-gear" data-adv="'+i+'" title="'
         + '{% translate "Adjust distance / emission factor" %}">'+GEAR+'</button>')+'</td></tr>';
     const adv='<tr class="uf-advrow" data-grp="'+g+'" data-kind="adv" id="adv-'+i+'" style="display:none"><td class="l" colspan="7" style="padding-left:24px">'
-      + '<span class="lbl">Distance (km):</span>'
-      + '<input data-i="'+i+'" data-f="distance_km" type="number" step="1" min="0" value="'+r.distance_km+'" class="input input-bordered input-sm uf-in" '+dis+'>'
-      + '<span class="lbl" style="margin-left:16px">EF (kg CO₂e/tonne-km):</span>'
-      + '<input data-i="'+i+'" data-f="ef" type="number" step="0.001" min="0" value="'+r.ef+'" class="input input-bordered input-sm uf-in" '+dis+'>'
+      + '<span class="lbl">Journey</span>'
+      + '<span class="uf-legs">'+esc(r.legs_text||'')+'</span>'
+      + '<span class="uf-sep">=</span>'
+      + '<span class="uf-pt">'+num(r.kgco2e_per_tonne,2)+' kg CO₂e per tonne carried</span>'
+      + '<span class="uf-sep">x</span>'
+      + '<span class="uf-pt">'+num((r.mass_kg||0)/1000,2)+' t</span>'
+      + '<span class="uf-sep">÷</span>'
+      + '<span class="uf-pt">'+num(state.floor_area,0)+' m²</span>'
+      + '<span class="uf-sep">=</span>'
+      + '<span class="uf-pt strong">'+num(r.a4,3)+'</span>'
       + '<span class="uf-info" title="'+tip+'">'+INFO+'</span>'
       + '</td></tr>';
     return main+adv;
@@ -117,14 +146,39 @@
     state.rows.forEach((r,i)=>{if(!cur||cur.name!==r.component){cur={name:r.component,g:groups.length,idx:[]};groups.push(cur);}cur.idx.push(i);});
     state._groups=groups;
 
-    let html='<div class="text-xs text-[var(--text--sub-600)] mb-3" style="line-height:1.7">'
-      + '<div><b>A1-A3</b>: from the EPD (product stage, cradle-to-gate).</div>'
-      + '<div><b>A4</b>: transport of materials to the site.</div>'
-      + '<div><b>A5w</b>: construction / installation waste.</div>'
-      + '<div><b>Country</b>: '+esc(state.country)+' (GFA '+num(state.floor_area,0)+' m²) &mdash; sets the default transport distances and emission factors.</div>'.replace('&mdash;',':')
-      + '<div><b>Sourcing scenario</b>: Local / National / Imported &ndash; chooses the transport distance and EF for each material; use the gear icon to fine-tune.</div>'.replace('&ndash;',':')
-      + '<div>All values are kg CO₂e/m². Click a component to expand its materials.</div>'
+    let html='<div class="uf-key">'
+      + '<div><b>A1&ndash;A3</b> product stage, from the EPD &middot; '
+      + '<b>A4</b> transport to site &middot; <b>A5w</b> construction waste. '
+      + 'All figures kg CO₂e/m². Click a component to expand it.</div>'
+      + '<div><b>'+esc(state.country)+'</b>, GFA '+num(state.floor_area,0)+' m². '
+      + 'The sourcing scenario picks the journey; distances and emission factors '
+      + 'come from the country tables (RICS WLCA).</div>'
       + '</div>';
+
+    // the journeys behind every A4 figure, stated once
+    const sd=state.scenario_defaults||{};
+    html+='<div class="uf-assump"><div class="uf-assump-h">'
+      + 'How transport is estimated in '+esc(state.country)+'</div>'
+      + '<table class="uf-jtable"><thead><tr><th>Scenario</th><th class="r">Distance</th>'
+      + '<th class="r">kg CO₂e / tonne</th><th>Legs</th><th>Road vehicle</th></tr></thead><tbody>';
+    ['local','national','imported'].forEach(k=>{
+      const j=sd[k]; if(!j) return;
+      html+='<tr><td class="cap">'+k+'</td>'
+        + '<td class="r">'+num(j.distance_km,0)+' km</td>'
+        + '<td class="r">'+num(j.kgco2e_per_tonne,2)+'</td>'
+        + '<td class="legs">'+esc(j.legs_text||'')+'</td>'
+        + '<td class="legs">'+esc(j.road_class||'—')+'</td></tr>';
+    });
+    html+='</tbody></table>';
+    if(state.ef_source) html+='<div class="uf-src">Emission factors: '+esc(state.ef_source)+'</div>';
+    if(!state.road_sourced) html+='<div class="uf-warn"><b>Placeholder factor.</b> '
+      + 'No national road-freight study was found for '+esc(state.country)
+      + ', so a GLEC regional default is used.</div>';
+    if(state.rail_share_pct) html+='<div class="uf-warn"><b>Assumption, not sourced.</b> '
+      + state.rail_share_pct+'% of a national haul is assumed to go by rail rather than road. '
+      + 'Rail is far less carbon-intensive per tonne-km, so this lowers A4 for nationally '
+      + 'sourced materials. Replace with real modal-split data before publishing figures.</div>';
+    html+='</div>';
     html+='<div style="overflow-x:auto"><table class="uf-table"><thead><tr>'
       + '<th class="l">{% translate "Component / material" %}</th><th>A1-A3</th><th class="l">{% translate "Sourcing" %}</th>'
       + '<th>A4</th><th>{% translate "Waste" %}</th><th>A5w</th><th></th></tr></thead><tbody>';
@@ -163,14 +217,18 @@
       el.addEventListener('input',()=>{
         const i=+el.dataset.i,f=el.dataset.f,r=state.rows[i];
         if(f==='scenario'){r.scenario=el.value;
-          if(el.value&&state.scenario_defaults[el.value]){const sd=state.scenario_defaults[el.value];
-            r.distance_km=sd.distance_km;r.ef=sd.ef;
-            const di=body.querySelector('input[data-i="'+i+'"][data-f="distance_km"]');
-            const ei=body.querySelector('input[data-i="'+i+'"][data-f="ef"]');
-            if(di)di.value=sd.distance_km; if(ei)ei.value=sd.ef;}
+          const sd=el.value?state.scenario_defaults[el.value]:null;
+          if(sd){
+            r.kgco2e_per_tonne=sd.kgco2e_per_tonne;
+            r.distance_km=null;r.ef=null;r.legs_text=sd.legs_text;
+            const lg=body.querySelector('#adv-'+i+' .uf-legs');
+            if(lg)lg.textContent=sd.legs_text||'';
+            const row=body.querySelector('#adv-'+i);
+            if(row){const pts=row.querySelectorAll('.uf-pt');
+              if(pts[0])pts[0].textContent=num(sd.kgco2e_per_tonne,2)+' kg CO₂e per tonne carried';}}
           const info=body.querySelector('#adv-'+i+' .uf-info');
           if(info)info.title=el.value?('Overrides the “'+el.value+'” default'):'Auto default by material';
-        } else { r[f]=parseFloat(el.value); }
+        } else { r[f]=(el.value===''?null:parseFloat(el.value)); }
         recalc(r);paintRow(i);paintGroups();paintTotals();
         document.getElementById('uf-msg').textContent='{% translate "unsaved changes" %}';
       });
@@ -179,7 +237,8 @@
   }
 
   function save(){
-    const overrides=state.rows.map(r=>({id:r.id,scenario:r.scenario||'',distance_km:r.distance_km,ef:r.ef,waste_pct:r.waste_pct}));
+    const overrides=state.rows.map(r=>({id:r.id,scenario:r.scenario||'',waste_pct:r.waste_pct,
+                                        distance_km:null,ef:null}));
     const btn=document.getElementById('uf-save');btn.disabled=true;
     document.getElementById('uf-msg').textContent='{% translate "Saving…" %}';
     fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':csrf()},body:JSON.stringify({overrides})})

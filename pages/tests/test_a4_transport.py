@@ -23,14 +23,14 @@ from pages.scripts.a4a5.compute import material_a4_a5
 
 def test_local_is_a_single_road_leg():
     legs = D.scenario_legs("local", "India")
-    assert legs == [{"mode": "road", "km": 50.0, "ef": 0.07}]
+    assert legs == [{"mode": "road", "km": 50.0, "ef": D.SFC_INDIA_ROAD["hcv1"]}]
 
 
 def test_imported_is_a_sea_leg_then_a_road_leg():
     legs = D.scenario_legs("imported", "India")
     assert [l["mode"] for l in legs] == ["sea", "road"]
     assert legs[0] == {"mode": "sea", "km": 3000.0, "ef": 0.01}
-    assert legs[1] == {"mode": "road", "km": 150.0, "ef": 0.07}
+    assert legs[1] == {"mode": "road", "km": 150.0, "ef": D.SFC_INDIA_ROAD["hcv2"]}
 
 
 def test_every_leg_carries_its_own_modes_published_factor():
@@ -38,6 +38,9 @@ def test_every_leg_carries_its_own_modes_published_factor():
     for country in ("India", "Thailand", "Cambodia", "Vietnam", "Indonesia"):
         ef = D.transport_ef(country)
         allowed = {ef["road"], ef["rail"], ef["sea"]}
+        if country == "India":
+            # road is picked per class from the SFC table
+            allowed |= set(D.SFC_INDIA_ROAD.values())
         for scenario in ("local", "national", "imported"):
             for leg in D.scenario_legs(scenario, country):
                 assert leg["ef"] in allowed, (country, scenario, leg)
@@ -73,8 +76,7 @@ def test_the_old_blend_is_what_fell_with_distance():
     """Documents the original fault, so nobody reintroduces the blend."""
     local = D.effective_ef(D.scenario_legs("local", "India"))
     imported = D.effective_ef(D.scenario_legs("imported", "India"))
-    assert local == pytest.approx(0.070)
-    assert imported == pytest.approx(0.012857, abs=1e-5)
+    assert local == pytest.approx(D.SFC_INDIA_ROAD["hcv1"])
     assert imported < local          # the blend really does fall...
     # ...while the carbon it represents rises, which is why legs are reported.
     assert (D.legs_tonne_km_co2(D.scenario_legs("imported", "India"))
@@ -111,12 +113,13 @@ def test_rail_share_splits_the_land_distance():
 # --- the A4 figure -----------------------------------------------------------
 
 def test_a4_is_tonnes_times_the_summed_leg_carbon():
-    # 2,000 kg = 2 t imported into India: 3000x0.01 + 150x0.07 = 40.5 kg/t
+    # 2,000 kg = 2 t imported into India: 3000 km sea + 150 km road
+    expected = 3000 * 0.010 + 150 * D.SFC_INDIA_ROAD["hcv2"]
     a4, _, meta = material_a4_a5(
         a1a3_per_m2=Decimal("0"), mass_kg=2000, floor_area=100,
         country_name="India", category_name="Steel", scenario="imported")
-    assert meta["kgco2e_per_tonne"] == pytest.approx(40.5)
-    assert float(a4) == pytest.approx(2 * 40.5 / 100)   # per m2 of floor area
+    assert meta["kgco2e_per_tonne"] == pytest.approx(expected)
+    assert float(a4) == pytest.approx(2 * expected / 100)   # per m2 of floor area
 
 
 def test_steel_defaults_to_imported_and_concrete_to_local():
@@ -142,7 +145,8 @@ def test_a_distance_alone_keeps_the_scenarios_effective_factor():
         country_name="India", category_name="Steel",
         scenario="imported", distance_km=1000)
     assert len(meta["legs"]) == 1
-    assert meta["legs"][0]["ef"] == pytest.approx(0.01286, abs=1e-5)
+    assert meta["legs"][0]["ef"] == pytest.approx(
+        D.effective_ef(D.scenario_legs("imported", "India")), abs=1e-5)
 
 
 def test_a_factor_alone_keeps_the_scenarios_distance():
@@ -186,3 +190,56 @@ def test_an_unknown_country_falls_back_without_raising():
     legs = D.scenario_legs("national", "Atlantis")
     assert [l["mode"] for l in legs] == ["road"]          # default rail share is 0
     assert legs[0]["ef"] == D.DEFAULT_TRANSPORT_EF["road"]
+
+
+# --- the India factors, straight from the SFC study --------------------------
+
+def test_india_road_factors_are_the_published_sfc_values():
+    """Published per tonne-km and well-to-wheel: nothing is derived here."""
+    assert D.SFC_INDIA_ROAD["hcv1"] == 0.0902     # GVW 12-20 t
+    assert D.SFC_INDIA_ROAD["hcv2"] == 0.0823     # GVW 20-30 t
+    assert D.SFC_INDIA_ROAD["mcv2"] == 0.1400
+    assert D.SFC_INDIA_ROAD["trailer"] == 0.0551
+
+
+def test_india_rail_is_the_sfc_value_not_the_old_placeholder():
+    # WTT 0.0064 + TTW 0.0041, averaged 2015-16 to 2019-20
+    assert D.SFC_INDIA_RAIL == 0.0106
+    assert D.COUNTRY_TRANSPORT_EF["India"]["rail"] == 0.0106
+
+
+def test_the_road_class_follows_the_journey():
+    """A 50 km delivery runs on a smaller, worse truck than a line haul."""
+    assert D.road_ef("India", "local")[0] == D.SFC_INDIA_ROAD["hcv1"]
+    assert D.road_ef("India", "national")[0] == D.SFC_INDIA_ROAD["hcv2"]
+    assert D.road_ef("India", "imported")[0] == D.SFC_INDIA_ROAD["hcv2"]
+    # and the lighter class is the dirtier one per tonne-km
+    assert D.SFC_INDIA_ROAD["hcv1"] > D.SFC_INDIA_ROAD["hcv2"]
+
+
+def test_the_vehicle_class_is_named_for_india_and_not_claimed_elsewhere():
+    assert "12-20 t" in D.road_class_for("local", "India")
+    assert "20-30 t" in D.road_class_for("national", "India")
+    for c in ("Thailand", "Cambodia", "Vietnam", "Indonesia"):
+        assert D.road_class_for("national", c) is None
+
+
+def test_only_india_claims_a_national_source():
+    assert D.COUNTRY_TRANSPORT_EF["India"]["road_sourced"] is True
+    for c in ("Thailand", "Cambodia", "Vietnam", "Indonesia"):
+        assert D.COUNTRY_TRANSPORT_EF[c]["road_sourced"] is False
+        assert "GLEC" in D.COUNTRY_TRANSPORT_EF[c]["source"]
+        assert "proxy" in D.COUNTRY_TRANSPORT_EF[c]["source"]
+    assert D.DEFAULT_TRANSPORT_EF["road_sourced"] is False
+
+
+def test_the_india_source_names_the_study_and_its_standard():
+    src = D.COUNTRY_TRANSPORT_EF["India"]["source"]
+    for fragment in ("Smart Freight Centre", "ISO 14083", "well-to-wheel"):
+        assert fragment in src, fragment
+
+
+def test_sea_is_not_claimed_as_indian_national_data():
+    """SFC covers road and rail only; the sea leg stays a GLEC default."""
+    assert D.COUNTRY_TRANSPORT_EF["India"]["sea"] == 0.010
+    assert D.COUNTRY_TRANSPORT_EF["Cambodia"]["sea"] == 0.010

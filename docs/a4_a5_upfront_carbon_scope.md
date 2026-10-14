@@ -35,14 +35,70 @@ Confirmed mechanics from the standard:
 
 ## 3. Country transport emission factors (kg CO₂e/tonne-km)
 
-| Country | Source | Road | Rail | Sea |
+| Country | Road | Rail | Sea | Source |
 |---|---|---|---|---|
-| India | **SFC/WRI India Default GHG Values v1.0 (May 2025)**, GLEC v3.1/ISO 14083, by GVW class | ~0.05–0.09 | ~0.006–0.011 | — |
-| Thailand | **TGO** national EF database (same body as our TGO EPDs) | national value (lock at build) | — | — |
-| Cambodia / Vietnam / Indonesia | **GLEC v3 default** (avg laden HGV, WTW, AR6) | ~0.10 | ~0.02–0.03 | ~0.008–0.015 |
+| **India** | **0.0823 / 0.0902** (by class) | **0.0106** | 0.010 | **SFC / TCI-IIMB — sourced** |
+| Thailand | 0.090 | 0.020 | 0.010 | GLEC v3 proxy |
+| Cambodia | 0.100 | 0.025 | 0.010 | GLEC v3 proxy |
+| Vietnam | 0.100 | 0.025 | 0.010 | GLEC v3 proxy |
+| Indonesia | 0.100 | 0.025 | 0.010 | GLEC v3 proxy |
 
-Exact per-class India values and the Thailand TGO value are pulled into the seed table at
-build. Sea leg (imports) = GLEC container-ship default everywhere.
+**Only India is sourced.** The other four are GLEC regional defaults standing in
+for national figures that do not exist yet, and the panel labels them as proxies
+rather than presenting them as equals. The **sea leg is GLEC everywhere**,
+India included — SFC covers road and rail only.
+
+### India — Smart Freight Centre / TCI-IIMB
+
+*India Default GHG Emission Values*, Version 1, Smart Freight Centre with the
+TCI-IIMB Supply Chain Sustainability Lab at IIM Bangalore. Aligned to
+**ISO 14083** and the GLEC Framework.
+
+The values are published **directly as kg CO₂e per tonne-km, well-to-wheel**, so
+BEAT derives nothing. Everything an estimate would otherwise have to assume is
+measured in the study:
+
+- CO₂e on IPCC AR6 GWP100, including CH₄ and N₂O
+- WTT (fuel supply) and TTW (combustion) given separately; WTW is their sum
+- **empty running measured per class**, 10.8%–14.4%
+- **vehicle utilisation measured per class**, 67%–83%
+- a 5% DAF uplift for out-of-route deviation
+
+Road, WTW kg CO₂e/tonne-km, diesel:
+
+| Class | GVW | Payload | Empty | Utilisation | WTW |
+|---|---|---|---|---|---|
+| Small commercial | <3.5 t | 0.5–2 t | 10.9% | 83.0% | 0.3795 |
+| Medium commercial 1 | 3–5 t | 2–3.5 t | 10.9% | 82.7% | 0.2222 |
+| Medium commercial 2 | 5–12 t | 3.5–8 t | 10.8% | 78.8% | 0.1400 |
+| **Heavy commercial 1** | 12–20 t | 8–12 t | 12.4% | 76.8% | **0.0902** |
+| **Heavy commercial 2** | 20–30 t | 12–20 t | 12.0% | 69.4% | **0.0823** |
+| Heavy commercial 3 | 30–50 t | 20–40 t | 14.4% | 68.3% | 0.0663 |
+| Tractor trailer | 30–60 t | 20–50 t | 13.3% | 67.2% | 0.0551 |
+
+Rail: WTT 0.0064 + TTW 0.0041 = **0.0106**, averaged 2015-16 to 2019-20 from
+Ministry of Railways annual reports.
+
+**The class is matched to the journey, not flattened to one number:**
+
+| Journey | Road class | Factor |
+|---|---|---|
+| Local, ~50 km delivery | Heavy commercial 1 (12–20 t) | 0.0902 |
+| National line haul | Heavy commercial 2 (20–30 t) | 0.0823 |
+| Inland leg off a port | Heavy commercial 2 (20–30 t) | 0.0823 |
+
+A short delivery genuinely runs on a smaller, less efficient truck than a line
+haul, and the study's own class split is what makes that statement defensible.
+
+The study notes its road values "seem to be on the lower side" and rest on sample
+primary research that will be updated over time.
+
+**Cross-check, for the record.** Deriving a factor independently from WRI's
+*India Specific Road Transport Emission Factors* v1.0 (2015) — a consultation
+draft publishing kg CO₂ per *vehicle*-km — required assuming a 16 t payload and
+applying CO₂e, well-to-wheel and empty-running uplifts by hand. That gave
+**0.0807**, within 2% of SFC's measured **0.0823**. SFC is used because it needs
+none of those assumptions.
 
 ## 4. Sourcing scenarios (how A4 distance is set) — RICS-style
 

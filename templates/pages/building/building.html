@@ -558,7 +558,6 @@
               aria-label="{% translate 'Systems' %}"
             />
             <input type="radio" name="building-tabs" class="tab" aria-label="{% translate 'Savings' %}" />
-            <input type="radio" name="building-tabs" class="tab" aria-label="{% translate 'Upfront' %}" />
           </div>
         </div>
       </div>
@@ -851,15 +850,6 @@
           tabContentContainer.innerHTML = '<div class="flex justify-center items-center py-8 w-full"><span class="loading loading-spinner loading-lg"></span></div>';
           // Use HTMX to load content
           htmx.ajax('GET', `{% url "savings_tab" building_id=building.id %}`, {
-            target: '#tab-content-container'
-          });
-          return;
-        }
-
-        if (tabLabel === "{% translate 'Upfront' %}") {
-          if (tabContentContainerTop) tabContentContainerTop.classList.add("hidden");
-          tabContentContainer.innerHTML = '<div class="flex justify-center items-center py-8 w-full"><span class="loading loading-spinner loading-lg"></span></div>';
-          htmx.ajax('GET', `{% url "upfront_tab" building_id=building.id %}`, {
             target: '#tab-content-container'
           });
           return;

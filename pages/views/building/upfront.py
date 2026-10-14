@@ -1,8 +1,10 @@
 """Upfront Carbon (A4–A5) panel: per-material breakdown + inline override editing.
 
-GET  /building/<id>/upfront/       -> JSON breakdown (rows + totals + defaults)
-POST /building/<id>/upfront/       -> save per-material overrides, returns recomputed totals
-GET  /building/<id>/upfront-tab/   -> the rendered panel, loaded into the building page by htmx
+GET  /building/<id>/upfront/   -> JSON breakdown (rows + totals + defaults)
+POST /building/<id>/upfront/   -> save per-material overrides, returns recomputed totals
+
+The panel itself is templates/pages/building/_upfront_panel.html, included by
+the building page and driven by this JSON.
 """
 import json
 import uuid as uuid_lib
@@ -10,7 +12,6 @@ from decimal import Decimal, InvalidOperation
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
 from pages.models.building import Building
@@ -91,6 +92,8 @@ def _rows_and_totals(building):
             "legs_text": D.describe_legs(legs),
             "distance_km": D.scenario_total_km(legs),
             "kgco2e_per_tonne": round(D.legs_tonne_km_co2(legs), 4),
+            # only India has per-class road data; None elsewhere
+            "road_class": D.road_class_for(k, country_name),
         }
     return rows, totals, floor_area, country_name, sdef
 
@@ -104,10 +107,16 @@ def building_upfront(request, building_id):
 
     if request.method == "GET":
         rows, totals, floor_area, country, sdef = _rows_and_totals(building)
+        ef = D.transport_ef(country)
         return JsonResponse({
             "success": True, "rows": rows, "totals": totals,
             "floor_area": floor_area, "country": country,
             "disposal_ef": D.DISPOSAL_EF_PER_KG, "scenario_defaults": sdef,
+            # provenance, so the panel can say which figures are sourced and
+            # which are placeholders standing in for a national study
+            "ef_source": ef["source"],
+            "road_sourced": ef.get("road_sourced", False),
+            "rail_share_pct": round(D.national_rail_share(country) * 100),
         })
 
     # POST — save overrides
@@ -154,49 +163,3 @@ def building_upfront(request, building_id):
     return JsonResponse({"success": True, "saved": saved, "rows": rows, "totals": totals,
                          "scenario_defaults": sdef})
 
-
-@login_required
-def upfront_tab(request, building_id):
-    """The Upfront Carbon tab, loaded into the building page by htmx.
-
-    Same numbers as the JSON endpoint — this renders them. Rows are grouped by
-    component so the table reads the way the Assembly tab does.
-    """
-    building = _get_building(building_id, request.user)
-    if not building:
-        return render(request, "pages/building/upfront_tab.html",
-                      {"not_found": True})
-
-    rows, totals, floor_area, country_name, sdef = _rows_and_totals(building)
-
-    groups, order = {}, []
-    for r in rows:
-        key = r["component_id"]
-        if key not in groups:
-            groups[key] = {"name": r["component"], "rows": [],
-                           "a1a3": 0.0, "a4": 0.0, "a5w": 0.0}
-            order.append(key)
-        g = groups[key]
-        g["rows"].append(r)
-        g["a1a3"] += r["a1a3"]; g["a4"] += r["a4"]; g["a5w"] += r["a5w"]
-    for g in groups.values():
-        for k in ("a1a3", "a4", "a5w"):
-            g[k] = round(g[k], 2)
-
-    # the journeys behind every row, shown once rather than repeated per material
-    journeys = [dict(key=k, **sdef[k]) for k in ("local", "national", "imported")]
-    rail_share = D.national_rail_share(country_name)
-
-    return render(request, "pages/building/upfront_tab.html", {
-        "building": building,
-        "country": country_name,
-        "floor_area": floor_area,
-        "totals": totals,
-        "groups": [groups[k] for k in order],
-        "journeys": journeys,
-        "rail_share_pct": round(rail_share * 100),
-        "ef_source": D.transport_ef(country_name)["source"],
-        "disposal_ef": D.DISPOSAL_EF_PER_KG,
-        "scenario_choices": D.SCENARIO_CHOICES,
-        "has_rows": bool(rows),
-    })

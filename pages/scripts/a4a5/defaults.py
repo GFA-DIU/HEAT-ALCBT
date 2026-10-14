@@ -32,16 +32,110 @@ weighted average of two different vehicles and was not a property of anything
 real. Legs are reported separately now, and no blended figure is shown.
 """
 
-# --- Freight emission factors, kg CO2e per tonne-km (well-to-wheel) -----------
+# --- Freight emission factors, kg CO2e per tonne-km --------------------------
+#
+# INDIA is sourced. The other four are GLEC regional defaults standing in for
+# national figures that do not exist yet, and the panel labels them as proxies
+# rather than presenting them as equals.
+#
+# India — Smart Freight Centre / TCI-IIMB
+# ---------------------------------------
+# "India Default GHG Emission Values", Version 1, Smart Freight Centre with the
+# TCI-IIMB Supply Chain Sustainability Lab at IIM Bangalore. Aligned to
+# ISO 14083 and the GLEC Framework.
+#
+# These are published **directly as kg CO2e per tonne-km, well-to-wheel**, so
+# nothing has to be derived. Everything an estimate would otherwise have to
+# assume is measured in the study:
+#
+#   * CO2e on IPCC AR6 GWP100, including CH4 and N2O
+#   * WTT (fuel supply) and TTW (combustion) given separately; WTW is their sum
+#   * empty running measured per class (10.8%-14.4%)
+#   * vehicle utilisation measured per class (67%-83%)
+#   * a 5% DAF uplift for out-of-route deviation
+#
+# Road, WTW kg CO2e/tonne-km, diesel (study's table, page 6):
+#
+#   Small commercial       GVW <3.5 t    payload 0.5-2 t     0.3795
+#   Medium commercial 1    GVW 3-5 t     payload 2-3.5 t     0.2222
+#   Medium commercial 2    GVW 5-12 t    payload 3.5-8 t     0.1400
+#   Heavy commercial 1     GVW 12-20 t   payload 8-12 t      0.0902   <- local
+#   Heavy commercial 2     GVW 20-30 t   payload 12-20 t     0.0823   <- line haul
+#   Heavy commercial 3     GVW 30-50 t   payload 20-40 t     0.0663
+#   Tractor trailer        GVW 30-60 t   payload 20-50 t     0.0551
+#
+# The class is matched to the journey rather than flattened to one number: a
+# 50 km delivery runs on a smaller, less efficient truck than a 300 km line
+# haul, and the study's own class split is what lets us say so.
+#
+# Rail: WTT 0.0064 + TTW 0.0041 = 0.0106, averaged over 2015-16 to 2019-20 from
+# Ministry of Railways annual reports.
+#
+# The study notes its road values "seem to be on the lower side" and rest on
+# sample primary research that will be updated over time.
+#
+# Cross-check, for the record: deriving a factor independently from WRI's
+# "India Specific Road Transport Emission Factors" v1.0 (2015) — a consultation
+# draft giving kg CO2 per vehicle-km — gave 0.0807 for a 16 t payload HDV after
+# adding CO2e, well-to-wheel and empty-running uplifts by hand. That is within
+# 2% of SFC's measured 0.0823. SFC is used because it needs none of those
+# assumptions.
+SFC_INDIA_ROAD = {
+    "scv": 0.3795, "mcv1": 0.2222, "mcv2": 0.1400,
+    "hcv1": 0.0902, "hcv2": 0.0823, "hcv3": 0.0663, "trailer": 0.0551,
+}
+SFC_INDIA_RAIL = 0.0106
+
+# Which road class carries which leg. Keyed by scenario; "default" covers the
+# rest. Only India has the class data to make this distinction.
+INDIA_ROAD_CLASS_BY_SCENARIO = {
+    "local": "hcv1",        # short delivery, 12-20 t GVW
+    "default": "hcv2",      # line haul and the inland leg off a port, 20-30 t
+}
+VEHICLE_CLASS_LABEL = {
+    "scv": "small commercial, GVW <3.5 t",
+    "mcv1": "medium commercial, GVW 3-5 t",
+    "mcv2": "medium commercial, GVW 5-12 t",
+    "hcv1": "heavy commercial, GVW 12-20 t",
+    "hcv2": "heavy commercial, GVW 20-30 t",
+    "hcv3": "heavy commercial, GVW 30-50 t",
+    "trailer": "tractor trailer, GVW 30-60 t",
+}
+
+_GLEC = "GLEC v3 regional default — proxy, no national study found"
+_SFC = ("Smart Freight Centre / TCI-IIMB, India Default GHG Emission Values v1 "
+        "(ISO 14083, well-to-wheel, measured empty running and load factor)")
+
 # road / rail / sea. Keyed by Country.name.
 COUNTRY_TRANSPORT_EF = {
-    "India":     {"road": 0.070, "rail": 0.008, "sea": 0.010, "source": "SFC/WRI India Default GHG Values v1.0 (2025)"},
-    "Thailand":  {"road": 0.090, "rail": 0.020, "sea": 0.010, "source": "TGO (placeholder — lock exact)"},
-    "Cambodia":  {"road": 0.100, "rail": 0.025, "sea": 0.010, "source": "GLEC v3 regional default"},
-    "Vietnam":   {"road": 0.100, "rail": 0.025, "sea": 0.010, "source": "GLEC v3 regional default"},
-    "Indonesia": {"road": 0.100, "rail": 0.025, "sea": 0.010, "source": "GLEC v3 regional default"},
+    "India":     {"road": SFC_INDIA_ROAD["hcv2"], "rail": SFC_INDIA_RAIL, "sea": 0.010,
+                  "source": _SFC, "road_sourced": True},
+    "Thailand":  {"road": 0.090, "rail": 0.020, "sea": 0.010,
+                  "source": _GLEC, "road_sourced": False},
+    "Cambodia":  {"road": 0.100, "rail": 0.025, "sea": 0.010,
+                  "source": _GLEC, "road_sourced": False},
+    "Vietnam":   {"road": 0.100, "rail": 0.025, "sea": 0.010,
+                  "source": _GLEC, "road_sourced": False},
+    "Indonesia": {"road": 0.100, "rail": 0.025, "sea": 0.010,
+                  "source": _GLEC, "road_sourced": False},
 }
-DEFAULT_TRANSPORT_EF = {"road": 0.100, "rail": 0.025, "sea": 0.010, "source": "GLEC v3 default"}
+DEFAULT_TRANSPORT_EF = {"road": 0.100, "rail": 0.025, "sea": 0.010,
+                        "source": _GLEC, "road_sourced": False}
+
+
+def road_ef(country_name: str, scenario: str):
+    """(factor, vehicle-class label or None) for a road leg on this journey.
+
+    Only India carries per-class data. Everywhere else returns the single
+    regional road factor, with no class claimed.
+    """
+    ef = transport_ef(country_name)
+    if country_name == "India":
+        key = INDIA_ROAD_CLASS_BY_SCENARIO.get(
+            scenario, INDIA_ROAD_CLASS_BY_SCENARIO["default"])
+        return SFC_INDIA_ROAD[key], VEHICLE_CLASS_LABEL[key]
+    return ef["road"], None
+
 
 # --- Share of a NATIONAL land haul carried by rail ----------------------------
 # ⚠️ ASSUMPTION, not sourced. These shares are judgement about how much of a
@@ -142,7 +236,8 @@ def scenario_legs(scenario: str, country_name: str) -> list[dict]:
     own terms. Legs of zero length are left out.
     """
     ef = transport_ef(country_name)
-    scen = SCENARIOS.get(scenario, SCENARIOS["national"])
+    key = scenario if scenario in SCENARIOS else "national"
+    scen = SCENARIOS[key]
     legs = []
 
     sea_km = float(scen["sea_km"])
@@ -156,9 +251,18 @@ def scenario_legs(scenario: str, country_name: str) -> list[dict]:
     if rail_km > 0:
         legs.append({"mode": "rail", "km": round(rail_km, 1), "ef": round(ef["rail"], 5)})
     if road_km > 0:
-        legs.append({"mode": "road", "km": round(road_km, 1), "ef": round(ef["road"], 5)})
+        # the road class depends on the journey: a short delivery runs on a
+        # smaller, less efficient truck than a line haul
+        rf, _cls = road_ef(country_name, key)
+        legs.append({"mode": "road", "km": round(road_km, 1), "ef": round(rf, 5)})
 
     return legs
+
+
+def road_class_for(scenario: str, country_name: str):
+    # The vehicle class behind a journey road leg, or None where unknown.
+    key = scenario if scenario in SCENARIOS else "national"
+    return road_ef(country_name, key)[1]
 
 
 def legs_tonne_km_co2(legs) -> float:
