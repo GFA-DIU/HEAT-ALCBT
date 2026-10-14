@@ -102,10 +102,14 @@
     const set=(id,v,d)=>{const e=document.getElementById(id);if(e)e.textContent=num(v,d);};
     set('uf-g-a1a3-'+g.g,a1,2);set('uf-g-a4-'+g.g,a4,3);set('uf-g-a5w-'+g.g,a5,3);});}
   function paintTotals(){let a1=0,a4=0,a5=0;state.rows.forEach(r=>{a1+=r.a1a3||0;a4+=r.a4||0;a5+=r.a5w||0;});
+    // A5.2 is project level: it comes from the server and does not move when a
+    // material's scenario or waste rate changes.
+    const a52=(state.totals&&state.totals.a5_2)||0;
     document.getElementById('uf-t-a1a3').textContent=num(a1,1);
     document.getElementById('uf-t-a4').textContent=num(a4,2);
     document.getElementById('uf-t-a5w').textContent=num(a5,2);
-    document.getElementById('uf-t-up').textContent=num(a1+a4+a5,1);}
+    const e52=document.getElementById('uf-t-a52'); if(e52)e52.textContent=num(a52,2);
+    document.getElementById('uf-t-up').textContent=num(a1+a4+a5+a52,1);}
 
   function matRows(r,i,g){
     const massless=(r.mass_kg===null||r.mass_kg===undefined);
@@ -148,7 +152,8 @@
 
     let html='<div class="uf-key">'
       + '<div><b>A1&ndash;A3</b> product stage, from the EPD &middot; '
-      + '<b>A4</b> transport to site &middot; <b>A5w</b> construction waste. '
+      + '<b>A4</b> transport to site &middot; <b>A5.2</b> site energy &middot; '
+      + '<b>A5.3</b> construction waste. '
       + 'All figures kg CO₂e/m². Click a component to expand it.</div>'
       + '<div><b>'+esc(state.country)+'</b>, GFA '+num(state.floor_area,0)+' m². '
       + 'The sourcing scenario picks the journey; distances and emission factors '
@@ -179,6 +184,34 @@
       + 'Rail is far less carbon-intensive per tonne-km, so this lowers A4 for nationally '
       + 'sourced materials. Replace with real modal-split data before publishing figures.</div>';
     html+='</div>';
+    // A5.2 - construction site energy. Project level, so it sits outside the
+    // per-material table rather than inside it.
+    const ce = state.construction || {rows:[], notes:[], scope:''};
+    html+='<div class="uf-assump"><div class="uf-assump-h">'
+      + 'A5.2 &mdash; energy used on site during construction</div>';
+    if(ce.rows && ce.rows.length){
+      html+='<table class="uf-jtable"><thead><tr><th>Carrier</th><th class="r">Recorded</th>'
+        + '<th class="r">kWh</th><th class="r">kg CO₂e/kWh</th><th class="r">kg CO₂e/m²</th>'
+        + '<th>Conversion</th></tr></thead><tbody>';
+      ce.rows.forEach(r=>{
+        html+='<tr><td class="cap">'+esc(r.name||'')+'</td>'
+          + '<td class="r">'+num(r.quantity,0)+' '+esc(r.unit||'')+'</td>'
+          + '<td class="r">'+(r.kwh===null?'&mdash;':num(r.kwh,0))+'</td>'
+          + '<td class="r">'+(r.factor_kgco2e_per_kwh===null?'&mdash;':num(r.factor_kgco2e_per_kwh,3))+'</td>'
+          + '<td class="r">'+(r.a5_2===null?'&mdash;':num(r.a5_2,3))+'</td>'
+          + '<td class="legs">'+esc(r.problem||r.conversion||'')+'</td></tr>';
+      });
+      html+='</tbody></table>';
+    } else {
+      html+='<div class="uf-warn"><b>No site energy entered.</b> A5.2 is reported '
+        + 'as zero, so the upfront total below is understated by whatever the site '
+        + 'actually used &mdash; diesel for plant and generators, site electricity, '
+        + 'temporary works. Enter it as metered kWh or as litres from delivery notes.</div>';
+    }
+    (ce.notes||[]).forEach(n=>{ html+='<div class="uf-src">'+esc(n)+'</div>'; });
+    if(ce.scope) html+='<div class="uf-src"><b>Scope:</b> '+esc(ce.scope)+'</div>';
+    html+='</div>';
+
     html+='<div style="overflow-x:auto"><table class="uf-table"><thead><tr>'
       + '<th class="l">{% translate "Component / material" %}</th><th>A1-A3</th><th class="l">{% translate "Sourcing" %}</th>'
       + '<th>A4</th><th>{% translate "Waste" %}</th><th>A5w</th><th></th></tr></thead><tbody>';
@@ -190,8 +223,10 @@
       g.idx.forEach(i=>{ html+=matRows(state.rows[i],i,g.g); });
     });
     html+='</tbody><tfoot>'
-      + '<tr style="font-weight:600;border-top:2px solid var(--stroke--soft-200)"><td class="l">{% translate "TOTAL (kg CO₂e/m²)" %}</td>'
+      + '<tr style="font-weight:600;border-top:2px solid var(--stroke--soft-200)"><td class="l">{% translate "Materials: A1–A3 · A4 · A5.3" %}</td>'
       + '<td class="uf-num" id="uf-t-a1a3"></td><td></td><td class="uf-num" id="uf-t-a4"></td><td></td><td class="uf-num" id="uf-t-a5w"></td><td></td></tr>'
+      + '<tr><td class="l" colspan="5" style="text-align:right">{% translate "A5.2 site energy (whole project)" %}</td>'
+      + '<td class="uf-num" id="uf-t-a52"></td><td></td></tr>'
       + '<tr style="font-weight:700"><td class="l" colspan="5" style="text-align:right">{% translate "Upfront A1–A5" %}</td>'
       + '<td class="uf-num" id="uf-t-up"></td><td></td></tr></tfoot></table></div>';
     html+='<div class="flex items-center gap-3 mt-3"><button id="uf-save" class="btn btn-primary btn-sm">{% translate "Save changes" %}</button>'
@@ -243,7 +278,12 @@
     document.getElementById('uf-msg').textContent='{% translate "Saving…" %}';
     fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':csrf()},body:JSON.stringify({overrides})})
       .then(r=>r.json()).then(d=>{btn.disabled=false;
-        if(d.success){state.rows=d.rows;render();
+        if(d.success){state.rows=d.rows;
+          // keep the server-side figures in step, or A5.2 and the upfront
+          // total would go stale after a save
+          if(d.totals)state.totals=d.totals;
+          if(d.construction)state.construction=d.construction;
+          render();
           document.getElementById('uf-msg').textContent='{% translate "Saved ✓ (reload the page to update the dashboard totals)" %}';
         } else {document.getElementById('uf-msg').textContent=d.error||'Error';}
       }).catch(()=>{btn.disabled=false;document.getElementById('uf-msg').textContent='Error';});

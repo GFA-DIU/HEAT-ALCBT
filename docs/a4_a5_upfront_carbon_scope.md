@@ -154,6 +154,68 @@ defensible numbers in the file. They are also consequential: India's rail factor
 moved India's national haul from 21.0 to **9.84 kgCO₂e/tonne**. Replace them
 with real modal-split data before any published figure relies on them.
 
+## 4a. A5 sub-stages — what BEAT covers
+
+RICS WLCA 2nd ed. (section 5.1.4) splits A5 four ways. BEAT models two, and the
+panel says so rather than labelling the pair "A5":
+
+| Sub-stage | Covers | In BEAT |
+|---|---|---|
+| **A5.1** Pre-construction demolition | demolishing existing structures, waste transport and disposal | ❌ not modelled |
+| **A5.2** Construction activities | site electricity and fuels, plant, cranes, generators, site offices, temporary works | ✅ `pages/scripts/a4a5/construction.py` |
+| **A5.3** Construction waste | wasted material's own A1–A3 + A4, plus disposal | ✅ `compute.py` (named `a5w` in code) |
+| **A5.4** Worker transport | travel to and from site; optional under RICS | ❌ not modelled |
+
+### A5.2 — construction site energy
+
+    A5.2 = Σ( kWh of each carrier × that carrier's kgCO₂e/kWh ) / GFA
+
+**It reuses the operational energy EPDs.** A kWh of grid electricity has the
+same footprint whether a tower crane draws it in month four or a lift draws it
+in year ten — only the stage it is reported under changes. So `Electricity`,
+`Diesel`, `Natural Gas`, `LPG` and the rest serve both B6 and A5.2, and the
+factor is the EPD's own B6 figure.
+
+**Model.** `ConstructionProduct` is a third subclass of `BaseProduct`, sibling
+to `StructuralProduct` and `OperationalProduct`:
+
+```
+BaseProduct (abstract: EPD + unit + quantity)
+├── StructuralProduct   -> assembly   -> A1–A3, A4, A5.3
+├── OperationalProduct   -> building   -> B6
+└── ConstructionProduct  -> building   -> A5.2          <- new, migration 0061
+```
+
+A separate model rather than a flag on `OperationalProduct`, so that no
+existing query over `operational_products` can sweep site diesel into the
+building's annual running energy.
+
+**A5.2 and A5.3 are computed in opposite directions** and must not be merged
+into one loop or one reported figure: A5.3 is **per material** (waste % of that
+material's A1–A3 + A4), A5.2 is **per project** (one meter reading for the whole
+build).
+
+**Units.** Sites record what they bought — litres on a delivery note, kilograms
+on a cylinder, kWh on a meter — while the EPDs are declared per kWh. Conversion
+lives in `pages/scripts/a4a5/fuels.py`:
+
+- **Net calorific values: IPCC 2006 Guidelines, Vol 2, Ch 1, Table 1.2.** The
+  same defaults TGO and Smart Freight Centre cite for their own factors.
+- ⚠️ **Densities are typical trade values, not IPCC.** IPCC publishes NCVs per
+  unit mass and no densities. These are the weakest numbers in the module, they
+  are declared to the user whenever a litre figure depends on one, and they are
+  the thing to source next — the SFC study cites BPCL's conversion table for
+  exactly this.
+
+A fuel sold by mass (LPG, coal, charcoal) **refuses a litre entry** rather than
+inventing a density, and a non-fuel EPD is refused outright. Nothing is silently
+dropped: an entry that cannot be converted is shown with the reason.
+
+**No benchmark when nothing is entered.** A5.2 reports **zero and says the
+upfront total is understated**. There is no sourced kWh/m² figure for these five
+countries, and an invented default inside a total that looks measured is exactly
+the failure mode the A4 rail share is already flagged for.
+
 ## 5. Construction waste rates (A5w) — RICS Table 18 defaults
 
 Auto-assigned per **MaterialCategory**, shown and editable. Representative defaults

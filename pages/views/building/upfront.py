@@ -19,6 +19,7 @@ from pages.models.assembly import StructuralProduct
 from pages.views.building.impact_calculation import calculate_impacts, ImpactCalculationError
 from pages.scripts.a4a5 import defaults as D
 from pages.scripts.a4a5.compute import material_a4_a5
+from pages.scripts.a4a5.construction import construction_energy, scope_note
 
 
 def _get_building(building_id, user):
@@ -80,8 +81,18 @@ def _rows_and_totals(building):
                                    or sp.a4_distance_km is not None or sp.a4_ef is not None),
             })
             t_a1a3 += a1a3; t_a4 += float(a4); t_a5w += float(a5w)
-    totals = {"a1a3": round(t_a1a3, 2), "a4": round(t_a4, 2), "a5w": round(t_a5w, 2),
-              "upfront": round(t_a1a3 + t_a4 + t_a5w, 2)}
+    # A5.2 - site energy. Project-level, so it is computed once from the
+    # building's own entries rather than per material like A5.3 waste.
+    a5_2, constr_rows, constr_notes = construction_energy(
+        building.construction_products.select_related("epd").all(), floor_area)
+    t_a5_2 = float(a5_2)
+
+    totals = {"a1a3": round(t_a1a3, 2), "a4": round(t_a4, 2),
+              # a5w keeps its name so nothing that reads it breaks; the UI
+              # labels it A5.3, which is what RICS calls it
+              "a5w": round(t_a5w, 2), "a5_2": round(t_a5_2, 2),
+              "a5": round(t_a5w + t_a5_2, 2),
+              "upfront": round(t_a1a3 + t_a4 + t_a5w + t_a5_2, 2)}
     # scenario → journey defaults for this country, so the UI can prefill on change
     sdef = {}
     for k in ("local", "national", "imported"):
@@ -95,7 +106,8 @@ def _rows_and_totals(building):
             # only India has per-class road data; None elsewhere
             "road_class": D.road_class_for(k, country_name),
         }
-    return rows, totals, floor_area, country_name, sdef
+    return (rows, totals, floor_area, country_name, sdef,
+            {"rows": constr_rows, "notes": constr_notes, "scope": scope_note()})
 
 
 @login_required
@@ -106,7 +118,7 @@ def building_upfront(request, building_id):
         return JsonResponse({"success": False, "error": "Building not found"}, status=404)
 
     if request.method == "GET":
-        rows, totals, floor_area, country, sdef = _rows_and_totals(building)
+        rows, totals, floor_area, country, sdef, constr = _rows_and_totals(building)
         ef = D.transport_ef(country)
         return JsonResponse({
             "success": True, "rows": rows, "totals": totals,
@@ -117,6 +129,7 @@ def building_upfront(request, building_id):
             "ef_source": ef["source"],
             "road_sourced": ef.get("road_sourced", False),
             "rail_share_pct": round(D.national_rail_share(country) * 100),
+            "construction": constr,
         })
 
     # POST — save overrides
@@ -159,7 +172,7 @@ def building_upfront(request, building_id):
         sp.save(update_fields=["sourcing_scenario", "waste_rate", "a4_distance_km", "a4_ef"])
         saved += 1
 
-    rows, totals, floor_area, country, sdef = _rows_and_totals(building)
+    rows, totals, floor_area, country, sdef, constr = _rows_and_totals(building)
     return JsonResponse({"success": True, "saved": saved, "rows": rows, "totals": totals,
-                         "scenario_defaults": sdef})
+                         "scenario_defaults": sdef, "construction": constr})
 
