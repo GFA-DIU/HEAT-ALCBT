@@ -211,7 +211,107 @@ def calculate_embodied_modules(
                 ef=float(efv) if efv is not None else None)
             a1a3 += p_a1a3; a4 += p_a4; a5w += p_a5w
 
-    return {"a1a3": a1a3, "a4": a4, "a5w": a5w, "upfront": a1a3 + a4 + a5w}
+    # A5.2 - construction site energy. Project level rather than per material,
+    # so it is added once at the end. It was previously left out here while the
+    # Upfront panel counted it, which meant the two screens reported different
+    # upfront totals for the same building. Nothing is estimated: a building
+    # with no site energy entered contributes zero.
+    a5_2 = Decimal("0")
+    if not simulated:
+        try:
+            from pages.scripts.a4a5.construction import construction_energy
+            a5_2, _rows, _notes = construction_energy(
+                building.construction_products.select_related("epd").all(),
+                floor_area)
+        except Exception:
+            a5_2 = Decimal("0")
+
+    return {"a1a3": a1a3, "a4": a4, "a5w": a5w, "a5_2": a5_2,
+            "a5": a5w + a5_2, "a4a5": a4 + a5w + a5_2,
+            "upfront": a1a3 + a4 + a5w + a5_2}
+
+
+def get_a4a5_share_by_material(building, prefetched_assemblies=None):
+    """A4+A5 by material group, as a share of the building's total A4+A5.
+
+    Grouped with _MATERIAL_CATEGORY_MAPPING, the same grouping the A1-A3 chart
+    uses, so the two charts name materials identically and a reader can put
+    them side by side.
+
+    The bar is a share of the building's A4+A5, not of each material's own
+    carbon. The per-material version read strangely next to the A1-A3 chart:
+    masonry came out at 71% while contributing 1.7 kgCO2e/m2, because transport
+    dwarfs its tiny product carbon. A big percentage now always means a big
+    number, and the "share of its own carbon" figure is kept per row for the
+    CSV, where it can be read without being mistaken for the building total.
+    """
+    from collections import defaultdict
+    from pages.scripts.a4a5.compute import material_a4_a5
+
+    country_name = getattr(getattr(building, "country", None), "name", None) or "?"
+    floor_area = float(building.total_floor_area or 0)
+
+    if prefetched_assemblies is not None:
+        building_assemblies = prefetched_assemblies
+    else:
+        building_assemblies = building.buildingassembly_set.all()
+
+    agg = defaultdict(lambda: {"a1a3": Decimal("0"), "a4a5": Decimal("0")})
+    for ba in building_assemblies:
+        assembly = ba.assembly
+        products = getattr(assembly, "prefetched_products", None)
+        if products is None:
+            products = assembly.structuralproduct_set.all()
+        for sp in products:
+            try:
+                impacts = calculate_impacts(
+                    dimension=assembly.dimension, assembly_quantity=ba.quantity,
+                    total_floor_area=floor_area, p=sp)
+            except (ImpactCalculationError, ValueError, AttributeError,
+                    ZeroDivisionError):
+                continue
+            a1a3 = next((Decimal(str(i["impact_value"])) for i in impacts
+                         if i["impact_type"].impact_category == "gwp"
+                         and i["impact_type"].life_cycle_stage == "a1a3"
+                         and Decimal(str(i["impact_value"])) > 0), Decimal("0"))
+            if a1a3 <= 0:
+                continue
+            mass_kg = next((i.get("mass_kg") for i in impacts), None)
+            original = (str(sp.epd.category)
+                        if sp.epd and sp.epd.category else "Others")
+            group = _MATERIAL_CATEGORY_MAPPING.get(original, "Others")
+            a4, a5w, _meta = material_a4_a5(
+                a1a3_per_m2=a1a3, mass_kg=mass_kg, floor_area=floor_area,
+                country_name=country_name,
+                category_name=(getattr(sp.epd.category, "name_en", "")
+                               if sp.epd.category else ""),
+                scenario=getattr(sp, "sourcing_scenario", None) or None,
+                waste_rate=(float(sp.waste_rate)
+                            if getattr(sp, "waste_rate", None) is not None else None))
+            agg[group]["a1a3"] += a1a3
+            agg[group]["a4a5"] += a4 + a5w
+
+    total = sum(r["a4a5"] for r in agg.values())
+    rows = []
+    for name, r in agg.items():
+        if r["a4a5"] <= 0:
+            continue
+        rows.append({
+            "name": name,
+            "a1a3": float(round(r["a1a3"], 2)),
+            "a4a5": float(round(r["a4a5"], 3)),
+            "pct_of_total": round(float(r["a4a5"] / total * 100), 1) if total else 0.0,
+            # kept for the CSV: how much of this group's own carbon is A4+A5
+            "pct_of_own": round(float(r["a4a5"] / r["a1a3"] * 100), 1) if r["a1a3"] else 0.0,
+        })
+    rows.sort(key=lambda x: -x["a4a5"])
+    return {
+        "labels": [r["name"] for r in rows],
+        "data": [r["pct_of_total"] for r in rows],
+        "absolute": [r["a4a5"] for r in rows],
+        "rows": rows,
+        "total": float(round(total, 3)),
+    }
 
 
 def _op_is_electricity(op) -> bool:
@@ -483,6 +583,9 @@ def get_building_detail_statistics(
         # from country + RICS defaults). New metrics — headline embodied/footprint unchanged.
         'embodied_a4': modules['a4'],
         'embodied_a5w': modules['a5w'],
+        # A5.2 was missing from the card's breakdown line, so A1-A3 + A4 + A5w
+        # did not add up to the upfront figure printed above it.
+        'embodied_a5_2': modules['a5_2'],
         'upfront_carbon': modules['upfront'],
         'total_operational_carbon': operational,
         # Per-year intensity (sum of Systems-tab bars), so the stat card matches the chart.
@@ -1325,10 +1428,32 @@ def get_building_chart_data(
         )
 
     return {
+        # Three stages rather than embodied-vs-operational. The word "Upfront"
+        # is gone from the labels: it named a total the chart no longer shows
+        # as one slice, and readers took it to mean something distinct from
+        # A1-A5 rather than a synonym for it.
         'whole_life_carbon': {
-            'labels': ['Operational carbon (B6)', 'Upfront embodied carbon (A1-A5)'],
-            'data': [float(operational), float(embodied)],
+            'labels': ['Product (A1-A3)', 'Construction (A4-A5)',
+                       'Operational (B6)'],
+            'data': [float(modules['a1a3']), float(modules['a4a5']),
+                     float(operational)],
+            # the sub-stages behind the middle slice, for the CSV download
+            'breakdown': [
+                {'stage': 'A1-A3', 'label': 'Product stage (materials)',
+                 'value': float(modules['a1a3'])},
+                {'stage': 'A4', 'label': 'Transport to site',
+                 'value': float(modules['a4'])},
+                {'stage': 'A5.2', 'label': 'Construction site energy',
+                 'value': float(modules['a5_2'])},
+                {'stage': 'A5.3', 'label': 'Construction waste',
+                 'value': float(modules['a5w'])},
+                {'stage': 'B6', 'label': 'Operational energy',
+                 'value': float(operational)},
+            ],
         },
+        'a4a5_by_material': get_a4a5_share_by_material(
+            building, prefetched_assemblies=prefetched_assemblies
+        ),
         'embodied_by_assembly': get_embodied_carbon_by_assembly(
             building, prefetched_assemblies=prefetched_assemblies
         ),

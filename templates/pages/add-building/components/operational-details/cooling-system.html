@@ -135,7 +135,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -173,14 +173,17 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="COP is dimensionless (Watt/Watt). EER and ISEER are in Btu/h per Watt and are about 3.412x larger. Choose the metric printed on your equipment label - BEAT converts EER/ISEER to COP automatically so the energy estimate is correct." title="COP is dimensionless (Watt/Watt). EER and ISEER are in Btu/h per Watt and are about 3.412x larger. Choose the metric printed on your equipment label - BEAT converts EER/ISEER to COP automatically so the energy estimate is correct."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart." title="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span><span class="tooltip align-middle ml-1" data-tip="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER." title="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 2.8" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
         <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form); updateEffHint(this)" title="Efficiency metric on your label">
-          <option value="cop" selected>COP</option>
-          <option value="eer">EER</option>
-          <option value="iseer">ISEER</option>
+          <option value="cop" selected>COP - full load (W/W)</option>
+          <option value="eer_ww">EER - full load (W/W)</option>
+          <option value="eer">EER - full load (Btu/h per W)</option>
+          <option value="iseer">ISEER - seasonal (W/W)</option>
+          <option value="cspf">CSPF - seasonal (W/W)</option>
+          <option value="seer">SEER - seasonal (W/W)</option>
         </select>
       </label>
       <p class="text-xs text-[var(--text--sub-600)] mt-0.5"><span data-eff-hint>{% translate "COP from the label, typically 2.3 – 5.3. Cannot be zero." %}</span></p>
@@ -292,7 +295,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -324,14 +327,17 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="COP is dimensionless (Watt/Watt). EER and ISEER are in Btu/h per Watt and are about 3.412x larger. Choose the metric printed on your equipment label - BEAT converts EER/ISEER to COP automatically so the energy estimate is correct." title="COP is dimensionless (Watt/Watt). EER and ISEER are in Btu/h per Watt and are about 3.412x larger. Choose the metric printed on your equipment label - BEAT converts EER/ISEER to COP automatically so the energy estimate is correct."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart." title="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span><span class="tooltip align-middle ml-1" data-tip="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER." title="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 2.8" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
         <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form); updateEffHint(this)" title="Efficiency metric on your label">
-          <option value="cop" selected>COP</option>
-          <option value="eer">EER</option>
-          <option value="iseer">ISEER</option>
+          <option value="cop" selected>COP - full load (W/W)</option>
+          <option value="eer_ww">EER - full load (W/W)</option>
+          <option value="eer">EER - full load (Btu/h per W)</option>
+          <option value="iseer">ISEER - seasonal (W/W)</option>
+          <option value="cspf">CSPF - seasonal (W/W)</option>
+          <option value="seer">SEER - seasonal (W/W)</option>
         </select>
       </label>
       <p class="text-xs text-[var(--text--sub-600)] mt-0.5"><span data-eff-hint>{% translate "COP from the label, typically 2.3 – 5.3. Cannot be zero." %}</span></p>
@@ -439,7 +445,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -471,14 +477,17 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="COP is dimensionless (Watt/Watt). EER and ISEER are in Btu/h per Watt and are about 3.412x larger. Choose the metric printed on your equipment label - BEAT converts EER/ISEER to COP automatically so the energy estimate is correct." title="COP is dimensionless (Watt/Watt). EER and ISEER are in Btu/h per Watt and are about 3.412x larger. Choose the metric printed on your equipment label - BEAT converts EER/ISEER to COP automatically so the energy estimate is correct."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart." title="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span><span class="tooltip align-middle ml-1" data-tip="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER." title="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 4.0" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
         <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form); updateEffHint(this)" title="Efficiency metric on your label">
-          <option value="cop" selected>COP</option>
-          <option value="eer">EER</option>
-          <option value="iseer">ISEER</option>
+          <option value="cop" selected>COP - full load (W/W)</option>
+          <option value="eer_ww">EER - full load (W/W)</option>
+          <option value="eer">EER - full load (Btu/h per W)</option>
+          <option value="iseer">ISEER - seasonal (W/W)</option>
+          <option value="cspf">CSPF - seasonal (W/W)</option>
+          <option value="seer">SEER - seasonal (W/W)</option>
         </select>
       </label>
       <p class="text-xs text-[var(--text--sub-600)] mt-0.5"><span data-eff-hint>{% translate "COP from the label, typically 2.3 – 5.3. Cannot be zero." %}</span></p>
@@ -596,7 +605,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -628,14 +637,17 @@
     </fieldset>
 
     <fieldset class="fieldset col-span-2">
-      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="COP is dimensionless (Watt/Watt). EER and ISEER are in Btu/h per Watt and are about 3.412x larger. Choose the metric printed on your equipment label - BEAT converts EER/ISEER to COP automatically so the energy estimate is correct." title="COP is dimensionless (Watt/Watt). EER and ISEER are in Btu/h per Watt and are about 3.412x larger. Choose the metric printed on your equipment label - BEAT converts EER/ISEER to COP automatically so the energy estimate is correct."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart." title="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span><span class="tooltip align-middle ml-1" data-tip="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER." title="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
         <input type="number" name="eer_iseer_cop" placeholder="e.g. 3.0" required min="0.01" step="0.01"
           oninput="recalcWindowAcEnergy(this.form)" class="block w-full" />
         <select name="eer_metric" class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none border-l border-[var(--stroke--soft-200)] w-[5.5rem]" onchange="recalcWindowAcEnergy(this.form); updateEffHint(this)" title="Efficiency metric on your label">
-          <option value="cop" selected>COP</option>
-          <option value="eer">EER</option>
-          <option value="iseer">ISEER</option>
+          <option value="cop" selected>COP - full load (W/W)</option>
+          <option value="eer_ww">EER - full load (W/W)</option>
+          <option value="eer">EER - full load (Btu/h per W)</option>
+          <option value="iseer">ISEER - seasonal (W/W)</option>
+          <option value="cspf">CSPF - seasonal (W/W)</option>
+          <option value="seer">SEER - seasonal (W/W)</option>
         </select>
       </label>
       <p class="text-xs text-[var(--text--sub-600)] mt-0.5"><span data-eff-hint>{% translate "COP from the label, typically 2.3 – 5.3. Cannot be zero." %}</span></p>
@@ -738,7 +750,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -780,7 +792,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Installation of variable speed drives" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of variable speed drives" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT assumption, not equipment data: ticking Yes multiplies the plant energy by 0.80, a flat 20% saving. It is not derived from your chiller's specification, and if the efficiency you entered already reflects a variable-speed machine the saving is counted twice. Leave as No in that case." title="BEAT assumption, not equipment data: ticking Yes multiplies the plant energy by 0.80, a flat 20% saving. It is not derived from your chiller's specification, and if the efficiency you entered already reflects a variable-speed machine the saving is counted twice. Leave as No in that case."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span></legend>
       <div class="flex items-center gap-2.5">
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> {% translate "Yes" %}</label>
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> {% translate "No" %}</label>
@@ -788,7 +800,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Installation of heat recovery systems" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of heat recovery systems" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT assumption, not equipment data: ticking Yes multiplies the plant energy by 0.70, a flat 30% saving. A heat recovery system should properly be assessed on the useful heat it recovers and the heating energy that displaces, not as a fixed reduction in chiller electricity." title="BEAT assumption, not equipment data: ticking Yes multiplies the plant energy by 0.70, a flat 30% saving. A heat recovery system should properly be assessed on the useful heat it recovers and the heating energy that displaces, not as a fixed reduction in chiller electricity."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span></legend>
       <div class="flex items-center gap-2.5">
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> {% translate "Yes" %}</label>
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> {% translate "No" %}</label>
@@ -896,7 +908,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline leakage factor" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one." title="Yearly refrigerant leakage as a percent of the charge. IPCC/RICS default is about 2 percent/yr for a new split system, rising to around 10 percent/yr for older or poorly maintained equipment. BEAT fills this in automatically from the installation year, switching at 7 years - that threshold is a BEAT assumption, not a figure from your equipment specification. Replace it with a service record where you have one."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
         <input type="number" name="baseline_leakage_factor" placeholder="2 (new) or 10 (old)" required min="0" max="100" value="2" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">%</span>
@@ -938,7 +950,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Installation of variable speed drives" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of variable speed drives" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT assumption, not equipment data: ticking Yes multiplies the plant energy by 0.80, a flat 20% saving. It is not derived from your chiller's specification, and if the efficiency you entered already reflects a variable-speed machine the saving is counted twice. Leave as No in that case." title="BEAT assumption, not equipment data: ticking Yes multiplies the plant energy by 0.80, a flat 20% saving. It is not derived from your chiller's specification, and if the efficiency you entered already reflects a variable-speed machine the saving is counted twice. Leave as No in that case."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span></legend>
       <div class="flex items-center gap-2.5">
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> {% translate "Yes" %}</label>
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_variable_speed_drives" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> {% translate "No" %}</label>
@@ -946,7 +958,7 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Installation of heat recovery systems" %}<span class="text-[var(--state--error--base)]">*</span></legend>
+      <legend class="fieldset-legend">{% translate "Installation of heat recovery systems" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT assumption, not equipment data: ticking Yes multiplies the plant energy by 0.70, a flat 30% saving. A heat recovery system should properly be assessed on the useful heat it recovers and the heating energy that displaces, not as a fixed reduction in chiller electricity." title="BEAT assumption, not equipment data: ticking Yes multiplies the plant energy by 0.70, a flat 30% saving. A heat recovery system should properly be assessed on the useful heat it recovers and the heating energy that displaces, not as a fixed reduction in chiller electricity."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span></legend>
       <div class="flex items-center gap-2.5">
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="yes" class="radio radio-xs" onchange="recalcChillerEnergy(this.form)" /> {% translate "Yes" %}</label>
         <label class="flex items-center gap-2"><input type="radio" name="installation_of_heat_recovery_systems" value="no" class="radio radio-xs" checked onchange="recalcChillerEnergy(this.form)" /> {% translate "No" %}</label>
@@ -1255,8 +1267,16 @@
     // and no metric needs to be persisted. eer_metric is a UI helper only.
     var _metric = systemData.eer_metric;
     var _effVal = parseFloat(systemData.eer_iseer_cop);
-    if ((_metric === 'eer' || _metric === 'iseer') && !isNaN(_effVal) && _effVal > 0) {
-      systemData.eer_iseer_cop = (_effVal / 3.412).toFixed(2);
+    // ONLY EER in Btu/h per watt converts. On the Thai EGAT No.5 label the
+    // No.5 threshold is 11.60, so it is ~3.412x a COP. ISEER, CSPF and SEER do
+    // not: India's BEE defines ISEER as CSTL/CSEC, both in Wh, so it is
+    // already dimensionless W/W and a 5-star split AC is >= 5.30.
+    //
+    // This routine used to divide ISEER as well, while the on-screen
+    // calculation left it alone. A user entering ISEER 5.30 therefore saw the
+    // right energy, had 1.55 stored, and on reopening read 3.4x the energy.
+    if (_metric === 'eer' && !isNaN(_effVal) && _effVal > 0) {
+      systemData.eer_iseer_cop = (_effVal / 3.412).toFixed(4);
     }
     delete systemData.eer_metric;
 

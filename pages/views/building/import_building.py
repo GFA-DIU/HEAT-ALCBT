@@ -668,9 +668,20 @@ def _calc_chiller_energy(row_data):
     Compute total_energy_consumption_of_chiller_system_annually (kWh/year) for chillers.
     Mirrors recalcChillerEnergy from the frontend.
 
-      energy = load × units × efficiency × h × d × w × vsd_factor × hr_factor
-      vsd_factor = 0.80 if VSD=yes else 1.00
-      hr_factor  = 0.70 if HR=yes  else 1.00
+      energy = load x efficiency x h x d x w
+      VSD and heat recovery are metadata, not automatic discounts.
+
+    The chiller COUNT is deliberately absent. `total_cooling_load` is the whole
+    plant's load - the form says so on screen: "the plant energy comes from the
+    total cooling load above, which already covers all machines" - so
+    multiplying by the number of chillers counts the plant once per machine.
+
+    This function claimed to mirror the frontend and did not. The same plant
+    entered by hand and by import differed by the chiller count: a 15-chiller
+    plant imported at 945,000 kWh/yr against 63,000 entered manually. Three of
+    the four chiller records in the database carry the inflated figure.
+    Re-import or re-save those buildings, or run
+    `manage.py recalc_chiller_energy`.
 
     Returns a rounded string, or '' if inputs are insufficient.
     """
@@ -693,10 +704,7 @@ def _calc_chiller_energy(row_data):
     if load <= 0 or units <= 0 or eff <= 0 or hrs <= 0 or days <= 0 or weeks <= 0:
         return ''
 
-    vsd_factor = 0.80 if _yes('installation_of_variable_speed_drives') else 1.00
-    hr_factor  = 0.70 if _yes('installation_of_heat_recovery_systems') else 1.00
-
-    energy = load * units * eff * hrs * days * weeks * vsd_factor * hr_factor
+    energy = load * eff * hrs * days * weeks
     return str(round(Decimal(str(energy)), 3))
 
 

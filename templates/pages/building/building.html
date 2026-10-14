@@ -276,8 +276,11 @@
               </div>
               {% if stats.upfront_carbon %}
               <span class="text-[10px] text-[var(--text--sub-600)] pl-2.5 mt-0.5"
-                    title="{% translate 'A1-A3 from the EPD; A4 transport and A5w construction waste estimated from country + RICS defaults' %}">
-                A1-A3 {{ stats.total_embodied_carbon|floatformat:1 }} + A4 {{ stats.embodied_a4|floatformat:1 }} + A5w {{ stats.embodied_a5w|floatformat:1 }}
+                    title="{% translate 'A1-A3 from the EPD. A4 transport and A5.3 construction waste are estimated from the country defaults and RICS; A5.2 is the site energy you entered.' %}">
+                A1-A3 {{ stats.total_embodied_carbon|floatformat:1 }}
+                + A4 {{ stats.embodied_a4|floatformat:1 }}
+                + A5.2 {{ stats.embodied_a5_2|floatformat:1 }}
+                + A5.3 {{ stats.embodied_a5w|floatformat:1 }}
               </span>
               {% endif %}
             </li>
@@ -767,6 +770,37 @@
           <canvas id="emboided-carbon-by-material-chart"></canvas>
         </div>
       </div>
+
+      {% comment %}
+      A4-A5 as a share of each material's own carbon. Deliberately a separate
+      card from Embodied Carbon by Material, because it answers a different
+      question: not "which material carries the most carbon" but "for which
+      material do transport and site waste dominate its footprint".
+
+      Checked over 32 buildings, the answer is not the imported finishes - they
+      sit near 3% - but heavy, low-carbon bulk: sand and gravel around 72%,
+      brick near 20%. The driver is the mass-to-carbon ratio, not distance.
+      {% endcomment %}
+      <div
+        class="flex w-full flex-col border border-[var(--stroke--soft-200)] rounded-2xl shadow-[var(--regular-shadow-x-small)] p-4 mt-6"
+        id="chart-card-a4a5-material"
+      >
+        <div class="flex items-center gap-2 pb-4 border-b border-[var(--stroke--soft-200)]">
+          <span data-icon="road-map-line" data-size="24" data-color="var(--icon--sub-600)"></span>
+          <span class="text-base/6 font-medium">{% translate "Transport & Waste by Material (A4-A5)" %}</span>
+          <div class="ml-auto flex gap-1">
+            <button onclick="downloadChartPNG('chart-card-a4a5-material', 'a4a5-share-by-material')" class="btn btn-xs btn-ghost gap-1" title="{% translate 'Download PNG' %}">
+              <span data-icon="download-2-line" data-size="14"></span> PNG
+            </button>
+            <button onclick="downloadChartCSV('a4a5Material', 'a4a5-share-by-material')" class="btn btn-xs btn-ghost gap-1" title="{% translate 'Download CSV' %}">
+              <span data-icon="file-chart-fill" data-size="14"></span> CSV
+            </button>
+          </div>
+        </div>
+        <div class="w-full">
+          <canvas id="a4a5-share-by-material-chart"></canvas>
+        </div>
+      </div>
     </template>
 
     <template id="energy-template">
@@ -799,6 +833,8 @@
 
     // Dynamic chart data from backend
     const chartData = {{ chart_data|safe }};
+    // the CSV download reads the whole-life sub-stage breakdown from here
+    window.chartData = chartData;
 
     async function handleDelete(buildingId, redirectUrl) {
       const confirmed = await confirmDialog.delete(
@@ -913,6 +949,9 @@
         const styles = getComputedStyle(document.documentElement);
         const operationalColor = styles.getPropertyValue("--state--feature--base").trim();
         const embodiedColor = styles.getPropertyValue("--bg--surface-800").trim();
+        // A1-A3 product, A4-A5 construction, B6 operational - in the order the
+        // server sends them.
+        const stageColors = [embodiedColor, "#FFA468", operationalColor];
         const primaryColor = styles.getPropertyValue("--color-primary").trim();
         const strongTextColor = styles.getPropertyValue("--text--strong-950").trim();
         const gridLineColor = styles.getPropertyValue("--neutral--slate--200").trim();
@@ -922,12 +961,11 @@
         const exportCtx = document.getElementById("whole-life-carbon-cycle-export");
         if (exportCtx) {
           const wholeLifeData = chartData.whole_life_carbon || { labels: [], data: [0, 0] };
-          const donutColors = [operationalColor, embodiedColor];
           new Chart(exportCtx, {
             type: "doughnut",
             data: {
               labels: wholeLifeData.labels,
-              datasets: [{ data: wholeLifeData.data, backgroundColor: donutColors, borderWidth: 0, cutout: "50%" }],
+              datasets: [{ data: wholeLifeData.data, backgroundColor: stageColors, borderWidth: 0, cutout: "50%" }],
             },
             options: {
               responsive: false, animation: false,
@@ -938,7 +976,9 @@
                   formatter: function(value, context) {
                     const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                     if (total === 0) return "";
-                    return (value / total * 100).toFixed(0) + "%";
+                    const pct = value / total * 100;
+                    if (pct < 5) return "";   // same threshold as the live donut
+                    return pct.toFixed(0) + "%";
                   },
                 },
               },
@@ -951,11 +991,11 @@
           wholeLifeData.labels.forEach(function(lbl, i) {
             const value = wholeLifeData.data[i];
             const formatted = value.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-            legendItems.push({ color: donutColors[i], label: lbl + ': ' + formatted + ' kgCO₂eq/m²' });
+            legendItems.push({ color: stageColors[i], label: lbl + ': ' + formatted + ' kgCO₂eq/m²' });
             if (legendEl) {
               const row = document.createElement("div");
               row.className = "flex items-center gap-2";
-              row.innerHTML = `<div class="size-2 rounded-full flex-shrink-0" style="background-color:${donutColors[i]}"></div><span class="text-sm" style="color:#475569">${lbl}: ${formatted} kgCO₂eq/m²</span>`;
+              row.innerHTML = `<div class="size-2 rounded-full flex-shrink-0" style="background-color:${stageColors[i]}"></div><span class="text-sm" style="color:#475569">${lbl}: ${formatted} kgCO₂eq/m²</span>`;
               legendEl.appendChild(row);
             }
           });
@@ -1088,6 +1128,50 @@
       };
 
       window.downloadChartCSV = function(chartKey, filename) {
+        // The whole-life donut shows three slices but the user wants the
+        // sub-stages behind the middle one, so its CSV is built from the
+        // server's breakdown rather than from the chart's three data points.
+        if (chartKey === 'wholeLife') {
+          const wl = (window.chartData || {}).whole_life_carbon || {};
+          const rows = wl.breakdown || [];
+          if (rows.length) {
+            let csv = 'Stage,Description,kgCO2e/m2\n';
+            let total = 0;
+            rows.forEach(function (r) {
+              total += Number(r.value) || 0;
+              csv += '"' + r.stage + '","' + String(r.label).replace(/"/g, '""')
+                   + '",' + (Number(r.value) || 0).toFixed(3) + '\n';
+            });
+            csv += '"TOTAL","Whole life (A1-A5 + B6)",' + total.toFixed(3) + '\n';
+            const blob0 = new Blob([csv], { type: 'text/csv' });
+            const a0 = document.createElement('a');
+            a0.href = URL.createObjectURL(blob0);
+            a0.download = (filename || chartKey) + '.csv';
+            a0.click();
+            URL.revokeObjectURL(a0.href);
+            return;
+          }
+        }
+        if (chartKey === 'a4a5Material') {
+          const am = (window.chartData || {}).a4a5_by_material || {};
+          const rows = am.rows || [];
+          if (rows.length) {
+            let csv = 'Material,A1-A3 kgCO2e/m2,A4+A5 kgCO2e/m2,'
+                    + '% of building A4-A5,% of this material own carbon\n';
+            rows.forEach(function (r) {
+              csv += '"' + String(r.name).replace(/"/g, '""') + '",'
+                   + r.a1a3 + ',' + r.a4a5 + ',' + r.pct_of_total + ','
+                   + r.pct_of_own + '\n';
+            });
+            const blob1 = new Blob([csv], { type: 'text/csv' });
+            const a1 = document.createElement('a');
+            a1.href = URL.createObjectURL(blob1);
+            a1.download = (filename || chartKey) + '.csv';
+            a1.click();
+            URL.revokeObjectURL(a1.href);
+            return;
+          }
+        }
         const chart = window.buildingCharts && window.buildingCharts[chartKey];
         if (!chart) return;
         const labels = chart.data.labels || [];
@@ -1137,6 +1221,7 @@
         if (ctx) {
           const operationalColor = stateFeatureBaseColor;
           const embodiedColor = surface800Color;
+          const stageColors = [surface800Color, "#FFA468", stateFeatureBaseColor];
 
           // Use dynamic data for whole life carbon cycle
           const wholeLifeData = chartData.whole_life_carbon || { labels: [], data: [0, 0] };
@@ -1149,7 +1234,7 @@
               datasets: [
                 {
                   data: wholeLifeData.data,
-                  backgroundColor: [operationalColor, embodiedColor],
+                  backgroundColor: stageColors,
                   borderWidth: 0,
                   cutout: "50%",
                 },
@@ -1187,8 +1272,12 @@
                   formatter: function (value, context) {
                     const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                     if (total === 0) return "";
-                    const pct = (value / total * 100).toFixed(0);
-                    return pct + "%";
+                    const pct = value / total * 100;
+                    // A slice under 5% has no room for its label. On a real
+                    // building "3%" and "0%" printed on top of each other.
+                    // The legend carries every value and its percentage.
+                    if (pct < 5) return "";
+                    return pct.toFixed(0) + "%";
                   },
                 },
               },
@@ -1199,15 +1288,20 @@
           // Build legend: colour dot + label name + carbon value
           const legendEl = document.getElementById("whole-life-legend");
           if (legendEl) {
-            const colors = [operationalColor, embodiedColor];
+            // This used [operationalColor, embodiedColor] - two colours, in the
+            // old two-slice order - so with three stages the dots were wrong
+            // and the third had none at all.
+            const wlTotal = wholeLifeData.data.reduce(function (a, b) { return a + (b || 0); }, 0);
             wholeLifeData.labels.forEach(function (lbl, i) {
-              const value = wholeLifeData.data[i];
+              const value = wholeLifeData.data[i] || 0;
               const formatted = value.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+              const pct = wlTotal ? (value / wlTotal * 100) : 0;
               const row = document.createElement("div");
               row.className = "flex items-center gap-2";
               row.innerHTML = `
-                <div class="size-2 rounded-full flex-shrink-0" style="background-color:${colors[i]}"></div>
-                <span class="text-sm text-[var(--text--sub-600)]">${lbl}: ${formatted} kgCO₂eq/m²</span>
+                <div class="size-2 rounded-full flex-shrink-0" style="background-color:${stageColors[i]}"></div>
+                <span class="text-sm text-[var(--text--sub-600)] flex-1">${lbl}: ${formatted} kgCO₂eq/m²</span>
+                <span class="text-sm tabular-nums text-[var(--text--sub-600)]">(${pct.toFixed(1)}%)</span>
               `;
               legendEl.appendChild(row);
             });
@@ -1321,6 +1415,22 @@
             materialData.data.length > 0 ? materialData.data : [0],
             materialData.absolute.length > 0 ? materialData.absolute : [0],
             stateFeatureBaseColor
+          ));
+        }
+
+        // A4-A5 share by material. Bars are a percentage of that material's
+        // own A1-A3, so the axis runs 0-100 like the other share charts.
+        const a4a5MaterialChart = document.getElementById("a4a5-share-by-material-chart");
+        if (a4a5MaterialChart) {
+          const aData = chartData.a4a5_by_material || { labels: [], data: [], absolute: [] };
+          const aLabels = aData.labels.length > 0 ? aData.labels : [i18n.noData];
+          a4a5MaterialChart.style.height = Math.max(180, aLabels.length * 52) + "px";
+          window.buildingCharts = window.buildingCharts || {};
+          window.buildingCharts.a4a5Material = new Chart(a4a5MaterialChart, makeBarChart(
+            aLabels,
+            aData.data.length > 0 ? aData.data : [0],
+            aData.absolute.length > 0 ? aData.absolute : [0],
+            "#FFA468"
           ));
         }
 

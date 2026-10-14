@@ -150,6 +150,42 @@ trajectories, licensed).
 
 ---
 
+## Outdoor units (CDU) and indoor units (FCU): how BEAT counts them
+
+Cooling entries now declare their electrical coverage. FCUs can link to one
+AC/VRF or chiller entry in the same building.
+
+| Cooling entry coverage | Treatment of its linked FCUs |
+|---|---|
+| Complete system, including indoor fans | Retain fan inventory and its estimate; add zero extra fan electricity |
+| Outdoor equipment / chiller only | Add the linked FCUs' electrical fan energy separately |
+| Not yet specified (legacy entries) | Require a coverage choice before a new fan link is accepted |
+
+Unlinked fans are counted separately and carry a warning. BEAT cannot infer
+coverage from the equipment name: users must check the manufacturer's data
+sheet or meter boundary. Existing records remain unlinked and keep their stored
+energy until reviewed. There is no automatic reclassification or backfill.
+
+For a matched split, enter the complete pair once when the declared input
+includes both units. For outdoor-only VRF data, add the linked indoor fans.
+For a chiller-only figure, include FCU fans separately. Pumps and cooling-tower
+fans still need separate accounting unless explicitly included in the input.
+This limited change does not introduce an auxiliary-equipment inventory.
+
+Do not add indoor and outdoor cooling capacities: they serve the same cooling
+load. FCU fan inputs are electrical W or kW, not thermal cooling capacity.
+The fan calculation is power per unit x count x annual operating hours.
+SFP and airflow are optional reference inputs for FCUs.
+
+Refrigerant charge is entered once for the connected DX circuit on the cooling
+record. Chilled-water FCUs have water in their coils; their refrigerant belongs
+to the chiller. Refrigerant circuit modelling is outside this change.
+
+The summary and system carbon breakdown exclude linked fans already covered
+by a complete-system entry. Changing coverage recalculates the summary;
+copying a building reconnects fans to the new building's cooling entries.
+Unlinking or deleting a parent makes its fans standalone, so review coverage.
+
 ## System classification: cassette air conditioners
 
 A cassette AC is cooling equipment. The ventilation form nevertheless offered
@@ -208,35 +244,26 @@ building. Under RICS WLCA refrigerant leakage sits in **B1**, not B6, so it is
 a scope decision rather than a bug fix and needs agreeing with GT before it
 ships.
 
-## Efficiency metrics: EER, ISEER and COP are not interchangeable
+## Efficiency metrics: raw value, units and rating basis
 
-The cooling form lets a user enter the efficiency figure from their own
-national label. Three are offered, and only one of them needs converting:
+The numeric rating and selected metric are stored together and restored on edit.
+COP and EER in W/W can derive full-load input as capacity / rating.
+EER in Btu/h per W converts to W/W by division by 3.412 during calculation only.
+ISEER, CSPF and SEER are seasonal ratings; they are retained as reference data
+and cannot substitute for full-load COP. With a seasonal rating, electrical
+input is required for the current screening calculation. SEER offers separate
+W/W and Btu/h per W choices.
 
-| Metric | Unit | Where | Typical | Convert to COP |
-|---|---|---|---|---|
-| COP | W/W | generic | 2.3 – 5.3 | as entered |
-| ISEER | W/W | India, BEE (`CSTL ÷ CSEC`) | 3.5 – 5.5 | **as entered** |
-| EER | Btu/h per W | Thailand, EGAT No.5 | 9 – 14 | `÷ 3.412` |
+Known electrical input takes precedence over an efficiency-derived estimate.
+The server recalculates annual energy rather than trusting the browser total.
+These are screening estimates, not seasonal simulation: operating hours at
+constant input still require a documented usage assumption or metered validation.
 
-BEAT previously divided **both** EER and ISEER by 3.412. ISEER is already
-dimensionless, so an Indian 5-star unit at ISEER 5.30 was treated as a COP of
-1.55 and the AC reported about 3.4× the energy it should.
-
-No stored record was affected. The picker defaults to COP, and reconstructing
-all 167 AC records from their own inputs showed every one of them was computed
-on the COP basis — 105 matched the COP arithmetic exactly, 47 were entered as
-a power input, and none matched the divided form. The fault was latent, not
-historical.
-
-The metric is now stored on the record (`efficiency_metric`). Without it,
-re-opening a saved AC recomputed its energy against whatever the form happened
-to default to, silently changing a number the user never touched.
-
-The field hint also contradicted the code: it read "Typical EER: 2.3 – 3.5",
-which is a COP range. A Thai user following that hint while EER was selected
-would have entered a COP and got an answer 3.4× out. The hint now follows the
-picker.
+Chiller energy is plant cooling load (RT) x efficiency (kW/RT) x annual hours.
+The whole-plant load is not multiplied by chiller count. VSD and heat-recovery
+flags no longer apply automatic 20% and 30% energy discounts. This rule applies
+to form calculation, save, import and the explicit recalculation command.
+Existing saved estimates are not silently rewritten by the schema migration.
 
 ## Known gap: no part-load factor on air conditioners
 

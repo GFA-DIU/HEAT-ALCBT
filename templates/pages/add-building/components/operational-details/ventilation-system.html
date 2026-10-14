@@ -175,6 +175,18 @@
 
 <template id="fcu-template">
   <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "FAN COIL UNIT (FCU) DATA" %}</div>
+  {% comment %}
+  BEAT adds every record once and deducts nothing. Nothing links an indoor unit
+  to the outdoor unit that serves it, so it cannot tell a chilled-water FCU
+  (correctly counted alongside its chiller) from a split AC's own indoor unit
+  (already inside the cooling record). The boundary is the user's to get right.
+  {% endcomment %}
+  <div class="mx-5 mt-3 p-3 rounded-lg bg-[#FEF3C7] text-xs/5 text-[var(--text--strong-950)]">
+    <b>{% translate "Enter each unit of electricity once." %}</b>
+    {% translate "Add FCUs here when they are chilled-water units served by a chiller - their fan electricity is separate from the chiller's and both should be counted." %}
+    {% translate "Do NOT add the indoor unit of a split or VRF system here: the cooling record already covers it, because its energy comes from the system's cooling capacity and efficiency, which include the indoor fan." %}
+    {% translate "BEAT cannot detect the difference, so it will add whatever you enter." %}
+  </div>
   <div class="px-5 py-4 grid grid-cols-3 gap-x-2.5 gap-y-1">
 
     <fieldset class="fieldset">
@@ -634,7 +646,10 @@
     var perUnit = parseFloat(perUnitEl ? perUnitEl.value : NaN);
     var units   = parseFloat(unitsEl   ? unitsEl.value   : NaN);
     if (!isNaN(perUnit) && !isNaN(units) && units > 0) {
-      powerEl.value = (perUnit * units).toFixed(2);
+      // Four decimals, not two. A chilled-water FCU draws tens of watts - the
+      // Daikin FWMJCC2BV1 is 63 W - and 0.063 kW rounded to 0.06 reported
+      // 120 kWh a year instead of 126, a 5% loss on every small unit.
+      powerEl.value = (perUnit * units).toFixed(4);
     }
 
     var power = parseFloat(powerEl.value);
