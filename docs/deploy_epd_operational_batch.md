@@ -1,4 +1,14 @@
-# Deployment runbook — EPD catalogue + operational carbon batch
+# Deployment runbook - EPD catalogue + operational carbon batch
+
+> **This release was executed on 12 Oct 2026 (v170).** The commit counts and
+> migration numbers below describe that release and are now historic: `qa` has
+> been at **0060** since, and the six data commands have all been run. Do not
+> re-run them expecting work to be left; they are idempotent but they are done.
+>
+> **Section 0 is not historic.** The backup procedure, the Supabase-not-Heroku
+> point and the corrupt-dump trap apply to every release, and the next one is
+> described in [`docs/CODEX_HANDOVER.md`](CODEX_HANDOVER.md).
+
 
 For PR #593. **This is wider than it looks.** `qa` sits at migration
 `0051`; `rohit-qa` carries **36 commits and nine migrations** (0052–0060),

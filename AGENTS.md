@@ -1,5 +1,9 @@
 # Working on BEAT
 
+> **New here, or picking this up from another agent? Start with
+> [`docs/CODEX_HANDOVER.md`](docs/CODEX_HANDOVER.md)** — the next two tasks,
+> and what you are and are not allowed to do with production.
+>
 > **Current state of the work — what is in flight, what is deliberately
 > not built, and the decisions waiting on a human — is in
 > [`docs/AGENT_HANDOVER.md`](docs/AGENT_HANDOVER.md). Read it before
