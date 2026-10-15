@@ -79,12 +79,23 @@ These are methodology calls, not implementation gaps. They need GT.
 ## Next steps, in order
 
 1. Run the suite; commit the boundary work if green
-2. Put the boundary field and the fan-parent picker into the two forms' UI —
-   the model and the form classes accept them, the templates do not yet show
-   them
+2. ~~Put the boundary field and the fan-parent picker into the forms~~ —
+   **done**. A coverage dropdown on all six cooling forms; a parent picker on
+   the FCU, cassette, AHU and DOAS forms (not the plain fan — an exhaust fan is
+   not an indoor unit). The view translates `air_conditioner:<id>` /
+   `chiller:<id>` into the right foreign key and checks the parent belongs to
+   the same building.
 3. Decide the open questions above with GT before anything ships
 4. The deploy runbook is `docs/deploy_epd_operational_batch.md` — **read §0
    before merging anything to `qa`**, it is a release
+
+### Still not built, deliberately
+
+- no warning when a building has a complete-system record and *unlinked* fans —
+  the shape of a double count, but indistinguishable from a legitimate
+  chilled-water plant
+- no reconnection of links when a building is cloned
+- no auxiliary inventory (pumps, cooling-tower fans)
 
 ---
 

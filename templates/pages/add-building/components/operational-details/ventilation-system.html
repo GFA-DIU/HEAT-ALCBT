@@ -176,19 +176,23 @@
 <template id="fcu-template">
   <div class="px-5 py-1.5 text-[var(--text--soft-400)] bg-[var(--bg--weak-50)] text-xs/4">{% translate "FAN COIL UNIT (FCU) DATA" %}</div>
   {% comment %}
-  BEAT adds every record once and deducts nothing. Nothing links an indoor unit
-  to the outdoor unit that serves it, so it cannot tell a chilled-water FCU
-  (correctly counted alongside its chiller) from a split AC's own indoor unit
-  (already inside the cooling record). The boundary is the user's to get right.
+  One line at the point of entry. The full reasoning - why BEAT cannot tell a
+  chilled-water FCU from a split system's indoor unit - is in
+  docs/operational_carbon_methodology.md.
   {% endcomment %}
-  <div class="mx-5 mt-3 p-3 rounded-lg bg-[#FEF3C7] text-xs/5 text-[var(--text--strong-950)]">
-    <b>{% translate "Enter each unit of electricity once." %}</b>
-    {% translate "Add FCUs here when they are chilled-water units served by a chiller - their fan electricity is separate from the chiller's and both should be counted." %}
-    {% translate "Do NOT add the indoor unit of a split or VRF system here: the cooling record already covers it, because its energy comes from the system's cooling capacity and efficiency, which include the indoor fan." %}
-    {% translate "BEAT cannot detect the difference, so it will add whatever you enter." %}
+  <div class="mx-5 mt-3 px-3 py-2 rounded-lg bg-[#FEF3C7] text-xs text-[var(--text--strong-950)]">
+    {% translate "Enter each unit of electricity once — do not add a split system's indoor unit here, the cooling record already covers it." %}
   </div>
   <div class="px-5 py-4 grid grid-cols-3 gap-x-2.5 gap-y-1">
 
+
+    <fieldset class="fieldset col-span-3">
+      <legend class="fieldset-legend">{% translate "Part of which cooling system?" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span><span class="tooltip align-middle ml-1" data-tip="Optional. Link this fan coil to the cooling system that serves it. If that system says its figure already covers the complete system, BEAT will not count this fan again." title="Optional. Link this fan coil to the cooling system that serves it. If that system says its figure already covers the complete system, BEAT will not count this fan again."><span data-icon="information-2-line" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <select name="cooling_parent" class="select w-full cooling-parent-select">
+        <option value="">{% translate "Not linked" %}</option>
+      </select>
+      <p class="text-xs mt-1 cooling-parent-note"></p>
+    </fieldset>
     <fieldset class="fieldset">
       <legend class="fieldset-legend">{% translate "Total number of units installed" %}<span class="text-[var(--state--error--base)]">*</span></legend>
       <label class="input validator w-full">
@@ -749,6 +753,10 @@
     }
     setTimeout(() => {
       applyVentOperatingDefaults(document.getElementById('ventilation-system-form'), ventType);
+      // The fan-coil form lives in a <template>, so its parent picker does not
+      // exist in the DOM until this clone happens. Populating on page load
+      // found nothing, which is why the list only ever offered "Not linked".
+      if (window.loadCoolingParents) window.loadCoolingParents();
     }, 50);
   }
 
@@ -954,4 +962,71 @@
     if (evt.detail.target.id === 'dynamic-content') window.renderVentilationSystems();
   });
   if (document.getElementById('ventilation-systems-list')) window.renderVentilationSystems();
+
+  // ---- link a fan to the cooling system it belongs to --------------------
+  // Populated from the building's cooling records. The option text states what
+  // each record says it covers, because that - not the link alone - decides
+  // whether this fan's electricity is added.
+  window.loadCoolingParents = async function () {
+    const selects = document.querySelectorAll('.cooling-parent-select');
+    if (!selects.length) return;
+    const uuid = new URLSearchParams(window.location.search).get('building_uuid');
+    if (!uuid) return;
+    let systems = [];
+    try {
+      const res = await fetch('/cooling-system/' + uuid + '/');
+      const data = await res.json();
+      systems = (data && data.cooling_systems) || [];
+    } catch (e) { return; }
+
+    selects.forEach(function (sel) {
+      const keep = sel.value;
+      sel.querySelectorAll('option[value]:not([value=""])').forEach(o => o.remove());
+      systems.forEach(function (sys) {
+        // name only - the consequence goes in the note under the field
+        const opt = new Option(sys.label || ('System #' + sys.id),
+                               sys.cooling_system_type + ':' + sys.id);
+        opt.dataset.boundary = sys.energy_boundary || 'unknown';
+        sel.appendChild(opt);
+      });
+      if (keep) sel.value = keep;
+      updateCoolingParentNote(sel);
+    });
+  };
+
+  // one short line, changing with the selection
+  window.updateCoolingParentNote = function (sel) {
+    const note = sel.closest('fieldset') &&
+                 sel.closest('fieldset').querySelector('.cooling-parent-note');
+    if (!note) return;
+    const opt = sel.selectedOptions[0];
+    const b = opt && opt.dataset ? opt.dataset.boundary : '';
+    if (!sel.value) {
+      note.textContent = '';
+      note.className = 'text-xs mt-1 cooling-parent-note';
+      return;
+    }
+    if (b === 'complete_system') {
+      note.textContent = '{% translate "Already included — this fan will not be counted again." %}';
+      note.className = 'text-xs mt-1 cooling-parent-note text-[var(--state--success--base)]';
+    } else {
+      note.textContent = '{% translate "Counted on top of the cooling system figure." %}';
+      note.className = 'text-xs mt-1 cooling-parent-note text-[var(--text--sub-600)]';
+    }
+  };
+
+  document.addEventListener('change', function (e) {
+    if (e.target.classList && e.target.classList.contains('cooling-parent-select')) {
+      window.updateCoolingParentNote(e.target);
+    }
+  });
+
+  // Populate it. This was defined and never called, so the list only ever
+  // offered "Not linked" - the field looked broken because it was.
+  // Called from loadVentTemplate, once the form exists. Also after an HTMX
+  // swap, which can replace the panel wholesale.
+  document.body.addEventListener('htmx:afterSwap', function () {
+    if (document.querySelector('.cooling-parent-select')) window.loadCoolingParents();
+  });
+
 </script>

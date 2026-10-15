@@ -191,12 +191,18 @@ def test_indoor_fans_can_now_be_linked_to_their_parent():
     assert {"cooling_parent_ac", "cooling_parent_chiller"} <= fields
 
 
-def test_the_fcu_form_warns_at_the_point_of_entry():
-    """Documentation nobody reads while typing does not prevent the mistake."""
+def test_the_fcu_form_warns_in_one_line():
+    """Documentation nobody reads while typing does not prevent the mistake -
+    but a paragraph nobody reads while typing does not either.
+
+    The warning was three sentences. The reasoning lives in
+    docs/operational_carbon_methodology.md; what is on the form is the rule.
+    """
     html = VENT_FORM.read_text(encoding="utf-8")
     assert "Enter each unit of electricity once" in html
-    assert "chilled-water units served by a chiller" in html
-    assert "cannot detect the difference" in html
+    assert "the cooling record already covers it" in html
+    # the earlier paragraph is gone
+    assert "cannot detect the difference" not in html
 
 
 def test_the_cooling_form_says_what_its_figure_already_covers():
@@ -284,3 +290,74 @@ def test_the_methodology_matches_what_is_built(fragment):
     committed and read as fact. These fragments pin the claims that matter.
     """
     assert fragment in METHODOLOGY.read_text(encoding="utf-8"), fragment
+
+
+# --- the boundary and fan-link UI -------------------------------------------
+
+def test_the_cooling_forms_ask_what_the_figure_covers():
+    """Without this on screen the field exists but nobody can set it."""
+    html = COOLING_FORM.read_text(encoding="utf-8")
+    assert html.count('name="energy_boundary"') >= 4, "every cooling form needs it"
+    for option in ("complete_system", "equipment_only", "unknown"):
+        assert 'value="%s"' % option in html, option
+    # the default must be the one that changes nothing
+    assert '<option value="unknown" selected>' in html
+
+
+def test_only_the_fan_coil_form_asks_about_a_parent():
+    """A fan coil is the one type whose electricity may already sit inside a
+    cooling record.
+
+    A cassette is already counted as cooling and excluded from the ventilation
+    line, so linking one cannot change a number. An AHU or DOAS is ventilation
+    plant whose fan is separate electricity and is always added. Asking there
+    put a question on forms where the answer is always "not linked".
+    """
+    html = VENT_FORM.read_text(encoding="utf-8")
+    assert html.count('name="cooling_parent"') == 1
+    for tpl in ("ahu-template", "doas-template", "cassette-template",
+                "fan-template"):
+        block = html[html.index('<template id="%s">' % tpl):]
+        block = block[:block.index("</template>")]
+        assert 'name="cooling_parent"' not in block, tpl
+    fcu = html[html.index('<template id="fcu-template">'):]
+    fcu = fcu[:fcu.index("</template>")]
+    assert 'name="cooling_parent"' in fcu
+
+
+def test_the_picker_is_actually_populated():
+    """It was defined and never called, so the list only ever offered
+    "Not linked" - the field looked broken because it was.
+
+    The fan coil form lives in a <template>, so the select does not exist until
+    the form is injected. The loader has to run there, not on page load.
+    """
+    html = VENT_FORM.read_text(encoding="utf-8")
+    inject = html[html.index("function loadVentTemplate("):]
+    inject = inject[:inject.index("window.handleVentilationTypeChange")]
+    assert "loadCoolingParents()" in inject
+
+
+def test_the_consequence_is_a_short_note_not_a_long_option_label():
+    """Option text is the system's name; the effect goes underneath."""
+    html = VENT_FORM.read_text(encoding="utf-8")
+    assert "Already included" in html
+    assert "Counted on top of the cooling system figure" in html
+    # the verbose labels are gone
+    assert "this fan will NOT be added" not in html
+
+
+def test_the_endpoint_gives_the_picker_what_it_needs():
+    src = (REPO / "pages/views/building/cooling_system.py").read_text(encoding="utf-8")
+    assert src.count("'energy_boundary': system.energy_boundary,") == 2, \
+        "both chillers and air conditioners must report their boundary"
+    assert "'label': 'Chiller #%s" in src
+    assert "'label': 'AC #%s" in src
+
+
+def test_a_fan_cannot_be_linked_across_buildings():
+    """The picker sends an id; the view must check it belongs to this building."""
+    src = (REPO / "pages/views/building/ventilation_system.py").read_text(encoding="utf-8")
+    assert "building=building).exists()" in src
+    # and both kinds are checked, not just one
+    assert src.count("building=building).exists()") == 2

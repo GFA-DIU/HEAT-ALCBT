@@ -172,6 +172,15 @@
       </div>
     </fieldset>
 
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">{% translate "What this electricity figure covers" %}<span class="tooltip align-middle ml-1" data-tip="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before." title="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before."><span data-icon="information-2-line" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <select name="energy_boundary" class="select w-full">
+        <option value="unknown" selected>{% translate "Not specified - linked fans are added separately" %}</option>
+        <option value="complete_system">{% translate "Complete system, including indoor fans" %}</option>
+        <option value="equipment_only">{% translate "Outdoor unit / chiller only" %}</option>
+      </select>
+    </fieldset>
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart." title="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span><span class="tooltip align-middle ml-1" data-tip="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER." title="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
@@ -326,6 +335,15 @@
       </div>
     </fieldset>
 
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">{% translate "What this electricity figure covers" %}<span class="tooltip align-middle ml-1" data-tip="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before." title="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before."><span data-icon="information-2-line" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <select name="energy_boundary" class="select w-full">
+        <option value="unknown" selected>{% translate "Not specified - linked fans are added separately" %}</option>
+        <option value="complete_system">{% translate "Complete system, including indoor fans" %}</option>
+        <option value="equipment_only">{% translate "Outdoor unit / chiller only" %}</option>
+      </select>
+    </fieldset>
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart." title="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span><span class="tooltip align-middle ml-1" data-tip="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER." title="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
@@ -476,6 +494,15 @@
       </div>
     </fieldset>
 
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">{% translate "What this electricity figure covers" %}<span class="tooltip align-middle ml-1" data-tip="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before." title="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before."><span data-icon="information-2-line" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <select name="energy_boundary" class="select w-full">
+        <option value="unknown" selected>{% translate "Not specified - linked fans are added separately" %}</option>
+        <option value="complete_system">{% translate "Complete system, including indoor fans" %}</option>
+        <option value="equipment_only">{% translate "Outdoor unit / chiller only" %}</option>
+      </select>
+    </fieldset>
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart." title="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span><span class="tooltip align-middle ml-1" data-tip="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER." title="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
@@ -636,6 +663,15 @@
       </div>
     </fieldset>
 
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">{% translate "What this electricity figure covers" %}<span class="tooltip align-middle ml-1" data-tip="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before." title="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before."><span data-icon="information-2-line" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <select name="energy_boundary" class="select w-full">
+        <option value="unknown" selected>{% translate "Not specified - linked fans are added separately" %}</option>
+        <option value="complete_system">{% translate "Complete system, including indoor fans" %}</option>
+        <option value="equipment_only">{% translate "Outdoor unit / chiller only" %}</option>
+      </select>
+    </fieldset>
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">EER / ISEER / COP<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart." title="BEAT derives this system's electricity from cooling capacity divided by efficiency. On a matched split or packaged system the manufacturer's capacity and COP/EER cover the WHOLE system, indoor fan included - so do not also enter the indoor unit as a fan coil unit under Ventilation, or its fan is counted twice. A chilled-water chiller is different: its FCU fans are separate electricity and should be entered. BEAT adds every record once and cannot tell the two cases apart."><span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span></span><span class="tooltip align-middle ml-1" data-tip="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER." title="COP and ISEER are dimensionless (Watt/Watt) - India's BEE defines ISEER as CSTL/CSEC, so a 5-star split AC is about 5.3. EER on a Thai EGAT No.5 label is in Btu/h per Watt and is about 3.412x larger. Pick the metric printed on your label; BEAT converts only EER."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
@@ -781,6 +817,15 @@
       </div>
     </fieldset>
 
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">{% translate "What this electricity figure covers" %}<span class="tooltip align-middle ml-1" data-tip="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before." title="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before."><span data-icon="information-2-line" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <select name="energy_boundary" class="select w-full">
+        <option value="unknown" selected>{% translate "Not specified - linked fans are added separately" %}</option>
+        <option value="complete_system">{% translate "Complete system, including indoor fans" %}</option>
+        <option value="equipment_only">{% translate "Outdoor unit / chiller only" %}</option>
+      </select>
+    </fieldset>
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">{% translate "Baseline cooling efficiency" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
       <label class="input validator w-full">
@@ -939,6 +984,15 @@
       </div>
     </fieldset>
 
+
+    <fieldset class="fieldset col-span-2">
+      <legend class="fieldset-legend">{% translate "What this electricity figure covers" %}<span class="tooltip align-middle ml-1" data-tip="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before." title="Does the electricity figure above already include the indoor fans? On a matched split or packaged unit it usually does, because the capacity and COP/EER describe the whole system. A VRF sheet often quotes the outdoor unit alone, and a chiller's input is its own. Leave as not specified and BEAT adds any linked fans separately, exactly as before."><span data-icon="information-2-line" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <select name="energy_boundary" class="select w-full">
+        <option value="unknown" selected>{% translate "Not specified - linked fans are added separately" %}</option>
+        <option value="complete_system">{% translate "Complete system, including indoor fans" %}</option>
+        <option value="equipment_only">{% translate "Outdoor unit / chiller only" %}</option>
+      </select>
+    </fieldset>
     <fieldset class="fieldset col-span-2">
       <legend class="fieldset-legend">{% translate "Baseline cooling efficiency" %}<span class="text-[var(--state--error--base)]">*</span> <span class="text-[var(--text--sub-600)]">(kW/RT)</span></legend>
       <label class="input validator w-full">
@@ -1381,6 +1435,7 @@
         setTimeout(() => {
           const form = document.getElementById('cooling-system-form');
           setField(form, 'year_of_installation', system.year_of_installation);
+          setField(form, 'energy_boundary', system.energy_boundary || 'unknown');
           setRefrigerant(form, system.refrigerant_type);
           setField(form, 'refrigerant_quantity', system.refrigerant_quantity_kg);
           setField(form, 'total_cooling_load', system.total_cooling_load_rt);
@@ -1408,6 +1463,7 @@
         setTimeout(() => {
           const form = document.getElementById('cooling-system-form');
           setField(form, 'year_of_installation', system.year_of_installation);
+          setField(form, 'energy_boundary', system.energy_boundary || 'unknown');
           setRefrigerant(form, system.refrigerant_type);
           setField(form, 'refrigerant_quantity', system.refrigerant_quantity_kg);
           setField(form, 'number_of_units', system.number_of_units);

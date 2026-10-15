@@ -324,6 +324,11 @@ def get_cooling_systems(request, building_uuid):
                 'number_of_stars': system.number_of_stars,
                 'total_energy_consumption_kwh_per_year': system.total_energy_consumption_kwh_per_year,
                 'baseline_refrigerant_emission_factor': system.baseline_refrigerant_emission_factor,
+                # what the entered electricity already covers, and a label the
+                # fan picker can show
+                'energy_boundary': system.energy_boundary,
+                'label': 'Chiller #%s - %s' % (
+                    system.id, system.get_chiller_type_display() or 'chiller'),
             })
 
         # Add air conditioner systems
@@ -355,6 +360,11 @@ def get_cooling_systems(request, building_uuid):
                 'iseer_rating': float(system.iseer_rating) if system.iseer_rating else None,
                 'energy_efficiency_label': system.energy_efficiency_label,
                 'number_of_stars': system.number_of_stars,
+                # what the entered electricity already covers, and a label the
+                # fan picker can show
+                'energy_boundary': system.energy_boundary,
+                'label': 'AC #%s - %s' % (
+                    system.id, system.get_ac_type_display() or 'air conditioner'),
             })
 
         return JsonResponse({
