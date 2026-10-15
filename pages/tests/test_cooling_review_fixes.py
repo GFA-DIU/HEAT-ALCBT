@@ -347,12 +347,43 @@ def test_the_consequence_is_a_short_note_not_a_long_option_label():
     assert "this fan will NOT be added" not in html
 
 
+def test_the_label_describes_the_equipment_not_its_database_id():
+    """"AC #104" is a primary key. It means nothing to the person who installed
+    the unit and cannot be matched against a nameplate or a schedule."""
+    from pages.views.building.cooling_system import _cooling_label
+    assert (_cooling_label("Split Air Conditioners", 7.032, "kW", 1, 2014)
+            == "Split Air Conditioners, 7 kW, installed 2014")
+    # several units are worth saying; one is not
+    assert "3 units" in _cooling_label("Split", 5, "kW", 3, 2020)
+    assert "1 units" not in _cooling_label("Split", 5, "kW", 1, 2020)
+    # missing parts are left out rather than printed blank or zero
+    assert _cooling_label("Chiller", None, "RT", None, None) == "Chiller"
+    assert _cooling_label("Chiller", 0, "RT", 0, 2019) == "Chiller, installed 2019"
+
+
+def test_duplicate_labels_are_numbered_only_when_they_collide():
+    src = (REPO / "pages/views/building/cooling_system.py").read_text(encoding="utf-8")
+    assert "if seen[row['label']] > 1:" in src, (
+        "numbering every row would add noise to a building with one of each")
+
+
+def test_no_em_dashes_in_the_text_this_work_added():
+    """Requested: avoid em dashes in user-facing text."""
+    html = VENT_FORM.read_text(encoding="utf-8")
+    for phrase in ("Enter each unit of electricity once",
+                   "Already included"):
+        i = html.index(phrase)
+        assert "—" not in html[i:i + 160], phrase
+
+
 def test_the_endpoint_gives_the_picker_what_it_needs():
     src = (REPO / "pages/views/building/cooling_system.py").read_text(encoding="utf-8")
     assert src.count("'energy_boundary': system.energy_boundary,") == 2, \
         "both chillers and air conditioners must report their boundary"
-    assert "'label': 'Chiller #%s" in src
-    assert "'label': 'AC #%s" in src
+    # the label describes the equipment, not its database id
+    assert "_cooling_label(" in src
+    assert "'label': 'AC #%s" not in src, "the primary key must not reach the UI"
+    assert "'label': 'Chiller #%s" not in src
 
 
 def test_a_fan_cannot_be_linked_across_buildings():

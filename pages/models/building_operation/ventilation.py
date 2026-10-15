@@ -60,9 +60,18 @@ class VentilationSystem(models.Model):
         verbose_name=_("Ventilation Capacity"),
     )
 
+    # Optional, and only read for AHU and DOAS.
+    #
+    # It used to be required on every form. The FCU, cassette and fan forms
+    # compute their energy from power x units x hours and never look at it, so
+    # 149 of the 152 stored values drive nothing: people were made to invent a
+    # specific fan power to get past a validator. AHU and DOAS still derive
+    # power from airflow x this figure, so there it stays required on the form.
     baseline_efficiency_w_cmh = models.DecimalField(
         max_digits=6,
         decimal_places=2,
+        null=True,
+        blank=True,
         verbose_name=_("Baseline Ventilation System Efficiency (W/CMH)")
     )
     operation_hours_per_workday = models.PositiveSmallIntegerField(
@@ -74,9 +83,16 @@ class VentilationSystem(models.Model):
     workweeks_per_year = models.PositiveSmallIntegerField(
         null=True, blank=True, verbose_name=_("Workweeks per Year")
     )
+    # Four decimal places, not two.
+    #
+    # numeric(10,2) cannot hold a small fan. Record 267 - seven fans at 300 CMH
+    # each - stored 0.00 kW and reported 0 kWh a year. A chilled-water FCU is
+    # tens of watts (the Daikin FWMJCC2BV1 is 63 W = 0.0630 kW), and 84 of the
+    # 152 stored rows are under 1 kW, so this is the common case here, not the
+    # edge case. Widening loses nothing: every existing value fits unchanged.
     total_power_input_kw = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
+        max_digits=12,
+        decimal_places=4,
         verbose_name=_("Total Ventilation System Power Input (kW)")
     )
     air_flow_rate = models.PositiveIntegerField(

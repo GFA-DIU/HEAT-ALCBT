@@ -303,7 +303,7 @@
               <span class="text-[10px] text-[var(--text--sub-600)] pl-2.5 mt-0.5">{% blocktranslate with yrs=building.reference_period|default:50 %}over {{ yrs }} years{% endblocktranslate %}</span>
               {% endif %}
             </li>
-            {# Carbon Savings hidden — will be re-enabled in a future release #}
+            {# Carbon Savings hidden: will be re-enabled in a future release #}
           </ul>
           {% include "pages/building/_upfront_panel.html" %}
           {% if design_drawings_status == 'available_pending' or boq_status == 'available_pending' %}
@@ -311,21 +311,21 @@
             {% if design_drawings_status == 'available_pending' %}
             <div class="flex items-center gap-2 text-sm text-[var(--text--sub-600)]">
               <span data-icon="information-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
-              <span>{% translate "Design drawings — marked as available, not yet uploaded." %}</span>
+              <span>{% translate "Design drawings: marked as available, not yet uploaded." %}</span>
               <a href="{% url 'edit_building' %}?building_uuid={{ building.uuid }}" class="link link-primary font-medium text-xs">{% translate "Upload now" %}</a>
             </div>
             {% endif %}
             {% if boq_status == 'available_pending' %}
             <div class="flex items-center gap-2 text-sm text-[var(--text--sub-600)]">
               <span data-icon="information-2-line" data-size="16" data-color="var(--icon--soft-400)"></span>
-              <span>{% translate "Bill of Quantities — marked as available, not yet uploaded." %}</span>
+              <span>{% translate "Bill of Quantities: marked as available, not yet uploaded." %}</span>
               <a href="{% url 'edit_building' %}?building_uuid={{ building.uuid }}" class="link link-primary font-medium text-xs">{% translate "Upload now" %}</a>
             </div>
             {% endif %}
           </div>
           {% endif %}
           <div id="tab-content-container-top" class="w-full py-6 max-w-[68.75rem] hidden"></div>
-          <!-- Hidden off-screen cards for export capture — always rendered on page load, never visible -->
+          <!-- Hidden off-screen cards for export capture: always rendered on page load, never visible -->
           <div id="export-cards-hidden" style="position:absolute;left:-9999px;top:0;pointer-events:none;" aria-hidden="true">
             <!-- Donut card -->
             <div id="hidden-card-donut" class="border border-[var(--stroke--soft-200)] flex flex-col rounded-2xl bg-white p-4" style="width:320px;">
@@ -360,7 +360,7 @@
                 <canvas id="emboided-carbon-by-material-chart-export"></canvas>
               </div>
             </div>
-            <!-- Savings tab card — rebuilt with plain hex only, no CSS variables -->
+            <!-- Savings tab card: rebuilt with plain hex only, no CSS variables -->
             <div id="export-card-savings" style="width:1100px;background:#ffffff;padding:24px 32px;font-family:ui-sans-serif,system-ui,sans-serif;font-size:14px;line-height:1.5;color:#0f172a;box-sizing:border-box;">
 
               <!-- Benchmark header -->
@@ -379,7 +379,7 @@
               </div>
 
               {% if benchmark_position and stats.total_embodied_carbon %}
-              <!-- Gauge bar — matches live layout -->
+              <!-- Gauge bar: matches live layout -->
               <div style="position:relative;height:110px;margin-top:16px;margin-bottom:8px;">
                 <div style="position:absolute;top:28px;left:0;right:0;height:16px;border-radius:4px;background:linear-gradient(90deg,#81F28E 0%,#FEEA93 50%,#FFCFC2 100%);"></div>
 
@@ -445,7 +445,7 @@
                       </div>
                     </div>
 
-                    <!-- Bar chart static replica — proportional heights -->
+                    <!-- Bar chart static replica: proportional heights -->
                     {% with b=embodied_savings.total_baseline_ec o=embodied_savings.total_optimised_ec %}
                     <div style="height:180px;display:flex;align-items:flex-end;justify-content:center;gap:20px;padding:0 10px;">
                       <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
@@ -1191,7 +1191,7 @@
       function initializeCharts() {
         // Tear down any charts created by a previous call. initializeCharts() runs
         // on every tab switch, and the Whole Life donut lives on a persistent
-        // canvas — re-creating a Chart on a canvas that still has one makes the
+        // canvas: re-creating a Chart on a canvas that still has one makes the
         // responsive chart shrink a little each time. Destroy first to prevent that.
         window.buildingCharts = window.buildingCharts || {};
         Object.keys(window.buildingCharts).forEach(function (key) {

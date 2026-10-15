@@ -384,6 +384,34 @@ forms on the same page and the cooling form. `total_power_input_kw` remains the
 stored field and still holds the total, so the 143 existing records keep their
 meaning; the editable per-unit field is derived from it on load.
 
+### Fixed: the stored power column could not hold the equipment
+
+`total_power_input_kw` was `numeric(10,2)`. A chilled-water fan coil is tens of
+watts — the Daikin FWMJCC2BV1 is 63 W — so 0.063 kW was stored as 0.06 and the
+year came out 120 kWh instead of 126. Record 267, seven fans at 300 CMH each,
+stored **0.00 kW and reported 0 kWh a year**. This was not an edge case: 84 of
+the 152 ventilation rows are under 1 kW.
+
+The column is now `numeric(12,4)` (migration 0064). Widening loses nothing —
+every existing value fits unchanged — and the three forms that enter power
+directly now offer **W or kW**, defaulting to W. That also closes a mismatch
+between the two entry routes: the import template has always stated this column
+in watts, while the form asked for kilowatts.
+
+### Airflow and baseline efficiency are reference-only on three forms
+
+`baseline_efficiency_w_cmh` is specific fan power, and AHU and DOAS genuinely
+need it: there, `power = airflow × efficiency × units ÷ 1000`. The FCU,
+cassette and fan forms take power directly and compute
+`energy = power × units × hours × days × weeks`. They read neither airflow nor
+efficiency — and required both.
+
+149 of the 152 stored rows are on those three forms, so almost every value in
+that column was invented by someone trying to get past a validator. Both fields
+are now optional there and labelled "Reference only" on screen; the model field
+is nullable from migration 0064. Nothing was deleted, and no stored figure
+moved: neither field was ever read for those types.
+
 ### Deliberately not multiplied
 
 The chiller form's unit count does not scale the result, and says so in its own

@@ -181,7 +181,7 @@
   docs/operational_carbon_methodology.md.
   {% endcomment %}
   <div class="mx-5 mt-3 px-3 py-2 rounded-lg bg-[#FEF3C7] text-xs text-[var(--text--strong-950)]">
-    {% translate "Enter each unit of electricity once — do not add a split system's indoor unit here, the cooling record already covers it." %}
+    {% translate "Enter each unit of electricity once. Do not add a split system's indoor unit here: the cooling record already covers it." %}
   </div>
   <div class="px-5 py-4 grid grid-cols-3 gap-x-2.5 gap-y-1">
 
@@ -202,23 +202,23 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, in watts per m3/h (W/CMH). Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number. Typical range 0.30 to 1.20." title="Specific Fan Power (SFP): electrical power per unit of airflow, in watts per m3/h (W/CMH). Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number. Typical range 0.30 to 1.20."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
+        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
       </label>
-      <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Reference only - not used to calculate energy for this equipment type." %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan specification. Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number." title="Design airflow of ONE unit, from the fan specification. Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
-        <input type="number" name="airflow_rate" placeholder="e.g. 2000" min="1" required />
+        <input type="number" name="airflow_rate" placeholder="e.g. 2000" min="1" />
         <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Reference only - not used to calculate energy for this equipment type." %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-3">
@@ -243,9 +243,11 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Power input per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit." title="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
-      <label class="input validator w-full">
-        <input type="number" name="power_input_per_unit" placeholder="e.g. 8" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="power_input_per_unit" placeholder="e.g. 63" required min="0" step="any" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-20" name="power_input_unit" onchange="recalcVentSimpleEnergy(this.closest('form'))">
+          <option value="W" selected>W</option><option value="kW">kW</option>
+        </select>
       </label>
       <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
@@ -395,23 +397,23 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, in watts per m3/h (W/CMH). Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number. Typical range 0.30 to 1.20." title="Specific Fan Power (SFP): electrical power per unit of airflow, in watts per m3/h (W/CMH). Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number. Typical range 0.30 to 1.20."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
+        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
       </label>
-      <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Reference only - not used to calculate energy for this equipment type." %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan specification. Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number." title="Design airflow of ONE unit, from the fan specification. Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
-        <input type="number" name="airflow_rate" placeholder="e.g. 3000" min="1" required />
+        <input type="number" name="airflow_rate" placeholder="e.g. 3000" min="1" />
         <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Reference only - not used to calculate energy for this equipment type." %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-3">
@@ -436,9 +438,11 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Power input per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit." title="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
-      <label class="input validator w-full">
-        <input type="number" name="power_input_per_unit" placeholder="e.g. 12" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="power_input_per_unit" placeholder="e.g. 120" required min="0" step="any" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-20" name="power_input_unit" onchange="recalcVentSimpleEnergy(this.closest('form'))">
+          <option value="W" selected>W</option><option value="kW">kW</option>
+        </select>
       </label>
       <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
@@ -483,23 +487,23 @@
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Baseline efficiency" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)." title="Specific Fan Power (SFP): electrical power per unit of airflow, entered in watts per m³/h (W/CMH). Lower is better; typical range 0.30 to 1.20 W/CMH. If your specification gives SFP in W per L/s, divide it by 3.6 first (2.0 W/(L/s) = 0.56 W/CMH)."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Baseline efficiency" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span><span class="tooltip align-middle ml-1" data-tip="Specific Fan Power (SFP): electrical power per unit of airflow, in watts per m3/h (W/CMH). Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number. Typical range 0.30 to 1.20." title="Specific Fan Power (SFP): electrical power per unit of airflow, in watts per m3/h (W/CMH). Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number. Typical range 0.30 to 1.20."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full">
-        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" required min="0.01" max="10" step="0.01" />
+        <input type="number" name="baseline_efficiency" placeholder="0.30 – 1.20" min="0.01" max="10" step="0.01" />
         <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">W/CMH</span>
       </label>
-      <p class="validator-hint">{% translate "Typical: 0.30 – 1.20 W/CMH" %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Reference only - not used to calculate energy for this equipment type." %}</p>
     </fieldset>
 
     <fieldset class="fieldset">
-      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total." title="Design airflow of ONE unit, from the fan or AHU specification. The number of units above multiplies it, so enter the per-unit figure, not the building total."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
+      <legend class="fieldset-legend">{% translate "Air flow rate per unit" %} <span class="text-[var(--text--sub-600)]">({% translate "Optional" %})</span><span class="tooltip align-middle ml-1" data-tip="Design airflow of ONE unit, from the fan specification. Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number." title="Design airflow of ONE unit, from the fan specification. Recorded for reference only on this form - BEAT works out the energy from the power input and the hours below, so leaving it blank changes no number."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
       <label class="input validator w-full pr-0 overflow-hidden">
-        <input type="number" name="airflow_rate" placeholder="e.g. 500" min="1" required />
+        <input type="number" name="airflow_rate" placeholder="e.g. 500" min="1" />
         <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-25" name="ventilation_capacity">
           <option value="M3H" selected>CMH</option><option value="F3M">CFM</option>
         </select>
       </label>
-      <p class="validator-hint">{% translate "This field is required" %}</p>
+      <p class="text-xs text-[var(--text--sub-600)] mt-1">{% translate "Reference only - not used to calculate energy for this equipment type." %}</p>
     </fieldset>
 
     <fieldset class="fieldset col-span-3">
@@ -524,9 +528,11 @@
 
     <fieldset class="fieldset col-span-3">
       <legend class="fieldset-legend">{% translate "Power input per unit" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit." title="Power drawn by ONE unit, from its nameplate. The number of units above multiplies it - enter the whole building's load here and it is counted once per unit."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
-      <label class="input validator w-full">
-        <input type="number" name="power_input_per_unit" placeholder="e.g. 2" required min="0" step="0.01" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
-        <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">kW</span>
+      <label class="input validator w-full pr-0 overflow-hidden">
+        <input type="number" name="power_input_per_unit" placeholder="e.g. 45" required min="0" step="any" oninput="recalcVentSimpleEnergy(this.closest('form'))" />
+        <select class="select select-ghost bg-[var(--bg--white-0)] focus:!outline-none !pr-0 rounded-none w-20" name="power_input_unit" onchange="recalcVentSimpleEnergy(this.closest('form'))">
+          <option value="W" selected>W</option><option value="kW">kW</option>
+        </select>
       </label>
       <p class="validator-hint">{% translate "This field is required" %}</p>
     </fieldset>
@@ -647,12 +653,16 @@
     var energyEl = form.querySelector('[name="annual_energy_consumption"]');
     if (!powerEl || !energyEl) return;
 
+    var unitEl  = form.querySelector('[name="power_input_unit"]');
     var perUnit = parseFloat(perUnitEl ? perUnitEl.value : NaN);
     var units   = parseFloat(unitsEl   ? unitsEl.value   : NaN);
+    // The field accepts watts or kilowatts; the stored figure is always kW.
+    // Most of this equipment is nameplated in watts - a chilled-water FCU is
+    // tens of watts - and asking for "0.063" invites a misplaced decimal.
+    if (unitEl && unitEl.value === 'W') perUnit = perUnit / 1000;
     if (!isNaN(perUnit) && !isNaN(units) && units > 0) {
-      // Four decimals, not two. A chilled-water FCU draws tens of watts - the
-      // Daikin FWMJCC2BV1 is 63 W - and 0.063 kW rounded to 0.06 reported
-      // 120 kWh a year instead of 126, a 5% loss on every small unit.
+      // Four decimals, not two, and the column now holds four as well. At two,
+      // a seven-fan record stored 0.00 kW and reported 0 kWh a year.
       powerEl.value = (perUnit * units).toFixed(4);
     }
 
@@ -899,10 +909,22 @@
         sf('operating_days_per_week', system.workdays_per_week);
         sf('operating_weeks_per_year', system.workweeks_per_year);
         sf('power_input', system.total_power_input_kw);
-        // stored value is the total; the editable field is per unit
+        // Stored value is the total; the editable field is per unit.
+        //
+        // Shown in whichever unit reads naturally, because toFixed(2) on a
+        // small fan put 0.06 back in the box and a save then wrote that 0.06
+        // in place of the 0.063 that was there.
         if (system.total_power_input_kw && system.number_of_units_installed) {
-          sf('power_input_per_unit', (Number(system.total_power_input_kw) /
-                                      Number(system.number_of_units_installed)).toFixed(2));
+          const perUnitKw = Number(system.total_power_input_kw) /
+                            Number(system.number_of_units_installed);
+          const unitEl = form.querySelector('[name="power_input_unit"]');
+          if (unitEl && perUnitKw < 1) {
+            unitEl.value = 'W';
+            sf('power_input_per_unit', Math.round(perUnitKw * 1000));
+          } else {
+            if (unitEl) unitEl.value = 'kW';
+            sf('power_input_per_unit', Number(perUnitKw.toFixed(4)));
+          }
         }
         sf('airflow_rate', system.air_flow_rate);
         sf('ventilation_capacity', system.ventilation_capacity);
@@ -1007,7 +1029,7 @@
       return;
     }
     if (b === 'complete_system') {
-      note.textContent = '{% translate "Already included — this fan will not be counted again." %}';
+      note.textContent = '{% translate "Already included: this fan will not be counted again." %}';
       note.className = 'text-xs mt-1 cooling-parent-note text-[var(--state--success--base)]';
     } else {
       note.textContent = '{% translate "Counted on top of the cooling system figure." %}';

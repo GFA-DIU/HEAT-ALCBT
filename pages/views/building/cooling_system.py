@@ -260,6 +260,33 @@ def _handle_air_conditioner_system(request, building, data, cooling_system_id, i
         }, status=400)
 
 
+def _cooling_label(type_name, capacity, unit, count, year):
+    """A label the person who installed the equipment would recognise.
+
+    The picker used to show "AC #104", which is the database primary key - it
+    means nothing to a user and cannot be matched against anything on site.
+    Type, size, how many and the year are all on the nameplate or the schedule.
+
+    Parts that are missing are left out rather than printed as blank or zero.
+    """
+    bits = [str(type_name)]
+    try:
+        if capacity and float(capacity) > 0:
+            size = float(capacity)
+            bits.append("%g %s" % (round(size, 1), unit))
+    except (TypeError, ValueError):
+        pass
+    try:
+        n = int(count or 0)
+        if n > 1:
+            bits.append("%d units" % n)
+    except (TypeError, ValueError):
+        pass
+    if year:
+        bits.append("installed %s" % year)
+    return ", ".join(bits)
+
+
 @login_required
 @require_http_methods(["GET"])
 def get_cooling_systems(request, building_uuid):
@@ -327,8 +354,10 @@ def get_cooling_systems(request, building_uuid):
                 # what the entered electricity already covers, and a label the
                 # fan picker can show
                 'energy_boundary': system.energy_boundary,
-                'label': 'Chiller #%s - %s' % (
-                    system.id, system.get_chiller_type_display() or 'chiller'),
+                'label': _cooling_label(
+                    system.get_chiller_type_display() or 'Chiller',
+                    system.total_cooling_load_rt, 'RT',
+                    system.number_of_chillers, system.year_of_installation),
             })
 
         # Add air conditioner systems
@@ -363,9 +392,23 @@ def get_cooling_systems(request, building_uuid):
                 # what the entered electricity already covers, and a label the
                 # fan picker can show
                 'energy_boundary': system.energy_boundary,
-                'label': 'AC #%s - %s' % (
-                    system.id, system.get_ac_type_display() or 'air conditioner'),
+                'label': _cooling_label(
+                    system.get_ac_type_display() or 'Air conditioner',
+                    system.cooling_capacity_per_unit_kw, 'kW',
+                    system.number_of_units, system.year_of_installation),
             })
+
+        # Two identical machines produce the same label, which would make the
+        # fan picker ambiguous. Number them only when that actually happens, so
+        # a building with one of each stays clean.
+        seen = {}
+        for row in systems_data:
+            seen[row['label']] = seen.get(row['label'], 0) + 1
+        running = {}
+        for row in systems_data:
+            if seen[row['label']] > 1:
+                running[row['label']] = running.get(row['label'], 0) + 1
+                row['label'] = '%s (%d)' % (row['label'], running[row['label']])
 
         return JsonResponse({
             'success': True,

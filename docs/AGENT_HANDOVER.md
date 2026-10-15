@@ -69,6 +69,20 @@ These are methodology calls, not implementation gaps. They need GT.
 - **106 cassette rows sit under ventilation.** They report as cooling and
   building totals were verified unchanged. Moving them needs three NOT NULL
   fields the ventilation form never collected. User said "check later".
+- **Airflow and baseline efficiency are reference-only on three forms.**
+  The FCU, cassette and fan forms compute energy from power × units × hours and
+  never read either field, yet both were required: 149 of the 152 stored rows
+  are on those forms, so nearly every value in that column was invented to get
+  past a validator. They are now optional and labelled "Reference only" on
+  screen (migration 0064 made `baseline_efficiency_w_cmh` nullable). AHU and
+  DOAS still require both, because there power *is* airflow × efficiency.
+- **Two ventilation records lost their power to the old 2-dp column.**
+  Record 267 (building "1st project", 7 fans, 300 CMH each) stores 0.0000 kW
+  and reports **0 kWh a year**; record 1 (KBC, 2 FCUs) stores 0.0000 kW. The
+  column is wide enough now, but the figures people originally typed are gone
+  and cannot be recovered — deriving them from the stored airflow × efficiency
+  would be applying the AHU formula to equipment it was never meant for. The
+  two buildings' owners need to re-enter the nameplate watts.
 - **A5.1 demolition and A5.4 worker transport are not modelled.** Stated on
   screen so nobody reads A5 as complete.
 - **Three German EPD names contain literal newlines.** Cosmetic, identical in
@@ -81,10 +95,13 @@ These are methodology calls, not implementation gaps. They need GT.
 1. Run the suite; commit the boundary work if green
 2. ~~Put the boundary field and the fan-parent picker into the forms~~ —
    **done**. A coverage dropdown on all six cooling forms; a parent picker on
-   the FCU, cassette, AHU and DOAS forms (not the plain fan — an exhaust fan is
-   not an indoor unit). The view translates `air_conditioner:<id>` /
-   `chiller:<id>` into the right foreign key and checks the parent belongs to
-   the same building.
+   the **fan coil form only**. A cassette is already counted as cooling and
+   excluded from the ventilation line, so linking one cannot change a number;
+   an AHU or DOAS is ventilation plant and its fan is always separate
+   electricity. The view translates `air_conditioner:<id>` / `chiller:<id>`
+   into the right foreign key and checks the parent belongs to the same
+   building. The picker shows "Split Air Conditioners, 7 kW, installed 2014",
+   not the database id it used to print.
 3. Decide the open questions above with GT before anything ships
 4. The deploy runbook is `docs/deploy_epd_operational_batch.md` — **read §0
    before merging anything to `qa`**, it is a release
