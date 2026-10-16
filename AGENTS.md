@@ -163,13 +163,14 @@ Not `# convert the efficiency`.
 | | |
 |---|---|
 | Branch | work on `rohit-qa`; **never merge to `qa` unless asked** |
-| `qa` | this **is** production — beat-alcbt.gggi.org. Merging deploys to real users |
+| `qa` | this **is** production — beat-alcbt.gggi.org |
+| Deploying | **merging to `qa` does NOT deploy.** A deploy is `git push heroku origin/qa:refs/heads/main` |
 | Production DB | read-only unless explicitly directed |
 | Secrets | never print, paste or commit; mask connection strings |
 | Python | `.venv/Scripts/python.exe` |
 | Database | local Postgres in Docker, container `heat-alcbt-db-1` |
 | Templates | `/templates`, not `pages/templates` |
-| Migrations | run automatically on deploy via `Procfile` release phase |
+| Migrations | run automatically **on deploy** via the `Procfile` release phase — not on merge |
 
 ### Two local traps
 

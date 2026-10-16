@@ -16,9 +16,20 @@ including work from earlier sessions — the A4/A5 scope, the lighting space
 types and the per-country EPD uniqueness key — not only the EPD catalogue
 and operational carbon batch.
 
-> **Merging this PR is a release.** `qa` is the live tool at
-> beat-alcbt.gggi.org. There is no staging step after it. Treat the merge
-> itself as the deploy button, not as a review gate.
+> **Merging is not the deploy.** This was wrong here until 16.10.2026 and it
+> cost a release: PR #595 was merged to `qa` and nothing reached production,
+> because the app has **no GitHub integration and no Actions workflow** — the
+> Heroku GitHub link returns `not_found`. `qa` is the live tool at
+> beat-alcbt.gggi.org and there is no staging step after it, but the thing that
+> ships is a manual push to the Heroku remote:
+>
+> ```bash
+> git push heroku origin/qa:refs/heads/main
+> ```
+>
+> That push, and only that push, starts the build and the release phase that
+> runs the migrations. Check `heroku releases --app beat-qa` afterwards: a new
+> version number is the only proof the deploy happened.
 
 Everything below is idempotent and every data command takes `--dry-run`.
 Migrations run automatically — `Procfile` has

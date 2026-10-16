@@ -18,11 +18,24 @@ Three files, three jobs:
 
 **`qa` is production.** It is the live tool at beat-alcbt.gggi.org, used by
 real people in five countries. There is no staging environment behind it.
-Merging `rohit-qa` into `qa` **is** the deploy button, not a review gate.
 
-`Procfile` carries `release: python manage.py migrate --noinput`, so
-**migrations run automatically the moment the merge lands**. Preboot is off,
-so every deploy is 10 to 30 seconds of downtime.
+**Merging `rohit-qa` into `qa` does NOT deploy.** This file said the opposite
+until 16.10.2026, and that cost a release: PR #595 was merged, everyone
+believed it had shipped, and production carried on serving twelve-day-old code.
+The app has no GitHub integration (the Heroku link returns `not_found`) and no
+Actions workflow. A deploy is one manual command:
+
+```bash
+git push heroku origin/qa:refs/heads/main
+```
+
+`Procfile` carries `release: python manage.py migrate --noinput`, so migrations
+run automatically **on that push** — not on the merge. Preboot is off, so every
+deploy is 10 to 30 seconds of downtime.
+
+**`heroku releases --app beat-qa` is the only proof.** A new version number
+means it shipped; an unchanged one means it did not, however clean the merge
+looked.
 
 ### Your authority, as set by Rohit on 15 Oct 2026
 
@@ -119,7 +132,11 @@ Do not skip a step because the last one passed. Write down each number.
    ```
 
 6. **Write the pre-flight up and stop.** Give Rohit the backup location, the
-   suite result, the before-counts, and the exact merge command. Do not merge.
+   suite result, the before-counts, and **both** commands — the merge *and*
+   the `git push heroku` that actually ships it. Do not run either.
+
+   Do not report a release as done because a PR merged. Read
+   `heroku releases --app beat-qa` and quote the version number.
 
 ### Immediately after the deploy, once he has pressed it
 
