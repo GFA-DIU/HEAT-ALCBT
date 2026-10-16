@@ -145,11 +145,28 @@ class EnergySummary(models.Model):
         elif not self.is_manual_cooling:
             self.cooling_kwh = None
 
-        # Ventilation: everything except the cassettes counted above
+        # Ventilation: everything except the cassettes counted above, minus any
+        # fan whose parent cooling record already includes it.
+        #
+        # BEAT used to add every record and deduct nothing, with no link between
+        # an indoor unit and the outdoor unit serving it. That made a matched
+        # split system's indoor fan countable twice - once inside the cooling
+        # figure derived from capacity and COP, once as a fan coil unit - and
+        # BEAT could not tell that apart from a chilled-water FCU, where adding
+        # both is correct.
+        #
+        # A fan is now excluded only when the user has BOTH linked it to a
+        # cooling record AND said that record's figure covers the complete
+        # system. An unlinked fan, or a parent whose boundary is unspecified,
+        # is added exactly as before - which is why no existing figure moves.
         if other_vent_qs.exists():
-            self.ventilation_kwh = other_vent_qs.aggregate(
-                s=Sum("total_energy_consumption_kwh_per_year")
-            )["s"] or 0
+            vent_total = 0
+            for v in other_vent_qs.select_related(
+                    "cooling_parent_ac", "cooling_parent_chiller"):
+                if v.fan_energy_already_counted:
+                    continue
+                vent_total += v.total_energy_consumption_kwh_per_year or 0
+            self.ventilation_kwh = vent_total
             self.is_manual_ventilation = False
         elif not self.is_manual_ventilation:
             self.ventilation_kwh = None

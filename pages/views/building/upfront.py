@@ -2,6 +2,9 @@
 
 GET  /building/<id>/upfront/   -> JSON breakdown (rows + totals + defaults)
 POST /building/<id>/upfront/   -> save per-material overrides, returns recomputed totals
+
+The panel itself is templates/pages/building/_upfront_panel.html, included by
+the building page and driven by this JSON.
 """
 import json
 import uuid as uuid_lib
@@ -16,6 +19,7 @@ from pages.models.assembly import StructuralProduct
 from pages.views.building.impact_calculation import calculate_impacts, ImpactCalculationError
 from pages.scripts.a4a5 import defaults as D
 from pages.scripts.a4a5.compute import material_a4_a5
+from pages.scripts.a4a5.construction import construction_energy, scope_note
 
 
 def _get_building(building_id, user):
@@ -63,7 +67,13 @@ def _rows_and_totals(building):
                 "a1a3": round(a1a3, 3),
                 "scenario": meta["scenario"],
                 "distance_km": meta["distance_km"],
-                "ef": meta["ef"],
+                # One entry per transport mode. There is deliberately no single
+                # "ef" field: a blended factor across a sea leg and a road leg
+                # is not a property of anything, and reading it as one made the
+                # factor look like it fell as distance rose.
+                "legs": meta["legs"],
+                "legs_text": meta["legs_text"],
+                "kgco2e_per_tonne": meta["kgco2e_per_tonne"],
                 "waste_pct": round(meta["waste_rate"] * 100, 2),
                 "a4": round(float(a4), 3),
                 "a5w": round(float(a5w), 3),
@@ -71,12 +81,33 @@ def _rows_and_totals(building):
                                    or sp.a4_distance_km is not None or sp.a4_ef is not None),
             })
             t_a1a3 += a1a3; t_a4 += float(a4); t_a5w += float(a5w)
-    totals = {"a1a3": round(t_a1a3, 2), "a4": round(t_a4, 2), "a5w": round(t_a5w, 2),
-              "upfront": round(t_a1a3 + t_a4 + t_a5w, 2)}
-    # scenario→(distance,ef) defaults for this country, so the UI can prefill on change
-    sdef = {k: dict(zip(("distance_km", "ef"), D.scenario_distance_ef(k, country_name)))
-            for k in ("local", "national", "imported")}
-    return rows, totals, floor_area, country_name, sdef
+    # A5.2 - site energy. Project-level, so it is computed once from the
+    # building's own entries rather than per material like A5.3 waste.
+    a5_2, constr_rows, constr_notes = construction_energy(
+        building.construction_products.select_related("epd").all(), floor_area)
+    t_a5_2 = float(a5_2)
+
+    totals = {"a1a3": round(t_a1a3, 2), "a4": round(t_a4, 2),
+              # a5w keeps its name so nothing that reads it breaks; the UI
+              # labels it A5.3, which is what RICS calls it
+              "a5w": round(t_a5w, 2), "a5_2": round(t_a5_2, 2),
+              "a5": round(t_a5w + t_a5_2, 2),
+              "upfront": round(t_a1a3 + t_a4 + t_a5w + t_a5_2, 2)}
+    # scenario → journey defaults for this country, so the UI can prefill on change
+    sdef = {}
+    for k in ("local", "national", "imported"):
+        legs = D.scenario_legs(k, country_name)
+        sdef[k] = {
+            "label": D.SCENARIOS[k]["label"],
+            "legs": legs,
+            "legs_text": D.describe_legs(legs),
+            "distance_km": D.scenario_total_km(legs),
+            "kgco2e_per_tonne": round(D.legs_tonne_km_co2(legs), 4),
+            # only India has per-class road data; None elsewhere
+            "road_class": D.road_class_for(k, country_name),
+        }
+    return (rows, totals, floor_area, country_name, sdef,
+            {"rows": constr_rows, "notes": constr_notes, "scope": scope_note()})
 
 
 @login_required
@@ -87,11 +118,18 @@ def building_upfront(request, building_id):
         return JsonResponse({"success": False, "error": "Building not found"}, status=404)
 
     if request.method == "GET":
-        rows, totals, floor_area, country, sdef = _rows_and_totals(building)
+        rows, totals, floor_area, country, sdef, constr = _rows_and_totals(building)
+        ef = D.transport_ef(country)
         return JsonResponse({
             "success": True, "rows": rows, "totals": totals,
             "floor_area": floor_area, "country": country,
             "disposal_ef": D.DISPOSAL_EF_PER_KG, "scenario_defaults": sdef,
+            # provenance, so the panel can say which figures are sourced and
+            # which are placeholders standing in for a national study
+            "ef_source": ef["source"],
+            "road_sourced": ef.get("road_sourced", False),
+            "rail_share_pct": round(D.national_rail_share(country) * 100),
+            "construction": constr,
         })
 
     # POST — save overrides
@@ -134,6 +172,7 @@ def building_upfront(request, building_id):
         sp.save(update_fields=["sourcing_scenario", "waste_rate", "a4_distance_km", "a4_ef"])
         saved += 1
 
-    rows, totals, floor_area, country, sdef = _rows_and_totals(building)
+    rows, totals, floor_area, country, sdef, constr = _rows_and_totals(building)
     return JsonResponse({"success": True, "saved": saved, "rows": rows, "totals": totals,
-                         "scenario_defaults": sdef})
+                         "scenario_defaults": sdef, "construction": constr})
+

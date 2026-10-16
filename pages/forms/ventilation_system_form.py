@@ -17,6 +17,9 @@ class VentilationSystemForm(forms.ModelForm):
         model = VentilationSystem
         fields = [
             'ventilation_type',
+            # the cooling system this fan belongs to, when it is one
+            'cooling_parent_ac',
+            'cooling_parent_chiller',
             'ventilation_capacity',
             'baseline_efficiency_w_cmh',
             'operation_hours_per_workday',

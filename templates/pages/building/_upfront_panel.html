@@ -1,5 +1,5 @@
 {% load i18n %}
-{# Upfront Carbon (A4–A5) panel — collapsible components, subtotal in header, inline editing #}
+{# Upfront Carbon (A4–A5) panel: collapsible components, subtotal in header, inline editing #}
 <details id="upfront-panel" data-building-id="{{ building.id }}"
          class="w-full max-w-[68.75rem] my-4 border border-[var(--stroke--soft-200)] rounded-2xl bg-white">
   <summary class="cursor-pointer select-none px-5 py-4 flex items-center gap-2 font-medium">
@@ -17,22 +17,73 @@
 
 <style>
   #upfront-body table.uf-table{width:100%;border-collapse:collapse;font-size:13px}
+  /* A header must sit over its own column. SOURCING was left-aligned while
+     A1-A3 was right-aligned, so the two met in the middle and it read as if
+     SOURCING labelled the A1-A3 numbers. Every header now takes the alignment
+     of the cells beneath it, and the two control columns are centred so they
+     are visibly not part of the run of figures. */
   #upfront-body .uf-table th{font-size:11px;text-transform:uppercase;letter-spacing:.02em;
-    color:var(--text--sub-600);font-weight:600;padding:8px;border-bottom:1px solid var(--stroke--soft-200);text-align:right}
+    color:var(--text--sub-600);font-weight:600;padding:8px 10px;
+    border-bottom:1px solid var(--stroke--soft-200);text-align:right;white-space:nowrap}
   #upfront-body .uf-table th.l{text-align:left}
-  #upfront-body .uf-table td{padding:10px 8px;border-bottom:1px solid var(--stroke--soft-200);
+  #upfront-body .uf-table th.c,#upfront-body .uf-table td.c{text-align:center}
+  #upfront-body .uf-table th small{display:block;text-transform:none;letter-spacing:0;
+    font-weight:400;font-size:10px;opacity:.75;margin-top:1px}
+  /* the controls sit in their own band, fenced off from the figures */
+  #upfront-body .uf-table th.ctl,#upfront-body .uf-table td.ctl{
+    background:var(--bg--weak-50);border-left:1px solid var(--stroke--soft-200);
+    border-right:1px solid var(--stroke--soft-200);text-align:center}
+  #upfront-body .uf-table td{padding:7px 10px;border-bottom:1px solid var(--stroke--soft-200);
     text-align:right;vertical-align:middle}
   #upfront-body .uf-table td.l{text-align:left}
   #upfront-body .uf-table td.c{text-align:center}
   #upfront-body .uf-name{font-weight:500;white-space:normal;word-break:break-word;line-height:1.3;max-width:26rem}
   #upfront-body .uf-cat{font-size:11px;color:var(--text--sub-600);margin-top:2px}
   #upfront-body .uf-num{white-space:nowrap;font-variant-numeric:tabular-nums}
-  #upfront-body .uf-grp td{background:var(--bg--weak-50);font-weight:600;text-align:left;cursor:pointer}
+  #upfront-body .uf-grp td{background:var(--bg--weak-50);font-weight:600;text-align:left;cursor:pointer;
+    border-top:2px solid var(--stroke--soft-200)}
+  /* the stacked upfront breakdown under the table */
+  #upfront-body .uf-sum{margin-top:18px;border:1px solid var(--stroke--soft-200);border-radius:8px;overflow:hidden}
+  #upfront-body .uf-sum table{width:100%;border-collapse:collapse;font-size:13px}
+  #upfront-body .uf-sum td{padding:8px 14px;vertical-align:middle}
+  #upfront-body .uf-sum .st{font-weight:700;color:var(--text--strong-950);width:4.5rem}
+  #upfront-body .uf-sum .lbl2{color:var(--text--sub-600)}
+  #upfront-body .uf-sum .val{text-align:right;font-variant-numeric:tabular-nums;
+    font-weight:600;white-space:nowrap;width:7rem}
+  #upfront-body .uf-sum .sub td{padding-top:2px;padding-bottom:2px;font-size:12px;
+    color:var(--text--sub-600);background:var(--bg--weak-50)}
+  #upfront-body .uf-sum .sub .st{padding-left:34px;font-weight:600}
+  #upfront-body .uf-sum .tot td{border-top:2px solid var(--stroke--soft-200);
+    font-size:15px;font-weight:700;color:var(--text--strong-950);padding-top:10px;padding-bottom:10px}
+  #upfront-body .uf-sum .unit{text-align:right;font-size:11px;color:var(--text--sub-600);
+    padding:0 14px 10px}
   #upfront-body .uf-grp td.uf-num{text-align:right}
   #upfront-body .uf-grp:hover td{background:var(--bg--soft-200)}
   #upfront-body .uf-caret{display:inline-block;width:1em;color:var(--icon--soft-400);transition:transform .12s}
   #upfront-body select.uf-src{min-width:8.5rem}
-  #upfront-body input.uf-in{width:4rem;text-align:right}
+  #upfront-body input.uf-in{width:5.5rem;text-align:right}
+  #upfront-body .uf-key{font-size:12px;color:var(--text--sub-600);line-height:1.8;margin-bottom:12px}
+  #upfront-body .uf-assump{border:1px solid var(--stroke--soft-200);border-radius:8px;padding:12px 14px;margin-bottom:16px}
+  #upfront-body .uf-assump-h{font-weight:700;font-size:13px;color:var(--text--strong-950);margin-bottom:8px}
+  #upfront-body .uf-jtable{width:100%;border-collapse:collapse;font-size:12px}
+  #upfront-body .uf-jtable th{text-align:left;font-weight:600;color:var(--text--sub-600);
+    padding:4px 8px;border-bottom:1px solid var(--stroke--soft-200)}
+  #upfront-body .uf-jtable td{padding:4px 8px;font-variant-numeric:tabular-nums}
+  #upfront-body .uf-jtable .r,#upfront-body .uf-jtable th.r{text-align:right}
+  #upfront-body .uf-jtable .cap{text-transform:capitalize;font-weight:600;color:var(--text--strong-950)}
+  #upfront-body .uf-jtable .legs{color:var(--text--sub-600)}
+  #upfront-body .uf-src{font-size:11px;color:var(--text--sub-600);margin-top:8px}
+  #upfront-body .uf-warn{font-size:11px;line-height:1.6;background:#FEF3C7;border-radius:6px;
+    padding:8px 10px;margin-top:8px;color:var(--text--strong-950)}
+  /* the read-only derivation line: journey = per-tonne x mass / area = A4 */
+  #upfront-body .uf-advrow td{padding:10px 8px 10px 24px;background:var(--bg--weak-50)}
+  #upfront-body .uf-legs{font-variant-numeric:tabular-nums;color:var(--text--strong-950);
+    background:#fff;border:1px solid var(--stroke--soft-200);border-radius:4px;padding:2px 8px;margin:0 2px}
+  #upfront-body .uf-pt{font-variant-numeric:tabular-nums;color:var(--text--sub-600);white-space:nowrap}
+  #upfront-body .uf-pt.strong{color:var(--text--strong-950);font-weight:600}
+  #upfront-body .uf-sep{color:var(--text--sub-600);margin:0 8px;font-weight:600}
+  #upfront-body .uf-advrow .lbl{font-weight:600;margin-right:8px;color:var(--text--sub-600);
+    text-transform:uppercase;font-size:10px;letter-spacing:.04em}
   #upfront-body input.uf-w{width:3.4rem;text-align:right}
   #upfront-body .uf-gear{background:none;border:none;cursor:pointer;color:var(--icon--soft-400);
     padding:4px;border-radius:6px;display:inline-flex;line-height:0}
@@ -60,6 +111,7 @@
   const INFO='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
     +'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
 
+  const val=(v)=>(v===null||v===undefined)?'':v;
   const num=(n,d=2)=>(n===null||n===undefined||isNaN(n))?'—':Number(n).toFixed(d);
   const esc=(s)=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   function getCookie(n){const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)');return m?m.pop():'';}
@@ -68,7 +120,7 @@
   function recalc(r){
     if(r.mass_kg===null||r.mass_kg===undefined){r.a4=0;r.a5w=0;return;}
     const fa=state.floor_area||1,t=r.mass_kg/1000,w=(r.waste_pct||0)/100;
-    r.a4=(t*(r.distance_km||0)*(r.ef||0))/fa;
+    r.a4=(t*(Number(r.kgco2e_per_tonne)||0))/fa;
     r.a5w=w*((r.a1a3||0)+r.a4)+(r.mass_kg*w*state.disposal_ef)/fa;
   }
   function paintRow(i){const r=state.rows[i];
@@ -79,10 +131,15 @@
     const set=(id,v,d)=>{const e=document.getElementById(id);if(e)e.textContent=num(v,d);};
     set('uf-g-a1a3-'+g.g,a1,2);set('uf-g-a4-'+g.g,a4,3);set('uf-g-a5w-'+g.g,a5,3);});}
   function paintTotals(){let a1=0,a4=0,a5=0;state.rows.forEach(r=>{a1+=r.a1a3||0;a4+=r.a4||0;a5+=r.a5w||0;});
+    // A5.2 is project level: it comes from the server and does not move when a
+    // material's scenario or waste rate changes.
+    const a52=(state.totals&&state.totals.a5_2)||0;
     document.getElementById('uf-t-a1a3').textContent=num(a1,1);
     document.getElementById('uf-t-a4').textContent=num(a4,2);
     document.getElementById('uf-t-a5w').textContent=num(a5,2);
-    document.getElementById('uf-t-up').textContent=num(a1+a4+a5,1);}
+    const e52=document.getElementById('uf-t-a52'); if(e52)e52.textContent=num(a52,2);
+    const e5=document.getElementById('uf-t-a5'); if(e5)e5.textContent=num(a5+a52,2);
+    document.getElementById('uf-t-up').textContent=num(a1+a4+a5+a52,1);}
 
   function matRows(r,i,g){
     const massless=(r.mass_kg===null||r.mass_kg===undefined);
@@ -93,20 +150,26 @@
       + '<td class="l" style="padding-left:24px"><div class="uf-name"'+(massless?' style="opacity:.55"':'')+'>'+esc(r.name)+'</div>'
         + (r.category?'<div class="uf-cat">'+esc(r.category)+'</div>':'') + '</td>'
       + '<td class="uf-num">'+num(r.a1a3,2)+'</td>'
-      + '<td class="l"><select data-i="'+i+'" data-f="scenario" class="select select-bordered select-sm uf-src" '+dis+'>'
+      + '<td class="ctl"><select data-i="'+i+'" data-f="scenario" class="select select-bordered select-sm uf-src" '+dis+'>'
         + '<option value=""'+(r.scenario?'':' selected')+'>auto</option>'
         + opt('local',r.scenario)+opt('national',r.scenario)+opt('imported',r.scenario)+'</select></td>'
       + '<td class="uf-num" id="uf-a4-'+i+'">'+num(r.a4,3)+'</td>'
-      + '<td><input data-i="'+i+'" data-f="waste_pct" type="number" step="0.5" min="0" max="100" '
+      + '<td class="ctl"><input data-i="'+i+'" data-f="waste_pct" type="number" step="0.5" min="0" max="100" '
         + 'value="'+r.waste_pct+'" class="input input-bordered input-sm uf-w" '+dis+'> %</td>'
       + '<td class="uf-num" id="uf-a5w-'+i+'">'+num(r.a5w,3)+'</td>'
       + '<td class="c">'+(massless?'':'<button type="button" class="uf-gear" data-adv="'+i+'" title="'
         + '{% translate "Adjust distance / emission factor" %}">'+GEAR+'</button>')+'</td></tr>';
     const adv='<tr class="uf-advrow" data-grp="'+g+'" data-kind="adv" id="adv-'+i+'" style="display:none"><td class="l" colspan="7" style="padding-left:24px">'
-      + '<span class="lbl">Distance (km):</span>'
-      + '<input data-i="'+i+'" data-f="distance_km" type="number" step="1" min="0" value="'+r.distance_km+'" class="input input-bordered input-sm uf-in" '+dis+'>'
-      + '<span class="lbl" style="margin-left:16px">EF (kg CO₂e/tonne-km):</span>'
-      + '<input data-i="'+i+'" data-f="ef" type="number" step="0.001" min="0" value="'+r.ef+'" class="input input-bordered input-sm uf-in" '+dis+'>'
+      + '<span class="lbl">Journey</span>'
+      + '<span class="uf-legs">'+esc(r.legs_text||'')+'</span>'
+      + '<span class="uf-sep">=</span>'
+      + '<span class="uf-pt">'+num(r.kgco2e_per_tonne,2)+' kg CO₂e per tonne carried</span>'
+      + '<span class="uf-sep">x</span>'
+      + '<span class="uf-pt">'+num((r.mass_kg||0)/1000,2)+' t</span>'
+      + '<span class="uf-sep">÷</span>'
+      + '<span class="uf-pt">'+num(state.floor_area,0)+' m²</span>'
+      + '<span class="uf-sep">=</span>'
+      + '<span class="uf-pt strong">'+num(r.a4,3)+'</span>'
       + '<span class="uf-info" title="'+tip+'">'+INFO+'</span>'
       + '</td></tr>';
     return main+adv;
@@ -117,29 +180,101 @@
     state.rows.forEach((r,i)=>{if(!cur||cur.name!==r.component){cur={name:r.component,g:groups.length,idx:[]};groups.push(cur);}cur.idx.push(i);});
     state._groups=groups;
 
-    let html='<div class="text-xs text-[var(--text--sub-600)] mb-3" style="line-height:1.7">'
-      + '<div><b>A1-A3</b>: from the EPD (product stage, cradle-to-gate).</div>'
-      + '<div><b>A4</b>: transport of materials to the site.</div>'
-      + '<div><b>A5w</b>: construction / installation waste.</div>'
-      + '<div><b>Country</b>: '+esc(state.country)+' (GFA '+num(state.floor_area,0)+' m²) &mdash; sets the default transport distances and emission factors.</div>'.replace('&mdash;',':')
-      + '<div><b>Sourcing scenario</b>: Local / National / Imported &ndash; chooses the transport distance and EF for each material; use the gear icon to fine-tune.</div>'.replace('&ndash;',':')
-      + '<div>All values are kg CO₂e/m². Click a component to expand its materials.</div>'
+    let html='<div class="uf-key">'
+      + '<div><b>A1&ndash;A3</b> product stage, from the EPD &middot; '
+      + '<b>A4</b> transport to site &middot; <b>A5.2</b> site energy &middot; '
+      + '<b>A5.3</b> construction waste. '
+      + 'All figures kg CO₂e/m². Click a component to expand it.</div>'
+      + '<div><b>'+esc(state.country)+'</b>, GFA '+num(state.floor_area,0)+' m². '
+      + 'The sourcing scenario picks the journey; distances and emission factors '
+      + 'come from the country tables (RICS WLCA).</div>'
       + '</div>';
+
+    // the journeys behind every A4 figure, stated once
+    const sd=state.scenario_defaults||{};
+    html+='<div class="uf-assump"><div class="uf-assump-h">'
+      + 'How transport is estimated in '+esc(state.country)+'</div>'
+      + '<table class="uf-jtable"><thead><tr><th>Scenario</th><th class="r">Distance</th>'
+      + '<th class="r">kg CO₂e / tonne</th><th>Legs</th><th>Road vehicle</th></tr></thead><tbody>';
+    ['local','national','imported'].forEach(k=>{
+      const j=sd[k]; if(!j) return;
+      html+='<tr><td class="cap">'+k+'</td>'
+        + '<td class="r">'+num(j.distance_km,0)+' km</td>'
+        + '<td class="r">'+num(j.kgco2e_per_tonne,2)+'</td>'
+        + '<td class="legs">'+esc(j.legs_text||'')+'</td>'
+        + '<td class="legs">'+esc(j.road_class||'—')+'</td></tr>';
+    });
+    html+='</tbody></table>';
+    if(state.ef_source) html+='<div class="uf-src">Emission factors: '+esc(state.ef_source)+'</div>';
+    if(!state.road_sourced) html+='<div class="uf-warn"><b>Placeholder factor.</b> '
+      + 'No national road-freight study was found for '+esc(state.country)
+      + ', so a GLEC regional default is used.</div>';
+    if(state.rail_share_pct) html+='<div class="uf-warn"><b>Assumption, not sourced.</b> '
+      + state.rail_share_pct+'% of a national haul is assumed to go by rail rather than road. '
+      + 'Rail is far less carbon-intensive per tonne-km, so this lowers A4 for nationally '
+      + 'sourced materials. Replace with real modal-split data before publishing figures.</div>';
+    html+='</div>';
+    // A5.2 - construction site energy. Project level, so it sits outside the
+    // per-material table rather than inside it.
+    const ce = state.construction || {rows:[], notes:[], scope:''};
+    html+='<div class="uf-assump"><div class="uf-assump-h">'
+      + 'A5.2 &mdash; energy used on site during construction</div>';
+    if(ce.rows && ce.rows.length){
+      html+='<table class="uf-jtable"><thead><tr><th>Carrier</th><th class="r">Recorded</th>'
+        + '<th class="r">kWh</th><th class="r">kg CO₂e/kWh</th><th class="r">kg CO₂e/m²</th>'
+        + '<th>Conversion</th></tr></thead><tbody>';
+      ce.rows.forEach(r=>{
+        html+='<tr><td class="cap">'+esc(r.name||'')+'</td>'
+          + '<td class="r">'+num(r.quantity,0)+' '+esc(r.unit||'')+'</td>'
+          + '<td class="r">'+(r.kwh===null?'&mdash;':num(r.kwh,0))+'</td>'
+          + '<td class="r">'+(r.factor_kgco2e_per_kwh===null?'&mdash;':num(r.factor_kgco2e_per_kwh,3))+'</td>'
+          + '<td class="r">'+(r.a5_2===null?'&mdash;':num(r.a5_2,3))+'</td>'
+          + '<td class="legs">'+esc(r.problem||r.conversion||'')+'</td></tr>';
+      });
+      html+='</tbody></table>';
+    } else {
+      html+='<div class="uf-warn"><b>No site energy entered.</b> A5.2 is reported '
+        + 'as zero, so the upfront total below is understated by whatever the site '
+        + 'actually used &mdash; diesel for plant and generators, site electricity, '
+        + 'temporary works. Enter it as metered kWh or as litres from delivery notes.</div>';
+    }
+    (ce.notes||[]).forEach(n=>{ html+='<div class="uf-src">'+esc(n)+'</div>'; });
+    if(ce.scope) html+='<div class="uf-src"><b>Scope:</b> '+esc(ce.scope)+'</div>';
+    html+='</div>';
+
     html+='<div style="overflow-x:auto"><table class="uf-table"><thead><tr>'
-      + '<th class="l">{% translate "Component / material" %}</th><th>A1-A3</th><th class="l">{% translate "Sourcing" %}</th>'
-      + '<th>A4</th><th>{% translate "Waste" %}</th><th>A5w</th><th></th></tr></thead><tbody>';
+      + '<th class="l">{% translate "Component / material" %}</th>'
+      + '<th>A1&ndash;A3<small>{% translate "product" %}</small></th>'
+      + '<th class="ctl">{% translate "Sourcing" %}<small>{% translate "sets A4" %}</small></th>'
+      + '<th>A4<small>{% translate "transport" %}</small></th>'
+      + '<th class="ctl">{% translate "Waste" %}<small>{% translate "sets A5.3" %}</small></th>'
+      + '<th>A5.3<small>{% translate "waste" %}</small></th><th></th></tr></thead><tbody>';
     groups.forEach(g=>{
       html+='<tr class="uf-grp" data-grp="'+g.g+'"><td class="l"><span class="uf-caret">▸</span> '+esc(g.name)+'</td>'
-        + '<td class="uf-num" id="uf-g-a1a3-'+g.g+'"></td><td></td>'
-        + '<td class="uf-num" id="uf-g-a4-'+g.g+'"></td><td></td>'
+        + '<td class="uf-num" id="uf-g-a1a3-'+g.g+'"></td><td class="ctl"></td>'
+        + '<td class="uf-num" id="uf-g-a4-'+g.g+'"></td><td class="ctl"></td>'
         + '<td class="uf-num" id="uf-g-a5w-'+g.g+'"></td><td></td></tr>';
       g.idx.forEach(i=>{ html+=matRows(state.rows[i],i,g.g); });
     });
-    html+='</tbody><tfoot>'
-      + '<tr style="font-weight:600;border-top:2px solid var(--stroke--soft-200)"><td class="l">{% translate "TOTAL (kg CO₂e/m²)" %}</td>'
-      + '<td class="uf-num" id="uf-t-a1a3"></td><td></td><td class="uf-num" id="uf-t-a4"></td><td></td><td class="uf-num" id="uf-t-a5w"></td><td></td></tr>'
-      + '<tr style="font-weight:700"><td class="l" colspan="5" style="text-align:right">{% translate "Upfront A1–A5" %}</td>'
-      + '<td class="uf-num" id="uf-t-up"></td><td></td></tr></tfoot></table></div>';
+    html+='</tbody></table></div>';
+
+    // The stages spelled out, with A5 split into the two parts BEAT models.
+    // Reading a column total off the table told you the number but not which
+    // stage it was, and A5.2 and A5.3 had no visible relationship at all.
+    html+='<div class="uf-sum"><table>'
+      + '<tr><td class="st">A1&ndash;A3</td><td class="lbl2">{% translate "Product stage (materials)" %}</td>'
+        + '<td class="val" id="uf-t-a1a3"></td></tr>'
+      + '<tr><td class="st">A4</td><td class="lbl2">{% translate "Transport to site" %}</td>'
+        + '<td class="val" id="uf-t-a4"></td></tr>'
+      + '<tr><td class="st">A5</td><td class="lbl2">{% translate "Construction" %}</td>'
+        + '<td class="val" id="uf-t-a5"></td></tr>'
+      + '<tr class="sub"><td class="st">A5.2</td><td class="lbl2">{% translate "Site energy (whole project)" %}</td>'
+        + '<td class="val" id="uf-t-a52"></td></tr>'
+      + '<tr class="sub"><td class="st">A5.3</td><td class="lbl2">{% translate "Construction waste (per material)" %}</td>'
+        + '<td class="val" id="uf-t-a5w"></td></tr>'
+      + '<tr class="tot"><td class="st">{% translate "UPFRONT" %}</td><td class="lbl2">A1&ndash;A5</td>'
+        + '<td class="val" id="uf-t-up"></td></tr>'
+      + '</table><div class="unit">kgCO<sub>2</sub>e/m<sup>2</sup></div></div>';
     html+='<div class="flex items-center gap-3 mt-3"><button id="uf-save" class="btn btn-primary btn-sm">{% translate "Save changes" %}</button>'
       + '<span id="uf-msg" class="text-sm text-[var(--text--sub-600)]"></span></div>';
     body.innerHTML=html;
@@ -163,14 +298,18 @@
       el.addEventListener('input',()=>{
         const i=+el.dataset.i,f=el.dataset.f,r=state.rows[i];
         if(f==='scenario'){r.scenario=el.value;
-          if(el.value&&state.scenario_defaults[el.value]){const sd=state.scenario_defaults[el.value];
-            r.distance_km=sd.distance_km;r.ef=sd.ef;
-            const di=body.querySelector('input[data-i="'+i+'"][data-f="distance_km"]');
-            const ei=body.querySelector('input[data-i="'+i+'"][data-f="ef"]');
-            if(di)di.value=sd.distance_km; if(ei)ei.value=sd.ef;}
+          const sd=el.value?state.scenario_defaults[el.value]:null;
+          if(sd){
+            r.kgco2e_per_tonne=sd.kgco2e_per_tonne;
+            r.distance_km=null;r.ef=null;r.legs_text=sd.legs_text;
+            const lg=body.querySelector('#adv-'+i+' .uf-legs');
+            if(lg)lg.textContent=sd.legs_text||'';
+            const row=body.querySelector('#adv-'+i);
+            if(row){const pts=row.querySelectorAll('.uf-pt');
+              if(pts[0])pts[0].textContent=num(sd.kgco2e_per_tonne,2)+' kg CO₂e per tonne carried';}}
           const info=body.querySelector('#adv-'+i+' .uf-info');
           if(info)info.title=el.value?('Overrides the “'+el.value+'” default'):'Auto default by material';
-        } else { r[f]=parseFloat(el.value); }
+        } else { r[f]=(el.value===''?null:parseFloat(el.value)); }
         recalc(r);paintRow(i);paintGroups();paintTotals();
         document.getElementById('uf-msg').textContent='{% translate "unsaved changes" %}';
       });
@@ -179,12 +318,18 @@
   }
 
   function save(){
-    const overrides=state.rows.map(r=>({id:r.id,scenario:r.scenario||'',distance_km:r.distance_km,ef:r.ef,waste_pct:r.waste_pct}));
+    const overrides=state.rows.map(r=>({id:r.id,scenario:r.scenario||'',waste_pct:r.waste_pct,
+                                        distance_km:null,ef:null}));
     const btn=document.getElementById('uf-save');btn.disabled=true;
     document.getElementById('uf-msg').textContent='{% translate "Saving…" %}';
     fetch(url,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':csrf()},body:JSON.stringify({overrides})})
       .then(r=>r.json()).then(d=>{btn.disabled=false;
-        if(d.success){state.rows=d.rows;render();
+        if(d.success){state.rows=d.rows;
+          // keep the server-side figures in step, or A5.2 and the upfront
+          // total would go stale after a save
+          if(d.totals)state.totals=d.totals;
+          if(d.construction)state.construction=d.construction;
+          render();
           document.getElementById('uf-msg').textContent='{% translate "Saved ✓ (reload the page to update the dashboard totals)" %}';
         } else {document.getElementById('uf-msg').textContent=d.error||'Error';}
       }).catch(()=>{btn.disabled=false;document.getElementById('uf-msg').textContent='Error';});

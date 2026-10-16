@@ -150,6 +150,106 @@ trajectories, licensed).
 
 ---
 
+## Outdoor units (CDU) and indoor units (FCU): how BEAT counts them
+
+**The base rule: BEAT adds every record once and deducts nothing.** Everything
+below is the one exception to it.
+
+```python
+cooling_kwh     = Σ air conditioners + Σ chillers + Σ cassette ACs
+ventilation_kwh = Σ everything else under ventilation   ← fan coil units sit here
+total_kwh       = cooling_kwh + ventilation_kwh + lighting + …
+```
+
+### The problem this creates
+
+Two opposite errors were possible on the same building, and neither was visible:
+
+- **Double counting.** A matched split system's energy is derived from cooling
+  capacity ÷ efficiency, and the manufacturer's capacity and COP/EER describe
+  the *whole* system, indoor fan included. Entering that indoor unit again as a
+  fan coil counted the fan twice.
+- **Omission.** A chilled-water FCU's fan is genuinely separate from its
+  chiller's electricity. Assuming the chiller figure covered it lost that load.
+
+From the data the two look identical — a cooling record and a ventilation
+record on the same building. The difference is in what the entered number
+already includes, which only the user knows.
+
+### So BEAT asks
+
+Every cooling record carries **what its electricity figure covers**:
+
+| Boundary | Meaning | A linked fan is |
+|---|---|---|
+| **Not specified** (default) | nobody has said | **added**, exactly as before |
+| **Complete system, including indoor fans** | matched split or packaged unit | **not added** — already inside the figure |
+| **Outdoor unit / chiller only** | VRF outdoor module, or a chiller | **added** — separate electricity |
+
+And a fan coil or cassette row can name its parent, through
+`cooling_parent_ac` or `cooling_parent_chiller` on `VentilationSystem`.
+
+**A fan is skipped only when both are true** — it is linked, *and* its parent
+says it covers the complete system:
+
+```python
+# EnergySummary.recalculate
+for v in other_vent_qs:
+    if v.fan_energy_already_counted:   # linked AND parent covers the system
+        continue
+    vent_total += v.total_energy_consumption_kwh_per_year or 0
+```
+
+### Nothing that already existed moved
+
+All 273 cooling records and 154 ventilation rows predating the field default to
+**not specified** and are unlinked, so they sum exactly as they always did.
+Verified on a real building: linking a fan changed nothing; only setting the
+parent to *complete system* removed it, and unsetting restored the original
+figure.
+
+Removing a fan also reduces the **estimated** plug load, which is a fraction of
+system energy — so a 40 kWh fan moved the building total by 48 kWh. That is
+intended.
+
+### What this does and does not do
+
+It **removes the ambiguity for users who fill it in**. It does **not** detect
+anything on its own: an unlinked fan beside a complete-system AC record is
+still double counted, and BEAT cannot know. Entering each unit of electricity
+once is still the user's responsibility.
+
+Not built, deliberately:
+
+- no requirement to state coverage before linking
+- no warning when a building has a complete-system record and unlinked fans
+- no reconnection of links when a building is cloned
+- no auxiliary inventory — pumps and cooling-tower fans still need separate
+  accounting unless the entered plant figure already includes them
+
+### Measured exposure, when the field was added
+
+Of the 5 buildings with fan coil rows: **2** had a chiller (adding both is
+correct), **2** had an AC record and no chiller (the real exposure), **1** had
+neither. The 67 buildings with cassette rows are not in this category — a
+cassette is standalone cooling equipment, already counted as cooling and
+excluded from the ventilation line.
+
+### Capacities and refrigerant
+
+**Do not add indoor and outdoor capacities.** A 5 kW outdoor unit serving a
+matched 5 kW indoor unit is a 5 kW system. For VRF, even summing the indoor
+capacities does not give the outdoor capacity: Daikin's VRV S permits a
+connected indoor index between **50% and 130%** of the outdoor index.
+
+FCU fan inputs are **electrical** W or kW, not thermal capacity. The fan
+calculation is power per unit × count × annual hours.
+
+A connected DX system holds **one** refrigerant charge across the outdoor unit,
+the indoor coils and the pipework — record it once on the cooling record.
+A chilled-water FCU has water in its coil; Daikin's FWMJCC2BV1 lists
+refrigerant as "N/A". The refrigerant belongs to the chiller.
+
 ## System classification: cassette air conditioners
 
 A cassette AC is cooling equipment. The ventilation form nevertheless offered
@@ -208,35 +308,26 @@ building. Under RICS WLCA refrigerant leakage sits in **B1**, not B6, so it is
 a scope decision rather than a bug fix and needs agreeing with GT before it
 ships.
 
-## Efficiency metrics: EER, ISEER and COP are not interchangeable
+## Efficiency metrics: raw value, units and rating basis
 
-The cooling form lets a user enter the efficiency figure from their own
-national label. Three are offered, and only one of them needs converting:
+The numeric rating and selected metric are stored together and restored on edit.
+COP and EER in W/W can derive full-load input as capacity / rating.
+EER in Btu/h per W converts to W/W by division by 3.412 during calculation only.
+ISEER, CSPF and SEER are seasonal ratings; they are retained as reference data
+and cannot substitute for full-load COP. With a seasonal rating, electrical
+input is required for the current screening calculation. SEER offers separate
+W/W and Btu/h per W choices.
 
-| Metric | Unit | Where | Typical | Convert to COP |
-|---|---|---|---|---|
-| COP | W/W | generic | 2.3 – 5.3 | as entered |
-| ISEER | W/W | India, BEE (`CSTL ÷ CSEC`) | 3.5 – 5.5 | **as entered** |
-| EER | Btu/h per W | Thailand, EGAT No.5 | 9 – 14 | `÷ 3.412` |
+Known electrical input takes precedence over an efficiency-derived estimate.
+The server recalculates annual energy rather than trusting the browser total.
+These are screening estimates, not seasonal simulation: operating hours at
+constant input still require a documented usage assumption or metered validation.
 
-BEAT previously divided **both** EER and ISEER by 3.412. ISEER is already
-dimensionless, so an Indian 5-star unit at ISEER 5.30 was treated as a COP of
-1.55 and the AC reported about 3.4× the energy it should.
-
-No stored record was affected. The picker defaults to COP, and reconstructing
-all 167 AC records from their own inputs showed every one of them was computed
-on the COP basis — 105 matched the COP arithmetic exactly, 47 were entered as
-a power input, and none matched the divided form. The fault was latent, not
-historical.
-
-The metric is now stored on the record (`efficiency_metric`). Without it,
-re-opening a saved AC recomputed its energy against whatever the form happened
-to default to, silently changing a number the user never touched.
-
-The field hint also contradicted the code: it read "Typical EER: 2.3 – 3.5",
-which is a COP range. A Thai user following that hint while EER was selected
-would have entered a COP and got an answer 3.4× out. The hint now follows the
-picker.
+Chiller energy is plant cooling load (RT) x efficiency (kW/RT) x annual hours.
+The whole-plant load is not multiplied by chiller count. VSD and heat-recovery
+flags no longer apply automatic 20% and 30% energy discounts. This rule applies
+to form calculation, save, import and the explicit recalculation command.
+Existing saved estimates are not silently rewritten by the schema migration.
 
 ## Known gap: no part-load factor on air conditioners
 
@@ -292,6 +383,34 @@ Power is now asked per unit and the total derived, matching the AHU and DOAS
 forms on the same page and the cooling form. `total_power_input_kw` remains the
 stored field and still holds the total, so the 143 existing records keep their
 meaning; the editable per-unit field is derived from it on load.
+
+### Fixed: the stored power column could not hold the equipment
+
+`total_power_input_kw` was `numeric(10,2)`. A chilled-water fan coil is tens of
+watts — the Daikin FWMJCC2BV1 is 63 W — so 0.063 kW was stored as 0.06 and the
+year came out 120 kWh instead of 126. Record 267, seven fans at 300 CMH each,
+stored **0.00 kW and reported 0 kWh a year**. This was not an edge case: 84 of
+the 152 ventilation rows are under 1 kW.
+
+The column is now `numeric(12,4)` (migration 0064). Widening loses nothing —
+every existing value fits unchanged — and the three forms that enter power
+directly now offer **W or kW**, defaulting to W. That also closes a mismatch
+between the two entry routes: the import template has always stated this column
+in watts, while the form asked for kilowatts.
+
+### Airflow and baseline efficiency are reference-only on three forms
+
+`baseline_efficiency_w_cmh` is specific fan power, and AHU and DOAS genuinely
+need it: there, `power = airflow × efficiency × units ÷ 1000`. The FCU,
+cassette and fan forms take power directly and compute
+`energy = power × units × hours × days × weeks`. They read neither airflow nor
+efficiency — and required both.
+
+149 of the 152 stored rows are on those three forms, so almost every value in
+that column was invented by someone trying to get past a validator. Both fields
+are now optional there and labelled "Reference only" on screen; the model field
+is nullable from migration 0064. Nothing was deleted, and no stored figure
+moved: neither field was ever read for those types.
 
 ### Deliberately not multiplied
 

@@ -61,6 +61,26 @@ def display_unit_op(value):
     return _UNIT_DISPLAY_OP.get(value, value)
 
 
+# Construction-phase energy (A5.2) is a one-off total for the whole build, not
+# a yearly rate, so the "/yr" that display_unit_op appends is wrong there -
+# 2,000 litres of site diesel is not 2,000 litres a year.
+_UNIT_DISPLAY_CONSTR = {
+    "kwh": "kWh",
+    "mj": "MJ",
+    "m3": "m\u00b3",
+    "kg": "kg",
+    "ton": "tonnes",
+    "liter": "litres",
+    "l": "litres",
+}
+
+
+@register.filter(is_safe=True)
+@stringfilter
+def display_unit_constr(value):
+    return _UNIT_DISPLAY_CONSTR.get(value, value)
+
+
 
 @register.filter
 def has_gcca_image(label):

@@ -663,18 +663,6 @@
     // Sourcing segmented control: clicking a button sets its group's hidden
     // .material-scenario value and highlights the active option. Delegated once
     // so it works for both server-rendered rows and dynamically added ones.
-    // Gear toggles the per-material A4 distance / EF detail row.
-    if (!this._a4GearDelegated) {
-      this._a4GearDelegated = true;
-      document.addEventListener('click', (e) => {
-        const g = e.target.closest('.a4-gear');
-        if (!g) return;
-        e.preventDefault();
-        const det = g.closest('details')?.querySelector('.a4-detail');
-        if (det) det.classList.toggle('hidden');
-      });
-    }
-
     if (!this._scenarioDelegated) {
       this._scenarioDelegated = true;
       document.addEventListener('click', (e) => {
@@ -1018,8 +1006,11 @@
           return isNaN(w) ? '' : (w / 100);   // UI is % → store as fraction
         })(),
         // A4 fine-tuning (blank → scenario default at calc time)
-        a4_distance_km: li.querySelector('.material-a4-distance')?.value || '',
-        a4_ef: li.querySelector('.material-a4-ef')?.value || '',
+        // Distance and emission factor are no longer per-material: they come
+        // from the country tables via the sourcing scenario. Sent empty so any
+        // override stored by the old editor is cleared on the next save.
+        a4_distance_km: '',
+        a4_ef: '',
         timestamp: timestamp
       };
       console.log(`[collectMaterials] Material collected:`, material);
@@ -1300,21 +1291,10 @@
                      value="${(m.waste_rate!==null&&m.waste_rate!==undefined&&m.waste_rate!=='')?(parseFloat(m.waste_rate)*100):''}" />
               <span class="text-[var(--text--sub-600)]">%</span>
             </label>
-            <button type="button" class="btn btn-xs btn-ghost a4-gear" title="Adjust distance / emission factor">&#9881;</button>
             ${uploadedBuildingId ? `<a href="/building/${uploadedBuildingId}/#upfront-panel" target="_blank" rel="noopener"
                  class="text-[10px] underline text-[var(--state--information--base)]"
                  title="Open the full A4-A5 panel with A1-A3, mass and computed A4/A5w">Open full A4&ndash;A5 panel &#8599;</a>` : ''}
-          </div>
-          <div class="a4-detail hidden flex items-center gap-3 mt-2 flex-wrap">
-            <label class="flex items-center gap-1"><span class="text-[var(--text--sub-600)]">Distance (km)</span>
-              <input type="number" class="material-a4-distance input input-xs" style="width:5rem" min="0" step="1" placeholder="auto"
-                     value="${(m.a4_distance_km!==null&&m.a4_distance_km!==undefined)?m.a4_distance_km:''}" />
-            </label>
-            <label class="flex items-center gap-1"><span class="text-[var(--text--sub-600)]">EF (kgCO&#8322;e/tonne&#8209;km)</span>
-              <input type="number" class="material-a4-ef input input-xs" style="width:5.5rem" min="0" step="0.001" placeholder="auto"
-                     value="${(m.a4_ef!==null&&m.a4_ef!==undefined)?m.a4_ef:''}" />
-            </label>
-            <span class="text-[10px] text-[var(--text--sub-600)]">Blank = scenario default</span>
+            <span class="text-[10px] text-[var(--text--sub-600)]">Transport follows the country defaults (RICS WLCA).</span>
           </div>
         </details>` : ''}
       `;

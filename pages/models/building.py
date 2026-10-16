@@ -529,6 +529,39 @@ class OperationalProduct(BaseProduct):
         return calculate_impact_operational(self)
 
 
+class ConstructionProduct(BaseProduct):
+    """Energy used on site while the building is being built — RICS A5.2.
+
+    A sibling of OperationalProduct rather than a flag on it. Both are an EPD
+    with a quantity attached to a building; the difference is only which life
+    cycle stage the result belongs to, A5.2 here against B6 there. Keeping them
+    apart means no existing query over operational_products can accidentally
+    sweep site diesel into the building's annual running energy.
+
+    The same per-country energy EPDs serve both — Electricity, Diesel, LPG,
+    Natural Gas and so on — because a litre of diesel burnt by a crane and a
+    litre burnt by a generator in year three carry the same carbon.
+
+    Quantities are entered as the site records them (litres on a delivery note,
+    kWh on a meter) and converted to kWh by pages/scripts/a4a5/fuels.py, since
+    the EPDs are declared per kWh.
+
+    Scope note: this is A5.2 only. RICS A5 also covers A5.1 pre-construction
+    demolition and A5.4 worker transport, neither of which BEAT models.
+    """
+
+    building = models.ForeignKey(
+        Building, on_delete=models.CASCADE, related_name="construction_products"
+    )
+
+    class Meta:
+        verbose_name = "Construction site energy (A5.2)"
+        verbose_name_plural = "Construction site energy (A5.2)"
+
+    def __str__(self):
+        return "%s - %s %s" % (self.epd.name, self.quantity, self.input_unit)
+
+
 class SimulatedOperationalProduct(BaseProduct):
     """Join Table for EPDs and Simulated Building. Products are EPDs with quantity and results."""
 

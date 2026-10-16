@@ -18,9 +18,10 @@ from django.db.models import Sum
 
 from pages.forms.epds_filter_form import EPDsFilterForm
 from pages.models.base import ALCBTCountryManager
-from pages.models.building import Building, OperationalProduct
+from pages.models.building import Building, ConstructionProduct, OperationalProduct
 from pages.models.building_operation.energy_summary import EnergySummary
 from pages.models.epd import EPD, MaterialCategory, Unit
+from pages.scripts.a4a5.construction import construction_energy
 from pages.views.assembly.epd_processing import get_epd_list
 from pages.views.building.operational_products.operational_products import handle_op_products_save
 
@@ -93,6 +94,8 @@ def building_step_operational_products(request):
         return handle_select_product(request)
     elif action == "save_op_products":
         return handle_save_products(request)
+    elif action == "save_constr_products":
+        return handle_save_construction_products(request)
     elif action == "delete_op_product":
         return handle_delete_product(request)
     else:
@@ -182,7 +185,17 @@ def handle_select_product(request):
         }
         
         context = {"epd": epd_data}
-        
+
+        # A5.2 site energy uses the same carriers but a different row template,
+        # so the two phases cannot collide in the POST data.
+        if request.POST.get("phase") == "construction":
+            return render(
+                request,
+                "pages/add-building/components/operational-data-entry/"
+                "_selected_construction_product.html",
+                context,
+            )
+
         return render(
             request,
             "pages/add-building/components/operational-data-entry/_selected_product.html",
@@ -378,3 +391,69 @@ def get_building_total_kwh(request, building_uuid):
     ).aggregate(total=Sum('quantity'))['total'] or 0
 
     return JsonResponse({"success": True, "total_kwh": float(total)})
+
+
+def handle_save_construction_products(request):
+    """Save construction-phase energy carriers (RICS A5.2).
+
+    Deliberately separate from handle_save_products. Operational carriers are
+    validated against the building's metered annual bill; site energy has no
+    such reference - it is whatever the site used - so applying that check
+    would reject legitimate data. Keeping the handlers apart also means no
+    query over operational products can pick up site diesel.
+    """
+    building_uuid = request.POST.get("building_uuid")
+    if not building_uuid:
+        return JsonResponse({"error": "Building UUID is required"}, status=400)
+
+    try:
+        uuid_obj = uuid_lib.UUID(building_uuid)
+        building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
+    except (ValueError, Building.DoesNotExist):
+        return JsonResponse(
+            {"error": "Invalid building UUID or building not found"}, status=400)
+
+    submitted = {}
+    for key, value in request.POST.items():
+        if key.startswith("constr_") and "_quantity_" in key:
+            parts = key.split("_")
+            epd_id, timestamp = parts[1], parts[-1]
+            submitted[epd_id + timestamp] = {
+                "epd_id": epd_id,
+                "quantity": value,
+                "unit": request.POST.get("constr_%s_unit_%s" % (epd_id, timestamp), ""),
+                "description": request.POST.get(
+                    "constr_%s_description_%s" % (epd_id, timestamp), ""),
+            }
+
+    epds = {str(e.id): e for e in
+            EPD.objects.filter(id__in=[v["epd_id"] for v in submitted.values()])}
+
+    ConstructionProduct.objects.filter(building=building).delete()
+    saved = 0
+    for item in submitted.values():
+        epd = epds.get(item["epd_id"])
+        if not epd or not item["unit"]:
+            continue
+        try:
+            qty = Decimal(str(item["quantity"]))
+        except (InvalidOperation, ValueError, TypeError):
+            continue
+        if qty <= 0:
+            continue
+        ConstructionProduct.objects.create(
+            building=building, epd=epd, quantity=qty,
+            input_unit=item["unit"], description=item["description"] or "")
+        saved += 1
+
+    logger.info("Saved %d construction energy carriers for building %s",
+                saved, building.id)
+
+    a5_2, rows, notes = construction_energy(
+        ConstructionProduct.objects.filter(building=building).select_related("epd"),
+        building.total_floor_area)
+    return JsonResponse({
+        "success": True, "saved": saved,
+        "a5_2_per_m2": float(round(a5_2, 3)),
+        "rows": rows, "notes": notes,
+    })

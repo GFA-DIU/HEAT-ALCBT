@@ -38,6 +38,97 @@ gives 5,485 kWh/yr against a metered 1,500–2,500. Applying a 0.4–0.7 factor
 would lower every cooled building's reported energy, so it is GT's call, not a
 patch. Written up in `docs/operational_carbon_methodology.md`.
 
+**`get_gwp_impact_sum` rounds every impact to two decimals — NOT FIXED.**
+Found 2026-10-14 while comparing BEAT against TGO's Thai operational factors.
+Investigated and deliberately left alone: the accessor is used by every carbon
+calculation in the tool, so changing it needs its own before/after verification
+rather than being folded into another task.
+
+`pages/models/epd.py`, in both `get_gwp_impact_sum` and
+`get_penrt_impact_sum`, prefetch path and DB fallback — four places:
+
+```python
+rounded = round(epdimpact.value, 2)
+return Decimal(rounded) / self.declared_amount
+```
+
+It corrupts small declarations in both directions. Measured over 13,667 GWP
+impact rows:
+
+- **415 rounded to zero** (0.00223 → 0.00)
+- **1,510 wrong by ≥1%**, e.g. 0.00505 → 0.01, nearly doubled
+
+It reaches real buildings. On EPDs actually used by assemblies:
+
+| Material | Country | Declared | Reported | Error | Material rows |
+|---|---|---|---|---|---|
+| Sand | India | 0.009 | 0.01 | +11.1% | **657** |
+| Aggregate | India | 0.009 | 0.01 | +11.1% | **495** |
+| Aggregate | Cambodia | 0.0069 | 0.01 | +44.9% | 1 |
+| Sand 0/2 | Germany | 0.00285 | 0.00 | −100% | 3 |
+
+**1,236 material rows** carry an inflated A1–A3 figure. Sand and aggregate sit
+in nearly every structural build-up.
+
+It is also why **Thailand's grid factor reads 0.470 when the stored value is
+0.475** — the TGO figure is already in the database and is being rounded away
+on the way out.
+
+The rounding entered in a commit titled *"Prefetch EPD impacts"*, so it looks
+like an implementation detail that came with a performance change rather than
+a methodology decision anyone took.
+
+**If this is picked up:** remove the rounding in all four places, use
+`Decimal(str(value))` (the column can return a float, and `Decimal(0.475)` is
+`0.47499999999999997779…`), and produce a before/after across all buildings
+first — figures will fall for sand and aggregate and rise for the 415 currently
+zeroed. Round at display, not in a shared accessor.
+
+**Thailand operational factors — checked, no change needed.** TGO's CFO
+reference factors (`TH_CFP_Final_Usable_Dataset_20260518.xlsx`, sheet
+`Operational_EF_TH`) were compared against BEAT on 2026-10-14. Grid electricity
+matches what is stored (0.475). Natural gas and LPG match once converted from
+TGO's per-MJ and per-kg basis. Diesel, kerosene, coal, lignite and charcoal
+differ by 10–70%, but BEAT stores fuels **per kWh** while TGO publishes per
+litre/kg/MJ, and the conversion needs net calorific values the sheet does not
+give — so the gaps may be the assumed NCVs rather than real differences. The
+fuel records are also **identical across all five countries**, so they are
+global generics, not national values. Left unchanged deliberately. To settle
+it, ask TGO which calorific values sit behind their factors.
+
+**Refrigerant GWPs are IPCC AR4; TGO uses AR5.** BEAT's table holds 91 rows on
+AR4 (R-410A 2088, R-134a 1430, R-125 3500). TGO's eleven are AR5 (1923.5, 1300,
+3170). EN 15804+A2 and current practice use AR5, so BEAT is probably out of
+date, but the table is global — switching it moves F-gas emissions for every
+building in every country, and an AR5 source would be needed for all 91 rows,
+not just TGO's eleven. For GT.
+
+**The Vietnam `co2_factor.csv` is not Vietnamese data.** From Zenodo record
+19707349, a Vietnam transport *modelling* dataset. Nearly every row is labelled
+*"Value is based on EU27"* with estimate/assumption flags; it is gCO2 not CO2e,
+and it assumes electricity has zero emissions because the model accounts for
+grid elsewhere. Its heavy-duty road figure (88.9 gCO2/tonne-km) is close to the
+GLEC default already in use, but putting an EU27 number behind a Vietnam label
+would be less honest than the proxy BEAT already shows. Not used.
+
+**A4 national rail share — needs GT.** The `national` sourcing scenario now
+splits its 300 km land haul between rail and road. The shares are
+**an assumption, not sourced**: India 60%, Thailand 30%, Vietnam 20%,
+Indonesia 10%, Cambodia 0% (Cambodia has negligible rail freight, so that one
+is safe). They are consequential — India's rail factor is 0.0106 against road
+at 0.0823, so the split lowers A4 for every nationally-sourced material in an
+Indian building: the national haul reads **11.78 kgCO₂e/tonne** against 24.69
+if it all went by road. Before any published figure relies on this, the shares need
+real modal-split data. Flagged in `pages/scripts/a4a5/defaults.py`,
+`docs/a4_a5_upfront_carbon_scope.md` and the `estimate_a4a5` output.
+
+**A4 imported sea leg is a flat 3,000 km** regardless of origin. Chinese steel
+into Vietnam and Brazilian steel into India get the same distance. Known
+simplification, left deliberately: now that the sea leg is reported separately
+rather than blended away, the assumption is at least visible to whoever reads
+the figure. The per-material override fields (`a4_distance_km`, `a4_ef`) can
+already be used to correct a specific material.
+
 **F-gas emissions as a B1 line.** Refrigerant type, charge, leakage factor and
 GWP are collected on every AC and chiller. They now feed the operational
 baseline on the Savings tab, but there is no B1 scope line and the Systems tab
@@ -53,6 +144,18 @@ match since plug load entered the breakdown.
 cassette re-attribution, which was verified to change no total.
 
 ## Decided — do not reopen
+
+**A4 is modelled as legs, never a blended factor.** A journey is one leg per
+transport mode, each carrying its own mode's emission factor. The earlier model
+collapsed each scenario into a single distance and a single averaged factor,
+which reported India's factor as 0.070 over 50 km and 0.01286 over 3,150 km —
+reading as though the factor fell as distance rose. The arithmetic was correct
+(an import is 95% sea, and sea is ~7× cleaner per tonne-km than road) but the
+displayed number was a weighted mean of a ship and a truck and was not a
+property of anything. `effective_ef()` survives only to fill the missing half of
+a half-specified override; `test_a4_transport.py` fails if a blended factor is
+reported again.
+
 
 **Cement carries no GCCA rating.** GCCA publishes cement ratings, but each
 country must first choose its own clinker/cement ratio to derive the

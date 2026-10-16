@@ -73,3 +73,9 @@ HANDOVER.md
 
 # production database backups - never commit
 beat_backup_*.dump
+
+# Transit artefacts from the production backup procedure (docs/deploy_epd_operational_batch.md).
+# dump.b64 is a base64-encoded copy of the live database; beat_backup_*.dump was already
+# ignored but its base64 twin was not, and it is created fresh on every release.
+dump.b64
+.last_backup_name

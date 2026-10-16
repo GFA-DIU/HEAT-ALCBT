@@ -193,6 +193,8 @@ class CoolingSystemAirConditionerForm(forms.ModelForm):
             'iseer_rating',
             'eer_iseer_cop',
             'efficiency_metric',
+            # what the entered electricity figure already covers
+            'energy_boundary',
             'energy_efficiency_label',
             'number_of_stars',
         ]

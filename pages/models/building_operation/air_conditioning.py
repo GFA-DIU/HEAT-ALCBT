@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from pages.models.building_operation.energy_boundary import (
+    EnergyBoundary)
+
 from pages.models.building import Building
 from pages.models.building_operation.chilling import RefrigerantGWP, RefrigerantType
 
@@ -8,22 +11,51 @@ from pages.models.building_operation.chilling import RefrigerantGWP, Refrigerant
 class EfficiencyMetric(models.TextChoices):
     """Which efficiency figure the user read off their equipment label.
 
-    These are not interchangeable, and the difference is a factor of 3.412:
+    Two things separate these, and only one of them is a unit conversion.
 
-      COP    dimensionless, W/W
-      ISEER  dimensionless, W/W - India's BEE defines it as CSTL/CSEC, so it
-             is already on the COP basis. A 5-star split AC is >= 5.30.
-      EER    Btu/h per watt on the Thai EGAT No.5 label, where the No.5
-             threshold is >= 11.60. This one does need converting.
+    UNITS. Most are dimensionless W/W; one is not:
+
+      COP     W/W, full load
+      EER_WW  W/W, full load - Mitsubishi's Indian sheets and Daikin's
+              Indonesian cassette sheets publish EER this way
+      EER     Btu/h per watt - the Thai EGAT No.5 label, where the No.5
+              threshold is >= 11.60. The only one that needs dividing by 3.412
+      ISEER   W/W - India's BEE defines it as CSTL/CSEC, both in Wh
+      CSPF    W/W - Indonesian and Vietnamese labels
+      SEER    W/W here; the rating standard varies by market, so the figure is
+              stored as given and not converted
+
+    BASIS. Seasonal and full-load ratings are different quantities even when
+    their units agree. ISEER, CSPF and SEER already average over a cooling
+    season, so using one as an instantaneous COP overstates efficiency at
+    design conditions. Converting units does not turn a seasonal rating into a
+    full-load COP, and BEAT does not pretend otherwise - it records the basis.
+
+    EER being W/W on some sheets and Btu/h per W on others is exactly why the
+    metric has to be stored rather than inferred. The earlier single "EER"
+    choice assumed Btu/h per W for everyone.
 
     Storing the choice matters as much as converting it: without it, re-opening
     a saved record recomputes the energy against whatever the form defaults to,
     silently changing a number the user never touched.
     """
 
-    COP = "cop", _("COP (W/W)")
-    EER = "eer", _("EER (Btu/h per W)")
-    ISEER = "iseer", _("ISEER (W/W)")
+    COP = "cop", _("COP - full load (W/W)")
+    EER_WW = "eer_ww", _("EER - full load (W/W)")
+    EER = "eer", _("EER - full load (Btu/h per W)")
+    ISEER = "iseer", _("ISEER - seasonal (W/W)")
+    CSPF = "cspf", _("CSPF - seasonal (W/W)")
+    SEER = "seer", _("SEER - seasonal (W/W)")
+    SEER_BTU = "seer_btu", _("SEER - seasonal (Btu/h per W)")
+
+
+#: Metrics already on the COP basis (W/W). Only plain EER in Btu/h per watt
+#: converts, by dividing by 3.412.
+DIMENSIONLESS_METRICS = ("cop", "eer_ww", "iseer", "cspf", "seer")
+
+#: Seasonal ratings: an average over a cooling season, not a full-load COP.
+#: Kept separate because converting units never turns one into the other.
+SEASONAL_METRICS = ("iseer", "cspf", "seer", "seer_btu")
 
 
 class PackagedACSubType(models.TextChoices):
@@ -107,12 +139,25 @@ class CoolingSystemAirConditioner(models.Model):
         verbose_name=_("Baseline Split Unit/VRV System Efficiency (kW/RT)"),
     )
     eer_iseer_cop = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+        max_digits=9,
+        decimal_places=4,
         null=True,
         blank=True,
         verbose_name=_("EER / ISEER / COP"),
     )
+    energy_boundary = models.CharField(
+        max_length=24,
+        choices=EnergyBoundary.choices,
+        default=EnergyBoundary.UNKNOWN,
+        blank=True,
+        verbose_name=_("What this electricity figure covers"),
+        help_text=_(
+            "Whether the entered figure already includes the indoor fans. "
+            "Leave as not specified and BEAT adds any linked fans separately, "
+            "exactly as it did before this field existed."
+        ),
+    )
+
     efficiency_metric = models.CharField(
         max_length=10,
         choices=EfficiencyMetric.choices,

@@ -35,28 +35,186 @@ Confirmed mechanics from the standard:
 
 ## 3. Country transport emission factors (kg CO₂e/tonne-km)
 
-| Country | Source | Road | Rail | Sea |
+| Country | Road | Rail | Sea | Source |
 |---|---|---|---|---|
-| India | **SFC/WRI India Default GHG Values v1.0 (May 2025)**, GLEC v3.1/ISO 14083, by GVW class | ~0.05–0.09 | ~0.006–0.011 | — |
-| Thailand | **TGO** national EF database (same body as our TGO EPDs) | national value (lock at build) | — | — |
-| Cambodia / Vietnam / Indonesia | **GLEC v3 default** (avg laden HGV, WTW, AR6) | ~0.10 | ~0.02–0.03 | ~0.008–0.015 |
+| **India** | **0.0823 / 0.0902** (by class) | **0.0106** | 0.010 | **SFC / TCI-IIMB — sourced** |
+| Thailand | 0.090 | 0.020 | 0.010 | GLEC v3 proxy |
+| Cambodia | 0.100 | 0.025 | 0.010 | GLEC v3 proxy |
+| Vietnam | 0.100 | 0.025 | 0.010 | GLEC v3 proxy |
+| Indonesia | 0.100 | 0.025 | 0.010 | GLEC v3 proxy |
 
-Exact per-class India values and the Thailand TGO value are pulled into the seed table at
-build. Sea leg (imports) = GLEC container-ship default everywhere.
+**Only India is sourced.** The other four are GLEC regional defaults standing in
+for national figures that do not exist yet, and the panel labels them as proxies
+rather than presenting them as equals. The **sea leg is GLEC everywhere**,
+India included — SFC covers road and rail only.
+
+### India — Smart Freight Centre / TCI-IIMB
+
+*India Default GHG Emission Values*, Version 1, Smart Freight Centre with the
+TCI-IIMB Supply Chain Sustainability Lab at IIM Bangalore. Aligned to
+**ISO 14083** and the GLEC Framework.
+
+The values are published **directly as kg CO₂e per tonne-km, well-to-wheel**, so
+BEAT derives nothing. Everything an estimate would otherwise have to assume is
+measured in the study:
+
+- CO₂e on IPCC AR6 GWP100, including CH₄ and N₂O
+- WTT (fuel supply) and TTW (combustion) given separately; WTW is their sum
+- **empty running measured per class**, 10.8%–14.4%
+- **vehicle utilisation measured per class**, 67%–83%
+- a 5% DAF uplift for out-of-route deviation
+
+Road, WTW kg CO₂e/tonne-km, diesel:
+
+| Class | GVW | Payload | Empty | Utilisation | WTW |
+|---|---|---|---|---|---|
+| Small commercial | <3.5 t | 0.5–2 t | 10.9% | 83.0% | 0.3795 |
+| Medium commercial 1 | 3–5 t | 2–3.5 t | 10.9% | 82.7% | 0.2222 |
+| Medium commercial 2 | 5–12 t | 3.5–8 t | 10.8% | 78.8% | 0.1400 |
+| **Heavy commercial 1** | 12–20 t | 8–12 t | 12.4% | 76.8% | **0.0902** |
+| **Heavy commercial 2** | 20–30 t | 12–20 t | 12.0% | 69.4% | **0.0823** |
+| Heavy commercial 3 | 30–50 t | 20–40 t | 14.4% | 68.3% | 0.0663 |
+| Tractor trailer | 30–60 t | 20–50 t | 13.3% | 67.2% | 0.0551 |
+
+Rail: WTT 0.0064 + TTW 0.0041 = **0.0106**, averaged 2015-16 to 2019-20 from
+Ministry of Railways annual reports.
+
+**The class is matched to the journey, not flattened to one number:**
+
+| Journey | Road class | Factor |
+|---|---|---|
+| Local, ~50 km delivery | Heavy commercial 1 (12–20 t) | 0.0902 |
+| National line haul | Heavy commercial 2 (20–30 t) | 0.0823 |
+| Inland leg off a port | Heavy commercial 2 (20–30 t) | 0.0823 |
+
+A short delivery genuinely runs on a smaller, less efficient truck than a line
+haul, and the study's own class split is what makes that statement defensible.
+
+The study notes its road values "seem to be on the lower side" and rest on sample
+primary research that will be updated over time.
+
+**Cross-check, for the record.** Deriving a factor independently from WRI's
+*India Specific Road Transport Emission Factors* v1.0 (2015) — a consultation
+draft publishing kg CO₂ per *vehicle*-km — required assuming a 16 t payload and
+applying CO₂e, well-to-wheel and empty-running uplifts by hand. That gave
+**0.0807**, within 2% of SFC's measured **0.0823**. SFC is used because it needs
+none of those assumptions.
 
 ## 4. Sourcing scenarios (how A4 distance is set) — RICS-style
 
 Each material is auto-assigned a **sourcing scenario** (user-overridable dropdown). Each
 scenario maps to a distance + mode + the country EF above:
 
-| Scenario | Default distance / mode | Auto-assigned to (by MaterialCategory) |
+| Scenario | Journey | Auto-assigned to (by MaterialCategory) |
 |---|---|---|
 | **Local** | ~50 km road | Concrete, aggregate, sand, cement, blocks/bricks/AAC, mortar/plaster |
-| **National** | ~300 km road | Reinforcement, timber, tiles, plasterboard, finishes |
-| **Imported** | sea leg (country→nearest port, e.g. ~2,000–4,000 km) + ~150 km inland road | Structural steel, aluminium, glass, specialised products |
+| **National** | ~300 km over land, **split rail/road by country** | Reinforcement, timber, tiles, plasterboard, finishes |
+| **Imported** | ~3,000 km sea + ~150 km inland road | Structural steel, aluminium, glass, specialised products |
 
 Distances are country-tunable (RICS Table 17 as the template). User can switch any material's
-scenario; "Imported" reveals an editable sea-distance.
+scenario.
+
+### A journey is a list of legs, not one averaged number
+
+A scenario resolves to **one leg per transport mode**, each carrying its own
+mode's emission factor, and A4 sums them. This replaced an earlier model that
+collapsed each scenario into a single distance and a single *blended* factor.
+
+That blend was the source of a real complaint: for India it reported
+**0.070 kgCO₂e/tonne-km over 50 km and 0.01286 over 3,150 km**, which reads as
+the emission factor falling as the distance grows. The arithmetic was right — a
+3,150 km import is 95% sea, and sea freight is roughly seven times cleaner per
+tonne-km than road, so an average dominated by the sea leg sits near the sea
+figure — but the number shown was a weighted mean of two different vehicles and
+was not a property of anything. The carbon it stood for had been rising all
+along (3.5 → 21 → 40.5 kgCO₂e/tonne).
+
+Nothing now reports a blended factor. `effective_ef()` survives for exactly one
+job: filling in the missing half when a user overrides a distance but not a
+factor, or the reverse. Setting either by hand replaces the journey with a
+single explicit leg, because someone who types "400 km" means one trip of
+400 km, not a reshuffle of the legs behind it.
+
+### Rail
+
+`rail` was defined for every country and **used by no code path**. It is now the
+line-haul portion of the national scenario:
+
+| Country | National rail share | Why |
+|---|---|---|
+| India | 60% | dedicated freight corridors; cement and steel move by rail |
+| Thailand | 30% | rail freight exists but road dominates |
+| Vietnam | 20% | north–south line used for bulk, limited capacity |
+| Indonesia | 10% | archipelago; rail freight is Java-only and marginal |
+| Cambodia | 0% | negligible rail freight — treated as all road |
+
+⚠️ **These shares are an assumption, not sourced**, and they are the least
+defensible numbers in the file. They are also consequential: India's rail factor
+(0.008) is about a ninth of its road factor (0.070), so introducing the split
+moved India's national haul from 21.0 to **9.84 kgCO₂e/tonne**. Replace them
+with real modal-split data before any published figure relies on them.
+
+## 4a. A5 sub-stages — what BEAT covers
+
+RICS WLCA 2nd ed. (section 5.1.4) splits A5 four ways. BEAT models two, and the
+panel says so rather than labelling the pair "A5":
+
+| Sub-stage | Covers | In BEAT |
+|---|---|---|
+| **A5.1** Pre-construction demolition | demolishing existing structures, waste transport and disposal | ❌ not modelled |
+| **A5.2** Construction activities | site electricity and fuels, plant, cranes, generators, site offices, temporary works | ✅ `pages/scripts/a4a5/construction.py` |
+| **A5.3** Construction waste | wasted material's own A1–A3 + A4, plus disposal | ✅ `compute.py` (named `a5w` in code) |
+| **A5.4** Worker transport | travel to and from site; optional under RICS | ❌ not modelled |
+
+### A5.2 — construction site energy
+
+    A5.2 = Σ( kWh of each carrier × that carrier's kgCO₂e/kWh ) / GFA
+
+**It reuses the operational energy EPDs.** A kWh of grid electricity has the
+same footprint whether a tower crane draws it in month four or a lift draws it
+in year ten — only the stage it is reported under changes. So `Electricity`,
+`Diesel`, `Natural Gas`, `LPG` and the rest serve both B6 and A5.2, and the
+factor is the EPD's own B6 figure.
+
+**Model.** `ConstructionProduct` is a third subclass of `BaseProduct`, sibling
+to `StructuralProduct` and `OperationalProduct`:
+
+```
+BaseProduct (abstract: EPD + unit + quantity)
+├── StructuralProduct   -> assembly   -> A1–A3, A4, A5.3
+├── OperationalProduct   -> building   -> B6
+└── ConstructionProduct  -> building   -> A5.2          <- new, migration 0061
+```
+
+A separate model rather than a flag on `OperationalProduct`, so that no
+existing query over `operational_products` can sweep site diesel into the
+building's annual running energy.
+
+**A5.2 and A5.3 are computed in opposite directions** and must not be merged
+into one loop or one reported figure: A5.3 is **per material** (waste % of that
+material's A1–A3 + A4), A5.2 is **per project** (one meter reading for the whole
+build).
+
+**Units.** Sites record what they bought — litres on a delivery note, kilograms
+on a cylinder, kWh on a meter — while the EPDs are declared per kWh. Conversion
+lives in `pages/scripts/a4a5/fuels.py`:
+
+- **Net calorific values: IPCC 2006 Guidelines, Vol 2, Ch 1, Table 1.2.** The
+  same defaults TGO and Smart Freight Centre cite for their own factors.
+- ⚠️ **Densities are typical trade values, not IPCC.** IPCC publishes NCVs per
+  unit mass and no densities. These are the weakest numbers in the module, they
+  are declared to the user whenever a litre figure depends on one, and they are
+  the thing to source next — the SFC study cites BPCL's conversion table for
+  exactly this.
+
+A fuel sold by mass (LPG, coal, charcoal) **refuses a litre entry** rather than
+inventing a density, and a non-fuel EPD is refused outright. Nothing is silently
+dropped: an entry that cannot be converted is shown with the reason.
+
+**No benchmark when nothing is entered.** A5.2 reports **zero and says the
+upfront total is understated**. There is no sourced kWh/m² figure for these five
+countries, and an invented default inside a total that looks measured is exactly
+the failure mode the A4 rail share is already flagged for.
 
 ## 5. Construction waste rates (A5w) — RICS Table 18 defaults
 
@@ -111,7 +269,7 @@ only when explicitly requested).
 ## 7. Formulas (final)
 
 ```
-A4_material   = (mass_kg / 1000) × distance_km × EF_mode
+A4_material   = (mass_kg / 1000) × Σ( leg_km × leg_EF )     over the journey's legs
 A5w_material  = mass_kg × waste_rate × ( GWP_A1A3_per_kg + A4_per_kg + disposal_EF_per_kg )
 Upfront       = Σ(A1A3 + A4 + A5w) / GFA        [kg CO₂e/m²]
 ```

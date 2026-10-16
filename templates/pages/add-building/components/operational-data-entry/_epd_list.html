@@ -70,7 +70,7 @@
               data-country="{{ epd.country }}"
               data-category="{{ epd.category }}"
               hx-post="{% url 'building_step_operational' %}"
-              hx-vals='{"action": "select_op_product", "epd_id": "{{ epd.id }}" }'
+              hx-vals='js:{"action": "select_op_product", "epd_id": "{{ epd.id }}", "phase": (window.BEAT_PHASE || "operational")}'
               hx-target="#selected_op_products"
               hx-swap="beforeend"
             >

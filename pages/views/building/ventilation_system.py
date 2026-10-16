@@ -8,6 +8,9 @@ from django.db import transaction
 from pages.models.building import Building
 from pages.models.building_operation import VentilationSystem
 from pages.forms.ventilation_system_form import VentilationSystemForm
+from pages.models.building_operation.air_conditioning import (
+    CoolingSystemAirConditioner)
+from pages.models.building_operation.chilling import CoolingSystemChiller
 
 
 def get_building_by_uuid(building_uuid, user):
@@ -37,6 +40,12 @@ def _serialize(system):
         'total_energy_consumption_kwh_per_year': system.total_energy_consumption_kwh_per_year,
         'fresh_air_ratio_percent': system.fresh_air_ratio_percent,
         'number_of_stars': system.number_of_stars,
+        # one value for the picker, matching what it posts
+        'cooling_parent': (
+            'air_conditioner:%s' % system.cooling_parent_ac_id
+            if system.cooling_parent_ac_id else
+            'chiller:%s' % system.cooling_parent_chiller_id
+            if system.cooling_parent_chiller_id else ''),
     }
 
 
@@ -59,6 +68,28 @@ def create_or_update_ventilation_system(request):
 
         ventilation_system_id = data.get('ventilation_system_id')
         is_update = bool(ventilation_system_id)
+
+        # The fan picker sends one value, "ac:<id>" or "chiller:<id>", because a
+        # fan has one parent. Split it into the two foreign keys here rather
+        # than asking the form for both - and confirm the parent belongs to
+        # this building, so a link cannot be forged across buildings.
+        data['cooling_parent_ac'] = None
+        data['cooling_parent_chiller'] = None
+        parent = (data.get('cooling_parent') or '').strip()
+        if parent and ':' in parent:
+            kind, _, raw_id = parent.partition(':')
+            try:
+                pid = int(raw_id)
+            except (TypeError, ValueError):
+                pid = None
+            if pid is not None and kind == 'air_conditioner':
+                if CoolingSystemAirConditioner.objects.filter(
+                        id=pid, building=building).exists():
+                    data['cooling_parent_ac'] = pid
+            elif pid is not None and kind == 'chiller':
+                if CoolingSystemChiller.objects.filter(
+                        id=pid, building=building).exists():
+                    data['cooling_parent_chiller'] = pid
 
         if is_update:
             try:

@@ -1,3 +1,4 @@
+from pages.models.building import ConstructionProduct
 from django import forms
 from django.contrib import admin
 from django.db.models import Q, Prefetch
@@ -212,3 +213,14 @@ class RefrigerantGWPAdmin(admin.ModelAdmin):
 
 
 admin.site.register(RefrigerantGWP, RefrigerantGWPAdmin)
+
+
+@admin.register(ConstructionProduct)
+class ConstructionProductAdmin(admin.ModelAdmin):
+    """A5.2 site energy. Registered so the figures can be entered and checked
+    before a dedicated entry screen exists."""
+    list_display = ["building", "epd", "quantity", "input_unit"]
+    list_filter = ["input_unit"]
+    search_fields = ["building__name", "epd__name"]
+    autocomplete_fields = ["building", "epd"] if False else []
+    raw_id_fields = ["building", "epd"]
