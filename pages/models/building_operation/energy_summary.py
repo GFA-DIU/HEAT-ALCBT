@@ -37,6 +37,30 @@ def plug_load_factor_for(type_name):
     return _PLUG_LOAD_FACTOR_DEFAULT
 
 
+LIFT_ESTIMATE_FRACTION = Decimal("0.075")
+
+
+def lift_estimate_kwh(cooling, ventilation, lighting, hot_water):
+    """The 7.5% top-down lift estimate. The only implementation.
+
+    It deliberately takes the four modelled systems and NOT the building's
+    whole electricity. The lift form's JavaScript used to call /total-kwh/,
+    which sums every operational product in kWh including plug and equipment
+    loads, so the figure it pre-filled was about 20% higher than the one the
+    summary showed for the same building - 69,189.15 against 57,657.6. The
+    tooltip, the hint and this model all said four systems; only the
+    JavaScript disagreed, and it was the number the user actually saw.
+
+    Accepting that prefill saved it as an entered value, after which the
+    estimate stopped applying at all.
+    """
+    base = sum(
+        Decimal(str(v)) for v in (cooling, ventilation, lighting, hot_water)
+        if v is not None
+    )
+    return (base * LIFT_ESTIMATE_FRACTION).quantize(Decimal("0.001"))
+
+
 class EnergySummary(models.Model):
     """
     Stores per-category annual energy consumption for a building.
@@ -217,13 +241,10 @@ class EnergySummary(models.Model):
             if entered:
                 self.lift_escalator_kwh = sum(entered).quantize(Decimal("0.001"))
             else:
-                base = sum(
-                    Decimal(str(v)) for v in [
-                        self.cooling_kwh, self.ventilation_kwh,
-                        self.lighting_kwh, self.hot_water_kwh,
-                    ] if v is not None
+                self.lift_escalator_kwh = lift_estimate_kwh(
+                    self.cooling_kwh, self.ventilation_kwh,
+                    self.lighting_kwh, self.hot_water_kwh,
                 )
-                self.lift_escalator_kwh = (base * Decimal("0.075")).quantize(Decimal("0.001"))
             self.is_manual_lift_escalator = False
         elif not self.is_manual_lift_escalator:
             self.lift_escalator_kwh = None
