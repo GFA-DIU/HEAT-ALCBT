@@ -217,6 +217,10 @@ def _finalise(system):
     """Energy-weighted fraction over the records that could be benchmarked."""
     base = system["benchmarked_energy_kwh"]
     system["saving_fraction"] = round(system["saving_kwh"] / base, 4) if base else 0.0
+    # The same number as a percentage, because a template that multiplies by
+    # 100 itself is a template that forgets to. Printing the fraction raw
+    # showed "0.4%" against 553,280 kWh, which is 38.5%.
+    system["saving_pct"] = round(system["saving_fraction"] * 100, 1)
     system["saving_kwh"] = round(system["saving_kwh"], 1)
     system["energy_kwh"] = round(system["energy_kwh"], 1)
     system["benchmarked_energy_kwh"] = round(system["benchmarked_energy_kwh"], 1)

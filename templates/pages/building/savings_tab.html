@@ -350,11 +350,25 @@
             </div>
 
             <div class="space-y-2.5">
+              {% comment %}
+              Bars follow the toggles, and their length is each system's share
+              of the building's total saving.
+
+              Both were wrong. The width used the system's own reduction
+              percentage, so refrigerant - 0.03% of the total saving - drew a
+              full-width bar while hot water at 61.7% drew half: the panel
+              ranked systems by how much of themselves they could remove
+              rather than by how much they contribute, which is not what
+              "Savings by System" asks. And the figures were the full
+              potential while the headline above showed only what was
+              selected, so the two disagreed by a factor of eighty on first
+              load.
+              {% endcomment %}
               {% for sys in operational_savings.systems %}
-                <div class="space-y-2">
+                <div class="space-y-2" data-op-bar-row data-op-bar-key="{{ sys.key }}">
                   <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
                     <span>{{ sys.label }}</span>
-                    <span class="text-[#81F28E]">-{{ sys.saving|floatformat:1 }}</span>
+                    <span class="text-[#81F28E]" data-op-bar-value>0.0</span>
                   </div>
                   {% comment %}
                   The saving, not the baseline. This printed sys.baseline with
@@ -363,18 +377,18 @@
                   it could avoid. The bar is the share of that system's own
                   carbon the measures remove.
                   {% endcomment %}
-                  <progress class="progress progress-success w-full h-3" value="{{ sys.reduction_pct }}" max="100"></progress>
+                  <progress class="progress progress-success w-full h-3" data-op-bar value="0" max="100"></progress>
                 </div>
               {% empty %}
                 <p class="text-xs text-[var(--text--sub-600)]">{% translate "No operational system data entered yet. Add a cooling, ventilation, lighting, hot water or lift system to see savings." %}</p>
               {% endfor %}
               {% if operational_savings.refrigerant.has_saving %}
-                <div class="space-y-2">
+                <div class="space-y-2" data-op-bar-row data-op-bar-key="refrigerant">
                   <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
                     <span>{% translate "Refrigerant transition" %}</span>
-                    <span class="text-[#81F28E]">-{{ operational_savings.refrigerant.saving|floatformat:2 }}</span>
+                    <span class="text-[#81F28E]" data-op-bar-value>0.0</span>
                   </div>
-                  <progress class="progress progress-success w-full h-3" value="100" max="100"></progress>
+                  <progress class="progress progress-success w-full h-3" data-op-bar value="0" max="100"></progress>
                 </div>
               {% endif %}
             </div>
@@ -509,7 +523,7 @@
                   <div class="flex items-center gap-2">
                     <span data-icon="temp-cold-line" data-size="16" class="text-[#0EA5E9]"></span>
                     <span class="text-sm font-bold text-[var(--text--strong-950)]">{{ operational_savings.refrigerant.label }}</span>
-                    <span class="text-[9px] font-bold text-[#0369A1] bg-[#E0F2FE] px-1.5 py-0.5 rounded uppercase tracking-wider">{% translate "Scope 1" %}</span><span class="tooltip align-middle ml-1" data-tip="Refrigerant leaking from the equipment: a direct emission the building makes itself. The electricity rows are Scope 2, emitted at the power station. They are kept apart because the BMS measure reduces electricity and cannot reduce a leak." title="Refrigerant leaking from the equipment: a direct emission the building makes itself. The electricity rows are Scope 2, emitted at the power station. They are kept apart because the BMS measure reduces electricity and cannot reduce a leak."><span data-icon="info-custom-fill" data-size="14" data-color="var(--icon--disabled-300)"></span></span>
+                    <span class="text-[9px] font-medium text-[#0369A1] bg-[#E0F2FE] px-1.5 py-0.5 rounded uppercase tracking-wider align-middle">{% translate "Scope 1" %}</span><span class="tooltip align-middle ml-1" data-tip="Refrigerant leaking from the equipment: a direct emission the building makes itself. The electricity rows are Scope 2, emitted at the power station. They are kept apart because the BMS measure reduces electricity and cannot reduce a leak." title="Refrigerant leaking from the equipment: a direct emission the building makes itself. The electricity rows are Scope 2, emitted at the power station. They are kept apart because the BMS measure reduces electricity and cannot reduce a leak."><span data-icon="info-custom-fill" data-size="14" data-color="var(--icon--disabled-300)"></span></span>
                   </div>
                   <div class="flex items-center gap-2">
                     <span class="text-[11px] text-[var(--text--sub-600)] whitespace-nowrap">{% translate "Saves" %} (~{{ operational_savings.refrigerant.saving|floatformat:1 }} kgCO₂eq/m²/yr)</span>
@@ -623,7 +637,12 @@
         </div>
         <div class="text-right shrink-0">
           {% if sys.saving_kwh %}
-            <p class="text-sm font-bold text-[#16A34A]">-{{ sys.saving_fraction|floatformat:"-1g" }}%</p>
+            {% comment %}
+            saving_fraction is a fraction: 0.3846 means 38.5%, and printing it
+            raw showed "0.4%" beside 553,280 kWh - a figure that contradicted
+            its own percentage by two orders of magnitude.
+            {% endcomment %}
+            <p class="text-sm font-bold text-[#16A34A]">-{{ sys.saving_pct|floatformat:1 }}%</p>
             <p class="text-xs text-[var(--text--sub-600)]">{{ sys.saving_kwh|floatformat:"0g" }} kWh/{% translate "yr" %}</p>
           {% else %}
             <p class="text-sm font-medium text-[var(--text--sub-600)]">&mdash;</p>
@@ -830,10 +849,14 @@
       // One entry per measure the user has actually selected, in the order it
       // is applied, so the waterfall shows the same arithmetic the totals use.
       const steps = [];
+      // saving per system, from the toggles currently on
+      const perSystem = {};
       document.querySelectorAll('[data-op-system]').forEach(function (sysEl) {
         const baselineEl = sysEl.querySelector('[data-op-baseline]');
         if (!baselineEl) return;
-        let remaining = parseFloat(baselineEl.dataset.opBaseline) || 0;
+        const sysKey = sysEl.dataset.opSystem;
+        const startedAt = parseFloat(baselineEl.dataset.opBaseline) || 0;
+        let remaining = startedAt;
         sysEl.querySelectorAll('.op-measure-toggle').forEach(function (tog) {
           const pct = parseFloat(tog.dataset.opPct) || 0;
           // The label shows what this measure WOULD save, whether or not it is
@@ -850,6 +873,7 @@
             steps.push({ label: lbl ? lbl.textContent.trim() : '', amount: potential });
           }
         });
+        perSystem[sysKey] = startedAt - remaining;
         optimizedElectricity += remaining;
       });
 
@@ -883,8 +907,29 @@
       set('op-baseline-stat', opBaselineTotal.toFixed(1));
       set('op-optimised-stat', optimised.toFixed(1));
 
+      // BMS is whole-building, so it is not attributed to any one system.
+      perSystem.refrigerant = refrigerantSaving;
+      drawSavingsBySystem(perSystem, saving);
       drawOperationalWaterfall(steps, opBaselineTotal, optimised);
       return optimised;
+    }
+
+    // ---- savings by system -------------------------------------------------
+    //
+    // Length is each system's share of the building's total saving, so the
+    // longest bar is the biggest contributor. It used to be the system's own
+    // reduction percentage, which made refrigerant - three hundredths of one
+    // percent of the total - draw a full-width bar.
+    function drawSavingsBySystem(perSystem, totalSaving) {
+      document.querySelectorAll('[data-op-bar-row]').forEach(function (row) {
+        const key = row.dataset.opBarKey;
+        const amount = perSystem[key] || 0;
+        const valEl = row.querySelector('[data-op-bar-value]');
+        const barEl = row.querySelector('[data-op-bar]');
+        if (valEl) valEl.textContent = amount > 0 ? '-' + amount.toFixed(amount < 1 ? 2 : 1) : '0.0';
+        if (barEl) barEl.value = totalSaving > 0 ? (amount / totalSaving * 100) : 0;
+        row.style.opacity = amount > 0 ? '1' : '0.45';
+      });
     }
 
     // ---- the waterfall -----------------------------------------------------
@@ -949,7 +994,23 @@
           },
           scales: {
             x: { grid: { display: false },
-                 ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 0 } },
+                 ticks: {
+                   font: { size: 9 }, maxRotation: 0, autoSkip: false,
+                   // "LED retrofit on fluorescent zones" rotated 45 degrees
+                   // ran off the panel and collided with its neighbours. Wrap
+                   // instead: Chart.js breaks an array label onto two lines.
+                   callback: function (v, i) {
+                     const l = this.getLabelForValue(v) || '';
+                     if (l.length <= 14) return l;
+                     const words = l.split(' ');
+                     const out = ['']; let n = 0;
+                     words.forEach(function (w) {
+                       if ((out[n] + ' ' + w).trim().length > 14 && out[n]) { out.push(w); n++; }
+                       else { out[n] = (out[n] + ' ' + w).trim(); }
+                     });
+                     return out.slice(0, 2);
+                   }
+                 } },
             y: { beginAtZero: true,
                  title: { display: true, text: 'kgCO2eq/m2/yr', font: { size: 10 } },
                  ticks: { font: { size: 10 } } }
