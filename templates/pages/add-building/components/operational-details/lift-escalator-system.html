@@ -31,7 +31,7 @@
         <fieldset class="fieldset col-span-2">
           <legend class="fieldset-legend">{% translate "Number of lifts" %}<span class="text-[var(--state--error--base)]">*</span><span class="tooltip align-middle ml-1" data-tip="How many lifts/elevators serve the building. Note: annual lift energy is estimated as 7.5 percent of the building's other operational energy, so this count is descriptive and does not change the energy figure." title="How many lifts/elevators serve the building. Note: annual lift energy is estimated as 7.5 percent of the building's other operational energy, so this count is descriptive and does not change the energy figure."><span data-icon="info-custom-fill" data-size="16" data-color="var(--icon--disabled-300)"></span></span></legend>
           <label class="input validator w-full">
-            <input type="number" placeholder="e.g. 5" name="number_of_lifts" required min="1" />
+            <input type="number" placeholder="e.g. 5" name="number_of_lifts" required min="0" oninput="if (window.refreshLiftEstimate) window.refreshLiftEstimate();" />
           </label>
         </fieldset>
 
@@ -136,7 +136,13 @@
             // two places made the form read 69,189.15 where the summary read
             // 57,657.6 for the same building: total_kwh is ALL electricity
             // including plug loads, the estimate is the four systems only.
-            var est = data.lift_estimate_kwh;
+            //
+            // A building with no lifts uses no lift energy. The estimate used
+            // to appear whatever the count said, so a card reading
+            // "number of lifts: 0" still showed 65,943 kWh a year.
+            var countEl = form.querySelector('[name="number_of_lifts"]');
+            var lifts = countEl ? parseInt(countEl.value, 10) : NaN;
+            var est = (lifts === 0) ? 0 : data.lift_estimate_kwh;
             energyEl.value = est > 0 ? est.toFixed(3) : '';
             var hint = form.querySelector('.lift-energy-hint');
             if (hint && est <= 0) {
