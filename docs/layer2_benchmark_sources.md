@@ -226,6 +226,53 @@ What was found:
 So residential EPI stays blank across the region, and that is a data gap for
 ALCBT to fill rather than one BEAT should paper over.
 
+## Indonesia EUI, replaced 19.10.2026
+
+The national studies exist; they were simply not in the workbook. Three of
+them, supplied by HEAT:
+
+| Study | Sample | Shape |
+|---|---|---|
+| BPPT 2018, government buildings | 267 across 4 cities | bands by floor area |
+| BPPT 2020, commercial sector | 110 across 7 cities | bands by type, star and hospital class |
+| C40 Cities 2023, Jakarta | 150 buildings | **averages** by category |
+
+The figures BEAT had were not merely imprecise. They sat **above the studies'
+own "wasteful" threshold** for four of five building types, so almost any
+Indonesian building scored well against its own national average. Residential
+was the mirror image at 60, little over half the measured 108, so homes looked
+bad.
+
+| Type | was | now | source |
+|---|---|---|---|
+| Office, >50% AC | 250 | **155** | BPPT 2020 large office, E/FE boundary |
+| Office, <50% AC | 250 | **158** | BPPT 2020 medium office, E/FE boundary |
+| Hotel, up to 3-star | 350 | **170** | BPPT 2020, mean of budget 145 and 3-star 194 |
+| Hotel, above 3-star | 350 | **196** | BPPT 2020, mean of 4-star 199 and 5-star 193 |
+| Shopping Mall | 450 | **383** | C40 2023 Jakarta mall average |
+| Hospital | 450 | **214** | BPPT 2020 Class B, E/FE boundary |
+| Residential | 60 | **108** | C40 2023 Jakarta residential average |
+
+Three choices in there are interpretations, not figures the sources state, and
+each is recorded in the code beside the value:
+
+1. **Where a band is used, the figure is the Efficient / Fairly-Efficient
+   boundary.** BPPT publishes classification bands, not averages. That
+   boundary is where the middle of the distribution sits. C40's measured
+   office average of 168 corroborates it - it falls between the large-office
+   155 and the wasteful threshold of 193.
+2. **One figure per type applies to every climate zone.** The studies are
+   national and Jakarta-weighted and do not resolve by climate. This is not a
+   detail: 252 of 430 Indonesian buildings sit in the composite zone, which
+   had no row at all, and only **15 of 430 found any benchmark** before. After,
+   **420 do**.
+3. **BEAT's conditioned-area office split maps onto BPPT's floor-area split**,
+   because BPPT states the reason for its own split - large offices use
+   centralised air conditioning, medium ones use split units.
+
+The 33-office study at 160 kWh/m2/yr that prompted this is consistent with the
+BPPT large-office band and is no longer the basis for anything on its own.
+
 ## The rule that kept this honest
 
 From the workbook's own `0_README`, and worth repeating because the India

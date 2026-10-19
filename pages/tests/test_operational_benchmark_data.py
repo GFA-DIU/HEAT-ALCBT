@@ -250,3 +250,61 @@ def test_zero_grid_factor_returns_none():
         "climate_label": "Composite", "is_approximation": False,
     }
     assert calculate_operational_benchmark_position(160, entry, 0, 1000, 50) is None
+
+
+# ---------------------------------------------------------------------------
+# Indonesia, replaced 19.10.2026 from the national studies
+# ---------------------------------------------------------------------------
+
+def test_indonesia_benchmarks_sit_below_the_wasteful_threshold():
+    """The previous figures were above the studies' own "wasteful" line, so
+    almost any Indonesian building scored well against its national average.
+
+    BPPT 2020 wasteful thresholds: large office >193, 3-star hotel >216,
+    5-star >270, supermall >403, hospital Class B >253.
+    """
+    from pages.views.building.operational_benchmark_data import NATIONAL_AVG_EUI
+    ceilings = {
+        ("Office", ">50% AC"): 193,
+        ("Office", "<50% AC"): 285,
+        ("Hotel", "Up to 3-star"): 216,
+        ("Hotel", "Above 3-star"): 270,
+        ("Shopping Mall", None): 403,
+        ("Hospital", None): 253,
+    }
+    for (btype, sub), ceiling in ceilings.items():
+        for key, value in NATIONAL_AVG_EUI.items():
+            if key[0] == "Indonesia" and key[1] == btype and key[2] == sub:
+                assert value < ceiling, f"{btype} {sub}: {value} is not below {ceiling}"
+
+
+def test_indonesia_covers_every_climate_its_buildings_use():
+    """The studies are national and do not resolve by climate, so one figure
+    per type applies to all zones. 252 of 430 Indonesian buildings are in the
+    composite zone, which previously had no row at all - only 15 of 430 found
+    any benchmark."""
+    from pages.views.building.operational_benchmark_data import NATIONAL_AVG_EUI
+    needed = {"Tropical Wet", "Composite", "Warm & Humid", "Temperate", "Hot & Dry"}
+    for btype in ("Office", "Hotel", "Shopping Mall", "Hospital", "Residential"):
+        got = {k[3] for k in NATIONAL_AVG_EUI if k[0] == "Indonesia" and k[1] == btype}
+        assert needed <= got, f"{btype} missing {needed - got}"
+
+
+def test_indonesia_residential_exists_and_matches_the_measured_average():
+    """C40 2023 measured 108 kWh/m2/yr across Jakarta homes. BEAT carried 60,
+    little over half, and only under Temperate - so 140 Indonesian homes were
+    judged against a figure nearly half the measured average, or against
+    nothing at all."""
+    from pages.views.building.operational_benchmark_data import NATIONAL_AVG_EUI
+    for climate in ("Tropical Wet", "Composite"):
+        assert NATIONAL_AVG_EUI[("Indonesia", "Residential", None, climate)] == 108
+
+
+def test_the_two_office_figures_follow_the_sources_own_reasoning():
+    """BPPT split at 5,000 m2 because large offices use centralised AC and
+    medium ones use split units, which is why BEAT's conditioned-area split
+    maps onto it."""
+    from pages.views.building.operational_benchmark_data import NATIONAL_AVG_EUI
+    large = NATIONAL_AVG_EUI[("Indonesia", "Office", ">50% AC", "Composite")]
+    medium = NATIONAL_AVG_EUI[("Indonesia", "Office", "<50% AC", "Composite")]
+    assert large == 155 and medium == 158
