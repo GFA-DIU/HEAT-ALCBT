@@ -199,11 +199,17 @@ def test_refrigerant_scope1_saving(create_building, setup_grid):
     setup_grid(building)
     EnergySummary.objects.create(building=building, cooling_kwh=Decimal("1000"))
 
-    RefrigerantGWP.objects.get_or_create(refrigerant_code="R-717", defaults={"gwp_value": 0})
+    RefrigerantGWP.objects.get_or_create(refrigerant_code="R-513A", defaults={"gwp_value": 629})
     RefrigerantGWP.objects.get_or_create(refrigerant_code="R-410A", defaults={"gwp_value": 2088})
 
-    # 10 kg R-410A (GWP 2088), 2% leakage, GFA 100, target GWP 0 (R-717):
-    # 10 * 0.02 * (2088 - 0) / 100 = 4.176 -> 4.18
+    # The target is the lowest-GWP refrigerant usable in THIS class of
+    # equipment, not the lowest in existence. A chiller targets R-513A, an A1
+    # drop-in; it used to target R-717, ammonia, which is toxic and belongs in
+    # an industrial plant room behind gas detection, not in a commercial
+    # chiller BEAT models.
+    #
+    # 10 kg R-410A (GWP 2088), 2% leakage, GFA 100, target R-513A (GWP 629):
+    # 10 * 0.02 * (2088 - 629) / 100 = 2.918 -> 2.92
     CoolingSystemChiller.objects.create(
         building=building, chiller_type="air_cooled", year_of_installation=2020,
         refrigerant_type="R-410A", refrigerant_quantity_kg=Decimal("10"),
@@ -214,7 +220,8 @@ def test_refrigerant_scope1_saving(create_building, setup_grid):
 
     result = get_operational_savings_measures(building)
     assert result["refrigerant"]["has_saving"] is True
-    assert result["refrigerant"]["saving"] == 4.18
+    assert result["refrigerant"]["saving"] == 2.92
+    assert result["refrigerant"]["target_gwp"]["code"] == "R-513A"
 
 
 @pytest.mark.django_db
@@ -262,3 +269,48 @@ def test_totals_and_lifetime(create_building, setup_grid):
     assert result["baseline_total_lifetime"] == 300
     assert result["reduction_pct"] > 0
     assert result["optimized_total"] < result["baseline_total"]
+
+
+@pytest.mark.django_db
+def test_a_split_is_not_told_to_switch_to_ammonia(create_building, setup_grid):
+    """R-717 is toxic, lives in industrial plant rooms behind gas detection,
+    and is never used in a building split. BEAT searched one list lowest-GWP
+    first, so every unit in the database - including bedroom air conditioners
+    in Phnom Penh - was told to switch to ammonia, and that was the largest
+    Scope 1 figure it reported."""
+    from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
+    building = create_building(total_floor_area=Decimal("100"))
+    setup_grid(building)
+    EnergySummary.objects.create(building=building, cooling_kwh=Decimal("1000"))
+    RefrigerantGWP.objects.get_or_create(refrigerant_code="R-290", defaults={"gwp_value": 3})
+    RefrigerantGWP.objects.get_or_create(refrigerant_code="R-717", defaults={"gwp_value": 0})
+    CoolingSystemAirConditioner.objects.create(
+        building=building, ac_type="split", year_of_installation=2020,
+        refrigerant_type="R-32", refrigerant_quantity_kg=Decimal("2"),
+        baseline_refrigerant_emission_factor=675,
+        baseline_leakage_factor_percent=7, number_of_units=1,
+    )
+    r = get_operational_savings_measures(building)["refrigerant"]
+    assert r["target_gwp"]["code"] == "R-290", "a split must target propane"
+    assert r["target_gwp"]["code"] != "R-717"
+    # 2 kg * 7% * (675 - 3) / 100 = 0.9408 -> 0.94
+    assert r["saving"] == 0.94
+
+
+@pytest.mark.django_db
+def test_vrf_targets_a_blend_not_propane(create_building, setup_grid):
+    """R-290 charge limits under IEC 60335-2-40 cannot be met by a system with
+    long refrigerant lines through occupied space, so VRF targets R-454B."""
+    from pages.models.building_operation.air_conditioning import CoolingSystemAirConditioner
+    building = create_building(total_floor_area=Decimal("100"))
+    setup_grid(building)
+    EnergySummary.objects.create(building=building, cooling_kwh=Decimal("1000"))
+    RefrigerantGWP.objects.get_or_create(refrigerant_code="R-454B", defaults={"gwp_value": 465})
+    CoolingSystemAirConditioner.objects.create(
+        building=building, ac_type="vrv", year_of_installation=2020,
+        refrigerant_type="R-410A", refrigerant_quantity_kg=Decimal("10"),
+        baseline_refrigerant_emission_factor=2088,
+        baseline_leakage_factor_percent=5, number_of_units=1,
+    )
+    r = get_operational_savings_measures(building)["refrigerant"]
+    assert r["target_gwp"]["code"] == "R-454B"

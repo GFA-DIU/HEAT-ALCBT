@@ -188,6 +188,44 @@ opening the code found it. The difference between "ECSBC 2024 Table 7.3" and
 "a spreadsheet" is the difference between a target a user can check and one
 they have to trust.
 
+## Why there is no EUI benchmark for most of the region
+
+Searched 19.10.2026. The finding is structural rather than a gap in the
+search: **no ALCBT country publishes a whole-building EUI in its building
+code.** All five are prescriptive, setting envelope performance, lighting
+density and equipment minimums rather than a kWh/m2/yr target.
+
+| Code | Sets | Whole-building EUI |
+|---|---|---|
+| Vietnam QCVN 09:2017/BXD | envelope, LPD 11 W/m2 offices, COP/CSPF minimums | no |
+| Indonesia SNI 6389:2020 | envelope design criteria | no |
+| India ECSBC 2024 | LPD, equipment minimums, lift classes | no |
+| India ENS 2024 | RETV envelope, common-area LPD | no |
+| Thailand BEC | not located | - |
+
+A national-average EUI is a **measured statistic, not a code value**. India's
+rows in `NATIONAL_AVG_EUI` come from the BEE 1,160-building survey, which is a
+study. The equivalent surveys for the other four either do not exist or are
+not published per m2.
+
+What was found:
+
+* **Indonesia offices, 160 kWh/m2/yr** mean across 33 buildings, with under
+  115 treated as high performance and over 190 as inefficient.
+  **Not applied** - the workbook carries 250 for the same cell, 586 production
+  buildings are benchmarked against it, and the two may not cover the same end
+  uses. Recorded in `operational_benchmark_data.py` for a decision.
+* **Household surveys** for Bangkok (16.2 GJ), Hanoi (18.2), Ho Chi Minh City
+  (18.8) and Phnom Penh (13.2) are per household, not per m2. Converting them
+  needs a typical dwelling floor area, which would be an assumption driving
+  the entire result.
+* **Vietnam office LPD 11 W/m2** from QCVN 09 matches the workbook exactly.
+  That cell is now marked verified - the one thing a prescriptive code can
+  confirm.
+
+So residential EPI stays blank across the region, and that is a data gap for
+ALCBT to fill rather than one BEAT should paper over.
+
 ## The rule that kept this honest
 
 From the workbook's own `0_README`, and worth repeating because the India

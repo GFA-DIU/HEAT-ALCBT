@@ -1076,8 +1076,40 @@ _SYSTEM_STYLE = {
     "Lift & escalator": {"key": "lift", "icon": "stairs-line", "color": "#818CF8"},
 }
 
-# Natural (target) refrigerants for the Scope-1 transition, lowest GWP preferred.
-_NATURAL_REFRIGERANTS = ["R-717", "R-744", "R-290"]
+# Low-GWP target per equipment class, in preference order.
+#
+# This used to be one list - R-717, R-744, R-290 - searched lowest GWP first,
+# so every unit in the database was told to switch to ammonia. R-717 is toxic
+# (safety class B2L), lives in industrial plant rooms behind gas detection,
+# and is never used in a building split. Proposing it for a bedroom air
+# conditioner in Phnom Penh is not a saving anyone can act on, and it was the
+# single largest Scope 1 figure BEAT reported.
+#
+# The target now depends on what the equipment is:
+#
+#   split / window / cassette - R-290 (propane). Already used in the database
+#       and in Indian and Chinese room ACs. Flammability class A3, so IEC
+#       60335-2-40 charge limits confine it to small systems, which is what
+#       these are.
+#   VRF - R-454B. An A2L blend, the industry's declared R-410A replacement for
+#       VRF. R-290 is not an option: the charge limits cannot be met by a
+#       system with long refrigerant lines through occupied space.
+#   chiller - R-513A. A1, non-flammable, the drop-in for R-134a centrifugal
+#       and screw chillers. R-717 and R-744 do appear in chillers, but only in
+#       purpose-built industrial plant, not in the commercial chillers BEAT
+#       models.
+#
+# Every GWP here is one BEAT already holds. A unit already on its class target
+# or better reports no saving.
+_REFRIGERANT_TARGET_BY_CLASS = {
+    "window":   ["R-290"],
+    "split":    ["R-290"],
+    "cassette": ["R-290"],
+    "vrv":      ["R-454B", "R-32"],
+    "packaged": ["R-454B", "R-32"],
+    "chiller":  ["R-513A"],
+}
+_REFRIGERANT_TARGET_DEFAULT = ["R-290"]
 
 
 def _all_records_flagged(records, attr):
@@ -1199,33 +1231,50 @@ def _refrigerant_scope1_saving(building, floor_area):
         return 0.0, None
     gfa = Decimal(str(floor_area))
 
-    # Cheapest available natural target.
-    target_gwp = None
-    for code in _NATURAL_REFRIGERANTS:
-        gwp = RefrigerantGWP.get_gwp(code)
-        if gwp is not None:
-            target_gwp = Decimal(str(gwp))
-            break
-    if target_gwp is None:
-        return 0.0, None
+    def _target_for(unit):
+        """Lowest-GWP refrigerant usable in THIS kind of equipment."""
+        if hasattr(unit, "chiller_type"):
+            codes = _REFRIGERANT_TARGET_BY_CLASS["chiller"]
+        else:
+            codes = _REFRIGERANT_TARGET_BY_CLASS.get(
+                getattr(unit, "ac_type", None), _REFRIGERANT_TARGET_DEFAULT)
+        best, best_code = None, None
+        for code in codes:
+            gwp = RefrigerantGWP.get_gwp(code)
+            if gwp is None:
+                continue
+            gwp = Decimal(str(gwp))
+            if best is None or gwp < best:
+                best, best_code = gwp, code
+        return best, best_code
 
     units = list(building.chillers.all()) + list(building.air_conditioners.all())
 
     total = Decimal("0")
+    chosen = {}
     for u in units:
         qty = getattr(u, "refrigerant_quantity_kg", None)
         gwp = getattr(u, "baseline_refrigerant_emission_factor", None)
         leakage = getattr(u, "baseline_leakage_factor_percent", None)
         if qty is None or gwp is None or leakage is None:
             continue
+        target_gwp, target_code = _target_for(u)
+        if target_gwp is None:
+            continue
         gwp = Decimal(str(gwp))
         if gwp <= target_gwp:
             continue
-        saving = Decimal(str(qty)) * (Decimal(str(leakage)) / Decimal("100")) \
-            * (gwp - target_gwp) / gfa
+        saving = (Decimal(str(qty)) * (Decimal(str(leakage)) / Decimal("100"))
+                  * (gwp - target_gwp) / gfa)
         total += saving
+        chosen[target_code] = chosen.get(target_code, Decimal("0")) + saving
 
-    return round(float(total), 2), (float(target_gwp) if total > 0 else None)
+    # Name the refrigerant doing most of the work, so the row can say what it
+    # proposes rather than only how much it saves.
+    best_code = max(chosen, key=chosen.get) if chosen else None
+    best_gwp = RefrigerantGWP.get_gwp(best_code) if best_code else None
+    return round(float(total), 2), (
+        {"code": best_code, "gwp": float(best_gwp)} if best_code else None)
 
 
 def get_operational_savings_measures(

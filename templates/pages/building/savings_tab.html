@@ -530,6 +530,23 @@
                     <input type="checkbox" class="toggle toggle-xs" checked disabled />
                   </div>
                 </div>
+                {% comment %}
+                Say what is being proposed, and what the figure does not
+                cover. The target used to be whatever had the lowest GWP in
+                existence, which meant ammonia for a bedroom split - toxic,
+                industrial, and not a thing anyone can install. It is now the
+                lowest-GWP refrigerant usable in that class of equipment.
+                {% endcomment %}
+                {% if operational_savings.refrigerant.target_gwp.code %}
+                <p class="text-[11px] text-[var(--text--sub-600)]">
+                  {% blocktranslate trimmed with code=operational_savings.refrigerant.target_gwp.code gwp=operational_savings.refrigerant.target_gwp.gwp %}
+                    Assumes a switch to {{ code }} (GWP {{ gwp }}), the lowest-GWP refrigerant usable in this class of equipment.
+                  {% endblocktranslate %}
+                </p>
+                {% endif %}
+                <p class="text-[11px] text-[var(--text--soft-400)]">
+                  {% translate "Not included: the charge mass and leakage rate are held constant, and only operating leakage is counted. End-of-life recovery losses, where most refrigerant escapes in practice, are not modelled, so this figure is conservative." %}
+                </p>
               </div>
               {% endif %}
 

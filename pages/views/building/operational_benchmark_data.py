@@ -142,6 +142,27 @@ INDIA_CATEGORY_ONLY_TO_EPI = {
 # missing key => no national benchmark for that combination.
 # ---------------------------------------------------------------------------
 
+# Indonesia offices, added 19.10.2026 from a measured study rather than a code.
+#
+# No ALCBT country publishes a whole-building EUI in its building code - they
+# are all prescriptive, setting envelope, lighting density and equipment
+# minimums. A national average EUI is a measured statistic, which is why
+# India's rows come from the BEE 1,160-building survey and not from ECSBC.
+#
+# Benchmarking Energy Use Intensity of 33 Office Buildings in Indonesia gives
+# a mean of 160 kWh/m2/yr, with under 115 treated as high performance and over
+# 190 as significantly inefficient. Entered against both climates Indonesia
+# already has rows for, because the study reports one national mean and does
+# not break down by climate - that is a limit of the source, not a choice.
+# NOT APPLIED. The workbook carries 250 for an Indonesian office and this
+# study measures 160 - a 56% gap on a figure that 586 production buildings are
+# benchmarked against. Swapping it would make every Indonesian office look
+# materially worse overnight, and the two numbers may not measure the same
+# thing: the study covers 33 offices and does not say whether its EUI includes
+# the same end uses. Recorded for a decision, not applied.
+INDONESIA_OFFICE_EUI_MEASURED_2025 = 160.0
+INDONESIA_OFFICE_EUI_IN_USE = 250.0
+
 NATIONAL_AVG_EUI = {
     # ---- Office <50% AC ----
     ("India", "Office", "<50% AC", "Warm & Humid"): 101,

@@ -245,6 +245,12 @@ WORKBOOK = "Operational_Carbon_Benchmark_restructured.xlsx"
 BENCHMARK_SOURCES = {
     ("lighting", "India"): ("ECSBC 2024, Tables 7.1-7.3 (Interior Lighting "
                             "Power, Building Area Method)", VERIFIED),
+    # QCVN 09:2017/BXD sets a maximum lighting power density of 11 W/m2 for
+    # offices, which is the figure the workbook already carried for Vietnam.
+    # Checked 19.10.2026; the code is prescriptive and publishes no
+    # whole-building EUI, so only the lighting row can be verified this way.
+    ("lighting", "Vietnam"): ("QCVN 09:2017/BXD, maximum lighting power "
+                              "density", VERIFIED),
 }
 
 _DEFAULT_SOURCE = (WORKBOOK, UNVERIFIED)
