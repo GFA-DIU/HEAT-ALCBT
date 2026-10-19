@@ -19,6 +19,9 @@ from typing import Dict, Any, List, Optional
 from pages.models.building import Building
 from pages.models.epd import Unit
 from pages.views.building.embodied_benchmark_data import get_embodied_savings_data
+from pages.views.building.equipment_savings import (
+    get_equipment_efficiency_savings,
+)
 from pages.views.building.operational_benchmark_data import (
     get_operational_benchmark_for_building,
     calculate_operational_benchmark_position,
@@ -1470,4 +1473,8 @@ def get_building_chart_data(
         'operational_savings': get_operational_savings_measures(
             building, prefetched_operational=prefetched_operational
         ),
+        # Layer 2 - what replacing the equipment would save, as opposed to
+        # Layer 3 above, which is what a control bolted onto it would save.
+        # A chiller with a VSD fitted is still the same chiller.
+        'equipment_savings': get_equipment_efficiency_savings(building),
     }

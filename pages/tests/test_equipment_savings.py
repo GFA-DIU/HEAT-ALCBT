@@ -214,3 +214,25 @@ def test_a_system_with_no_benchmark_is_distinguishable_from_one_with_no_saving(i
     assert cooling["has_benchmark"] is False
     assert cooling["energy_kwh"] == 5000.0      # the energy is still real
     assert cooling["saving_kwh"] == 0.0
+
+
+@pytest.mark.django_db
+def test_a_system_keeps_its_target_even_when_no_record_can_use_it(india):
+    """Ventilation is the real case: India publishes 0.42 W/CMH, but most
+    stored specific fan powers are outside the range the form itself declares,
+    so every record is refused. The row must still say what the target is -
+    "has a benchmark" and "Target None" cannot both be true."""
+    india = india()
+    VentilationSystem.objects.create(
+        building=india, ventilation_type="CASSETTE_AC",
+        baseline_efficiency_w_cmh=Decimal("60.00"),   # refused by the guard
+        number_of_units_installed=1, total_power_input_kw=Decimal("5"),
+        total_energy_consumption_kwh_per_year=Decimal("10000"))
+    vent = next(s for s in get_equipment_efficiency_savings(india)["systems"]
+                if s["key"] == "ventilation")
+    assert vent["has_benchmark"] is True
+    # India ventilation: national 0.42, LEED 0.31, EDGE 0.25 - EDGE wins
+    assert vent["target"] == 0.25
+    assert vent["unit"] == "W/CMH"
+    assert vent["no_benchmark"] == 1
+    assert vent["saving_kwh"] == 0.0

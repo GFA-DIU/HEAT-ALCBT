@@ -189,17 +189,23 @@ def _accumulate(system, current, target, direction, energy, basis, unit,
     energy = float(energy or 0.0)
     system["energy_kwh"] += energy
     if target is not None:
+        # Record the target as soon as it is known, not after the record has
+        # been found usable. A system whose benchmark exists but whose records
+        # all carry unusable figures - ventilation, where most stored specific
+        # fan powers are outside the range the form itself declares - would
+        # otherwise report "Target None", claiming to have a benchmark it had
+        # just thrown away.
         system["has_benchmark"] = True
         system["source"] = source
         system["verified"] = verified
+        system["target"] = target
+        system["target_basis"] = basis
+        system["unit"] = unit
     if current is None or target is None:
         system["no_benchmark"] += 1
         return
     fraction = efficiency_saving_fraction(current, target, direction)
     system["benchmarked_energy_kwh"] += energy
-    system["target"] = target
-    system["target_basis"] = basis
-    system["unit"] = unit
     if fraction <= 0:
         system["already_better"] += 1
         return

@@ -253,6 +253,8 @@ def handle_building_load(request, building_id, simulation):
         # Operational (Layer 1 benchmark + Layer 3 measures) for savings tab
         "operational_benchmark_position": chart_data.get("operational_benchmark_position"),
         "operational_savings": chart_data.get("operational_savings", {}),
+        # Layer 2 - equipment-efficiency replacement
+        "equipment_savings": chart_data.get("equipment_savings", {}),
         "energy_mismatch": energy_mismatch,
         "energy_mismatch_systems_kwh": float(systems_total_kwh),
         "energy_mismatch_carriers_kwh": float(carriers_total_kwh),

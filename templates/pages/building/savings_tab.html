@@ -559,6 +559,91 @@
     </div>
   </div>
 
+  {% comment %}
+  Layer 2 - equipment-efficiency replacement.
+
+  A different question from the measures above: those ask what a control
+  bolted onto the existing equipment saves, this asks what replacing the
+  equipment would. A chiller with a VSD fitted is still the same chiller, so
+  the two are not added together and are not shown as one number.
+
+  Every row states where its target came from. The India lighting benchmark
+  was wrong for months in a way no plausibility check caught - real ECBC
+  numbers attached to the wrong building types - and only opening the code
+  found it. A target that cannot be traced is a target nobody can audit.
+  {% endcomment %}
+  {% if equipment_savings.systems %}
+  <div class="w-full max-w-[68.75rem] mt-6 border border-[var(--stroke--soft-200)] rounded-2xl bg-white">
+    <div class="px-5 py-4 border-b border-[var(--stroke--soft-200)]">
+      <h3 class="text-base font-semibold text-[var(--text--strong-950)]">
+        {% translate "Equipment Efficiency Replacement" %}
+      </h3>
+      <p class="text-xs text-[var(--text--sub-600)] mt-0.5">
+        {% blocktranslate trimmed with c=equipment_savings.country %}
+          What replacing this equipment with efficient units would save, against published benchmarks for {{ c }}. Separate from the measures above, and not added to them.
+        {% endblocktranslate %}
+      </p>
+    </div>
+
+    <div class="p-5 flex flex-col gap-2.5">
+      {% for sys in equipment_savings.systems %}
+      <div class="flex items-start justify-between gap-3 p-3 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]{% if not sys.has_benchmark %} border border-dashed border-[var(--stroke--soft-200)]{% endif %}">
+        <div class="flex flex-col flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm font-medium text-[var(--text--strong-950)]">{{ sys.label }}</span>
+            {% if not sys.has_benchmark %}
+              <span class="text-[0.625rem] font-medium uppercase tracking-widest rounded px-1.5 py-0.5 bg-[var(--bg--weak-100)] text-[var(--text--sub-600)]">{% translate "No benchmark published" %}</span>
+            {% elif sys.verified %}
+              <span class="text-[0.625rem] font-medium uppercase tracking-widest rounded px-1.5 py-0.5 bg-[#D5EDCD] text-[var(--text--strong-950)]">{% translate "Verified" %}</span>
+            {% else %}
+              <span class="text-[0.625rem] font-medium uppercase tracking-widest rounded px-1.5 py-0.5 bg-[#FEF3C7] text-[var(--text--strong-950)]">{% translate "Unverified" %}</span>
+            {% endif %}
+          </div>
+          <p class="text-xs text-[var(--text--sub-600)] mt-0.5">
+            {% if sys.has_benchmark %}
+              {% blocktranslate trimmed with t=sys.target u=sys.unit basis=sys.target_basis %}
+                Target {{ t }} {{ u }} ({{ basis }})
+              {% endblocktranslate %}
+              &middot;
+            {% endif %}
+            {% blocktranslate trimmed with n=sys.records ok=sys.benchmarked better=sys.already_better none=sys.no_benchmark %}
+              {{ n }} record(s): {{ ok }} with a saving, {{ better }} already better, {{ none }} not benchmarked
+            {% endblocktranslate %}
+          </p>
+          {% if sys.source %}
+          <p class="text-[11px] text-[var(--text--soft-400)] mt-0.5 truncate">{{ sys.source }}</p>
+          {% endif %}
+        </div>
+        <div class="text-right shrink-0">
+          {% if sys.saving_kwh %}
+            <p class="text-sm font-bold text-[#16A34A]">-{{ sys.saving_fraction|floatformat:"-1g" }}%</p>
+            <p class="text-xs text-[var(--text--sub-600)]">{{ sys.saving_kwh|floatformat:"0g" }} kWh/{% translate "yr" %}</p>
+          {% else %}
+            <p class="text-sm font-medium text-[var(--text--sub-600)]">&mdash;</p>
+            <p class="text-xs text-[var(--text--soft-400)]">{{ sys.energy_kwh|floatformat:"0g" }} kWh/{% translate "yr" %}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+
+      <div class="flex items-center justify-between pt-2.5 mt-1 border-t border-[var(--stroke--soft-200)]">
+        <span class="text-sm font-medium text-[var(--text--strong-950)]">{% translate "Total if every benchmarked unit were replaced" %}</span>
+        <span class="text-sm font-bold text-[#16A34A]">
+          {{ equipment_savings.total_saving_kwh|floatformat:"0g" }} <span class="font-normal text-[var(--text--sub-600)]">kWh/{% translate "yr" %}</span>
+        </span>
+      </div>
+
+      {% if equipment_savings.coverage.no_benchmark %}
+      <p class="text-[11px] text-[var(--text--sub-600)] mt-1">
+        {% blocktranslate trimmed with n=equipment_savings.coverage.no_benchmark %}
+          {{ n }} record(s) could not be benchmarked. Their energy is counted in the building total but no saving is claimed for them, so this figure understates what is achievable rather than overstating it.
+        {% endblocktranslate %}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
 </div>
 
 <script>
