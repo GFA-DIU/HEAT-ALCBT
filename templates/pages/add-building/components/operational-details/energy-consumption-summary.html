@@ -1,5 +1,8 @@
 {% load i18n %}
-<div id="energy-consumption-summary-container" class="w-full" data-building-uuid="{{ building_uuid }}">
+<div id="energy-consumption-summary-container" class="w-full" data-building-uuid="{{ building_uuid }}"
+     data-has-plug-load="{% if summary.has_plug_load is True %}true{% elif summary.has_plug_load is False %}false{% endif %}"
+     data-plug-load-basis="{{ summary.plug_load_basis }}"
+     data-plug-load-percent="{{ summary.plug_load_percent|default_if_none:summary.plug_load_default_percent|floatformat:-2 }}">
   <div class="flex flex-col gap-2">
 
     <!-- Cooling system -->
@@ -146,38 +149,43 @@
     <div id="summary-row-plug-load" class="flex items-center justify-between p-2.5 rounded-[var(--radius-12)] bg-[var(--bg--weak-50)]">
       <div class="flex items-center gap-1.5">
         <span data-icon="flashlight-line" data-size="20" data-color="var(--icon--strong-950)"></span>
-        <span class="text-sm font-normal">{% translate "Plug & equipment loads" %}</span>
+        <div class="flex flex-col">
+          <span class="text-sm font-normal">{% translate "Plug & equipment loads" %}</span>
+          </div>
       </div>
       <div class="flex items-center gap-2" data-summary-right>
-        {% if summary and summary.plug_load_kwh is not None %}
-          <span class="text-sm font-bold text-[var(--text--sub-600)]">
-            {{ summary.plug_load_kwh|floatformat:-3 }} <span class="font-normal">kWh/yr</span>
-          </span>
-          <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('plug_load', {{ summary.plug_load_kwh|floatformat:3 }})">
+        {% comment %}
+        Branches on plug_load_basis, not on whether a number happens to be
+        set. A building that answered "no" used to fall through to the
+        "No data" warning, because its figure is 0 and 0 is falsy - so a
+        deliberate answer looked like a missing one. The ESTIMATED badge now
+        appears only when BEAT really is guessing, not when the user gave a
+        percentage.
+        {% endcomment %}
+        {% with basis=summary.plug_load_basis sug=summary.plug_load_effective %}
+          {% if basis == "none" %}
+            <span class="text-sm font-bold text-[var(--text--sub-600)]">
+              0 <span class="font-normal">kWh/yr</span>
+            </span>
+          {% elif sug is not None %}
+            <span class="text-sm font-bold text-[var(--text--sub-600)]{% if basis == 'estimated' %} italic font-medium{% endif %}">
+              {{ sug|floatformat:"-3g" }} <span class="font-normal">kWh/yr</span>
+            </span>
+            {% if basis == "estimated" %}
+              <span class="text-[0.625rem] font-medium uppercase tracking-widest rounded px-1.5 py-0.5 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]">{% translate "Estimated" %}</span>
+            {% endif %}
+          {% else %}
+            <div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
+              <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
+              <span class="text-[0.625rem] font-medium uppercase tracking-widest">{% translate "No data" %}</span>
+            </div>
+          {% endif %}
+          <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('plug_load', {{ summary.plug_load_kwh|default_if_none:'null' }})">
             <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
           </button>
-        {% else %}
-          {% with sug=summary.suggested_plug_load %}
-            {% if sug %}
-              <span class="text-sm font-medium text-[var(--text--sub-600)] italic" title="{% translate 'Estimated. Enter a value to override.' %}">
-                {{ sug|floatformat:-3 }} <span class="font-normal">kWh/yr</span>
-              </span>
-              <span class="text-[0.625rem] font-medium uppercase tracking-widest rounded px-1.5 py-0.5 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]">{% translate "Estimated" %}</span>
-              <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('plug_load', {{ sug|floatformat:3 }})">
-                <span data-icon="edit-line" data-size="16" data-color="var(--icon--strong-950)"></span>
-              </button>
-            {% else %}
-              <div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
-                <span data-icon="error-warning-line" data-size="16" data-color="var(--state--warning--base)"></span>
-                <span class="text-[0.625rem] font-medium uppercase tracking-widest">{% translate "No data" %}</span>
-              </div>
-              <button class="btn btn-ghost size-6 p-0" onclick="openSummaryModal('plug_load', null)">
-                <span data-icon="add-circle-fill" data-size="20" data-color="var(--icon--strong-950)"></span>
-              </button>
-            {% endif %}
-          {% endwith %}
-        {% endif %}
+        {% endwith %}
       </div>
+    </div>
     </div>
 
     <!-- Total row -->
@@ -217,7 +225,57 @@
       <p class="text-xs text-[var(--text--sub-600)]">
         {% translate "Enter the annual energy consumption for this system. Leave blank if it does not apply to this building." %}
       </p>
-      <fieldset class="fieldset p-0">
+      {% comment %}
+      Plug load is asked differently from the five equipment systems: there is
+      no equipment table behind it, so "is there any?" has to be a question
+      rather than something BEAT can read off a record. A stored 0 could not
+      be told apart from an unanswered question, which is how the row ended up
+      showing a 0 figure beside a 20% basis.
+      {% endcomment %}
+      <fieldset class="fieldset p-0 hidden" id="plug-load-gate">
+        <legend class="fieldset-legend mb-1">
+          {% translate "Does this building have plug & equipment loads?" %}
+        </legend>
+        <div class="flex flex-col gap-1.5">
+          <label class="flex items-center gap-2 text-sm">
+            <input type="radio" name="has_plug_load" value="yes" class="radio radio-sm"
+                   onchange="updatePlugLoadMode()" />
+            <span>{% translate "Yes" %}</span>
+          </label>
+          <label class="flex items-center gap-2 text-sm">
+            <input type="radio" name="has_plug_load" value="no" class="radio radio-sm"
+                   onchange="updatePlugLoadMode()" />
+            <span>{% translate "No - this building has none" %}</span>
+          </label>
+        </div>
+      </fieldset>
+
+      {% comment %}
+      One basis, chosen explicitly. Writing either clears the other on the
+      server, so the two can never disagree on screen again.
+      {% endcomment %}
+      <fieldset class="fieldset p-0 hidden" id="plug-load-basis">
+        <legend class="fieldset-legend mb-1">{% translate "How is it known?" %}</legend>
+        <div class="flex gap-4 mb-2">
+          <label class="flex items-center gap-2 text-sm">
+            <input type="radio" name="plug_basis" value="percent" class="radio radio-sm"
+                   onchange="updatePlugLoadMode()" checked />
+            <span>{% translate "A share of system energy" %}</span>
+          </label>
+          <label class="flex items-center gap-2 text-sm">
+            <input type="radio" name="plug_basis" value="kwh" class="radio radio-sm"
+                   onchange="updatePlugLoadMode()" />
+            <span>{% translate "A measured figure" %}</span>
+          </label>
+        </div>
+        <label class="input w-full" id="plug-percent-wrap">
+          <input type="number" id="plug-percent-input" min="0" max="100" step="0.5"
+                 placeholder="{% translate 'e.g. 20' %}" />
+          <span class="text-sm/5 align-middle text-[var(--text--sub-600)]">{% translate "% of system energy" %}</span>
+        </label>
+      </fieldset>
+
+      <fieldset class="fieldset p-0" id="energy-modal-value">
         <legend class="fieldset-legend mb-1">
           {% translate "Annual energy consumption" %}<span class="text-[var(--state--error--base)]">*</span>
         </legend>
@@ -251,11 +309,62 @@
     plug_load: "{% translate 'Plug & equipment loads' %}",
   };
 
+  // Plug load is the only category with a gate and a choice of basis, so the
+  // modal grows two fieldsets for it and hides them for everything else.
+  function plugEls() {
+    return {
+      gate: document.getElementById('plug-load-gate'),
+      basis: document.getElementById('plug-load-basis'),
+      value: document.getElementById('energy-modal-value'),
+      pctWrap: document.getElementById('plug-percent-wrap'),
+      pct: document.getElementById('plug-percent-input'),
+    };
+  }
+
+  function checkedValue(name) {
+    var el = document.querySelector('[name="' + name + '"]:checked');
+    return el ? el.value : null;
+  }
+
+  window.updatePlugLoadMode = function () {
+    var e = plugEls();
+    if (!e.gate || e.gate.classList.contains('hidden')) return;
+    var has = checkedValue('has_plug_load');
+    // "No" and "not known" both need no figure: one is zero, the other is
+    // BEAT's typical share.
+    var needsValue = has === 'yes';
+    e.basis.classList.toggle('hidden', !needsValue);
+    var basis = checkedValue('plug_basis');
+    e.value.classList.toggle('hidden', !(needsValue && basis === 'kwh'));
+    e.pctWrap.classList.toggle('hidden', !(needsValue && basis === 'percent'));
+  };
+
   window.openSummaryModal = function (category, currentValue) {
     _currentCategory = category;
     document.getElementById('energy-modal-title').textContent = CATEGORY_LABELS[category] || category;
     var input = document.getElementById('energy-modal-input');
     input.value = currentValue !== null ? currentValue : '';
+
+    var e = plugEls();
+    var isPlug = category === 'plug_load';
+    e.gate.classList.toggle('hidden', !isPlug);
+    e.basis.classList.add('hidden');
+    if (isPlug) {
+      var container = document.getElementById('energy-consumption-summary-container');
+      var has = container.dataset.hasPlugLoad;            // "true" | "false" | ""
+      var basis = container.dataset.plugLoadBasis || 'estimated';
+      var want = has === 'true' ? 'yes' : (has === 'false' ? 'no' : 'unknown');
+      var g = document.querySelector('[name="has_plug_load"][value="' + want + '"]');
+      if (g) g.checked = true;
+      var b = document.querySelector('[name="plug_basis"][value="' +
+              (basis === 'metered' ? 'kwh' : 'percent') + '"]');
+      if (b) b.checked = true;
+      e.pct.value = container.dataset.plugLoadPercent || '';
+      window.updatePlugLoadMode();
+    } else {
+      e.value.classList.remove('hidden');
+      e.pctWrap.classList.add('hidden');
+    }
     energy_summary_modal.showModal();
   };
 
@@ -317,6 +426,17 @@
     var kwh = summary[KWH_KEY[category]];
     var isManual = summary[IS_MANUAL_KEY[category]];
 
+    // Plug load has no equipment table, so its figure does not live in
+    // plug_load_kwh alone: a building that answered "no" stores null and
+    // means zero, and a percentage stores null and means a share of system
+    // energy. Reading plug_load_kwh like the other five rows rendered both as
+    // the orange NO DATA warning, so saving "No" appeared to lose the answer
+    // while the server had recorded it correctly.
+    if (category === 'plug_load') {
+      kwh = summary.plug_load_effective;
+      isManual = true;                       // always editable, never auto-derived
+    }
+
     if (kwh === null || kwh === undefined) {
       right.innerHTML =
         '<div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">' +
@@ -359,7 +479,20 @@
     var buildingUuid = document.getElementById('energy-consumption-summary-container').dataset.buildingUuid;
     var value = document.getElementById('energy-modal-input').value;
     var payload = { building_uuid: buildingUuid };
-    payload[_currentCategory + '_kwh'] = value !== '' ? parseFloat(value) : null;
+    if (_currentCategory === 'plug_load') {
+      var has = checkedValue('has_plug_load');
+      payload.has_plug_load = has === 'yes' ? true : (has === 'no' ? false : null);
+      if (has === 'yes' && checkedValue('plug_basis') === 'percent') {
+        // Send the percentage only. The server clears the kWh, so the row
+        // cannot show a share beside a figure that contradicts it.
+        payload.plug_load_percent = document.getElementById('plug-percent-input').value;
+      } else if (has === 'yes') {
+        payload.plug_load_kwh = value !== '' ? parseFloat(value) : null;
+        payload.plug_load_percent = null;
+      }
+    } else {
+      payload[_currentCategory + '_kwh'] = value !== '' ? parseFloat(value) : null;
+    }
 
     fetch('{% url "energy_summary_save" %}', {
       method: 'POST',
@@ -387,5 +520,7 @@
       })
       .catch(function (err) { console.error('Error saving energy summary', err); });
   };
+
 })();
+
 </script>

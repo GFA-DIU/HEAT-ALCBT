@@ -142,68 +142,173 @@ INDIA_CATEGORY_ONLY_TO_EPI = {
 # missing key => no national benchmark for that combination.
 # ---------------------------------------------------------------------------
 
+# Indonesia offices, added 19.10.2026 from a measured study rather than a code.
+#
+# No ALCBT country publishes a whole-building EUI in its building code - they
+# are all prescriptive, setting envelope, lighting density and equipment
+# minimums. A national average EUI is a measured statistic, which is why
+# India's rows come from the BEE 1,160-building survey and not from ECSBC.
+#
+# Benchmarking Energy Use Intensity of 33 Office Buildings in Indonesia gives
+# a mean of 160 kWh/m2/yr, with under 115 treated as high performance and over
+# 190 as significantly inefficient. Entered against both climates Indonesia
+# already has rows for, because the study reports one national mean and does
+# not break down by climate - that is a limit of the source, not a choice.
+# NOT APPLIED. The workbook carries 250 for an Indonesian office and this
+# study measures 160 - a 56% gap on a figure that 586 production buildings are
+# benchmarked against. Swapping it would make every Indonesian office look
+# materially worse overnight, and the two numbers may not measure the same
+# thing: the study covers 33 offices and does not say whether its EUI includes
+# the same end uses. Recorded for a decision, not applied.
+INDONESIA_OFFICE_EUI_MEASURED_2025 = 160.0
+INDONESIA_OFFICE_EUI_IN_USE = 250.0
+
 NATIONAL_AVG_EUI = {
+    # --- Thailand: these figures are suspect, and unchanged -----------------
+    #
+    # Thailand's rows are not Indian copies - they are distinct, and carry two
+    # decimal places, which suggests they were computed rather than surveyed.
+    # But offices at 59.26 kWh/m2/yr is about a quarter of the 225 a study of
+    # 41 Bangkok offices calls typical, and hotels at 179.67 against a
+    # measured Thai average of 321.84.
+    #
+    # A figure four times out is more likely measuring something else -
+    # electricity only, or per conditioned area rather than per gross floor
+    # area - than simply wrong. Left alone until what it measures is known,
+    # because swapping one unexplained number for another is not an
+    # improvement. Recorded in docs/layer2_benchmark_sources.md.
+
+    # --- Vietnam and Cambodia: India's rows were removed 19.10.2026 ---------
+    #
+    # 15 of Vietnam's 22 rows and 7 of Cambodia's 15 were India's BEE figures
+    # copied verbatim, so a Vietnamese hotel was told its national average was
+    # 333 kWh/m2/yr - India's warm-and-humid figure from a survey of 1,160
+    # Indian buildings. Published Vietnamese research puts hotels at 151.
+    #
+    # Deleted rather than relabelled. An Indian benchmark is not a proxy for
+    # Vietnam: different climate, construction, occupancy and grid. A gap is a
+    # true statement about what has been published; a borrowed number is not,
+    # and it is invisible precisely because it looks like data.
+    #
+    # What remains for each country is its own. Candidates for filling the
+    # gaps, read in summary only and not yet adopted, are recorded in
+    # docs/layer2_benchmark_sources.md.
+    # --- Indonesia ---------------------------------------------------------
+    #
+    # Replaced 19.10.2026 from the national studies. The previous figures -
+    # office 250, hotel 350, mall 450, hospital 450 - sat ABOVE the "wasteful"
+    # threshold of every one of those studies, so almost any Indonesian
+    # building scored well against its own national average. Residential at 60
+    # was the opposite: little over half the measured average, so homes looked
+    # bad.
+    #
+    # Sources, per row:
+    #   C40 Cities (2023), Baseline Study on the Energy and Buildings
+    #       Landscape of Jakarta - 150 buildings, publishes true averages.
+    #   BPPT (2020), Benchmarking Specific Energy Consumption in the
+    #       Commercial Building Sector - 110 buildings across 7 cities,
+    #       publishes classification BANDS, not averages. Where a band is used
+    #       the figure is the Efficient / Fairly-Efficient boundary, which is
+    #       where the middle of the distribution sits. That is an
+    #       interpretation of the source, not a number the source states, and
+    #       it is recorded as such.
+    #
+    # One figure per type applies to every Indonesian climate. The studies are
+    # national and Jakarta-weighted and do not resolve by climate zone, so a
+    # per-climate figure would be invented. Writing one value to all zones is
+    # what the data supports - and it matters: 252 of 430 Indonesian buildings
+    # are in the composite zone, which previously had no row at all, so only
+    # 15 of them found any benchmark.
+    #
+    # BPPT split offices at 5,000 m2 explicitly because "large office
+    # buildings usually use centralized air conditioning systems, while
+    # medium-sized offices rely on split units". That is the source's own
+    # reasoning for mapping its size split onto BEAT's conditioned-area split.
+    # Office / >50% AC: 155 - BPPT 2020 large office, E/FE boundary (centralised AC)
+    ("Indonesia", "Office", ">50% AC", "Tropical Wet"): 155,
+    ("Indonesia", "Office", ">50% AC", "Composite"): 155,
+    ("Indonesia", "Office", ">50% AC", "Warm & Humid"): 155,
+    ("Indonesia", "Office", ">50% AC", "Temperate"): 155,
+    ("Indonesia", "Office", ">50% AC", "Hot & Dry"): 155,
+    # Office / <50% AC: 158 - BPPT 2020 medium office, E/FE boundary (split units)
+    ("Indonesia", "Office", "<50% AC", "Tropical Wet"): 158,
+    ("Indonesia", "Office", "<50% AC", "Composite"): 158,
+    ("Indonesia", "Office", "<50% AC", "Warm & Humid"): 158,
+    ("Indonesia", "Office", "<50% AC", "Temperate"): 158,
+    ("Indonesia", "Office", "<50% AC", "Hot & Dry"): 158,
+    # Hotel / Up to 3-star: 170 - BPPT 2020 mean of budget 145 and 3-star 194
+    ("Indonesia", "Hotel", "Up to 3-star", "Tropical Wet"): 170,
+    ("Indonesia", "Hotel", "Up to 3-star", "Composite"): 170,
+    ("Indonesia", "Hotel", "Up to 3-star", "Warm & Humid"): 170,
+    ("Indonesia", "Hotel", "Up to 3-star", "Temperate"): 170,
+    ("Indonesia", "Hotel", "Up to 3-star", "Hot & Dry"): 170,
+    # Hotel / Above 3-star: 196 - BPPT 2020 mean of 4-star 199 and 5-star 193
+    ("Indonesia", "Hotel", "Above 3-star", "Tropical Wet"): 196,
+    ("Indonesia", "Hotel", "Above 3-star", "Composite"): 196,
+    ("Indonesia", "Hotel", "Above 3-star", "Warm & Humid"): 196,
+    ("Indonesia", "Hotel", "Above 3-star", "Temperate"): 196,
+    ("Indonesia", "Hotel", "Above 3-star", "Hot & Dry"): 196,
+    # Shopping Mall: 383 - C40 2023 Jakarta mall average
+    ("Indonesia", "Shopping Mall", None, "Tropical Wet"): 383,
+    ("Indonesia", "Shopping Mall", None, "Composite"): 383,
+    ("Indonesia", "Shopping Mall", None, "Warm & Humid"): 383,
+    ("Indonesia", "Shopping Mall", None, "Temperate"): 383,
+    ("Indonesia", "Shopping Mall", None, "Hot & Dry"): 383,
+    # Hospital: 214 - BPPT 2020 Class B, E/FE boundary
+    ("Indonesia", "Hospital", None, "Tropical Wet"): 214,
+    ("Indonesia", "Hospital", None, "Composite"): 214,
+    ("Indonesia", "Hospital", None, "Warm & Humid"): 214,
+    ("Indonesia", "Hospital", None, "Temperate"): 214,
+    ("Indonesia", "Hospital", None, "Hot & Dry"): 214,
+    # Residential: 108 - C40 2023 Jakarta residential average
+    ("Indonesia", "Residential", None, "Tropical Wet"): 108,
+    ("Indonesia", "Residential", None, "Composite"): 108,
+    ("Indonesia", "Residential", None, "Warm & Humid"): 108,
+    ("Indonesia", "Residential", None, "Temperate"): 108,
+    ("Indonesia", "Residential", None, "Hot & Dry"): 108,
     # ---- Office <50% AC ----
     ("India", "Office", "<50% AC", "Warm & Humid"): 101,
-    ("Vietnam", "Office", "<50% AC", "Warm & Humid"): 101,
     ("Thailand", "Office", "<50% AC", "Warm & Humid"): 59.26,
     ("India", "Office", "<50% AC", "Composite"): 86,
-    ("Vietnam", "Office", "<50% AC", "Composite"): 86,
-    ("Cambodia", "Office", "<50% AC", "Composite"): 86,
     ("Thailand", "Office", "<50% AC", "Composite"): 59.26,
     ("India", "Office", "<50% AC", "Hot & Dry"): 90,
-    ("Vietnam", "Office", "<50% AC", "Hot & Dry"): 90,
     ("India", "Office", "<50% AC", "Temperate"): 94,
-    ("Vietnam", "Office", "<50% AC", "Temperate"): 94,
-    ("Indonesia", "Office", "<50% AC", "Tropical Wet"): 250,
     ("Vietnam", "Office", "<50% AC", "Tropical Wet"): 150,
     ("Cambodia", "Office", "<50% AC", "Tropical Wet"): 250,
     ("Thailand", "Office", "<50% AC", "Tropical Wet"): 59.26,
     # ---- Office >50% AC ----
     ("India", "Office", ">50% AC", "Warm & Humid"): 182,
-    ("Vietnam", "Office", ">50% AC", "Warm & Humid"): 182,
     ("Thailand", "Office", ">50% AC", "Warm & Humid"): 59.26,
     ("India", "Office", ">50% AC", "Composite"): 179,
-    ("Vietnam", "Office", ">50% AC", "Composite"): 179,
-    ("Cambodia", "Office", ">50% AC", "Composite"): 179,
     ("Thailand", "Office", ">50% AC", "Composite"): 59.26,
     ("India", "Office", ">50% AC", "Hot & Dry"): 173,
-    ("Vietnam", "Office", ">50% AC", "Hot & Dry"): 173,
-    ("India", "Office", ">50% AC", "Moderate"): 179,
+    # The BEE tables call this zone "Moderate"; every other row here was
+    # normalised to BEAT's own "Temperate" and this one was missed, so a
+    # temperate-zone Indian office with more than 50% conditioned area found
+    # no benchmark at all. The figure is unchanged.
+    ("India", "Office", ">50% AC", "Temperate"): 179,
     ("Vietnam", "Office", ">50% AC", "Moderate"): 179,
-    ("Indonesia", "Office", ">50% AC", "Tropical Wet"): 250,
     ("Vietnam", "Office", ">50% AC", "Tropical Wet"): 150,
     ("Cambodia", "Office", ">50% AC", "Tropical Wet"): 250,
     ("Thailand", "Office", ">50% AC", "Tropical Wet"): 59.26,
     # ---- Hotel Up to 3-star ----
     ("India", "Hotel", "Up to 3-star", "Warm & Humid"): 215,
-    ("Vietnam", "Hotel", "Up to 3-star", "Warm & Humid"): 215,
     ("Thailand", "Hotel", "Up to 3-star", "Warm & Humid"): 179.67,
     ("India", "Hotel", "Up to 3-star", "Composite"): 201,
-    ("Vietnam", "Hotel", "Up to 3-star", "Composite"): 201,
-    ("Cambodia", "Hotel", "Up to 3-star", "Composite"): 201,
     ("Thailand", "Hotel", "Up to 3-star", "Composite"): 179.67,
     ("India", "Hotel", "Up to 3-star", "Hot & Dry"): 167,
-    ("Vietnam", "Hotel", "Up to 3-star", "Hot & Dry"): 167,
     ("India", "Hotel", "Up to 3-star", "Temperate"): 107,
-    ("Vietnam", "Hotel", "Up to 3-star", "Temperate"): 107,
-    ("Indonesia", "Hotel", "Up to 3-star", "Tropical Wet"): 350,
     ("Vietnam", "Hotel", "Up to 3-star", "Tropical Wet"): 250,
     ("Cambodia", "Hotel", "Up to 3-star", "Tropical Wet"): 350,
     ("Thailand", "Hotel", "Up to 3-star", "Tropical Wet"): 179.67,
     # ---- Hotel Above 3-star ----
     ("India", "Hotel", "Above 3-star", "Warm & Humid"): 333,
-    ("Vietnam", "Hotel", "Above 3-star", "Warm & Humid"): 333,
     ("Cambodia", "Hotel", "Above 3-star", "Warm & Humid"): 290,
     ("Thailand", "Hotel", "Above 3-star", "Warm & Humid"): 179.67,
     ("India", "Hotel", "Above 3-star", "Composite"): 290,
-    ("Vietnam", "Hotel", "Above 3-star", "Composite"): 290,
     ("Thailand", "Hotel", "Above 3-star", "Composite"): 179.67,
     ("India", "Hotel", "Above 3-star", "Hot & Dry"): 250,
-    ("Vietnam", "Hotel", "Above 3-star", "Hot & Dry"): 250,
     ("India", "Hotel", "Above 3-star", "Temperate"): 313,
-    ("Vietnam", "Hotel", "Above 3-star", "Temperate"): 313,
-    ("Indonesia", "Hotel", "Above 3-star", "Tropical Wet"): 350,
     ("Vietnam", "Hotel", "Above 3-star", "Tropical Wet"): 250,
     ("Cambodia", "Hotel", "Above 3-star", "Tropical Wet"): 350,
     ("Thailand", "Hotel", "Above 3-star", "Tropical Wet"): 179.67,
@@ -211,11 +316,9 @@ NATIONAL_AVG_EUI = {
     ("India", "Shopping Mall", None, "Warm & Humid"): 428,
     ("Thailand", "Shopping Mall", None, "Warm & Humid"): 150.81,
     ("India", "Shopping Mall", None, "Composite"): 327,
-    ("Cambodia", "Shopping Mall", None, "Composite"): 327,
     ("Thailand", "Shopping Mall", None, "Composite"): 150.81,
     ("India", "Shopping Mall", None, "Hot & Dry"): 273,
     ("India", "Shopping Mall", None, "Temperate"): 257,
-    ("Indonesia", "Shopping Mall", None, "Tropical Wet"): 450,
     ("Vietnam", "Shopping Mall", None, "Tropical Wet"): 300,
     ("Cambodia", "Shopping Mall", None, "Tropical Wet"): 450,
     ("Thailand", "Shopping Mall", None, "Tropical Wet"): 150.81,
@@ -227,27 +330,22 @@ NATIONAL_AVG_EUI = {
     ("Thailand", "Hospital", None, "Composite"): 171.03,
     ("India", "Hospital", None, "Hot & Dry"): 261,
     ("India", "Hospital", None, "Temperate"): 247,
-    ("Indonesia", "Hospital", None, "Tropical Wet"): 450,
     ("Vietnam", "Hospital", None, "Tropical Wet"): 300,
     ("Cambodia", "Hospital", None, "Tropical Wet"): 450,
     # ---- Institute ----
     ("India", "Institute", None, "Warm & Humid"): 150,
     ("India", "Institute", None, "Composite"): 117,
-    ("Cambodia", "Institute", None, "Composite"): 117,
     ("India", "Institute", None, "Hot & Dry"): 106,
     ("India", "Institute", None, "Temperate"): 129,
     # ---- BPO (India only) ----
     ("India", "BPO", None, "Warm & Humid"): 452,
     ("India", "BPO", None, "Composite"): 437,
-    ("Cambodia", "BPO", None, "Composite"): 437,
     ("India", "BPO", None, "Temperate"): 433,
     # ---- Residential ----
     ("India", "Residential", None, "Warm & Humid"): 64,
     ("India", "Residential", None, "Composite"): 60,
-    ("Cambodia", "Residential", None, "Composite"): 60,
     ("India", "Residential", None, "Hot & Dry"): 67,
     ("India", "Residential", None, "Temperate"): 31,
-    ("Indonesia", "Residential", None, "Temperate"): 60,
 }
 
 # ---------------------------------------------------------------------------

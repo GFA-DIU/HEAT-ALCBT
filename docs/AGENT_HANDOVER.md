@@ -118,8 +118,12 @@ These are methodology calls, not implementation gaps. They need GT.
 
 ## Traps that have already cost a day each
 
-- **`qa` is production.** Merging deploys to real users at
-  beat-alcbt.gggi.org. There is no staging after it.
+- **`qa` is production** at beat-alcbt.gggi.org, with no staging after it —
+  but **merging to `qa` does not deploy**. There is no GitHub integration and
+  no Actions workflow; the deploy is `git push heroku origin/qa:refs/heads/main`,
+  and that push is what runs the migrations. On 16.10.2026 PR #595 was merged,
+  reported as shipped, and production served twelve-day-old code until someone
+  read `heroku releases` and noticed the version had not moved.
 - **Templates live in `/templates`**, not `pages/templates`. Searching the
   wrong one and concluding a feature is missing led to a third copy of an
   editor that already existed twice.

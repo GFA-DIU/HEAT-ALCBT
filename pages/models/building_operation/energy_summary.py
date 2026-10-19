@@ -37,6 +37,30 @@ def plug_load_factor_for(type_name):
     return _PLUG_LOAD_FACTOR_DEFAULT
 
 
+LIFT_ESTIMATE_FRACTION = Decimal("0.075")
+
+
+def lift_estimate_kwh(cooling, ventilation, lighting, hot_water):
+    """The 7.5% top-down lift estimate. The only implementation.
+
+    It deliberately takes the four modelled systems and NOT the building's
+    whole electricity. The lift form's JavaScript used to call /total-kwh/,
+    which sums every operational product in kWh including plug and equipment
+    loads, so the figure it pre-filled was about 20% higher than the one the
+    summary showed for the same building - 69,189.15 against 57,657.6. The
+    tooltip, the hint and this model all said four systems; only the
+    JavaScript disagreed, and it was the number the user actually saw.
+
+    Accepting that prefill saved it as an entered value, after which the
+    estimate stopped applying at all.
+    """
+    base = sum(
+        Decimal(str(v)) for v in (cooling, ventilation, lighting, hot_water)
+        if v is not None
+    )
+    return (base * LIFT_ESTIMATE_FRACTION).quantize(Decimal("0.001"))
+
+
 class EnergySummary(models.Model):
     """
     Stores per-category annual energy consumption for a building.
@@ -93,6 +117,37 @@ class EnergySummary(models.Model):
         verbose_name=_("Plug & Equipment Loads (kWh/yr)"),
     )
     is_manual_plug_load = models.BooleanField(default=True)
+
+    # Does this building have plug and equipment loads at all?
+    #
+    # True  - yes, and plug_load_kwh or plug_load_percent says how much
+    # False - no, and the figure is zero and stays zero
+    # None  - not stated, so BEAT shows the typical share for the building
+    #         type, clearly labelled as an estimate
+    #
+    # Without this there was no way to say "no plug load" and have it stick:
+    # a stored 0 was indistinguishable from an unanswered question, so the row
+    # could show a 0 override beside a 20% basis and contradict itself.
+    has_plug_load = models.BooleanField(
+        null=True, blank=True,
+        verbose_name=_("Building has plug and equipment loads"),
+    )
+
+    # The percentage of system energy the user says their plug load is.
+    #
+    # Overwriting the kWh was the only way to correct plug load, which hid
+    # where the number came from and went stale the moment a system changed.
+    # A percentage stays live: change the lighting and the plug load follows.
+    # Blank means BEAT uses the typical share for the building type.
+    plug_load_percent = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True,
+        verbose_name=_("Plug load as a percentage of system energy"),
+        help_text=_(
+            "Share of cooling, ventilation, lighting and hot water energy that "
+            "plug and equipment loads add. Leave blank to use the typical "
+            "share for this building type."
+        ),
+    )
 
     total_override_kwh = models.DecimalField(
         max_digits=14, decimal_places=3, null=True, blank=True,
@@ -214,16 +269,25 @@ class EnergySummary(models.Model):
                     "annual_energy_consumption_kwh", flat=True
                 ) if v is not None
             ]
+            lift_count = sum(
+                int(n or 0) for n in lift_qs.values_list("number_of_lifts", flat=True)
+            )
             if entered:
                 self.lift_escalator_kwh = sum(entered).quantize(Decimal("0.001"))
+            elif lift_count <= 0:
+                # A building with no lifts uses no lift energy.
+                #
+                # The estimate used to fire on the existence of a record, not
+                # on whether it described any lifts, so a card saying
+                # "number of lifts: 0" still produced 65,943 kWh a year out of
+                # 7.5% of the other systems. The count is the whole point of
+                # the question.
+                self.lift_escalator_kwh = Decimal("0.000")
             else:
-                base = sum(
-                    Decimal(str(v)) for v in [
-                        self.cooling_kwh, self.ventilation_kwh,
-                        self.lighting_kwh, self.hot_water_kwh,
-                    ] if v is not None
+                self.lift_escalator_kwh = lift_estimate_kwh(
+                    self.cooling_kwh, self.ventilation_kwh,
+                    self.lighting_kwh, self.hot_water_kwh,
                 )
-                self.lift_escalator_kwh = (base * Decimal("0.075")).quantize(Decimal("0.001"))
             self.is_manual_lift_escalator = False
         elif not self.is_manual_lift_escalator:
             self.lift_escalator_kwh = None
@@ -245,16 +309,111 @@ class EnergySummary(models.Model):
         nums = [Decimal(str(v)) for v in vals if v is not None]
         return sum(nums) if nums else Decimal("0")
 
+    @property
+    def lift_energy_is_estimated(self):
+        """True when the lift figure is BEAT's 7.5%, not a figure from a meter.
+
+        It is an estimate only when there are lift records, none of them gives
+        an energy figure, and nothing was typed into the summary by hand.
+        """
+        if self.is_manual_lift_escalator:
+            return False
+        qs = LiftEscalatorSystem.objects.filter(building=self.building)
+        if not qs.exists():
+            return False
+        return not any(
+            v is not None for v in
+            qs.values_list("annual_energy_consumption_kwh", flat=True)
+        )
+
+    @property
+    def plug_load_base(self):
+        """The systems a plug-load percentage is taken of.
+
+        Always the four measured systems; lift joins them only when its figure
+        is real. When no lift energy was entered, the lift number is itself
+        7.5% of these same four systems, so counting it would take a
+        percentage of a percentage and inflate plug load off the back of an
+        estimate rather than a measurement.
+
+        A metered or hand-entered lift figure is a measurement like any other
+        and belongs in the base. The energy-mismatch check is unaffected and
+        still uses systems_sum, where counting every system is correct.
+        """
+        vals = [self.cooling_kwh, self.ventilation_kwh,
+                self.lighting_kwh, self.hot_water_kwh]
+        if not self.lift_energy_is_estimated:
+            vals.append(self.lift_escalator_kwh)
+        nums = [Decimal(str(v)) for v in vals if v is not None]
+        return sum(nums) if nums else Decimal("0")
+
+    @property
+    def plug_load_effective(self):
+        """The plug-load figure actually used, whatever its basis.
+
+        total_kwh already resolves this - entered figure first, else the
+        estimate - and the row must show the same number the total adds, or
+        the panel does not add up on screen.
+        """
+        if self.has_plug_load is False:
+            return Decimal("0")
+        if self.plug_load_kwh is not None:
+            return Decimal(str(self.plug_load_kwh))
+        return self.suggested_plug_load()
+
+    @property
+    def plug_load_basis(self):
+        """Which of the three answers the plug-load figure rests on.
+
+        Exactly one, so the row can never show a percentage beside a figure
+        that contradicts it. "none" means the building was said to have no
+        plug load; "metered" and "percent" are the two ways of saying how
+        much; "estimated" is BEAT's typical share while the question is
+        unanswered.
+        """
+        if self.has_plug_load is False:
+            return "none"
+        if self.plug_load_kwh is not None:
+            return "metered"
+        if self.plug_load_percent is not None:
+            return "percent"
+        if self.total_override_kwh is not None:
+            return "difference"
+        return "estimated"
+
+    @property
+    def plug_load_default_percent(self):
+        """The typical share for this building type, shown when none is set."""
+        building = self.building
+        type_name = (
+            building.category.category.name
+            if building and building.category and building.category.category
+            else ""
+        )
+        return plug_load_factor_for(type_name) * Decimal("100")
+
     def suggested_plug_load(self):
         """Estimate plug load when the user hasn't entered one.
 
-        - If a metered bill total is present: plug = bill − Σ(systems) (difference).
-        - Else, if systems are present: plug = Σ(systems) × building-type factor.
+        - If a metered bill total is present: plug = bill − Σ(all systems).
+        - Else, if a percentage was entered: plug = base × that percentage.
+        - Else, if systems are present: plug = base × building-type factor.
         - Else (no bill, no systems): None (nothing to base an estimate on).
+
+        The difference method uses every system, because it is reconciling
+        against a bill that covers them all. The percentage methods use
+        plug_load_base.
         """
-        systems = self.systems_sum
-        if self.total_override_kwh is not None and systems > 0:
-            return max(Decimal("0"), Decimal(str(self.total_override_kwh)) - systems)
+        # An explicit "no" is an answer, not a blank.
+        if self.has_plug_load is False:
+            return Decimal("0")
+        if self.total_override_kwh is not None and self.systems_sum > 0:
+            return max(Decimal("0"),
+                       Decimal(str(self.total_override_kwh)) - self.systems_sum)
+        systems = self.plug_load_base
+        if systems > 0 and self.plug_load_percent is not None:
+            return (systems * Decimal(str(self.plug_load_percent))
+                    / Decimal("100")).quantize(Decimal("0.001"))
         if systems > 0:
             building = self.building
             type_name = (

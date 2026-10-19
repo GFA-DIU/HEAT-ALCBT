@@ -1,0 +1,357 @@
+# Layer 2 benchmarks: what each country actually publishes
+
+Layer 2 of the Savings tab asks what replacing a building's equipment with
+efficient units would save. That needs a target to replace *towards*, and a
+target is only worth having if someone published it.
+
+This file records what was found when the sources were read, including where
+nothing exists. A gap recorded is a gap someone can close; a gap filled by
+guesswork is a wrong number nobody catches.
+
+Companion to `docs/Operational_Carbon_Savings_Methodology_and_Logic_v1.1.docx`,
+which specified Layer 2 and deferred it from v1.
+
+---
+
+## Why the workbook alone was not enough
+
+`Operational_Carbon_Benchmark_restructured.xlsx` is the source for Layer 1 and
+was the starting point here. Reading the underlying codes found two errors in
+it, both of which would have produced confident wrong savings.
+
+**India's lighting densities were shifted one row.** The base column was
+right; ECBC+ and Super had slipped one row down ECSBC Table 7.2/7.3. Shopping
+Mall carried Hospital's figures, Hospital carried Hotel's, Hotel carried
+Shopping Mall's. The tell is Hotel: ECBC+ 11.3 against a base of 9.5, a tier
+that tightens being laxer than the one it tightens. Corrected 19.10.2026.
+
+**The split-unit row gives LEED 1.36 kW/RT**, against national baselines of
+0.80 to 0.85 - "best practice" 60% worse than average, which is COP 2.59
+against COP 4.14. Vietnam's own split baseline of 1.35 sits one cell away and
+is 60% worse than every neighbour. Both look like copy errors. Neither is
+corrected, because unlike the lighting case there is no source here that says
+what they should be. `_best_practice_is_credible` refuses them instead.
+
+---
+
+## India - commercial
+
+**Energy Conservation and Sustainable Building Code 2024 (ECSBC 2024)**,
+`ESCBC_Commercial.pdf`. Note this supersedes the ECBC 2017 the workbook was
+built from. Three tiers: ECSBC, ECSBC Plus, Super ECSBC.
+
+| Quantity | Where | Form |
+|---|---|---|
+| Interior lighting power | Tables 7.1-7.3, pp. 77-78 | absolute W/m2, three tiers, by building type |
+| Lifts | Table 8.11, p. 90 | energy class A-G via IS 17515 Part 2 |
+| Escalators | Table 8.11, p. 90 | energy performance ratio, classes A+++ to E, via IS 17515 Part 3 |
+| Cooling equipment | Tables 6.1, 6.2, 6.12, pp. 72-83 | **values do not extract** - see below |
+| AHU fans | Tables 6.9-6.11, p. 83 | mechanical efficiency % + motor class, by tier |
+
+### The chiller table will not come out of the PDF
+
+Table 6.12 (Minimum Efficiency Requirements for Chillers for ECSBC, ECSBC+
+and Super ECSBC) exists and is referenced in the text, but its values are not
+in the PDF's text layer - pypdf returns the table captions and numbering
+(6.13, 6.14 ...) and none of the figures. The same is true of Tables 6.1
+(unitary AC) and 6.2 (VRF).
+
+They need reading by eye, or a tool that can reach the table graphics. Until
+then India's cooling benchmarks stay on the workbook, marked unverified.
+Chillers are additionally required to be rated at full and part load per
+IS 16590.
+
+### AHU fans: a real figure, but not the one BEAT stores
+
+ECSBC does publish fan requirements by tier:
+
+| Tier | Mechanical efficiency | Motor |
+|---|---|---|
+| ECSBC | 65% | IE 3 |
+| ECSBC Plus | 70% | IE 4 |
+| Super ECSBC | 75% | IE 4 |
+
+**This is not specific fan power.** BEAT stores W/CMH; converting mechanical
+efficiency into W/CMH needs the fan's pressure rise, which BEAT does not
+collect:
+
+```
+SFP (W/CMH)  =  pressure rise (Pa)  /  (efficiency x 3600)
+```
+
+Assuming a pressure rise to make the two comparable would manufacture exactly
+the kind of number this review exists to catch, so ventilation stays on the
+workbook's W/CMH, marked unverified. Collecting fan static pressure would make
+the code figure usable.
+
+### Lifts are the interesting one
+
+BEAT has no lift benchmark and this is why that is fixable. ECSBC classifies a
+lift by its daily energy against the **ISO 25745-2** formula, adopted in India
+as IS 17515 Part 2:
+
+```
+Ed  <=  k x Q x nd x Sav / 1000  +  c x tnr        (Wh per day)
+
+  Q    rated load, kg
+  nd   starts (trips) per day
+  Sav  average travel distance, m
+  tnr  non-running time, hours
+```
+
+| Class | k | c | ECSBC tier |
+|---|---|---|---|
+| A | 0.72 | 50 | Super ECSBC |
+| B | 1.08 | 100 | ECSBC Plus |
+| C | 1.62 | 200 | ECSBC |
+| D | 2.43 | 400 | |
+| E | 3.65 | 800 | |
+| F | 5.47 | 1600 | |
+| G | 5.47 | 1600 | extracts identically to F; suspected PDF artefact, verify against IS 17515 |
+
+**BEAT collects none of Q, nd, Sav or tnr.** The lift form has a count and two
+checkboxes. Using this method is a four-field form change, not a table entry,
+and that is why the current estimate is still 7.5% of the other systems.
+
+---
+
+## India - residential
+
+**Eco-Niwas Samhita 2024 (ENS 2024)**, `ENS_Residential.pdf`.
+
+The important finding is a negative one, and it vindicates the blank in the
+workbook rather than contradicting it.
+
+**ENS regulates lighting only in common areas.** Table 10 gives corridor
+3.0 W/m2 and basement/stilt parking 1.0 W/m2; Table 11 covers outdoor zones.
+There is no published Indian lighting power density for the inside of a
+dwelling. So `LPD_BENCHMARKS["Residential"]["India"]` stays `None`, and the
+common-area figures are held separately as `ENS_COMMON_AREA_LPD` precisely so
+nobody mistakes a corridor limit for a living-room target.
+
+ENS offers an alternative compliance route throughout: lamps of at least
+95 lm/W instead of meeting the density. A building over the density is
+therefore not automatically non-compliant.
+
+**Residential cooling is a star level, not a number.** Section 5.2.3 B:
+unitary 5 star, split 3 star, chiller 3 star, VRF 3.28 EER or 4.36 IEER. Only
+the VRF line is absolute; the rest defer to the BEE Standards and Labelling
+Program, whose ISEER thresholds per star are published separately and are not
+in this document. A residential split cannot be benchmarked from ENS alone.
+
+Converting the one absolute figure for comparison: 3.28 EER is 1.072 kW/RT,
+which is **laxer** than the 0.86 the workbook carries as India's VRV national
+baseline. A code minimum should not be stricter than typical stock. One of the
+two is wrong and it is worth resolving before either becomes a target.
+
+**Lifts in ENS are prescriptive only** - IE3 motors, lamps at 95 lm/W,
+auto switch-off - with no energy classification. The ECSBC method above does
+not carry over to residential.
+
+---
+
+## Other countries
+
+**Not yet verified against any source.** Thailand, Vietnam, Indonesia and
+Cambodia currently rest on the workbook alone, which the India review has just
+shown can be wrong in ways that survive a plausibility check.
+
+The figures in use are in `system_efficiency_data.py`. Until each is traced to
+its national code they should be treated as provisional, and the UI says so.
+
+Known gaps regardless of source:
+
+- **window and packaged AC** - no row in any country. 20 units in production.
+- **Thailand VRV** - blank in the workbook.
+- **Indonesia hot water** - blank for heat pump, solar and boiler alike.
+- **ventilation** - one figure per country, with no variation by building
+  type, so a hospital AHU and an office AHU are judged identically.
+
+---
+
+## How provenance is recorded
+
+Every benchmark carries a citation and a status, returned by
+`benchmark_source()` and surfaced on the Savings tab:
+
+| Status | Meaning |
+|---|---|
+| `verified` | someone read the figure in its own national code and recorded the table |
+| `unverified` | it came from the workbook and has not been traced to a source |
+
+Today exactly one entry is verified: India lighting, against ECSBC 2024
+Tables 7.1-7.3. Everything else is unverified, which is the worklist.
+
+This exists because the India lighting error was invisible to inspection - the
+figures were real ECBC numbers attached to the wrong building types, and only
+opening the code found it. The difference between "ECSBC 2024 Table 7.3" and
+"a spreadsheet" is the difference between a target a user can check and one
+they have to trust.
+
+## Why there is no EUI benchmark for most of the region
+
+Searched 19.10.2026. The finding is structural rather than a gap in the
+search: **no ALCBT country publishes a whole-building EUI in its building
+code.** All five are prescriptive, setting envelope performance, lighting
+density and equipment minimums rather than a kWh/m2/yr target.
+
+| Code | Sets | Whole-building EUI |
+|---|---|---|
+| Vietnam QCVN 09:2017/BXD | envelope, LPD 11 W/m2 offices, COP/CSPF minimums | no |
+| Indonesia SNI 6389:2020 | envelope design criteria | no |
+| India ECSBC 2024 | LPD, equipment minimums, lift classes | no |
+| India ENS 2024 | RETV envelope, common-area LPD | no |
+| Thailand BEC | not located | - |
+
+A national-average EUI is a **measured statistic, not a code value**. India's
+rows in `NATIONAL_AVG_EUI` come from the BEE 1,160-building survey, which is a
+study. The equivalent surveys for the other four either do not exist or are
+not published per m2.
+
+What was found:
+
+* **Indonesia offices, 160 kWh/m2/yr** mean across 33 buildings, with under
+  115 treated as high performance and over 190 as inefficient.
+  **Not applied** - the workbook carries 250 for the same cell, 586 production
+  buildings are benchmarked against it, and the two may not cover the same end
+  uses. Recorded in `operational_benchmark_data.py` for a decision.
+* **Household surveys** for Bangkok (16.2 GJ), Hanoi (18.2), Ho Chi Minh City
+  (18.8) and Phnom Penh (13.2) are per household, not per m2. Converting them
+  needs a typical dwelling floor area, which would be an assumption driving
+  the entire result.
+* **Vietnam office LPD 11 W/m2** from QCVN 09 matches the workbook exactly.
+  That cell is now marked verified - the one thing a prescriptive code can
+  confirm.
+
+So residential EPI stays blank across the region, and that is a data gap for
+ALCBT to fill rather than one BEAT should paper over.
+
+## Indonesia EUI, replaced 19.10.2026
+
+The national studies exist; they were simply not in the workbook. Three of
+them, supplied by HEAT:
+
+| Study | Sample | Shape |
+|---|---|---|
+| BPPT 2018, government buildings | 267 across 4 cities | bands by floor area |
+| BPPT 2020, commercial sector | 110 across 7 cities | bands by type, star and hospital class |
+| C40 Cities 2023, Jakarta | 150 buildings | **averages** by category |
+
+The figures BEAT had were not merely imprecise. They sat **above the studies'
+own "wasteful" threshold** for four of five building types, so almost any
+Indonesian building scored well against its own national average. Residential
+was the mirror image at 60, little over half the measured 108, so homes looked
+bad.
+
+| Type | was | now | source |
+|---|---|---|---|
+| Office, >50% AC | 250 | **155** | BPPT 2020 large office, E/FE boundary |
+| Office, <50% AC | 250 | **158** | BPPT 2020 medium office, E/FE boundary |
+| Hotel, up to 3-star | 350 | **170** | BPPT 2020, mean of budget 145 and 3-star 194 |
+| Hotel, above 3-star | 350 | **196** | BPPT 2020, mean of 4-star 199 and 5-star 193 |
+| Shopping Mall | 450 | **383** | C40 2023 Jakarta mall average |
+| Hospital | 450 | **214** | BPPT 2020 Class B, E/FE boundary |
+| Residential | 60 | **108** | C40 2023 Jakarta residential average |
+
+Three choices in there are interpretations, not figures the sources state, and
+each is recorded in the code beside the value:
+
+1. **Where a band is used, the figure is the Efficient / Fairly-Efficient
+   boundary.** BPPT publishes classification bands, not averages. That
+   boundary is where the middle of the distribution sits. C40's measured
+   office average of 168 corroborates it - it falls between the large-office
+   155 and the wasteful threshold of 193.
+2. **One figure per type applies to every climate zone.** The studies are
+   national and Jakarta-weighted and do not resolve by climate. This is not a
+   detail: 252 of 430 Indonesian buildings sit in the composite zone, which
+   had no row at all, and only **15 of 430 found any benchmark** before. After,
+   **420 do**.
+3. **BEAT's conditioned-area office split maps onto BPPT's floor-area split**,
+   because BPPT states the reason for its own split - large offices use
+   centralised air conditioning, medium ones use split units.
+
+The 33-office study at 160 kWh/m2/yr that prompted this is consistent with the
+BPPT large-office band and is no longer the basis for anything on its own.
+
+## EUI by country, after the 19.10.2026 review
+
+### India - verified
+
+`EPI_2024_benchmark.pdf`, Bureau of Energy Efficiency, from the UNDP-GEF study
+of **1,160 commercial buildings** across every Indian climate zone. All 35
+commercial rows in `NATIONAL_AVG_EUI` match its tables exactly. The study's
+own disclaimer is worth repeating: the benchmarks are indicative and depend on
+operating hours, efficiency measures, sample size and climate.
+
+One bug found while checking. The BEE tables call one zone **Moderate**; every
+other row had been normalised to BEAT's **Temperate** and the Office >50% AC
+row was missed, so a temperate-zone Indian office with more than half its area
+conditioned found no benchmark at all. Renamed; the figure is unchanged.
+
+India **residential** (60 / 67 / 31 / 64) is **not** from this study, which is
+commercial only. It has no source here and ENS publishes no dwelling EUI
+either.
+
+### Indonesia - replaced, see the section above
+
+### Vietnam and Cambodia - borrowed rows removed
+
+**15 of Vietnam's 22 rows and 7 of Cambodia's 15 were India's figures copied
+verbatim.** A Vietnamese hotel was told its national average was 333
+kWh/m2/yr, which is India's warm-and-humid value. The `Moderate` key bug had
+propagated with them.
+
+Removed rather than relabelled. An Indian benchmark is not a proxy for
+Vietnam - different climate, construction, occupancy and grid - and a borrowed
+number is invisible because it looks exactly like data. What remains for each
+country is its own: Vietnam 7 rows, Cambodia 8.
+
+Candidates found but **not adopted**, read in summary only:
+
+| Country | Type | Published | Source |
+|---|---|---|---|
+| Vietnam | hotel | 151 national avg (32 hotels; Hanoi 184, Da Nang 71, HCMC 212) | Journal of Science and Technology in Civil Engineering |
+| Vietnam | hotel by star | 4-5 star 170, 3-star 111 | review across three data sources |
+| Vietnam | office | 109.6 (Hanoi 105.9, HCMC 116.4) | office building study |
+| Thailand | office | 225 typical, 170 good practice (41 Bangkok offices) | JARS, Establishing Energy Consumption Benchmarks of Office Buildings in Bangkok |
+| Thailand | hotel | 321.84 average | APST, factors affecting hotel electricity consumption |
+| Cambodia | retail | 205.5 - highest of those surveyed | first national benchmark, 250 buildings in Phnom Penh and Kandal |
+
+These are single studies of 32 to 250 buildings, not national surveys on the
+scale of India's 1,160 or Indonesia's three. They are recorded for a decision,
+not applied.
+
+### Thailand - suspect, unchanged
+
+Thailand's rows are not Indian copies, and they carry two decimal places,
+which suggests they were computed rather than surveyed. But **offices at 59.26
+kWh/m2/yr** is about a quarter of the 225 a Bangkok study calls typical, and
+**hotels at 179.67** against a measured Thai average of 321.84.
+
+A figure four times out is more likely measuring something else - electricity
+only, or per conditioned area rather than gross floor area - than simply
+wrong. Left alone until what it measures is known. Swapping one unexplained
+number for another is not an improvement.
+
+### What each country now covers
+
+| Country | rows | buildings with a benchmark | without |
+|---|---|---|---|
+| India | 35 | 560 | 69 |
+| Indonesia | 35 | 420 | 10 |
+| Thailand | 17 | 17 | 53 |
+| Cambodia | 8 | 19 | 385 |
+| Vietnam | 7 | 2 | 4 |
+
+Cambodia is the large gap, and it has no national building energy code either.
+
+## The rule that kept this honest
+
+From the workbook's own `0_README`, and worth repeating because the India
+review turned entirely on it:
+
+> Blank = no benchmark published; do not synthesise.
+
+A blank is a finding. The India residential row is blank because India has not
+published that number, and writing a plausible figure there would have buried
+the very thing a methodology review is for.

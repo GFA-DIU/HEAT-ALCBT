@@ -390,7 +390,30 @@ def get_building_total_kwh(request, building_uuid):
         input_unit='kwh'
     ).aggregate(total=Sum('quantity'))['total'] or 0
 
-    return JsonResponse({"success": True, "total_kwh": float(total)})
+    # The lift estimate is computed here, by the same function the summary
+    # uses, rather than left to the caller to multiply.
+    #
+    # The lift form used to take total_kwh and apply 7.5% itself. total_kwh is
+    # every operational product in kWh - the whole electricity entry, plug and
+    # equipment loads included - while the summary applies 7.5% to cooling,
+    # ventilation, lighting and hot water only. The same building showed
+    # 69,189.15 on the form and 57,657.6 in the summary.
+    from pages.models.building_operation.energy_summary import (
+        EnergySummary, lift_estimate_kwh,
+    )
+    summary = EnergySummary.objects.filter(building=building).first()
+    estimate = 0.0
+    if summary:
+        estimate = float(lift_estimate_kwh(
+            summary.cooling_kwh, summary.ventilation_kwh,
+            summary.lighting_kwh, summary.hot_water_kwh,
+        ))
+
+    return JsonResponse({
+        "success": True,
+        "total_kwh": float(total),
+        "lift_estimate_kwh": estimate,
+    })
 
 
 def handle_save_construction_products(request):

@@ -83,6 +83,15 @@ heroku run python manage.py showmigrations pages --app <your-app>   # 0045–004
 Each is idempotent (safe to re-run). Run on the prod dyno:
 
 ```
+# A — lighting space types. REQUIRED, and missed on 12 Oct 2026.
+#     The migration creates pages_lightingspacetype; only this command fills
+#     it. Without it the "Room type" dropdown on the lighting form is empty
+#     and no lighting system can be saved at all, because the field is
+#     required. Production ran with 0 rows from 12 to 19 October.
+#     Takes --dry-run. Expect "62 created" on an empty table, "0 created,
+#     62 updated" thereafter.
+heroku run python manage.py load_lighting_space_types --app <your-app>
+
 # C — TGO Thailand (selective replace; protects in-use EPDs)
 heroku run python manage.py load_thailand_epds --app <your-app>
 
