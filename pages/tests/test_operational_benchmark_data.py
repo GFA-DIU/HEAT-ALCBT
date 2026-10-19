@@ -114,16 +114,18 @@ def test_missing_cond_area_defaults_to_above_50(make_country, make_building):
 
 @pytest.mark.django_db
 def test_non_india_uses_leed_best_practice(make_country, make_building):
-    vietnam = make_country("Vietnam", "VN")
-    # Vietnam Office <50% AC Composite national avg = 86; LEED Office = 136.
-    # Guard: 136 >= 86 -> best practice hidden.
+    """Rewritten 19.10.2026. This used Vietnam Office Composite = 86, which was
+    India's figure copied into Vietnam and has been removed. Thailand exercises
+    the same guard: its office figure of 59.26 is below LEED's 136, so best
+    practice is hidden."""
+    thailand = make_country("Thailand", "TH")
     building = make_building(
-        country=vietnam, climate="composite",
+        country=thailand, climate="composite",
         category_name="Office", subcategory_name="Grade A",
         total_floor_area=Decimal("1000"), cond_floor_area=Decimal("100"),
     )
     entry = get_operational_benchmark_for_building(building)
-    assert entry["national_average_eui"] == 86.0
+    assert entry["national_average_eui"] == 59.26
     assert entry["best_practice_eui"] is None  # LEED >= national -> guard hides it
 
 
@@ -308,3 +310,50 @@ def test_the_two_office_figures_follow_the_sources_own_reasoning():
     large = NATIONAL_AVG_EUI[("Indonesia", "Office", ">50% AC", "Composite")]
     medium = NATIONAL_AVG_EUI[("Indonesia", "Office", "<50% AC", "Composite")]
     assert large == 155 and medium == 158
+
+
+def test_no_country_borrows_indias_benchmarks():
+    """15 of Vietnam's 22 rows and 7 of Cambodia's 15 were India's BEE figures
+    copied verbatim, so a Vietnamese hotel was told its national average was
+    333 kWh/m2/yr - India's warm-and-humid figure from a survey of 1,160
+    Indian buildings. Published Vietnamese research puts hotels at 151.
+
+    A borrowed number is invisible: it looks exactly like data.
+    """
+    from pages.views.building.operational_benchmark_data import NATIONAL_AVG_EUI as N
+    india = {(k[1], k[2], k[3]): v for k, v in N.items() if k[0] == "India"}
+    for key, value in N.items():
+        if key[0] in ("India", "Indonesia"):
+            continue
+        shape = (key[1], key[2], key[3])
+        assert india.get(shape) != value, (
+            f"{key[0]} {key[1]} {key[3]} = {value} is India's figure")
+
+
+def test_india_matches_the_bee_benchmark_pdf():
+    """EPI_2024_benchmark.pdf, Bureau of Energy Efficiency, from the UNDP-GEF
+    study of 1,160 commercial buildings. Checked against the tables
+    19.10.2026."""
+    from pages.views.building.operational_benchmark_data import NATIONAL_AVG_EUI as N
+    expected = {
+        ("Office", "<50% AC", "Warm & Humid"): 101,
+        ("Office", ">50% AC", "Warm & Humid"): 182,
+        ("Office", "<50% AC", "Composite"): 86,
+        ("Hospital", None, "Warm & Humid"): 275,
+        ("Hotel", "Up to 3-star", "Warm & Humid"): 215,
+        ("Hotel", "Above 3-star", "Warm & Humid"): 333,
+        ("Shopping Mall", None, "Warm & Humid"): 428,
+        ("Institute", None, "Warm & Humid"): 150,
+        ("BPO", None, "Warm & Humid"): 452,
+    }
+    for (btype, sub, climate), value in expected.items():
+        assert N[("India", btype, sub, climate)] == value, (btype, climate)
+
+
+def test_a_temperate_indian_office_finds_its_benchmark():
+    """The BEE tables call that zone "Moderate" and every other row here was
+    normalised to BEAT's "Temperate". This one was missed, so a temperate-zone
+    Indian office with more than half its area conditioned found nothing."""
+    from pages.views.building.operational_benchmark_data import NATIONAL_AVG_EUI as N
+    assert ("India", "Office", ">50% AC", "Temperate") in N
+    assert ("India", "Office", ">50% AC", "Moderate") not in N

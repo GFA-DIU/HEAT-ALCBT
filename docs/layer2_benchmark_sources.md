@@ -273,6 +273,78 @@ each is recorded in the code beside the value:
 The 33-office study at 160 kWh/m2/yr that prompted this is consistent with the
 BPPT large-office band and is no longer the basis for anything on its own.
 
+## EUI by country, after the 19.10.2026 review
+
+### India - verified
+
+`EPI_2024_benchmark.pdf`, Bureau of Energy Efficiency, from the UNDP-GEF study
+of **1,160 commercial buildings** across every Indian climate zone. All 35
+commercial rows in `NATIONAL_AVG_EUI` match its tables exactly. The study's
+own disclaimer is worth repeating: the benchmarks are indicative and depend on
+operating hours, efficiency measures, sample size and climate.
+
+One bug found while checking. The BEE tables call one zone **Moderate**; every
+other row had been normalised to BEAT's **Temperate** and the Office >50% AC
+row was missed, so a temperate-zone Indian office with more than half its area
+conditioned found no benchmark at all. Renamed; the figure is unchanged.
+
+India **residential** (60 / 67 / 31 / 64) is **not** from this study, which is
+commercial only. It has no source here and ENS publishes no dwelling EUI
+either.
+
+### Indonesia - replaced, see the section above
+
+### Vietnam and Cambodia - borrowed rows removed
+
+**15 of Vietnam's 22 rows and 7 of Cambodia's 15 were India's figures copied
+verbatim.** A Vietnamese hotel was told its national average was 333
+kWh/m2/yr, which is India's warm-and-humid value. The `Moderate` key bug had
+propagated with them.
+
+Removed rather than relabelled. An Indian benchmark is not a proxy for
+Vietnam - different climate, construction, occupancy and grid - and a borrowed
+number is invisible because it looks exactly like data. What remains for each
+country is its own: Vietnam 7 rows, Cambodia 8.
+
+Candidates found but **not adopted**, read in summary only:
+
+| Country | Type | Published | Source |
+|---|---|---|---|
+| Vietnam | hotel | 151 national avg (32 hotels; Hanoi 184, Da Nang 71, HCMC 212) | Journal of Science and Technology in Civil Engineering |
+| Vietnam | hotel by star | 4-5 star 170, 3-star 111 | review across three data sources |
+| Vietnam | office | 109.6 (Hanoi 105.9, HCMC 116.4) | office building study |
+| Thailand | office | 225 typical, 170 good practice (41 Bangkok offices) | JARS, Establishing Energy Consumption Benchmarks of Office Buildings in Bangkok |
+| Thailand | hotel | 321.84 average | APST, factors affecting hotel electricity consumption |
+| Cambodia | retail | 205.5 - highest of those surveyed | first national benchmark, 250 buildings in Phnom Penh and Kandal |
+
+These are single studies of 32 to 250 buildings, not national surveys on the
+scale of India's 1,160 or Indonesia's three. They are recorded for a decision,
+not applied.
+
+### Thailand - suspect, unchanged
+
+Thailand's rows are not Indian copies, and they carry two decimal places,
+which suggests they were computed rather than surveyed. But **offices at 59.26
+kWh/m2/yr** is about a quarter of the 225 a Bangkok study calls typical, and
+**hotels at 179.67** against a measured Thai average of 321.84.
+
+A figure four times out is more likely measuring something else - electricity
+only, or per conditioned area rather than gross floor area - than simply
+wrong. Left alone until what it measures is known. Swapping one unexplained
+number for another is not an improvement.
+
+### What each country now covers
+
+| Country | rows | buildings with a benchmark | without |
+|---|---|---|---|
+| India | 35 | 560 | 69 |
+| Indonesia | 35 | 420 | 10 |
+| Thailand | 17 | 17 | 53 |
+| Cambodia | 8 | 19 | 385 |
+| Vietnam | 7 | 2 | 4 |
+
+Cambodia is the large gap, and it has no national building energy code either.
+
 ## The rule that kept this honest
 
 From the workbook's own `0_README`, and worth repeating because the India

@@ -164,6 +164,35 @@ INDONESIA_OFFICE_EUI_MEASURED_2025 = 160.0
 INDONESIA_OFFICE_EUI_IN_USE = 250.0
 
 NATIONAL_AVG_EUI = {
+    # --- Thailand: these figures are suspect, and unchanged -----------------
+    #
+    # Thailand's rows are not Indian copies - they are distinct, and carry two
+    # decimal places, which suggests they were computed rather than surveyed.
+    # But offices at 59.26 kWh/m2/yr is about a quarter of the 225 a study of
+    # 41 Bangkok offices calls typical, and hotels at 179.67 against a
+    # measured Thai average of 321.84.
+    #
+    # A figure four times out is more likely measuring something else -
+    # electricity only, or per conditioned area rather than per gross floor
+    # area - than simply wrong. Left alone until what it measures is known,
+    # because swapping one unexplained number for another is not an
+    # improvement. Recorded in docs/layer2_benchmark_sources.md.
+
+    # --- Vietnam and Cambodia: India's rows were removed 19.10.2026 ---------
+    #
+    # 15 of Vietnam's 22 rows and 7 of Cambodia's 15 were India's BEE figures
+    # copied verbatim, so a Vietnamese hotel was told its national average was
+    # 333 kWh/m2/yr - India's warm-and-humid figure from a survey of 1,160
+    # Indian buildings. Published Vietnamese research puts hotels at 151.
+    #
+    # Deleted rather than relabelled. An Indian benchmark is not a proxy for
+    # Vietnam: different climate, construction, occupancy and grid. A gap is a
+    # true statement about what has been published; a borrowed number is not,
+    # and it is invisible precisely because it looks like data.
+    #
+    # What remains for each country is its own. Candidates for filling the
+    # gaps, read in summary only and not yet adopted, are recorded in
+    # docs/layer2_benchmark_sources.md.
     # --- Indonesia ---------------------------------------------------------
     #
     # Replaced 19.10.2026 from the national studies. The previous figures -
@@ -239,61 +268,47 @@ NATIONAL_AVG_EUI = {
     ("Indonesia", "Residential", None, "Hot & Dry"): 108,
     # ---- Office <50% AC ----
     ("India", "Office", "<50% AC", "Warm & Humid"): 101,
-    ("Vietnam", "Office", "<50% AC", "Warm & Humid"): 101,
     ("Thailand", "Office", "<50% AC", "Warm & Humid"): 59.26,
     ("India", "Office", "<50% AC", "Composite"): 86,
-    ("Vietnam", "Office", "<50% AC", "Composite"): 86,
-    ("Cambodia", "Office", "<50% AC", "Composite"): 86,
     ("Thailand", "Office", "<50% AC", "Composite"): 59.26,
     ("India", "Office", "<50% AC", "Hot & Dry"): 90,
-    ("Vietnam", "Office", "<50% AC", "Hot & Dry"): 90,
     ("India", "Office", "<50% AC", "Temperate"): 94,
-    ("Vietnam", "Office", "<50% AC", "Temperate"): 94,
     ("Vietnam", "Office", "<50% AC", "Tropical Wet"): 150,
     ("Cambodia", "Office", "<50% AC", "Tropical Wet"): 250,
     ("Thailand", "Office", "<50% AC", "Tropical Wet"): 59.26,
     # ---- Office >50% AC ----
     ("India", "Office", ">50% AC", "Warm & Humid"): 182,
-    ("Vietnam", "Office", ">50% AC", "Warm & Humid"): 182,
     ("Thailand", "Office", ">50% AC", "Warm & Humid"): 59.26,
     ("India", "Office", ">50% AC", "Composite"): 179,
-    ("Vietnam", "Office", ">50% AC", "Composite"): 179,
-    ("Cambodia", "Office", ">50% AC", "Composite"): 179,
     ("Thailand", "Office", ">50% AC", "Composite"): 59.26,
     ("India", "Office", ">50% AC", "Hot & Dry"): 173,
-    ("Vietnam", "Office", ">50% AC", "Hot & Dry"): 173,
-    ("India", "Office", ">50% AC", "Moderate"): 179,
+    # The BEE tables call this zone "Moderate"; every other row here was
+    # normalised to BEAT's own "Temperate" and this one was missed, so a
+    # temperate-zone Indian office with more than 50% conditioned area found
+    # no benchmark at all. The figure is unchanged.
+    ("India", "Office", ">50% AC", "Temperate"): 179,
     ("Vietnam", "Office", ">50% AC", "Moderate"): 179,
     ("Vietnam", "Office", ">50% AC", "Tropical Wet"): 150,
     ("Cambodia", "Office", ">50% AC", "Tropical Wet"): 250,
     ("Thailand", "Office", ">50% AC", "Tropical Wet"): 59.26,
     # ---- Hotel Up to 3-star ----
     ("India", "Hotel", "Up to 3-star", "Warm & Humid"): 215,
-    ("Vietnam", "Hotel", "Up to 3-star", "Warm & Humid"): 215,
     ("Thailand", "Hotel", "Up to 3-star", "Warm & Humid"): 179.67,
     ("India", "Hotel", "Up to 3-star", "Composite"): 201,
-    ("Vietnam", "Hotel", "Up to 3-star", "Composite"): 201,
-    ("Cambodia", "Hotel", "Up to 3-star", "Composite"): 201,
     ("Thailand", "Hotel", "Up to 3-star", "Composite"): 179.67,
     ("India", "Hotel", "Up to 3-star", "Hot & Dry"): 167,
-    ("Vietnam", "Hotel", "Up to 3-star", "Hot & Dry"): 167,
     ("India", "Hotel", "Up to 3-star", "Temperate"): 107,
-    ("Vietnam", "Hotel", "Up to 3-star", "Temperate"): 107,
     ("Vietnam", "Hotel", "Up to 3-star", "Tropical Wet"): 250,
     ("Cambodia", "Hotel", "Up to 3-star", "Tropical Wet"): 350,
     ("Thailand", "Hotel", "Up to 3-star", "Tropical Wet"): 179.67,
     # ---- Hotel Above 3-star ----
     ("India", "Hotel", "Above 3-star", "Warm & Humid"): 333,
-    ("Vietnam", "Hotel", "Above 3-star", "Warm & Humid"): 333,
     ("Cambodia", "Hotel", "Above 3-star", "Warm & Humid"): 290,
     ("Thailand", "Hotel", "Above 3-star", "Warm & Humid"): 179.67,
     ("India", "Hotel", "Above 3-star", "Composite"): 290,
-    ("Vietnam", "Hotel", "Above 3-star", "Composite"): 290,
     ("Thailand", "Hotel", "Above 3-star", "Composite"): 179.67,
     ("India", "Hotel", "Above 3-star", "Hot & Dry"): 250,
-    ("Vietnam", "Hotel", "Above 3-star", "Hot & Dry"): 250,
     ("India", "Hotel", "Above 3-star", "Temperate"): 313,
-    ("Vietnam", "Hotel", "Above 3-star", "Temperate"): 313,
     ("Vietnam", "Hotel", "Above 3-star", "Tropical Wet"): 250,
     ("Cambodia", "Hotel", "Above 3-star", "Tropical Wet"): 350,
     ("Thailand", "Hotel", "Above 3-star", "Tropical Wet"): 179.67,
@@ -301,7 +316,6 @@ NATIONAL_AVG_EUI = {
     ("India", "Shopping Mall", None, "Warm & Humid"): 428,
     ("Thailand", "Shopping Mall", None, "Warm & Humid"): 150.81,
     ("India", "Shopping Mall", None, "Composite"): 327,
-    ("Cambodia", "Shopping Mall", None, "Composite"): 327,
     ("Thailand", "Shopping Mall", None, "Composite"): 150.81,
     ("India", "Shopping Mall", None, "Hot & Dry"): 273,
     ("India", "Shopping Mall", None, "Temperate"): 257,
@@ -321,18 +335,15 @@ NATIONAL_AVG_EUI = {
     # ---- Institute ----
     ("India", "Institute", None, "Warm & Humid"): 150,
     ("India", "Institute", None, "Composite"): 117,
-    ("Cambodia", "Institute", None, "Composite"): 117,
     ("India", "Institute", None, "Hot & Dry"): 106,
     ("India", "Institute", None, "Temperate"): 129,
     # ---- BPO (India only) ----
     ("India", "BPO", None, "Warm & Humid"): 452,
     ("India", "BPO", None, "Composite"): 437,
-    ("Cambodia", "BPO", None, "Composite"): 437,
     ("India", "BPO", None, "Temperate"): 433,
     # ---- Residential ----
     ("India", "Residential", None, "Warm & Humid"): 64,
     ("India", "Residential", None, "Composite"): 60,
-    ("Cambodia", "Residential", None, "Composite"): 60,
     ("India", "Residential", None, "Hot & Dry"): 67,
     ("India", "Residential", None, "Temperate"): 31,
 }

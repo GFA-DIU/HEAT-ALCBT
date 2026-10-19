@@ -101,7 +101,25 @@
           </p>
           {% endwith %}
         {% else %}
-          <p class="text-sm text-[var(--text--sub-600)]">{% translate "Operational benchmark not available for this building type, climate or country yet." %}</p>
+          {% comment %}
+          Say why, not just that. "Not available" reads as a BEAT limitation;
+          the truth is usually that no national survey has been published for
+          that building type in that country, which is a gap ALCBT could fill
+          and a user can act on.
+
+          This replaced borrowed figures: 15 of Vietnam's rows and 7 of
+          Cambodia's were India's BEE numbers copied verbatim, so a Vietnamese
+          hotel was shown an Indian benchmark as its own national average. A
+          stated gap is honest where a borrowed number is invisible.
+          {% endcomment %}
+          <p class="text-sm text-[var(--text--sub-600)]">
+            {% blocktranslate trimmed with c=building.country %}
+              No national energy benchmark has been published for this building type and climate in {{ c }}.
+            {% endblocktranslate %}
+          </p>
+          <p class="text-xs text-[var(--text--soft-400)] mt-1">
+            {% translate "BEAT shows a benchmark only where a national survey exists. India and Indonesia have one; the others are gaps rather than omissions." %}
+          </p>
         {% endif %}
       </div>
 
