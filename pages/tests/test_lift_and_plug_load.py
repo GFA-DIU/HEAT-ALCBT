@@ -237,8 +237,11 @@ def test_the_row_has_no_inline_input_any_more():
                     encoding="utf-8")
     assert 'id="plug-load-percent"' not in html
     assert 'savePlugLoadPercent' not in html
-    # the basis is a quiet line instead, and grouped so 242249 reads 242,249
-    assert 'floatformat:"0g"' in html
+    # and no explanatory line either: the row carries the label and the figure,
+    # nothing else, like the five rows above it
+    assert 'system energy' not in html.split('summary-row-plug-load')[1][:1200]
+    # the figure is grouped, so 48449.856 reads 48,449.856
+    assert 'floatformat:"-3g"' in html
 
 
 def test_the_modal_asks_the_question_before_the_value():
@@ -249,3 +252,30 @@ def test_the_modal_asks_the_question_before_the_value():
     assert 'id="plug-load-gate"' in html
     assert 'name="has_plug_load"' in html
     assert 'name="plug_basis"' in html
+
+
+def test_the_gate_offers_yes_and_no_only():
+    """Two answers, not three. "Not known" was the only way into the typical
+    share, and it made the question harder than it is."""
+    from pathlib import Path
+    html = Path("templates/pages/add-building/components/"
+                "operational-details/energy-consumption-summary.html").read_text(
+                    encoding="utf-8")
+    gate = html[html.index('id="plug-load-gate"'):]
+    gate = gate[:gate.index("</fieldset>")]
+    assert gate.count('name="has_plug_load"') == 2
+    assert 'value="yes"' in gate and 'value="no"' in gate
+    assert 'value="unknown"' not in gate
+
+
+def test_the_javascript_renders_the_same_figure_the_server_does():
+    """updateRow read plug_load_kwh like the other five rows. A building that
+    answered "no" stores null and means zero, so saving "No" repainted the row
+    as the orange NO DATA warning while the server had recorded the answer."""
+    from pathlib import Path
+    html = Path("templates/pages/add-building/components/"
+                "operational-details/energy-consumption-summary.html").read_text(
+                    encoding="utf-8")
+    assert "kwh = summary.plug_load_effective;" in html
+    src = Path("pages/views/building/energy_summary.py").read_text(encoding="utf-8")
+    assert '"plug_load_effective"' in src

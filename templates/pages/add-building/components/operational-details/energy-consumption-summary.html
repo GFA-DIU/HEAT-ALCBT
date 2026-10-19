@@ -151,34 +151,7 @@
         <span data-icon="flashlight-line" data-size="20" data-color="var(--icon--strong-950)"></span>
         <div class="flex flex-col">
           <span class="text-sm font-normal">{% translate "Plug & equipment loads" %}</span>
-          {% comment %}
-          The basis, as one quiet line under the label - not an input box.
-          The row now matches the five above it: label left, value right,
-          pencil to edit. The inline control made this the only row with a
-          form field in it, and it could show "20% of 242,249" beside
-          "0 kWh/yr" because a percentage and a kWh override could both be
-          set. Editing happens in the same modal the other rows use.
-          {% endcomment %}
-          {% with basis=summary.plug_load_basis %}
-          <span class="text-xs text-[var(--text--sub-600)]">
-            {% if basis == "none" %}
-              {% translate "This building has no plug or equipment loads." %}
-            {% elif basis == "metered" %}
-              {% translate "Entered figure." %}
-            {% elif basis == "percent" %}
-              {% blocktranslate trimmed with pct=summary.plug_load_percent|floatformat:-2 base=summary.plug_load_base|floatformat:"0g" %}
-                {{ pct }}% of {{ base }} kWh system energy
-              {% endblocktranslate %}
-            {% elif basis == "difference" %}
-              {% translate "Metered bill less the modelled systems." %}
-            {% elif summary.plug_load_base %}
-              {% blocktranslate trimmed with pct=summary.plug_load_default_percent|floatformat:-2 base=summary.plug_load_base|floatformat:"0g" %}
-                Estimated at {{ pct }}% of {{ base }} kWh system energy
-              {% endblocktranslate %}
-            {% endif %}
-          </span>
-          {% endwith %}
-        </div>
+          </div>
       </div>
       <div class="flex items-center gap-2" data-summary-right>
         {% comment %}
@@ -264,11 +237,6 @@
           {% translate "Does this building have plug & equipment loads?" %}
         </legend>
         <div class="flex flex-col gap-1.5">
-          <label class="flex items-center gap-2 text-sm">
-            <input type="radio" name="has_plug_load" value="unknown" class="radio radio-sm"
-                   onchange="updatePlugLoadMode()" />
-            <span>{% translate "Not known - use the typical share for this building type" %}</span>
-          </label>
           <label class="flex items-center gap-2 text-sm">
             <input type="radio" name="has_plug_load" value="yes" class="radio radio-sm"
                    onchange="updatePlugLoadMode()" />
@@ -457,6 +425,17 @@
 
     var kwh = summary[KWH_KEY[category]];
     var isManual = summary[IS_MANUAL_KEY[category]];
+
+    // Plug load has no equipment table, so its figure does not live in
+    // plug_load_kwh alone: a building that answered "no" stores null and
+    // means zero, and a percentage stores null and means a share of system
+    // energy. Reading plug_load_kwh like the other five rows rendered both as
+    // the orange NO DATA warning, so saving "No" appeared to lose the answer
+    // while the server had recorded it correctly.
+    if (category === 'plug_load') {
+      kwh = summary.plug_load_effective;
+      isManual = true;                       // always editable, never auto-derived
+    }
 
     if (kwh === null || kwh === undefined) {
       right.innerHTML =

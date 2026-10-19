@@ -44,6 +44,10 @@ def _serialize(summary):
         "plug_load_base": _dec(summary.plug_load_base),
         "plug_load_default_percent": _dec(summary.plug_load_default_percent),
         "plug_load_basis": summary.plug_load_basis,
+        # What the row actually shows, resolved the same way total_kwh does.
+        # Without it the JS fell back to plug_load_kwh and contradicted the
+        # server's own rendering of the same record.
+        "plug_load_effective": _dec(summary.plug_load_effective),
         "has_plug_load": summary.has_plug_load,
         "systems_sum": _dec(summary.systems_sum),
         "total_kwh": _dec(summary.total_kwh),
