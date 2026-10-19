@@ -158,10 +158,67 @@ LPD_BENCHMARKS = {
     "School":     {"India": 11.2, "India_ECBC+": 9.0,  "India_Super_ECBC": 6.0,
                    "Indonesia": 7.53, "Vietnam": 13, "Thailand": 10,
                    "Cambodia": 7.53, "leed": 7.5},
-    # India publishes no residential LPD; the workbook leaves it blank.
+    # India's blank here is correct, and it is not an omission.
+    #
+    # ECSBC 2024 is a commercial code and has no residential row. The
+    # residential code is Eco-Niwas Samhita 2024, and ENS regulates lighting
+    # only in COMMON areas - corridors, parking, stairways - never inside a
+    # dwelling. There is no published Indian lighting power density for the
+    # inside of a home to benchmark against, so nothing goes here.
+    #
+    # The common-area figures ENS does publish are below. They are a different
+    # quantity and must not be used as a whole-dwelling target: 3.0 W/m2 is a
+    # corridor, not a living room.
     "Residential": {"India": None, "India_ECBC+": None, "India_Super_ECBC": None,
                     "Indonesia": 7.53, "Vietnam": 8, "Thailand": 12,
                     "Cambodia": 7.53, "leed": 7.0},
+}
+
+
+# ENS 2024 Table 10 (common area) and Table 11 (outdoor), maximum W/m2.
+#
+# Not yet wired into Layer 2. Using them needs BEAT's lighting room_type to be
+# mapped to these space kinds, and a corridor benchmark applied to a bedroom
+# would be worse than no benchmark at all. Recorded here so the next person
+# does not have to find the code again.
+#
+# ENS offers an alternative compliance route to either figure: lamps of at
+# least 95 lumens per watt. A building that meets the efficacy route need not
+# meet the density one, so a density overshoot is not automatically
+# non-compliance.
+ENS_COMMON_AREA_LPD = {
+    "corridor": 3.0,
+    "basement_stilt_parking": 1.0,
+}
+
+ENS_OUTDOOR_LPD = {
+    "driveways_and_parking": 1.6,
+    "pedestrian_walkways": 2.0,
+    "stairways": 10.0,
+    "landscaping": 0.5,
+    "outdoor_sales_area": 9.0,
+}
+
+
+# What India publishes for residential cooling is a BEE star level, not a
+# number this module can compare against.
+#
+# ENS 2024 section 5.2.3 B: unitary 5 star, split 3 star, chiller 3 star, and
+# VRF 3.28 EER or 4.36 IEER. Only the VRF line is an absolute figure; the rest
+# defer to the BEE Standards and Labelling Program, whose ISEER thresholds per
+# star are published separately and are not in this document.
+#
+# So a residential split cannot be benchmarked from ENS alone. Converting the
+# one absolute figure for reference: 3.28 EER is 3.516/3.28 = 1.072 kW/RT,
+# which is well above the 0.86 the workbook carries for an Indian VRV - the
+# code minimum is laxer than the figure BEAT calls a national baseline. That
+# is worth resolving before either is used as a residential target.
+ENS_RESIDENTIAL_COOLING = {
+    "unitary": "BEE 5 star",
+    "split": "BEE 3 star",
+    "chiller": "BEE 3 star",
+    "vrf_eer": 3.28,
+    "vrf_ieer": 4.36,
 }
 
 

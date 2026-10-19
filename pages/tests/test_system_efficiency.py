@@ -225,3 +225,38 @@ def test_each_india_tier_is_stricter_than_the_one_before():
             continue
         assert plus < base, f"{t}: ECBC+ {plus} is not stricter than {base}"
         assert sup < plus, f"{t}: Super {sup} is not stricter than {plus}"
+
+
+# --- India residential: what the code actually publishes -------------------
+
+def test_india_residential_lighting_stays_blank_on_purpose():
+    """ECSBC 2024 is a commercial code with no residential row, and ENS 2024
+    regulates lighting only in common areas. There is no published Indian
+    density for the inside of a dwelling, so there is nothing to benchmark
+    against and nothing is invented."""
+    from pages.views.building.system_efficiency_data import ENS_COMMON_AREA_LPD
+    row = LPD_BENCHMARKS["Residential"]
+    assert row["India"] is None
+    assert row["India_ECBC+"] is None
+    assert row["India_Super_ECBC"] is None
+    # the common-area figures exist and are a different quantity
+    assert ENS_COMMON_AREA_LPD["corridor"] == 3.0
+    assert ENS_COMMON_AREA_LPD["basement_stilt_parking"] == 1.0
+
+
+def test_the_common_area_density_is_not_used_as_a_dwelling_target():
+    """3.0 W/m2 is a corridor. Applied to a living room it would report a
+    saving that no code asks for."""
+    import inspect
+    from pages.views.building import equipment_savings as es
+    assert "ENS_COMMON_AREA_LPD" not in inspect.getsource(es)
+
+
+def test_residential_cooling_is_a_star_level_not_a_number():
+    """ENS defers to BEE Standards and Labelling for everything but VRF, so a
+    residential split cannot be benchmarked from ENS alone."""
+    from pages.views.building.system_efficiency_data import ENS_RESIDENTIAL_COOLING
+    assert ENS_RESIDENTIAL_COOLING["split"] == "BEE 3 star"
+    assert ENS_RESIDENTIAL_COOLING["vrf_eer"] == 3.28
+    # the one absolute figure is laxer than the workbook's own VRV baseline
+    assert float(cop_to_kw_per_rt(3.28)) > SYSTEM_EFFICIENCY["vrv"]["national"]["India"]
