@@ -354,8 +354,15 @@
                 <div class="space-y-2">
                   <div class="flex justify-between gap-3 text-xs uppercase font-medium text-[var(--text--sub-600)]">
                     <span>{{ sys.label }}</span>
-                    <span class="text-[#81F28E]">-{{ sys.baseline|floatformat:1|add:"0"|default:"0" }}</span>
+                    <span class="text-[#81F28E]">-{{ sys.saving|floatformat:1 }}</span>
                   </div>
+                  {% comment %}
+                  The saving, not the baseline. This printed sys.baseline with
+                  a minus sign, so cooling's 19.01 baseline read as a -19.00
+                  saving: the whole of a system's carbon shown as the amount
+                  it could avoid. The bar is the share of that system's own
+                  carbon the measures remove.
+                  {% endcomment %}
                   <progress class="progress progress-success w-full h-3" value="{{ sys.reduction_pct }}" max="100"></progress>
                 </div>
               {% empty %}
@@ -474,7 +481,7 @@
                     {% for measure in system.measures %}
                     <div class="flex items-start justify-between gap-4">
                       <div>
-                        <p class="text-xs font-semibold text-[var(--text--strong-950)]">{{ measure.label }}</p>
+                        <p class="text-xs font-semibold text-[var(--text--strong-950)]" data-op-measure-label>{{ measure.label }}</p>
                         <p class="text-[11px] text-[var(--text--sub-600)] mt-0.5">
                           {{ measure.description }}
                           {% if measure.installed %}<span class="font-semibold text-[#16A34A]">• {% translate "Already installed" %}</span>{% endif %}
@@ -502,7 +509,7 @@
                   <div class="flex items-center gap-2">
                     <span data-icon="temp-cold-line" data-size="16" class="text-[#0EA5E9]"></span>
                     <span class="text-sm font-bold text-[var(--text--strong-950)]">{{ operational_savings.refrigerant.label }}</span>
-                    <span class="text-[9px] font-bold text-[#0369A1] bg-[#E0F2FE] px-1.5 py-0.5 rounded uppercase tracking-wider">{% translate "Scope 1" %}</span>
+                    <span class="text-[9px] font-bold text-[#0369A1] bg-[#E0F2FE] px-1.5 py-0.5 rounded uppercase tracking-wider">{% translate "Scope 1" %}</span><span class="tooltip align-middle ml-1" data-tip="Refrigerant leaking from the equipment: a direct emission the building makes itself. The electricity rows are Scope 2, emitted at the power station. They are kept apart because the BMS measure reduces electricity and cannot reduce a leak." title="Refrigerant leaking from the equipment: a direct emission the building makes itself. The electricity rows are Scope 2, emitted at the power station. They are kept apart because the BMS measure reduces electricity and cannot reduce a leak."><span data-icon="info-custom-fill" data-size="14" data-color="var(--icon--disabled-300)"></span></span>
                   </div>
                   <div class="flex items-center gap-2">
                     <span class="text-[11px] text-[var(--text--sub-600)] whitespace-nowrap">{% translate "Saves" %} (~{{ operational_savings.refrigerant.saving|floatformat:1 }} kgCO₂eq/m²/yr)</span>
@@ -651,6 +658,8 @@
     var i18n = {
       baseline:  "{% translate 'Baseline' %}",
       optimized: "{% translate 'Optimized' %}",
+      refrigerant: "{% translate 'Refrigerant' %}",
+      bms: "{% translate 'BMS' %}",
     };
 
     // Initialize Chart
@@ -818,16 +827,28 @@
       // Only the systems with measures; the unoptimisable baseline is added
       // after BMS, because a BMS does not control plug loads or boiler fuel.
       let optimizedElectricity = 0;
+      // One entry per measure the user has actually selected, in the order it
+      // is applied, so the waterfall shows the same arithmetic the totals use.
+      const steps = [];
       document.querySelectorAll('[data-op-system]').forEach(function (sysEl) {
         const baselineEl = sysEl.querySelector('[data-op-baseline]');
         if (!baselineEl) return;
         let remaining = parseFloat(baselineEl.dataset.opBaseline) || 0;
         sysEl.querySelectorAll('.op-measure-toggle').forEach(function (tog) {
           const pct = parseFloat(tog.dataset.opPct) || 0;
-          const saving = tog.checked ? remaining * pct : 0;
+          // The label shows what this measure WOULD save, whether or not it is
+          // selected. It used to show the live figure, so an available measure
+          // beside an unflipped toggle read "Saves (~0.0)" - which says the
+          // measure is worthless, the opposite of what it means, and hides the
+          // number a user needs in order to decide which toggle to flip first.
+          const potential = remaining * pct;
           const savEl = tog.closest('.flex').querySelector('[data-op-measure-saving]');
-          if (savEl) savEl.textContent = saving.toFixed(1);
-          if (tog.checked) remaining -= saving;
+          if (savEl) savEl.textContent = potential.toFixed(1);
+          if (tog.checked) {
+            remaining -= potential;
+            const lbl = tog.closest('.items-start').querySelector('[data-op-measure-label]');
+            steps.push({ label: lbl ? lbl.textContent.trim() : '', amount: potential });
+          }
         });
         optimizedElectricity += remaining;
       });
@@ -837,7 +858,14 @@
       const bmsPct = bmsToggle ? (parseFloat(bmsToggle.dataset.opPct) || 0) : 0;
       const bmsSaving = (bmsToggle && bmsToggle.checked) ? optimizedElectricity * bmsPct : 0;
       const bmsEl = document.getElementById('op-bms-saving');
-      if (bmsEl) bmsEl.textContent = bmsSaving.toFixed(1);
+      // Same rule as the per-measure labels: show what it would save.
+      if (bmsEl) bmsEl.textContent = (optimizedElectricity * bmsPct).toFixed(1);
+      if (bmsToggle && bmsToggle.checked) {
+        steps.push({ label: i18n.bms, amount: bmsSaving });
+      }
+      if (refrigerantSaving > 0) {
+        steps.push({ label: i18n.refrigerant, amount: refrigerantSaving });
+      }
 
       const optimised = optimizedElectricity - bmsSaving + unoptimisableTotal
                         + refrigerantBaseline - refrigerantSaving;
@@ -855,12 +883,79 @@
       set('op-baseline-stat', opBaselineTotal.toFixed(1));
       set('op-optimised-stat', optimised.toFixed(1));
 
-      const chart = window.operationalReductionChart;
-      if (chart) {
-        chart.data.datasets[0].data = [opBaselineTotal, optimised];
-        chart.update();
-      }
+      drawOperationalWaterfall(steps, opBaselineTotal, optimised);
       return optimised;
+    }
+
+    // ---- the waterfall -----------------------------------------------------
+    //
+    // Baseline on the left, one descending step per selected measure, the
+    // optimised total on the right. A waterfall rather than a pair of bars
+    // because the question this panel answers is "which action matters most",
+    // and it mirrors how the arithmetic actually stacks: per-system measures
+    // multiply within a system, then BMS applies to what electricity is left,
+    // then the Scope 1 refrigerant term is separate from both.
+    //
+    // Chart.js has no waterfall type. A floating bar is one: each bar is
+    // [from, to], so a step from 22.9 down to 19.1 is [19.1, 22.9] and reads
+    // as a block hanging beneath the running total.
+    function drawOperationalWaterfall(steps, baseline, optimised) {
+      const canvas = document.getElementById('savings-operational-reduction-chart');
+      if (!canvas || typeof Chart === 'undefined') return;
+
+      const labels = [i18n.baseline];
+      const bars = [[0, baseline]];
+      const colours = ['#A78BFA'];
+      let running = baseline;
+      steps.forEach(function (st) {
+        labels.push(st.label);
+        bars.push([running - st.amount, running]);
+        colours.push('#16A34A');
+        running -= st.amount;
+      });
+      labels.push(i18n.optimized);
+      bars.push([0, optimised]);
+      colours.push('#86EFAC');
+
+      if (window.operationalReductionChart) {
+        const c = window.operationalReductionChart;
+        c.data.labels = labels;
+        c.data.datasets[0].data = bars;
+        c.data.datasets[0].backgroundColor = colours;
+        c.update();
+        return;
+      }
+
+      window.operationalReductionChart = new Chart(canvas, {
+        type: 'bar',
+        data: { labels: labels,
+                datasets: [{ data: bars, backgroundColor: colours,
+                             borderRadius: 3, barPercentage: 0.7 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  const v = ctx.raw;
+                  // A step's value is the height of the block, not its top.
+                  const amount = Math.abs(v[1] - v[0]);
+                  const isStep = ctx.dataIndex > 0 && ctx.dataIndex < labels.length - 1;
+                  return (isStep ? '-' : '') + amount.toFixed(1) + ' kgCO2eq/m2/yr';
+                }
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false },
+                 ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 0 } },
+            y: { beginAtZero: true,
+                 title: { display: true, text: 'kgCO2eq/m2/yr', font: { size: 10 } },
+                 ticks: { font: { size: 10 } } }
+          }
+        }
+      });
     }
 
     document.querySelectorAll('.op-measure-toggle, #op-bms-toggle').forEach(function (t) {

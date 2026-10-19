@@ -1303,6 +1303,12 @@ def get_operational_savings_measures(
             "color": style["color"],
             "baseline": round(baseline, 2),
             "optimized": optimized,
+            # What this system would save with every one of its measures
+            # taken. The Savings by System panel used to print `baseline` with
+            # a minus sign, so cooling's 19.01 baseline read as a -19.00
+            # saving - the system's whole carbon presented as the amount it
+            # could avoid.
+            "saving": round(baseline - optimized, 2),
             "reduction_pct": reduction_pct,
             "share_pct": share_pct,
             "measures": measure_rows,
