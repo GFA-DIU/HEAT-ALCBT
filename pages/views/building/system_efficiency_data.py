@@ -223,6 +223,43 @@ ENS_RESIDENTIAL_COOLING = {
 
 
 # --------------------------------------------------------------------------
+# provenance
+# --------------------------------------------------------------------------
+# Every benchmark says where it came from and whether anyone has checked it
+# against the national code it claims to represent.
+#
+# This exists because the India lighting values were wrong for months in a way
+# no plausibility check caught: the figures were real ECBC numbers, just
+# attached to the wrong building types. Only opening the code found it. A
+# target that cannot say where it came from is a target nobody can audit, and
+# the difference between "ECSBC 2024 Table 7.3" and "a spreadsheet" is the
+# difference between a number a user can check and one they must trust.
+
+VERIFIED = "verified"
+UNVERIFIED = "unverified"
+
+WORKBOOK = "Operational_Carbon_Benchmark_restructured.xlsx"
+
+# (system key or "lighting", country) -> (citation, status)
+# Anything absent falls back to the workbook, unverified.
+BENCHMARK_SOURCES = {
+    ("lighting", "India"): ("ECSBC 2024, Tables 7.1-7.3 (Interior Lighting "
+                            "Power, Building Area Method)", VERIFIED),
+}
+
+_DEFAULT_SOURCE = (WORKBOOK, UNVERIFIED)
+
+
+def benchmark_source(system_key, country):
+    """Where a benchmark came from, and whether it has been checked.
+
+    Returns ``(citation, status)``. ``status`` is VERIFIED only when someone
+    has read the figure in its own national code and recorded the table.
+    """
+    return BENCHMARK_SOURCES.get((system_key, country), _DEFAULT_SOURCE)
+
+
+# --------------------------------------------------------------------------
 # conversion
 # --------------------------------------------------------------------------
 
@@ -321,6 +358,7 @@ def resolve_system_benchmark(system_key, country, standard=None):
     else:
         target, basis = national, "national baseline"
 
+    citation, status = benchmark_source(system_key, country)
     return {
         "system": system_key,
         "label": spec["label"],
@@ -332,6 +370,8 @@ def resolve_system_benchmark(system_key, country, standard=None):
         "target": target,
         "target_basis": basis,
         "credible": best is not None,
+        "source": citation,
+        "verified": status == VERIFIED,
     }
 
 

@@ -23,7 +23,8 @@ from pages.forms.cooling_system_form import (
     AC_EFFICIENCY_RANGES, EFFICIENCY_RANGES as CHILLER_EFFICIENCY_RANGES,
 )
 from pages.views.building.system_efficiency_data import (
-    HIGHER_IS_BETTER, LPD_BENCHMARKS, LOWER_IS_BETTER, cop_to_kw_per_rt,
+    HIGHER_IS_BETTER, LPD_BENCHMARKS, LOWER_IS_BETTER, benchmark_source,
+    cop_to_kw_per_rt,
     efficiency_saving_fraction, resolve_system_benchmark,
 )
 
@@ -173,14 +174,24 @@ def _blank_system(key, label, unit):
         "energy_kwh": 0.0, "benchmarked_energy_kwh": 0.0,
         "saving_kwh": 0.0, "saving_fraction": 0.0,
         "target": None, "target_basis": None, "current_weighted": None,
+        # Where the target came from, and whether anyone checked it. The chart
+        # draws a system with no benchmark at full height and hatched: its
+        # energy is real, and "not assessed" must not look like "nothing to
+        # gain here".
+        "source": None, "verified": False, "has_benchmark": False,
     }
 
 
-def _accumulate(system, current, target, direction, energy, basis, unit):
+def _accumulate(system, current, target, direction, energy, basis, unit,
+                source=None, verified=False):
     """Fold one record into a system's running totals."""
     system["records"] += 1
     energy = float(energy or 0.0)
     system["energy_kwh"] += energy
+    if target is not None:
+        system["has_benchmark"] = True
+        system["source"] = source
+        system["verified"] = verified
     if current is None or target is None:
         system["no_benchmark"] += 1
         return
@@ -237,7 +248,9 @@ def get_equipment_efficiency_savings(building) -> Dict[str, Any]:
         _accumulate(cooling, float(current) if current else None,
                     bench["target"] if bench else None,
                     LOWER_IS_BETTER, energy,
-                    bench["target_basis"] if bench else None, "kW/RT")
+                    bench["target_basis"] if bench else None, "kW/RT",
+                    bench["source"] if bench else None,
+                    bench["verified"] if bench else False)
 
     # --- cooling: chillers, already stated in kW/RT
     for ch in building.chillers.all():
@@ -250,7 +263,9 @@ def get_equipment_efficiency_savings(building) -> Dict[str, Any]:
         _accumulate(cooling, float(current) if current else None,
                     bench["target"] if bench else None,
                     LOWER_IS_BETTER, ch.total_energy_consumption_kwh_per_year,
-                    bench["target_basis"] if bench else None, "kW/RT")
+                    bench["target_basis"] if bench else None, "kW/RT",
+                    bench["source"] if bench else None,
+                    bench["verified"] if bench else False)
 
     # --- ventilation: specific fan power, already in the benchmark's unit
     #
@@ -265,7 +280,9 @@ def get_equipment_efficiency_savings(building) -> Dict[str, Any]:
         _accumulate(ventilation, float(current) if current else None,
                     bench_vent["target"] if bench_vent else None,
                     LOWER_IS_BETTER, v.total_energy_consumption_kwh_per_year,
-                    bench_vent["target_basis"] if bench_vent else None, "W/CMH")
+                    bench_vent["target_basis"] if bench_vent else None, "W/CMH",
+                    bench_vent["source"] if bench_vent else None,
+                    bench_vent["verified"] if bench_vent else False)
 
     # --- hot water: COP for a heat pump, a fraction for boiler and solar
     for h in building.hot_water_systems.all():
@@ -283,11 +300,14 @@ def get_equipment_efficiency_savings(building) -> Dict[str, Any]:
                     bench["direction"] if bench else LOWER_IS_BETTER,
                     h.total_energy_consumption_kwh_per_year,
                     bench["target_basis"] if bench else None,
-                    bench["unit"] if bench else "COP")
+                    bench["unit"] if bench else "COP",
+                    bench["source"] if bench else None,
+                    bench["verified"] if bench else False)
 
     # --- lighting: power density, W/m2, derived per room
     lpd_type = _lpd_type(building)
     lpd_target, lpd_basis = _lpd_target(lpd_type, country) if lpd_type else (None, None)
+    lpd_source, lpd_status = benchmark_source("lighting", country)
     for l in building.lighting_systems.all():
         # Derived from installed power and room area, NOT from
         # baseline_lighting_power_density.
@@ -310,7 +330,7 @@ def get_equipment_efficiency_savings(building) -> Dict[str, Any]:
         _accumulate(lighting, float(current) if current else None,
                     lpd_target, LOWER_IS_BETTER,
                     l.total_energy_consumption_kwh_per_year,
-                    lpd_basis, "W/m2")
+                    lpd_basis, "W/m2", lpd_source, lpd_status == "verified")
 
     systems: List[Dict[str, Any]] = [
         _finalise(s) for s in (cooling, ventilation, hot_water, lighting)

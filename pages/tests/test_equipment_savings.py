@@ -166,3 +166,51 @@ def test_lighting_does_not_trust_the_stored_power_density_column():
     lighting = src[src.index("lpd_type = _lpd_type"):]
     assert "total_lighting_power_kw" in lighting
     assert "_dec(l.baseline_lighting_power_density)" not in lighting
+
+
+# --- provenance ------------------------------------------------------------
+#
+# The India lighting values were wrong for months in a way no plausibility
+# check caught: real ECBC numbers attached to the wrong building types. Only
+# opening the code found it. A benchmark that cannot say where it came from is
+# one nobody can audit.
+
+def test_india_lighting_reports_its_code_and_is_marked_verified():
+    from pages.views.building.system_efficiency_data import benchmark_source
+    citation, status = benchmark_source("lighting", "India")
+    assert "ECSBC 2024" in citation
+    assert status == "verified"
+
+
+def test_everything_else_is_marked_unverified_against_the_workbook():
+    """Four countries still rest on the spreadsheet alone. Saying so is the
+    worklist for replacing them."""
+    from pages.views.building.system_efficiency_data import benchmark_source
+    for key, country in [("lighting", "Thailand"), ("split", "India"),
+                         ("ventilation", "Vietnam"), ("air_cooled_chiller", "Cambodia")]:
+        citation, status = benchmark_source(key, country)
+        assert status == "unverified", (key, country)
+        assert "xlsx" in citation
+
+
+def test_a_resolved_benchmark_carries_its_source(india):
+    from pages.views.building.system_efficiency_data import resolve_system_benchmark
+    r = resolve_system_benchmark("air_cooled_chiller", "India")
+    assert r["source"]
+    assert r["verified"] is False
+
+
+@pytest.mark.django_db
+def test_a_system_with_no_benchmark_is_distinguishable_from_one_with_no_saving(india):
+    """A flat bar must not read as "nothing to gain here" when it means "not
+    assessed". The chart hatches one and not the other."""
+    india = india()
+    CoolingSystemAirConditioner.objects.create(
+        building=india, ac_type="window", efficiency_metric="cop",
+        **AC_REQUIRED, eer_iseer_cop=Decimal("2.5"), number_of_units=1,
+        total_energy_consumption_kwh_per_year=Decimal("5000"))
+    cooling = next(s for s in get_equipment_efficiency_savings(india)["systems"]
+                   if s["key"] == "cooling")
+    assert cooling["has_benchmark"] is False
+    assert cooling["energy_kwh"] == 5000.0      # the energy is still real
+    assert cooling["saving_kwh"] == 0.0

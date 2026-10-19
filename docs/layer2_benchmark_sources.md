@@ -45,7 +45,44 @@ built from. Three tiers: ECSBC, ECSBC Plus, Super ECSBC.
 | Interior lighting power | Tables 7.1-7.3, pp. 77-78 | absolute W/m2, three tiers, by building type |
 | Lifts | Table 8.11, p. 90 | energy class A-G via IS 17515 Part 2 |
 | Escalators | Table 8.11, p. 90 | energy performance ratio, classes A+++ to E, via IS 17515 Part 3 |
-| Cooling equipment | Table 6, pp. 72-83 | **not yet extracted** |
+| Cooling equipment | Tables 6.1, 6.2, 6.12, pp. 72-83 | **values do not extract** - see below |
+| AHU fans | Tables 6.9-6.11, p. 83 | mechanical efficiency % + motor class, by tier |
+
+### The chiller table will not come out of the PDF
+
+Table 6.12 (Minimum Efficiency Requirements for Chillers for ECSBC, ECSBC+
+and Super ECSBC) exists and is referenced in the text, but its values are not
+in the PDF's text layer - pypdf returns the table captions and numbering
+(6.13, 6.14 ...) and none of the figures. The same is true of Tables 6.1
+(unitary AC) and 6.2 (VRF).
+
+They need reading by eye, or a tool that can reach the table graphics. Until
+then India's cooling benchmarks stay on the workbook, marked unverified.
+Chillers are additionally required to be rated at full and part load per
+IS 16590.
+
+### AHU fans: a real figure, but not the one BEAT stores
+
+ECSBC does publish fan requirements by tier:
+
+| Tier | Mechanical efficiency | Motor |
+|---|---|---|
+| ECSBC | 65% | IE 3 |
+| ECSBC Plus | 70% | IE 4 |
+| Super ECSBC | 75% | IE 4 |
+
+**This is not specific fan power.** BEAT stores W/CMH; converting mechanical
+efficiency into W/CMH needs the fan's pressure rise, which BEAT does not
+collect:
+
+```
+SFP (W/CMH)  =  pressure rise (Pa)  /  (efficiency x 3600)
+```
+
+Assuming a pressure rise to make the two comparable would manufacture exactly
+the kind of number this review exists to catch, so ventilation stays on the
+workbook's W/CMH, marked unverified. Collecting fan static pressure would make
+the code figure usable.
 
 ### Lifts are the interesting one
 
@@ -131,6 +168,25 @@ Known gaps regardless of source:
   type, so a hospital AHU and an office AHU are judged identically.
 
 ---
+
+## How provenance is recorded
+
+Every benchmark carries a citation and a status, returned by
+`benchmark_source()` and surfaced on the Savings tab:
+
+| Status | Meaning |
+|---|---|
+| `verified` | someone read the figure in its own national code and recorded the table |
+| `unverified` | it came from the workbook and has not been traced to a source |
+
+Today exactly one entry is verified: India lighting, against ECSBC 2024
+Tables 7.1-7.3. Everything else is unverified, which is the worklist.
+
+This exists because the India lighting error was invisible to inspection - the
+figures were real ECBC numbers attached to the wrong building types, and only
+opening the code found it. The difference between "ECSBC 2024 Table 7.3" and
+"a spreadsheet" is the difference between a target a user can check and one
+they have to trust.
 
 ## The rule that kept this honest
 
