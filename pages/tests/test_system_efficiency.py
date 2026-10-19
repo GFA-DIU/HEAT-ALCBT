@@ -192,3 +192,36 @@ def test_window_units_have_no_benchmark_row_at_all():
     """20 window units across four countries. The workbook publishes no row,
     so they report nothing rather than borrowing the split figure."""
     assert resolve_system_benchmark("window", "India") is None
+
+
+# --- India lighting, checked against the code rather than the workbook -----
+
+def test_india_lpd_matches_ecsbc_2024():
+    """ECSBC 2024 Tables 7.1-7.3, ESCBC_Commercial.pdf pages 77-78.
+
+    The workbook's ECBC+ and Super columns were shifted one row: Shopping Mall
+    held Hospital's figures, Hospital held Hotel's, Hotel held Shopping Mall's.
+    """
+    expected = {
+        "Office":   (9.5, 7.6, 5.0),
+        "Hospital": (9.7, 7.8, 4.9),
+        "Hotel":    (9.5, 7.6, 4.8),
+        "Retail":  (14.1, 11.3, 7.0),
+        "School":  (11.2, 9.0, 6.0),
+    }
+    for t, (base, plus, sup) in expected.items():
+        row = LPD_BENCHMARKS[t]
+        assert row["India"] == base, t
+        assert row["India_ECBC+"] == plus, t
+        assert row["India_Super_ECBC"] == sup, t
+
+
+def test_each_india_tier_is_stricter_than_the_one_before():
+    """The property the shifted data broke: a hotel's ECBC+ was 11.3 against a
+    base of 9.5. A tier that tightens cannot be laxer."""
+    for t, row in LPD_BENCHMARKS.items():
+        base, plus, sup = (row["India"], row["India_ECBC+"], row["India_Super_ECBC"])
+        if base is None:
+            continue
+        assert plus < base, f"{t}: ECBC+ {plus} is not stricter than {base}"
+        assert sup < plus, f"{t}: Super {sup} is not stricter than {plus}"

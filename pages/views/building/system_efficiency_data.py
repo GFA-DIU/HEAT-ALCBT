@@ -124,17 +124,35 @@ SYSTEM_EFFICIENCY = {
 # Lower is always better. India publishes three tiers; the others publish one.
 # EDGE is performance-based (">= 65 lumens per watt"), not a density, so it has
 # no column here - a luminous efficacy cannot be compared against a W/m2 value.
+# India corrected against the code itself, 19.10.2026.
+#
+# ECSBC 2024 Tables 7.1, 7.2 and 7.3 (Interior Lighting Power, Building Area
+# Method), from ESCBC_Commercial.pdf pages 77-78. The workbook's base column
+# was right and its ECBC+ and Super columns were shifted one row down the
+# table: Shopping Mall had taken Hospital's figures, Hospital had taken
+# Hotel's, and Hotel had taken Shopping Mall's.
+#
+# Hotel is the row that gives it away - the workbook has ECBC+ at 11.3 against
+# a base of 9.5, a stricter tier laxer than the one it tightens. The effect on
+# Layer 2 was a hotel target 46% too lax and a retail target 29% too strict.
+#
+#   type            ECSBC   ECSBC+   Super ECSBC
+#   Office            9.5      7.6        5.0
+#   Hospitals         9.7      7.8        4.9
+#   Hotels            9.5      7.6        4.8
+#   Shopping Mall    14.1     11.3        7.0
+#   Univ. & Schools  11.2      9.0        6.0
 LPD_BENCHMARKS = {
     "Office":     {"India": 9.5,  "India_ECBC+": 7.6,  "India_Super_ECBC": 5.0,
                    "Indonesia": 7.53, "Vietnam": 11, "Thailand": 10,
                    "Cambodia": 7.53, "leed": 6.7},
-    "Retail":     {"India": 14.1, "India_ECBC+": 7.8,  "India_Super_ECBC": 4.9,
+    "Retail":     {"India": 14.1, "India_ECBC+": 11.3, "India_Super_ECBC": 7.0,
                    "Indonesia": 10.76, "Vietnam": 16, "Thailand": 11,
                    "Cambodia": 10.76, "leed": 8.4},
-    "Hospital":   {"India": 9.7,  "India_ECBC+": 7.6,  "India_Super_ECBC": 4.8,
+    "Hospital":   {"India": 9.7,  "India_ECBC+": 7.8,  "India_Super_ECBC": 4.9,
                    "Indonesia": 10.33, "Vietnam": 13, "Thailand": 12,
                    "Cambodia": 10.33, "leed": 9.9},
-    "Hotel":      {"India": 9.5,  "India_ECBC+": 11.3, "India_Super_ECBC": 7.0,
+    "Hotel":      {"India": 9.5,  "India_ECBC+": 7.6,  "India_Super_ECBC": 4.8,
                    "Indonesia": 9.04, "Vietnam": 11, "Thailand": 12,
                    "Cambodia": 9.04, "leed": 5.7},
     "School":     {"India": 11.2, "India_ECBC+": 9.0,  "India_Super_ECBC": 6.0,
