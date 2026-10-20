@@ -567,13 +567,13 @@ PACKAGED_SUBTYPE_MAP = {
 # 0:year  1:refrigerant_type  2:refrigerant_qty  3:cooling_capacity  4:capacity_unit
 # 5:num_units  6:leakage_factor  7:hours/day  8:days/week  9:weeks/year
 # 10:power_input_per_unit  11:eer_iseer_cop  12:energy_label  13:stars
-# (col 14 in template = auto-calculated annual energy, ignored on import)
+# (14 = auto-calculated annual energy, ignored)  15:efficiency_metric (optional)
 
 # Packaged tab — 16 user columns + 1 auto-calculated (not read)
 # 0:subtype  1:year  2:refrigerant_type  3:refrigerant_qty  4:cooling_capacity  5:capacity_unit
 # 6:num_units  7:leakage_factor  8:hours/day  9:days/week  10:weeks/year
 # 11:power_input_per_unit  12:eer_iseer_cop  13:eer_formula_hint(ignored)  14:energy_label
-# 15:stars  (col 16 in template = auto-calculated annual energy, ignored on import)
+# 15:stars  (16 = auto-calculated annual energy, ignored)  17:efficiency_metric (optional)
 
 # Chiller Water tabs — 18 user columns + 1 auto-calculated (not read)
 # 0:year  1:refrigerant_type  2:refrigerant_qty  3:total_cooling_load  4:num_units
@@ -761,6 +761,11 @@ def _parse_cooling_rows(sheet_key, raw_rows):
                     'weeks_per_year':         cell(10),
                     'power_input_per_unit':   cell(11),
                     'eer_iseer_cop':          cell(12),
+                    # Optional, appended column; blank means COP as before.
+                    # 17, not 16: index 16 on this tab is the auto-calculated
+                    # annual energy, so reading 16 would have fed a kWh figure
+                    # to the metric parser and silently defaulted to COP.
+                    'efficiency_metric':      _efficiency_metric(cell(17)),
                     'energy_efficiency_label': cell(14),
                     'number_of_stars':        cell(15),
                 }
@@ -785,6 +790,9 @@ def _parse_cooling_rows(sheet_key, raw_rows):
                     'weeks_per_year':        cell(9),
                     'power_input_per_unit':  cell(10),
                     'eer_iseer_cop':         cell(11),
+                    # Optional, appended column; blank means COP as before.
+                    # 15 is one past the auto-calculated energy at 14.
+                    'efficiency_metric':     _efficiency_metric(cell(15)),
                     'energy_efficiency_label': cell(12),
                     'number_of_stars':       cell(13),
                 }
@@ -2417,6 +2425,47 @@ def _alias_for(name, country):
     return a.get((n, c)) or a.get((n, ""))
 
 
+# Which of the seven efficiency metrics the template's figure is stated in.
+#
+# The template has ONE column headed "EER/ISEER/COP" and the importer never
+# set efficiency_metric, so every imported air conditioner was stored as COP
+# whatever the user actually had. All 351 air conditioners in production are
+# on `cop`, which is the signature of that rather than of the stock.
+#
+# It is a 3.4x error where it bites. Thailand's EGAT No.5 label states EER in
+# Btu/h per watt - the No.5 threshold is >= 11.60 - and stored as COP 11.60
+# that machine appears 3.4 times more efficient than it is, so its energy
+# comes out 3.4 times too low. Indonesia and Vietnam label CSPF, India ISEER.
+#
+# An optional column now names the metric. Blank keeps the old behaviour, so
+# every file that imported before still imports and still means COP.
+_METRIC_ALIASES = {
+    "cop": "cop",
+    "eer": "eer", "eer btu": "eer", "eer btu/h per w": "eer",
+    "eer btu/h.w": "eer", "eer (btu/h per w)": "eer",
+    "eer w/w": "eer_ww", "eer ww": "eer_ww", "eer (w/w)": "eer_ww",
+    "iseer": "iseer", "cspf": "cspf",
+    "seer": "seer", "seer w/w": "seer",
+    "seer btu": "seer_btu", "seer (btu/h per w)": "seer_btu",
+}
+
+
+def _efficiency_metric(raw):
+    """Template text -> stored metric key. Blank or unknown means COP."""
+    key = (str(raw or "").strip().lower()
+           .replace("·", " ").replace("-", " "))
+    key = " ".join(key.split())
+    if not key:
+        return "cop"
+    return _METRIC_ALIASES.get(key, "cop")
+
+
+# Returned as the "error" slot when a match was only possible by using another
+# country's EPD. Not an error - the row imports - but the localised GWP is the
+# wrong one, so the preview marks it for review.
+CROSS_COUNTRY = "__cross_country__"
+
+
 def _lookup_structural_epd(epd_name_raw, country_name_raw):
     """
     Look up a structural (non-operational) EPD by name and country.
@@ -2472,8 +2521,23 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
         return epd, None
 
     # 4. Name contains only
+    #
+    # This is the step that crosses borders. The catalogue carries LOCALISED
+    # GWP per country - steel rebar is India 2.60, Indonesia 2.52, Vietnam
+    # 2.46, Cambodia 2.42, Thailand 2.37 - so matching another country's EPD
+    # uses the wrong factor. Over a sample of 100 plausible material names
+    # across the five countries, 37 resolved to a different country's EPD: an
+    # Indian AAC block to a German product, Indian cement to a Vietnamese one.
+    #
+    # The fallback stays, because refusing would flag a third of every import.
+    # But the caller is told, so the row can be shown for review instead of
+    # succeeding silently.
     epd = qs.filter(name__icontains=name).first()
     if epd:
+        if country and epd.country and epd.country.name.lower() != country.lower():
+            logger.warning("Import: %r (%s) matched an EPD from %s",
+                           name, country, epd.country.name)
+            return epd, CROSS_COUNTRY
         return epd, None
 
     # 5. Fuzzy fallback — templates abbreviate or reword EPD names
@@ -2499,6 +2563,8 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
                     "Import fuzzy-matched structural EPD %r -> %r (score %.2f, scope %s)",
                     name, best, score, scope_label,
                 )
+                if country and epd.country and epd.country.name.lower() != country.lower():
+                    return epd, CROSS_COUNTRY
                 return epd, None
 
     return None, f"Structural EPD not found for name '{name}' (country: '{country}')."
@@ -2572,6 +2638,10 @@ def import_structural_components(request):
 
     cat_map = _get_structural_category_map()
     errors = {}
+    # Rows that imported but used another country's EPD. Not a failure -
+    # the row is saved - but the localised carbon factor is the wrong one,
+    # so the response says which rows to check.
+    warnings = {}
 
     # We group rows into assemblies.
     # Each new non-blank Building Component starts a new assembly.
@@ -2674,9 +2744,21 @@ def import_structural_components(request):
                 # Row deliberately carries no material (e.g. "No Insulation").
                 # Contributes zero carbon — skip without raising an error.
                 continue
-            if epd_error:
+            # CROSS_COUNTRY is a warning, not a failure. The row imports with
+            # another country's localised GWP, which is wrong but better than
+            # refusing a third of every file - 37 of 100 plausible material
+            # names resolve across a border. Treating it as an error here
+            # would have rejected all of them.
+            cross_country = epd_error is CROSS_COUNTRY
+            if epd_error and not cross_country:
                 errors[label] = {"epd_name": [epd_error]}
                 continue
+            if cross_country:
+                warnings.setdefault(label, []).append(
+                    f"'{epd_name}' matched an EPD from "
+                    f"{epd.country.name if epd.country else 'another country'} "
+                    f"rather than {epd_country}; its localised carbon factor "
+                    f"differs. Check this material.")
 
             # Derive the correct input_unit from the assembly dimension (same logic as UI)
             from pages.views.assembly.epd_dimension_info import get_epd_dimension_info
@@ -2779,6 +2861,7 @@ def import_structural_components(request):
 
     return JsonResponse({
         "success": True,
+        "warnings": warnings,
         "saved_count": saved_count,
         "building_uuid": str(building.uuid),
     })

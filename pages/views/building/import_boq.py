@@ -26,7 +26,9 @@ from pages.models.assembly import (Assembly, AssemblyCategory,
                                     AssemblyMode, StructuralProduct)
 from pages.models.building import Building, BuildingAssembly
 from pages.models.epd import Unit
-from pages.views.building.import_building import _lookup_structural_epd, _resolve_country
+from pages.views.building.import_building import (
+    CROSS_COUNTRY, _lookup_structural_epd, _resolve_country,
+)
 
 # BoQ unit text -> BEAT Unit. Count-like units (set/nos/lot) collapse to pcs.
 BOQ_UNIT_MAP = {
@@ -125,6 +127,15 @@ def resolve_boq_rows(rows):
             AssemblyCategory.objects.filter(name__iexact=r["component"].strip()).first()
             if r["component"] else None
         )
+        # A cross-country match is a warning, not a failure: the row imports
+        # but with another country's localised GWP. 37 of 100 plausible
+        # material names resolve across a border, so refusing them would flag
+        # a third of every file; saying nothing uses the wrong factor
+        # silently. The preview marks the row instead.
+        r["cross_country"] = (err is CROSS_COUNTRY)
+        if r["cross_country"]:
+            r["epd_error"] = None
+            err = None
         if not epd:
             r["status"] = "no_epd"
             r["reason"] = err or f"No EPD found for '{r['epd_name']}' ({r['country']})."
@@ -133,6 +144,10 @@ def resolve_boq_rows(rows):
             if str(r["unit"]) in avail:
                 r["status"] = "ok"
                 r["reason"] = ""
+                if r["cross_country"] and epd.country:
+                    r["reason"] = (f"matched an EPD from {epd.country.name} "
+                                   f"rather than {r['country']}; its carbon "
+                                   f"factor differs - check this material")
             else:
                 r["status"] = "bad_unit"
                 r["reason"] = (f"'{r['epd_name']}' cannot be used in "
@@ -335,6 +350,7 @@ def serialize_row(r):
         "status": r["status"],
         "reason": r.get("reason", ""),
         "assumed_density": r.get("assumed_density"),
+        "cross_country": bool(r.get("cross_country")),
     }
 
 
