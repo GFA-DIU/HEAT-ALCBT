@@ -197,14 +197,21 @@ def _fuzzy_epd_pick(name, candidates):
 
     Requires a DISTINCTIVE shared token (one that is rare across the catalogue),
     reasonable coverage of the query's words, and a clear margin over the
-    runner-up. Returns (best_name, score) or (None, 0.0).
+    runner-up.
+
+    Returns (best_name, score, reason). `reason` is None on a hit, otherwise
+    why there was none: "ambiguous" when two candidates were too close to
+    separate, "below_cutoff" when the best was too weak, "none" when nothing
+    shared an informative word. The caller needs that distinction - an
+    ambiguous result means the material IS here and we cannot tell which, which
+    is not a reason to go looking in another country.
     """
     if not name or not candidates:
-        return None, 0.0
+        return None, 0.0, "none"
 
     q_tokens = _epd_tokens(name)
     if not q_tokens:
-        return None, 0.0
+        return None, 0.0, "none"
 
     # Document frequency of each token across the candidate set.
     freq = {}
@@ -234,14 +241,14 @@ def _fuzzy_epd_pick(name, candidates):
         scored.append((0.45 * seq + 0.55 * coverage, c))
 
     if not scored:
-        return None, 0.0
+        return None, 0.0, "none"
     scored.sort(reverse=True)
     top_score, top_name = scored[0]
     if top_score < 0.45:
-        return None, top_score
+        return None, top_score, "below_cutoff"
     if len(scored) > 1 and (top_score - scored[1][0]) < 0.05:
-        return None, top_score  # ambiguous -> do not guess
-    return top_name, top_score
+        return None, top_score, "ambiguous"  # too close to separate
+    return top_name, top_score, None
 
 
 def _resolve_region(name, country):
@@ -779,8 +786,28 @@ def _parse_cooling_rows(sheet_key, raw_rows):
     cooling_system_type, ac_type, chiller_type, packaged_subtype_flag = entry
     results = []
 
+    # The VRF tab carries an extra leading column, "Type of cooling system",
+    # that the Window and Split tabs do not. The browser sends rows with every
+    # column present - slice(1) there drops the header ROW, not a column - so
+    # the shared parser below, written for Window/Split, read every VRF field
+    # one place to the left: year_of_installation came out as the text "VRF",
+    # refrigerant_quantity as "R-410A", number_of_units as "kW", and the
+    # efficiency as the power input (12.5 rather than COP 3.60).
+    #
+    # The practical effect was that VRF rows did not import at all rather than
+    # importing wrong: a year of "VRF" fails validation, and a blank first
+    # column instead made `if not year: continue` skip the row in silence. The
+    # four VRF records in the developer database are all coherent and were
+    # entered through the form, so nothing in the data needs repairing - but
+    # one tab of the template simply never worked.
+    #
+    # The PackagedDuctable tab has the same extra column but is handled in its
+    # own branch with absolute indices, so it takes no offset.
+    col_offset = 1 if sheet_key == 'vrf' else 0
+
     for row in raw_rows:
-        def cell(idx, default=''):
+        def cell(idx, default='', _off=col_offset):
+            idx = idx + _off
             val = row[idx] if idx < len(row) else None
             if val is None or str(val).strip().lower() == 'none':
                 return default
@@ -2630,7 +2657,7 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
     if country:
         in_country = qs.filter(country__name__iexact=country)
         candidates = list(in_country.values_list("name", flat=True)[:5000])
-        best, score = _fuzzy_epd_pick(name, candidates)
+        best, score, reason = _fuzzy_epd_pick(name, candidates)
         if best:
             epd = in_country.filter(name__iexact=best).first()
             if epd:
@@ -2639,6 +2666,23 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
                     name, best, score, country,
                 )
                 return epd, None
+        if reason == "ambiguous":
+            # The material IS in this country - we just cannot tell WHICH of
+            # several it is. "Portland cement OPC 43" sits between India's
+            # Ordinary Portland, Portland Composite and Portland Pozzolana
+            # cements, which are three different products with three different
+            # factors. Falling through from here used to cross the border and
+            # take Vietnam's, so a careful refusal at home was overridden by a
+            # careless grab abroad. Stop instead and let the user pick.
+            logger.warning(
+                "Import: %r (%s) is ambiguous within its own country - refusing",
+                name, country,
+            )
+            return None, (
+                f"'{name}' matches more than one {country} EPD closely "
+                f"(score {score:.2f}). Pick the right one rather than letting "
+                f"the import guess."
+            )
 
     epd = _shortest_contains(qs, name, None)
     if epd:
@@ -2663,7 +2707,7 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
         if not country and scope_label != "any country":
             continue
         candidates = list(scope_qs.values_list("name", flat=True)[:5000])
-        best, score = _fuzzy_epd_pick(name, candidates)
+        best, score, _reason = _fuzzy_epd_pick(name, candidates)
         if best:
             epd = scope_qs.filter(name__iexact=best).first()
             if epd:

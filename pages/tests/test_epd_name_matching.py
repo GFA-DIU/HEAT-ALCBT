@@ -57,12 +57,12 @@ def test_a_double_s_word_is_not_stemmed():
 # --- the picker ------------------------------------------------------------
 
 def test_the_picker_refuses_a_product_changing_candidate():
-    best, _ = _fuzzy_epd_pick("Reinforced concrete", ["Glass reinforced concrete"])
+    best, _, _ = _fuzzy_epd_pick("Reinforced concrete", ["Glass reinforced concrete"])
     assert best is None, "glass-reinforced cladding is not structural concrete"
 
 
 def test_the_picker_still_takes_an_elaborated_candidate():
-    best, _ = _fuzzy_epd_pick(
+    best, _, _ = _fuzzy_epd_pick(
         "AAC block",
         ["Autoclaved aerated concrete (AAC) solid blocks", "Float glass", "Sand"],
     )
@@ -184,3 +184,63 @@ def test_the_alias_table_is_actually_shipped():
         capture_output=True, text=True,
     )
     assert out.returncode == 0, "the alias table is not tracked, so it will not deploy"
+
+
+# --- ambiguous at home is not a reason to cross a border -------------------
+
+# A token counts as distinctive only if it is rare ACROSS the candidate set,
+# so this behaviour cannot be reproduced on a handful of names: with three
+# candidates "portland" is in all three and is therefore common. Padding to a
+# realistic catalogue size is what makes the test exercise the real path.
+_FILLER = [f"Filler material {i}" for i in range(100)]
+
+
+def test_the_picker_says_why_it_declined():
+    """The caller has to tell "the material is not here" from "it is here and
+    there are three of it"."""
+    _, _, reason = _fuzzy_epd_pick(
+        "Portland cement OPC 43",
+        ["Ordinary Portland Cement", "Portland Composite Cement",
+         "Portland Pozzolana Cement"] + _FILLER,
+    )
+    assert reason == "ambiguous"
+
+
+def test_nothing_in_common_is_not_ambiguous():
+    _, _, reason = _fuzzy_epd_pick("Portland cement", ["Float glass", "Sand"])
+    assert reason != "ambiguous"
+
+
+@pytest.mark.django_db
+def test_an_ambiguous_home_match_refuses_instead_of_crossing(db):
+    """India holds Ordinary Portland, Portland Composite and Portland
+    Pozzolana cements - three products, three factors, within 0.05 of each
+    other. The in-country step correctly refused to choose, and the step after
+    it then crossed the border and took Vietnam's anyway."""
+    from cities_light.models import Country
+    from pages.models.epd import EPD, EPDType, Unit
+    india = Country.objects.get_or_create(
+        code2="IN", defaults={"name": "India", "continent": "AS", "slug": "india"})[0]
+    vietnam = Country.objects.get_or_create(
+        code2="VN", defaults={"name": "Vietnam", "continent": "AS", "slug": "vietnam"})[0]
+
+    def make(n, c):
+        EPD.objects.create(
+            name=n, names=[{"value": n, "lang": "en"}],
+            UUID=f"t-{abs(hash((n, c.code2)))}", declared_unit=Unit.KG,
+            conversions=[], type=EPDType.GENERIC, country=c,
+            public=True, draft=False, declared_amount=1,
+        )
+
+    for n in ("Ordinary Portland Cement", "Portland Composite Cement",
+              "Portland Pozzolana Cement"):
+        make(n, india)
+    make("SCG Portland Cement (OPC) Type I", vietnam)
+    # See _FILLER above: "portland" has to be rare among India's names before
+    # it counts as distinctive, which it is not in a catalogue of three.
+    for i in range(100):
+        make(f"Filler material {i}", india)
+
+    epd, err = _lookup_structural_epd("Portland cement OPC 43", "India")
+    assert epd is None, f"crossed the border and took {epd.name!r}"
+    assert "more than one" in err
