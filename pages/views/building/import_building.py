@@ -140,8 +140,56 @@ _EPD_STOPWORDS = {
 }
 
 
+# Words that change WHAT A MATERIAL IS rather than merely describing it.
+# If a catalogue name carries one of these and the imported name does not, the
+# two are different products however well the strings overlap.
+#
+# This list exists because substring and similarity matching are both blind to
+# the distinction. "Reinforced concrete" is a substring of "Glass reinforced
+# concrete" and scores 0.94 against it, but glass-reinforced concrete is a thin
+# cladding product with a completely different carbon factor from structural
+# concrete. Likewise "AAC block" matched "AAC block mortar": the mortar that
+# joins the blocks, not the blocks.
+#
+# Only words that change the product belong here. Words that merely elaborate
+# it - "autoclaved", "aerated", "solid", "ready-mix" - must NOT be listed, or
+# the correct, more descriptive EPD gets rejected.
+_MATERIAL_CHANGING_WORDS = {
+    "mortar", "adhesive", "glue", "grout", "plaster", "render", "screed",
+    "paint", "coating", "primer", "sealant", "waterproofing",
+    "pipe", "pipes", "shaft", "duct", "fitting", "fittings",
+    "glass", "fibre", "fiber", "frp", "grc",
+    "formwork", "shuttering", "scaffolding",
+}
+
+
 def _epd_tokens(text):
-    return {t for t in re.findall(r"[a-z0-9]+", (text or "").lower()) if len(t) > 1}
+    """Lower-cased word set, with plurals folded onto the singular.
+
+    Without the fold, "AAC block" shares no token with the catalogue's "AAC
+    solid blocks" beyond the abbreviation, and the correct EPD scores below the
+    confidence cutoff while a wrong one above it wins.
+    """
+    words = re.findall(r"[a-z0-9]+", (text or "").lower())
+    out = set()
+    for t in words:
+        if len(t) <= 1:
+            continue
+        if len(t) > 3 and t.endswith("s") and not t.endswith("ss"):
+            t = t[:-1]
+        out.add(t)
+    return out
+
+
+def _changes_material(query, candidate):
+    """True when `candidate` names a different product from `query`.
+
+    Compared on the raw text, not the token sets, so this stays independent of
+    the stemming above.
+    """
+    q = set(re.findall(r"[a-z0-9]+", (query or "").lower()))
+    c = set(re.findall(r"[a-z0-9]+", (candidate or "").lower()))
+    return bool((c & _MATERIAL_CHANGING_WORDS) - q)
 
 
 def _fuzzy_epd_pick(name, candidates):
@@ -173,6 +221,8 @@ def _fuzzy_epd_pick(name, candidates):
         shared = q_tokens & ct
         if not shared:
             continue
+        if _changes_material(name, c):
+            continue  # same words, different product - see _MATERIAL_CHANGING_WORDS
         informative = {
             t for t in shared
             if t not in _EPD_STOPWORDS and freq.get(t, 0) <= rare_cap
@@ -2463,6 +2513,27 @@ def _efficiency_metric(raw):
 # Returned as the "error" slot when a match was only possible by using another
 # country's EPD. Not an error - the row imports - but the localised GWP is the
 # wrong one, so the preview marks it for review.
+def _shortest_contains(qs, name, country):
+    """The shortest catalogue name containing `name`, optionally in `country`.
+
+    "Contains" matching picked whichever row the database happened to return
+    first, so "Reinforced concrete" resolved to "Glass reinforced concrete" -
+    a thin cladding product with a completely different carbon factor - purely
+    because the query string is a substring of it. The shortest containing
+    name is the least elaborated one and therefore the closest to what was
+    asked for; an exact match is shortest of all.
+    """
+    f = qs.filter(name__icontains=name)
+    if country:
+        f = f.filter(country__name__iexact=country)
+    names = [n for n in f.values_list("name", flat=True)[:200]
+             if not _changes_material(name, n)]
+    if not names:
+        return None
+    best = min(names, key=lambda n: (len(n), n.lower()))
+    return f.filter(name__iexact=best).first()
+
+
 CROSS_COUNTRY = "__cross_country__"
 
 
@@ -2511,12 +2582,28 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
         return epd, None
 
     # 2. Exact name only
+    #
+    # An exact name match can still be another country's EPD. A dummy BoQ
+    # naming "Ready-mix concrete C25/30" for a Cambodian building matched the
+    # GERMAN EPD of that name and reported nothing, because this step returns
+    # before any country is considered. Flagged like the looser steps below.
     epd = qs.filter(name__iexact=name).first()
     if epd:
+        if country and epd.country and epd.country.name.lower() != country.lower():
+            logger.warning("Import: %r (%s) exact-matched an EPD from %s",
+                           name, country, epd.country.name)
+            return epd, CROSS_COUNTRY
         return epd, None
 
     # 3. Name contains + country
-    epd = qs.filter(name__icontains=name, country__name__iexact=country).first()
+    #
+    # Country is pinned here, but "contains" can still land on a different
+    # material: "Reinforced concrete" is a substring of "Glass reinforced
+    # concrete", which is a thin cladding product, not structural concrete.
+    # Prefer the shortest match - the least elaborated name is the closest to
+    # what was asked for - rather than whichever row the database returns
+    # first.
+    epd = _shortest_contains(qs, name, country)
     if epd:
         return epd, None
 
@@ -2532,7 +2619,28 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
     # The fallback stays, because refusing would flag a third of every import.
     # But the caller is told, so the row can be shown for review instead of
     # succeeding silently.
-    epd = qs.filter(name__icontains=name).first()
+    # 4a. Fuzzy within the row's own country, BEFORE crossing a border.
+    #
+    # Ordering matters more than it looks. "AAC block" has no Cambodian name
+    # containing it, so the contains-any-country step below used to return the
+    # GERMAN "AAC block and AAC Blocks for Floor Plates" - while Cambodia's own
+    # "Autoclaved aerated concrete (AAC) solid blocks" sat unexamined. The
+    # localised GWP is the whole point of the per-country catalogue, so a
+    # confident same-country match beats a better string elsewhere.
+    if country:
+        in_country = qs.filter(country__name__iexact=country)
+        candidates = list(in_country.values_list("name", flat=True)[:5000])
+        best, score = _fuzzy_epd_pick(name, candidates)
+        if best:
+            epd = in_country.filter(name__iexact=best).first()
+            if epd:
+                logger.warning(
+                    "Import fuzzy-matched structural EPD %r -> %r (score %.2f, own country %s)",
+                    name, best, score, country,
+                )
+                return epd, None
+
+    epd = _shortest_contains(qs, name, None)
     if epd:
         if country and epd.country and epd.country.name.lower() != country.lower():
             logger.warning("Import: %r (%s) matched an EPD from %s",
