@@ -1,106 +1,91 @@
-# Construction techniques the import template offers that no longer exist
+# Construction techniques: the template vs the catalogue
 
-**Status: written up, not fixed. A decision is needed before it can be.**
+**Status: mapped. 123 of the template's 136 dropdown entries now resolve; the
+remaining 13 are the migration's deliberate drops.**
 
-Migration 0046 consolidated building components from 19 to 14. It renamed and
+Migration 0046 consolidated building components from 19 to 14 and renamed or
 merged construction techniques at the same time. The categories were mapped in
-`_LEGACY_CATEGORY_NAMES`; the techniques were not.
+`_LEGACY_CATEGORY_NAMES`; the techniques were not, so 42 of the 90 distinct
+names the template offers no longer existed - including `Stones and Tiles`,
+which the shipped example row uses.
 
-## What happens today
+`import_structural_components` looks a technique up by exact name. On a miss it
+creates the assembly with `classification = None`, under what used to be a bare
+`except ... : pass`. **The carbon figure is unaffected** - that comes from the
+EPD and the quantity - so this was lost metadata rather than a wrong number,
+which is why it went unnoticed.
 
-`import_structural_components` looks the technique up by exact name. On a miss
-it creates the assembly with `classification = None`. That used to be a bare
-`except ... : pass`; it now logs a warning, so it is at least visible in the
-dyno log.
+## What was done
 
-**The carbon figure is unaffected** - that comes from the EPD and the quantity,
-not the classification - so this is lost metadata, not a wrong number. That is
-why it went unnoticed, and why it is lower priority than the faults fixed
-around it.
+`_LEGACY_TECHNIQUE_NAMES` maps the old names onto the current ones. It is keyed
+on **(category, old name)**, not the name alone, because the same string means
+different things in different categories: `In-Situ Reinforced Concrete Slab`
+was renamed under Basement and kept under Roof; `Aluminium` exists only under
+Windows and Doors.
 
-## The scale
+A miss is now logged rather than swallowed.
 
-90 distinct techniques in the List sheet; **42 do not resolve**.
+## The spec could not be trusted on its own
 
-The template's own example rows use six techniques. Five resolve. The sixth,
-`Stones and Tiles`, does not - so even the shipped example loses its
-classification on one row.
+`docs/taxonomy_mapping.md` is a draft, and the migration did not follow all of
+it. It proposes dropping the `Frame —` and `Glazing —` prefixes on Windows.
+**They were kept.** The catalogue holds `Frame — Aluminium` and
+`Glazing — Single`, not `Aluminium` and `Single Glazing`.
 
-## Why this was not mapped the way the categories were
+Mapping from the spec would have left all nine Windows techniques unresolved
+while looking right. Every target in the map is therefore checked against
+`AssemblyCategoryTechnique` by `test_import_technique_map.py`, and a warning
+has been added to that section of the spec.
 
-`docs/taxonomy_mapping.md` marks each technique keep, rename, merge or drop.
-The renames are mechanical, but the table also contains:
+## The two merges
 
-- **merges**, where two techniques become one - `Frame - Aluminum` and
-  `Aluminum` both fold into `Aluminium`, combining their usage counts
-- **drops**, 14 of them, for techniques with no recorded uses
-- **prefix changes** - the old `Frame - X` and `Glazing - X` names lost their
-  prefixes when Window Frames and Window Glazing merged into `Windows`
+Both are recorded in the spec and already applied by the migration.
 
-A merge or a drop is a decision about what a record means, not a spelling
-change. Applying them from a draft spec without review would put a wrong
-technique on an imported assembly silently, which is the failure mode this
-project cares about most. So the mapping is written up here rather than
-guessed at in code.
+| Category | Old names | Becomes | Combined uses |
+|---|---|---|---|
+| Windows | `Aluminium Windows`, `Aluminum` | `Frame — Aluminium` | 83 |
+| Doors | `Aluminium Doors`, `Aluminum` | `Aluminium` | 433 |
 
-## The 42 that do not resolve
+`Air Gap <100mm Wide` and `Air Gap >100mm Wide` likewise both become `Air Gap`.
 
-| Template offers | In the catalogue? |
+## One mapping that is not a migration decision
+
+`Precast Concrete Foundations` (template) to `Precast Reinforced Concrete
+Foundations` (catalogue) is not recorded in the spec - the two were simply
+always worded differently. Precast concrete foundations are reinforced by
+definition and Foundations has no other precast option, so they are treated as
+the same technique. Agreed with the user on 2026-10-20.
+
+## The 13 left unmapped, by decision
+
+These were dropped by the migration, each with zero recorded uses. A row naming
+one **imports without a classification** rather than being refused: the
+material, quantity and carbon are all still good, and only the technique label
+is missing. Refusing would reject rows that succeed today. Agreed with the user
+on 2026-10-20.
+
+| Category | Technique |
 |---|---|
-| Air Gap <100mm Wide | no |
-| Air Gap >100mm Wide | no |
-| Aluminium Doors | no |
-| Aluminium Windows | no |
-| Aluminum | no |
-| Aluminum Clad Timber | no |
-| Aluminum Profile Cladding | no |
-| Cellulose | no |
-| Cement Fiber Boards on Metal Studs | no |
-| Cement Fiber Boards on Timber Studs | no |
-| Construction chemical | no |
-| Cored (with Holes) Bricks with Internal & External Plaster | no |
-| Cored (with Holes) Bricks with Plaster Both Sides | no |
-| Double Glazing | no |
-| Granites | no |
-| In-Situ Reinforced Concrete Staircases and Ramps | no |
-| In-Situ Reinforced Wall | no |
-| Lintel, Sunshade and Sill Beam | no |
-| Micro Concrete Tiles on Timber Rafters | no |
-| Others | no |
-| PCC for Footings | no |
-| Paint and Coatings | no |
-| Plasterboards on Metal Studs with Insulation | no |
-| Plasterboards on Timber Studs with Insulation | no |
-| Polystyrene | no |
-| Polyurethane | no |
-| Pre-cast Concrete | no |
-| Precast Concrete Double Tee Floor Units | no |
-| Precast Concrete Double Tee Roof Units | no |
-| Precast Concrete Foundations | no |
-| Precast Concrete Sandwich Panel | no |
-| Re-use of Existing Door Frames | no |
-| Re-use of Existing Window Frames | no |
-| Single Glazing | no |
-| Steel (Zinc or Galvanized Iron) Sheets on Steel Rafters | no |
-| Steel (Zinc or Galvanized iron) Sheets on Timber Rafters | no |
-| Stones and Tiles | no |
-| Surface preparation and treatments | no |
-| Thin Precast Concrete Deck and Composite In-situ Slab | no |
-| Triple Glazing | no |
-| Ventillators | no |
-| Woods | no |
+| Ground Floor | Precast Concrete Double Tee Floor Units |
+| Ground Floor | Thin Precast Concrete Deck and Composite In-situ Slab |
+| Roof | Precast Concrete Double Tee Roof Units |
+| Roof | Micro Concrete Tiles on Timber Rafters |
+| Internal Walls & Partitions | Precast Concrete Sandwich Panel |
+| Internal Walls & Partitions | Cement Fiber Boards on Timber Studs |
+| Internal Walls & Partitions | Plasterboards on Timber Studs with Insulation |
+| Internal Walls & Partitions | Plasterboards on Metal Studs with Insulation |
+| Windows | Aluminum Clad Timber |
+| Windows | Re-use of Existing Window Frames |
+| Insulation | Cellulose |
 
-## What a fix would involve
+(`Thin Precast Concrete Deck...` is mapped under Beams & Slabs and Roof, and
+dropped only under Ground Floor. `Cellulose` appears under all three insulation
+groups, which collapse into one category.)
 
-1. Walk `docs/taxonomy_mapping.md` technique by technique and confirm each
-   rename, merge and drop against the current `AssemblyTechnique` rows.
-2. Add a `_LEGACY_TECHNIQUE_NAMES` map beside `_LEGACY_CATEGORY_NAMES`, built
-   from that review rather than from string similarity.
-3. Correct the List sheet so new files offer names that exist, keeping the
-   legacy map for files already saved.
-4. Decide what a dropped technique should do: refuse the row, or import it
-   without a classification as today. Refusing is the honest default
-   everywhere else in this importer, but it would reject rows that currently
-   succeed, so it is the user's call.
+## Still open
 
-Until then the warning in the log is the only signal.
+The template's List sheet still OFFERS the old names. They import correctly
+through the map, so this is cosmetic rather than broken, but a user picking
+from the dropdown is picking a name the catalogue no longer uses. Correcting
+the sheet means editing the XML in place - openpyxl destroys the workbook's
+x14 validations - and has not been done.

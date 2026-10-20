@@ -2545,6 +2545,97 @@ _LEGACY_CATEGORY_NAMES = {
 }
 
 
+# Construction techniques the template offers, mapped to the ones migration
+# 0046 left behind. 42 of the 90 in its dropdown no longer exist.
+#
+# Keyed on the CATEGORY as well as the name, because the same old string means
+# different things in different places: "In-Situ Reinforced Concrete Slab" was
+# renamed under Basement but kept under Roof, and "Aluminium" exists only under
+# Windows and Doors.
+#
+# Built against the live catalogue, NOT from docs/taxonomy_mapping.md alone.
+# That spec is a draft and the migration did not follow all of it: it proposed
+# dropping the "Frame —" and "Glazing —" prefixes on Windows, and they were
+# kept. Mapping "Single Glazing" to the spec's "Single Glazing" rather than the
+# catalogue's "Glazing — Single" would have left all nine Windows techniques
+# unresolved while looking correct. Every target below is checked by
+# test_import_technique_map.py against AssemblyCategoryTechnique.
+#
+# The migration's 13 deliberate drops are deliberately ABSENT. A row naming one
+# imports without a classification, as it does today, rather than being
+# refused: the material, quantity and carbon are all still good, and only the
+# technique label is missing.
+_EM_DASH = "—"
+
+_LEGACY_TECHNIQUE_NAMES = {
+    ("Beams & Slabs", "precast concrete double tee floor units"): "Precast Concrete Double Tee Units",
+    ("Beams & Slabs", "thin precast concrete deck and composite in-situ slab"): "Thin Precast Concrete Deck & Composite In-Situ Slab",
+
+    ("Roof", "thin precast concrete deck and composite in-situ slab"): "Thin Precast Concrete Deck & Composite In-Situ Slab",
+    ("Roof", "steel (zinc or galvanized iron) sheets on steel rafters"): "Metal Sheets on Steel Rafters",
+    ("Roof", "steel (zinc or galvanized iron) sheets on timber rafters"): "Metal Sheets on Timber Rafters",
+
+    ("Foundations", "pcc for footings"): "Plain Cement Concrete (PCC) Footings",
+    # Not a migration rename - the template and the catalogue were always
+    # worded differently. Precast concrete foundations are reinforced by
+    # definition and Foundations has no other precast option.
+    ("Foundations", "precast concrete foundations"): "Precast Reinforced Concrete Foundations",
+
+    ("Basement & Retaining Walls", "pre-cast concrete"): "Precast Concrete",
+
+    ("Staircases & Ramps", "in-situ reinforced concrete staircases and ramps"): "In-Situ Reinforced Concrete",
+
+    ("External Walls", "cored (with holes) bricks with internal & external plaster"): "Cored Bricks with Internal & External Plaster",
+    ("External Walls", "aluminum profile cladding"): "Aluminium Profile Cladding",
+
+    ("Internal Walls & Partitions", "cored (with holes) bricks with plaster both sides"): "Cored Bricks with Plaster Both Sides",
+    ("Internal Walls & Partitions", "in-situ reinforced wall"): "In-Situ Reinforced Concrete Wall",
+    ("Internal Walls & Partitions", "cement fiber boards on metal studs"): "Cement Fibre Boards on Metal Studs",
+
+    # Both spellings merge into one frame, per the spec (combined 83 uses).
+    ("Windows", "aluminium windows"): "Frame " + _EM_DASH + " Aluminium",
+    ("Windows", "aluminum"): "Frame " + _EM_DASH + " Aluminium",
+    ("Windows", "ventillators"): "Frame " + _EM_DASH + " Ventilators",
+    ("Windows", "single glazing"): "Glazing " + _EM_DASH + " Single",
+    ("Windows", "double glazing"): "Glazing " + _EM_DASH + " Double",
+    ("Windows", "triple glazing"): "Glazing " + _EM_DASH + " Triple",
+
+    # Likewise for doors (combined 433 uses).
+    ("Doors", "aluminium doors"): "Aluminium",
+    ("Doors", "aluminum"): "Aluminium",
+    ("Doors", "aluminum clad timber"): "Aluminium Clad Timber",
+    ("Doors", "re-use of existing door frames"): "Re-use of Existing Doors",
+
+    ("Finishes", "stones and tiles"): "Stone & Tiles",
+    ("Finishes", "woods"): "Timber Flooring",
+    ("Finishes", "others"): "Other Floor Finishes",
+    ("Finishes", "granites"): "Granite",
+    ("Finishes", "paint and coatings"): "Paint & Coatings",
+    ("Finishes", "surface preparation and treatments"): "Surface Preparation & Treatments",
+
+    ("Insulation", "polystyrene"): "Polystyrene (EPS/XPS)",
+    ("Insulation", "polyurethane"): "Polyurethane (PIR)",
+    # The spec merged the two width variants into one.
+    ("Insulation", "air gap <100mm wide"): "Air Gap",
+    ("Insulation", "air gap >100mm wide"): "Air Gap",
+
+    ("Miscellaneous", "lintel, sunshade and sill beam"): "Lintel, Sunshade & Sill Beam",
+    ("Miscellaneous", "construction chemical"): "Construction Chemicals",
+}
+
+
+def _resolve_technique_name(category, raw_name):
+    """The catalogue name for a technique as the template spells it.
+
+    Returns the name to look up, which is `raw_name` unchanged when it needs no
+    translation. The caller still decides what to do when the lookup misses.
+    """
+    name = " ".join((raw_name or "").split())
+    if not name or category is None:
+        return name
+    return _LEGACY_TECHNIQUE_NAMES.get((category.name, name.lower()), name)
+
+
 def _get_structural_category_map():
     """Build a lower-cased name → AssemblyCategory lookup, queried fresh each call.
 
@@ -3095,7 +3186,9 @@ def import_structural_components(request):
             if asm_data["technique_name"]:
                 try:
                     technique = AssemblyTechnique.objects.get(
-                        name__iexact=asm_data["technique_name"].strip()
+                        name__iexact=_resolve_technique_name(
+                            asm_data["category"], asm_data["technique_name"]
+                        )
                     )
                     classification = AssemblyCategoryTechnique.objects.filter(
                         category=asm_data["category"],
