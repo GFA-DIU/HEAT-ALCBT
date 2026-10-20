@@ -1973,7 +1973,26 @@ def _calc_hws_energy(system_type, power, num, hours, days, weeks, cop_or_eff, fu
         elif system_type == HotWaterSystemType.SOLAR and str(fuel_type).lower() == 'solar':
             result = 0
         else:
-            # Boiler or Water Heater: divide by (efficiency% / 100)
+            # Boiler or Water Heater: divide by (efficiency% / 100).
+            #
+            # This column is a PERCENTAGE - the manual form asks for 75-95 and
+            # caps it at 100 - but the header said only "efficiency level" and
+            # the template's own example row carried 3. Dividing by 0.03 turned
+            # a 12,600 kWh/yr water heater into 420,000: a plausible figure,
+            # 33x too high, from the example value the template taught.
+            #
+            # The header now says "(%)" and the example says 95. This refuses
+            # the rest: no boiler or water heater runs under 10% efficient, so
+            # such a number is a unit mistake, not a reading. Returning None
+            # leaves the energy blank and visible rather than wrong and
+            # convincing.
+            if e < 10:
+                logger.warning(
+                    "Import: hot water efficiency %r is below 10%% - refusing to "
+                    "divide by it. The column is a percentage (75-95), not a level.",
+                    cop_or_eff,
+                )
+                return None
             result = base / (e / 100)
 
         return round(Decimal(str(result)), 3)
