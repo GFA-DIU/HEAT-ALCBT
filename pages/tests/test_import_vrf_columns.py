@@ -1,7 +1,11 @@
-"""The VRF tab of the import template never worked.
+"""Cooling tabs read one column out.
 
-Found by parsing a VRF row laid out exactly as the shipped template lays it
-out, rather than by reading the parser.
+The VRF tab and both chiller tabs carry a leading "Type of cooling system"
+column that Window and Split do not, and the shared parser used Window/Split
+indices for all of them.
+
+Found by parsing rows laid out exactly as the shipped template lays them out,
+rather than by reading the parser.
 """
 import pytest
 
@@ -65,3 +69,77 @@ def test_the_offset_is_not_applied_to_packaged():
     row = _parse_cooling_rows("packagedductab", [packaged])[0]
     assert row["year_of_installation"] == "2020"
     assert row["eer_iseer_cop"] == "3.4"
+
+
+# --- the chillers ----------------------------------------------------------
+#
+# Worse than VRF, because these still produced a figure. VRF rows failed on a
+# year of "VRF"; a chiller row reported 4,320,000 kWh/yr.
+
+WATER_COOLED_ROW = ["Water cooled chiller", 2017, "R-134a", 120, 400, 2, 10,
+                    12, 6, 50, 0.62, "Yes", "No", 6.4, 0.85, 250, 5.6, "A", 4, ""]
+
+WATER_COOLED_EXPECTED = {
+    "year_of_installation": "2017",
+    "type_of_refrigerants": "R-134a",
+    "refrigerant_quantity": "120",
+    "total_cooling_load": "400",
+    "number_of_chillers": "2",
+    "baseline_leakage_factor": "10",
+    "annual_operating_hours_per_day": "12",
+    "annual_operating_days_per_week": "6",
+    "annual_operating_weeks_per_year": "50",
+    "baseline_cooling_efficiency": "0.62",
+    "cop": "5.6",
+    "number_of_stars": "4",
+}
+
+# air-cooled puts IPLV at 13, system power at 14 and COP at 15, one fewer than
+# water-cooled, which has a cooling load factor at 14.
+AIR_COOLED_ROW = ["Air cooled chiller", 2016, "R-410A", 90, 300, 3, 10, 10, 6,
+                  52, 0.85, "No", "No", 5.1, 210, 3.9, "B", 3, ""]
+
+AIR_COOLED_EXPECTED = {
+    "year_of_installation": "2016",
+    "total_cooling_load": "300",
+    "number_of_chillers": "3",
+    "baseline_cooling_efficiency": "0.85",
+    "cop": "3.9",
+    "number_of_stars": "3",
+}
+
+
+@pytest.mark.parametrize("field,expected", sorted(WATER_COOLED_EXPECTED.items()))
+def test_water_cooled_fields_land_in_their_own_columns(field, expected):
+    row = _parse_cooling_rows("water cooled", [WATER_COOLED_ROW])[0]
+    assert str(row[field]) == expected
+
+
+@pytest.mark.parametrize("field,expected", sorted(AIR_COOLED_EXPECTED.items()))
+def test_air_cooled_fields_land_in_their_own_columns(field, expected):
+    row = _parse_cooling_rows("air cooled", [AIR_COOLED_ROW])[0]
+    assert str(row[field]) == expected
+
+
+def test_the_chiller_energy_that_was_nearly_five_times_too_high():
+    """400 RT x 0.62 kW/RT x 12 h x 6 d x 50 wk = 892,800 kWh/yr. Shifted, it
+    read the load as 120 and the efficiency as 50 kW/RT and reported
+    4,320,000 - a plausible figure for a large plant."""
+    row = _parse_cooling_rows("water cooled", [WATER_COOLED_ROW])[0]
+    energy = float(row["total_energy_consumption_of_chiller_system_annually"])
+    assert abs(energy - 892800) < 1
+
+
+def test_the_chiller_row_validates():
+    from pages.forms.cooling_system_form import CoolingSystemChillerForm
+
+    row = _parse_cooling_rows("air cooled", [AIR_COOLED_ROW])[0]
+    assert CoolingSystemChillerForm(data=row).is_valid()
+
+
+def test_the_offset_covers_exactly_the_tabs_that_need_it():
+    from pages.views.building.import_building import _TABS_WITH_LEADING_COLUMN
+
+    assert _TABS_WITH_LEADING_COLUMN == {"vrf", "water cooled", "air cooled"}
+    # PackagedDuctable has the leading column but its own absolute indices.
+    assert "packagedductab" not in _TABS_WITH_LEADING_COLUMN

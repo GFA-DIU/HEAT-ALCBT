@@ -627,6 +627,29 @@ COOLING_TAB_MAP = {
     'air cooled':      ('chiller',         None,          'air_cooled',  None),
 }
 
+# Tabs that carry an extra leading "Type of cooling system" column, which the
+# Window and Split tabs do not. The browser sends rows with every column
+# present - slice(1) there drops the header ROW, not a column - so the shared
+# parser, written for Window/Split, read every field on these tabs one place
+# to the left.
+#
+# On VRF that meant year_of_installation came out as the text "VRF",
+# refrigerant_quantity as "R-410A" and the efficiency as the power input. Those
+# rows did not import at all rather than importing wrong: a year of "VRF" fails
+# validation, and a blank first column instead made `if not year: continue`
+# skip the row in silence.
+#
+# The chillers were worse, because they still produced a figure. A 2-unit,
+# 400 RT water-cooled plant at 0.62 kW/RT read its cooling load as 120, its
+# unit count as 400 and its efficiency as 50 kW/RT, and reported 4,320,000
+# kWh/yr - a plausible number for a large plant, from a row that said nothing
+# of the sort.
+#
+# PackagedDuctable has the same extra column but is handled in its own branch
+# with absolute indices, so it is deliberately absent here.
+_TABS_WITH_LEADING_COLUMN = {'vrf', 'water cooled', 'air cooled'}
+
+
 # Packaged sub-type label → model value
 PACKAGED_SUBTYPE_MAP = {
     'rooftop':        'rooftop',
@@ -810,24 +833,7 @@ def _parse_cooling_rows(sheet_key, raw_rows):
     cooling_system_type, ac_type, chiller_type, packaged_subtype_flag = entry
     results = []
 
-    # The VRF tab carries an extra leading column, "Type of cooling system",
-    # that the Window and Split tabs do not. The browser sends rows with every
-    # column present - slice(1) there drops the header ROW, not a column - so
-    # the shared parser below, written for Window/Split, read every VRF field
-    # one place to the left: year_of_installation came out as the text "VRF",
-    # refrigerant_quantity as "R-410A", number_of_units as "kW", and the
-    # efficiency as the power input (12.5 rather than COP 3.60).
-    #
-    # The practical effect was that VRF rows did not import at all rather than
-    # importing wrong: a year of "VRF" fails validation, and a blank first
-    # column instead made `if not year: continue` skip the row in silence. The
-    # four VRF records in the developer database are all coherent and were
-    # entered through the form, so nothing in the data needs repairing - but
-    # one tab of the template simply never worked.
-    #
-    # The PackagedDuctable tab has the same extra column but is handled in its
-    # own branch with absolute indices, so it takes no offset.
-    col_offset = 1 if sheet_key == 'vrf' else 0
+    col_offset = 1 if sheet_key in _TABS_WITH_LEADING_COLUMN else 0
 
     for row in raw_rows:
         def cell(idx, default='', _off=col_offset):
