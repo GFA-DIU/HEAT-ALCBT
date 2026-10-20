@@ -186,12 +186,19 @@ def create_building_from_boq(user, name, country_name, gfa, rows, building_type=
         if r.get("category"):
             classification, _ = AssemblyCategoryTechnique.objects.get_or_create(
                 category=r["category"], technique=None)
+        # An assumed density is stated on the material it was used for, so the
+        # assumption travels with the building that depends on it instead of
+        # being written into a shared EPD where it looks like published data.
+        desc = (r.get("description") or "")
+        if r.get("assumed_density"):
+            note = f" [assumed density {r['assumed_density']} kg/m3]"
+            desc = (desc[:255 - len(note)] + note)
         StructuralProduct.objects.create(
             epd=epd,
             assembly=assembly,
             quantity=Decimal(str(r["quantity"])),
             input_unit=r["unit"],
-            description=(r.get("description") or "")[:255],
+            description=desc[:255],
             classification=classification,
         )
         created += 1
@@ -207,18 +214,52 @@ def create_building_from_boq(user, name, country_name, gfa, rows, building_type=
 # m³ (or kg) computes. Only the mass<->volume case is a defensible constant; area
 # / linear / pcs mismatches need geometry the BoQ doesn't carry, so they stay flagged.
 # ---------------------------------------------------------------------------
+# Fallback bulk densities, kg/m3, used ONLY when an EPD publishes none.
+#
+# Three things were wrong with the previous version, all of them silent.
+#
+# It matched the FIRST rule containing any fragment, and the order put the
+# general before the specific. "Autoclaved aerated concrete" matched
+# "concrete" and got 2400 instead of 600, four times its real mass.
+# "Reinforced concrete" matched "reinforc" and got steel's 7850, over three
+# times. "Glass wool" matched "glass" and got solid-glass 2500 against a real
+# 16 - the figure the EPD catalogue itself carries - a factor of 156.
+#
+# Density converts a BoQ quantity into mass and mass drives embodied carbon,
+# so each of those is a wrong carbon figure, not a wrong label.
+#
+# Now ordered most-specific first, and _std_volume_density stops at the first
+# match, so a specific rule always beats the general one it is a special case
+# of. The ordering is load-bearing: moving "concrete" above "aerated concrete"
+# reintroduces the 4x error. test_boq_density.py pins it.
+#
+# PROVENANCE: these are typical trade values for the material class, not
+# figures from a published standard, and they are a last resort - 610 of the
+# EPDs in the catalogue carry their own measured density and those always win.
+# They are applied to the imported material only and never written back to the
+# EPD. Sourcing them properly against IS 875 Part 1 or EN 1991-1-1 Annex A is
+# recorded as outstanding in docs/AGENT_HANDOVER.md.
 _STD_VOLUME_DENSITY = [
-    (("reinforc", "rebar", "steel", "tmt", " iron"), 7850),
+    # --- specific cases first; each would otherwise be caught by a rule below
+    (("autoclaved aerated", "aerated concrete", "aac", "lightweight concrete",
+      "cellular concrete", "foamed concrete"), 600),
+    (("glass wool", "mineral wool", "rock wool", "glasswool"), 100),
+    (("glass fibre", "fibreglass", "fiberglass"), 2000),
+    (("reinforced concrete", "rcc"), 2500),
+    (("cement board", "fibre cement", "fiber cement"), 1400),
+    (("cement mortar", "cement plaster"), 2000),
+    # --- general classes
+    (("rebar", "reinforcement bar", "tmt", "structural steel", "mild steel",
+      "stainless steel", "steel"), 7850),
     (("aluminium", "aluminum"), 2700),
-    (("glass",), 2500),
-    (("precast", "ready mix", "ready-mix", "concrete", "rcc"), 2400),
-    (("autoclaved aerated", "aerated concrete", "aac", "lightweight concrete"), 600),
+    (("float glass", "glazing", "glass"), 2500),
+    (("precast", "ready mix", "ready-mix", "concrete"), 2400),
     (("cement",), 1440),
     (("aggregate", "gravel", "crushed"), 1600),
     (("sand",), 1600),
     (("brick", "masonry"), 1800),
     (("timber", "wood", "plywood", "laminate", "bamboo"), 600),
-    (("gypsum", "plaster", "board"), 1200),
+    (("gypsum", "plasterboard", "plaster"), 1200),
     (("bitumen", "bituminous", "waterproof"), 1100),
 ]
 
@@ -247,28 +288,38 @@ def autofix_conversions(rows):
             continue
         if str(r["unit"]) not in ("kg", "m3"):
             continue
-        # already has a volume density? then it's a different problem — skip
+        # The EPD's own published density always wins and is never overwritten.
         if any((c.get("name") == "volume density") for c in (epd.conversions or [])):
             continue
         density = _std_volume_density(epd.name)
         if not density:
             continue
-        convs = list(epd.conversions or [])
-        convs.append({"name": "volume density", "unit": "kg/m^3",
-                      "value": str(density), "unit_description": "kilograms per cubic metre"})
-        epd.conversions = convs
-        epd.save(update_fields=["conversions"])
-        # re-evaluate
-        avail = {str(u) for u in (epd.get_available_units() or {epd.declared_unit})}
-        if str(r["unit"]) in avail:
-            r["status"] = "ok"
-            r["reason"] = f"auto-added volume density {density} kg/m³"
-            fixed += 1
+        # Recorded on the ROW, not saved to the EPD.
+        #
+        # This used to write the guessed density into the shared EPD record and
+        # persist it - from the PREVIEW step, so merely looking at a BoQ
+        # changed an EPD that every other building uses. A fallback became
+        # indistinguishable from published data the moment it was saved: 117
+        # catalogue EPDs already carry a value exactly matching one of these
+        # constants and there is now no way to tell which were measured.
+        #
+        # The importing building gets its conversion; nobody else's carbon
+        # moves because someone opened a spreadsheet.
+        r["assumed_density"] = density
+        r["status"] = "ok"
+        r["reason"] = (f"no published density for this EPD; using a typical "
+                       f"{density} kg/m³ for this material, applied to this "
+                       f"import only")
+        fixed += 1
     return fixed
 
 
 def serialize_row(r):
-    """Row -> plain dict for the preview/process JSON (EPD as id + name)."""
+    """Row -> plain dict for the preview/process JSON (EPD as id + name).
+
+    assumed_density is included so the preview can show which rows rest on a
+    fallback rather than on the EPD's own published figure.
+    """
     epd = r.get("epd")
     return {
         "row": r["row"],
@@ -283,6 +334,7 @@ def serialize_row(r):
         "supported_units": sorted(str(u) for u in (epd.get_available_units() or {epd.declared_unit})) if epd else [],
         "status": r["status"],
         "reason": r.get("reason", ""),
+        "assumed_density": r.get("assumed_density"),
     }
 
 
