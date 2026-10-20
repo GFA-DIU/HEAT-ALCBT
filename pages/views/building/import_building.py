@@ -3102,8 +3102,27 @@ def import_structural_components(request):
                         technique=technique,
                     ).first()
                 except AssemblyTechnique.DoesNotExist:
-                    # Technique not found — still create assembly without classification
-                    pass
+                    # Still create the assembly, but say so.
+                    #
+                    # This used to be a bare `pass`. Migration 0046 renamed and
+                    # merged techniques alongside the categories, and the
+                    # template still offers the old names: 42 of the 90 in its
+                    # dropdown no longer exist, including "Stones and Tiles",
+                    # which its own example row uses. Every one of those
+                    # imported with classification = None and said nothing.
+                    #
+                    # The carbon figure is unaffected - that comes from the EPD
+                    # and the quantity - so this is lost metadata rather than a
+                    # wrong number, which is why it went unnoticed. The mapping
+                    # is not applied here because the spec's technique table
+                    # carries merges and drops, not only renames, and guessing
+                    # at those would put a wrong technique on the record
+                    # silently. See docs/import_technique_mismatches.md.
+                    logger.warning(
+                        "Import: construction technique %r is not in the "
+                        "catalogue - assembly saved without a classification",
+                        asm_data["technique_name"],
+                    )
 
             # Create Assembly
             assembly = Assembly.objects.create(
