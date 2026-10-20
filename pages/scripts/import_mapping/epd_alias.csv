@@ -1,0 +1,17 @@
+# EPD name mapping for building-import templates.
+# Maps the material name written in a source .xlsx to an EPD in the BEAT catalogue.
+# Columns:
+#   template_name - material name exactly as it appears in the template (case-insensitive)
+#   country       - country column in the template; blank = applies to any country
+#   action        - "map" (use epd_name) or "skip" (row carries no material; import nothing)
+#   epd_name      - target EPD name in the BEAT catalogue (required when action=map)
+#   note          - why this mapping was chosen (for audit)
+template_name,country,action,epd_name,note
+TMT Steel bars (Fe 550),,map,Steel reinforcement (steel rebar),"Fe 550 mapped to the same generic rebar EPD as Fe 415 (2.6 kgCO2e/kg) so both grades stay consistent; product-specific 98%-recycled TMT (0.592) would understate a general building stock."
+Toughened glass,,map,Toughened Laminated Glass - 44.2,"No plain toughened-glass EPD in catalogue; closest India product (33.71 kgCO2e/m2). Covers all case/spelling variants."
+Touhened Glass,,map,Toughened Laminated Glass - 44.2,"Misspelling of 'Toughened Glass' in source templates."
+Single Glazing,,map,Float glass,"Generic India float glass. NOTE: declared per kg while templates give m2 - check unit conversion."
+No Insulation,,skip,,"Means literally no insulation material - correctly contributes zero carbon."
+Ceramic Tile,,map,Rectified ceramic tile,"Exact-name match 'ceramic tile' [Germany] declares 165 kgCO2e/m2 - ~13x every other tile EPD (11-13) and treated as an outlier. Mapped to the regional ALCBT product (Thailand, 12.7 /m2)."
+Stones and Tiles,,map,Vitrified ceramic floor tiles,"Floor-finish row with no exact EPD. Mapped to the country-localised generic (Cambodia 14.49 kgCO2e/m2), declared in m2 so no thickness assumption is needed."
+Reinforcement steel wire,,map,Steel reinforcement (steel rebar),"Named by the SHIPPED TEMPLATE's own example rows against Cambodia, but it exists only as a German EPD, so every first-time import crossed the border for it. That EPD is high-recycled wire at 0.62 kgCO2e/kg (a second at 0.68) against the ALCBT localised rebar at 2.42 Cambodia / 2.60 India / 2.52 Indonesia / 2.46 Vietnam / 2.37 Thailand - the template understated its own reinforcement by about 3.9x. Blank country so each row resolves to its own country's localised factor."

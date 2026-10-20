@@ -146,3 +146,41 @@ def test_the_own_country_match_wins_over_the_closer_name_abroad(catalogue):
     confident same-country match beats a closer name somewhere else."""
     epd, _ = _lookup_structural_epd("AAC block", "Cambodia")
     assert epd.country.name == "Cambodia"
+
+
+# --- the shipped template's own example rows -------------------------------
+
+def test_the_templates_own_example_reinforcement_is_aliased():
+    """static/docs/import-template.xlsx ships example structural rows naming
+    "Reinforcement steel wire" against Cambodia. No such EPD exists outside
+    Germany, where it is high-recycled wire at 0.62 kgCO2e/kg against the
+    ALCBT localised rebar at 2.42 - so the template understated its own
+    reinforcement by about 3.9x, and did it on every first-time import."""
+    from pages.views.building.import_building import _alias_for
+    alias = _alias_for("Reinforcement steel wire", "Cambodia")
+    assert alias, "the template's own example material must be mapped"
+    assert alias["action"] == "map"
+    assert alias["epd_name"] == "Steel reinforcement (steel rebar)"
+
+
+def test_that_alias_applies_to_every_country():
+    """Blank country in the CSV, so each row still resolves to its OWN
+    country's localised factor rather than one country's for all."""
+    from pages.views.building.import_building import _alias_for
+    for country in ("India", "Indonesia", "Vietnam", "Thailand", "Cambodia"):
+        assert _alias_for("Reinforcement steel wire", country), country
+
+
+def test_the_alias_table_is_actually_shipped():
+    """A blanket *.csv rule in .gitignore kept epd_alias.csv untracked, so it
+    existed only on the machine that wrote it. Heroku deploys from git, so on
+    production _load_epd_aliases hit FileNotFoundError, returned {}, and every
+    curated mapping above was inert - silently, because the importer then just
+    falls through to automatic matching and still produces a number."""
+    import subprocess
+    from pages.views.building.import_building import _EPD_ALIAS_PATH
+    out = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", _EPD_ALIAS_PATH],
+        capture_output=True, text=True,
+    )
+    assert out.returncode == 0, "the alias table is not tracked, so it will not deploy"
