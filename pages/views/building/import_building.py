@@ -2406,7 +2406,11 @@ def import_operational_energy_carriers(request):
                 unit_raw = unit_raw[: -len(_suffix)].strip()
                 break
 
-        label = f"row {row_idx + 1}"
+        # Named, like every other section's errors ("led row 1", "ahu row 1").
+        # A bare "row 1" here was indistinguishable from the structural
+        # importer's "row 1" below - both land in one error panel under the
+        # preview - so an energy-carrier problem read as a structural one.
+        label = f"energy carrier row {row_idx + 1}"
 
         if not name_raw:
             continue  # Skip blank rows
@@ -2951,7 +2955,7 @@ def import_structural_components(request):
         epd_qty    = cell(10)
         epd_unit   = cell(11)
 
-        label = f"row {row_idx + 1}"
+        label = f"structural row {row_idx + 1}"
 
         # Separator row: Building Component present but no material data → end of group
         if comp_raw and not tech_raw and not qty_raw:
