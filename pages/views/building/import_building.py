@@ -32,7 +32,9 @@ from pages.models.assembly import (
 )
 from pages.models.building_operation import CoolingSystemChiller, CoolingSystemAirConditioner
 from pages.models.building_operation.ventilation import VentilationType, VentilationCapacity
-from pages.models.building_operation.lighting import RoomType, LightingBulbType, EnergyEfficiencyLabelType
+from pages.models.building_operation.lighting import (
+    RoomType, LightingBulbType, EnergyEfficiencyLabelType, LightingSpaceType,
+)
 from pages.models.building_operation import HotWaterSystem, HotWaterSystemType, FuelType
 from pages.forms.cooling_system_form import (
     CAPACITY_CONVERSION,
@@ -631,7 +633,12 @@ PACKAGED_SUBTYPE_MAP = {
     'floor standing': 'floor_standing',
     'floor-standing': 'floor_standing',
     'ductable':       'ductable',
-    'cassette':       'cassette',
+    # 'cassette' used to be listed here and mapped to itself, which is not a
+    # PackagedACSubType - the valid three are rooftop, floor_standing and
+    # ductable. Cassettes became their own ventilation type, so they belong on
+    # the "Ventilation - Cassette AC" tab. Left out rather than mapped: the
+    # unknown value falls through unchanged either way and the row is
+    # rejected, but listing it implied the Packaged tab accepted cassettes.
 }
 
 # Column index definitions per tab type (0-based, after stripping None columns)
@@ -1478,6 +1485,44 @@ ENERGY_LABEL_MAP = {
 }
 
 
+def _resolve_room_type(room_label):
+    """Template room name -> the code LightingSystem.room_type stores.
+
+    `room_type` holds a LightingSpaceType code. The table carries 68 of them -
+    6 legacy ones and 62 added with the national room types - but the map above
+    only ever knew the 6, so every current room type failed with "room_type:
+    This field is required". Nothing could be imported for a room named
+    "Work room / Open plan", "Meeting room" or "Corridor / Lobby".
+
+    The table is asked first, by exact name, which also repairs a quieter
+    fault: the substring pass below matched "Staff office" on the key "office"
+    and filed it as OFFICE_CONFERENCE - a conference room, which carries a
+    different lighting power density benchmark. Every one of the 68 names now
+    resolves to itself before any substring is tried.
+
+    The substring pass is kept after it, because files written against the old
+    template use wording that no longer appears in the table at all, such as
+    "Residential: Kitchen, Dining, Bedroom, Bathroom".
+    """
+    if not room_label:
+        return None
+
+    label = " ".join(room_label.split())
+
+    match = LightingSpaceType.objects.filter(name__iexact=label).first()
+    if match:
+        return match.code
+
+    for key, val in ROOM_TYPE_MAP.items():
+        if key in label or label in key:
+            logger.warning(
+                "Import: room type %r matched the legacy key %r -> %s",
+                room_label, key, val,
+            )
+            return val
+    return None
+
+
 def _calc_lighting_power(fixtures, tubes, wattage):
     """
     Auto-calculate total lighting power (kW).
@@ -1571,11 +1616,7 @@ def _parse_lighting_rows(tab_layout, raw_rows):
 
         # --- Room type ---
         room_label = cell(0).lower()
-        room_type_val = None
-        for label, val in ROOM_TYPE_MAP.items():
-            if label in room_label or room_label in label:
-                room_type_val = val
-                break
+        room_type_val = _resolve_room_type(room_label)
         if room_type_val:
             row_data['room_type'] = room_type_val
 
