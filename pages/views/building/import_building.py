@@ -344,6 +344,23 @@ def _resolve_building_type(combined_name):
 
     subcategory = BuildingSubcategory.objects.filter(name__iexact=subcat_name).first()
     if not subcategory:
+        # The template offers "Office - grade A office" while the database
+        # stores the subcategory as "Grade A": the second half repeats the
+        # category word. All three Office grades failed on this, so no office
+        # building could be imported at all, while the other 39 types worked.
+        #
+        # The template is corrected too, but files saved from the old one - and
+        # anyone who typed the wording it showed them - still carry the old
+        # text, so the trailing repeat is tolerated here as well. Only the
+        # category's own word is stripped, so nothing else is loosened.
+        trimmed = re.sub(
+            r"\s+" + re.escape(cat_name) + r"$", "", subcat_name, flags=re.IGNORECASE
+        ).strip()
+        if trimmed and trimmed.lower() != subcat_name.lower():
+            subcategory = BuildingSubcategory.objects.filter(name__iexact=trimmed).first()
+            if subcategory:
+                subcat_name = subcategory.name
+    if not subcategory:
         return None, f"Apartment type '{subcat_name}' was not found."
 
     cat_subcat = CategorySubcategory.objects.filter(
@@ -2423,8 +2440,47 @@ def import_operational_energy_carriers(request):
 # Structural Components import (By Component)
 # ---------------------------------------------------------------------------
 
+# The component names the import template offers, mapped to the categories that
+# replaced them when migration 0046 consolidated the taxonomy from 19 to 14.
+#
+# That migration is on qa and on heroku/main, so the consolidated names have
+# been live since July 2026 - but the template still offers the old ones, and
+# so does every file anyone has saved from it. 11 of the template's own 13
+# example structural rows named a category that no longer exists: only
+# Foundation and Columns still resolved, the first by the plural rule below
+# and the second because its name did not change.
+#
+# Taken from docs/taxonomy_mapping.md, which drove the migration, rather than
+# guessed from the names - "Beams" merging into "Beams & Slabs" together with
+# Slabs and Upper Floors is a decision recorded there, not something the
+# strings tell you.
+_LEGACY_CATEGORY_NAMES = {
+    "basement":                       "Basement & Retaining Walls",
+    "beams":                          "Beams & Slabs",
+    "slabs":                          "Beams & Slabs",
+    "upper floors":                   "Beams & Slabs",
+    "intermediate floor construction": "Beams & Slabs",
+    "bottom floor construction":      "Ground Floor",
+    "roof construction":              "Roof",
+    "staircases and ramps":           "Staircases & Ramps",
+    "exterior walls":                 "External Walls",
+    "interior walls":                 "Internal Walls & Partitions",
+    "window frames":                  "Windows",
+    "window glazing":                 "Windows",
+    "door frames":                    "Doors",
+    "floor finish":                   "Finishes",
+    "floor insulation":               "Insulation",
+    "roof insulation":                "Insulation",
+    "wall insulation":                "Insulation",
+}
+
+
 def _get_structural_category_map():
-    """Build a lower-cased name → AssemblyCategory lookup, queried fresh each call."""
+    """Build a lower-cased name → AssemblyCategory lookup, queried fresh each call.
+
+    Current names win; the legacy names above are only filled in where they do
+    not collide with one, so renaming a category back would not be shadowed.
+    """
     cat_map = {}
     for cat in AssemblyCategory.objects.all():
         cat_map[cat.name.lower().strip()] = cat
@@ -2432,6 +2488,12 @@ def _get_structural_category_map():
             cat_map[cat.name[:-1].lower().strip()] = cat
         else:
             cat_map[(cat.name + 's').lower().strip()] = cat
+
+    by_name = {c.name.lower().strip(): c for c in AssemblyCategory.objects.all()}
+    for old, new in _LEGACY_CATEGORY_NAMES.items():
+        cat = by_name.get(new.lower())
+        if cat is not None and old not in cat_map:
+            cat_map[old] = cat
     return cat_map
 
 

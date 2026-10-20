@@ -386,8 +386,21 @@
           // Convert each cell to string or null
           row.map(c => (c === null || c === undefined) ? null : String(c).trim())
         ).filter(row =>
-          // Skip completely empty rows (all null/empty)
-          row.some(c => c !== null && c !== '' && c.toLowerCase() !== 'none')
+          // Skip empty rows - including the ones that only LOOK filled.
+          //
+          // The chiller sheets ship with their "Installation of variable speed
+          // drives" and "heat recovery" columns pre-filled "No", so a row
+          // nobody has touched still has two values in it and was counted as
+          // data. A real row always carries something besides a checkbox
+          // default, so a yes/no on its own does not make a row.
+          //
+          // Which column is required differs per tab here - the VRF and
+          // PackagedDuctable sheets carry a leading sub-type column that the
+          // others do not - so this tests the row rather than an index.
+          row.some(c =>
+            c !== null && c !== '' &&
+            !['none', 'no', 'yes'].includes(c.toLowerCase())
+          )
         );
 
         if (dataRows.length > 0) {
@@ -418,10 +431,20 @@
 
         const ws = wb.Sheets[wb.SheetNames[si]];
         const sheetRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+        // A ventilation row counts only when it says how many units there are.
+        //
+        // "Any non-empty cell" counted the template's own blank rows as data,
+        // because the AHU and DOAS sheets ship with their two checkbox columns
+        // pre-filled "No". The preview announced "AHU - 12 rows" and "DOAS -
+        // 11 rows" for a file in which neither sheet had been touched. Nothing
+        // was ever imported from them: _parse_ventilation_rows skips a row
+        // whose unit count is blank, which is the same rule applied here so
+        // the preview and the import agree on what a row is.
         const dataRows = sheetRows.slice(1).map(row =>
           row.map(c => (c === null || c === undefined) ? null : String(c).trim())
         ).filter(row =>
-          row.some(c => c !== null && c !== '' && c.toLowerCase() !== 'none')
+          row.length > 0 && row[0] !== null && row[0] !== '' &&
+          row[0].toLowerCase() !== 'none'
         );
 
         if (dataRows.length > 0) {
