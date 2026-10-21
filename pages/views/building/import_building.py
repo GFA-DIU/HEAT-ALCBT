@@ -1110,16 +1110,41 @@ VENT_CAPACITY_MAP = {
 }
 
 
+# The ventilation form's own cap on Specific Fan Power. Its field reads
+# `max="10"` with a stated range of 0.30-1.20 W/CMH, so anything above 10 is a
+# value in some other unit rather than a reading.
+MAX_SPECIFIC_FAN_POWER_W_PER_CMH = 10.0
+
+
 def _calc_vent_power(airflow, efficiency, units):
     """
     Auto-calculate total ventilation system power input (kW) for AHU/DOAS.
     Formula: airflow (CMH) × efficiency (W/CMH) × units / 1000
     Returns float or None if inputs are invalid.
+
+    Specific Fan Power is small: the form asks for 0.30-1.20 W/CMH and refuses
+    anything over 10. The importer applied no such bound, so a value of 75 -
+    plausible if you read the unlabelled "Baseline efficiency" column as a
+    percentage - gave 6,000 CMH x 75 x 4 units = 1,800 kW and 4,322,970 kWh/yr
+    from a single AHU row. That one field then dominated the building: its
+    operational baseline read 1,495 kgCO2eq/m2/yr, about ten times a real
+    office, and the savings tab reported against it without complaint.
+
+    Returning None leaves the power blank and visible rather than wrong and
+    convincing, which is what the hot-water efficiency guard does.
     """
     try:
         a = float(airflow)
         e = float(efficiency)
         u = float(units)
+        if e > MAX_SPECIFIC_FAN_POWER_W_PER_CMH:
+            logger.warning(
+                "Import: ventilation efficiency %r W/CMH is above the form's "
+                "limit of %s - refusing. The column is Specific Fan Power "
+                "(typically 0.30-1.20), not a percentage.",
+                efficiency, MAX_SPECIFIC_FAN_POWER_W_PER_CMH,
+            )
+            return None
         if a > 0 and e > 0 and u > 0:
             return round((a * e * u) / 1000, 4)
     except (ValueError, TypeError):

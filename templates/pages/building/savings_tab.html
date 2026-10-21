@@ -335,7 +335,12 @@
               </div>
             </div>
 
-            <div class="w-full h-[200px] relative">
+            {% comment %}
+            Taller than the embodied chart beside it: the bars run
+            horizontally, so height is one row per measure rather than a fixed
+            plot area. 200px squeezed eight rows into 25px each.
+            {% endcomment %}
+            <div class="w-full h-[340px] relative">
               <canvas id="savings-operational-reduction-chart"
                 data-baseline="{{ operational_savings.baseline_total }}"
                 data-optimised="{{ operational_savings.optimized_total }}"></canvas>
@@ -628,8 +633,15 @@
   numbers attached to the wrong building types - and only opening the code
   found it. A target that cannot be traced is a target nobody can audit.
   {% endcomment %}
+  {% comment %}
+  Operational view only. This block sits outside both column containers, so
+  until it was given an id and added to toggleSavingsView it rendered under the
+  Embodied tab too - offering to replace chillers and light fittings on a panel
+  about materials.
+  {% endcomment %}
   {% if equipment_savings.systems %}
-  <div class="w-full max-w-[68.75rem] mt-6 border border-[var(--stroke--soft-200)] rounded-2xl bg-white">
+  <div id="savings-equipment-replacement"
+       class="w-full max-w-[68.75rem] mt-6 border border-[var(--stroke--soft-200)] rounded-2xl bg-white hidden">
     <div class="px-5 py-4 border-b border-[var(--stroke--soft-200)]">
       <h3 class="text-base font-semibold text-[var(--text--strong-950)]">
         {% translate "Equipment Efficiency Replacement" %}
@@ -820,6 +832,14 @@
       if (leftEmbodied && leftOperational) {
         leftEmbodied.classList.toggle('hidden', view === 'operational');
         leftOperational.classList.toggle('hidden', view !== 'operational');
+      }
+
+      // Equipment-efficiency replacement is an operational measure. It lives
+      // outside both columns, so it has to be toggled explicitly or it shows
+      // on the Embodied tab as well.
+      const equipment = document.getElementById('savings-equipment-replacement');
+      if (equipment) {
+        equipment.classList.toggle('hidden', view !== 'operational');
       }
 
       // Swap the top benchmark banner (embodied vs operational EUI)
@@ -1027,26 +1047,33 @@
               }
             }
           },
+          // Horizontal. Eight measure names across a narrow column overprinted
+          // each other: rotating ran them off the panel, and wrapping onto two
+          // lines still left "Demand-controlled ventilation" and "VSD on AHU &
+          // FCU fans" colliding. Down the side each name has the full width of
+          // the panel, so nothing is truncated and nothing is hidden in a
+          // tooltip.
+          indexAxis: 'y',
           scales: {
-            x: { grid: { display: false },
+            y: { grid: { display: false },
                  ticks: {
-                   font: { size: 9 }, maxRotation: 0, autoSkip: false,
-                   // "LED retrofit on fluorescent zones" rotated 45 degrees
-                   // ran off the panel and collided with its neighbours. Wrap
-                   // instead: Chart.js breaks an array label onto two lines.
-                   callback: function (v, i) {
+                   font: { size: 10 }, autoSkip: false, crossAlign: 'far',
+                   // Still wrapped, but at a width the side of the panel can
+                   // actually hold rather than the 14 characters a vertical
+                   // axis allowed.
+                   callback: function (v) {
                      const l = this.getLabelForValue(v) || '';
-                     if (l.length <= 14) return l;
+                     if (l.length <= 24) return l;
                      const words = l.split(' ');
                      const out = ['']; let n = 0;
                      words.forEach(function (w) {
-                       if ((out[n] + ' ' + w).trim().length > 14 && out[n]) { out.push(w); n++; }
+                       if ((out[n] + ' ' + w).trim().length > 24 && out[n]) { out.push(w); n++; }
                        else { out[n] = (out[n] + ' ' + w).trim(); }
                      });
                      return out.slice(0, 2);
                    }
                  } },
-            y: { beginAtZero: true,
+            x: { beginAtZero: true,
                  title: { display: true, text: 'kgCO2eq/m2/yr', font: { size: 10 } },
                  ticks: { font: { size: 10 } } }
           }
