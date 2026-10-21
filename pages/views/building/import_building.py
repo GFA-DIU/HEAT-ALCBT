@@ -3427,10 +3427,19 @@ def view_import_building_step(request, step_id):
     logger.debug(f"Received request for import building step: {step_id}")
     context = {}
     if step_id == "step-upload":
+        # Two files, because one cannot do both jobs. The template used to
+        # ship with 23 rows of example data, so it was simultaneously the
+        # thing you fill in and the example you learn from - and anything a
+        # user forgot to delete imported as their own building.
         try:
             context["import_template_url"] = static("docs/import-template.xlsx")
         except Exception:
             context["import_template_url"] = None
+        try:
+            context["import_example_url"] = static(
+                "docs/import-template-example.xlsx")
+        except Exception:
+            context["import_example_url"] = None
     return render(request, f"pages/home/import-dialog/{step_id}.html", context)
 
 

@@ -1,13 +1,14 @@
-"""Drive the SHIPPED template through the real import endpoints.
+"""Drive the shipped WORKED EXAMPLE through the real import endpoints.
 
 Every bug found in this round survived because the checks stopped one layer
 short of where the error messages are produced. Parsers were tested, then
 forms; the endpoints were only ever exercised with hand-written rows that
 matched the parser rather than the template.
 
-This reads static/docs/import-template.xlsx, builds each payload the way
-import-dialog.html builds it, and posts it. If a sheet and its endpoint ever
-disagree again, this fails instead of the user.
+This reads static/docs/import-template-example.xlsx, builds each payload the
+way import-dialog.html builds it, and posts it. If a sheet and its endpoint
+ever disagree again, this fails instead of the user - and the example we hand
+people cannot quietly become one BEAT would reject.
 """
 import csv
 import json
@@ -23,7 +24,11 @@ from pages.models.building import Building
 
 pytestmark = pytest.mark.django_db
 
-TEMPLATE = "static/docs/import-template.xlsx"
+# The worked example, not the blank template. The blank one carries no rows
+# by design - it used to ship with 23, so a user who missed one imported
+# someone else's building alongside their own. The example is the file that
+# has to survive this journey.
+TEMPLATE = "static/docs/import-template-example.xlsx"
 
 
 # --- reading the template the way the browser does -------------------------
@@ -138,7 +143,7 @@ def _check(resp, what):
 
 def test_the_split_ac_example_imports(client, user, building):
     rows = _cooling("Cooling System - Split air cond")
-    assert rows, "the template ships a filled Split AC row"
+    assert rows, "the example ships filled Split AC rows"
     client.force_login(user)
     body = _check(_post(client, "import_cooling_systems", {
         "building_uuid": str(building.uuid),
@@ -149,7 +154,7 @@ def test_the_split_ac_example_imports(client, user, building):
 
 def test_the_cassette_example_imports(client, user, building):
     rows = _ventilation("Ventillation System - CeilingWa")
-    assert rows, "the template ships a filled ceiling/wall fan row"
+    assert rows, "the example ships a filled ceiling/wall fan row"
     client.force_login(user)
     _check(_post(client, "import_ventilation_systems", {
         "building_uuid": str(building.uuid),
@@ -159,7 +164,7 @@ def test_the_cassette_example_imports(client, user, building):
 
 def test_the_led_example_imports(client, user, building, space_types):
     rows = _simple("Lightning System - LED")
-    assert rows, "the template ships a filled LED row"
+    assert rows, "the example ships filled LED rows"
     client.force_login(user)
     _check(_post(client, "import_lighting_systems", {
         "building_uuid": str(building.uuid),
@@ -171,7 +176,7 @@ def test_the_water_heater_example_imports(client, user, building):
     """Its efficiency column is a percentage. The example used to say 3, which
     divided the energy by 0.03 and reported 33x the truth."""
     rows = _simple("Hot water System - Water Heater")
-    assert rows, "the template ships a filled water heater row"
+    assert rows, "the example ships a filled water heater row"
     client.force_login(user)
     _check(_post(client, "import_hot_water_systems", {
         "building_uuid": str(building.uuid),
@@ -181,15 +186,15 @@ def test_the_water_heater_example_imports(client, user, building):
     from pages.models.building_operation import HotWaterSystem
     hws = HotWaterSystem.objects.filter(building=building).first()
     assert hws is not None
-    # 2 units x 3.5 kW x 1 h/day x 7 d x 52 wk = 2,548 kWh before efficiency,
-    # and 2,548 / 0.95 = 2,682. With the old example value of 3 it was
-    # 2,548 / 0.03 = 84,933: the same row, 33x over.
+    # 6 units x 3.5 kW x 2 h/day x 6 d x 50 wk = 12,600 kWh before efficiency,
+    # and 12,600 / 0.95 = 13,263. With an efficiency of 3 it would be
+    # 12,600 / 0.03 = 420,000: the same row, 33x over.
     energy = hws.total_energy_consumption_kwh_per_year
     assert energy is not None, (
         "no energy was computed - the guard in _calc_hws_energy refused the "
-        "efficiency, which means the template's example is not a percentage")
-    assert 2600 < float(energy) < 2800, (
-        "expected about 2,682 kWh/yr, got %s - the efficiency column was read "
+        "efficiency, which means the example's value is not a percentage")
+    assert 13000 < float(energy) < 13500, (
+        "expected about 13,263 kWh/yr, got %s - the efficiency column was read "
         "as a level rather than a percentage" % energy)
 
 
