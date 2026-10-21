@@ -11,13 +11,34 @@
     <!-- Component injected by JS -->
   </div>
 
-  {% if import_template_url %}
-  <p class="paragraph-small text-[var(--text--strong-950)]">
-    {% translate "Need a template?" %}
-    <a href="{{ import_template_url }}" download class="text-[var(--state--information--base)] underline cursor-pointer">
-      {% translate "Download sample template" %}
-    </a>
-  </p>
+  {% comment %}
+  Two downloads. The template used to ship with 23 rows of example data, so a
+  single file was both the thing you fill in and the example you learn from -
+  and anything a user forgot to delete imported as their own building. The
+  blank one is now empty; the worked example is a separate file.
+  {% endcomment %}
+  {% if import_template_url or import_example_url %}
+  <div class="flex flex-col items-center gap-1 text-center">
+    <p class="paragraph-small text-[var(--text--strong-950)]">
+      {% if import_template_url %}
+      {% translate "Need a template?" %}
+      <a href="{{ import_template_url }}" download class="text-[var(--state--information--base)] underline cursor-pointer">
+        {% translate "Download blank template" %}
+      </a>
+      {% endif %}
+      {% if import_template_url and import_example_url %}
+      <span class="text-[var(--text--sub-600)]">&middot;</span>
+      {% endif %}
+      {% if import_example_url %}
+      <a href="{{ import_example_url }}" download class="text-[var(--state--information--base)] underline cursor-pointer">
+        {% translate "See a worked example" %}
+      </a>
+      {% endif %}
+    </p>
+    <p class="text-[0.6875rem] leading-snug text-[var(--text--sub-600)] max-w-[22rem]">
+      {% translate "Fill in the blank template with your own building. The worked example is a completed one to look at - a 2,400 m² Phnom Penh office - and is not meant to be uploaded as-is." %}
+    </p>
+  </div>
   {% endif %}
 </div>
 
