@@ -327,6 +327,28 @@ class EnergySummary(models.Model):
         )
 
     @property
+    def entered_systems_kwh(self):
+        """The systems whose energy the USER supplied, not BEAT.
+
+        The four measured systems, plus lift when its figure is real rather
+        than the 7.5% estimate. Deliberately excludes the plug-load default
+        and an estimated lift, because those are derived after a file is read
+        and nobody filling a spreadsheet can know them in advance.
+
+        The import's energy-carrier check compares against this: it is the
+        figure a user can reconcile from their own data.
+
+        Same rule as the plug-load base below, kept as one implementation so
+        the two cannot drift.
+        """
+        vals = [self.cooling_kwh, self.ventilation_kwh,
+                self.lighting_kwh, self.hot_water_kwh]
+        if not self.lift_energy_is_estimated:
+            vals.append(self.lift_escalator_kwh)
+        nums = [Decimal(str(v)) for v in vals if v is not None]
+        return sum(nums) if nums else Decimal("0")
+
+    @property
     def plug_load_base(self):
         """The systems a plug-load percentage is taken of.
 
@@ -340,12 +362,7 @@ class EnergySummary(models.Model):
         and belongs in the base. The energy-mismatch check is unaffected and
         still uses systems_sum, where counting every system is correct.
         """
-        vals = [self.cooling_kwh, self.ventilation_kwh,
-                self.lighting_kwh, self.hot_water_kwh]
-        if not self.lift_energy_is_estimated:
-            vals.append(self.lift_escalator_kwh)
-        nums = [Decimal(str(v)) for v in vals if v is not None]
-        return sum(nums) if nums else Decimal("0")
+        return self.entered_systems_kwh
 
     @property
     def plug_load_effective(self):

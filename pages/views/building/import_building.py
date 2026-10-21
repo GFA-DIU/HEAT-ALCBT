@@ -1115,6 +1115,12 @@ VENT_CAPACITY_MAP = {
 # value in some other unit rather than a reading.
 MAX_SPECIFIC_FAN_POWER_W_PER_CMH = 10.0
 
+# How far the imported energy carriers may sit from the energy the file's own
+# systems account for. 5% matches the tolerance the building page already uses
+# for the carriers-against-bill check in views/building/building.py, so the two
+# do not disagree about what counts as a mismatch.
+ENERGY_CARRIER_TOLERANCE = Decimal("0.05")
+
 
 def _calc_vent_power(airflow, efficiency, units):
     """
@@ -2506,6 +2512,63 @@ def import_operational_energy_carriers(request):
 
     if errors:
         return JsonResponse({"success": False, "errors": errors}, status=400)
+
+    # The carriers must account for the energy the systems say the building
+    # uses, or the building reports two different operational carbon figures.
+    #
+    # That is not hypothetical. A test import carried 48,000 kWh of carriers
+    # against 4,603,164 kWh of modelled systems. The building page headline
+    # read 588.0 kgCO2eq/m2 over 50 years, computed from the carriers, while
+    # the Systems tab read 1,494.30 kgCO2eq/m2/yr, computed from the systems.
+    # Both were correct arithmetic on different inputs, and nothing said so.
+    #
+    # Compared against entered_systems_kwh, NOT the building's total: the
+    # plug-load default and an estimated lift are derived after the file is
+    # read, so requiring them would fail every first attempt with a number
+    # only BEAT could know.
+    #
+    # Only kWh carriers are compared. A fuel given in litres or m3 would need
+    # a calorific conversion to sit alongside these, and inventing one to make
+    # a comparison pass is exactly the kind of guess this importer refuses
+    # elsewhere; such a file skips the check and says so in the log.
+    carriers_kwh = sum(
+        Decimal(str(item["quantity"])) for item in to_save
+        if item["input_unit"] == "kwh"
+    )
+    non_kwh = [item for item in to_save if item["input_unit"] != "kwh"]
+    summary = getattr(building, "energy_summary", None)
+    entered_systems = Decimal(str(summary.entered_systems_kwh)) if summary else Decimal("0")
+
+    if non_kwh:
+        logger.info(
+            "Import energy carriers: %s carrier(s) are not in kWh, so the "
+            "energy cross-check is skipped for building %s",
+            len(non_kwh), building.uuid,
+        )
+    elif to_save and entered_systems > 0:
+        tolerance = entered_systems * ENERGY_CARRIER_TOLERANCE
+        if abs(carriers_kwh - entered_systems) > tolerance:
+            pct = (carriers_kwh - entered_systems) / entered_systems * 100
+            logger.warning(
+                "Import energy carriers: %s kWh against %s kWh of systems "
+                "(%.1f%%) for building %s - refusing",
+                carriers_kwh, entered_systems, pct, building.uuid,
+            )
+            return JsonResponse({"success": False, "errors": {
+                "energy carriers": {"quantity": [
+                    "The energy carriers total {carriers:,.0f} kWh/yr but the "
+                    "systems in this file use {systems:,.0f} kWh/yr - a "
+                    "difference of {pct:+.0f}%. They must agree within "
+                    "{tol:.0f}% before the building can be imported, or it "
+                    "would report two different operational carbon figures. "
+                    "Enter the building's whole annual energy by fuel, not "
+                    "only part of it. (The lift estimate and plug load are "
+                    "added by BEAT afterwards and are not counted here.)".format(
+                        carriers=carriers_kwh, systems=entered_systems, pct=pct,
+                        tol=ENERGY_CARRIER_TOLERANCE * 100,
+                    )
+                ]}
+            }}, status=400)
 
     with transaction.atomic():
         # Replace existing operational products (same as normal UI behaviour)

@@ -171,8 +171,22 @@
             <span class="text-sm font-bold text-[var(--text--sub-600)]{% if basis == 'estimated' %} italic font-medium{% endif %}">
               {{ sug|floatformat:"-3g" }} <span class="font-normal">kWh/yr</span>
             </span>
+            {% comment %}
+            The badge states WHAT the number is, on hover rather than as a
+            line of its own - the row deliberately carries only the label and
+            the figure, like the five above it.
+
+            It matters that it says so somewhere: on a test building this
+            default was 1,150,790 kWh/yr, 19% of the whole building's energy,
+            and nobody had entered any part of it. An unsourced number that
+            large should not look like a measurement.
+            {% endcomment %}
             {% if basis == "estimated" %}
-              <span class="text-[0.625rem] font-medium uppercase tracking-widest rounded px-1.5 py-0.5 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]">{% translate "Estimated" %}</span>
+              {% with pct=summary.plug_load_percent|default_if_none:summary.plug_load_default_percent|floatformat:"-2" %}
+              <span class="tooltip text-[0.625rem] font-medium uppercase tracking-widest rounded px-1.5 py-0.5 bg-[var(--bg--weak-50)] text-[var(--text--sub-600)]"
+                    data-tip="{% blocktranslate trimmed %}Assumption, not a measurement: {{ pct }}% of the cooling, ventilation, lighting and hot water energy above. Nobody entered this figure. Use the pencil to replace it with your own.{% endblocktranslate %}"
+                    title="{% blocktranslate trimmed %}Assumption, not a measurement: {{ pct }}% of the cooling, ventilation, lighting and hot water energy above. Nobody entered this figure. Use the pencil to replace it with your own.{% endblocktranslate %}">{% translate "Estimated" %}</span>
+              {% endwith %}
             {% endif %}
           {% else %}
             <div class="flex items-center gap-1.5 rounded px-2 py-1 bg-[var(--state--warning--lighter)] text-[var(--state--warning--base)]">
@@ -383,12 +397,21 @@
     return n.toLocaleString(undefined, { maximumFractionDigits: 3 });
   }
 
-  // Reformat server-rendered values with thousand separators on load
+  // Reformat server-rendered values with thousand separators on load.
+  //
+  // The separators have to be stripped before parsing. parseFloat stops at the
+  // first character it cannot read, so parseFloat("1,150,790.890") is 1 - and
+  // the plug & equipment row, the one row rendered with floatformat's "g"
+  // grouping suffix, displayed "1 kWh/yr" while the total below it counted the
+  // real 1,150,790.89. The five rows above use plain "-3" and were unaffected,
+  // which is why only that row looked wrong.
   function reformatValueSpan(el) {
     for (var i = 0; i < el.childNodes.length; i++) {
       var node = el.childNodes[i];
       if (node.nodeType === 3) {
-        var raw = parseFloat(node.nodeValue);
+        var text = node.nodeValue.replace(/,/g, '');
+        if (text.trim() === '') { continue; }
+        var raw = parseFloat(text);
         if (!isNaN(raw)) { node.nodeValue = fmt(raw) + ' '; break; }
       }
     }
