@@ -39,7 +39,17 @@ def _buildings_with_stats(buildings):
             queryset=BuildingAssembly.objects.select_related("assembly").prefetch_related(
                 models.Prefetch(
                     "assembly__structuralproduct_set",
-                    queryset=StructuralProduct.objects.select_related("epd", "classification").prefetch_related(
+                    # The two category relations are joined here, not left to
+                    # lazy loading. Without them the card's 6 buildings issued
+                    # 97 MaterialCategory and 96 AssemblyCategory queries - one
+                    # per structural product - inside a helper whose docstring
+                    # already said "N+1-free". The prefetching above is real;
+                    # these two relations were simply missed, and they were
+                    # 193 of the page's 238 queries.
+                    queryset=StructuralProduct.objects.select_related(
+                        "epd", "epd__category",
+                        "classification", "classification__category",
+                    ).prefetch_related(
                         models.Prefetch(
                             "epd__epdimpact_set",
                             queryset=EPDImpact.objects.select_related("impact"),
