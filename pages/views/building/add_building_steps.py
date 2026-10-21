@@ -250,7 +250,10 @@ def handle_details_step(request):
                 "boq_status": building.boq_status,
                 "has_boq": building.has_boq,
                 "boq_files": boq_info,
-                "total_annual_energy_consumption": energy_summary.total_kwh if energy_summary and energy_summary.total_kwh is not None else None,
+                # entered_systems_kwh for the same reason as below: the carrier
+                # target must hold only what the user supplied, never the lift
+                # and plug-load estimates.
+                "total_annual_energy_consumption": energy_summary.entered_systems_kwh if energy_summary and energy_summary.entered_systems_kwh else None,
                 # Bill total (metered) is user-entered and may coexist with systems;
                 # systems sum is shown as a helper so plug = bill − systems is clear.
                 "bill_total_kwh": float(energy_summary.total_override_kwh) if energy_summary and energy_summary.total_override_kwh is not None else None,
@@ -476,10 +479,21 @@ def handle_operational_data_step(request):
             building = Building.objects.get(uuid=uuid_obj, created_by=request.user)
             logger.info(f"Found building: {building.id} - {building.name}")
 
-            # Target total energy from building systems (Systems/Consumption section)
+            # Target total energy from building systems (Systems/Consumption section).
+            #
+            # entered_systems_kwh, not total_kwh: the target must contain only
+            # figures the user supplied. total_kwh adds a 7.5% lift estimate
+            # and a 25% plug-load default, and on one test building those two
+            # made the page ask for 432,432 kWh while the import asked for
+            # 326,364 - a 106,068 kWh gap that was entirely BEAT's own
+            # guesses. The carriers could not satisfy both, and whichever they
+            # matched, the other screen called them wrong.
+            #
+            # Entering a real lift or plug figure moves it into this total, so
+            # a user who has those numbers can still account for them.
             energy_summary = EnergySummary.objects.filter(building=building).first()
-            if energy_summary and energy_summary.total_kwh is not None:
-                total_annual_energy_consumption = energy_summary.total_kwh
+            if energy_summary and energy_summary.entered_systems_kwh:
+                total_annual_energy_consumption = energy_summary.entered_systems_kwh
 
             # On-site renewable share + resulting net grid energy (shown so the user
             # sees that only the grid share is used for operational carbon).

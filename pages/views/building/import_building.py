@@ -2554,6 +2554,24 @@ def import_operational_energy_carriers(request):
                 "(%.1f%%) for building %s - refusing",
                 carriers_kwh, entered_systems, pct, building.uuid,
             )
+            # Name the systems that make up the target. A bare total leaves
+            # the user to work out which sheet is responsible, and when the
+            # carriers come in BELOW the systems the breakdown is the only way
+            # to see which one is larger than the bill that should contain it.
+            parts = [
+                ("Cooling", summary.cooling_kwh),
+                ("Ventilation", summary.ventilation_kwh),
+                ("Lighting", summary.lighting_kwh),
+                ("Hot water", summary.hot_water_kwh),
+            ]
+            if not summary.lift_energy_is_estimated:
+                parts.append(("Lift & escalator", summary.lift_escalator_kwh))
+            if summary.plug_load_basis == "metered":
+                parts.append(("Plug & equipment", summary.plug_load_kwh))
+            breakdown = "; ".join(
+                "{0} {1:,.0f}".format(name, Decimal(str(value)))
+                for name, value in parts if value
+            )
             return JsonResponse({"success": False, "errors": {
                 "energy carriers": {"quantity": [
                     "The energy carriers total {carriers:,.0f} kWh/yr but the "
@@ -2561,11 +2579,12 @@ def import_operational_energy_carriers(request):
                     "difference of {pct:+.0f}%. They must agree within "
                     "{tol:.0f}% before the building can be imported, or it "
                     "would report two different operational carbon figures. "
-                    "Enter the building's whole annual energy by fuel, not "
-                    "only part of it. (The lift estimate and plug load are "
-                    "added by BEAT afterwards and are not counted here.)".format(
+                    "The systems are: {breakdown}. "
+                    "BEAT's own lift and plug-load estimates are NOT counted "
+                    "here - enter a real figure for either and it joins this "
+                    "total.".format(
                         carriers=carriers_kwh, systems=entered_systems, pct=pct,
-                        tol=ENERGY_CARRIER_TOLERANCE * 100,
+                        tol=ENERGY_CARRIER_TOLERANCE * 100, breakdown=breakdown,
                     )
                 ]}
             }}, status=400)

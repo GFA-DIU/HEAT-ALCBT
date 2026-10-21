@@ -161,7 +161,9 @@ def test_the_message_says_what_is_excluded(client, user, building):
     client.force_login(user)
     message = _post(client, building, [_row(1)]).json()[
         "errors"]["energy carriers"]["quantity"][0]
-    assert "plug load" in message.lower()
+    low = message.lower().replace("plug-load", "plug load")
+    assert "plug load" in low
+    assert "not counted" in low, "it must say the estimates are excluded"
     assert "%" in message
 
 
@@ -169,3 +171,94 @@ def test_the_tolerance_matches_the_building_page():
     """views/building/building.py already uses 5% for its carriers-against-bill
     check. Two different ideas of a mismatch would be worse than either."""
     assert ENERGY_CARRIER_TOLERANCE == Decimal("0.05")
+
+
+# --- the two checks must ask for the same number ---------------------------
+#
+# They did not. The data-entry page compared carriers against total_kwh and
+# the import against the entered systems, and on a test building those were
+# 432,432 and 326,364 - a gap of 106,068 kWh that was entirely a 7.5% lift
+# estimate and a 25% plug-load default. The carriers could not satisfy both.
+
+def test_the_page_target_is_the_entered_systems(building):
+    """Not total_kwh. The target must hold only what the user supplied."""
+    import inspect
+
+    from pages.views.building import add_building_steps
+
+    src = inspect.getsource(add_building_steps)
+    assert "total_annual_energy_consumption = energy_summary.entered_systems_kwh" in src
+    assert "total_annual_energy_consumption = energy_summary.total_kwh" not in src
+
+
+def test_the_estimates_are_excluded_from_the_target(building):
+    """The building's own total still includes them - only the target does
+    not, so operational carbon is unchanged."""
+    es = building.energy_summary
+    assert es.entered_systems_kwh == Decimal("100000")
+    assert es.total_kwh > es.entered_systems_kwh
+    assert es.plug_load_basis == "estimated"
+
+
+def test_a_metered_plug_load_joins_the_target(building):
+    """"User while re-entering can enter them manually if they have the
+    value" - a real figure must count, a percentage must not."""
+    es = building.energy_summary
+    es.plug_load_kwh = Decimal("20000")
+    es.save()
+    es.refresh_from_db()
+    assert es.plug_load_basis == "metered"
+    assert es.entered_systems_kwh == Decimal("120000")
+
+
+def test_a_percentage_plug_load_does_not(building):
+    """Scaled off the systems rather than measured, so requiring a bill to
+    match it would make the assumption the thing being tested."""
+    es = building.energy_summary
+    es.plug_load_percent = Decimal("25")
+    es.save()
+    es.refresh_from_db()
+    assert es.plug_load_basis == "percent"
+    assert es.entered_systems_kwh == Decimal("100000")
+
+
+def test_the_plug_base_never_contains_the_plug_load(building):
+    """plug_load_base is the base a percentage is taken OF. Folding the plug
+    figure into it would take a percentage of itself."""
+    es = building.energy_summary
+    es.plug_load_kwh = Decimal("20000")
+    es.save()
+    es.refresh_from_db()
+    assert es.plug_load_base == Decimal("100000")
+    assert es.entered_systems_kwh == Decimal("120000")
+
+
+def test_a_metered_plug_load_changes_what_imports(client, user, building):
+    """With 20,000 kWh of metered plug load the target becomes 120,000, so
+    the carriers that passed before are now 17% short."""
+    es = building.energy_summary
+    es.plug_load_kwh = Decimal("20000")
+    es.save()
+    client.force_login(user)
+    assert _post(client, building, [_row(100000)]).status_code == 400
+    assert _post(client, building, [_row(120000)]).status_code == 200
+
+
+def test_the_message_breaks_the_total_down(client, user, building):
+    """A bare total leaves the user to work out which sheet is responsible."""
+    client.force_login(user)
+    message = _post(client, building, [_row(1)]).json()[
+        "errors"]["energy carriers"]["quantity"][0]
+    for name, value in (("Cooling", "60,000"), ("Ventilation", "20,000"),
+                        ("Lighting", "15,000"), ("Hot water", "5,000")):
+        assert name in message, message
+        assert value in message, message
+
+
+def test_the_message_does_not_list_an_estimated_lift(client, user, building):
+    """It is not in the target, so naming it would send the user looking for
+    a number that does not count."""
+    client.force_login(user)
+    message = _post(client, building, [_row(1)]).json()[
+        "errors"]["energy carriers"]["quantity"][0]
+    assert "Lift" not in message

@@ -328,25 +328,28 @@ class EnergySummary(models.Model):
 
     @property
     def entered_systems_kwh(self):
-        """The systems whose energy the USER supplied, not BEAT.
+        """The energy the USER supplied, with nothing BEAT assumed.
 
         The four measured systems, plus lift when its figure is real rather
-        than the 7.5% estimate. Deliberately excludes the plug-load default
-        and an estimated lift, because those are derived after a file is read
-        and nobody filling a spreadsheet can know them in advance.
+        than the 7.5% estimate, plus plug load when it was METERED - a figure
+        the user actually has. A plug load that is a percentage, a default or
+        a difference is excluded: those are scaled off the systems rather than
+        measured, so asking a bill to match one would make an assumption the
+        thing being tested.
 
-        The import's energy-carrier check compares against this: it is the
-        figure a user can reconcile from their own data.
+        This is what BOTH the carrier checks compare against - the import's
+        and the data-entry page's - so the two cannot ask for different
+        numbers. On one test building they did: the page wanted 432,432 kWh
+        and the import 326,364, and the 106,068 between them was entirely a
+        7.5% lift guess and a 25% plug guess.
 
-        Same rule as the plug-load base below, kept as one implementation so
-        the two cannot drift.
+        Entering a real lift or plug figure moves it into this total, which is
+        the intended way to make the target larger.
         """
-        vals = [self.cooling_kwh, self.ventilation_kwh,
-                self.lighting_kwh, self.hot_water_kwh]
-        if not self.lift_energy_is_estimated:
-            vals.append(self.lift_escalator_kwh)
-        nums = [Decimal(str(v)) for v in vals if v is not None]
-        return sum(nums) if nums else Decimal("0")
+        total = self.plug_load_base
+        if self.plug_load_basis == "metered" and self.plug_load_kwh is not None:
+            total += Decimal(str(self.plug_load_kwh))
+        return total
 
     @property
     def plug_load_base(self):
@@ -361,8 +364,17 @@ class EnergySummary(models.Model):
         A metered or hand-entered lift figure is a measurement like any other
         and belongs in the base. The energy-mismatch check is unaffected and
         still uses systems_sum, where counting every system is correct.
+
+        Never includes the plug load itself - it is the base a plug-load
+        percentage is taken OF. entered_systems_kwh above adds a metered plug
+        figure on top of this for the carrier checks.
         """
-        return self.entered_systems_kwh
+        vals = [self.cooling_kwh, self.ventilation_kwh,
+                self.lighting_kwh, self.hot_water_kwh]
+        if not self.lift_energy_is_estimated:
+            vals.append(self.lift_escalator_kwh)
+        nums = [Decimal(str(v)) for v in vals if v is not None]
+        return sum(nums) if nums else Decimal("0")
 
     @property
     def plug_load_effective(self):
