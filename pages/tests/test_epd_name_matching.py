@@ -1,0 +1,246 @@
+"""Name matching that landed on the wrong material while looking like a hit.
+
+Both faults below were found by importing a dummy BoQ against the real
+catalogue. Both produced a carbon number, which is why neither was noticed:
+the row said "ok" and the material was wrong.
+"""
+import pytest
+
+from pages.views.building.import_building import (
+    CROSS_COUNTRY, _changes_material, _epd_tokens, _fuzzy_epd_pick,
+    _lookup_structural_epd,
+)
+
+
+# --- words that change what a material is ----------------------------------
+
+@pytest.mark.parametrize("query,candidate", [
+    # Glass-reinforced concrete is thin cladding, not structural concrete.
+    ("Reinforced concrete", "Glass reinforced concrete"),
+    # The mortar that joins the blocks is not the blocks.
+    ("AAC block", "AAC block mortar - TPI - M319"),
+    ("Reinforced concrete", "Reinforced concrete pipe (tongue-and-groove type)"),
+    ("Cement", "Cement plaster"),
+    ("Concrete", "Concrete formwork"),
+])
+def test_a_different_product_is_not_a_match(query, candidate):
+    assert _changes_material(query, candidate)
+
+
+@pytest.mark.parametrize("query,candidate", [
+    # The word is in the query too, so it is not an added difference.
+    ("Float glass", "Float glass, 6mm"),
+    ("Cement mortar", "Cement mortar 1:4"),
+    # Elaboration, not a different product. These must NOT be rejected.
+    ("AAC block", "Autoclaved aerated concrete (AAC) solid blocks"),
+    ("Concrete", "Ready-mix concrete C25/30"),
+    ("Steel rebar", "Steel reinforcement (steel rebar)"),
+])
+def test_an_elaborated_name_is_still_a_match(query, candidate):
+    assert not _changes_material(query, candidate)
+
+
+# --- plurals ---------------------------------------------------------------
+
+def test_a_plural_matches_its_singular():
+    """Without this, "AAC block" shares only the abbreviation with the
+    catalogue's "AAC solid blocks" and the correct EPD scores below the
+    confidence cutoff while a wrong one above it wins."""
+    assert "block" in _epd_tokens("AAC solid blocks")
+    assert _epd_tokens("block") & _epd_tokens("blocks")
+
+
+def test_a_double_s_word_is_not_stemmed():
+    assert "glass" in _epd_tokens("Float glass")
+
+
+# --- the picker ------------------------------------------------------------
+
+def test_the_picker_refuses_a_product_changing_candidate():
+    best, _, _ = _fuzzy_epd_pick("Reinforced concrete", ["Glass reinforced concrete"])
+    assert best is None, "glass-reinforced cladding is not structural concrete"
+
+
+def test_the_picker_still_takes_an_elaborated_candidate():
+    best, _, _ = _fuzzy_epd_pick(
+        "AAC block",
+        ["Autoclaved aerated concrete (AAC) solid blocks", "Float glass", "Sand"],
+    )
+    assert best == "Autoclaved aerated concrete (AAC) solid blocks"
+
+
+# --- against a seeded catalogue --------------------------------------------
+#
+# Seeded rather than borrowed from the developer's database: a test that skips
+# when the catalogue is absent cannot fail, and both faults below were the kind
+# that only a real lookup exposes.
+
+@pytest.fixture
+def cambodia(db):
+    from cities_light.models import Country
+    return Country.objects.get_or_create(
+        code2="KH",
+        defaults={"name": "Cambodia", "continent": "AS", "slug": "cambodia"},
+    )[0]
+
+
+@pytest.fixture
+def germany(db):
+    from cities_light.models import Country
+    return Country.objects.get_or_create(
+        code2="DE",
+        defaults={"name": "Germany", "continent": "EU", "slug": "germany"},
+    )[0]
+
+
+@pytest.fixture
+def catalogue(db, cambodia, germany):
+    """The four names that produced the two wrong matches."""
+    from pages.models.epd import EPD, EPDType, Unit
+
+    def make(name, country):
+        return EPD.objects.create(
+            name=name,
+            names=[{"value": name, "lang": "en"}],
+            UUID=f"test-{abs(hash((name, country.code2)))}",
+            declared_unit=Unit.KG,
+            conversions=[],
+            type=EPDType.GENERIC,
+            country=country,
+            public=True,
+            draft=False,
+            declared_amount=1,
+        )
+
+    return {
+        "grc": make("Glass reinforced concrete", cambodia),
+        "pipe": make("Reinforced concrete pipe (tongue-and-groove type)", cambodia),
+        "aac": make("Autoclaved aerated concrete (AAC) solid blocks", cambodia),
+        "mortar": make("AAC block mortar - TPI - M319", germany),
+    }
+
+
+@pytest.mark.django_db
+def test_reinforced_concrete_refuses_rather_than_taking_cladding(catalogue):
+    """It scored 0.94 against "Glass reinforced concrete" and imported as it.
+    No plain structural "Reinforced concrete" EPD exists, so the honest answer
+    is no match: an absent figure is visible, a wrong one is not."""
+    epd, err = _lookup_structural_epd("Reinforced concrete", "Cambodia")
+    assert epd is None, f"took {epd.name!r} instead of refusing"
+    assert err and "not found" in err.lower()
+
+
+@pytest.mark.django_db
+def test_aac_block_takes_the_block_not_the_mortar(catalogue):
+    """The mortar that joins the blocks carries a different factor entirely,
+    and its name is the closer string, so string distance alone chose it."""
+    epd, err = _lookup_structural_epd("AAC block", "Cambodia")
+    assert epd is not None, "the correct block EPD was in the catalogue"
+    assert epd.name == "Autoclaved aerated concrete (AAC) solid blocks"
+    assert err is not CROSS_COUNTRY
+
+
+@pytest.mark.django_db
+def test_the_own_country_match_wins_over_the_closer_name_abroad(catalogue):
+    """The localised GWP is the point of a per-country catalogue, so a
+    confident same-country match beats a closer name somewhere else."""
+    epd, _ = _lookup_structural_epd("AAC block", "Cambodia")
+    assert epd.country.name == "Cambodia"
+
+
+# --- the shipped template's own example rows -------------------------------
+
+def test_the_templates_own_example_reinforcement_is_aliased():
+    """static/docs/import-template.xlsx ships example structural rows naming
+    "Reinforcement steel wire" against Cambodia. No such EPD exists outside
+    Germany, where it is high-recycled wire at 0.62 kgCO2e/kg against the
+    ALCBT localised rebar at 2.42 - so the template understated its own
+    reinforcement by about 3.9x, and did it on every first-time import."""
+    from pages.views.building.import_building import _alias_for
+    alias = _alias_for("Reinforcement steel wire", "Cambodia")
+    assert alias, "the template's own example material must be mapped"
+    assert alias["action"] == "map"
+    assert alias["epd_name"] == "Steel reinforcement (steel rebar)"
+
+
+def test_that_alias_applies_to_every_country():
+    """Blank country in the CSV, so each row still resolves to its OWN
+    country's localised factor rather than one country's for all."""
+    from pages.views.building.import_building import _alias_for
+    for country in ("India", "Indonesia", "Vietnam", "Thailand", "Cambodia"):
+        assert _alias_for("Reinforcement steel wire", country), country
+
+
+def test_the_alias_table_is_actually_shipped():
+    """A blanket *.csv rule in .gitignore kept epd_alias.csv untracked, so it
+    existed only on the machine that wrote it. Heroku deploys from git, so on
+    production _load_epd_aliases hit FileNotFoundError, returned {}, and every
+    curated mapping above was inert - silently, because the importer then just
+    falls through to automatic matching and still produces a number."""
+    import subprocess
+    from pages.views.building.import_building import _EPD_ALIAS_PATH
+    out = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", _EPD_ALIAS_PATH],
+        capture_output=True, text=True,
+    )
+    assert out.returncode == 0, "the alias table is not tracked, so it will not deploy"
+
+
+# --- ambiguous at home is not a reason to cross a border -------------------
+
+# A token counts as distinctive only if it is rare ACROSS the candidate set,
+# so this behaviour cannot be reproduced on a handful of names: with three
+# candidates "portland" is in all three and is therefore common. Padding to a
+# realistic catalogue size is what makes the test exercise the real path.
+_FILLER = [f"Filler material {i}" for i in range(100)]
+
+
+def test_the_picker_says_why_it_declined():
+    """The caller has to tell "the material is not here" from "it is here and
+    there are three of it"."""
+    _, _, reason = _fuzzy_epd_pick(
+        "Portland cement OPC 43",
+        ["Ordinary Portland Cement", "Portland Composite Cement",
+         "Portland Pozzolana Cement"] + _FILLER,
+    )
+    assert reason == "ambiguous"
+
+
+def test_nothing_in_common_is_not_ambiguous():
+    _, _, reason = _fuzzy_epd_pick("Portland cement", ["Float glass", "Sand"])
+    assert reason != "ambiguous"
+
+
+@pytest.mark.django_db
+def test_an_ambiguous_home_match_refuses_instead_of_crossing(db):
+    """India holds Ordinary Portland, Portland Composite and Portland
+    Pozzolana cements - three products, three factors, within 0.05 of each
+    other. The in-country step correctly refused to choose, and the step after
+    it then crossed the border and took Vietnam's anyway."""
+    from cities_light.models import Country
+    from pages.models.epd import EPD, EPDType, Unit
+    india = Country.objects.get_or_create(
+        code2="IN", defaults={"name": "India", "continent": "AS", "slug": "india"})[0]
+    vietnam = Country.objects.get_or_create(
+        code2="VN", defaults={"name": "Vietnam", "continent": "AS", "slug": "vietnam"})[0]
+
+    def make(n, c):
+        EPD.objects.create(
+            name=n, names=[{"value": n, "lang": "en"}],
+            UUID=f"t-{abs(hash((n, c.code2)))}", declared_unit=Unit.KG,
+            conversions=[], type=EPDType.GENERIC, country=c,
+            public=True, draft=False, declared_amount=1,
+        )
+
+    for n in ("Ordinary Portland Cement", "Portland Composite Cement",
+              "Portland Pozzolana Cement"):
+        make(n, india)
+    make("SCG Portland Cement (OPC) Type I", vietnam)
+    # See _FILLER above: "portland" has to be rare among India's names before
+    # it counts as distinctive, which it is not in a catalogue of three.
+    for i in range(100):
+        make(f"Filler material {i}", india)
+
+    epd, err = _lookup_structural_epd("Portland cement OPC 43", "India")
+    assert epd is None, f"crossed the border and took {epd.name!r}"
+    assert "more than one" in err

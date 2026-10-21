@@ -32,7 +32,9 @@ from pages.models.assembly import (
 )
 from pages.models.building_operation import CoolingSystemChiller, CoolingSystemAirConditioner
 from pages.models.building_operation.ventilation import VentilationType, VentilationCapacity
-from pages.models.building_operation.lighting import RoomType, LightingBulbType, EnergyEfficiencyLabelType
+from pages.models.building_operation.lighting import (
+    RoomType, LightingBulbType, EnergyEfficiencyLabelType, LightingSpaceType,
+)
 from pages.models.building_operation import HotWaterSystem, HotWaterSystemType, FuelType
 from pages.forms.cooling_system_form import (
     CAPACITY_CONVERSION,
@@ -140,8 +142,56 @@ _EPD_STOPWORDS = {
 }
 
 
+# Words that change WHAT A MATERIAL IS rather than merely describing it.
+# If a catalogue name carries one of these and the imported name does not, the
+# two are different products however well the strings overlap.
+#
+# This list exists because substring and similarity matching are both blind to
+# the distinction. "Reinforced concrete" is a substring of "Glass reinforced
+# concrete" and scores 0.94 against it, but glass-reinforced concrete is a thin
+# cladding product with a completely different carbon factor from structural
+# concrete. Likewise "AAC block" matched "AAC block mortar": the mortar that
+# joins the blocks, not the blocks.
+#
+# Only words that change the product belong here. Words that merely elaborate
+# it - "autoclaved", "aerated", "solid", "ready-mix" - must NOT be listed, or
+# the correct, more descriptive EPD gets rejected.
+_MATERIAL_CHANGING_WORDS = {
+    "mortar", "adhesive", "glue", "grout", "plaster", "render", "screed",
+    "paint", "coating", "primer", "sealant", "waterproofing",
+    "pipe", "pipes", "shaft", "duct", "fitting", "fittings",
+    "glass", "fibre", "fiber", "frp", "grc",
+    "formwork", "shuttering", "scaffolding",
+}
+
+
 def _epd_tokens(text):
-    return {t for t in re.findall(r"[a-z0-9]+", (text or "").lower()) if len(t) > 1}
+    """Lower-cased word set, with plurals folded onto the singular.
+
+    Without the fold, "AAC block" shares no token with the catalogue's "AAC
+    solid blocks" beyond the abbreviation, and the correct EPD scores below the
+    confidence cutoff while a wrong one above it wins.
+    """
+    words = re.findall(r"[a-z0-9]+", (text or "").lower())
+    out = set()
+    for t in words:
+        if len(t) <= 1:
+            continue
+        if len(t) > 3 and t.endswith("s") and not t.endswith("ss"):
+            t = t[:-1]
+        out.add(t)
+    return out
+
+
+def _changes_material(query, candidate):
+    """True when `candidate` names a different product from `query`.
+
+    Compared on the raw text, not the token sets, so this stays independent of
+    the stemming above.
+    """
+    q = set(re.findall(r"[a-z0-9]+", (query or "").lower()))
+    c = set(re.findall(r"[a-z0-9]+", (candidate or "").lower()))
+    return bool((c & _MATERIAL_CHANGING_WORDS) - q)
 
 
 def _fuzzy_epd_pick(name, candidates):
@@ -149,14 +199,21 @@ def _fuzzy_epd_pick(name, candidates):
 
     Requires a DISTINCTIVE shared token (one that is rare across the catalogue),
     reasonable coverage of the query's words, and a clear margin over the
-    runner-up. Returns (best_name, score) or (None, 0.0).
+    runner-up.
+
+    Returns (best_name, score, reason). `reason` is None on a hit, otherwise
+    why there was none: "ambiguous" when two candidates were too close to
+    separate, "below_cutoff" when the best was too weak, "none" when nothing
+    shared an informative word. The caller needs that distinction - an
+    ambiguous result means the material IS here and we cannot tell which, which
+    is not a reason to go looking in another country.
     """
     if not name or not candidates:
-        return None, 0.0
+        return None, 0.0, "none"
 
     q_tokens = _epd_tokens(name)
     if not q_tokens:
-        return None, 0.0
+        return None, 0.0, "none"
 
     # Document frequency of each token across the candidate set.
     freq = {}
@@ -173,6 +230,8 @@ def _fuzzy_epd_pick(name, candidates):
         shared = q_tokens & ct
         if not shared:
             continue
+        if _changes_material(name, c):
+            continue  # same words, different product - see _MATERIAL_CHANGING_WORDS
         informative = {
             t for t in shared
             if t not in _EPD_STOPWORDS and freq.get(t, 0) <= rare_cap
@@ -184,14 +243,14 @@ def _fuzzy_epd_pick(name, candidates):
         scored.append((0.45 * seq + 0.55 * coverage, c))
 
     if not scored:
-        return None, 0.0
+        return None, 0.0, "none"
     scored.sort(reverse=True)
     top_score, top_name = scored[0]
     if top_score < 0.45:
-        return None, top_score
+        return None, top_score, "below_cutoff"
     if len(scored) > 1 and (top_score - scored[1][0]) < 0.05:
-        return None, top_score  # ambiguous -> do not guess
-    return top_name, top_score
+        return None, top_score, "ambiguous"  # too close to separate
+    return top_name, top_score, None
 
 
 def _resolve_region(name, country):
@@ -286,6 +345,23 @@ def _resolve_building_type(combined_name):
         return None, f"Building type '{cat_name}' was not found."
 
     subcategory = BuildingSubcategory.objects.filter(name__iexact=subcat_name).first()
+    if not subcategory:
+        # The template offers "Office - grade A office" while the database
+        # stores the subcategory as "Grade A": the second half repeats the
+        # category word. All three Office grades failed on this, so no office
+        # building could be imported at all, while the other 39 types worked.
+        #
+        # The template is corrected too, but files saved from the old one - and
+        # anyone who typed the wording it showed them - still carry the old
+        # text, so the trailing repeat is tolerated here as well. Only the
+        # category's own word is stripped, so nothing else is loosened.
+        trimmed = re.sub(
+            r"\s+" + re.escape(cat_name) + r"$", "", subcat_name, flags=re.IGNORECASE
+        ).strip()
+        if trimmed and trimmed.lower() != subcat_name.lower():
+            subcategory = BuildingSubcategory.objects.filter(name__iexact=trimmed).first()
+            if subcategory:
+                subcat_name = subcategory.name
     if not subcategory:
         return None, f"Apartment type '{subcat_name}' was not found."
 
@@ -551,13 +627,41 @@ COOLING_TAB_MAP = {
     'air cooled':      ('chiller',         None,          'air_cooled',  None),
 }
 
+# Tabs that carry an extra leading "Type of cooling system" column, which the
+# Window and Split tabs do not. The browser sends rows with every column
+# present - slice(1) there drops the header ROW, not a column - so the shared
+# parser, written for Window/Split, read every field on these tabs one place
+# to the left.
+#
+# On VRF that meant year_of_installation came out as the text "VRF",
+# refrigerant_quantity as "R-410A" and the efficiency as the power input. Those
+# rows did not import at all rather than importing wrong: a year of "VRF" fails
+# validation, and a blank first column instead made `if not year: continue`
+# skip the row in silence.
+#
+# The chillers were worse, because they still produced a figure. A 2-unit,
+# 400 RT water-cooled plant at 0.62 kW/RT read its cooling load as 120, its
+# unit count as 400 and its efficiency as 50 kW/RT, and reported 4,320,000
+# kWh/yr - a plausible number for a large plant, from a row that said nothing
+# of the sort.
+#
+# PackagedDuctable has the same extra column but is handled in its own branch
+# with absolute indices, so it is deliberately absent here.
+_TABS_WITH_LEADING_COLUMN = {'vrf', 'water cooled', 'air cooled'}
+
+
 # Packaged sub-type label → model value
 PACKAGED_SUBTYPE_MAP = {
     'rooftop':        'rooftop',
     'floor standing': 'floor_standing',
     'floor-standing': 'floor_standing',
     'ductable':       'ductable',
-    'cassette':       'cassette',
+    # 'cassette' used to be listed here and mapped to itself, which is not a
+    # PackagedACSubType - the valid three are rooftop, floor_standing and
+    # ductable. Cassettes became their own ventilation type, so they belong on
+    # the "Ventilation - Cassette AC" tab. Left out rather than mapped: the
+    # unknown value falls through unchanged either way and the row is
+    # rejected, but listing it implied the Packaged tab accepted cassettes.
 }
 
 # Column index definitions per tab type (0-based, after stripping None columns)
@@ -567,13 +671,13 @@ PACKAGED_SUBTYPE_MAP = {
 # 0:year  1:refrigerant_type  2:refrigerant_qty  3:cooling_capacity  4:capacity_unit
 # 5:num_units  6:leakage_factor  7:hours/day  8:days/week  9:weeks/year
 # 10:power_input_per_unit  11:eer_iseer_cop  12:energy_label  13:stars
-# (col 14 in template = auto-calculated annual energy, ignored on import)
+# (14 = auto-calculated annual energy, ignored)  15:efficiency_metric (optional)
 
 # Packaged tab — 16 user columns + 1 auto-calculated (not read)
 # 0:subtype  1:year  2:refrigerant_type  3:refrigerant_qty  4:cooling_capacity  5:capacity_unit
 # 6:num_units  7:leakage_factor  8:hours/day  9:days/week  10:weeks/year
 # 11:power_input_per_unit  12:eer_iseer_cop  13:eer_formula_hint(ignored)  14:energy_label
-# 15:stars  (col 16 in template = auto-calculated annual energy, ignored on import)
+# 15:stars  (16 = auto-calculated annual energy, ignored)  17:efficiency_metric (optional)
 
 # Chiller Water tabs — 18 user columns + 1 auto-calculated (not read)
 # 0:year  1:refrigerant_type  2:refrigerant_qty  3:total_cooling_load  4:num_units
@@ -729,8 +833,11 @@ def _parse_cooling_rows(sheet_key, raw_rows):
     cooling_system_type, ac_type, chiller_type, packaged_subtype_flag = entry
     results = []
 
+    col_offset = 1 if sheet_key in _TABS_WITH_LEADING_COLUMN else 0
+
     for row in raw_rows:
-        def cell(idx, default=''):
+        def cell(idx, default='', _off=col_offset):
+            idx = idx + _off
             val = row[idx] if idx < len(row) else None
             if val is None or str(val).strip().lower() == 'none':
                 return default
@@ -761,6 +868,11 @@ def _parse_cooling_rows(sheet_key, raw_rows):
                     'weeks_per_year':         cell(10),
                     'power_input_per_unit':   cell(11),
                     'eer_iseer_cop':          cell(12),
+                    # Optional, appended column; blank means COP as before.
+                    # 17, not 16: index 16 on this tab is the auto-calculated
+                    # annual energy, so reading 16 would have fed a kWh figure
+                    # to the metric parser and silently defaulted to COP.
+                    'efficiency_metric':      _efficiency_metric(cell(17)),
                     'energy_efficiency_label': cell(14),
                     'number_of_stars':        cell(15),
                 }
@@ -785,6 +897,9 @@ def _parse_cooling_rows(sheet_key, raw_rows):
                     'weeks_per_year':        cell(9),
                     'power_input_per_unit':  cell(10),
                     'eer_iseer_cop':         cell(11),
+                    # Optional, appended column; blank means COP as before.
+                    # 15 is one past the auto-calculated energy at 14.
+                    'efficiency_metric':     _efficiency_metric(cell(15)),
                     'energy_efficiency_label': cell(12),
                     'number_of_stars':       cell(13),
                 }
@@ -995,16 +1110,47 @@ VENT_CAPACITY_MAP = {
 }
 
 
+# The ventilation form's own cap on Specific Fan Power. Its field reads
+# `max="10"` with a stated range of 0.30-1.20 W/CMH, so anything above 10 is a
+# value in some other unit rather than a reading.
+MAX_SPECIFIC_FAN_POWER_W_PER_CMH = 10.0
+
+# How far the imported energy carriers may sit from the energy the file's own
+# systems account for. 5% matches the tolerance the building page already uses
+# for the carriers-against-bill check in views/building/building.py, so the two
+# do not disagree about what counts as a mismatch.
+ENERGY_CARRIER_TOLERANCE = Decimal("0.05")
+
+
 def _calc_vent_power(airflow, efficiency, units):
     """
     Auto-calculate total ventilation system power input (kW) for AHU/DOAS.
     Formula: airflow (CMH) × efficiency (W/CMH) × units / 1000
     Returns float or None if inputs are invalid.
+
+    Specific Fan Power is small: the form asks for 0.30-1.20 W/CMH and refuses
+    anything over 10. The importer applied no such bound, so a value of 75 -
+    plausible if you read the unlabelled "Baseline efficiency" column as a
+    percentage - gave 6,000 CMH x 75 x 4 units = 1,800 kW and 4,322,970 kWh/yr
+    from a single AHU row. That one field then dominated the building: its
+    operational baseline read 1,495 kgCO2eq/m2/yr, about ten times a real
+    office, and the savings tab reported against it without complaint.
+
+    Returning None leaves the power blank and visible rather than wrong and
+    convincing, which is what the hot-water efficiency guard does.
     """
     try:
         a = float(airflow)
         e = float(efficiency)
         u = float(units)
+        if e > MAX_SPECIFIC_FAN_POWER_W_PER_CMH:
+            logger.warning(
+                "Import: ventilation efficiency %r W/CMH is above the form's "
+                "limit of %s - refusing. The column is Specific Fan Power "
+                "(typically 0.30-1.20), not a percentage.",
+                efficiency, MAX_SPECIFIC_FAN_POWER_W_PER_CMH,
+            )
+            return None
         if a > 0 and e > 0 and u > 0:
             return round((a * e * u) / 1000, 4)
     except (ValueError, TypeError):
@@ -1376,6 +1522,44 @@ ENERGY_LABEL_MAP = {
 }
 
 
+def _resolve_room_type(room_label):
+    """Template room name -> the code LightingSystem.room_type stores.
+
+    `room_type` holds a LightingSpaceType code. The table carries 68 of them -
+    6 legacy ones and 62 added with the national room types - but the map above
+    only ever knew the 6, so every current room type failed with "room_type:
+    This field is required". Nothing could be imported for a room named
+    "Work room / Open plan", "Meeting room" or "Corridor / Lobby".
+
+    The table is asked first, by exact name, which also repairs a quieter
+    fault: the substring pass below matched "Staff office" on the key "office"
+    and filed it as OFFICE_CONFERENCE - a conference room, which carries a
+    different lighting power density benchmark. Every one of the 68 names now
+    resolves to itself before any substring is tried.
+
+    The substring pass is kept after it, because files written against the old
+    template use wording that no longer appears in the table at all, such as
+    "Residential: Kitchen, Dining, Bedroom, Bathroom".
+    """
+    if not room_label:
+        return None
+
+    label = " ".join(room_label.split())
+
+    match = LightingSpaceType.objects.filter(name__iexact=label).first()
+    if match:
+        return match.code
+
+    for key, val in ROOM_TYPE_MAP.items():
+        if key in label or label in key:
+            logger.warning(
+                "Import: room type %r matched the legacy key %r -> %s",
+                room_label, key, val,
+            )
+            return val
+    return None
+
+
 def _calc_lighting_power(fixtures, tubes, wattage):
     """
     Auto-calculate total lighting power (kW).
@@ -1469,11 +1653,7 @@ def _parse_lighting_rows(tab_layout, raw_rows):
 
         # --- Room type ---
         room_label = cell(0).lower()
-        room_type_val = None
-        for label, val in ROOM_TYPE_MAP.items():
-            if label in room_label or room_label in label:
-                room_type_val = val
-                break
+        room_type_val = _resolve_room_type(room_label)
         if room_type_val:
             row_data['room_type'] = room_type_val
 
@@ -1830,7 +2010,26 @@ def _calc_hws_energy(system_type, power, num, hours, days, weeks, cop_or_eff, fu
         elif system_type == HotWaterSystemType.SOLAR and str(fuel_type).lower() == 'solar':
             result = 0
         else:
-            # Boiler or Water Heater: divide by (efficiency% / 100)
+            # Boiler or Water Heater: divide by (efficiency% / 100).
+            #
+            # This column is a PERCENTAGE - the manual form asks for 75-95 and
+            # caps it at 100 - but the header said only "efficiency level" and
+            # the template's own example row carried 3. Dividing by 0.03 turned
+            # a 12,600 kWh/yr water heater into 420,000: a plausible figure,
+            # 33x too high, from the example value the template taught.
+            #
+            # The header now says "(%)" and the example says 95. This refuses
+            # the rest: no boiler or water heater runs under 10% efficient, so
+            # such a number is a unit mistake, not a reading. Returning None
+            # leaves the energy blank and visible rather than wrong and
+            # convincing.
+            if e < 10:
+                logger.warning(
+                    "Import: hot water efficiency %r is below 10%% - refusing to "
+                    "divide by it. The column is a percentage (75-95), not a level.",
+                    cop_or_eff,
+                )
+                return None
             result = base / (e / 100)
 
         return round(Decimal(str(result)), 3)
@@ -2238,7 +2437,11 @@ def import_operational_energy_carriers(request):
                 unit_raw = unit_raw[: -len(_suffix)].strip()
                 break
 
-        label = f"row {row_idx + 1}"
+        # Named, like every other section's errors ("led row 1", "ahu row 1").
+        # A bare "row 1" here was indistinguishable from the structural
+        # importer's "row 1" below - both land in one error panel under the
+        # preview - so an energy-carrier problem read as a structural one.
+        label = f"energy carrier row {row_idx + 1}"
 
         if not name_raw:
             continue  # Skip blank rows
@@ -2310,6 +2513,82 @@ def import_operational_energy_carriers(request):
     if errors:
         return JsonResponse({"success": False, "errors": errors}, status=400)
 
+    # The carriers must account for the energy the systems say the building
+    # uses, or the building reports two different operational carbon figures.
+    #
+    # That is not hypothetical. A test import carried 48,000 kWh of carriers
+    # against 4,603,164 kWh of modelled systems. The building page headline
+    # read 588.0 kgCO2eq/m2 over 50 years, computed from the carriers, while
+    # the Systems tab read 1,494.30 kgCO2eq/m2/yr, computed from the systems.
+    # Both were correct arithmetic on different inputs, and nothing said so.
+    #
+    # Compared against entered_systems_kwh, NOT the building's total: the
+    # plug-load default and an estimated lift are derived after the file is
+    # read, so requiring them would fail every first attempt with a number
+    # only BEAT could know.
+    #
+    # Only kWh carriers are compared. A fuel given in litres or m3 would need
+    # a calorific conversion to sit alongside these, and inventing one to make
+    # a comparison pass is exactly the kind of guess this importer refuses
+    # elsewhere; such a file skips the check and says so in the log.
+    carriers_kwh = sum(
+        Decimal(str(item["quantity"])) for item in to_save
+        if item["input_unit"] == "kwh"
+    )
+    non_kwh = [item for item in to_save if item["input_unit"] != "kwh"]
+    summary = getattr(building, "energy_summary", None)
+    entered_systems = Decimal(str(summary.entered_systems_kwh)) if summary else Decimal("0")
+
+    if non_kwh:
+        logger.info(
+            "Import energy carriers: %s carrier(s) are not in kWh, so the "
+            "energy cross-check is skipped for building %s",
+            len(non_kwh), building.uuid,
+        )
+    elif to_save and entered_systems > 0:
+        tolerance = entered_systems * ENERGY_CARRIER_TOLERANCE
+        if abs(carriers_kwh - entered_systems) > tolerance:
+            pct = (carriers_kwh - entered_systems) / entered_systems * 100
+            logger.warning(
+                "Import energy carriers: %s kWh against %s kWh of systems "
+                "(%.1f%%) for building %s - refusing",
+                carriers_kwh, entered_systems, pct, building.uuid,
+            )
+            # Name the systems that make up the target. A bare total leaves
+            # the user to work out which sheet is responsible, and when the
+            # carriers come in BELOW the systems the breakdown is the only way
+            # to see which one is larger than the bill that should contain it.
+            parts = [
+                ("Cooling", summary.cooling_kwh),
+                ("Ventilation", summary.ventilation_kwh),
+                ("Lighting", summary.lighting_kwh),
+                ("Hot water", summary.hot_water_kwh),
+            ]
+            if not summary.lift_energy_is_estimated:
+                parts.append(("Lift & escalator", summary.lift_escalator_kwh))
+            if summary.plug_load_basis == "metered":
+                parts.append(("Plug & equipment", summary.plug_load_kwh))
+            breakdown = "; ".join(
+                "{0} {1:,.0f}".format(name, Decimal(str(value)))
+                for name, value in parts if value
+            )
+            return JsonResponse({"success": False, "errors": {
+                "energy carriers": {"quantity": [
+                    "The energy carriers total {carriers:,.0f} kWh/yr but the "
+                    "systems in this file use {systems:,.0f} kWh/yr - a "
+                    "difference of {pct:+.0f}%. They must agree within "
+                    "{tol:.0f}% before the building can be imported, or it "
+                    "would report two different operational carbon figures. "
+                    "The systems are: {breakdown}. "
+                    "BEAT's own lift and plug-load estimates are NOT counted "
+                    "here - enter a real figure for either and it joins this "
+                    "total.".format(
+                        carriers=carriers_kwh, systems=entered_systems, pct=pct,
+                        tol=ENERGY_CARRIER_TOLERANCE * 100, breakdown=breakdown,
+                    )
+                ]}
+            }}, status=400)
+
     with transaction.atomic():
         # Replace existing operational products (same as normal UI behaviour)
         OperationalProduct.objects.filter(building=building).delete()
@@ -2338,8 +2617,138 @@ def import_operational_energy_carriers(request):
 # Structural Components import (By Component)
 # ---------------------------------------------------------------------------
 
+# The component names the import template offers, mapped to the categories that
+# replaced them when migration 0046 consolidated the taxonomy from 19 to 14.
+#
+# That migration is on qa and on heroku/main, so the consolidated names have
+# been live since July 2026 - but the template still offers the old ones, and
+# so does every file anyone has saved from it. 11 of the template's own 13
+# example structural rows named a category that no longer exists: only
+# Foundation and Columns still resolved, the first by the plural rule below
+# and the second because its name did not change.
+#
+# Taken from docs/taxonomy_mapping.md, which drove the migration, rather than
+# guessed from the names - "Beams" merging into "Beams & Slabs" together with
+# Slabs and Upper Floors is a decision recorded there, not something the
+# strings tell you.
+_LEGACY_CATEGORY_NAMES = {
+    "basement":                       "Basement & Retaining Walls",
+    "beams":                          "Beams & Slabs",
+    "slabs":                          "Beams & Slabs",
+    "upper floors":                   "Beams & Slabs",
+    "intermediate floor construction": "Beams & Slabs",
+    "bottom floor construction":      "Ground Floor",
+    "roof construction":              "Roof",
+    "staircases and ramps":           "Staircases & Ramps",
+    "exterior walls":                 "External Walls",
+    "interior walls":                 "Internal Walls & Partitions",
+    "window frames":                  "Windows",
+    "window glazing":                 "Windows",
+    "door frames":                    "Doors",
+    "floor finish":                   "Finishes",
+    "floor insulation":               "Insulation",
+    "roof insulation":                "Insulation",
+    "wall insulation":                "Insulation",
+}
+
+
+# Construction techniques the template offers, mapped to the ones migration
+# 0046 left behind. 42 of the 90 in its dropdown no longer exist.
+#
+# Keyed on the CATEGORY as well as the name, because the same old string means
+# different things in different places: "In-Situ Reinforced Concrete Slab" was
+# renamed under Basement but kept under Roof, and "Aluminium" exists only under
+# Windows and Doors.
+#
+# Built against the live catalogue, NOT from docs/taxonomy_mapping.md alone.
+# That spec is a draft and the migration did not follow all of it: it proposed
+# dropping the "Frame —" and "Glazing —" prefixes on Windows, and they were
+# kept. Mapping "Single Glazing" to the spec's "Single Glazing" rather than the
+# catalogue's "Glazing — Single" would have left all nine Windows techniques
+# unresolved while looking correct. Every target below is checked by
+# test_import_technique_map.py against AssemblyCategoryTechnique.
+#
+# The migration's 13 deliberate drops are deliberately ABSENT. A row naming one
+# imports without a classification, as it does today, rather than being
+# refused: the material, quantity and carbon are all still good, and only the
+# technique label is missing.
+_EM_DASH = "—"
+
+_LEGACY_TECHNIQUE_NAMES = {
+    ("Beams & Slabs", "precast concrete double tee floor units"): "Precast Concrete Double Tee Units",
+    ("Beams & Slabs", "thin precast concrete deck and composite in-situ slab"): "Thin Precast Concrete Deck & Composite In-Situ Slab",
+
+    ("Roof", "thin precast concrete deck and composite in-situ slab"): "Thin Precast Concrete Deck & Composite In-Situ Slab",
+    ("Roof", "steel (zinc or galvanized iron) sheets on steel rafters"): "Metal Sheets on Steel Rafters",
+    ("Roof", "steel (zinc or galvanized iron) sheets on timber rafters"): "Metal Sheets on Timber Rafters",
+
+    ("Foundations", "pcc for footings"): "Plain Cement Concrete (PCC) Footings",
+    # Not a migration rename - the template and the catalogue were always
+    # worded differently. Precast concrete foundations are reinforced by
+    # definition and Foundations has no other precast option.
+    ("Foundations", "precast concrete foundations"): "Precast Reinforced Concrete Foundations",
+
+    ("Basement & Retaining Walls", "pre-cast concrete"): "Precast Concrete",
+
+    ("Staircases & Ramps", "in-situ reinforced concrete staircases and ramps"): "In-Situ Reinforced Concrete",
+
+    ("External Walls", "cored (with holes) bricks with internal & external plaster"): "Cored Bricks with Internal & External Plaster",
+    ("External Walls", "aluminum profile cladding"): "Aluminium Profile Cladding",
+
+    ("Internal Walls & Partitions", "cored (with holes) bricks with plaster both sides"): "Cored Bricks with Plaster Both Sides",
+    ("Internal Walls & Partitions", "in-situ reinforced wall"): "In-Situ Reinforced Concrete Wall",
+    ("Internal Walls & Partitions", "cement fiber boards on metal studs"): "Cement Fibre Boards on Metal Studs",
+
+    # Both spellings merge into one frame, per the spec (combined 83 uses).
+    ("Windows", "aluminium windows"): "Frame " + _EM_DASH + " Aluminium",
+    ("Windows", "aluminum"): "Frame " + _EM_DASH + " Aluminium",
+    ("Windows", "ventillators"): "Frame " + _EM_DASH + " Ventilators",
+    ("Windows", "single glazing"): "Glazing " + _EM_DASH + " Single",
+    ("Windows", "double glazing"): "Glazing " + _EM_DASH + " Double",
+    ("Windows", "triple glazing"): "Glazing " + _EM_DASH + " Triple",
+
+    # Likewise for doors (combined 433 uses).
+    ("Doors", "aluminium doors"): "Aluminium",
+    ("Doors", "aluminum"): "Aluminium",
+    ("Doors", "aluminum clad timber"): "Aluminium Clad Timber",
+    ("Doors", "re-use of existing door frames"): "Re-use of Existing Doors",
+
+    ("Finishes", "stones and tiles"): "Stone & Tiles",
+    ("Finishes", "woods"): "Timber Flooring",
+    ("Finishes", "others"): "Other Floor Finishes",
+    ("Finishes", "granites"): "Granite",
+    ("Finishes", "paint and coatings"): "Paint & Coatings",
+    ("Finishes", "surface preparation and treatments"): "Surface Preparation & Treatments",
+
+    ("Insulation", "polystyrene"): "Polystyrene (EPS/XPS)",
+    ("Insulation", "polyurethane"): "Polyurethane (PIR)",
+    # The spec merged the two width variants into one.
+    ("Insulation", "air gap <100mm wide"): "Air Gap",
+    ("Insulation", "air gap >100mm wide"): "Air Gap",
+
+    ("Miscellaneous", "lintel, sunshade and sill beam"): "Lintel, Sunshade & Sill Beam",
+    ("Miscellaneous", "construction chemical"): "Construction Chemicals",
+}
+
+
+def _resolve_technique_name(category, raw_name):
+    """The catalogue name for a technique as the template spells it.
+
+    Returns the name to look up, which is `raw_name` unchanged when it needs no
+    translation. The caller still decides what to do when the lookup misses.
+    """
+    name = " ".join((raw_name or "").split())
+    if not name or category is None:
+        return name
+    return _LEGACY_TECHNIQUE_NAMES.get((category.name, name.lower()), name)
+
+
 def _get_structural_category_map():
-    """Build a lower-cased name → AssemblyCategory lookup, queried fresh each call."""
+    """Build a lower-cased name → AssemblyCategory lookup, queried fresh each call.
+
+    Current names win; the legacy names above are only filled in where they do
+    not collide with one, so renaming a category back would not be shadowed.
+    """
     cat_map = {}
     for cat in AssemblyCategory.objects.all():
         cat_map[cat.name.lower().strip()] = cat
@@ -2347,6 +2756,12 @@ def _get_structural_category_map():
             cat_map[cat.name[:-1].lower().strip()] = cat
         else:
             cat_map[(cat.name + 's').lower().strip()] = cat
+
+    by_name = {c.name.lower().strip(): c for c in AssemblyCategory.objects.all()}
+    for old, new in _LEGACY_CATEGORY_NAMES.items():
+        cat = by_name.get(new.lower())
+        if cat is not None and old not in cat_map:
+            cat_map[old] = cat
     return cat_map
 
 
@@ -2417,6 +2832,68 @@ def _alias_for(name, country):
     return a.get((n, c)) or a.get((n, ""))
 
 
+# Which of the seven efficiency metrics the template's figure is stated in.
+#
+# The template has ONE column headed "EER/ISEER/COP" and the importer never
+# set efficiency_metric, so every imported air conditioner was stored as COP
+# whatever the user actually had. All 351 air conditioners in production are
+# on `cop`, which is the signature of that rather than of the stock.
+#
+# It is a 3.4x error where it bites. Thailand's EGAT No.5 label states EER in
+# Btu/h per watt - the No.5 threshold is >= 11.60 - and stored as COP 11.60
+# that machine appears 3.4 times more efficient than it is, so its energy
+# comes out 3.4 times too low. Indonesia and Vietnam label CSPF, India ISEER.
+#
+# An optional column now names the metric. Blank keeps the old behaviour, so
+# every file that imported before still imports and still means COP.
+_METRIC_ALIASES = {
+    "cop": "cop",
+    "eer": "eer", "eer btu": "eer", "eer btu/h per w": "eer",
+    "eer btu/h.w": "eer", "eer (btu/h per w)": "eer",
+    "eer w/w": "eer_ww", "eer ww": "eer_ww", "eer (w/w)": "eer_ww",
+    "iseer": "iseer", "cspf": "cspf",
+    "seer": "seer", "seer w/w": "seer",
+    "seer btu": "seer_btu", "seer (btu/h per w)": "seer_btu",
+}
+
+
+def _efficiency_metric(raw):
+    """Template text -> stored metric key. Blank or unknown means COP."""
+    key = (str(raw or "").strip().lower()
+           .replace("·", " ").replace("-", " "))
+    key = " ".join(key.split())
+    if not key:
+        return "cop"
+    return _METRIC_ALIASES.get(key, "cop")
+
+
+# Returned as the "error" slot when a match was only possible by using another
+# country's EPD. Not an error - the row imports - but the localised GWP is the
+# wrong one, so the preview marks it for review.
+def _shortest_contains(qs, name, country):
+    """The shortest catalogue name containing `name`, optionally in `country`.
+
+    "Contains" matching picked whichever row the database happened to return
+    first, so "Reinforced concrete" resolved to "Glass reinforced concrete" -
+    a thin cladding product with a completely different carbon factor - purely
+    because the query string is a substring of it. The shortest containing
+    name is the least elaborated one and therefore the closest to what was
+    asked for; an exact match is shortest of all.
+    """
+    f = qs.filter(name__icontains=name)
+    if country:
+        f = f.filter(country__name__iexact=country)
+    names = [n for n in f.values_list("name", flat=True)[:200]
+             if not _changes_material(name, n)]
+    if not names:
+        return None
+    best = min(names, key=lambda n: (len(n), n.lower()))
+    return f.filter(name__iexact=best).first()
+
+
+CROSS_COUNTRY = "__cross_country__"
+
+
 def _lookup_structural_epd(epd_name_raw, country_name_raw):
     """
     Look up a structural (non-operational) EPD by name and country.
@@ -2462,18 +2939,87 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
         return epd, None
 
     # 2. Exact name only
+    #
+    # An exact name match can still be another country's EPD. A dummy BoQ
+    # naming "Ready-mix concrete C25/30" for a Cambodian building matched the
+    # GERMAN EPD of that name and reported nothing, because this step returns
+    # before any country is considered. Flagged like the looser steps below.
     epd = qs.filter(name__iexact=name).first()
     if epd:
+        if country and epd.country and epd.country.name.lower() != country.lower():
+            logger.warning("Import: %r (%s) exact-matched an EPD from %s",
+                           name, country, epd.country.name)
+            return epd, CROSS_COUNTRY
         return epd, None
 
     # 3. Name contains + country
-    epd = qs.filter(name__icontains=name, country__name__iexact=country).first()
+    #
+    # Country is pinned here, but "contains" can still land on a different
+    # material: "Reinforced concrete" is a substring of "Glass reinforced
+    # concrete", which is a thin cladding product, not structural concrete.
+    # Prefer the shortest match - the least elaborated name is the closest to
+    # what was asked for - rather than whichever row the database returns
+    # first.
+    epd = _shortest_contains(qs, name, country)
     if epd:
         return epd, None
 
     # 4. Name contains only
-    epd = qs.filter(name__icontains=name).first()
+    #
+    # This is the step that crosses borders. The catalogue carries LOCALISED
+    # GWP per country - steel rebar is India 2.60, Indonesia 2.52, Vietnam
+    # 2.46, Cambodia 2.42, Thailand 2.37 - so matching another country's EPD
+    # uses the wrong factor. Over a sample of 100 plausible material names
+    # across the five countries, 37 resolved to a different country's EPD: an
+    # Indian AAC block to a German product, Indian cement to a Vietnamese one.
+    #
+    # The fallback stays, because refusing would flag a third of every import.
+    # But the caller is told, so the row can be shown for review instead of
+    # succeeding silently.
+    # 4a. Fuzzy within the row's own country, BEFORE crossing a border.
+    #
+    # Ordering matters more than it looks. "AAC block" has no Cambodian name
+    # containing it, so the contains-any-country step below used to return the
+    # GERMAN "AAC block and AAC Blocks for Floor Plates" - while Cambodia's own
+    # "Autoclaved aerated concrete (AAC) solid blocks" sat unexamined. The
+    # localised GWP is the whole point of the per-country catalogue, so a
+    # confident same-country match beats a better string elsewhere.
+    if country:
+        in_country = qs.filter(country__name__iexact=country)
+        candidates = list(in_country.values_list("name", flat=True)[:5000])
+        best, score, reason = _fuzzy_epd_pick(name, candidates)
+        if best:
+            epd = in_country.filter(name__iexact=best).first()
+            if epd:
+                logger.warning(
+                    "Import fuzzy-matched structural EPD %r -> %r (score %.2f, own country %s)",
+                    name, best, score, country,
+                )
+                return epd, None
+        if reason == "ambiguous":
+            # The material IS in this country - we just cannot tell WHICH of
+            # several it is. "Portland cement OPC 43" sits between India's
+            # Ordinary Portland, Portland Composite and Portland Pozzolana
+            # cements, which are three different products with three different
+            # factors. Falling through from here used to cross the border and
+            # take Vietnam's, so a careful refusal at home was overridden by a
+            # careless grab abroad. Stop instead and let the user pick.
+            logger.warning(
+                "Import: %r (%s) is ambiguous within its own country - refusing",
+                name, country,
+            )
+            return None, (
+                f"'{name}' matches more than one {country} EPD closely "
+                f"(score {score:.2f}). Pick the right one rather than letting "
+                f"the import guess."
+            )
+
+    epd = _shortest_contains(qs, name, None)
     if epd:
+        if country and epd.country and epd.country.name.lower() != country.lower():
+            logger.warning("Import: %r (%s) matched an EPD from %s",
+                           name, country, epd.country.name)
+            return epd, CROSS_COUNTRY
         return epd, None
 
     # 5. Fuzzy fallback — templates abbreviate or reword EPD names
@@ -2491,7 +3037,7 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
         if not country and scope_label != "any country":
             continue
         candidates = list(scope_qs.values_list("name", flat=True)[:5000])
-        best, score = _fuzzy_epd_pick(name, candidates)
+        best, score, _reason = _fuzzy_epd_pick(name, candidates)
         if best:
             epd = scope_qs.filter(name__iexact=best).first()
             if epd:
@@ -2499,6 +3045,8 @@ def _lookup_structural_epd(epd_name_raw, country_name_raw):
                     "Import fuzzy-matched structural EPD %r -> %r (score %.2f, scope %s)",
                     name, best, score, scope_label,
                 )
+                if country and epd.country and epd.country.name.lower() != country.lower():
+                    return epd, CROSS_COUNTRY
                 return epd, None
 
     return None, f"Structural EPD not found for name '{name}' (country: '{country}')."
@@ -2572,6 +3120,10 @@ def import_structural_components(request):
 
     cat_map = _get_structural_category_map()
     errors = {}
+    # Rows that imported but used another country's EPD. Not a failure -
+    # the row is saved - but the localised carbon factor is the wrong one,
+    # so the response says which rows to check.
+    warnings = {}
 
     # We group rows into assemblies.
     # Each new non-blank Building Component starts a new assembly.
@@ -2601,7 +3153,7 @@ def import_structural_components(request):
         epd_qty    = cell(10)
         epd_unit   = cell(11)
 
-        label = f"row {row_idx + 1}"
+        label = f"structural row {row_idx + 1}"
 
         # Separator row: Building Component present but no material data → end of group
         if comp_raw and not tech_raw and not qty_raw:
@@ -2674,9 +3226,21 @@ def import_structural_components(request):
                 # Row deliberately carries no material (e.g. "No Insulation").
                 # Contributes zero carbon — skip without raising an error.
                 continue
-            if epd_error:
+            # CROSS_COUNTRY is a warning, not a failure. The row imports with
+            # another country's localised GWP, which is wrong but better than
+            # refusing a third of every file - 37 of 100 plausible material
+            # names resolve across a border. Treating it as an error here
+            # would have rejected all of them.
+            cross_country = epd_error is CROSS_COUNTRY
+            if epd_error and not cross_country:
                 errors[label] = {"epd_name": [epd_error]}
                 continue
+            if cross_country:
+                warnings.setdefault(label, []).append(
+                    f"'{epd_name}' matched an EPD from "
+                    f"{epd.country.name if epd.country else 'another country'} "
+                    f"rather than {epd_country}; its localised carbon factor "
+                    f"differs. Check this material.")
 
             # Derive the correct input_unit from the assembly dimension (same logic as UI)
             from pages.views.assembly.epd_dimension_info import get_epd_dimension_info
@@ -2729,15 +3293,36 @@ def import_structural_components(request):
             if asm_data["technique_name"]:
                 try:
                     technique = AssemblyTechnique.objects.get(
-                        name__iexact=asm_data["technique_name"].strip()
+                        name__iexact=_resolve_technique_name(
+                            asm_data["category"], asm_data["technique_name"]
+                        )
                     )
                     classification = AssemblyCategoryTechnique.objects.filter(
                         category=asm_data["category"],
                         technique=technique,
                     ).first()
                 except AssemblyTechnique.DoesNotExist:
-                    # Technique not found — still create assembly without classification
-                    pass
+                    # Still create the assembly, but say so.
+                    #
+                    # This used to be a bare `pass`. Migration 0046 renamed and
+                    # merged techniques alongside the categories, and the
+                    # template still offers the old names: 42 of the 90 in its
+                    # dropdown no longer exist, including "Stones and Tiles",
+                    # which its own example row uses. Every one of those
+                    # imported with classification = None and said nothing.
+                    #
+                    # The carbon figure is unaffected - that comes from the EPD
+                    # and the quantity - so this is lost metadata rather than a
+                    # wrong number, which is why it went unnoticed. The mapping
+                    # is not applied here because the spec's technique table
+                    # carries merges and drops, not only renames, and guessing
+                    # at those would put a wrong technique on the record
+                    # silently. See docs/import_technique_mismatches.md.
+                    logger.warning(
+                        "Import: construction technique %r is not in the "
+                        "catalogue - assembly saved without a classification",
+                        asm_data["technique_name"],
+                    )
 
             # Create Assembly
             assembly = Assembly.objects.create(
@@ -2779,6 +3364,7 @@ def import_structural_components(request):
 
     return JsonResponse({
         "success": True,
+        "warnings": warnings,
         "saved_count": saved_count,
         "building_uuid": str(building.uuid),
     })

@@ -129,6 +129,20 @@ _The two blank joins (749 + 248) merge into one "Not specified" (997)._
 | Plasterboards on Timber Studs with Insulation (0) | ✗ | drop |
 
 ### 10. Windows  ← Window Frames **＋ Window Glazing**
+
+> **⚠️ NOT APPLIED AS WRITTEN (noted 2026-10-20).** This section proposes
+> dropping the `Frame —` and `Glazing —` prefixes. Migration 0046 **kept**
+> them. The catalogue holds `Frame — Aluminium`, `Frame — UPVC`,
+> `Glazing — Single`, `Glazing — Double`, `Glazing — Triple` — not the bare
+> names in the "New name" column below. The glazing entries also lost the word
+> "Glazing" from the leaf, so `Glazing — Single`, not `Glazing — Single Glazing`.
+>
+> Anyone mapping old names onto new ones must read the catalogue, not this
+> table. `_LEGACY_TECHNIQUE_NAMES` in `pages/views/building/import_building.py`
+> does, and a test asserts every target is really linked to its category.
+> Mapping from this section instead would leave all nine Windows techniques
+> unresolved while appearing correct.
+
 | Old technique (uses) | Action | New name |
 |---|---|---|
 | *Frame —* UPVC (67) | ✓ | UPVC |

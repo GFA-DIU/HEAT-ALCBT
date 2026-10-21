@@ -29,6 +29,9 @@ secrets
 !/pages/data/*.csv
 # Keep import template xlsx in static/docs
 !/static/docs/import-template.xlsx
+# Keep the EPD alias table - it is curated source, not data output, and the
+# importer silently does nothing without it
+!/pages/scripts/import_mapping/epd_alias.csv
 # Keep Thailand TGO source data
 !/docs/TH_CFP-TGO_Data_final(18Feb2026).xlsx
 !/docs/TH_CFP_Final_Usable_Dataset_20260709.xlsx

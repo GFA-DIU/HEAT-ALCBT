@@ -436,31 +436,45 @@ class TestImportCoolingSystems:
         assert resp.json()["saved_count"] == 1
 
     def test_water_cooled_chiller_happy_path(self, client, user, building):
-        # col: year, ref_type, ref_qty, load_kW, num_chillers, leakage, hours, days, weeks, cop, vsd, hr, ipvl, load_factor, total_power, cop2, label, stars
+        # Column 0 is "Type of cooling system", not the year.
+        #
+        # This row used to start at the year, matching the parser's indices
+        # rather than the template's columns. The chiller sheets have carried a
+        # leading "Type of cooling system" column since at least the May 2026
+        # template, and the browser sends every column - slice(1) in the import
+        # dialog drops the header ROW, not a column - so a real file is one
+        # place to the right of what this asserted. The parser read the load as
+        # the refrigerant quantity and the efficiency as the weeks per year,
+        # and still produced a figure.
+        #
+        # col: subtype, year, ref_type, ref_qty, load_RT, num_chillers, leakage,
+        #      hours, days, weeks, kW/RT, vsd, hr, ipvl, load_factor,
+        #      total_power, cop, label, stars
         client.force_login(user)
         resp = _post_json(client, "import_cooling_systems", {
             "building_uuid": str(building.uuid),
             "systems": [{
                 "tab": "water cooled",
                 "rows": [[
-                    "2019",   # 0: year
-                    "R-134a", # 1: refrigerant
-                    "100",    # 2: refrigerant qty kg
-                    "500",    # 3: load kW
-                    "1",      # 4: num_chillers
-                    "",       # 5: leakage → auto
-                    "10",     # 6: hours/day
-                    "5",      # 7: days/week
-                    "52",     # 8: weeks/year
-                    "0.65",   # 9: efficiency kW/RT (valid range 0.40-1.00)
-                    "No",     # 10: VSD
-                    "No",     # 11: heat recovery
-                    None,     # 12: ipvl
-                    None,     # 13: load_factor
-                    None,     # 14: total_power
-                    None,     # 15: cop2
-                    None,     # 16: label
-                    None,     # 17: stars
+                    "Water cooled chiller",  # 0: sub-type (the leading column)
+                    "2019",   # 1: year
+                    "R-134a", # 2: refrigerant
+                    "100",    # 3: refrigerant qty kg
+                    "500",    # 4: load RT
+                    "1",      # 5: num_chillers
+                    "",       # 6: leakage → auto
+                    "10",     # 7: hours/day
+                    "5",      # 8: days/week
+                    "52",     # 9: weeks/year
+                    "0.65",   # 10: efficiency kW/RT (valid range 0.40-1.00)
+                    "No",     # 11: VSD
+                    "No",     # 12: heat recovery
+                    None,     # 13: ipvl
+                    None,     # 14: load_factor
+                    None,     # 15: total_power
+                    None,     # 16: cop
+                    None,     # 17: label
+                    None,     # 18: stars
                 ]],
             }],
         })
