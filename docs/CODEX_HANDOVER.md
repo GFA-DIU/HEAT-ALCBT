@@ -26,8 +26,14 @@ The app has no GitHub integration (the Heroku link returns `not_found`) and no
 Actions workflow. A deploy is one manual command:
 
 ```bash
+git fetch origin                               # without this you deploy the OLD commit
 git push heroku origin/qa:refs/heads/main
 ```
+
+`origin/qa` is a remote-tracking ref and only moves on `git fetch`. Merging a PR
+on GitHub does not touch your local copy, so a push without the fetch rebuilds
+the previous commit, reports success, and ships nothing. PR #599 was lost that
+way on 21.10.2026.
 
 `Procfile` carries `release: python manage.py migrate --noinput`, so migrations
 run automatically **on that push** — not on the merge. Preboot is off, so every

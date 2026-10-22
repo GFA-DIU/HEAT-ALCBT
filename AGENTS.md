@@ -164,13 +164,35 @@ Not `# convert the efficiency`.
 |---|---|
 | Branch | work on `rohit-qa`; **never merge to `qa` unless asked** |
 | `qa` | this **is** production — beat-alcbt.gggi.org |
-| Deploying | **merging to `qa` does NOT deploy.** A deploy is `git push heroku origin/qa:refs/heads/main` |
+| Deploying | **merging to `qa` does NOT deploy.** A deploy is `git fetch origin` **then** `git push heroku origin/qa:refs/heads/main` — see below |
 | Production DB | read-only unless explicitly directed |
 | Secrets | never print, paste or commit; mask connection strings |
 | Python | `.venv/Scripts/python.exe` |
 | Database | local Postgres in Docker, container `heat-alcbt-db-1` |
 | Templates | `/templates`, not `pages/templates` |
 | Migrations | run automatically **on deploy** via the `Procfile` release phase — not on merge |
+
+### The deploy silently ships the wrong commit if you skip the fetch
+
+`origin/qa` is a **remote-tracking ref**. It only moves when you run `git fetch`.
+Merging a PR on GitHub does not touch your local copy of it.
+
+```
+git fetch origin                               # ← without this you deploy the OLD commit
+git push heroku origin/qa:refs/heads/main
+```
+
+> PR #599 was merged on GitHub and then deployed without a fetch. Heroku built
+> the previous commit, reported success, and the change simply was not there.
+> Twenty minutes went into asking why the template looked unchanged. The push
+> gives no warning — it ships whatever your machine last saw.
+
+Afterwards, check what actually shipped rather than trusting "Released vN":
+
+```
+heroku releases -a beat-qa -n 1        # the commit it deployed
+heroku releases:output vN -a beat-qa   # the release phase (migrations)
+```
 
 ### Two local traps
 

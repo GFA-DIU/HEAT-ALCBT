@@ -124,6 +124,10 @@ These are methodology calls, not implementation gaps. They need GT.
   and that push is what runs the migrations. On 16.10.2026 PR #595 was merged,
   reported as shipped, and production served twelve-day-old code until someone
   read `heroku releases` and noticed the version had not moved.
+  **Run `git fetch origin` first.** `origin/qa` is a remote-tracking ref that
+  only moves on a fetch, so pushing it straight after merging a PR on GitHub
+  rebuilds the previous commit and ships nothing. That happened again with
+  PR #599 on 21.10.2026 — the build succeeded and the change was simply absent.
 - **Templates live in `/templates`**, not `pages/templates`. Searching the
   wrong one and concluding a feature is missing led to a third copy of an
   editor that already existed twice.

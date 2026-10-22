@@ -1,12 +1,12 @@
-"""Drive the shipped WORKED EXAMPLE through the real import endpoints.
+"""Drive the shipped template through the real import endpoints.
 
 Every bug found in this round survived because the checks stopped one layer
 short of where the error messages are produced. Parsers were tested, then
 forms; the endpoints were only ever exercised with hand-written rows that
 matched the parser rather than the template.
 
-This reads static/docs/import-template-example.xlsx, builds each payload the
-way import-dialog.html builds it, and posts it. If a sheet and its endpoint
+This reads static/docs/import-template.xlsx, builds each payload the way
+import-dialog.html builds it, and posts it. If a sheet and its endpoint
 ever disagree again, this fails instead of the user - and the example we hand
 people cannot quietly become one BEAT would reject.
 """
@@ -24,11 +24,9 @@ from pages.models.building import Building
 
 pytestmark = pytest.mark.django_db
 
-# The worked example, not the blank template. The blank one carries no rows
-# by design - it used to ship with 23, so a user who missed one imported
-# someone else's building alongside their own. The example is the file that
-# has to survive this journey.
-TEMPLATE = "static/docs/import-template-example.xlsx"
+# One file now, filled in as a worked example. A blank template plus a
+# separate example was tried and only raised the question of which to open.
+TEMPLATE = "static/docs/import-template.xlsx"
 
 
 # --- reading the template the way the browser does -------------------------
