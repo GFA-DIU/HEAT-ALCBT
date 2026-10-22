@@ -14,9 +14,6 @@ from pages.models.building_operation import HotWaterSystemType
 from pages.views.building.import_building import _calc_hws_energy
 
 TEMPLATE = "static/docs/import-template.xlsx"
-# The blank template carries no values now - it is a shape to fill. The worked
-# example is where a figure lives, and it is the one people copy.
-EXAMPLE = "static/docs/import-template-example.xlsx"
 
 # 6 units x 3.5 kW x 2 h/day x 6 days x 50 weeks = 12,600 kWh before efficiency
 ARGS = (3.5, 6, 2, 6, 50)
@@ -66,14 +63,8 @@ def test_the_template_says_the_column_is_a_percentage():
     assert "%" in header, header
 
 
-def test_the_worked_examples_efficiency_is_plausible():
+def test_the_shipped_examples_efficiency_is_plausible():
     """It was 3 in the template that shipped. Anyone copying that row got a
     water heater reported at 33x its energy."""
-    ws = _sheet("Hot water System - Water Heater", EXAMPLE)
-    assert float(ws.cell(row=2, column=9).value) >= 10
-
-
-def test_the_blank_template_carries_no_value_to_copy():
-    """A blank template cannot teach a wrong number."""
     ws = _sheet("Hot water System - Water Heater")
-    assert ws.cell(row=2, column=9).value in (None, "")
+    assert float(ws.cell(row=2, column=9).value) >= 10

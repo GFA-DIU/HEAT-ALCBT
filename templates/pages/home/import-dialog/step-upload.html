@@ -12,31 +12,25 @@
   </div>
 
   {% comment %}
-  Two downloads. The template used to ship with 23 rows of example data, so a
-  single file was both the thing you fill in and the example you learn from -
-  and anything a user forgot to delete imported as their own building. The
-  blank one is now empty; the worked example is a separate file.
+  One file, filled in as a worked example. Two downloads were tried - a blank
+  one to fill and an example to read - and it only raised the question of
+  which to open. A single completed file shows what every sheet should look
+  like, and you type over it.
   {% endcomment %}
-  {% if import_template_url or import_example_url %}
+  {% if import_template_url %}
   <div class="flex flex-col items-center gap-1 text-center">
     <p class="paragraph-small text-[var(--text--strong-950)]">
-      {% if import_template_url %}
       {% translate "Need a template?" %}
       <a href="{{ import_template_url }}" download class="text-[var(--state--information--base)] underline cursor-pointer">
-        {% translate "Download blank template" %}
+        {% translate "Download sample template" %}
       </a>
-      {% endif %}
-      {% if import_template_url and import_example_url %}
-      <span class="text-[var(--text--sub-600)]">&middot;</span>
-      {% endif %}
-      {% if import_example_url %}
-      <a href="{{ import_example_url }}" download class="text-[var(--state--information--base)] underline cursor-pointer">
-        {% translate "See a worked example" %}
-      </a>
-      {% endif %}
     </p>
-    <p class="text-[0.6875rem] leading-snug text-[var(--text--sub-600)] max-w-[22rem]">
-      {% translate "Fill in the blank template with your own building. The worked example is a completed one to look at - a 2,400 m² Phnom Penh office - and is not meant to be uploaded as-is." %}
+    <p class="text-[0.6875rem] leading-snug text-[var(--text--sub-600)] max-w-[24rem]">
+      {% blocktranslate trimmed %}
+        It comes filled in as a worked example — a 2,400 m² Phnom Penh office.
+        Replace each value with your own building's, keeping the same sheets,
+        columns and units. Anything you leave behind is imported as yours.
+      {% endblocktranslate %}
     </p>
   </div>
   {% endif %}

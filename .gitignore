@@ -29,9 +29,6 @@ secrets
 !/pages/data/*.csv
 # Keep import template xlsx in static/docs
 !/static/docs/import-template.xlsx
-# and the worked example beside it - the blank template shows the shape, this
-# one shows a building filled in correctly
-!/static/docs/import-template-example.xlsx
 # Keep the EPD alias table - it is curated source, not data output, and the
 # importer silently does nothing without it
 !/pages/scripts/import_mapping/epd_alias.csv
