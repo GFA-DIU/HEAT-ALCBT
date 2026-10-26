@@ -4,14 +4,10 @@ from pathlib import Path
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
-# List of files to be sorted
-files = [
-    "1_ACE logo.jpg",
-    "2_EESL Logo Branding C2C (1)-01.png",
-    "3_GGGI Logo New Green.png"
-]
-
-# Priority mapping: GGGI first, then ACE, then EESL
+# The logos themselves are read from the folder, so adding a file is enough to
+# show it. Only the lead partners have a fixed order; development partners fall
+# back to alphabetical. Each key is matched as a substring of the filename, so a
+# renamed file keeps its place as long as the partner's initials survive.
 priority = {"GGGI": 0, "ACE": 1, "EESL": 2}
 
 @login_required
