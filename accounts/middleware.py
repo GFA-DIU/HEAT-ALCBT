@@ -1,19 +1,4 @@
-from allauth.account.models import EmailAddress
-from django.contrib.messages import get_messages
 from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.urls import reverse
-
-
-ALLOWED_PATHS_WHEN_UNVERIFIED = [
-    "/accounts/verify-email/",
-    "/accounts/resend-confirmation/",
-    "/accounts/confirm-email/",
-    "/accounts/logout/",
-    "/accounts/login/",
-    "/cookies/",
-    "/__debug__/",
-]
 
 
 class HtmxLoginRedirectMiddleware:
@@ -38,28 +23,18 @@ class HtmxLoginRedirectMiddleware:
         return response
 
 
-class EmailVerificationMiddleware:
-    """
-    Redirects authenticated users with unverified emails to the email
-    verification page. They cannot access any other part of the platform
-    until their email is confirmed.
-    """
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        if request.user.is_authenticated and not request.user.is_staff:
-            path = request.path
-
-            # Allow access to admin, static files and allowed auth paths
-            if not any(path.startswith(allowed) for allowed in ALLOWED_PATHS_WHEN_UNVERIFIED):
-                email_verified = EmailAddress.objects.filter(
-                    user=request.user, verified=True
-                ).exists()
-
-                if not email_verified:
-                    list(get_messages(request))
-                    return redirect(reverse("verify_email"))
-
-        return self.get_response(request)
+# EmailVerificationMiddleware used to live here. It redirected every
+# authenticated non-staff user whose address was not confirmed to a dead-end
+# "Confirm your email address" page, and the Resend button on that page only
+# appeared after seven days - so anyone whose confirmation mail went to spam
+# was locked out of BEAT for a week with no way to ask for another one.
+#
+# On 2026-10-26 it was blocking 359 of 1,205 production accounts, 30% of the
+# user base, and only 20 of those had signed up in the previous 90 days: the
+# rest had hit the wall and never come back. The gate was removed rather than
+# repaired. Confirmation mail still goes out (ACCOUNT_EMAIL_VERIFICATION is
+# "optional" in settings.py) and people can still confirm, it is simply no
+# longer a condition of using the tool.
+#
+# The trade-off, recorded deliberately: nothing now proves a signup address is
+# real, so typo'd and invented addresses create working accounts.
