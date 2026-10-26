@@ -114,7 +114,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # django-allauth
     "accounts.middleware.HtmxLoginRedirectMiddleware",
-    "accounts.middleware.EmailVerificationMiddleware",
     # # own
     # "django_project.middleware.LoginRequiredMiddleware",
 ]
@@ -334,6 +333,14 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
+
+# "optional": the confirmation mail is still sent and the link still works, but
+# signing in does not depend on it. Stated here rather than left to allauth's
+# default, because the default is what this app silently relied on while
+# accounts.middleware enforced a stricter rule of its own - and the two
+# disagreeing is how a gate ends up blocking 30% of the user base unnoticed.
+# See the note at the foot of accounts/middleware.py.
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 
 
 # Security
