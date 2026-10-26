@@ -555,7 +555,7 @@
 
   var UNIT_LABEL = {
     kg: "Mass (kg)", ton: "Mass (ton)", m3: "Volume (m³)",
-    m2: "Area (m²)", m: "Length (m)", pcs: "Quantity (pcs)", unknown: "Layers (#)",
+    m2: "Area (m²)", m: "Length (m)", pcs: "Quantity (pcs)", unknown: "Layers (n)",
   };
 
   // Use window assignment to avoid const/class re-declaration errors on dynamic reload
@@ -1187,7 +1187,7 @@
       // Fall back to a declared unit ONLY when the saved unit is genuinely empty.
       // 'unknown' must NOT be treated as missing: for an m²-declared EPD in an AREA
       // assembly, get_epd_dimension_info() deliberately returns Unit.UNKNOWN meaning
-      // "Number of layers" (UNIT_LABEL.unknown = "Layers (#)"). Overriding it with the
+      // "Number of layers" (UNIT_LABEL.unknown = "Layers (n)"). Overriding it with the
       // declared unit both hid that label and would rewrite input_unit on save,
       // silently changing the calculation.
       const _realUnits = availableUnits.filter(u => u && u !== 'unknown');
@@ -1207,7 +1207,7 @@
       // INSIDE the quantity box. For convertible EPDs it's a small switchable dropdown
       // (kg / m³); otherwise a locked label. Keeps the typed number fully visible.
       const isMultiUnit = (mode === 'boq' && availableUnits.length > 1);
-      const unitSymbol = (u) => u === 'm3' ? 'm³' : u === 'm2' ? 'm²' : u === 'unknown' ? '#' : u;
+      const unitSymbol = (u) => u === 'm3' ? 'm³' : u === 'm2' ? 'm²' : u === 'unknown' ? 'n' : u;
       const unitInline = isMultiUnit
         ? `<select class="material-unit-value select select-ghost select-xs text-xs shrink-0" style="width:auto;min-width:2.9rem;padding-left:0.35rem;padding-right:1.1rem;" title="${i18n.unit || 'Switch unit'}" onchange="structuralManager.onMaterialUnitChange(this)">
              ${availableUnits.map(u => `<option value="${u}" ${u === m.unit ? 'selected' : ''}>${unitSymbol(u)}</option>`).join('')}

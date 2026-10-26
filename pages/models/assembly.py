@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from cities_light.models import Country
 from accounts.models import CustomCity
 
-from .epd import EPD
+from .epd import EPD, Unit
 from .base import BaseModel
 from .product import BaseProduct
 
@@ -230,13 +230,35 @@ class StructuralProduct(BaseProduct):
         super().clean()
 
         dimension = None if self.assembly.is_boq else self.assembly.dimension
-        _, expected_units = self.epd.get_epd_info(dimension)
+        selection_text, expected_units = self.epd.get_epd_info(dimension)
+
+        # get_epd_info returns a single unit for a component (the dimension decides
+        # it) and a list for a BoQ row. Normalise, because `"m" in "m2"` is True:
+        # leaving a bare string here let a metre quantity pass as square metres.
+        if isinstance(expected_units, str):
+            expected_units = [expected_units]
+        else:
+            expected_units = list(expected_units)
+
         if self.input_unit not in expected_units:
+            # "Expected unit: 'unknown'" told the user nothing. 'unknown' is the unit
+            # of a dimensionless multiplier, and selection_text is its name
+            # ("Number of layers", "Share of mass"), so say that instead.
+            if selection_text and expected_units == [Unit.UNKNOWN]:
+                detail = (
+                    "this component asks for %s, which is a plain number with no unit"
+                    % str(selection_text).lower()
+                )
+            elif selection_text and not isinstance(selection_text, list):
+                detail = "this component asks for %s in %s" % (
+                    str(selection_text).lower(), ", ".join(expected_units))
+            else:
+                detail = "expected %s" % ", ".join(expected_units)
             raise ValidationError(
                 {
                     "input_unit": (
-                        f"The unit '{self.input_unit}' is not valid for the epd '{self.epd.name}'. "
-                        f"Expected unit: '{expected_units}'."
+                        "The unit '%s' is not valid for '%s': %s."
+                        % (self.input_unit, self.epd.name, detail)
                     )
                 }
             )
