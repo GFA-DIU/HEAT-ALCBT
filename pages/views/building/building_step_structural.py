@@ -269,10 +269,12 @@ def handle_filter_epds(request):
 # here (not via a template filter) so adding an EPD never depends on a filter loading.
 _UNIT_DIMENSION_LABEL = {
     "kg": "Mass (kg)", "ton": "Mass (ton)", "m3": "Volume (m³)",
-    "m2": "Area (m²)", "m": "Length (m)", "pcs": "Quantity (pcs)", "unknown": "Layers (#)",
+    "m2": "Area (m²)", "m": "Length (m)", "pcs": "Quantity (pcs)", "unknown": "Layers (n)",
 }
 # Compact symbol shown in the inline unit dropdown (keeps the row clean like single-unit rows).
-_UNIT_SYMBOL = {"m3": "m³", "m2": "m²", "unknown": "#"}
+# "unknown" is a layer count, not a unit. Shown as "n" (a plain number)
+# rather than "#", which readers took for a reference or an ID.
+_UNIT_SYMBOL = {"m3": "m³", "m2": "m²", "unknown": "n"}
 
 
 def handle_select_product(request):
@@ -326,11 +328,18 @@ def handle_select_product(request):
             except (ValueError, KeyError):
                 selection_unit = epd.declared_unit
 
-        # Fall back to the declared unit when the dimension mapping yields no usable unit.
-        # Some EPDs declare a real unit (e.g. m²) but return 'unknown' from the mapping,
-        # which would otherwise show as '#' and block the A4/A5 mass derivation.
-        if (not selection_unit or selection_unit == "unknown") and \
-           epd.declared_unit and epd.declared_unit != "unknown":
+        # 'unknown' is NOT a missing unit — it is the unit of a dimensionless
+        # multiplier. For an m²-declared EPD in an AREA component the quantity is a
+        # layer count; for an m-declared EPD in a LENGTH component it is a count of
+        # full-length elements. get_epd_dimension_info() says so, StructuralProduct
+        # .clean() enforces it, impact_calculation's direct-match step multiplies the
+        # assembly quantity by it, and the Excel importer stores it. This view used to
+        # rewrite it to the declared unit, which made the form post 'm2' and the save
+        # fail for 2,006 m² EPDs and 170 m EPDs — 38% of the library. The A4/A5 mass
+        # derivation that the rewrite was meant to protect reads the EPD's DECLARED
+        # unit (_factor_to_kg), never input_unit, so it was never at risk.
+        # The matching JS re-render path carries the same warning.
+        if not selection_unit and epd.declared_unit:
             selection_unit = epd.declared_unit
 
         epd_data = {

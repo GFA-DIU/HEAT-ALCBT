@@ -71,7 +71,7 @@
         {% endfor %}
       </select>
       {% else %}
-      <span class="text-xs text-[var(--text--sub-600)] material-unit shrink-0" data-unit="{{ epd.selection_unit }}">{% if epd.selection_unit == 'unknown' %}#{% else %}{{ epd.selection_unit }}{% endif %}</span>
+      <span class="text-xs text-[var(--text--sub-600)] material-unit shrink-0" data-unit="{{ epd.selection_unit }}">{% if epd.selection_unit == 'unknown' %}n{% else %}{{ epd.selection_unit }}{% endif %}</span>
       <input type="hidden" class="material-unit-value" value="{{ epd.selection_unit }}" />
       {% endif %}
     </label>{% comment %}unit sits inside the quantity box (compact) so all rows share the clean single-unit layout{% endcomment %}
