@@ -45,7 +45,13 @@ def import_EDGE_EPDs():
                 conversions=conversions,
                 category=get_category(row),
                 declared_unit=row["declared_unit"],
-                type=EPDType.OFFICIAL,
+                # NOT 'official'. That label reads "From a verified ILCD+EPD source"
+                # in the picker, and the EDGE / IFC-India handbook is neither an
+                # ECO Platform node nor EPD International: it is a methodology
+                # report published as a PDF. Claiming the stronger provenance made
+                # 99 figures look third-party verified when they are not. This
+                # loader set OFFICIAL, so re-running it used to undo any manual fix.
+                type=EPDType.OFFICIAL_NON_STANDARD,
                 declared_amount=1,
                 comment=row["description"],
                 created_by_id=superuser.id,
