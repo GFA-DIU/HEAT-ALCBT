@@ -54,6 +54,7 @@
             class="btn btn-outline p-2 border-[var(--stroke--soft-200)]">
             <span data-icon="delete-bin-5-line" data-size="20"></span>
           </button>
+          {% if report_export_enabled %}
           <!-- Export dropdown -->
           <div class="relative" id="export-dropdown-wrapper">
             <button
@@ -76,11 +77,13 @@
               </button>
             </div>
           </div>
+          {% endif %}
           <a href="{% url 'edit_building' %}?building_uuid={{ building.uuid }}"  class="btn btn-primary">
             <span data-icon="edit-fill" data-size="20"></span>
             <span>{% translate "Edit" %}</span>
           </a>
         </div>
+        {% if report_export_enabled %}
         <form id="export-form" method="POST" action="{% url 'building_export' building.id %}" style="display:none;">
           {% csrf_token %}
           <input type="hidden" name="format" id="export-format"/>
@@ -213,6 +216,7 @@
             });
           }
         </script>
+        {% endif %}
       </div>
 
   {% if calculation_errors %}
