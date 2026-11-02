@@ -55,6 +55,31 @@ def _names_the_maker(parts, manufacturer):
     return all(word in haystack for word in core)
 
 
+def _round_without_zeroing(value):
+    """Round to two decimals, unless that would erase the value entirely.
+
+    Both impact accessors round BEFORE dividing by the declared amount. For an
+    EPD declared per kilogram the stored figure is small, so two decimals can
+    wipe it out: 0.00106 becomes 0.00 and the material then contributes no
+    carbon at all. 41 records in production were in that state, and an absence
+    reads as "this material is free" rather than as an error.
+
+    The rule applied here is narrow and stated as a floor: rounding may never
+    turn a real value into zero. It does NOT remove the rounding, which still
+    shifts 628 other records by between 0.5 and 25 per cent - sand and
+    aggregate among them, overstated by 11 per cent across 1,547 uses.
+    Correcting those changes figures in 645 buildings, some already published,
+    so that is a decision for the data owner and is tracked separately.
+
+    Rounding inside a shared accessor is itself the underlying fault, as
+    AGENTS.md rule 4 says. This is a floor on the damage, not the fix.
+    """
+    rounded = round(value, 2)
+    if rounded == 0 and value != 0:
+        return value
+    return rounded
+
+
 class Unit(models.TextChoices):
     """Adapted from LCAx."""
 
@@ -476,7 +501,7 @@ class EPD(BaseModel, epdLCAx):
                     and epdimpact.impact.life_cycle_stage == life_cycle_stage
                 ):
                     # Round to two decimals, wrap in Decimal, then divide
-                    rounded = round(epdimpact.value, 2)
+                    rounded = _round_without_zeroing(epdimpact.value)
                     return Decimal(rounded) / self.declared_amount
 
             # If no matching GWP impact was found among the prefetched items:
@@ -492,7 +517,7 @@ class EPD(BaseModel, epdLCAx):
         except EPDImpact.DoesNotExist:
             return Decimal("0")
         else:
-            rounded = round(db_impact.value, 2)
+            rounded = _round_without_zeroing(db_impact.value)
             return Decimal(rounded) / self.declared_amount
 
     def get_penrt_impact_sum(self, life_cycle_stage):
@@ -520,7 +545,7 @@ class EPD(BaseModel, epdLCAx):
                     and epdimpact.impact.life_cycle_stage == life_cycle_stage
                 ):
                     # Round to two decimals, wrap in Decimal, then divide
-                    rounded = round(epdimpact.value, 2)
+                    rounded = _round_without_zeroing(epdimpact.value)
                     return Decimal(rounded) / self.declared_amount
 
             # If no matching GWP impact was found among the prefetched items:
@@ -536,7 +561,7 @@ class EPD(BaseModel, epdLCAx):
         except EPDImpact.DoesNotExist:
             return Decimal("0") / self.declared_amount
         else:
-            rounded = round(db_impact.value, 2)
+            rounded = _round_without_zeroing(db_impact.value)
             return Decimal(rounded) / self.declared_amount
 
     def get_available_units(self):
