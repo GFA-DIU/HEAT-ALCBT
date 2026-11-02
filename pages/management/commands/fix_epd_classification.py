@@ -48,6 +48,12 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--csv", required=True)
         parser.add_argument("--apply", action="store_true")
+        parser.add_argument(
+            "--recategorise-coarse", action="store_true",
+            help="Also replace a category that is a top-level node rather "
+                 "than a leaf. Off by default: a category somebody chose "
+                 "deliberately outranks a rule, and only a vague one is "
+                 "safe to overwrite.")
 
     def handle(self, *args, **options):
         rows = list(csv.DictReader(
@@ -77,7 +83,17 @@ class Command(BaseCommand):
             if cid:
                 current = (epd.category.name_en.strip().lower()
                            if epd.category else "")
-                if epd.category is not None and current != UNKNOWN:
+                # A top-level node such as "Coverings" or "Mineral building
+                # products" says almost nothing: the record cannot be found
+                # by browsing and its carbon lands in a vague bar on every
+                # breakdown chart. With the flag set, those count as fillable
+                # alongside "Unknown". A real leaf never does.
+                coarse = (epd.category is not None
+                          and epd.category.level is not None
+                          and epd.category.level <= 1
+                          and options["recategorise_coarse"])
+                if (epd.category is not None and current != UNKNOWN
+                        and not coarse):
                     already_set += 1
                     self.stderr.write(
                         "  has a category already, left alone: %s is %r"

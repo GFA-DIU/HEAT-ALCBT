@@ -93,6 +93,16 @@ CATEGORY_RULES = [
     (r"formwork panel",                      "9.1.03", "Formwork panel"),
     (r"\bpir panel\b|smart pir",            "2.4.04", "PIR panel"),
     (r"wood wool board|nishabd",             "2.7.01", "Wood wool board"),
+    # --- added 2026-11-02 from the Thailand and Vietnam batches ------------
+    # Saint-Gobain Weber sell tile grout and adhesive under colour names that
+    # never say grout; Webertai is the adhesive, Webercolor the grout.
+    (r"webercolor",                          "1.4.05", "Tile grout"),
+    (r"topcoat|\bprimer paints?\b|\bpaints?\b$|semigloss|sheen paints",
+                                             "5.5.02", "Paint"),
+    # Resilient sheet and plank flooring: WPC, LVT and SPC are all PVC-cored.
+    (r"\bwpc\b|\blvt\b|\bspc\b|vinyl.{0,12}floor|wood plastic composite",
+                                             "6.2.01", "Resilient flooring"),
+    (r"copper wire|copper rod|\betp\b copper", "4.4.03", "Copper profile"),
     (r"\bclinker\b",                        "1.1.01", "Cement clinker"),
     # --- named board ranges, before the generic board rules -----------------
     # The Siam Gypsum (Saraburi) and Knauf Indonesia ranges are gypsum

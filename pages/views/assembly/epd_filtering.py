@@ -72,8 +72,18 @@ def get_filtered_epd_list(request, dimension=None, operational=False):
     # Start with the base queryset
     # display_name compares material_name against the category, so pull the
     # category in with the row rather than one query per EPD rendered.
+    # A withdrawn EPD is not offered. Until this line, `draft` was a flag
+    # nothing acted on: a record could be marked withdrawn and still be picked
+    # from the catalogue, which is how a fire door published at 0.24
+    # kgCO2e/m2 - against 12 to 936 for comparable doors - stayed on offer
+    # after it had been retracted.
+    #
+    # It is excluded from the LIST, not deleted. A building that already uses
+    # one keeps working and keeps its figure, and the record stays available
+    # to look at and to restore if the retraction turns out to be wrong.
     filtered_epds = (EPD.objects.select_related("category", "country")
-                     .exclude(declared_unit=Unit.UNKNOWN).order_by("id"))
+                     .exclude(declared_unit=Unit.UNKNOWN)
+                     .exclude(draft=True).order_by("id"))
     if operational:
         # TODO: Adapt with Ökobaudat operational EPDs are added
         filtered_epds = filtered_epds.filter(
