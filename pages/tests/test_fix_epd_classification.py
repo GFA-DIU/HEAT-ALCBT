@@ -134,3 +134,47 @@ def test_an_empty_csv_is_refused(tmp_path):
     io.open(path, "w", encoding="utf-8").write(HEADER)
     with pytest.raises(CommandError, match="empty"):
         run(str(path))
+
+
+# --- replacing a vague category is opt-in ----------------------------------
+#
+# 1,564 ALCBT EPDs sit on a top-level node rather than a leaf, 153 of them in
+# real buildings. Those are worth replacing. A leaf somebody chose is not.
+
+@pytest.fixture
+def coarse(db):
+    cat, _ = MaterialCategory.objects.get_or_create(
+        category_id="4",
+        defaults={"name_en": "Metals", "name_de": "Metalle", "level": 1})
+    return cat
+
+
+def test_a_coarse_category_is_replaced_when_asked(tmp_path, coarse, rebar):
+    epd = make_epd("TMT Bars", category=coarse)
+    run(write_csv(tmp_path, epd, cid="4.1.01"), apply=True,
+        recategorise_coarse=True)
+    epd.refresh_from_db()
+    assert epd.category == rebar
+
+
+def test_a_coarse_category_is_left_alone_by_default(tmp_path, coarse, rebar):
+    """Without the flag the command behaves exactly as before."""
+    epd = make_epd("TMT Bars", category=coarse)
+    out = run(write_csv(tmp_path, epd, cid="4.1.01"), apply=True)
+    epd.refresh_from_db()
+    assert epd.category == coarse
+    assert "already set, left alone   : 1" in out
+
+
+def test_a_real_leaf_is_never_replaced_even_with_the_flag(tmp_path, rebar):
+    """The flag widens the rule to vague categories only. A leaf is somebody's
+    decision and outranks any rule of mine."""
+    leaf, _ = MaterialCategory.objects.get_or_create(
+        category_id="1.1.01",
+        defaults={"name_en": "Cement", "name_de": "Zement", "level": 2})
+    epd = make_epd("TMT Bars", category=leaf)
+    out = run(write_csv(tmp_path, epd, cid="4.1.01"), apply=True,
+              recategorise_coarse=True)
+    epd.refresh_from_db()
+    assert epd.category == leaf
+    assert "already set, left alone   : 1" in out
