@@ -1,3 +1,4 @@
+import re
 from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -8,6 +9,51 @@ from cities_light.models import Country
 from accounts.models import CustomCity
 
 from .base import BaseModel
+
+# Legal-form words carry no identity: "Jotun A/S" and "Jotun India Private
+# Limited" are the same maker wearing different suffixes.
+_LEGAL_FORMS = (
+    "private limited", "pvt ltd", "pvt", "limited", "ltd", "llp", "plc",
+    "inc", "incorporated", "corporation", "corp", "company", "co",
+    "gmbh", "ag", "a/s", "as", "sa", "nv", "bv", "oy", "ab", "srl", "spa",
+)
+
+
+def _core_name(value):
+    """A maker's name with punctuation and legal form stripped, for matching."""
+    # Dots and slashes JOIN rather than separate, so "A/S" and "Ltd." reduce
+    # to the legal forms below instead of to "a s" and "ltd ".
+    text = re.sub(r"[./]", "", (value or "").lower())
+    text = re.sub(r"[^a-z0-9 ]+", " ", text)
+    words = [w for w in text.split() if w]
+    while words and " ".join(words[-2:]) in _LEGAL_FORMS:
+        words = words[:-2]
+    while words and words[-1] in _LEGAL_FORMS:
+        words = words[:-1]
+    return " ".join(words)
+
+
+def _names_the_maker(parts, manufacturer):
+    """True when the label already says who made it.
+
+    48 of 284 India EPDs name their maker inside the product title, so
+    appending the manufacturer gave "Hardtop XP II, Jotun India Private
+    Limited - Jotun A/S".
+
+    The whole core name must appear, not just its first word. Matching on the
+    first word would suppress "Steel Authority of India Limited" against a
+    material called "Steel sheet", which names a different company entirely.
+    """
+    core = _core_name(manufacturer).split()
+    if not core or len(" ".join(core)) < 4:
+        return False
+    haystack = set(_core_name(" ".join(p for p in parts if p)).split())
+    # EVERY word of the maker must be there, not just the first and not merely
+    # as a substring. "UltraTech Cement" is already said by "UltraTech Portland
+    # Slag Cement", while "Steel Authority of India" is NOT said by "Steel
+    # sheet", which is a different company sharing one ordinary word.
+    return all(word in haystack for word in core)
+
 
 class Unit(models.TextChoices):
     """Adapted from LCAx."""
@@ -374,6 +420,14 @@ class EPD(BaseModel, epdLCAx):
         material_name directly and does not care what is displayed.
         """
         if not self.material_name:
+            # No nomenclature was ever split out for this record, so the title
+            # is all there is. Nine records are titled "Xtend", "Stonix",
+            # "OPOS" or "Building", which say nothing on their own, so name
+            # the maker where one is known rather than return early and hide
+            # the only identifying detail the record has.
+            if self.manufacturer and not _names_the_maker([self.name],
+                                                          self.manufacturer):
+                return "%s - %s" % (self.name, self.manufacturer)
             return self.name
         category_name = self.category.name_en if self.category_id else None
         product = self.product_name or ""
@@ -387,7 +441,7 @@ class EPD(BaseModel, epdLCAx):
                 and product not in parts
                 and self.product_name != self.manufacturer):
             parts.append(self.product_name)
-        if self.manufacturer:
+        if self.manufacturer and not _names_the_maker(parts, self.manufacturer):
             parts.append(self.manufacturer)
         if not parts:
             return self.name

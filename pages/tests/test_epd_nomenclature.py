@@ -90,3 +90,68 @@ def test_filter_values_that_are_not_ids_are_dropped_not_fatal(value, expected):
     """
     from pages.views.assembly.epd_filtering import _as_pk
     assert _as_pk(value) == expected
+
+
+# --- the maker is not said twice -------------------------------------------
+#
+# 48 of 284 India EPDs name their maker inside the title already, so appending
+# manufacturer produced "Hardtop XP II, Jotun India Private Limited - Jotun
+# A/S". Suppressing it must not go so far as to hide a DIFFERENT company whose
+# name merely starts with the same word.
+
+def test_display_name_omits_a_maker_the_title_already_names(epd):
+    epd.material_name = "Hardtop XP II, Jotun India Private Limited"
+    epd.product_name = None
+    epd.manufacturer = "Jotun A/S"
+    assert epd.display_name == "Hardtop XP II, Jotun India Private Limited"
+
+
+def test_display_name_omits_a_maker_the_product_already_names(epd):
+    epd.material_name = "Furniture"
+    epd.product_name = "Ikkita Chair-Alankaram"
+    epd.manufacturer = "Alankaram"
+    assert epd.display_name == "Furniture - Ikkita Chair-Alankaram"
+
+
+def test_display_name_keeps_a_maker_that_only_shares_a_word(epd):
+    """"Steel Authority of India" is not "Steel sheet". Matching on the first
+    word alone would drop the maker here."""
+    epd.material_name = "Steel sheet"
+    epd.product_name = None
+    epd.manufacturer = "Steel Authority of India Limited"
+    assert epd.display_name == "Steel sheet - Steel Authority of India Limited"
+
+
+def test_display_name_still_appends_a_maker_not_otherwise_named(epd):
+    epd.material_name = "Portland Slag Cement (PSC)"
+    epd.product_name = None
+    epd.manufacturer = "UltraTech Cement Ltd."
+    assert epd.display_name == "Portland Slag Cement (PSC) - UltraTech Cement Ltd."
+
+
+def test_display_name_names_the_maker_even_without_a_material(epd):
+    """Nine records are titled "Xtend" or "Stonix" and have no material_name.
+    Returning early hid the maker, which was the only identifying detail they
+    had."""
+    epd.material_name = None
+    epd.product_name = None
+    epd.name = "Xtend"
+    epd.manufacturer = "Greenex Environmental"
+    assert epd.display_name == "Xtend - Greenex Environmental"
+
+
+def test_display_name_without_a_material_or_maker_is_unchanged(epd):
+    epd.material_name = None
+    epd.product_name = None
+    epd.manufacturer = None
+    epd.name = "Xtend"
+    assert epd.display_name == "Xtend"
+
+
+def test_display_name_omits_a_maker_the_brand_prefix_already_names(epd):
+    """The four UltraTech cement records carry the brand in their title. The
+    maker must not then be repeated as a suffix."""
+    epd.material_name = "UltraTech Portland Slag Cement (PSC)"
+    epd.product_name = None
+    epd.manufacturer = "UltraTech Cement Ltd."
+    assert epd.display_name == "UltraTech Portland Slag Cement (PSC)"
