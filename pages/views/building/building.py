@@ -19,6 +19,7 @@ from pages.models.building import (Building, BuildingAssembly,
                                    SimulatedOperationalProduct)
 from pages.models.epd import EPDImpact, MaterialCategory
 from pages.views.assembly.epd_processing import get_epd_list
+from pages.views.building.building_report import REPORT_EXPORT_ENABLED
 from pages.views.building.building_stats import (
     get_building_chart_data, get_building_detail_statistics)
 from pages.views.building.embodied_benchmark_data import (
@@ -107,6 +108,9 @@ def building(request, building_id=None):
     context["form_operational_info"] = operationalInfoForm
 
     context["simulation"] = False
+    # Drives the Export dropdown in the template. One flag, one answer: the
+    # button cannot be shown while the view would refuse the request.
+    context["report_export_enabled"] = REPORT_EXPORT_ENABLED
     # Full page load for GET request
     logger.info("Serving full item list page for GET request")
     return render(request, "pages/building/building.html", context)

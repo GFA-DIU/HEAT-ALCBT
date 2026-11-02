@@ -23,6 +23,19 @@ from pages.views.building.building_stats import (
 
 logger = logging.getLogger(__name__)
 
+# Turned off on request: the report is out of date with what BEAT now
+# calculates, and a downloaded PDF carrying stale figures is worse than no
+# download at all, because nobody reading it can tell. The view refuses as
+# well as the button being hidden - a replayed POST or a saved form reaches
+# the view directly, so hiding the button alone would not stop it.
+# Set back to True once the report has been checked against current output.
+REPORT_EXPORT_ENABLED = False
+
+REPORT_EXPORT_DISABLED_MESSAGE = (
+    "Report export is temporarily unavailable while it is brought up to date "
+    "with the current calculation."
+)
+
 
 def _generate_ai_narratives(building, stats, assembly_data, material_data, operational_data):
     """
@@ -1393,6 +1406,9 @@ def _build_docx(ctx):
 @login_required
 @require_http_methods(["POST"])
 def export_building(request, building_id):
+    if not REPORT_EXPORT_ENABLED:
+        return JsonResponse({"error": REPORT_EXPORT_DISABLED_MESSAGE}, status=403)
+
     building = get_object_or_404(Building, pk=building_id, created_by=request.user)
     fmt = request.POST.get("format", "pdf")
     try:
