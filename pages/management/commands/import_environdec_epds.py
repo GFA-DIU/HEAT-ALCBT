@@ -224,6 +224,9 @@ MASS_BANDS = {
     "4.1.04": (0.50, 6.00),
     "4.2.01": (2.00, 8.00),    # stainless
     "4.2.02": (2.00, 8.00),
+    # Derived 2026-11-02 from the catalogue, as for the area bands above.
+    "5.5.02": (0.46, 11.70),   # paint, from 13 records 0.92-5.83
+    "5.9.01": (0.27, 3.62),    # coatings, from 6 records 0.53-1.81
     "4.3.01": (4.00, 25.0),    # aluminium
     "4.3.02": (4.00, 25.0),
     "4.3.03": (1.00, 25.0),    # billet; recycled stock sits near the bottom
@@ -234,6 +237,23 @@ MASS_BANDS = {
     "2.18.01": (1.00, 12.0),   # PE / XLPE foam
     "6.6.01": (0.50, 8.00),    # waterproofing membrane
     "6.6.07": (1.00, 12.0),    # geotextile
+}
+
+# kgCO2e per metre, for products declared by length. Added for the ductile
+# iron pipe ranges, which are declared per metre of pipe at a stated diameter,
+# so one band has to cover DN80 through DN1200.
+LINEAR_BANDS = {
+    # A pipe's carbon per metre scales with its bore, so one band has to span
+    # the whole range a maker sells: this family runs DN80 at about 14 to
+    # DN1200 at 1,180, a smooth monotonic series. Deriving the band from the
+    # 9 small-diameter records already held gave 7-98 and refused every pipe
+    # above DN250, which were correct figures.
+    #
+    # A band this wide is a weak check, and saying so is the point: for a
+    # product declared per metre at varying diameter, the real evidence that
+    # the figures are sound is that they rise smoothly with bore, which a
+    # band cannot express.
+    "4.1.05": (5.0, 2500.0),   # ductile iron pipe, DN80 to DN1200
 }
 
 # kgCO2e per m2, for the products declared by area rather than by mass.
@@ -248,6 +268,20 @@ AREA_BANDS = {
     "1.3.07": (5.0, 80.0),     # aluminium composite panel
     "7.1.05": (20.0, 200.0),   # glazed facade system, per m2 of facade
     "6.2.06": (10.0, 120.0),   # raised access floor panel
+    # --- added 2026-11-02 -------------------------------------------------
+    # DERIVED, not published: each range is half the minimum to twice the
+    # maximum of the EPDs already in that leaf and unit, so it catches an
+    # error of magnitude without judging quality. The record count is given
+    # so a band resting on thin evidence is visible as such.
+    "7.6.02": (42.9, 1122.0),  # aluminium door, from 23 records 85.9-560.9
+    "7.6.03": (9.9, 396.0),    # wooden door, from 20 records 19.8-197.8
+    "2.4.04": (1.2, 78.0),     # PIR panel, from 31 records 2.45-39.1
+    "2.21.01": (0.25, 60.0),   # ETICS, from 25 records 0.51-29.9
+    # 7.6.01 steel doors is deliberately absent. Its 49 existing records run
+    # 0.24 to 936 per m2, a 3,900-fold spread, so any band drawn from them
+    # would admit anything. The 0.24 is "Doors - Peneder Bau-Elemente GmbH",
+    # which is not a credible figure for a steel door and looks like a bad
+    # record already in the catalogue.
 }
 
 
@@ -393,6 +427,10 @@ class Command(BaseCommand):
                 basis = "kgCO2e/m2"
                 value = float(gwp) / float(amount)
                 band = AREA_BANDS[cat_id]
+            elif unit == "m" and cat_id in LINEAR_BANDS:
+                basis = "kgCO2e/m"
+                value = float(gwp) / float(amount)
+                band = LINEAR_BANDS[cat_id]
             else:
                 reject("declared per %s - no plausibility band for category %s"
                        % (unit, cat_id))
