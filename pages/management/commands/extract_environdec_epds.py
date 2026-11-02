@@ -26,7 +26,11 @@ from django.core.management.base import BaseCommand
 
 from pages.scripts.environdec.pdf_extract import extract_from_pdf
 
-requests.packages.urllib3.disable_warnings()
+# TLS verification is left ON. On a machine whose antivirus intercepts
+# HTTPS, point REQUESTS_CA_BUNDLE at a bundle of certifi plus the local
+# roots; requests picks that up on its own. Turning verification off
+# instead would silently accept any certificate for every EPD we read a
+# carbon figure out of.
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (BEAT EPD import)"}
 
@@ -110,16 +114,14 @@ class Command(BaseCommand):
 
         if not os.path.exists(path):
             try:
-                page = requests.get(row["url"], headers=HEADERS, timeout=60,
-                                    verify=False)
+                page = requests.get(row["url"], headers=HEADERS, timeout=60)
                 time.sleep(delay)
                 link = DOC_LINK.search(page.text)
                 if not link:
                     out.update(status="REFUSED",
                                reason="no document link on the library page")
                     return out
-                pdf = requests.get(link.group(0), headers=HEADERS, timeout=120,
-                                   verify=False)
+                pdf = requests.get(link.group(0), headers=HEADERS, timeout=120)
                 time.sleep(delay)
                 if pdf.status_code != 200 or not pdf.content[:4] == b"%PDF":
                     out.update(status="REFUSED",
