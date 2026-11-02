@@ -54,11 +54,45 @@ EXCLUDE = re.compile(
     # plywood: A1-A3 is negative because sequestration is declared in A1, and
     # BEAT sums A1-A3 straight into the building total. Held back pending a
     # methodology decision rather than quietly crediting timber buildings.
-    r"plywood|indowud",
+    r"plywood|indowud|"
+    # Furniture and fit-out, tested on what the product IS. A material rule
+    # saw "steel" in "Barstools: Steel framed" and let three furniture
+    # records through as steel, so the product type has to be checked first.
+    r"barstool|lounge chair|\bchairs?\b|modular chairs|seating|desking|"
+    r"deskpro|height adjustable|workstation|\blocker\b|\bsafes?\b|"
+    r"healthcare bed|meeting pod|phone booth|monitor arm|"
+    # Photovoltaic modules: generation equipment, not a building material.
+    r"l.?lios|topcon|bifacial|photovoltaic|\bsolar module\b|"
+    # PET acoustic panel: BEAT has no leaf for PET and none for acoustic
+    # panels. Filing it under PVC would name the wrong polymer on every chart,
+    # so it is held back rather than misdescribed.
+    r"pet acoustic",
     re.I,
 )
 
 CATEGORY_RULES = [
+    # --- added 2026-11-02, from the India catalogue reconciliation ---------
+    # Ductile iron is a cast iron, and these are 19 of one maker's pipe range.
+    (r"ductile iron pipe",                   "4.1.05", "Ductile iron pipe"),
+    # Frame materials read from the declarations, not assumed. Windor's glazed
+    # systems state "Aluminium framed"; the flush door is wood-cored in an
+    # aluminium frame; VDS states "Engineered steel" and never says aluminium.
+    (r"windor[^,]*flush door",               "7.6.03", "Flush door"),
+    (r"windor[^,]*(?:glazed )?(?:style )?door system",
+                                             "7.6.02", "Glazed door system"),
+    (r"vds.{0,3}\s*swing door|vds.{0,3}\s*fixed partition",
+                                             "7.6.01", "Steel door frame"),
+    (r"glass partition system",              "7.2.01", "Glass partition"),
+    (r"high pressure (?:decorative )?laminate|\bhpl\b|thin laminate|compact panel",
+                                             "6.5.01", "High pressure laminate"),
+    (r"gypboard",                            "1.3.13", "Gypsum plasterboard"),
+    (r"external thermal insulation|\betics\b",
+                                             "2.21.01", "ETICS"),
+    (r"berger paints",                       "5.5.02", "Paint"),
+    (r"roof kool|kool and seal",             "5.9.01", "Reflective roof coating"),
+    (r"formwork panel",                      "9.1.03", "Formwork panel"),
+    (r"\bpir panel\b|smart pir",            "2.4.04", "PIR panel"),
+    (r"wood wool board|nishabd",             "2.7.01", "Wood wool board"),
     (r"\bclinker\b",                        "1.1.01", "Cement clinker"),
     # --- named board ranges, before the generic board rules -----------------
     # The Siam Gypsum (Saraburi) and Knauf Indonesia ranges are gypsum
