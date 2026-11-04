@@ -143,15 +143,36 @@ CATEGORY_RULES = [
     (r"scg bulk type",                      "1.1.01", "Cement"),
     (r"easy mix|terrazzo|pebble washed",    "1.4.02", "Decorative mortar"),
     (r"raised access floor",                "6.2.06", "Raised access floor panel"),
+    # --- added 2026-11-04, from the India catalogue reconciliation ---------
+    # Carpet tile is a textile floor covering; the catalogue already holds 76
+    # of them under 6.2.05, so both the leaf and its band rest on real data.
+    (r"carpet tile|carpet",                 "6.2.05", "Textile flooring"),
+    # Screws, nuts and anchors. 4.2.04 "Fastener" sits under stainless steel
+    # and these are not stated to be stainless, so the general fixings leaf is
+    # the honest home for them.
+    (r"\bfasteners?\b|screws, nuts",        "7.4.06", "Fastener"),
+    # Vedanta sell primary aluminium ingot under the name Restora; the word
+    # "aluminium" appears nowhere in the product title, so the brand is the
+    # only thing left to match on.
+    (r"\brestora\b",                        "4.3.03", "Aluminium ingot"),
     (r"geotextile|geo woven|maxacore",      "6.6.07", "Geotextile"),
     (r"aggregate|\bsand\b|gravel|stonetec|sandtec|crushed stone|3/4 stone",
                                             "1.2.01", "Sand and gravel"),
+    # "Portland Pozzolana Cement" is a CEMENT containing pozzolan, not the
+    # pozzolan itself, and it has to beat the byproduct rule below for the
+    # same reason slag cement does. Filed as a byproduct it met the fly ash
+    # band of 0.001-0.3 kgCO2e/kg and both Indian PPC declarations, at 0.738
+    # and 0.739, were refused as implausible when they are perfectly ordinary
+    # cement figures.
+    (r"pozzolana cement|cement.*pozzolan",  "1.1.01", "Portland pozzolana cement"),
     (r"fly ash|\bpfa\b|pozzolan|puzzolan",  "1.2.08", "Fly ash"),
     # "Slag cement" is a cement that contains slag, not the raw byproduct, and
     # "fibre cement board" is a board, not a cement. Both have to beat the
     # plainer rules below or they land in the wrong plausibility band.
     (r"slag cement|cement.*\bslag\b",       "1.1.01", "Slag cement"),
-    (r"fibre cement|fiber cement",          "1.3.12", "Fibre cement board"),
+    # Visaka sell their fibre cement boards as "Vnext"; the declaration says
+    # fibre cement throughout but the product title never does.
+    (r"fibre cement|fiber cement|\bvnext\b", "1.3.12", "Fibre cement board"),
     (r"\bslag\b|ggbs|ggbfs",                "1.2.08", "Ground granulated blast furnace slag"),
     (r"skim coat|plastering mortar|masonry mortar|mortar",
                                             "1.4.02", "Mortar"),
@@ -247,6 +268,14 @@ MASS_BANDS = {
     "2.18.01": (1.00, 12.0),   # PE / XLPE foam
     "6.6.01": (0.50, 8.00),    # waterproofing membrane
     "6.6.07": (1.00, 12.0),    # geotextile
+    # 2026-11-04. The four records already in this leaf run 3.55-4.26, which
+    # halved would put the floor at 1.78 and refuse a carbon-steel screw at
+    # 1.71 - a correct figure. Those four are evidently at the top of the
+    # range, so the floor is taken from the structural steel band above
+    # (4.1.03, floor 0.50) rounded up to 1.00 rather than from them. That is a
+    # stated basis, not a derived one, and the band is weak either way: on
+    # four records it catches an error of magnitude and little else.
+    "7.4.06": (1.00, 8.52),    # fasteners; ceiling from 4 records 3.55-4.26
 }
 
 # kgCO2e per metre, for products declared by length. Added for the ductile
@@ -278,6 +307,9 @@ AREA_BANDS = {
     "1.3.07": (5.0, 80.0),     # aluminium composite panel
     "7.1.05": (20.0, 200.0),   # glazed facade system, per m2 of facade
     "6.2.06": (10.0, 120.0),   # raised access floor panel
+    # Derived 2026-11-04 the same way: half the lowest and twice the highest
+    # of the records the catalogue already holds in this leaf at this unit.
+    "6.2.05": (1.59, 33.8),    # textile flooring, from 76 records 3.18-16.89
     # --- added 2026-11-02 -------------------------------------------------
     # DERIVED, not published: each range is half the minimum to twice the
     # maximum of the EPDs already in that leaf and unit, so it catches an
@@ -469,9 +501,23 @@ class Command(BaseCommand):
                 declared_amount = amount
 
             name = (r["product"] or "").strip()
+            reg = (r["registration_number"] or "").split(":")[0]
+            maker = (r["manufacturer"] or "").strip()
             if (name, r["country"]) in collisions:
-                reg = (r["registration_number"] or "").split(":")[0]
                 name = "%s (%s)" % (name, reg) if reg else name
+            else:
+                # The same guard, against what is ALREADY in the catalogue.
+                # "TMT Bars" is the title of at least three different Indian
+                # declarations from three different steelmakers. Keyed on
+                # (name, country) alone, importing one would overwrite
+                # another maker's figures under that maker's own record, and
+                # the building using it would silently change.
+                existing = EPD.objects.filter(name=name,
+                                              country=country).first()
+                if (existing is not None and maker
+                        and (existing.manufacturer or "").strip() != maker):
+                    name = "%s (%s)" % (name, reg) if reg else "%s - %s" % (
+                        name, maker)
             name = name[:255]
             epd, was_created = EPD.objects.update_or_create(
                 name=name, country=country,
