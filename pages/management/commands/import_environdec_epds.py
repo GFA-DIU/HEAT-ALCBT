@@ -61,6 +61,7 @@ EXCLUDE = re.compile(
     r"barstool|lounge chair|\bchairs?\b|modular chairs|seating|desking|"
     r"deskpro|height adjustable|workstation|\blocker\b|\bsafes?\b|"
     r"healthcare bed|meeting pod|phone booth|monitor arm|"
+    r"conference table|cafe table|dinning table|dining table|"
     # Photovoltaic modules: generation equipment, not a building material.
     r"l.?lios|topcon|bifacial|photovoltaic|\bsolar module\b|"
     # PET acoustic panel: BEAT has no leaf for PET and none for acoustic
@@ -143,6 +144,16 @@ CATEGORY_RULES = [
     (r"scg bulk type",                      "1.1.01", "Cement"),
     (r"easy mix|terrazzo|pebble washed",    "1.4.02", "Decorative mortar"),
     (r"raised access floor",                "6.2.06", "Raised access floor panel"),
+    # --- added 2026-11-05, once the declared units became readable ---------
+    # Manhole covers, gratings and frames are cast iron items, which is what
+    # 4.1.05 is for. They sit above the pipe rule because a cover is not a
+    # pipe even when the same foundry makes both.
+    (r"manhole|channel grating|grate & frame|gully",
+                                             "4.1.05", "Cast iron item"),
+    # TechFab's drainage composite is a geotextile core with filter fabric;
+    # their geotextile is already filed as a technical textile.
+    (r"drainage composite|techdrain",        "6.6.07", "Drainage composite"),
+    (r"rockinsul|rock ?wool slab",           "2.1.03", "Rock wool slab"),
     # --- added 2026-11-04, from the India catalogue reconciliation ---------
     # Carpet tile is a textile floor covering; the catalogue already holds 76
     # of them under 6.2.05, so both the leaf and its band rest on real data.
@@ -249,10 +260,21 @@ MASS_BANDS = {
     "1.3.02": (0.04, 0.80),    # brick, low-carbon types run to 0.08
     "1.3.12": (0.50, 3.00),    # fibre cement board
     "6.6.01": (0.50, 8.00),    # waterproofing membrane
-    "4.1.01": (0.50, 4.00),    # steel
-    "4.1.02": (0.50, 4.00),
-    "4.1.03": (0.50, 6.00),
-    "4.1.04": (0.50, 6.00),
+    # Steel. The floor was 0.50, derived from records none of which were
+    # scrap-only. Jindal publish a TMT rebar and a steel plate both made from
+    # 100% recycled scrap, at 0.445 and 0.450 kgCO2e/kg, and both were refused
+    # as implausible when they are simply electric-arc figures: a scrap-fed
+    # route carries no ironmaking, so about a third of blast-furnace steel is
+    # the expected result, not an error.
+    #
+    # Lowered to 0.30 on that basis, which is below those two with a little
+    # room and still an order of magnitude above a figure that has lost its
+    # tonne-to-kilogram conversion. Stated here because it weakens the check
+    # for ALL steel, not only the scrap kind.
+    "4.1.01": (0.30, 4.00),    # steel
+    "4.1.02": (0.30, 4.00),
+    "4.1.03": (0.30, 6.00),
+    "4.1.04": (0.30, 6.00),
     "4.2.01": (2.00, 8.00),    # stainless
     "4.2.02": (2.00, 8.00),
     # Derived 2026-11-02 from the catalogue, as for the area bands above.
@@ -267,7 +289,13 @@ MASS_BANDS = {
     "2.1.02": (1.00, 8.00),    # glass wool
     "2.18.01": (1.00, 12.0),   # PE / XLPE foam
     "6.6.01": (0.50, 8.00),    # waterproofing membrane
-    "6.6.07": (1.00, 12.0),    # geotextile
+    # Derived 2026-11-05 from the records the catalogue already holds.
+    # 4.1.05 is wide because one existing record sits at 66.2 kgCO2e/kg while
+    # the rest of the leaf sits near 1 to 3, so the band catches an error of
+    # magnitude and nothing finer. Narrowing it would mean deciding on my own
+    # authority that the 66.2 record is wrong, which is a separate question.
+    "4.1.05": (0.32, 132.4),   # cast iron items, from 28 records 0.64-66.2
+    "6.6.07": (2.04, 40.2),    # technical textiles, from 4 records 4.07-20.08
     # 2026-11-04. The four records already in this leaf run 3.55-4.26, which
     # halved would put the floor at 1.78 and refuse a carbon-steel screw at
     # 1.71 - a correct figure. Those four are evidently at the top of the

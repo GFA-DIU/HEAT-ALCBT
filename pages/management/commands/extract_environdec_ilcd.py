@@ -52,6 +52,49 @@ FLOW_PROPERTY_UNITS = {
     "number of pieces": "pcs",
     "items": "pcs",
     "pieces": "pcs",
+    # The same properties as the publisher writes them in German. These
+    # datasets return the reference flow property's own name in whatever
+    # language it was registered in, and several Indian EPDs resolve to the
+    # German originals.
+    "masse": "kg",
+    "fläche": "m2",
+    "flaeche": "m2",
+    "volumen": "m3",
+    "länge": "m",
+    "laenge": "m",
+    "anzahl": "pcs",
+    "stück": "pcs",
+}
+
+# Flow property UUID -> unit, tried BEFORE the name above.
+#
+# 15 Indian EPDs were refused because their reference flow property's
+# shortDescription had been replaced with the PRODUCT name: "Steel Plate",
+# "Manhole Cover", "VDS(r) Fixed Partition". Keyed on that name nothing
+# matched and a declaration with a perfectly good figure was dropped. The
+# UUID beneath it is a reference to a standard ILCD flow property, and in
+# every dataset inspected it was correct even where the name was not, so it
+# is the better key.
+#
+# The first three were confirmed by fetching the flow property dataset from
+# the registry. Area and Volume return HTTP 403 and could not be confirmed
+# that way; they are included on the weaker basis that two datasets carry
+# them with their own name reading "Area" and "Volume" and the figures then
+# make sense. That is stated rather than hidden, and it costs little: when
+# the name is right the name route already handles it.
+#
+# These UUIDs differ only in the middle. Truncating them to 12 characters
+# while investigating made Mass, Area and Volume look like the same
+# identifier and nearly produced a map that labelled carpet tile per m2 as
+# per kg. Compare them whole.
+FLOW_PROPERTY_UUID_UNITS = {
+    # confirmed against the registry
+    "93a60a56-a3c8-11da-a746-0800200b9a66": "kg",   # Mass / Masse
+    "838aaa23-0117-11db-92e3-0800200c9a66": "m",    # Length / Länge
+    "01846770-4cfe-4a25-8ad9-919d8d378345": "pcs",  # Number of items
+    # observed in datasets whose own name agreed; not registry-confirmed
+    "93a60a56-a3c8-19da-a746-0800200c9a66": "m2",   # Area
+    "93a60a56-a3c8-22da-a746-0800200c9a66": "m3",   # Volume
 }
 
 NS = {
@@ -103,6 +146,23 @@ def parse_unit(functional_unit):
     if amount <= 0:
         return None, "declared amount is %s" % amount
     return (amount, unit), None
+
+
+def unit_for_flow_property(uuid, name):
+    """The declared unit a reference flow property implies, or None.
+
+    UUID first, name second. A publisher can rewrite the property's
+    shortDescription and several Indian ones have, replacing it with the
+    product name, which is why 15 declarations with perfectly good figures
+    were refused. The UUID is a reference to a standard ILCD flow property
+    and was correct in every dataset inspected, so it is the better key.
+
+    Returning None is a refusal and the caller must treat it as one. Guessing
+    a unit here would divide a carbon figure by the wrong dimension, which
+    produces a number that looks entirely reasonable and is not.
+    """
+    return (FLOW_PROPERTY_UUID_UNITS.get((uuid or "").strip().lower())
+            or FLOW_PROPERTY_UNITS.get((name or "").strip().lower()))
 
 
 def reference_flow_unit(session, root, delay):
@@ -157,24 +217,28 @@ def reference_flow_unit(session, root, delay):
         if el.tag.endswith("referenceToReferenceFlowProperty"):
             prop_id = _text(el)
             break
-    name, per_unit = "", None
+    name, per_unit, prop_uuid = "", None, ""
     for fp in flow.iter():
         if not fp.tag.endswith("flowProperty"):
             continue
         if prop_id is not None and fp.attrib.get("dataSetInternalID") != prop_id:
             continue
         for el in fp.iter():
-            if el.tag.endswith("shortDescription") and not name:
-                name = _text(el)
+            if el.tag.endswith("referenceToFlowPropertyDataSet"):
+                prop_uuid = el.attrib.get("refObjectId", "") or prop_uuid
+                for sub in el.iter():
+                    if sub.tag.endswith("shortDescription") and not name:
+                        name = _text(sub)
             elif el.tag.endswith("meanValue"):
                 try:
                     per_unit = float(_text(el))
                 except ValueError:
                     pass
         break
-    unit = FLOW_PROPERTY_UNITS.get(name.strip().lower())
+    unit = unit_for_flow_property(prop_uuid, name)
     if not unit:
-        return None, "flow property %r has no unit mapping" % name[:30]
+        return None, ("flow property %r (%s) has no unit mapping"
+                      % (name[:30], prop_uuid[:36] or "no uuid"))
     if per_unit is None or per_unit <= 0:
         return None, "reference flow property has no usable meanValue"
 
