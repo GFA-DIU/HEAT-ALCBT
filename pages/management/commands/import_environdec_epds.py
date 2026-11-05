@@ -61,6 +61,7 @@ EXCLUDE = re.compile(
     r"barstool|lounge chair|\bchairs?\b|modular chairs|seating|desking|"
     r"deskpro|height adjustable|workstation|\blocker\b|\bsafes?\b|"
     r"healthcare bed|meeting pod|phone booth|monitor arm|"
+    r"conference table|cafe table|dinning table|dining table|"
     # Photovoltaic modules: generation equipment, not a building material.
     r"l.?lios|topcon|bifacial|photovoltaic|\bsolar module\b|"
     # PET acoustic panel: BEAT has no leaf for PET and none for acoustic
@@ -83,7 +84,8 @@ CATEGORY_RULES = [
     (r"vds.{0,3}\s*swing door|vds.{0,3}\s*fixed partition",
                                              "7.6.01", "Steel door frame"),
     (r"glass partition system",              "7.2.01", "Glass partition"),
-    (r"high pressure (?:decorative )?laminate|\bhpl\b|thin laminate|compact panel",
+    (r"high pressure (?:decorative )?laminate|\bhpl\b|thin laminate|"
+     r"compact panel|compact laminate",
                                              "6.5.01", "High pressure laminate"),
     (r"gypboard",                            "1.3.13", "Gypsum plasterboard"),
     (r"external thermal insulation|\betics\b",
@@ -128,7 +130,12 @@ CATEGORY_RULES = [
     # --- metals, by product form ----------------------------------------------
     (r"prestressed concrete steel wire|\bpc wire\b|\bpc strand\b|lrpc",
                                             "4.1.01", "Prestressing steel strand"),
+    # Tata BlueScope's ZINCALUME and COLORBOND are metallic coated and
+    # pre-painted steel SHEET. Without them here the plain "steel" rule
+    # caught both and filed them as structural sections, which is the wrong
+    # product entirely and would have named them wrongly on every chart.
     (r"hot roll|hot-roll|sheet coil|plate mill|magnelis|nexalume|nexium|"
+     r"zincalume|colorbond|"
      r"satin silver|metallic coated sheet",
                                             "4.1.04", "Steel sheet"),
     (r"wire rod|welded pipe|\bcra\b",       "4.1.03", "Steel long product"),
@@ -143,15 +150,46 @@ CATEGORY_RULES = [
     (r"scg bulk type",                      "1.1.01", "Cement"),
     (r"easy mix|terrazzo|pebble washed",    "1.4.02", "Decorative mortar"),
     (r"raised access floor",                "6.2.06", "Raised access floor panel"),
+    # --- added 2026-11-05, once the declared units became readable ---------
+    # Manhole covers, gratings and frames are cast iron items, which is what
+    # 4.1.05 is for. They sit above the pipe rule because a cover is not a
+    # pipe even when the same foundry makes both.
+    (r"manhole|channel grating|grate & frame|gully",
+                                             "4.1.05", "Cast iron item"),
+    # TechFab's drainage composite is a geotextile core with filter fabric;
+    # their geotextile is already filed as a technical textile.
+    (r"drainage composite|techdrain",        "6.6.07", "Drainage composite"),
+    (r"rockinsul|rock ?wool slab",           "2.1.03", "Rock wool slab"),
+    # --- added 2026-11-04, from the India catalogue reconciliation ---------
+    # Carpet tile is a textile floor covering; the catalogue already holds 76
+    # of them under 6.2.05, so both the leaf and its band rest on real data.
+    (r"carpet tile|carpet",                 "6.2.05", "Textile flooring"),
+    # Screws, nuts and anchors. 4.2.04 "Fastener" sits under stainless steel
+    # and these are not stated to be stainless, so the general fixings leaf is
+    # the honest home for them.
+    (r"\bfasteners?\b|screws, nuts",        "7.4.06", "Fastener"),
+    # Vedanta sell primary aluminium ingot under the name Restora; the word
+    # "aluminium" appears nowhere in the product title, so the brand is the
+    # only thing left to match on.
+    (r"\brestora\b",                        "4.3.03", "Aluminium ingot"),
     (r"geotextile|geo woven|maxacore",      "6.6.07", "Geotextile"),
     (r"aggregate|\bsand\b|gravel|stonetec|sandtec|crushed stone|3/4 stone",
                                             "1.2.01", "Sand and gravel"),
+    # "Portland Pozzolana Cement" is a CEMENT containing pozzolan, not the
+    # pozzolan itself, and it has to beat the byproduct rule below for the
+    # same reason slag cement does. Filed as a byproduct it met the fly ash
+    # band of 0.001-0.3 kgCO2e/kg and both Indian PPC declarations, at 0.738
+    # and 0.739, were refused as implausible when they are perfectly ordinary
+    # cement figures.
+    (r"pozzolana cement|cement.*pozzolan",  "1.1.01", "Portland pozzolana cement"),
     (r"fly ash|\bpfa\b|pozzolan|puzzolan",  "1.2.08", "Fly ash"),
     # "Slag cement" is a cement that contains slag, not the raw byproduct, and
     # "fibre cement board" is a board, not a cement. Both have to beat the
     # plainer rules below or they land in the wrong plausibility band.
     (r"slag cement|cement.*\bslag\b",       "1.1.01", "Slag cement"),
-    (r"fibre cement|fiber cement",          "1.3.12", "Fibre cement board"),
+    # Visaka sell their fibre cement boards as "Vnext"; the declaration says
+    # fibre cement throughout but the product title never does.
+    (r"fibre cement|fiber cement|\bvnext\b", "1.3.12", "Fibre cement board"),
     (r"\bslag\b|ggbs|ggbfs",                "1.2.08", "Ground granulated blast furnace slag"),
     (r"skim coat|plastering mortar|masonry mortar|mortar",
                                             "1.4.02", "Mortar"),
@@ -228,10 +266,21 @@ MASS_BANDS = {
     "1.3.02": (0.04, 0.80),    # brick, low-carbon types run to 0.08
     "1.3.12": (0.50, 3.00),    # fibre cement board
     "6.6.01": (0.50, 8.00),    # waterproofing membrane
-    "4.1.01": (0.50, 4.00),    # steel
-    "4.1.02": (0.50, 4.00),
-    "4.1.03": (0.50, 6.00),
-    "4.1.04": (0.50, 6.00),
+    # Steel. The floor was 0.50, derived from records none of which were
+    # scrap-only. Jindal publish a TMT rebar and a steel plate both made from
+    # 100% recycled scrap, at 0.445 and 0.450 kgCO2e/kg, and both were refused
+    # as implausible when they are simply electric-arc figures: a scrap-fed
+    # route carries no ironmaking, so about a third of blast-furnace steel is
+    # the expected result, not an error.
+    #
+    # Lowered to 0.30 on that basis, which is below those two with a little
+    # room and still an order of magnitude above a figure that has lost its
+    # tonne-to-kilogram conversion. Stated here because it weakens the check
+    # for ALL steel, not only the scrap kind.
+    "4.1.01": (0.30, 4.00),    # steel
+    "4.1.02": (0.30, 4.00),
+    "4.1.03": (0.30, 6.00),
+    "4.1.04": (0.30, 6.00),
     "4.2.01": (2.00, 8.00),    # stainless
     "4.2.02": (2.00, 8.00),
     # Derived 2026-11-02 from the catalogue, as for the area bands above.
@@ -246,7 +295,33 @@ MASS_BANDS = {
     "2.1.02": (1.00, 8.00),    # glass wool
     "2.18.01": (1.00, 12.0),   # PE / XLPE foam
     "6.6.01": (0.50, 8.00),    # waterproofing membrane
-    "6.6.07": (1.00, 12.0),    # geotextile
+    # Derived 2026-11-05 from the records the catalogue already holds.
+    # 4.1.05 is wide because one existing record sits at 66.2 kgCO2e/kg while
+    # the rest of the leaf sits near 1 to 3, so the band catches an error of
+    # magnitude and nothing finer. Narrowing it would mean deciding on my own
+    # authority that the 66.2 record is wrong, which is a separate question.
+    "4.1.05": (0.32, 132.4),   # cast iron items, from 28 records 0.64-66.2
+    "6.6.07": (2.04, 40.2),    # technical textiles, from 4 records 4.07-20.08
+    # High pressure laminate. The leaf held NO records, so there was nothing
+    # in the catalogue to derive from. This band instead rests on three
+    # declarations from three UNRELATED makers - Luxotica 1.04, Century 1.49,
+    # Samrat 1.70 - which is a different kind of evidence from deriving a
+    # band off one record and then checking that same record against it.
+    #
+    # What it cannot do, and this is the limit of the method: three makers
+    # agreeing cannot catch an error they all share, such as a product
+    # category rule that tells every one of them to draw the same wrong
+    # background figure. It catches a misplaced decimal point and a tonne
+    # read as a kilogram. It is not a quality judgement.
+    "6.5.01": (0.52, 3.40),    # HPL, from 3 makers 1.04-1.70
+    # 2026-11-04. The four records already in this leaf run 3.55-4.26, which
+    # halved would put the floor at 1.78 and refuse a carbon-steel screw at
+    # 1.71 - a correct figure. Those four are evidently at the top of the
+    # range, so the floor is taken from the structural steel band above
+    # (4.1.03, floor 0.50) rounded up to 1.00 rather than from them. That is a
+    # stated basis, not a derived one, and the band is weak either way: on
+    # four records it catches an error of magnitude and little else.
+    "7.4.06": (1.00, 8.52),    # fasteners; ceiling from 4 records 3.55-4.26
 }
 
 # kgCO2e per metre, for products declared by length. Added for the ductile
@@ -278,11 +353,27 @@ AREA_BANDS = {
     "1.3.07": (5.0, 80.0),     # aluminium composite panel
     "7.1.05": (20.0, 200.0),   # glazed facade system, per m2 of facade
     "6.2.06": (10.0, 120.0),   # raised access floor panel
+    # Derived 2026-11-04 the same way: half the lowest and twice the highest
+    # of the records the catalogue already holds in this leaf at this unit.
+    "6.2.05": (1.59, 33.8),    # textile flooring, from 76 records 3.18-16.89
     # --- added 2026-11-02 -------------------------------------------------
     # DERIVED, not published: each range is half the minimum to twice the
     # maximum of the EPDs already in that leaf and unit, so it catches an
     # error of magnitude without judging quality. The record count is given
     # so a band resting on thin evidence is visible as such.
+    # High pressure laminate declared by area, 2026-11-05. Per square metre a
+    # laminate scales almost linearly with thickness, so the band has to span
+    # the thicknesses the market sells. The evidence is seven published
+    # declarations: Merino 1mm at 0.518, Rushil thin 3.12 and compact 4.76,
+    # and four read from PDFs - Greenlam 0.8mm at 1.19, Stylam 0.7mm at 1.46,
+    # Greenlam 6mm at 10.1 and Crown 6mm at 21.0. Those last four are held
+    # out of the catalogue for a different reason (their A1-A3 nets off a
+    # large biogenic credit), but the figures themselves are sound and they
+    # are what tells us what a 6 mm board weighs in carbon.
+    #
+    # A band spanning 0.7mm to 6mm is necessarily loose. It will not notice a
+    # thin laminate priced like a thick one.
+    "6.5.01": (0.26, 42.0),    # HPL by area, from 7 declarations 0.518-21.0
     "7.6.02": (42.9, 1122.0),  # aluminium door, from 23 records 85.9-560.9
     "7.6.03": (9.9, 396.0),    # wooden door, from 20 records 19.8-197.8
     "2.4.04": (1.2, 78.0),     # PIR panel, from 31 records 2.45-39.1
@@ -469,9 +560,23 @@ class Command(BaseCommand):
                 declared_amount = amount
 
             name = (r["product"] or "").strip()
+            reg = (r["registration_number"] or "").split(":")[0]
+            maker = (r["manufacturer"] or "").strip()
             if (name, r["country"]) in collisions:
-                reg = (r["registration_number"] or "").split(":")[0]
                 name = "%s (%s)" % (name, reg) if reg else name
+            else:
+                # The same guard, against what is ALREADY in the catalogue.
+                # "TMT Bars" is the title of at least three different Indian
+                # declarations from three different steelmakers. Keyed on
+                # (name, country) alone, importing one would overwrite
+                # another maker's figures under that maker's own record, and
+                # the building using it would silently change.
+                existing = EPD.objects.filter(name=name,
+                                              country=country).first()
+                if (existing is not None and maker
+                        and (existing.manufacturer or "").strip() != maker):
+                    name = "%s (%s)" % (name, reg) if reg else "%s - %s" % (
+                        name, maker)
             name = name[:255]
             epd, was_created = EPD.objects.update_or_create(
                 name=name, country=country,
