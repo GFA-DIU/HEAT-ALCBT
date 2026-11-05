@@ -54,7 +54,16 @@ EXCLUDE = re.compile(
     # plywood: A1-A3 is negative because sequestration is declared in A1, and
     # BEAT sums A1-A3 straight into the building total. Held back pending a
     # methodology decision rather than quietly crediting timber buildings.
-    r"plywood|indowud|"
+    #
+    # "samrat ply" is spelled out because it does NOT contain the word
+    # plywood. Samrat Plywood Limited names the board "Samrat Ply"
+    # (EPD-IES-0022924:005, -1.018 kgCO2e/kg), and until now it was refused
+    # only because that name happens not to map to a leaf category. The day
+    # the biogenic question is settled and a plywood leaf is added, that
+    # accident stops protecting it and a negative factor imports cleanly.
+    # Matching on the maker instead would be wrong: the same company's
+    # "Samrat HPL" is a laminate at +1.69977 and belongs in the catalogue.
+    r"plywood|samrat ply\b|indowud|"
     # Furniture and fit-out, tested on what the product IS. A material rule
     # saw "steel" in "Barstools: Steel framed" and let three furniture
     # records through as steel, so the product type has to be checked first.
