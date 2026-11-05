@@ -84,7 +84,8 @@ CATEGORY_RULES = [
     (r"vds.{0,3}\s*swing door|vds.{0,3}\s*fixed partition",
                                              "7.6.01", "Steel door frame"),
     (r"glass partition system",              "7.2.01", "Glass partition"),
-    (r"high pressure (?:decorative )?laminate|\bhpl\b|thin laminate|compact panel",
+    (r"high pressure (?:decorative )?laminate|\bhpl\b|thin laminate|"
+     r"compact panel|compact laminate",
                                              "6.5.01", "High pressure laminate"),
     (r"gypboard",                            "1.3.13", "Gypsum plasterboard"),
     (r"external thermal insulation|\betics\b",
@@ -129,7 +130,12 @@ CATEGORY_RULES = [
     # --- metals, by product form ----------------------------------------------
     (r"prestressed concrete steel wire|\bpc wire\b|\bpc strand\b|lrpc",
                                             "4.1.01", "Prestressing steel strand"),
+    # Tata BlueScope's ZINCALUME and COLORBOND are metallic coated and
+    # pre-painted steel SHEET. Without them here the plain "steel" rule
+    # caught both and filed them as structural sections, which is the wrong
+    # product entirely and would have named them wrongly on every chart.
     (r"hot roll|hot-roll|sheet coil|plate mill|magnelis|nexalume|nexium|"
+     r"zincalume|colorbond|"
      r"satin silver|metallic coated sheet",
                                             "4.1.04", "Steel sheet"),
     (r"wire rod|welded pipe|\bcra\b",       "4.1.03", "Steel long product"),
@@ -296,6 +302,18 @@ MASS_BANDS = {
     # authority that the 66.2 record is wrong, which is a separate question.
     "4.1.05": (0.32, 132.4),   # cast iron items, from 28 records 0.64-66.2
     "6.6.07": (2.04, 40.2),    # technical textiles, from 4 records 4.07-20.08
+    # High pressure laminate. The leaf held NO records, so there was nothing
+    # in the catalogue to derive from. This band instead rests on three
+    # declarations from three UNRELATED makers - Luxotica 1.04, Century 1.49,
+    # Samrat 1.70 - which is a different kind of evidence from deriving a
+    # band off one record and then checking that same record against it.
+    #
+    # What it cannot do, and this is the limit of the method: three makers
+    # agreeing cannot catch an error they all share, such as a product
+    # category rule that tells every one of them to draw the same wrong
+    # background figure. It catches a misplaced decimal point and a tonne
+    # read as a kilogram. It is not a quality judgement.
+    "6.5.01": (0.52, 3.40),    # HPL, from 3 makers 1.04-1.70
     # 2026-11-04. The four records already in this leaf run 3.55-4.26, which
     # halved would put the floor at 1.78 and refuse a carbon-steel screw at
     # 1.71 - a correct figure. Those four are evidently at the top of the
@@ -343,6 +361,19 @@ AREA_BANDS = {
     # maximum of the EPDs already in that leaf and unit, so it catches an
     # error of magnitude without judging quality. The record count is given
     # so a band resting on thin evidence is visible as such.
+    # High pressure laminate declared by area, 2026-11-05. Per square metre a
+    # laminate scales almost linearly with thickness, so the band has to span
+    # the thicknesses the market sells. The evidence is seven published
+    # declarations: Merino 1mm at 0.518, Rushil thin 3.12 and compact 4.76,
+    # and four read from PDFs - Greenlam 0.8mm at 1.19, Stylam 0.7mm at 1.46,
+    # Greenlam 6mm at 10.1 and Crown 6mm at 21.0. Those last four are held
+    # out of the catalogue for a different reason (their A1-A3 nets off a
+    # large biogenic credit), but the figures themselves are sound and they
+    # are what tells us what a 6 mm board weighs in carbon.
+    #
+    # A band spanning 0.7mm to 6mm is necessarily loose. It will not notice a
+    # thin laminate priced like a thick one.
+    "6.5.01": (0.26, 42.0),    # HPL by area, from 7 declarations 0.518-21.0
     "7.6.02": (42.9, 1122.0),  # aluminium door, from 23 records 85.9-560.9
     "7.6.03": (9.9, 396.0),    # wooden door, from 20 records 19.8-197.8
     "2.4.04": (1.2, 78.0),     # PIR panel, from 31 records 2.45-39.1
